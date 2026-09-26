@@ -217,3 +217,62 @@ def test_sync_optouts_command_reports_results(tmp_path: Path) -> None:
     assert "redacted_messages=0" in out
     assert "retracted_claims=0" in out
     assert exited == [True]
+
+
+class FlushCountingIO(io.StringIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.flushes_at: list[int] = []
+
+    def flush(self) -> None:
+        self.flushes_at.append(self.getvalue().count("\n"))
+        super().flush()
+
+
+def test_sync_optouts_streams_flushed_opening_line(tmp_path: Path) -> None:
+    from infovore.source.fake import FakeDiscordSource
+
+    fake_source = FakeDiscordSource(role_members={9: {"no-archive": [11]}})
+
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        yield fake_source
+
+    out = FlushCountingIO()
+    err = io.StringIO()
+    code = main(
+        ["sync-optouts"],
+        environ=environment(tmp_path),
+        dotenv_path=None,
+        stdout=out,
+        stderr=err,
+        source_factory=factory,
+    )
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "opening discord source..."
+    assert out.flushes_at[0] == 1
+
+
+def test_sync_optouts_writes_opening_line_before_connecting_to_source(tmp_path: Path) -> None:
+    from infovore.source.fake import FakeDiscordSource
+
+    fake_source = FakeDiscordSource(role_members={9: {"no-archive": [11]}})
+    out = io.StringIO()
+    seen_before_connect: list[bool] = []
+
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        seen_before_connect.append("opening discord source..." in out.getvalue())
+        yield fake_source
+
+    code = main(
+        ["sync-optouts"],
+        environ=environment(tmp_path),
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        source_factory=factory,
+    )
+    assert code == ExitCode.OK
+    assert seen_before_connect == [True]

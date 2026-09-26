@@ -20,7 +20,14 @@ from infovore.extract.fake import MarkerExtractor, MarkerProbe
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.protocol import ErrorKind, LLMBackend, LLMResult
 from infovore.llm.registry import Registry, default_registry
-from infovore.run import RunCommand, install_stop_handlers, remove_stop_handlers, run_forever
+from infovore.run import (
+    CycleStepStarted,
+    RunCommand,
+    install_stop_handlers,
+    remove_stop_handlers,
+    run_forever,
+    run_once,
+)
 from infovore.source.fake import FakeDiscordSource
 from infovore.source.protocol import (
     DiscordSource,
@@ -355,6 +362,45 @@ async def test_stop_during_interval_wait_returns_promptly(tmp_path: Path) -> Non
     assert report.cycles_failed == 0
 
 
+async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
+    promote_prompt_version(conn, PROMPT_VERSION, NOW)
+    settings = make_settings(tmp_path)
+    source = FakeDiscordSource()
+    events: list[CycleStepStarted] = []
+
+    report = await run_once(
+        conn,
+        source,
+        MarkerExtractor(),
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        settings,
+        progress=events.append,
+    )
+
+    assert report.cycles_completed == 1
+    assert events == [
+        CycleStepStarted(step="sync-optouts"),
+        CycleStepStarted(step="chunk"),
+        CycleStepStarted(step="extract"),
+        CycleStepStarted(step="probe"),
+    ]
+
+
+async def test_run_once_progress_defaults_to_noop(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    settings = make_settings(tmp_path)
+    source = FakeDiscordSource()
+
+    report = await run_once(
+        conn, source, MarkerExtractor(), MarkerProbe(), FixedClock(NOW), RecordingSleeper(), settings
+    )
+    assert report.cycles_completed == 1
+
+
 async def test_install_stop_handlers_sets_stop_on_sigterm_and_sigint() -> None:
     stop = asyncio.Event()
     signals = install_stop_handlers(stop)
@@ -499,3 +545,62 @@ async def test_run_command_continuous_mode_stops_on_signal_and_closes_source(
     assert code == ExitCode.OK
     assert exited == [True]
     assert "cycles_failed=0" in stdout.getvalue()
+
+
+class FlushCountingIO(io.StringIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.flushes_at: list[int] = []
+
+    def flush(self) -> None:
+        self.flushes_at.append(self.getvalue().count("\n"))
+        super().flush()
+
+
+def test_run_command_once_flag_streams_flushed_progress_lines(tmp_path: Path) -> None:
+    fake_source = FakeDiscordSource()
+
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        yield fake_source
+
+    out = FlushCountingIO()
+    err = io.StringIO()
+    code = main(
+        ["run", "--once"],
+        environ=environment(tmp_path),
+        dotenv_path=None,
+        stdout=out,
+        stderr=err,
+        source_factory=factory,
+    )
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "opening discord source..."
+    assert lines[1] == "cycle: sync-optouts"
+    assert lines[2] == "cycle: chunk"
+    assert lines[3] == "cycle: extract"
+    assert lines[4] == "cycle: probe"
+    assert out.flushes_at[:5] == [1, 2, 3, 4, 5]
+
+
+def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: Path) -> None:
+    fake_source = FakeDiscordSource()
+    out = io.StringIO()
+    seen_before_connect: list[bool] = []
+
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        seen_before_connect.append("opening discord source..." in out.getvalue())
+        yield fake_source
+
+    code = main(
+        ["run", "--once"],
+        environ=environment(tmp_path),
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        source_factory=factory,
+    )
+    assert code == ExitCode.OK
+    assert seen_before_connect == [True]
