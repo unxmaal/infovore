@@ -129,7 +129,7 @@ def test_prompt_version_is_v1() -> None:
 
 
 def test_prompt_sha256_matches_system_prompt() -> None:
-    assert PROMPT_SHA256 == hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()
+    assert hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest() == PROMPT_SHA256
 
 
 def test_render_prompt_uses_system_prompt_and_version() -> None:
@@ -186,7 +186,7 @@ def test_render_prompt_includes_reactions_and_attachments() -> None:
         ),
     )
     rendered = render_prompt(a_request(reactions=reactions, attachments=attachments))
-    assert "\U0001f44d×3" in rendered.prompt
+    assert "\U0001f44d\u00d73" in rendered.prompt
     assert "photo.png" in rendered.prompt
 
 
@@ -253,5 +253,25 @@ def test_render_prompt_snapshot() -> None:
     rendered = render_prompt(request)
     assert rendered.system == SYSTEM_PROMPT
     assert rendered.version == "v1"
-    assert rendered.prompt == "SNAPSHOT_PLACEHOLDER"
+    assert rendered.prompt == (
+        "CHANNEL: hardware\n"
+        "\n"
+        "PERMALINK: https://discord.com/channels/100/10/1\n"
+        "\n"
+        "CONTEXT (do not cite):\n"
+        "[50] alice @ 2026-01-01T00:00:00+00:00:\n"
+        "earlier context\n"
+        "\n"
+        "EXCHANGE:\n"
+        "[1] alice @ 2026-01-01T00:00:00+00:00:\n"
+        "What PROM does an Octane2 need?\n"
+        "Reactions: \U0001f44d\u00d72\n"
+        "Attachments: jumpers.png\n"
+        "\n"
+        "[2] bob @ 2026-01-01T00:00:00+00:00:\n"
+        "6.5 works fine.\n"
+        "\n"
+        "RELATED EXISTING CLAIMS:\n"
+        "[claim:5] (fact) IP30: Octane2 needs PROM 6.5"
+    )
     assert rendered.token_estimate == math.ceil(len(rendered.system + rendered.prompt) / 4)
