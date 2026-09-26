@@ -8,7 +8,7 @@ from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
 from infovore.rows import ClaimKind, ClaimRow, ExtractionRunRow, Novelty, RunMode, RunOutcome
 
-_WORD_RE = re.compile(r"[A-Za-z0-9_]+")
+_WORD_RE = re.compile(r"[\w\-./]+")
 
 
 class PromptVersionConflictError(Exception):
@@ -270,10 +270,17 @@ def retract_claims_with_all_sources_opted_out(conn: sqlite3.Connection, at: date
 
 
 def _match_expression(text: str) -> str | None:
-    tokens = _WORD_RE.findall(text)
+    seen: set[str] = set()
+    tokens: list[str] = []
+    for raw in _WORD_RE.findall(text):
+        token = raw.rstrip("-./")
+        if not token or token in seen:
+            continue
+        seen.add(token)
+        tokens.append(token)
     if not tokens:
         return None
-    return " OR ".join(f'"{token}"' for token in tokens)
+    return " OR ".join('"' + token.replace('"', '""') + '"' for token in tokens)
 
 
 def related_claims(conn: sqlite3.Connection, text: str, limit: int) -> list[ClaimRow]:
