@@ -226,11 +226,18 @@ def test_build_review_two_versions_diff_added_dropped_changed_verdict_shift(
         subject="Octane2 fan",
         source_message_ids=(1001, 1002),
     )
+    claim_d = a_claim(
+        exchange_id,
+        "uses a PS/2 keyboard",
+        subject="Octane2 keyboard",
+        source_message_ids=(1001,),
+    )
     run1_id, run1_claim_ids = seed_run(
-        conn, exchange_id, "v1", [claim_a, claim_b], input_tokens=100, output_tokens=50
+        conn, exchange_id, "v1", [claim_a, claim_b, claim_d], input_tokens=100, output_tokens=50
     )
     set_novelty(conn, run1_claim_ids[0], Novelty.UNKNOWN, "probe-model", "I don't know", NOW)
     set_novelty(conn, run1_claim_ids[1], Novelty.KNOWN, "probe-model", "yes it does", NOW)
+    set_novelty(conn, run1_claim_ids[2], Novelty.UNKNOWN, "probe-model", "I don't know", NOW)
 
     claim_a2 = a_claim(
         exchange_id,
@@ -241,10 +248,17 @@ def test_build_review_two_versions_diff_added_dropped_changed_verdict_shift(
     claim_c = a_claim(
         exchange_id, "ip30prom 6.5 required", subject="Octane2 PROM", source_message_ids=(1002,)
     )
+    claim_d2 = a_claim(
+        exchange_id,
+        "uses a PS/2 keyboard",
+        subject="Octane2 keyboard",
+        source_message_ids=(1001,),
+    )
     run2_id, run2_claim_ids = seed_run(
-        conn, exchange_id, "v2", [claim_a2, claim_c], input_tokens=120, output_tokens=60
+        conn, exchange_id, "v2", [claim_a2, claim_c, claim_d2], input_tokens=120, output_tokens=60
     )
     set_novelty(conn, run2_claim_ids[0], Novelty.CONTRADICTS, "probe-model", "no it's fine", NOW)
+    set_novelty(conn, run2_claim_ids[2], Novelty.KNOWN, "probe-model", "yes, confirmed", NOW)
 
     review = build_review(conn, [run1_id, run2_id])
 
@@ -258,25 +272,39 @@ def test_build_review_two_versions_diff_added_dropped_changed_verdict_shift(
     before, after = diff.changed[0]
     assert before.statement == "needs a jumper on pin 3"
     assert after.statement == "needs a jumper on pin 3 to enable fast SCSI"
-    assert len(diff.verdict_shifts) == 1
-    shift = diff.verdict_shifts[0]
-    assert shift.before is Novelty.UNKNOWN
-    assert shift.after is Novelty.CONTRADICTS
+    assert len(diff.verdict_shifts) == 2
+    keyboard_shift = next(
+        shift for shift in diff.verdict_shifts if shift.subject == "Octane2 keyboard"
+    )
+    assert keyboard_shift.before is Novelty.UNKNOWN
+    assert keyboard_shift.after is Novelty.KNOWN
+    octane_shift = next(shift for shift in diff.verdict_shifts if shift.subject == "Octane2")
+    assert octane_shift.before is Novelty.UNKNOWN
+    assert octane_shift.after is Novelty.CONTRADICTS
 
     v1_summary = review.summaries["v1"]
-    assert v1_summary.claims == 2
-    assert v1_summary.known_share == 0.5
-    assert v1_summary.verdict_distribution == {Novelty.UNKNOWN: 1, Novelty.KNOWN: 1}
+    assert v1_summary.claims == 3
+    assert v1_summary.known_share == pytest.approx(1 / 3)
+    assert v1_summary.verdict_distribution == {
+        Novelty.UNKNOWN: 2,
+        Novelty.KNOWN: 1,
+    }
     assert v1_summary.input_tokens_per_100_exchanges == pytest.approx(10000.0)
     assert v1_summary.output_tokens_per_100_exchanges == pytest.approx(5000.0)
 
     v2_summary = review.summaries["v2"]
-    assert v2_summary.claims == 2
-    assert v2_summary.known_share == 0.0
+    assert v2_summary.claims == 3
+    assert v2_summary.known_share == pytest.approx(1 / 3)
     assert v2_summary.verdict_distribution == {
         Novelty.CONTRADICTS: 1,
         Novelty.UNPROBED: 1,
+        Novelty.KNOWN: 1,
     }
+
+    output = render_review_html(review)
+    assert "Changed" in output
+    assert "Verdict shifts" in output
+    assert "Octane2 keyboard" in output
 
 
 def test_build_review_spans_multiple_exchanges_and_partial_version_coverage(
@@ -386,9 +414,7 @@ def test_render_review_html_is_a_single_document_with_no_external_scripts_or_sty
 
 def test_render_review_html_renders_two_version_diff_sections(tmp_path: Path) -> None:
     conn = db(tmp_path)
-    exchange_id = seed_exchange(
-        conn, 1, "h1", [a_message(1001), a_message(1002, author="bob")]
-    )
+    exchange_id = seed_exchange(conn, 1, "h1", [a_message(1001), a_message(1002, author="bob")])
     claim_a = a_claim(exchange_id, "needs a jumper on pin 3", source_message_ids=(1001,))
     claim_b = a_claim(
         exchange_id, "fan spins at 3000rpm", subject="Octane2 fan", source_message_ids=(1002,)
@@ -413,3 +439,29 @@ def test_review_dataclass_is_frozen() -> None:
     review = Review(versions=(), exchanges=(), summaries={})
     with pytest.raises(AttributeError):
         review.versions = ("x",)  # type: ignore[misc]
+
+
+def test_build_review_rejects_empty_run_ids(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    with pytest.raises(ValueError, match="run_ids must not be empty"):
+        build_review(conn, [])
+
+
+def test_render_review_html_shows_no_differences_when_versions_agree(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1, "h1", [a_message(1001)])
+    claim = a_claim(exchange_id, "needs a jumper on pin 3")
+    run1_id, _ = seed_run(conn, exchange_id, "v1", [claim])
+    claim_again = a_claim(exchange_id, "needs a jumper on pin 3")
+    run2_id, _ = seed_run(conn, exchange_id, "v2", [claim_again])
+
+    review = build_review(conn, [run1_id, run2_id])
+    diff = review.exchanges[0].diff
+    assert diff is not None
+    assert diff.added == ()
+    assert diff.dropped == ()
+    assert diff.changed == ()
+    assert diff.verdict_shifts == ()
+
+    output = render_review_html(review)
+    assert "no differences" in output

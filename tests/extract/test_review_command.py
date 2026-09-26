@@ -25,31 +25,33 @@ def environment(tmp_path: Path, **overrides: str) -> dict[str, str]:
         "INFOVORE_GUILD_ID": "9",
         "INFOVORE_CHANNEL_IDS": "1",
         "INFOVORE_DB_PATH": str(tmp_path / "infovore.db"),
+        "INFOVORE_SCRATCH_DIR": str(tmp_path / "scratch"),
     }
     env.update(overrides)
     return env
 
 
-def seed_run(db_path: str, prompt_version: str = "v1") -> int:
+def seed_run(db_path: str, prompt_version: str = "v1", message_id: int = 1) -> int:
     conn = open_database(db_path)
     migrate(conn)
     conn.execute(
         "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
         " created_at, content, ingested_at, raw_json)"
-        " VALUES (1, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'x',"
-        " '2026-01-01T00:00:00+00:00', '{}')"
+        " VALUES (?, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'x',"
+        " '2026-01-01T00:00:00+00:00', '{}')",
+        (message_id,),
     )
     exchange = ExchangeRow(
         id=None,
         channel_id=1,
         thread_id=None,
-        first_message_id=1,
-        last_message_id=1,
+        first_message_id=message_id,
+        last_message_id=message_id,
         started_at=NOW,
         ended_at=NOW,
         message_count=1,
         grouping_rule=GroupingRule.QUIET_GAP,
-        content_hash="h1",
+        content_hash=f"h{message_id}",
         parent_exchange_id=None,
         extraction_status=ExtractionStatus.DONE,
         retry_count=0,
@@ -57,7 +59,7 @@ def seed_run(db_path: str, prompt_version: str = "v1") -> int:
     )
     from infovore.db.exchanges import insert_exchange
 
-    exchange_id = insert_exchange(conn, exchange, [1])
+    exchange_id = insert_exchange(conn, exchange, [message_id])
     register_prompt_version(conn, prompt_version, f"sha-{prompt_version}", NOW)
     recorded = record_run(
         conn,
@@ -82,9 +84,9 @@ def seed_run(db_path: str, prompt_version: str = "v1") -> int:
                 kind=ClaimKind.FACT,
                 confidence=0.9,
                 probe_question="what about it?",
-                permalink="https://discord.com/channels/9/1/1",
+                permalink=f"https://discord.com/channels/9/1/{message_id}",
                 supersedes_claim_id=None,
-                source_message_ids=(1,),
+                source_message_ids=(message_id,),
             )
         ],
     )
@@ -143,8 +145,8 @@ def test_review_command_unknown_run_id_exits_config(tmp_path: Path) -> None:
 
 def test_review_command_accepts_multiple_run_ids(tmp_path: Path) -> None:
     env = environment(tmp_path)
-    run1 = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v1")
-    run2 = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v2")
+    run1 = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v1", message_id=1)
+    run2 = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v2", message_id=2)
 
     code, out, _ = run(["review", "--run-ids", str(run1), str(run2)], env)
 

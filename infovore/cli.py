@@ -192,6 +192,7 @@ def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
     from infovore.extract.command import ExtractCommand
     from infovore.extract.novelty import ProbeCommand
+    from infovore.extract.review import PromoteCommand, ReviewCommand
 
     return [
         StatusCommand(),
@@ -201,6 +202,8 @@ def builtin_commands() -> list[Command]:
         SnapshotCommand(),
         ProbeCommand(),
         ExtractCommand(),
+        ReviewCommand(),
+        PromoteCommand(),
     ]
 
 
