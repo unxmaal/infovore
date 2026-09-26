@@ -7,7 +7,7 @@ import pytest
 
 from infovore.config import StageSettings
 from infovore.llm.claude_cli import ClaudeCliBackend, ClaudeCliFactory, SubprocessRunner
-from infovore.llm.process import ProcessResult
+from infovore.llm.process import ProcessResult, ProcessRunner
 from infovore.llm.protocol import Capabilities, ErrorKind, LLMRequest
 
 
@@ -15,14 +15,27 @@ from infovore.llm.protocol import Capabilities, ErrorKind, LLMRequest
 class FakeProcessRunner:
     result: ProcessResult
     calls: list[tuple[list[str], str, str, float]] = field(default_factory=list)
+    cwd_states: list[tuple[bool, list[Path]]] = field(default_factory=list)
 
     async def run(self, argv: Sequence[str], stdin: str, cwd: str, timeout: float) -> ProcessResult:
         self.calls.append((list(argv), stdin, cwd, timeout))
+        path = Path(cwd)
+        entries = list(path.iterdir()) if path.is_dir() else []
+        self.cwd_states.append((path.is_dir(), entries))
         return self.result
 
 
+@dataclass
+class ExplodingRunner:
+    calls: list[str] = field(default_factory=list)
+
+    async def run(self, argv: Sequence[str], stdin: str, cwd: str, timeout: float) -> ProcessResult:
+        self.calls.append(cwd)
+        raise RuntimeError("runner exploded")
+
+
 def make_backend(
-    runner: FakeProcessRunner,
+    runner: ProcessRunner,
     scratch_dir: Path,
     model: str = "sonnet",
     binary: str = "claude",
@@ -100,8 +113,9 @@ async def test_cwd_is_a_fresh_empty_directory_under_scratch_dir(tmp_path: Path) 
     await backend.complete(text_request())
     cwd = Path(runner.calls[0][2])
     assert cwd.is_relative_to(scratch)
-    assert cwd.is_dir()
-    assert list(cwd.iterdir()) == []
+    was_dir, entries = runner.cwd_states[0]
+    assert was_dir
+    assert entries == []
 
 
 async def test_cwd_is_unique_per_call(tmp_path: Path) -> None:
@@ -111,6 +125,50 @@ async def test_cwd_is_unique_per_call(tmp_path: Path) -> None:
     await backend.complete(text_request())
     first_cwd, second_cwd = runner.calls[0][2], runner.calls[1][2]
     assert first_cwd != second_cwd
+
+
+async def test_cwd_is_removed_after_a_successful_call(tmp_path: Path) -> None:
+    scratch = tmp_path / "scratch"
+    runner = FakeProcessRunner(ok(result="hi"))
+    backend = make_backend(runner, scratch)
+    await backend.complete(text_request())
+    cwd = Path(runner.calls[0][2])
+    assert not cwd.exists()
+    assert list(scratch.iterdir()) == []
+
+
+async def test_scratch_dir_has_no_leftover_entries_after_an_error_result(tmp_path: Path) -> None:
+    scratch = tmp_path / "scratch"
+    runner = FakeProcessRunner(ok(is_error=True, result="boom"))
+    backend = make_backend(runner, scratch)
+    result = await backend.complete(text_request())
+    assert result.error is not None
+    cwd = Path(runner.calls[0][2])
+    assert not cwd.exists()
+    assert list(scratch.iterdir()) == []
+
+
+async def test_scratch_dir_has_no_leftover_entries_after_a_runner_exception(
+    tmp_path: Path,
+) -> None:
+    scratch = tmp_path / "scratch"
+    runner = ExplodingRunner()
+    backend = make_backend(runner, scratch)
+    with pytest.raises(RuntimeError, match="runner exploded"):
+        await backend.complete(text_request())
+    cwd = Path(runner.calls[0])
+    assert not cwd.exists()
+    assert list(scratch.iterdir()) == []
+
+
+async def test_scratch_dir_is_created_when_missing(tmp_path: Path) -> None:
+    scratch = tmp_path / "does" / "not" / "exist" / "yet"
+    runner = FakeProcessRunner(ok(result="hi"))
+    backend = make_backend(runner, scratch)
+    assert not scratch.exists()
+    await backend.complete(text_request())
+    assert scratch.is_dir()
+    assert list(scratch.iterdir()) == []
 
 
 async def test_text_success_reads_result_field(tmp_path: Path) -> None:
