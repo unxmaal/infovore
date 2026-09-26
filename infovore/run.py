@@ -4,7 +4,7 @@ import contextlib
 import logging
 import signal
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -36,6 +36,18 @@ class RunReport:
     cycles_failed: int = 0
 
 
+@dataclass(frozen=True)
+class CycleStepStarted:
+    step: str
+
+
+RunProgress = Callable[[CycleStepStarted], None]
+
+
+def _ignore_run_progress(event: CycleStepStarted) -> None:
+    return None
+
+
 async def _consume_events(
     conn: sqlite3.Connection,
     source: DiscordSource,
@@ -65,7 +77,9 @@ async def _run_cycle(
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
+    progress: RunProgress = _ignore_run_progress,
 ) -> None:
+    progress(CycleStepStarted(step="sync-optouts"))
     await sync_opt_outs(
         conn,
         source,
@@ -73,6 +87,7 @@ async def _run_cycle(
         settings.opt_out_role_name,
         clock,
     )
+    progress(CycleStepStarted(step="chunk"))
     group_pending(
         conn,
         clock,
@@ -81,6 +96,7 @@ async def _run_cycle(
         include_bots=settings.include_bot_messages,
     )
     extract_stage = settings.stages[Stage.EXTRACT]
+    progress(CycleStepStarted(step="extract"))
     try:
         await run_extraction(
             conn,
@@ -99,6 +115,7 @@ async def _run_cycle(
             error.version,
         )
     probe_stage = settings.stages[Stage.PROBE]
+    progress(CycleStepStarted(step="probe"))
     await run_probe(
         conn,
         probe,
@@ -133,10 +150,11 @@ async def _cycle_until_stop(
     interval_seconds: float,
     stop: asyncio.Event,
     report: RunReport,
+    progress: RunProgress = _ignore_run_progress,
 ) -> None:
     while not stop.is_set():
         try:
-            await _run_cycle(conn, source, extractor, probe, clock, sleeper, settings)
+            await _run_cycle(conn, source, extractor, probe, clock, sleeper, settings, progress)
         except Exception:
             logger.exception("periodic cycle failed")
             report.cycles_failed += 1
@@ -155,10 +173,11 @@ async def run_once(
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
+    progress: RunProgress = _ignore_run_progress,
 ) -> RunReport:
     report = RunReport()
     try:
-        await _run_cycle(conn, source, extractor, probe, clock, sleeper, settings)
+        await _run_cycle(conn, source, extractor, probe, clock, sleeper, settings, progress)
     except Exception:
         logger.exception("periodic cycle failed")
         report.cycles_failed += 1
@@ -178,6 +197,7 @@ async def run_forever(
     *,
     interval_seconds: float,
     stop: asyncio.Event,
+    progress: RunProgress = _ignore_run_progress,
 ) -> RunReport:
     report = RunReport()
     consume_task = asyncio.ensure_future(
@@ -187,7 +207,17 @@ async def run_forever(
     )
     cycle_task = asyncio.ensure_future(
         _cycle_until_stop(
-            conn, source, extractor, probe, clock, sleeper, settings, interval_seconds, stop, report
+            conn,
+            source,
+            extractor,
+            probe,
+            clock,
+            sleeper,
+            settings,
+            interval_seconds,
+            stop,
+            report,
+            progress,
         )
     )
     await stop.wait()
@@ -222,7 +252,7 @@ class RunCommand:
         parser.add_argument("--once", action="store_true")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
-        from infovore.cli import ExitCode, stage_backend
+        from infovore.cli import ExitCode, _say, stage_backend
 
         extract_backend = await stage_backend(context, Stage.EXTRACT)
         probe_backend = await stage_backend(context, Stage.PROBE)
@@ -230,9 +260,13 @@ class RunCommand:
         extractor = LLMClaimExtractor(extract_backend)
         probe = LLMNoveltyProbe(probe_backend, judge_backend)
 
+        def report_progress(event: CycleStepStarted) -> None:
+            _say(context.stdout, f"cycle: {event.step}")
+
         stop = asyncio.Event()
         signals = install_stop_handlers(stop)
         try:
+            _say(context.stdout, f"opening {context.settings.source.value} source...")
             async with context.source_factory(context.settings) as source:
                 if args.once:
                     report = await run_once(
@@ -243,6 +277,7 @@ class RunCommand:
                         context.clock,
                         context.sleeper,
                         context.settings,
+                        progress=report_progress,
                     )
                 else:
                     report = await run_forever(
@@ -255,6 +290,7 @@ class RunCommand:
                         context.settings,
                         interval_seconds=args.interval,
                         stop=stop,
+                        progress=report_progress,
                     )
         finally:
             remove_stop_handlers(signals)

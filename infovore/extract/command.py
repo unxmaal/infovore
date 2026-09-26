@@ -3,11 +3,43 @@ from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError, Stage
 from infovore.extract.llm_extractor import LLMClaimExtractor
-from infovore.extract.runner import PromptNotPromotedError, run_extraction, select_trial_sample
+from infovore.extract.runner import (
+    ExchangeClaimed,
+    ExchangeFailed,
+    ExchangeSkipped,
+    ExtractionEvent,
+    ExtractionStarted,
+    PromptNotPromotedError,
+    run_extraction,
+    select_trial_sample,
+)
 from infovore.rows import RunMode
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
+
+
+def _counter(index: int, total: int | None) -> str:
+    return f"{index}/{total}" if total is not None else f"{index} done"
+
+
+def _describe_extraction_event(event: ExtractionEvent) -> str:
+    match event:
+        case ExtractionStarted(mode=RunMode.TRIAL, total=total):
+            return f"extract: trial mode, {total} exchanges queued"
+        case ExtractionStarted():
+            return "extract: live mode, draining queued exchanges"
+        case ExchangeClaimed(exchange_id=exchange_id, claims=claims, index=index, total=total):
+            return f"exchange {exchange_id}: {claims} claims ({_counter(index, total)})"
+        case ExchangeSkipped(exchange_id=exchange_id, index=index, total=total):
+            return f"exchange {exchange_id}: skipped ({_counter(index, total)})"
+        case ExchangeFailed(exchange_id=exchange_id, kind=kind, index=index, total=total):
+            return f"exchange {exchange_id}: failed: {kind} ({_counter(index, total)})"
+        case _:
+            return (
+                f"exchange {event.exchange_id}: paused {event.retry_after}s (usage limit)"
+                f" ({_counter(event.index, event.total)})"
+            )
 
 
 class ExtractCommand:
@@ -21,7 +53,7 @@ class ExtractCommand:
         parser.add_argument("--exchange-id", type=int, action="append", default=[])
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
-        from infovore.cli import ExitCode, stage_backend
+        from infovore.cli import ExitCode, _say, stage_backend
 
         mode = RunMode(args.mode)
         if mode is RunMode.TRIAL and args.sample is None and not args.exchange_id:
@@ -51,6 +83,7 @@ class ExtractCommand:
                 max_retries=context.settings.max_retries,
                 concurrency=stage_settings.concurrency,
                 exchange_ids=exchange_ids,
+                progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
             )
         except PromptNotPromotedError as error:
             raise ConfigError(

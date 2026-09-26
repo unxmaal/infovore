@@ -14,7 +14,15 @@ from infovore.db.claims import (
 from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.extract.fake import MarkerProbe
-from infovore.extract.novelty import ProbeReport, run_probe
+from infovore.extract.novelty import (
+    ClaimFailed,
+    ClaimPaused,
+    ClaimProbed,
+    ProbeEvent,
+    ProbeReport,
+    ProbeStarted,
+    run_probe,
+)
 from infovore.extract.protocol import Failure, FailureKind, ProbeOutcome
 from infovore.rows import ClaimKind, ClaimRow, ExtractionRunRow, Novelty, RunMode, RunOutcome
 from infovore.timing import FixedClock, RecordingSleeper
@@ -237,6 +245,25 @@ async def test_run_probe_usage_limit_defaults_retry_after(tmp_path: Path) -> Non
     assert sleeper.slept == [300.0]
 
 
+async def test_run_probe_zero_retry_after_sleeps_zero_not_default(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    claim_id = seed_claim(conn, "widget ZZ [known]")
+    probe = ScriptedProbe(
+        {
+            claim_id: [
+                ProbeOutcome(None, None, None, Failure(FailureKind.USAGE_LIMIT, "limited", 0.0)),
+                ProbeOutcome(Novelty.KNOWN, "fake-model", "answer", None),
+            ]
+        }
+    )
+    sleeper = RecordingSleeper()
+
+    await run_probe(
+        conn, probe, FixedClock(NOW), sleeper, probe_model=None, limit=10, concurrency=2
+    )
+    assert sleeper.slept == [0.0]
+
+
 async def test_run_probe_idempotent_per_model_second_run_probes_nothing(tmp_path: Path) -> None:
     conn = setup_db(tmp_path)
     seed_claim(conn, "widget H [known]")
@@ -415,6 +442,118 @@ async def test_run_probe_failed_claims_do_not_starve_later_candidates(tmp_path: 
     )
     assert second.failed == 0
     assert second.probed == 0
+
+
+async def test_run_probe_progress_events_start_then_per_claim(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    known_id = seed_claim(conn, "widget A [known]", exchange_id=1, message_id=1)
+    events: list[ProbeEvent] = []
+
+    report = await run_probe(
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=1,
+        progress=events.append,
+    )
+
+    assert report.probed == 1
+    assert events == [
+        ProbeStarted(candidates=1),
+        ClaimProbed(claim_id=known_id, verdict="known"),
+    ]
+
+
+async def test_run_probe_progress_events_failed_claim(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    fail_id = seed_claim(conn, "widget E [probe-fail]")
+    events: list[ProbeEvent] = []
+
+    await run_probe(
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=1,
+        progress=events.append,
+    )
+
+    assert events == [
+        ProbeStarted(candidates=1),
+        ClaimFailed(claim_id=fail_id),
+    ]
+
+
+async def test_run_probe_progress_events_paused_then_probed(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    claim_id = seed_claim(conn, "widget F [known]")
+    probe = ScriptedProbe(
+        {
+            claim_id: [
+                ProbeOutcome(None, None, None, Failure(FailureKind.USAGE_LIMIT, "limited", 12.0)),
+                ProbeOutcome(Novelty.KNOWN, "fake-model", "answer", None),
+            ]
+        }
+    )
+    events: list[ProbeEvent] = []
+
+    await run_probe(
+        conn,
+        probe,
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=1,
+        progress=events.append,
+    )
+
+    assert events == [
+        ProbeStarted(candidates=1),
+        ClaimPaused(claim_id=claim_id),
+        ClaimProbed(claim_id=claim_id, verdict="known"),
+    ]
+
+
+async def test_run_probe_progress_events_empty_queue_reports_zero_candidates(
+    tmp_path: Path,
+) -> None:
+    conn = setup_db(tmp_path)
+    events: list[ProbeEvent] = []
+
+    await run_probe(
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=1,
+        progress=events.append,
+    )
+
+    assert events == [ProbeStarted(candidates=0)]
+
+
+async def test_run_probe_progress_defaults_to_noop(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    seed_claim(conn, "widget Z [known]")
+
+    report = await run_probe(
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=2,
+    )
+    assert report.probed == 1
 
 
 async def test_run_probe_retry_failed_reattempts_parked_claims(tmp_path: Path) -> None:

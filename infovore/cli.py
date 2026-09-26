@@ -117,6 +117,7 @@ class SyncOptOutsCommand:
         return None
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
+        _say(context.stdout, f"opening {context.settings.source.value} source...")
         async with context.source_factory(context.settings) as source:
             guild_id = resolve_guild_id(context.settings, source)
             report = await sync_opt_outs(
@@ -215,6 +216,11 @@ class BackfillCommand:
 
 
 async def stage_backend(context: AppContext, stage: Stage) -> LLMBackend:
+    stage_settings = context.settings.stages[stage]
+    _say(
+        context.stdout,
+        f"checking {stage.value} backend ({stage_settings.backend} / {stage_settings.model})...",
+    )
     backend = context.registry.build_stage(context.settings, stage)
     health = await context.registry.health_check({stage: backend})
     problem = health[stage]

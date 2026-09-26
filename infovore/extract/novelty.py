@@ -1,11 +1,11 @@
 import argparse
 import asyncio
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from infovore.cli import ExitCode, stage_backend
+from infovore.cli import ExitCode, _say, stage_backend
 from infovore.config import Stage
 from infovore.db.claims import (
     claims_for_runs_needing_probe,
@@ -31,6 +31,35 @@ class ProbeReport:
     by_verdict: dict[Novelty, int] = field(default_factory=dict)
     failed: int = 0
     pauses: int = 0
+
+
+@dataclass(frozen=True)
+class ProbeStarted:
+    candidates: int
+
+
+@dataclass(frozen=True)
+class ClaimProbed:
+    claim_id: int
+    verdict: str
+
+
+@dataclass(frozen=True)
+class ClaimFailed:
+    claim_id: int
+
+
+@dataclass(frozen=True)
+class ClaimPaused:
+    claim_id: int
+
+
+ProbeEvent = ProbeStarted | ClaimProbed | ClaimFailed | ClaimPaused
+ProbeProgress = Callable[[ProbeEvent], None]
+
+
+def _ignore_probe_progress(event: ProbeEvent) -> None:
+    return None
 
 
 def _fetch_candidates(
@@ -60,6 +89,7 @@ async def run_probe(
     concurrency: int,
     run_ids: Sequence[int] | None = None,
     retry_failed: bool = False,
+    progress: ProbeProgress = _ignore_probe_progress,
 ) -> ProbeReport:
     probed = 0
     failed = 0
@@ -84,24 +114,36 @@ async def run_probe(
                     )
                     probed += 1
                     by_verdict[outcome.verdict] = by_verdict.get(outcome.verdict, 0) + 1
+                    progress(ClaimProbed(claim_id=claim_id, verdict=outcome.verdict.value))
                     return
                 failure = outcome.failure
                 assert failure is not None
                 if failure.kind is FailureKind.USAGE_LIMIT:
                     pauses += 1
-                    await sleeper.sleep(failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_SECONDS)
+                    progress(ClaimPaused(claim_id=claim_id))
+                    retry_after = (
+                        DEFAULT_USAGE_LIMIT_RETRY_SECONDS
+                        if failure.retry_after is None
+                        else failure.retry_after
+                    )
+                    await sleeper.sleep(retry_after)
                     continue
                 set_probe_error(conn, claim_id, failure.message)
                 failed += 1
                 gave_up.add(claim_id)
+                progress(ClaimFailed(claim_id=claim_id))
                 return
 
+    started = False
     while True:
         candidates = [
             claim
             for claim in _fetch_candidates(conn, probe_model, limit, run_ids, retry_failed)
             if claim.id not in gave_up
         ]
+        if not started:
+            progress(ProbeStarted(candidates=len(candidates)))
+            started = True
         if not candidates:
             break
         await asyncio.gather(*(handle(claim) for claim in candidates))
@@ -111,6 +153,18 @@ async def run_probe(
 
 def _format_by_verdict(by_verdict: dict[Novelty, int]) -> str:
     return " ".join(f"{verdict.value}={count}" for verdict, count in by_verdict.items()) or "none"
+
+
+def _describe_probe_event(event: ProbeEvent) -> str:
+    match event:
+        case ProbeStarted(candidates=candidates):
+            return f"probe: {candidates} candidates"
+        case ClaimProbed(claim_id=claim_id, verdict=verdict):
+            return f"claim {claim_id}: {verdict}"
+        case ClaimFailed(claim_id=claim_id):
+            return f"claim {claim_id}: failed"
+        case _:
+            return f"claim {event.claim_id}: paused"
 
 
 class ProbeCommand:
@@ -141,6 +195,7 @@ class ProbeCommand:
             concurrency=concurrency,
             run_ids=run_ids,
             retry_failed=args.retry_failed,
+            progress=lambda event: _say(context.stdout, _describe_probe_event(event)),
         )
         context.stdout.write(
             f"probed: {report.probed}\n"

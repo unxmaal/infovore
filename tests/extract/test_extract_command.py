@@ -9,7 +9,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.fake import FakeBackend
-from infovore.llm.protocol import ErrorKind, LLMBackend, LLMResult
+from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import Registry
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
 
@@ -197,3 +197,221 @@ def test_extract_health_check_failure_exits_backend(tmp_path: Path) -> None:
 
     assert code == ExitCode.BACKEND
     assert "not logged in" in err
+
+
+class FlushCountingIO(io.StringIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.flushes_at: list[int] = []
+
+    def flush(self) -> None:
+        self.flushes_at.append(self.getvalue().count("\n"))
+        super().flush()
+
+
+def test_extract_live_mode_streams_flushed_progress_lines(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = registry_with(success_results())
+    out = FlushCountingIO()
+    err = io.StringIO()
+    code = main(
+        ["extract"], environ=env, dotenv_path=None, stdout=out, stderr=err, registry=registry
+    )
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == "exchange 1: 1 claims (1 done)"
+    assert out.flushes_at[:3] == [1, 2, 3]
+
+
+def test_extract_trial_mode_streams_known_total_counter(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    exchange_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    registry = registry_with(success_results())
+
+    code, out, _ = run(
+        ["extract", "--mode", "trial", "--exchange-id", str(exchange_id)], env, registry
+    )
+
+    assert code == ExitCode.OK
+    lines = out.splitlines()
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: trial mode, 1 exchanges queued"
+    assert lines[2] == f"exchange {exchange_id}: 1 claims (1/1)"
+
+
+def test_extract_streams_skipped_progress_line_for_opted_out_exchange(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    migrate(conn)
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (99, '2026-01-01T00:00:00+00:00')")
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (1, 1, 9, 99, 'bob', '2026-01-01T00:00:00+00:00', 'FACT: X :: y',"
+        " '2026-01-01T00:00:00+00:00', '{}')"
+    )
+    exchange_id = insert_exchange(
+        conn,
+        ExchangeRow(
+            id=None,
+            channel_id=1,
+            thread_id=None,
+            first_message_id=1,
+            last_message_id=1,
+            started_at=NOW,
+            ended_at=NOW,
+            message_count=1,
+            grouping_rule=GroupingRule.QUIET_GAP,
+            content_hash="hash-skip",
+            parent_exchange_id=None,
+            extraction_status=ExtractionStatus.PENDING,
+            retry_count=0,
+            last_error=None,
+        ),
+        [1],
+    )
+    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
+    promote_prompt_version(conn, PROMPT_VERSION, NOW)
+    conn.close()
+    registry = registry_with(success_results())
+
+    code, out, _ = run(["extract"], env, registry)
+
+    assert code == ExitCode.OK
+    lines = out.splitlines()
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == f"exchange {exchange_id}: skipped (1 done)"
+
+
+def test_extract_streams_failed_progress_line(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_MAX_RETRIES"] = "1"
+    exchange_id = seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = registry_with([HEALTH_OK, LLMResult.failed(ErrorKind.FATAL, "boom", None)])
+
+    code, out, _ = run(["extract"], env, registry)
+
+    assert code == ExitCode.FAILURE
+    lines = out.splitlines()
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == f"exchange {exchange_id}: failed: fatal (1 done)"
+
+
+def test_extract_streams_paused_then_claimed_progress_lines(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    exchange_id = seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    calls = {"extract": 0}
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if request.system == "health check":
+            return HEALTH_OK
+        calls["extract"] += 1
+        if calls["extract"] == 1:
+            return LLMResult.failed(ErrorKind.USAGE_LIMIT, "slow down", 0.01)
+        return LLMResult.ok_structured(VALID_EXTRACTION_OUT, "scripted-model")
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: StageSettings) -> list[str]:
+            return []
+
+        def build(self, settings: StageSettings) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    code, out, _ = run(["extract"], env, registry)
+
+    assert code == ExitCode.OK
+    lines = out.splitlines()
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == f"exchange {exchange_id}: paused 0.01s (usage limit) (0 done)"
+    assert lines[3] == f"exchange {exchange_id}: 1 claims (1 done)"
+
+
+def test_extract_prints_checking_backend_line_before_health_check(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    seen_before_health_check: list[bool] = []
+    checked = {"done": False}
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if not checked["done"]:
+            seen_before_health_check.append(
+                "checking extract backend (scripted / sonnet)..." in out.getvalue()
+            )
+            checked["done"] = True
+        return HEALTH_OK
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: StageSettings) -> list[str]:
+            return []
+
+        def build(self, settings: StageSettings) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    main(
+        ["extract"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert seen_before_health_check == [True]
+
+
+def test_extract_start_line_is_written_before_backend_processes_any_exchange(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    seen_first_line_early: list[bool] = []
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if request.system == "health check":
+            return HEALTH_OK
+        seen_first_line_early.append(
+            "extract: live mode, draining queued exchanges" in out.getvalue()
+        )
+        return LLMResult.ok_structured(VALID_EXTRACTION_OUT, "scripted-model")
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: StageSettings) -> list[str]:
+            return []
+
+        def build(self, settings: StageSettings) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    code = main(
+        ["extract"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert code == ExitCode.OK
+    assert seen_first_line_early == [True]
