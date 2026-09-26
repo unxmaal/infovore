@@ -11,6 +11,7 @@ from infovore.llm.claude_cli import ClaudeCliBackend
 from infovore.llm.fake import FakeBackend
 from infovore.llm.process import ProcessResult
 from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
+from tests.llm.test_openai_compat import OpenAICompatHarness
 
 
 class BackendHarness(Protocol):
@@ -79,7 +80,7 @@ class ClaudeCliHarness:
         )
 
 
-HARNESSES: list[BackendHarness] = [FakeHarness(), ClaudeCliHarness()]
+HARNESSES: list[BackendHarness] = [FakeHarness(), ClaudeCliHarness(), OpenAICompatHarness()]
 
 SCHEMA: Mapping[str, object] = {
     "type": "object",
