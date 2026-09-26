@@ -77,6 +77,39 @@ A group matching none of these is a new, unparented exchange. Precedence matters
 
 ## Extraction prompt
 
+`infovore.extract.prompt` assembles a versioned prompt from an `infovore.extract.protocol.ExtractionRequest` (built by `infovore.extract.request.build_request` from an exchange). `PROMPT_VERSION` (currently `v1`) identifies the exact system prompt below, whose sha256 is `PROMPT_SHA256`; `prompt_version` is written to every `extraction_runs` row so a change to the wording is a new version, never a silent edit. `render_prompt(request)` returns a `RenderedPrompt(system, prompt, version, token_estimate)`; `token_estimate` is `ceil(len(system + prompt) / 4)`.
+
+The system prompt, verbatim:
+
+```
+You are reading an archived exchange from a hobbyist SGI/IRIX community.
+
+Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, IRIX quirks and workarounds, repair procedures, compatibility facts, and sources for software and manuals. Generic computing knowledge is not wanted.
+
+Extract generously. A later closed-book novelty probe is the filter, not you: your job is to notice everything specific and supported by the messages, not to decide whether it is already widely known.
+
+Each claim must be specific and supported by the messages. Each claim carries a probe_question that asks for the fact without revealing it, so the fact can be tested for later without leaking the answer.
+
+If a claim corrects one of the supplied related existing claims, cite that claim's id in supersedes. If the community corrects itself within this exchange, extract only the corrected version, never the original mistake.
+
+Chatter, opinions, and questions that are never answered yield zero claims.
+
+Every claim must cite the ids of the messages in this exchange that support it. Never cite a message from the CONTEXT section: those messages are read-only background from a prior exchange and cannot be cited.
+
+Reactions are provided as a weak signal of community agreement, not proof.
+
+Output ONLY a JSON object matching the given schema. No other text.
+```
+
+The user prompt (`RenderedPrompt.prompt`) lays out, in order:
+
+- `CHANNEL:` the channel name (falls back to the numeric channel id when the channel is unknown) and `PERMALINK:` the exchange's permalink, `https://discord.com/channels/{guild_id}/{channel_id}/{first_message_id}` (built by `infovore.extract.prompt.permalink`).
+- `CONTEXT (do not cite):`, present only when the exchange has a `parent_exchange_id` — the last `context_size` messages of the parent exchange, read-only and never citable.
+- `EXCHANGE:` — every message of the exchange itself, each rendered as `[id] author @ ISO-8601 timestamp:` followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
+- `RELATED EXISTING CLAIMS:` — up to `related_limit` claims from `claims_fts` matching the exchange's own message contents, each as `[claim:<id>] (<kind>) <subject>: <statement>`, or the literal `none` when there are no matches.
+
+Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message id is kept so citations and ordering stay consistent. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
+
 ## Privacy and opt-out
 
 A Discord role (`INFOVORE_OPT_OUT_ROLE`, default `no-archive`) lets a guild member opt their messages out of extraction. `infovore sync-optouts` fetches the role's current members via `DiscordSource.role_member_ids` and reconciles them against the `opt_outs` table (`infovore.privacy.optout.sync_opt_outs`): a member holding the role who is not yet in `opt_outs` is added with `since` set to now; a member in `opt_outs` who no longer holds the role is removed. Removing a user from `opt_outs` only stops future redaction — **opting back in never restores previously redacted history**, since redaction is destructive (the original content is overwritten, not merely hidden).
