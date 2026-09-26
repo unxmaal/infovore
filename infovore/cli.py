@@ -23,7 +23,15 @@ from infovore.config import (
 from infovore.db.connection import migrate, open_database
 from infovore.db.snapshot import snapshot as snapshot_db
 from infovore.db.status import collect_status
-from infovore.ingest.backfill import BackfillReport, backfill
+from infovore.ingest.backfill import (
+    BackfillEvent,
+    BackfillReport,
+    ChannelFinished,
+    ChannelsFound,
+    ChannelStarted,
+    PageSaved,
+    backfill,
+)
 from infovore.llm.protocol import LLMBackend
 from infovore.llm.registry import Registry, default_registry
 from infovore.privacy.optout import sync_opt_outs
@@ -143,6 +151,31 @@ async def _open_export_source(settings: Settings) -> AsyncIterator[DiscordSource
     yield ExportDiscordSource(settings.export_dir)
 
 
+def _say(stdout: TextIO, line: str) -> None:
+    stdout.write(line + "\n")
+    stdout.flush()
+
+
+def _describe_backfill_event(event: BackfillEvent) -> str:
+    match event:
+        case ChannelsFound(total=total, selected=selected):
+            return f"found {total} channels ({selected} selected)"
+        case ChannelStarted(channel_id=channel_id, name=name, resume_after=None):
+            return f"channel {channel_id} {name}: start"
+        case ChannelStarted(channel_id=channel_id, name=name, resume_after=resume_after):
+            return f"channel {channel_id} {name}: start (resuming after message {resume_after})"
+        case PageSaved():
+            return (
+                f"channel {event.channel_id}: page +{event.inserted} new,"
+                f" {event.updated} updated, {event.unchanged} unchanged"
+                f" ({event.messages_total} messages so far)"
+            )
+        case ChannelFinished(channel_id=channel_id, report=report):
+            return f"channel {channel_id}: done ({report.pages} pages, {report.inserted} new)"
+        case _:
+            return f"channel {event.channel_id}: failed: {event.reason}"
+
+
 def _write_backfill_report(stdout: TextIO, report: BackfillReport) -> None:
     for channel_id in sorted(report.channels):
         channel_report = report.channels[channel_id]
@@ -163,6 +196,7 @@ class BackfillCommand:
         parser.add_argument("--page-size", type=int, default=100)
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
+        _say(context.stdout, f"opening {context.settings.source.value} source...")
         async with context.source_factory(context.settings) as source:
             guild_id = resolve_guild_id(context.settings, source)
             report = await backfill(
@@ -174,6 +208,7 @@ class BackfillCommand:
                 context.sleeper,
                 context.settings.include_bot_messages,
                 page_size=args.page_size,
+                progress=lambda event: _say(context.stdout, _describe_backfill_event(event)),
             )
         _write_backfill_report(context.stdout, report)
         return ExitCode.FAILURE if report.failed else ExitCode.OK

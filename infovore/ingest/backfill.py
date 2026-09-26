@@ -1,5 +1,5 @@
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -49,6 +49,48 @@ class BackfillReport:
     failed: list[FailedChannel] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class ChannelsFound:
+    total: int
+    selected: int
+
+
+@dataclass(frozen=True)
+class ChannelStarted:
+    channel_id: int
+    name: str
+    resume_after: int | None
+
+
+@dataclass(frozen=True)
+class PageSaved:
+    channel_id: int
+    inserted: int
+    updated: int
+    unchanged: int
+    messages_total: int
+
+
+@dataclass(frozen=True)
+class ChannelFinished:
+    channel_id: int
+    report: ChannelReport
+
+
+@dataclass(frozen=True)
+class ChannelFailed:
+    channel_id: int
+    reason: str
+
+
+BackfillEvent = ChannelsFound | ChannelStarted | PageSaved | ChannelFinished | ChannelFailed
+Progress = Callable[[BackfillEvent], None]
+
+
+def _ignore_progress(event: BackfillEvent) -> None:
+    return None
+
+
 def _select_channels(
     channels: Sequence[SourceChannel], channel_ids: Sequence[int]
 ) -> list[SourceChannel]:
@@ -68,7 +110,9 @@ def _commit_page(
     ingested_at: datetime,
     include_bots: bool,
     channel_report: ChannelReport,
+    progress: Progress,
 ) -> None:
+    before = (channel_report.inserted, channel_report.updated, channel_report.unchanged)
     with transaction(conn):
         opted_out = opted_out_user_ids(conn)
         for message in page:
@@ -90,6 +134,17 @@ def _commit_page(
                 _set_reaction_count(conn, reaction.message_id, reaction.emoji, reaction.count)
         _set_backfill_checkpoint(conn, channel_id, page[-1].id)
         channel_report.pages += 1
+    progress(
+        PageSaved(
+            channel_id=channel_id,
+            inserted=channel_report.inserted - before[0],
+            updated=channel_report.updated - before[1],
+            unchanged=channel_report.unchanged - before[2],
+            messages_total=channel_report.inserted
+            + channel_report.updated
+            + channel_report.unchanged,
+        )
+    )
 
 
 async def _walk_channel(
@@ -102,13 +157,16 @@ async def _walk_channel(
     page_size: int,
     max_attempts: int,
     channel_report: ChannelReport,
+    progress: Progress,
 ) -> str | None:
     attempts = 0
     while True:
         checkpoint = get_backfill_checkpoint(conn, channel_id)
         try:
             async for page in source.history(channel_id, checkpoint, page_size):
-                _commit_page(conn, channel_id, page, clock.now(), include_bots, channel_report)
+                _commit_page(
+                    conn, channel_id, page, clock.now(), include_bots, channel_report, progress
+                )
                 attempts = 0
             return None
         except SourceForbiddenError as error:
@@ -135,13 +193,23 @@ async def backfill(
     include_bots: bool,
     page_size: int = 100,
     max_attempts: int = 5,
+    progress: Progress = _ignore_progress,
 ) -> BackfillReport:
     report = BackfillReport()
     channels = await source.list_channels(guild_id)
-    for channel in _select_channels(channels, channel_ids):
+    selected = _select_channels(channels, channel_ids)
+    progress(ChannelsFound(total=len(channels), selected=len(selected)))
+    for channel in selected:
         upsert_channel(conn, normalize_channel(channel))
         channel_report = ChannelReport(channel_id=channel.id)
         report.channels[channel.id] = channel_report
+        progress(
+            ChannelStarted(
+                channel_id=channel.id,
+                name=channel.name,
+                resume_after=get_backfill_checkpoint(conn, channel.id),
+            )
+        )
         failure = await _walk_channel(
             conn,
             source,
@@ -152,7 +220,11 @@ async def backfill(
             page_size,
             max_attempts,
             channel_report,
+            progress,
         )
         if failure is not None:
             report.failed.append(FailedChannel(channel_id=channel.id, reason=failure))
+            progress(ChannelFailed(channel_id=channel.id, reason=failure))
+        else:
+            progress(ChannelFinished(channel_id=channel.id, report=channel_report))
     return report
