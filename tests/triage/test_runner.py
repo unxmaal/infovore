@@ -291,3 +291,62 @@ def test_triage_pending_empty_database(tmp_path: Path) -> None:
     assert report.channel_means == {}
     assert report.channel_priors == {}
     assert report.global_mean == 0.0
+
+
+def _insert_stub_model(conn: sqlite3.Connection) -> int:
+    cursor = conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES ('2026-01-01T00:00:00Z', 20, 4, ?)",
+        (json.dumps({"lore_documents": 10, "noise_documents": 10}),),
+    )
+    version = int(cursor.lastrowid or 0)
+    conn.execute(
+        "INSERT INTO triage_tokens (model_version, token, lore_count, noise_count)"
+        " VALUES (?, 'octane', 10, 0)",
+        (version,),
+    )
+    return version
+
+
+def test_triage_pending_leaves_p_lore_null_without_a_trained_model(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = zero_exchange(conn, 1, channel_id=1)
+    assert exchange.id is not None
+
+    triage_pending(conn)
+
+    row = conn.execute(
+        "SELECT p_lore, p_lore_model FROM exchanges WHERE id = ?", (exchange.id,)
+    ).fetchone()
+    assert (row["p_lore"], row["p_lore_model"]) == (None, None)
+
+
+def test_triage_pending_scores_p_lore_once_a_model_exists(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = full_exchange(conn, 1, channel_id=1)
+    assert exchange.id is not None
+    version = _insert_stub_model(conn)
+
+    triage_pending(conn)
+
+    row = conn.execute(
+        "SELECT p_lore, p_lore_model FROM exchanges WHERE id = ?", (exchange.id,)
+    ).fetchone()
+    assert row["p_lore"] is not None
+    assert row["p_lore_model"] == version
+
+
+def test_triage_pending_only_rescopes_exchanges_behind_the_model(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = full_exchange(conn, 1, channel_id=1)
+    assert exchange.id is not None
+    version = _insert_stub_model(conn)
+
+    triage_pending(conn)
+    conn.execute("UPDATE exchanges SET p_lore = -1.0 WHERE id = ?", (exchange.id,))
+
+    triage_pending(conn)
+
+    row = conn.execute("SELECT p_lore FROM exchanges WHERE id = ?", (exchange.id,)).fetchone()
+    assert row["p_lore"] == -1.0
+    assert version is not None
