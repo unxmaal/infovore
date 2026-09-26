@@ -396,7 +396,13 @@ async def test_run_once_progress_defaults_to_noop(tmp_path: Path) -> None:
     source = FakeDiscordSource()
 
     report = await run_once(
-        conn, source, MarkerExtractor(), MarkerProbe(), FixedClock(NOW), RecordingSleeper(), settings
+        conn,
+        source,
+        MarkerExtractor(),
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        settings,
     )
     assert report.cycles_completed == 1
 

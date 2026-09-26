@@ -108,21 +108,21 @@ def test_chunk_streams_flushed_progress_lines(tmp_path: Path) -> None:
 def test_chunk_start_line_is_written_before_persisting_any_exchange(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    import infovore.chunk.grouper as grouper_module
+    from infovore.db.exchanges import insert_exchange as real_insert_exchange
+    from infovore.rows import ExchangeRow
 
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
     out = io.StringIO()
     seen_first_line_early: list[bool] = []
-    real_insert_exchange = grouper_module.insert_exchange
 
-    def spy_insert_exchange(conn: object, exchange: object, message_ids: object) -> int:
+    def spy_insert_exchange(conn: object, exchange: "ExchangeRow", message_ids: list[int]) -> int:
         seen_first_line_early.append(
             "grouping: 1 channels with ungrouped messages" in out.getvalue()
         )
         return real_insert_exchange(conn, exchange, message_ids)  # type: ignore[arg-type]
 
-    monkeypatch.setattr(grouper_module, "insert_exchange", spy_insert_exchange)
+    monkeypatch.setattr("infovore.chunk.grouper.insert_exchange", spy_insert_exchange)
     code = main(
         ["chunk", "--now", "2026-01-01T03:10:00+00:00"],
         environ=env,

@@ -223,6 +223,70 @@ def test_probe_command_streams_flushed_progress_lines(tmp_path: Path) -> None:
     assert out.flushes_at[:2] == [1, 2]
 
 
+def test_probe_command_streams_failed_progress_line(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    claim_id, _ = seed(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    code = main(
+        ["probe"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry_with(ScriptedLLMFactory(fail_recall=True)),
+    )
+    assert code == ExitCode.FAILURE
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "probe: 1 candidates"
+    assert lines[1] == f"claim {claim_id}: failed"
+
+
+def test_probe_command_streams_paused_then_probed_progress_lines(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    claim_id, _ = seed(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    calls = {"recall": 0}
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if request.system == RECALL_SYSTEM_PROMPT:
+            calls["recall"] += 1
+            if calls["recall"] == 1:
+                return LLMResult.failed(ErrorKind.USAGE_LIMIT, "slow down", 0.01)
+            return LLMResult.ok_structured({"answer": "an answer"}, "claude-sonnet-5")
+        if request.system == JUDGE_SYSTEM_PROMPT:
+            return LLMResult.ok_structured(
+                {"verdict": "known", "reason": "because"}, "claude-haiku-5"
+            )
+        return LLMResult.ok_text("pong", "claude-sonnet-5")
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: object) -> list[str]:
+            return []
+
+        def build(self, settings: object) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    code = main(
+        ["probe"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "probe: 1 candidates"
+    assert lines[1] == f"claim {claim_id}: paused"
+    assert lines[2] == f"claim {claim_id}: known"
+
+
 def test_probe_start_line_is_written_before_backend_processes_any_claim(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
