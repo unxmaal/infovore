@@ -16,6 +16,7 @@ from infovore.db.exchanges import (
     exchange_message_ids,
     get_exchange,
     grouped_message_ids,
+    has_untriaged_claimable,
     insert_exchange,
     mark_stale_for_message,
     record_failure,
@@ -225,6 +226,98 @@ def test_claimable_exchanges_filters_status_and_retry_and_orders(
 
     limited = claimable_exchanges(conn, limit=1, max_retries=3)
     assert [row.id for row in limited] == [stale_id]
+
+
+def test_claimable_exchanges_filters_by_min_score(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1, 2, 3])
+    high_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="high"), [1])
+    low_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="low"), [2])
+    insert_exchange(conn, make_exchange(message_count=1, content_hash="untriaged"), [3])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.9, triage_version = 't1' WHERE id = ?", (high_id,)
+    )
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.1, triage_version = 't1' WHERE id = ?", (low_id,)
+    )
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3)
+
+    assert [row.id for row in result] == [high_id]
+
+
+def test_claimable_exchanges_without_min_score_ignores_triage(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="any"), [1])
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3)
+
+    assert [row.id for row in result] == [exchange_id]
+
+
+def test_has_untriaged_claimable_true_when_version_null(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    insert_exchange(conn, make_exchange(message_count=1, content_hash="untriaged"), [1])
+
+    assert has_untriaged_claimable(conn, "t1", max_retries=3) is True
+
+
+def test_has_untriaged_claimable_true_when_version_stale(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="old"), [1])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.5, triage_version = 't0' WHERE id = ?",
+        (exchange_id,),
+    )
+
+    assert has_untriaged_claimable(conn, "t1", max_retries=3) is True
+
+
+def test_has_untriaged_claimable_false_when_all_current(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="ok"), [1])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.5, triage_version = 't1' WHERE id = ?",
+        (exchange_id,),
+    )
+
+    assert has_untriaged_claimable(conn, "t1", max_retries=3) is False
+
+
+def test_has_untriaged_claimable_ignores_exhausted_retries(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="exhausted", retry_count=3), [1]
+    )
+
+    assert has_untriaged_claimable(conn, "t1", max_retries=3) is False
+
+
+def test_has_untriaged_claimable_ignores_done_exchanges(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    insert_exchange(
+        conn,
+        make_exchange(message_count=1, content_hash="done", status=ExtractionStatus.DONE),
+        [1],
+    )
+
+    assert has_untriaged_claimable(conn, "t1", max_retries=3) is False
+
+
+def test_exchange_row_carries_triage_columns(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="tr"), [1])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.42, triage_reasons = ?, triage_version = 't1'"
+        " WHERE id = ?",
+        ('[["code", 0.15]]', exchange_id),
+    )
+
+    fetched = get_exchange(conn, exchange_id)
+
+    assert fetched is not None
+    assert fetched.triage_score == 0.42
+    assert fetched.triage_reasons == '[["code", 0.15]]'
+    assert fetched.triage_version == "t1"
 
 
 def test_set_status_updates_status_and_last_error(conn: sqlite3.Connection) -> None:
