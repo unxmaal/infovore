@@ -91,9 +91,12 @@ Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, e
 uv run infovore status
 uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
+uv run infovore snapshot <dest> [--force]
 ```
 
 `chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill.
+
+`snapshot` writes a consistent copy of the product database to `<dest>` using the SQLite backup API (`infovore.db.snapshot.snapshot`), safe to run at any time, including while `backfill`/`chunk`/`extract`/`run` is mid-write against the same file: the backup only ever sees committed data, never a writer's in-flight transaction. It refuses to overwrite an existing `<dest>` unless `--force` is given, creates `<dest>`'s parent directories as needed, and writes through a temporary file in the same directory that it atomically renames into place, so a reader never observes a partially written snapshot. It reports the destination path, its size in bytes, and its `PRAGMA user_version` (the schema version). This is how the product database leaves a host — see "Deployment" below.
 
 Every subcommand loads configuration (environment, then `.env` in the working directory for anything not set), opens and migrates the database, and runs. `status` prints row counts, the exchange queue by status, claims by novelty, run outcomes, the last extraction and probe times, the live prompt version, and each stage's backend and model.
 
@@ -286,6 +289,107 @@ SELECT subject, statement, permalink FROM lore WHERE novelty = 'contradicts';
 `PRAGMA user_version` holds the schema version (the latest applied migration). Columns of `lore` are only ever added; renaming or removing one bumps the version and is called out here.
 
 ## Deployment
+
+Nothing host-specific lives in code. Every setting comes from the environment (or a `.env` file next to the working directory, see "Configuration"); `INFOVORE_DB_PATH` and `INFOVORE_SCRATCH_DIR` are the only paths involved and both must sit on durable, local (non-network) storage. `infovore` is one console-script package (`uv tool install .`) plus one container image built from the repo's `Dockerfile`; the recipes below are the same few commands on every host.
+
+### Laptop
+
+```
+uv tool install .
+infovore backfill && infovore chunk
+```
+
+or, from a checkout without installing anything system-wide, `uv run infovore <command>`.
+
+### macOS launchd (Mac Studio)
+
+A `launchd` user agent runs a periodic `backfill` + `chunk` pair. Save as `~/Library/LaunchAgents/com.example.infovore.plist` and load with `launchctl load ~/Library/LaunchAgents/com.example.infovore.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.example.infovore</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>infovore backfill && infovore chunk</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>WorkingDirectory</key><string>/Users/you/infovore</string>
+  <key>StartInterval</key><integer>1800</integer>
+  <key>StandardOutPath</key><string>/Users/you/infovore/infovore.log</string>
+  <key>StandardErrorPath</key><string>/Users/you/infovore/infovore.log</string>
+</dict>
+</plist>
+```
+
+`WorkingDirectory` is where `infovore` looks for `.env`; put every `INFOVORE_*` and backend credential variable there instead of in the plist so secrets never end up in `launchctl list` output.
+
+### Linux systemd
+
+A oneshot service plus a timer, run as the unprivileged user that owns the database:
+
+```ini
+# /etc/systemd/system/infovore.service
+[Unit]
+Description=infovore backfill + chunk
+
+[Service]
+Type=oneshot
+User=infovore
+EnvironmentFile=/etc/infovore/infovore.env
+WorkingDirectory=/var/lib/infovore
+ExecStart=/usr/local/bin/infovore backfill
+ExecStart=/usr/local/bin/infovore chunk
+```
+
+```ini
+# /etc/systemd/system/infovore.timer
+[Unit]
+Description=Run infovore periodically
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=30min
+
+[Install]
+WantedBy=timers.target
+```
+
+`sudo systemctl enable --now infovore.timer`.
+
+### Container on unknown hardware
+
+Build with `docker build -t infovore .` (add `--build-arg WITH_CLAUDE_CLI=1` to bundle the `claude` CLI for the `claude_cli` backend; it adds Node.js and `@anthropic-ai/claude-code`, needed only for that backend). The image runs as a non-root user (uid/gid 1000) and declares `/data` as the volume holding both `INFOVORE_DB_PATH` (`/data/infovore.db` by default) and `INFOVORE_SCRATCH_DIR` (`/data/scratch` by default). A bind-mounted host directory must be owned by uid 1000 (or `chown 1000:1000` it first); a named Docker volume is populated with the image's own ownership automatically and needs no extra step:
+
+```
+mkdir -p data && sudo chown 1000:1000 data
+docker run --rm -v "$PWD/data:/data" --env-file .env infovore backfill
+docker run --rm -v "$PWD/data:/data" --env-file .env infovore chunk
+```
+
+or, once the long-running `run` loop (PLAN.md Phase 6 task 1) lands, `docker run -d --name infovore --restart unless-stopped -v "$PWD/data:/data" --env-file .env infovore run` keeps the same container alive as the live ingest + periodic pipeline. `--env-file .env` carries every `INFOVORE_*` setting plus whichever backend credentials apply (see "Headless auth" below); none of it needs to be baked into the image.
+
+### AWS
+
+Run the same image on ECS (Fargate or EC2 launch type) or a plain EC2 instance, with `/data` backed by a **persistent block volume** — an EBS volume, attached to the task (Fargate's EBS volume attachment support) or mounted on the instance and bind-mounted into the container (EC2 launch type or plain `docker run`). **Never put `INFOVORE_DB_PATH` on EFS, FSx, or any other network filesystem**: SQLite's locking (and WAL mode especially) depends on POSIX byte-range advisory locks that network filesystems emulate poorly or not at all, leading to silent corruption or "database is locked" errors that never clear. Credentials and endpoint URLs come from the task definition's environment/secrets (Secrets Manager or SSM Parameter Store), the same `INFOVORE_*` and backend variables as everywhere else.
+
+### Headless auth per backend
+
+- **`claude_cli`**: run `claude setup-token` once, interactively, on any machine with a browser and a Claude Pro/Max/Team/Enterprise subscription; it prints a one-year OAuth token and does not store it anywhere. Set that token as `CLAUDE_CODE_OAUTH_TOKEN` in the environment (or `.env`/secrets store) of the host that runs `infovore`. Verified 2026-09-26 against Claude Code's current documentation at `https://code.claude.com/docs/en/authentication` ("Generate a long-lived token"): *"The command opens the same browser authorization flow as `/login`, and the token prints to the terminal after you approve access in the browser. It does not save the token anywhere; copy it and set it as the `CLAUDE_CODE_OAUTH_TOKEN` environment variable wherever you want to authenticate."* This is also confirmed by running `claude setup-token --help` locally (a Claude Code v2.1.283 install), though the CLI's own `--help` text does not name the variable — only the docs page does. `infovore`'s `claude_cli` backend never passes `--bare`, and the same docs page states bare mode does not read `CLAUDE_CODE_OAUTH_TOKEN`, so this token works with it.
+
+  Claude Code's own cloud-credential modes work the same way, as an alternative to a subscription token, also verified against the current docs on 2026-09-26:
+  - Amazon Bedrock (`https://code.claude.com/docs/en/amazon-bedrock`): set `CLAUDE_CODE_USE_BEDROCK=1`, AWS credentials by any of the AWS SDK's normal means (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN`, `AWS_PROFILE`, or `AWS_BEARER_TOKEN_BEDROCK`), and `AWS_REGION` (falls back to `AWS_DEFAULT_REGION`, then the active AWS profile's region, then `us-east-1`).
+  - Google Cloud's Agent Platform / Vertex AI (`https://code.claude.com/docs/en/google-vertex-ai`): set `CLAUDE_CODE_USE_VERTEX=1`, `ANTHROPIC_VERTEX_PROJECT_ID`, `CLOUD_ML_REGION`, and `GOOGLE_APPLICATION_CREDENTIALS` pointing at a service account key (or other Application Default Credentials).
+
+  These are Claude Code's own environment variables, not infovore's; set them alongside `INFOVORE_*` in the same environment/`.env` file/secrets store, since the `claude_cli` backend spawns `claude` inheriting its process environment untouched.
+- **`openai_compat`**: no interactive login — set `INFOVORE_<STAGE>_BASE_URL` and `INFOVORE_<STAGE>_API_KEY` (see "`openai_compat` backend" above for the full option list). Any OpenAI-compatible endpoint works: a hosted provider, or a local server (vLLM, llama.cpp, Ollama, LM Studio/MLX) reachable from the host running `infovore`.
 
 ## Development workflow
 

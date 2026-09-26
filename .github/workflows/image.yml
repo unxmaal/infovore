@@ -1,0 +1,57 @@
+name: image
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build amd64 image for the smoke test
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: infovore:smoke
+          cache-from: type=gha,scope=amd64
+          cache-to: type=gha,mode=max,scope=amd64
+      - name: Smoke test infovore status
+        run: |
+          docker run --rm --tmpfs /data:rw,uid=1000,gid=1000 \
+            -e INFOVORE_DISCORD_TOKEN=fake-smoke-token \
+            -e INFOVORE_GUILD_ID=1 \
+            -e INFOVORE_CHANNEL_IDS=1 \
+            -e INFOVORE_JUDGE_BACKEND=fake \
+            infovore:smoke status
+      - name: Build multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: false
+          tags: infovore:multiarch
+          cache-from: type=gha,scope=amd64
+          cache-to: type=gha,mode=max,scope=amd64
+  build-with-claude-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build amd64 image with WITH_CLAUDE_CLI=1
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          build-args: WITH_CLAUDE_CLI=1
+          load: true
+          tags: infovore:claude-smoke
+          cache-from: type=gha,scope=claude-cli
+          cache-to: type=gha,mode=max,scope=claude-cli
+      - name: Sanity check the claude CLI is installed
+        run: docker run --rm --entrypoint claude infovore:claude-smoke --version
