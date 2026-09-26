@@ -14,6 +14,7 @@ DEFAULT_INCLUDE_BOT_MESSAGES = False
 DEFAULT_SCRATCH_DIR = "scratch"
 DEFAULT_STAGE_CONCURRENCY = 2
 DEFAULT_STAGE_TIMEOUT_SECONDS = 60.0
+DEFAULT_TRIAGE_MIN_SCORE = 0.3
 
 STAGE_ENV_KEYS = ("BACKEND", "MODEL", "CONCURRENCY", "TIMEOUT")
 
@@ -65,6 +66,7 @@ class Settings:
     exchange_max_messages: int = DEFAULT_EXCHANGE_MAX_MESSAGES
     opt_out_role_name: str = DEFAULT_OPT_OUT_ROLE_NAME
     include_bot_messages: bool = DEFAULT_INCLUDE_BOT_MESSAGES
+    triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
 
 
 def _parse_int(raw: str) -> int | None:
@@ -126,6 +128,20 @@ def _optional_positive_float(
         return default
     if parsed <= 0:
         errors.append(f"{name} must be positive")
+        return default
+    return parsed
+
+
+def _optional_unit_float(raw: str | None, default: float, name: str, errors: list[str]) -> float:
+    if raw is None:
+        return default
+    try:
+        parsed = float(raw)
+    except ValueError:
+        errors.append(f"{name} must be a number")
+        return default
+    if not 0.0 <= parsed <= 1.0:
+        errors.append(f"{name} must be between 0 and 1")
         return default
     return parsed
 
@@ -267,6 +283,12 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         "INFOVORE_INCLUDE_BOT_MESSAGES",
         errors,
     )
+    triage_min_score = _optional_unit_float(
+        env.get("INFOVORE_TRIAGE_MIN_SCORE"),
+        DEFAULT_TRIAGE_MIN_SCORE,
+        "INFOVORE_TRIAGE_MIN_SCORE",
+        errors,
+    )
     stages = {stage: _parse_stage(env, stage, errors) for stage in Stage}
 
     if errors:
@@ -287,6 +309,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         exchange_max_messages=exchange_max_messages,
         opt_out_role_name=opt_out_role_name,
         include_bot_messages=include_bot_messages,
+        triage_min_score=triage_min_score,
     )
 
 
