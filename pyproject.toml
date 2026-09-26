@@ -2,7 +2,9 @@
 name = "infovore"
 version = "0.1.0"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+    "pydantic>=2.13.5",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -35,6 +37,7 @@ exclude_also = [
 strict = true
 files = ["infovore", "tests"]
 python_version = "3.12"
+plugins = ["pydantic.mypy"]
 
 [tool.ruff]
 line-length = 100
