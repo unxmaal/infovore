@@ -5,10 +5,12 @@ import pytest
 from infovore.config import (
     ConfigError,
     Settings,
+    SourceKind,
     Stage,
     StageSettings,
     load_settings,
     read_dotenv,
+    resolve_guild_id,
     settings_from_environment,
 )
 
@@ -304,3 +306,125 @@ def test_load_settings_never_leaks_secret_in_error_message() -> None:
     with pytest.raises(ConfigError) as excinfo:
         load_settings(env)
     assert "super-secret" not in str(excinfo.value)
+
+
+def test_load_settings_defaults_source_to_discord() -> None:
+    settings = load_settings(REQUIRED_ENV)
+    assert settings.source is SourceKind.DISCORD
+    assert settings.export_dir is None
+
+
+def test_load_settings_invalid_source_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_SOURCE": "carrier-pigeon"}
+    with pytest.raises(ConfigError, match="INFOVORE_SOURCE"):
+        load_settings(env)
+
+
+def test_load_settings_export_source_does_not_require_discord_token(tmp_path: Path) -> None:
+    env = {
+        "INFOVORE_SOURCE": "export",
+        "INFOVORE_EXPORT_DIR": str(tmp_path),
+        "INFOVORE_DB_PATH": "db.sqlite",
+    }
+    settings = load_settings(env)
+    assert settings.source is SourceKind.EXPORT
+    assert settings.discord_token == ""
+    assert settings.guild_id is None
+    assert settings.channel_ids == ()
+    assert settings.export_dir == tmp_path
+
+
+def test_load_settings_export_source_requires_export_dir() -> None:
+    env = {"INFOVORE_SOURCE": "export", "INFOVORE_DB_PATH": "db.sqlite"}
+    with pytest.raises(ConfigError, match="INFOVORE_EXPORT_DIR"):
+        load_settings(env)
+
+
+def test_load_settings_export_source_accepts_explicit_guild_and_channels(
+    tmp_path: Path,
+) -> None:
+    env = {
+        "INFOVORE_SOURCE": "export",
+        "INFOVORE_EXPORT_DIR": str(tmp_path),
+        "INFOVORE_DB_PATH": "db.sqlite",
+        "INFOVORE_GUILD_ID": "42",
+        "INFOVORE_CHANNEL_IDS": "1,2",
+    }
+    settings = load_settings(env)
+    assert settings.guild_id == 42
+    assert settings.channel_ids == (1, 2)
+
+
+def test_load_settings_export_source_bad_guild_id_reported(tmp_path: Path) -> None:
+    env = {
+        "INFOVORE_SOURCE": "export",
+        "INFOVORE_EXPORT_DIR": str(tmp_path),
+        "INFOVORE_DB_PATH": "db.sqlite",
+        "INFOVORE_GUILD_ID": "not-an-int",
+    }
+    with pytest.raises(ConfigError, match="INFOVORE_GUILD_ID"):
+        load_settings(env)
+
+
+def test_load_settings_export_source_whitespace_only_channel_ids_means_all(
+    tmp_path: Path,
+) -> None:
+    env = {
+        "INFOVORE_SOURCE": "export",
+        "INFOVORE_EXPORT_DIR": str(tmp_path),
+        "INFOVORE_DB_PATH": "db.sqlite",
+        "INFOVORE_CHANNEL_IDS": " , , ",
+    }
+    settings = load_settings(env)
+    assert settings.channel_ids == ()
+
+
+def test_load_settings_export_source_bad_channel_ids_reported(tmp_path: Path) -> None:
+    env = {
+        "INFOVORE_SOURCE": "export",
+        "INFOVORE_EXPORT_DIR": str(tmp_path),
+        "INFOVORE_DB_PATH": "db.sqlite",
+        "INFOVORE_CHANNEL_IDS": "1,nope",
+    }
+    with pytest.raises(ConfigError, match="INFOVORE_CHANNEL_IDS"):
+        load_settings(env)
+
+
+class _SourceWithGuildIds:
+    def __init__(self, ids: frozenset[int]) -> None:
+        self._ids = ids
+
+    def guild_ids(self) -> frozenset[int]:
+        return self._ids
+
+
+class _SourceWithoutGuildIds:
+    pass
+
+
+def test_resolve_guild_id_returns_configured_value_without_asking_source() -> None:
+    settings = make_settings(guild_id=7)
+    assert resolve_guild_id(settings, _SourceWithoutGuildIds()) == 7  # type: ignore[arg-type]
+
+
+def test_resolve_guild_id_infers_single_guild_from_source() -> None:
+    settings = make_settings(guild_id=None)
+    assert resolve_guild_id(settings, _SourceWithGuildIds(frozenset({5}))) == 5  # type: ignore[arg-type]
+
+
+def test_resolve_guild_id_raises_when_source_has_no_guild_ids_method() -> None:
+    settings = make_settings(guild_id=None)
+    with pytest.raises(ConfigError, match="INFOVORE_GUILD_ID"):
+        resolve_guild_id(settings, _SourceWithoutGuildIds())  # type: ignore[arg-type]
+
+
+def test_resolve_guild_id_raises_when_source_has_no_guilds() -> None:
+    settings = make_settings(guild_id=None)
+    with pytest.raises(ConfigError, match="INFOVORE_GUILD_ID"):
+        resolve_guild_id(settings, _SourceWithGuildIds(frozenset()))  # type: ignore[arg-type]
+
+
+def test_resolve_guild_id_raises_when_source_has_multiple_guilds() -> None:
+    settings = make_settings(guild_id=None)
+    with pytest.raises(ConfigError, match="INFOVORE_GUILD_ID"):
+        resolve_guild_id(settings, _SourceWithGuildIds(frozenset({1, 2})))  # type: ignore[arg-type]

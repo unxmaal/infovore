@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 
+from infovore.source.protocol import DiscordSource
+
 DEFAULT_QUIET_GAP_MINUTES = 30
 DEFAULT_BATCH_SIZE = 10
 DEFAULT_MAX_RETRIES = 3
@@ -20,6 +22,11 @@ class Stage(StrEnum):
     EXTRACT = "extract"
     PROBE = "probe"
     JUDGE = "judge"
+
+
+class SourceKind(StrEnum):
+    DISCORD = "discord"
+    EXPORT = "export"
 
 
 class ConfigError(Exception):
@@ -44,12 +51,14 @@ class StageSettings:
 
 @dataclass(frozen=True)
 class Settings:
-    discord_token: str = field(repr=False)
-    guild_id: int
-    channel_ids: tuple[int, ...]
     db_path: Path
     scratch_dir: Path
     stages: Mapping[Stage, StageSettings]
+    source: SourceKind = SourceKind.DISCORD
+    discord_token: str = field(default="", repr=False)
+    guild_id: int | None = None
+    channel_ids: tuple[int, ...] = ()
+    export_dir: Path | None = None
     quiet_gap_minutes: int = DEFAULT_QUIET_GAP_MINUTES
     batch_size: int = DEFAULT_BATCH_SIZE
     max_retries: int = DEFAULT_MAX_RETRIES
@@ -131,13 +140,16 @@ def _optional_bool(raw: str | None, default: bool, name: str, errors: list[str])
     return parsed
 
 
-def _require_channel_ids(raw: str | None, errors: list[str]) -> tuple[int, ...]:
-    text = _require(raw, "INFOVORE_CHANNEL_IDS", errors)
+def _parse_channel_ids(raw: str | None, errors: list[str], required: bool) -> tuple[int, ...]:
+    text = raw or ""
+    if required:
+        text = _require(raw, "INFOVORE_CHANNEL_IDS", errors)
     if not text:
         return ()
     parts = [part.strip() for part in text.split(",") if part.strip()]
     if not parts:
-        errors.append("INFOVORE_CHANNEL_IDS must not be empty")
+        if required:
+            errors.append("INFOVORE_CHANNEL_IDS must not be empty")
         return ()
     ids: list[int] = []
     bad = False
@@ -151,6 +163,22 @@ def _require_channel_ids(raw: str | None, errors: list[str]) -> tuple[int, ...]:
         errors.append("INFOVORE_CHANNEL_IDS must be a comma-separated list of positive integers")
         return ()
     return tuple(ids)
+
+
+def _optional_guild_id(raw: str | None, errors: list[str]) -> int | None:
+    if raw is None or not raw.strip():
+        return None
+    return _positive_int(raw, "INFOVORE_GUILD_ID", errors) or None
+
+
+def resolve_guild_id(settings: Settings, source: DiscordSource) -> int:
+    if settings.guild_id is not None:
+        return settings.guild_id
+    guild_ids = getattr(source, "guild_ids", None)
+    ids: frozenset[int] = guild_ids() if guild_ids is not None else frozenset()
+    if len(ids) == 1:
+        return next(iter(ids))
+    raise ConfigError("INFOVORE_GUILD_ID is required: it could not be inferred from the export")
 
 
 def _stage_options(env: Mapping[str, str], prefix: str) -> dict[str, str]:
@@ -188,12 +216,35 @@ def _parse_stage(env: Mapping[str, str], stage: Stage, errors: list[str]) -> Sta
     )
 
 
+def _parse_source_kind(raw: str | None, errors: list[str]) -> SourceKind:
+    text = raw or SourceKind.DISCORD.value
+    try:
+        return SourceKind(text)
+    except ValueError:
+        errors.append("INFOVORE_SOURCE must be 'discord' or 'export'")
+        return SourceKind.DISCORD
+
+
 def load_settings(env: Mapping[str, str]) -> Settings:
     errors: list[str] = []
 
-    discord_token = _require(env.get("INFOVORE_DISCORD_TOKEN"), "INFOVORE_DISCORD_TOKEN", errors)
-    guild_id = _require_positive_int(env.get("INFOVORE_GUILD_ID"), "INFOVORE_GUILD_ID", errors)
-    channel_ids = _require_channel_ids(env.get("INFOVORE_CHANNEL_IDS"), errors)
+    source_kind = _parse_source_kind(env.get("INFOVORE_SOURCE"), errors)
+    is_export = source_kind is SourceKind.EXPORT
+
+    export_dir: Path | None = None
+    if is_export:
+        discord_token = env.get("INFOVORE_DISCORD_TOKEN", "")
+        guild_id = _optional_guild_id(env.get("INFOVORE_GUILD_ID"), errors)
+        channel_ids = _parse_channel_ids(env.get("INFOVORE_CHANNEL_IDS"), errors, required=False)
+        export_dir_raw = _require(env.get("INFOVORE_EXPORT_DIR"), "INFOVORE_EXPORT_DIR", errors)
+        if export_dir_raw:
+            export_dir = Path(export_dir_raw)
+    else:
+        discord_token = _require(
+            env.get("INFOVORE_DISCORD_TOKEN"), "INFOVORE_DISCORD_TOKEN", errors
+        )
+        guild_id = _require_positive_int(env.get("INFOVORE_GUILD_ID"), "INFOVORE_GUILD_ID", errors)
+        channel_ids = _parse_channel_ids(env.get("INFOVORE_CHANNEL_IDS"), errors, required=True)
     db_path_raw = _require(env.get("INFOVORE_DB_PATH"), "INFOVORE_DB_PATH", errors)
     scratch_dir_raw = env.get("INFOVORE_SCRATCH_DIR", DEFAULT_SCRATCH_DIR)
     quiet_gap_minutes = _optional_positive_int(
@@ -227,12 +278,14 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         raise ConfigError("; ".join(errors))
 
     return Settings(
-        discord_token=discord_token,
-        guild_id=guild_id,
-        channel_ids=channel_ids,
         db_path=Path(db_path_raw),
         scratch_dir=Path(scratch_dir_raw),
         stages=stages,
+        source=source_kind,
+        discord_token=discord_token,
+        guild_id=guild_id,
+        channel_ids=channel_ids,
+        export_dir=export_dir,
         quiet_gap_minutes=quiet_gap_minutes,
         batch_size=batch_size,
         max_retries=max_retries,

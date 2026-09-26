@@ -51,13 +51,16 @@ class BackfillReport:
 def _select_channels(
     channels: Sequence[SourceChannel], channel_ids: Sequence[int]
 ) -> list[SourceChannel]:
-    allowlist = set(channel_ids)
-    selected = [
-        channel
-        for channel in channels
-        if channel.id in allowlist
-        or (channel.kind is ChannelKind.THREAD and channel.parent_id in allowlist)
-    ]
+    if not channel_ids:
+        selected = list(channels)
+    else:
+        allowlist = set(channel_ids)
+        selected = [
+            channel
+            for channel in channels
+            if channel.id in allowlist
+            or (channel.kind is ChannelKind.THREAD and channel.parent_id in allowlist)
+        ]
     selected.sort(key=lambda channel: channel.id)
     return selected
 
