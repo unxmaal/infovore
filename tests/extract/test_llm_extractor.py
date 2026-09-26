@@ -4,6 +4,8 @@ from datetime import UTC, datetime
 from infovore.extract.llm_extractor import (
     JUDGE_SYSTEM_PROMPT,
     RECALL_SYSTEM_PROMPT,
+    REPAIR_PREVIOUS_OUTPUT_HEADER,
+    REPAIR_VALIDATION_ERROR_HEADER,
     LLMClaimExtractor,
     LLMNoveltyProbe,
 )
@@ -195,10 +197,34 @@ async def test_extract_repair_fails_returns_invalid_output_failure() -> None:
     assert outcome.claims == ()
 
 
-async def test_extract_initial_call_transient_error() -> None:
-    backend = FakeBackend.scripted(
-        [LLMResult.failed(ErrorKind.TRANSIENT, "network blip", None)]
+async def test_extract_repair_quotes_previous_text_output() -> None:
+    bad = LLMResult.ok_text("not json at all", "m1")
+    good = LLMResult.ok_text(json.dumps(_extraction_payload()), "m2")
+    backend = FakeBackend.scripted([bad, good], capabilities=TEXT_ONLY_CAPABILITIES)
+    extractor = LLMClaimExtractor(backend)
+    outcome = await extractor.extract(a_request())
+    assert outcome.succeeded
+    repair_request = backend.requests[1]
+    assert "not json at all" in repair_request.prompt
+
+
+async def test_extract_repair_quotes_empty_previous_output_when_result_is_bare() -> None:
+    bad = LLMResult(text=None, structured=None, model="m1")
+    good = LLMResult.ok_structured(_extraction_payload(), "m2")
+    backend = FakeBackend.scripted([bad, good], capabilities=NATIVE_CAPABILITIES)
+    extractor = LLMClaimExtractor(backend)
+    outcome = await extractor.extract(a_request())
+    assert outcome.succeeded
+    repair_request = backend.requests[1]
+    start = repair_request.prompt.index(REPAIR_PREVIOUS_OUTPUT_HEADER) + len(
+        REPAIR_PREVIOUS_OUTPUT_HEADER
     )
+    end = repair_request.prompt.index(REPAIR_VALIDATION_ERROR_HEADER)
+    assert repair_request.prompt[start:end].strip() == ""
+
+
+async def test_extract_initial_call_transient_error() -> None:
+    backend = FakeBackend.scripted([LLMResult.failed(ErrorKind.TRANSIENT, "network blip", None)])
     extractor = LLMClaimExtractor(backend)
     outcome = await extractor.extract(a_request())
     assert not outcome.succeeded
@@ -218,9 +244,7 @@ async def test_extract_initial_call_fatal_error() -> None:
 
 
 async def test_extract_initial_call_usage_limit_error_carries_retry_after() -> None:
-    backend = FakeBackend.scripted(
-        [LLMResult.failed(ErrorKind.USAGE_LIMIT, "limit reached", 42.0)]
-    )
+    backend = FakeBackend.scripted([LLMResult.failed(ErrorKind.USAGE_LIMIT, "limit reached", 42.0)])
     extractor = LLMClaimExtractor(backend)
     outcome = await extractor.extract(a_request())
     assert not outcome.succeeded
