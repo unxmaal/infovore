@@ -1,6 +1,7 @@
 import hashlib
 import math
 from datetime import UTC, datetime
+from pathlib import Path
 
 from infovore.extract.prompt import (
     PROMPT_SHA256,
@@ -275,3 +276,8 @@ def test_render_prompt_snapshot() -> None:
         "[claim:5] (fact) IP30: Octane2 needs PROM 6.5"
     )
     assert rendered.token_estimate == math.ceil(len(rendered.system + rendered.prompt) / 4)
+
+
+def test_readme_contains_system_prompt_verbatim() -> None:
+    readme = Path(__file__).resolve().parents[2] / "README.md"
+    assert SYSTEM_PROMPT in readme.read_text()
