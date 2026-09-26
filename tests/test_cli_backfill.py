@@ -95,7 +95,6 @@ def test_backfill_reports_success_with_injected_source(tmp_path: Path) -> None:
         channels=[make_channel(1)], messages=[make_message(i) for i in range(1, 4)]
     )
 
-
     code, out, _ = run(["backfill"], environment(tmp_path), source_factory=serving(source))
     assert code == ExitCode.OK
     assert "channel 1" in out
@@ -107,7 +106,6 @@ def test_backfill_reports_failure_exit_code_when_a_channel_fails(tmp_path: Path)
     for _ in range(5):
         source.fail_next_history_call(SourceUnavailableError("down"), channel_id=1)
 
-
     code, out, _ = run(["backfill"], environment(tmp_path), source_factory=serving(source))
     assert code == ExitCode.FAILURE
     assert "channel 1 failed" in out
@@ -117,7 +115,6 @@ def test_backfill_page_size_option_is_respected(tmp_path: Path) -> None:
     source = FakeDiscordSource(
         channels=[make_channel(1)], messages=[make_message(i) for i in range(1, 4)]
     )
-
 
     code, out, _ = run(
         ["backfill", "--page-size", "1"], environment(tmp_path), source_factory=serving(source)

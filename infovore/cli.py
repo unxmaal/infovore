@@ -4,6 +4,7 @@ import os
 import sqlite3
 import sys
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
@@ -16,7 +17,7 @@ from infovore.db.status import collect_status
 from infovore.ingest.backfill import BackfillReport, backfill
 from infovore.llm.registry import Registry, default_registry
 from infovore.privacy.optout import sync_opt_outs
-from infovore.source.protocol import DiscordSource
+from infovore.source.protocol import DiscordSource, SourceUnavailableError
 from infovore.timing import AsyncioSleeper, Clock, Sleeper, SystemClock
 
 
@@ -31,6 +32,9 @@ class BackendUnavailableError(Exception):
     pass
 
 
+SourceFactory = Callable[[Settings], AbstractAsyncContextManager[DiscordSource]]
+
+
 @dataclass(frozen=True)
 class AppContext:
     settings: Settings
@@ -39,7 +43,7 @@ class AppContext:
     clock: Clock
     sleeper: Sleeper
     stdout: TextIO
-    source_factory: Callable[[Settings], DiscordSource]
+    source_factory: SourceFactory
 
 
 class Command(Protocol):
@@ -95,14 +99,14 @@ class SyncOptOutsCommand:
         return None
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
-        source = context.source_factory(context.settings)
-        report = await sync_opt_outs(
-            context.conn,
-            source,
-            context.settings.guild_id,
-            context.settings.opt_out_role_name,
-            context.clock,
-        )
+        async with context.source_factory(context.settings) as source:
+            report = await sync_opt_outs(
+                context.conn,
+                source,
+                context.settings.guild_id,
+                context.settings.opt_out_role_name,
+                context.clock,
+            )
         context.stdout.write(
             f"added={len(report.added)} removed={len(report.removed)}"
             f" redacted_messages={report.redacted_messages}"
@@ -111,8 +115,10 @@ class SyncOptOutsCommand:
         return ExitCode.OK
 
 
-def _default_source_factory(settings: Settings) -> DiscordSource:
-    raise BackendUnavailableError("discord source not configured")
+def default_source_factory(settings: Settings) -> AbstractAsyncContextManager[DiscordSource]:
+    from infovore.source.live import open_discord_source
+
+    return open_discord_source(settings.discord_token)
 
 
 def _write_backfill_report(stdout: TextIO, report: BackfillReport) -> None:
@@ -135,17 +141,17 @@ class BackfillCommand:
         parser.add_argument("--page-size", type=int, default=100)
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
-        source = context.source_factory(context.settings)
-        report = await backfill(
-            context.conn,
-            source,
-            context.settings.guild_id,
-            context.settings.channel_ids,
-            context.clock,
-            context.sleeper,
-            context.settings.include_bot_messages,
-            page_size=args.page_size,
-        )
+        async with context.source_factory(context.settings) as source:
+            report = await backfill(
+                context.conn,
+                source,
+                context.settings.guild_id,
+                context.settings.channel_ids,
+                context.clock,
+                context.sleeper,
+                context.settings.include_bot_messages,
+                page_size=args.page_size,
+            )
         _write_backfill_report(context.stdout, report)
         return ExitCode.FAILURE if report.failed else ExitCode.OK
 
@@ -187,7 +193,7 @@ def main(
     stdout: TextIO = sys.stdout,
     stderr: TextIO = sys.stderr,
     commands: Sequence[Command] | None = None,
-    source_factory: Callable[[Settings], DiscordSource] | None = None,
+    source_factory: SourceFactory | None = None,
 ) -> int:
     available = list(commands) if commands is not None else builtin_commands()
     try:
@@ -213,11 +219,11 @@ def main(
             SystemClock(),
             AsyncioSleeper(),
             stdout,
-            source_factory if source_factory is not None else _default_source_factory,
+            source_factory if source_factory is not None else default_source_factory,
         )
         command = next(command for command in available if command.name == args.command)
         return asyncio.run(command.run(context, args))
-    except BackendUnavailableError as error:
+    except (BackendUnavailableError, SourceUnavailableError) as error:
         stderr.write(f"backend unavailable: {error}\n")
         return ExitCode.BACKEND
     except Exception as error:

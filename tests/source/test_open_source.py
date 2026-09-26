@@ -1,4 +1,6 @@
 import asyncio
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 import pytest
 
@@ -26,7 +28,7 @@ class SessionClient:
         self.closed = True
 
 
-def starter_that_connects(client: SessionClient) -> "Starter":
+def starter_that_connects(client: SessionClient) -> Callable[[Any, str], Awaitable[None]]:
     async def start(_: object, token: str) -> None:
         client.started_with = token
         if client.becomes_ready:
@@ -34,9 +36,6 @@ def starter_that_connects(client: SessionClient) -> "Starter":
         await asyncio.Event().wait()
 
     return start
-
-
-Starter = object
 
 
 async def test_yields_a_discord_source_once_ready_and_closes_afterwards() -> None:
@@ -52,7 +51,7 @@ async def test_yields_a_discord_source_once_ready_and_closes_afterwards() -> Non
 
 async def test_not_ready_in_time_is_unavailable_and_closes() -> None:
     client = SessionClient(becomes_ready=False)
-    with pytest.raises(SourceUnavailableError, match="not ready within 0.05s"):
+    with pytest.raises(SourceUnavailableError, match=r"not ready within 0\.05s"):
         async with open_discord_source(
             "tok", 0.05, client_factory=lambda: client, starter=starter_that_connects(client)
         ):
@@ -117,3 +116,11 @@ async def test_a_starter_that_fails_after_ready_is_not_reraised_on_close() -> No
     ):
         await asyncio.sleep(0.01)
     assert client.closed
+
+
+def test_the_real_client_is_a_session_client_that_is_not_connected() -> None:
+    from infovore.source.live import _real_client
+
+    client = _real_client()
+    assert hasattr(client, "wait_until_ready")
+    assert hasattr(client, "close")
