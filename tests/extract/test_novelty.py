@@ -3,7 +3,7 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
-from infovore.db.claims import get_claim, record_run, register_prompt_version
+from infovore.db.claims import get_claim, record_run, register_prompt_version, set_novelty
 from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.extract.fake import MarkerProbe
@@ -257,21 +257,28 @@ async def test_run_probe_idempotent_per_model_second_run_probes_nothing(tmp_path
 async def test_run_probe_reprobes_on_probe_model_change(tmp_path: Path) -> None:
     conn = setup_db(tmp_path)
     claim_id = seed_claim(conn, "widget I [known]")
+    set_novelty(conn, claim_id, Novelty.KNOWN, "old-model", "old answer", NOW)
 
-    first = await run_probe(
+    unchanged = await run_probe(
+        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
+        probe_model="old-model", limit=10, concurrency=2,
+    )
+    assert unchanged.probed == 0
+
+    reprobed = await run_probe(
         conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
         probe_model="fake-probe", limit=10, concurrency=2,
     )
-    assert first.probed == 1
-
-    second = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model="fake-probe-v2", limit=10, concurrency=2,
-    )
-    assert second.probed == 1
+    assert reprobed.probed == 1
     claim = get_claim(conn, claim_id)
     assert claim is not None
     assert claim.probe_model == "fake-probe"
+
+    settled = await run_probe(
+        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
+        probe_model="fake-probe", limit=10, concurrency=2,
+    )
+    assert settled.probed == 0
 
 
 async def test_run_probe_run_ids_scopes_to_those_runs_claims(tmp_path: Path) -> None:
