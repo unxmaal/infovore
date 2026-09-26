@@ -11,10 +11,11 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Any, NoReturn, Protocol, TextIO
 
-from infovore.config import ConfigError, Settings, settings_from_environment
+from infovore.config import ConfigError, Settings, Stage, settings_from_environment
 from infovore.db.connection import migrate, open_database
 from infovore.db.status import collect_status
 from infovore.ingest.backfill import BackfillReport, backfill
+from infovore.llm.protocol import LLMBackend
 from infovore.llm.registry import Registry, default_registry
 from infovore.privacy.optout import sync_opt_outs
 from infovore.source.protocol import DiscordSource, SourceUnavailableError
@@ -156,6 +157,15 @@ class BackfillCommand:
         return ExitCode.FAILURE if report.failed else ExitCode.OK
 
 
+async def stage_backend(context: AppContext, stage: Stage) -> LLMBackend:
+    backend = context.registry.build_stage(context.settings, stage)
+    health = await context.registry.health_check({stage: backend})
+    problem = health[stage]
+    if problem is not None:
+        raise BackendUnavailableError(f"{stage.value}: {problem}")
+    return backend
+
+
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
 
@@ -194,6 +204,7 @@ def main(
     stderr: TextIO = sys.stderr,
     commands: Sequence[Command] | None = None,
     source_factory: SourceFactory | None = None,
+    registry: Registry | None = None,
 ) -> int:
     available = list(commands) if commands is not None else builtin_commands()
     try:
@@ -215,7 +226,7 @@ def main(
         context = AppContext(
             settings,
             conn,
-            default_registry(),
+            registry if registry is not None else default_registry(),
             SystemClock(),
             AsyncioSleeper(),
             stdout,
@@ -223,6 +234,9 @@ def main(
         )
         command = next(command for command in available if command.name == args.command)
         return asyncio.run(command.run(context, args))
+    except ConfigError as error:
+        stderr.write(f"configuration error: {error}\n")
+        return ExitCode.CONFIG
     except (BackendUnavailableError, SourceUnavailableError) as error:
         stderr.write(f"backend unavailable: {error}\n")
         return ExitCode.BACKEND

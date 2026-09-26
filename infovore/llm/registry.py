@@ -50,6 +50,16 @@ class Registry:
             )
         return errors
 
+    def build_stage(self, settings: Settings, stage: Stage) -> LLMBackend:
+        stage_settings = settings.stages[stage]
+        factory = self._factories.get(stage_settings.backend)
+        if factory is None:
+            raise ConfigError(f"{stage.value}: unknown backend '{stage_settings.backend}'")
+        errors = factory.validate(stage_settings)
+        if errors:
+            raise ConfigError("; ".join(f"{stage.value}: {message}" for message in errors))
+        return factory.build(stage_settings)
+
     def build_backends(self, settings: Settings) -> dict[Stage, LLMBackend]:
         errors = self.validate(settings)
         if errors:
