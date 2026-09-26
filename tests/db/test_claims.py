@@ -13,6 +13,7 @@ from infovore.db.claims import (
     UnknownPromptVersionError,
     claim_source_ids,
     claims_for_run,
+    claims_for_runs_needing_probe,
     claims_needing_probe,
     get_claim,
     live_prompt_version,
@@ -480,6 +481,158 @@ def test_related_claims_matches_paths_with_trailing_period(tmp_path: Path) -> No
     )
     results = related_claims(conn, "Only /usr/sbin/inst.", limit=10)
     assert len(results) == 1
+
+
+def test_claims_for_runs_needing_probe_scopes_to_runs_and_excludes_retracted(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_message(conn, 3)
+    insert_exchange(conn, 2, 2)
+    insert_exchange(conn, 3, 3)
+    in_scope = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    also_in_scope = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    out_of_scope = record_run(
+        conn, a_run(exchange_id=3), [a_claim(exchange_id=3, statement="c", subject="s")]
+    )
+    retracted_in_scope = record_run(conn, a_run(), [a_claim(statement="d", subject="s")])
+    retract_claim(conn, retracted_in_scope.claim_ids[0], "sources_deleted", NOW)
+
+    run_ids = (in_scope.run_id, also_in_scope.run_id, retracted_in_scope.run_id)
+    result = claims_for_runs_needing_probe(conn, run_ids, None, limit=10)
+    ids = {c.id for c in result}
+    assert in_scope.claim_ids[0] in ids
+    assert also_in_scope.claim_ids[0] in ids
+    assert out_of_scope.claim_ids[0] not in ids
+    assert retracted_in_scope.claim_ids[0] not in ids
+
+
+def test_claims_for_runs_needing_probe_filters_by_probe_model(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    unprobed_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    stale_result = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    set_novelty(conn, stale_result.claim_ids[0], Novelty.KNOWN, "old-model", "answer", NOW)
+
+    run_ids = (unprobed_result.run_id, stale_result.run_id)
+    needing = {c.id for c in claims_for_runs_needing_probe(conn, run_ids, "new-model", limit=10)}
+    assert unprobed_result.claim_ids[0] in needing
+    assert stale_result.claim_ids[0] in needing
+
+    set_novelty(conn, stale_result.claim_ids[0], Novelty.KNOWN, "new-model", "answer", NOW)
+    still_needing = {
+        c.id for c in claims_for_runs_needing_probe(conn, run_ids, "new-model", limit=10)
+    }
+    assert stale_result.claim_ids[0] not in still_needing
+    assert unprobed_result.claim_ids[0] in still_needing
+
+
+def test_claims_for_runs_needing_probe_without_probe_model_is_unprobed_only(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    unprobed_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    probed_result = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    set_novelty(conn, probed_result.claim_ids[0], Novelty.KNOWN, "any-model", "answer", NOW)
+
+    run_ids = (unprobed_result.run_id, probed_result.run_id)
+    needing = {c.id for c in claims_for_runs_needing_probe(conn, run_ids, None, limit=10)}
+    assert unprobed_result.claim_ids[0] in needing
+    assert probed_result.claim_ids[0] not in needing
+
+
+def test_claims_for_runs_needing_probe_respects_limit_and_empty_run_ids(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    first = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    second = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    run_ids = (first.run_id, second.run_id)
+    limited = claims_for_runs_needing_probe(conn, run_ids, None, limit=1)
+    assert len(limited) == 1
+    assert claims_for_runs_needing_probe(conn, (), None, limit=10) == []
+
+
+def test_unprobed_claims_excludes_failed_unless_include_failed(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    ok_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    failed_result = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    set_probe_error(conn, failed_result.claim_ids[0], "boom")
+
+    default_ids = {c.id for c in unprobed_claims(conn, limit=10)}
+    assert ok_result.claim_ids[0] in default_ids
+    assert failed_result.claim_ids[0] not in default_ids
+
+    with_failed_ids = {c.id for c in unprobed_claims(conn, limit=10, include_failed=True)}
+    assert ok_result.claim_ids[0] in with_failed_ids
+    assert failed_result.claim_ids[0] in with_failed_ids
+
+
+def test_claims_needing_probe_excludes_failed_unless_include_failed(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    ok_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    failed_result = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    set_probe_error(conn, failed_result.claim_ids[0], "boom")
+
+    default_ids = {c.id for c in claims_needing_probe(conn, "m", limit=10)}
+    assert ok_result.claim_ids[0] in default_ids
+    assert failed_result.claim_ids[0] not in default_ids
+
+    with_failed_ids = {c.id for c in claims_needing_probe(conn, "m", limit=10, include_failed=True)}
+    assert ok_result.claim_ids[0] in with_failed_ids
+    assert failed_result.claim_ids[0] in with_failed_ids
+
+
+def test_claims_for_runs_needing_probe_excludes_failed_unless_include_failed(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    ok_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    failed_result = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
+    set_probe_error(conn, failed_result.claim_ids[0], "boom")
+    run_ids = (ok_result.run_id, failed_result.run_id)
+
+    default_ids = {c.id for c in claims_for_runs_needing_probe(conn, run_ids, None, limit=10)}
+    assert ok_result.claim_ids[0] in default_ids
+    assert failed_result.claim_ids[0] not in default_ids
+
+    with_failed_ids = {
+        c.id
+        for c in claims_for_runs_needing_probe(conn, run_ids, None, limit=10, include_failed=True)
+    }
+    assert ok_result.claim_ids[0] in with_failed_ids
+    assert failed_result.claim_ids[0] in with_failed_ids
 
 
 def test_related_claims_matches_non_ascii_words(tmp_path: Path) -> None:
