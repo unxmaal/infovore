@@ -3,9 +3,8 @@ import math
 import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from enum import StrEnum
 
-from infovore.rows import AttachmentRow, MessageRow, ReactionRow
+from infovore.rows import AttachmentRow, Label, MessageRow, ReactionRow
 from infovore.triage.score import score_exchange
 
 UNKNOWN_WORD_STRENGTH = 1.0
@@ -17,10 +16,19 @@ TOKEN = re.compile(r"[\w/][\w'./+-]*")
 TRAILING_PUNCTUATION = ".,!?;:)'\"-"
 MAX_TOKEN_LENGTH = 40
 
-
-class Label(StrEnum):
-    LORE = "lore"
-    NOISE = "noise"
+__all__ = [
+    "Label",
+    "Metrics",
+    "Model",
+    "chi2q",
+    "evaluate",
+    "features",
+    "in_holdout",
+    "p_lore",
+    "recommend_threshold",
+    "token_probability",
+    "train",
+]
 
 
 @dataclass
