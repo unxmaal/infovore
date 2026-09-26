@@ -34,6 +34,7 @@ from infovore.extract.runner import (
     ExtractionReport,
     ExtractionStarted,
     PromptNotPromotedError,
+    UntriagedExchangesError,
     run_extraction,
     select_trial_sample,
 )
@@ -48,6 +49,7 @@ from infovore.rows import (
     RunOutcome,
 )
 from infovore.timing import FixedClock, RecordingSleeper
+from infovore.triage.score import TRIAGE_VERSION
 
 GUILD_ID = 500
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -90,6 +92,8 @@ def seed_exchange(
     status: ExtractionStatus = ExtractionStatus.PENDING,
     retry_count: int = 0,
     parent_exchange_id: int | None = None,
+    triage_score: float | None = 1.0,
+    triage_version: str | None = TRIAGE_VERSION,
 ) -> ExchangeRow:
     for message in messages:
         conn.execute(
@@ -128,6 +132,16 @@ def seed_exchange(
         last_error=None,
     )
     exchange_id = insert_exchange(conn, row, [m.id for m in messages])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = ?, triage_reasons = ?, triage_version = ?"
+        " WHERE id = ?",
+        (
+            triage_score,
+            "[]" if triage_score is not None else None,
+            triage_version,
+            exchange_id,
+        ),
+    )
     exchange = get_exchange(conn, exchange_id)
     assert exchange is not None
     return exchange
@@ -986,3 +1000,155 @@ def test_select_trial_sample_different_seeds_can_differ(tmp_path: Path) -> None:
 
     results = {tuple(select_trial_sample(conn, 3, seed=s)) for s in range(5)}
     assert len(results) > 1
+
+
+def test_select_trial_sample_min_score_filters_low_scores(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    high = seed_exchange(conn, [a_message(1, channel_id=1)], triage_score=0.9)
+    seed_exchange(conn, [a_message(2, channel_id=1)], triage_score=0.1)
+    assert high.id is not None
+
+    sample = select_trial_sample(conn, 10, seed=0, min_score=0.5)
+
+    assert sample == [high.id]
+
+
+def test_select_trial_sample_max_score_filters_high_scores(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)], triage_score=0.9)
+    low = seed_exchange(conn, [a_message(2, channel_id=1)], triage_score=0.1)
+    assert low.id is not None
+
+    sample = select_trial_sample(conn, 10, seed=0, max_score=0.5)
+
+    assert sample == [low.id]
+
+
+def test_select_trial_sample_min_and_max_score_bound_a_range(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)], triage_score=0.9)
+    middle = seed_exchange(conn, [a_message(2, channel_id=1)], triage_score=0.5)
+    seed_exchange(conn, [a_message(3, channel_id=1)], triage_score=0.1)
+    assert middle.id is not None
+
+    sample = select_trial_sample(conn, 10, seed=0, min_score=0.3, max_score=0.7)
+
+    assert sample == [middle.id]
+
+
+def test_select_trial_sample_without_filters_ignores_triage(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)], triage_score=None, triage_version=None)
+
+    assert select_trial_sample(conn, 10, seed=0) == [1]
+
+
+def test_live_refuses_when_pending_exchange_untriaged(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)], triage_score=None, triage_version=None)
+
+    async def go() -> None:
+        await promote(conn)
+        with pytest.raises(UntriagedExchangesError):
+            await run_extraction(
+                conn,
+                MarkerExtractor(),
+                FixedClock(NOW),
+                RecordingSleeper(),
+                mode=RunMode.LIVE,
+                model_label="model-x",
+                batch_size=10,
+                max_retries=3,
+                concurrency=2,
+            )
+
+    asyncio.run(go())
+
+
+def test_live_refuses_when_pending_exchange_has_stale_triage_version(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)], triage_score=0.9, triage_version="t0")
+
+    async def go() -> None:
+        await promote(conn)
+        with pytest.raises(UntriagedExchangesError):
+            await run_extraction(
+                conn,
+                MarkerExtractor(),
+                FixedClock(NOW),
+                RecordingSleeper(),
+                mode=RunMode.LIVE,
+                model_label="model-x",
+                batch_size=10,
+                max_retries=3,
+                concurrency=2,
+            )
+
+    asyncio.run(go())
+
+
+def test_trial_mode_never_checked_for_untriaged_exchanges(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = seed_exchange(
+        conn, [a_message(1, content="FACT: Octane2 :: a fact")], triage_score=None,
+        triage_version=None,
+    )
+    assert exchange.id is not None
+    exchange_id = exchange.id
+
+    async def go() -> ExtractionReport:
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            exchange_ids=[exchange_id],
+        )
+
+    report = asyncio.run(go())
+
+    assert report.claims_recorded == 1
+
+
+def test_live_only_claims_exchanges_at_or_above_min_score(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    high = seed_exchange(
+        conn, [a_message(1, content="FACT: Octane2 :: needs a jumper")], triage_score=0.9
+    )
+    low = seed_exchange(
+        conn, [a_message(2, channel_id=2, content="FACT: Fuel :: needs a fan")], triage_score=0.1
+    )
+    assert high.id is not None
+    assert low.id is not None
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            min_score=0.3,
+        )
+
+    report = asyncio.run(go())
+
+    assert report.processed == 1
+    assert report.succeeded == 1
+    updated_high = get_exchange(conn, high.id)
+    assert updated_high is not None
+    assert updated_high.extraction_status is ExtractionStatus.DONE
+    updated_low = get_exchange(conn, low.id)
+    assert updated_low is not None
+    assert updated_low.extraction_status is ExtractionStatus.PENDING
+    assert updated_low.retry_count == 0
