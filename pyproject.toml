@@ -1,0 +1,58 @@
+[project]
+name = "infovore"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "pytest-asyncio>=0.24",
+    "hypothesis>=6",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pre-commit>=3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=infovore --cov-branch --cov-report=term-missing --cov-fail-under=100"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.report]
+exclude_also = [
+    "^\\s*\\.\\.\\.\\s*$",
+    "if TYPE_CHECKING:",
+]
+
+[tool.mypy]
+strict = true
+files = ["infovore", "tests"]
+python_version = "3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "TID", "RUF"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"discord".msg = "discord is only imported in infovore/discord/live.py"
+"subprocess".msg = "processes are only spawned in infovore/llm/claude_cli.py"
+"asyncio.create_subprocess_exec".msg = "processes are only spawned in infovore/llm/claude_cli.py"
+"openai".msg = "openai is only imported in infovore/llm/openai_compat.py"
+"httpx".msg = "httpx is only imported in infovore/llm/openai_compat.py"
+
+[tool.ruff.lint.per-file-ignores]
+"infovore/discord/live.py" = ["TID251"]
+"infovore/llm/claude_cli.py" = ["TID251"]
+"infovore/llm/openai_compat.py" = ["TID251"]
+"tests/llm/test_openai_compat.py" = ["TID251"]
+"tests/discord/test_live.py" = ["TID251"]
