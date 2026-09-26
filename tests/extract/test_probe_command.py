@@ -193,6 +193,77 @@ def test_probe_command_probe_model_flag_idempotent(tmp_path: Path) -> None:
     assert "probed: 0" in out
 
 
+class FlushCountingIO(io.StringIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.flushes_at: list[int] = []
+
+    def flush(self) -> None:
+        self.flushes_at.append(self.getvalue().count("\n"))
+        super().flush()
+
+
+def test_probe_command_streams_flushed_progress_lines(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    claim_id, _ = seed(env["INFOVORE_DB_PATH"])
+    out = FlushCountingIO()
+    err = io.StringIO()
+    code = main(
+        ["probe"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=err,
+        registry=registry_with(ScriptedLLMFactory(verdict="known")),
+    )
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "probe: 1 candidates"
+    assert lines[1] == f"claim {claim_id}: known"
+    assert out.flushes_at[:2] == [1, 2]
+
+
+def test_probe_start_line_is_written_before_backend_processes_any_claim(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    seen_first_line_early: list[bool] = []
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if request.system == RECALL_SYSTEM_PROMPT:
+            seen_first_line_early.append("probe: 1 candidates" in out.getvalue())
+            return LLMResult.ok_structured({"answer": "an answer"}, "claude-sonnet-5")
+        if request.system == JUDGE_SYSTEM_PROMPT:
+            return LLMResult.ok_structured(
+                {"verdict": "known", "reason": "because"}, "claude-haiku-5"
+            )
+        return LLMResult.ok_text("pong", "claude-sonnet-5")
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: object) -> list[str]:
+            return []
+
+        def build(self, settings: object) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    code = main(
+        ["probe"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert code == ExitCode.OK
+    assert seen_first_line_early == [True]
+
+
 def test_probe_command_run_id_flag_scopes_to_run(tmp_path: Path) -> None:
     env = environment(tmp_path)
     _, run_id_a = seed(env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, statement="widget A")
