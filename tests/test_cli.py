@@ -1,14 +1,22 @@
 import argparse
 import io
-from collections.abc import Callable
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import pytest
 
 from infovore import cli
-from infovore.cli import AppContext, BackendUnavailableError, Command, ExitCode, main
+from infovore.cli import (
+    AppContext,
+    BackendUnavailableError,
+    Command,
+    ExitCode,
+    SourceFactory,
+    main,
+)
 from infovore.config import Settings
-from infovore.source.protocol import DiscordSource
+from infovore.source.protocol import DiscordSource, SourceUnavailableError
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -25,7 +33,7 @@ def run(
     argv: list[str],
     env: dict[str, str],
     commands: list[Command] | None = None,
-    source_factory: Callable[[Settings], DiscordSource] | None = None,
+    source_factory: SourceFactory | None = None,
 ) -> tuple[int, str, str]:
     out, err = io.StringIO(), io.StringIO()
     code = main(
@@ -168,20 +176,39 @@ def test_builtin_commands_include_sync_optouts() -> None:
     assert "sync-optouts" in [command.name for command in cli.builtin_commands()]
 
 
-def test_sync_optouts_without_source_factory_exits_backend_code(tmp_path: Path) -> None:
-    code, _, err = run(["sync-optouts"], environment(tmp_path))
+def test_sync_optouts_with_unavailable_source_exits_backend_code(tmp_path: Path) -> None:
+    @asynccontextmanager
+    async def unavailable(settings: Settings) -> AsyncIterator[DiscordSource]:
+        raise SourceUnavailableError("discord login failed: LoginFailure")
+        yield
+
+    code, _, err = run(["sync-optouts"], environment(tmp_path), source_factory=unavailable)
     assert code == ExitCode.BACKEND
-    assert "discord source not configured" in err
+    assert "discord login failed" in err
+    assert "secret-token" not in err
+
+
+def test_default_source_factory_builds_a_context_manager_without_connecting(
+    tmp_path: Path,
+) -> None:
+    from infovore.config import load_settings
+
+    manager = cli.default_source_factory(load_settings(environment(tmp_path)))
+    assert hasattr(manager, "__aenter__")
+    assert hasattr(manager, "__aexit__")
 
 
 def test_sync_optouts_command_reports_results(tmp_path: Path) -> None:
     from infovore.source.fake import FakeDiscordSource
 
     fake_source = FakeDiscordSource(role_members={9: {"no-archive": [11]}})
+    exited: list[bool] = []
 
-    def factory(settings: Settings) -> DiscordSource:
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
         assert settings.guild_id == 9
-        return fake_source
+        yield fake_source
+        exited.append(True)
 
     code, out, _ = run(["sync-optouts"], environment(tmp_path), source_factory=factory)
     assert code == ExitCode.OK
@@ -189,3 +216,4 @@ def test_sync_optouts_command_reports_results(tmp_path: Path) -> None:
     assert "removed=0" in out
     assert "redacted_messages=0" in out
     assert "retracted_claims=0" in out
+    assert exited == [True]

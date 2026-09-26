@@ -1,8 +1,10 @@
 import io
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from infovore.cli import ExitCode, main
+from infovore.cli import ExitCode, SourceFactory, main
 from infovore.config import Settings
 from infovore.rows import ChannelKind
 from infovore.source.fake import FakeDiscordSource
@@ -53,8 +55,17 @@ def make_message(msg_id: int, channel_id: int = 1) -> SourceMessage:
     )
 
 
+def serving(source: DiscordSource) -> SourceFactory:
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        assert settings.guild_id == GUILD_ID
+        yield source
+
+    return factory
+
+
 def run(
-    argv: list[str], env: dict[str, str], source_factory: object | None = None
+    argv: list[str], env: dict[str, str], source_factory: SourceFactory | None = None
 ) -> tuple[int, str, str]:
     out, err = io.StringIO(), io.StringIO()
     code = main(
@@ -63,15 +74,20 @@ def run(
         dotenv_path=None,
         stdout=out,
         stderr=err,
-        source_factory=source_factory,  # type: ignore[arg-type]
+        source_factory=source_factory,
     )
     return code, out.getvalue(), err.getvalue()
 
 
-def test_backfill_without_source_factory_is_backend_unavailable(tmp_path: Path) -> None:
-    code, _, err = run(["backfill"], environment(tmp_path))
+def test_backfill_with_unavailable_source_is_backend_unavailable(tmp_path: Path) -> None:
+    @asynccontextmanager
+    async def unavailable(settings: Settings) -> AsyncIterator[DiscordSource]:
+        raise SourceUnavailableError("discord client not ready within 60.0s")
+        yield
+
+    code, _, err = run(["backfill"], environment(tmp_path), source_factory=unavailable)
     assert code == ExitCode.BACKEND
-    assert "discord source not configured" in err
+    assert "not ready" in err
 
 
 def test_backfill_reports_success_with_injected_source(tmp_path: Path) -> None:
@@ -79,11 +95,7 @@ def test_backfill_reports_success_with_injected_source(tmp_path: Path) -> None:
         channels=[make_channel(1)], messages=[make_message(i) for i in range(1, 4)]
     )
 
-    def factory(settings: Settings) -> DiscordSource:
-        assert settings.guild_id == GUILD_ID
-        return source
-
-    code, out, _ = run(["backfill"], environment(tmp_path), source_factory=factory)
+    code, out, _ = run(["backfill"], environment(tmp_path), source_factory=serving(source))
     assert code == ExitCode.OK
     assert "channel 1" in out
     assert "inserted=3" in out
@@ -94,10 +106,7 @@ def test_backfill_reports_failure_exit_code_when_a_channel_fails(tmp_path: Path)
     for _ in range(5):
         source.fail_next_history_call(SourceUnavailableError("down"), channel_id=1)
 
-    def factory(settings: Settings) -> DiscordSource:
-        return source
-
-    code, out, _ = run(["backfill"], environment(tmp_path), source_factory=factory)
+    code, out, _ = run(["backfill"], environment(tmp_path), source_factory=serving(source))
     assert code == ExitCode.FAILURE
     assert "channel 1 failed" in out
 
@@ -107,11 +116,8 @@ def test_backfill_page_size_option_is_respected(tmp_path: Path) -> None:
         channels=[make_channel(1)], messages=[make_message(i) for i in range(1, 4)]
     )
 
-    def factory(settings: Settings) -> DiscordSource:
-        return source
-
     code, out, _ = run(
-        ["backfill", "--page-size", "1"], environment(tmp_path), source_factory=factory
+        ["backfill", "--page-size", "1"], environment(tmp_path), source_factory=serving(source)
     )
     assert code == ExitCode.OK
     assert "pages=3" in out

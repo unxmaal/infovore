@@ -1,7 +1,8 @@
 import asyncio
-from collections.abc import AsyncIterator, Sequence
+import contextlib
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from datetime import datetime
-from typing import Protocol
+from typing import Protocol, cast
 
 import discord
 
@@ -423,3 +424,47 @@ def build_client() -> discord.Client:
 
 async def connect(client: discord.Client, token: str) -> None:  # pragma: no cover
     await client.start(token)
+
+
+class _SessionClientLike(_ClientLike, Protocol):
+    async def wait_until_ready(self) -> None: ...
+
+    async def close(self) -> None: ...
+
+
+def _real_client() -> _SessionClientLike:
+    return cast(_SessionClientLike, build_client())
+
+
+async def _real_start(client: _SessionClientLike, token: str) -> None:  # pragma: no cover
+    await connect(cast(discord.Client, client), token)
+
+
+@contextlib.asynccontextmanager
+async def open_discord_source(
+    token: str,
+    ready_timeout: float = 60.0,
+    client_factory: Callable[[], _SessionClientLike] | None = None,
+    starter: Callable[[_SessionClientLike, str], Awaitable[None]] | None = None,
+) -> AsyncIterator[DiscordPySource]:
+    client = (client_factory or _real_client)()
+    running = asyncio.ensure_future((starter or _real_start)(client, token))
+    ready = asyncio.ensure_future(client.wait_until_ready())
+    try:
+        await asyncio.wait(
+            {running, ready}, timeout=ready_timeout, return_when=asyncio.FIRST_COMPLETED
+        )
+        if not ready.done():
+            if running.done():
+                failure = running.exception()
+                if failure is not None:
+                    raise SourceUnavailableError(f"discord login failed: {type(failure).__name__}")
+                raise SourceUnavailableError("discord client stopped before it was ready")
+            raise SourceUnavailableError(f"discord client not ready within {ready_timeout}s")
+        yield DiscordPySource(client)
+    finally:
+        ready.cancel()
+        await client.close()
+        running.cancel()
+        with contextlib.suppress(BaseException):
+            await running
