@@ -92,7 +92,7 @@ All timestamps UTC ISO-8601. All Discord IDs stored as `INTEGER` (snowflakes fit
 
 **exchanges** — id PK autoincrement, channel_id, thread_id NULL, first_message_id, last_message_id, started_at, ended_at, message_count, grouping_rule (`thread` | `reply_chain` | `quiet_gap`), content_hash (sha256 of ordered message ids), parent_exchange_id NULL (the closed exchange a late reply continues; rendered as read-only context), extraction_status (`pending` | `done` | `skipped` | `failed` | `stale`), retry_count, last_error NULL, UNIQUE(content_hash). `stale` = a member message was edited after extraction; the runner re-extracts it.
 
-**exchange_messages** — exchange_id FK, message_id FK, position, PK(exchange_id, message_id).
+**exchange_messages** — exchange_id FK, message_id FK UNIQUE (a message belongs to at most one exchange), position, PK(exchange_id, message_id), UNIQUE(exchange_id, position).
 
 **prompt_versions** — version PK, text_sha256, created_at, promoted_at NULL. The live version is the most recently promoted one.
 
