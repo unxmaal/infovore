@@ -375,3 +375,71 @@ async def test_run_probe_bounds_concurrency(tmp_path: Path) -> None:
 
     assert report.probed == 5
     assert probe.max_concurrent == 2
+
+
+async def test_run_probe_failed_claims_do_not_starve_later_candidates(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    fail_id_1 = seed_claim(conn, "widget N1 [probe-fail]", exchange_id=1, message_id=1)
+    fail_id_2 = seed_claim(conn, "widget N2 [probe-fail]", exchange_id=2, message_id=2)
+    valid_id = seed_claim(conn, "widget N3 [known]", exchange_id=3, message_id=3)
+
+    first = await run_probe(
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=2,
+        concurrency=2,
+    )
+
+    assert first.failed == 2
+    assert first.probed == 1
+    valid_claim = get_claim(conn, valid_id)
+    assert valid_claim is not None
+    assert valid_claim.novelty is Novelty.KNOWN
+    for failed_id in (fail_id_1, fail_id_2):
+        failed_claim = get_claim(conn, failed_id)
+        assert failed_claim is not None
+        assert failed_claim.novelty is Novelty.UNPROBED
+        assert failed_claim.probe_error == "fake probe failure"
+
+    second = await run_probe(
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=2,
+        concurrency=2,
+    )
+    assert second.failed == 0
+    assert second.probed == 0
+
+
+async def test_run_probe_retry_failed_reattempts_parked_claims(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    fail_id = seed_claim(conn, "widget O [probe-fail]")
+
+    parked = await run_probe(
+        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
+        probe_model=None, limit=10, concurrency=2,
+    )
+    assert parked.failed == 1
+
+    not_retried = await run_probe(
+        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
+        probe_model=None, limit=10, concurrency=2,
+    )
+    assert not_retried.failed == 0
+    assert not_retried.probed == 0
+
+    retried = await run_probe(
+        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
+        probe_model=None, limit=10, concurrency=2, retry_failed=True,
+    )
+    assert retried.failed == 1
+    claim = get_claim(conn, fail_id)
+    assert claim is not None
+    assert claim.novelty is Novelty.UNPROBED
+    assert claim.probe_error == "fake probe failure"
