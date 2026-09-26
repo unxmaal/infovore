@@ -15,6 +15,7 @@ from infovore.db.raw import (
     upsert_message,
 )
 from infovore.ingest.normalize import NormalizedMessage, normalize_channel, normalize_message
+from infovore.privacy.optout import opted_out_user_ids, redact_normalized
 from infovore.source.protocol import (
     DiscordSource,
     MessageCreated,
@@ -59,6 +60,7 @@ async def _handle_message_created(
     normalized = normalize_message(event.message, clock.now(), include_bots)
     if normalized is None:
         return EventOutcome.MESSAGE_SKIPPED
+    normalized = redact_normalized(normalized, opted_out_user_ids(conn))
     _persist_message(conn, normalized)
     return EventOutcome.MESSAGE_CREATED
 
@@ -69,6 +71,7 @@ async def _handle_message_edited(
     normalized = normalize_message(event.message, clock.now(), include_bots)
     if normalized is None:
         return EventOutcome.MESSAGE_SKIPPED
+    normalized = redact_normalized(normalized, opted_out_user_ids(conn))
     row = normalized.message
     updated = mark_edited(conn, row.id, row.content, row.edited_at, row.raw_json)
     if not updated:

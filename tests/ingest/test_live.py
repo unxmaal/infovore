@@ -79,9 +79,7 @@ def make_message(**overrides: object) -> SourceMessage:
 
 
 def opt_out(conn: sqlite3.Connection, user_id: int) -> None:
-    conn.execute(
-        "INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, to_db_time(NOW))
-    )
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, to_db_time(NOW)))
 
 
 async def test_handle_message_created_upserts_message(
