@@ -10,6 +10,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange, set_status
 from infovore.db.raw import (
     attachments_for_messages,
+    get_channel,
     get_message,
     message_revisions,
     reactions_for_messages,
@@ -413,6 +414,288 @@ async def test_consume_processes_all_events_from_source(
     assert report.processed == 2
     assert report.failed == 0
     assert isinstance(report, ConsumeReport)
+    assert get_message(conn, 1) is not None
+    assert get_message(conn, 2) is not None
+
+
+async def test_handle_message_created_in_allowed_channel_is_created(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    outcome = await handle_event(
+        conn,
+        MessageCreated(make_message(channel_id=10)),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.MESSAGE_CREATED
+    assert get_message(conn, 1) is not None
+
+
+async def test_handle_message_created_in_non_allowed_channel_is_ignored(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    outcome = await handle_event(
+        conn,
+        MessageCreated(make_message(channel_id=20)),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+    assert get_message(conn, 1) is None
+
+
+async def test_handle_message_created_in_thread_of_allowed_parent_known_in_db(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    channel = SourceChannel(
+        id=200, guild_id=100, parent_id=10, name="a-thread", kind=ChannelKind.THREAD, archived=False
+    )
+    await handle_event(conn, ThreadCreated(channel), clock, include_bots=False, channel_ids=(10,))
+    message = make_message(channel_id=200, thread_id=200)
+    outcome = await handle_event(
+        conn, MessageCreated(message), clock, include_bots=False, channel_ids=(10,)
+    )
+    assert outcome is EventOutcome.MESSAGE_CREATED
+    assert get_message(conn, 1) is not None
+
+
+async def test_handle_message_created_in_thread_of_non_allowed_parent_known_in_db(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    channel = SourceChannel(
+        id=200, guild_id=100, parent_id=20, name="a-thread", kind=ChannelKind.THREAD, archived=False
+    )
+    await handle_event(conn, ThreadCreated(channel), clock, include_bots=False, channel_ids=(10,))
+    message = make_message(channel_id=200, thread_id=200)
+    outcome = await handle_event(
+        conn, MessageCreated(message), clock, include_bots=False, channel_ids=(10,)
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+    assert get_message(conn, 1) is None
+
+
+async def test_handle_message_created_in_unknown_thread_resolves_parent_via_source(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    source = FakeDiscordSource(
+        channels=[
+            SourceChannel(
+                id=201,
+                guild_id=100,
+                parent_id=10,
+                name="another-thread",
+                kind=ChannelKind.THREAD,
+                archived=False,
+            ),
+            SourceChannel(
+                id=200,
+                guild_id=100,
+                parent_id=10,
+                name="a-thread",
+                kind=ChannelKind.THREAD,
+                archived=False,
+            ),
+        ]
+    )
+    message = make_message(channel_id=200, thread_id=200)
+    outcome = await handle_event(
+        conn,
+        MessageCreated(message),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+        source=source,
+    )
+    assert outcome is EventOutcome.MESSAGE_CREATED
+    assert get_message(conn, 1) is not None
+    resolved = get_channel(conn, 200)
+    assert resolved is not None
+    assert resolved.parent_id == 10
+
+
+async def test_handle_message_created_in_unknown_thread_source_cannot_resolve_is_ignored(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    source = FakeDiscordSource()
+    message = make_message(channel_id=200, thread_id=200)
+    outcome = await handle_event(
+        conn,
+        MessageCreated(message),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+        source=source,
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+    assert get_message(conn, 1) is None
+    assert get_channel(conn, 200) is None
+
+
+async def test_handle_message_created_in_unknown_channel_without_source_is_ignored(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    message = make_message(channel_id=200)
+    outcome = await handle_event(
+        conn, MessageCreated(message), clock, include_bots=False, channel_ids=(10,)
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+    assert get_message(conn, 1) is None
+
+
+async def test_handle_message_edited_in_non_allowed_channel_is_ignored(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    edited = make_message(channel_id=20, content="edited")
+    outcome = await handle_event(
+        conn, MessageEdited(edited), clock, include_bots=False, channel_ids=(10,)
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+    assert get_message(conn, 1) is None
+
+
+async def test_handle_message_deleted_direct_channel_match_is_processed(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    await handle_event(
+        conn,
+        MessageCreated(make_message(channel_id=10)),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    outcome = await handle_event(
+        conn,
+        MessageDeleted(message_id=1, channel_id=10),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.MESSAGE_DELETED
+    row = get_message(conn, 1)
+    assert row is not None
+    assert row.deleted_at == NOW
+
+
+async def test_handle_message_deleted_non_allowed_channel_is_ignored(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    outcome = await handle_event(
+        conn,
+        MessageDeleted(message_id=1, channel_id=999),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+
+
+async def test_handle_message_deleted_thread_of_allowed_parent_known_in_db(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    channel = SourceChannel(
+        id=200, guild_id=100, parent_id=10, name="a-thread", kind=ChannelKind.THREAD, archived=False
+    )
+    await handle_event(conn, ThreadCreated(channel), clock, include_bots=False, channel_ids=(10,))
+    outcome = await handle_event(
+        conn,
+        MessageDeleted(message_id=1, channel_id=200),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.MESSAGE_DELETED
+
+
+async def test_handle_message_deleted_thread_of_non_allowed_parent_known_in_db(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    channel = SourceChannel(
+        id=200, guild_id=100, parent_id=20, name="a-thread", kind=ChannelKind.THREAD, archived=False
+    )
+    await handle_event(conn, ThreadCreated(channel), clock, include_bots=False, channel_ids=(10,))
+    outcome = await handle_event(
+        conn,
+        MessageDeleted(message_id=1, channel_id=200),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+
+
+async def test_handle_reaction_changed_on_a_never_stored_ignored_message_is_skipped(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    await handle_event(
+        conn,
+        MessageCreated(make_message(channel_id=20)),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    outcome = await handle_event(
+        conn,
+        ReactionChanged(message_id=1, emoji="👍", count=1),
+        clock,
+        include_bots=False,
+        channel_ids=(10,),
+    )
+    assert outcome is EventOutcome.REACTION_SKIPPED
+
+
+async def test_handle_thread_created_of_allowed_parent_is_upserted(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    channel = SourceChannel(
+        id=200, guild_id=100, parent_id=10, name="a-thread", kind=ChannelKind.THREAD, archived=False
+    )
+    outcome = await handle_event(
+        conn, ThreadCreated(channel), clock, include_bots=False, channel_ids=(10,)
+    )
+    assert outcome is EventOutcome.THREAD_CREATED
+    assert get_channel(conn, 200) is not None
+
+
+async def test_handle_thread_created_of_non_allowed_parent_is_ignored(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    channel = SourceChannel(
+        id=200, guild_id=100, parent_id=20, name="a-thread", kind=ChannelKind.THREAD, archived=False
+    )
+    outcome = await handle_event(
+        conn, ThreadCreated(channel), clock, include_bots=False, channel_ids=(10,)
+    )
+    assert outcome is EventOutcome.CHANNEL_IGNORED
+    assert get_channel(conn, 200) is None
+
+
+async def test_consume_counts_ignored_events_from_allowlist(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    source = FakeDiscordSource()
+    source.push(MessageCreated(make_message(id=1, channel_id=10)))
+    source.push(MessageCreated(make_message(id=2, channel_id=20)))
+    source.close()
+    report = await consume(conn, source, clock, include_bots=False, channel_ids=(10,))
+    assert report.processed == 1
+    assert report.ignored == 1
+    assert report.failed == 0
+    assert get_message(conn, 1) is not None
+    assert get_message(conn, 2) is None
+
+
+async def test_consume_empty_allowlist_ingests_everything(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    source = FakeDiscordSource()
+    source.push(MessageCreated(make_message(id=1, channel_id=10)))
+    source.push(MessageCreated(make_message(id=2, channel_id=20)))
+    source.close()
+    report = await consume(conn, source, clock, include_bots=False, channel_ids=())
+    assert report.processed == 2
+    assert report.ignored == 0
     assert get_message(conn, 1) is not None
     assert get_message(conn, 2) is not None
 

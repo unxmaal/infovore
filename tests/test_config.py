@@ -203,8 +203,19 @@ def test_load_settings_missing_required_reports_all() -> None:
     message = str(excinfo.value)
     assert "INFOVORE_DISCORD_TOKEN" in message
     assert "INFOVORE_GUILD_ID" in message
-    assert "INFOVORE_CHANNEL_IDS" in message
     assert "INFOVORE_DB_PATH" in message
+
+
+def test_load_settings_discord_source_channel_ids_unset_means_all() -> None:
+    env = {key: value for key, value in REQUIRED_ENV.items() if key != "INFOVORE_CHANNEL_IDS"}
+    settings = load_settings(env)
+    assert settings.channel_ids == ()
+
+
+def test_load_settings_discord_source_channel_ids_blank_means_all() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_CHANNEL_IDS": " , , "}
+    settings = load_settings(env)
+    assert settings.channel_ids == ()
 
 
 def test_load_settings_bad_int_reported() -> None:
@@ -216,12 +227,6 @@ def test_load_settings_bad_int_reported() -> None:
 def test_load_settings_bad_bool_reported() -> None:
     env = {**REQUIRED_ENV, "INFOVORE_INCLUDE_BOT_MESSAGES": "maybe"}
     with pytest.raises(ConfigError, match="INFOVORE_INCLUDE_BOT_MESSAGES"):
-        load_settings(env)
-
-
-def test_load_settings_empty_channel_list_reported() -> None:
-    env = {**REQUIRED_ENV, "INFOVORE_CHANNEL_IDS": " , , "}
-    with pytest.raises(ConfigError, match="INFOVORE_CHANNEL_IDS"):
         load_settings(env)
 
 
@@ -293,7 +298,7 @@ def test_load_settings_stage_timeout_non_numeric_reported() -> None:
 
 def test_load_settings_collects_every_problem_at_once() -> None:
     with pytest.raises(ConfigError) as excinfo:
-        load_settings({"INFOVORE_CHANNEL_IDS": "", "INFOVORE_GUILD_ID": "bad"})
+        load_settings({"INFOVORE_CHANNEL_IDS": "nope", "INFOVORE_GUILD_ID": "bad"})
     message = str(excinfo.value)
     assert "INFOVORE_DISCORD_TOKEN" in message
     assert "INFOVORE_GUILD_ID" in message

@@ -140,16 +140,12 @@ def _optional_bool(raw: str | None, default: bool, name: str, errors: list[str])
     return parsed
 
 
-def _parse_channel_ids(raw: str | None, errors: list[str], required: bool) -> tuple[int, ...]:
+def _parse_channel_ids(raw: str | None, errors: list[str]) -> tuple[int, ...]:
     text = raw or ""
-    if required:
-        text = _require(raw, "INFOVORE_CHANNEL_IDS", errors)
-    if not text:
+    if not text.strip():
         return ()
     parts = [part.strip() for part in text.split(",") if part.strip()]
     if not parts:
-        if required:
-            errors.append("INFOVORE_CHANNEL_IDS must not be empty")
         return ()
     ids: list[int] = []
     bad = False
@@ -231,11 +227,11 @@ def load_settings(env: Mapping[str, str]) -> Settings:
     source_kind = _parse_source_kind(env.get("INFOVORE_SOURCE"), errors)
     is_export = source_kind is SourceKind.EXPORT
 
+    channel_ids = _parse_channel_ids(env.get("INFOVORE_CHANNEL_IDS"), errors)
     export_dir: Path | None = None
     if is_export:
         discord_token = env.get("INFOVORE_DISCORD_TOKEN", "")
         guild_id = _optional_guild_id(env.get("INFOVORE_GUILD_ID"), errors)
-        channel_ids = _parse_channel_ids(env.get("INFOVORE_CHANNEL_IDS"), errors, required=False)
         export_dir_raw = _require(env.get("INFOVORE_EXPORT_DIR"), "INFOVORE_EXPORT_DIR", errors)
         if export_dir_raw:
             export_dir = Path(export_dir_raw)
@@ -244,7 +240,6 @@ def load_settings(env: Mapping[str, str]) -> Settings:
             env.get("INFOVORE_DISCORD_TOKEN"), "INFOVORE_DISCORD_TOKEN", errors
         )
         guild_id = _require_positive_int(env.get("INFOVORE_GUILD_ID"), "INFOVORE_GUILD_ID", errors)
-        channel_ids = _parse_channel_ids(env.get("INFOVORE_CHANNEL_IDS"), errors, required=True)
     db_path_raw = _require(env.get("INFOVORE_DB_PATH"), "INFOVORE_DB_PATH", errors)
     scratch_dir_raw = env.get("INFOVORE_SCRATCH_DIR", DEFAULT_SCRATCH_DIR)
     quiet_gap_minutes = _optional_positive_int(

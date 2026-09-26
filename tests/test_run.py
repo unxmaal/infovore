@@ -52,10 +52,12 @@ def make_settings(tmp_path: Path) -> Settings:
     )
 
 
-def make_message(msg_id: int, created_at: datetime, content: str) -> SourceMessage:
+def make_message(
+    msg_id: int, created_at: datetime, content: str, channel_id: int = 1
+) -> SourceMessage:
     return SourceMessage(
         id=msg_id,
-        channel_id=1,
+        channel_id=channel_id,
         guild_id=9,
         author_id=5,
         author_name="alice",
@@ -241,6 +243,38 @@ async def test_run_forever_counts_a_failing_event_and_continues(tmp_path: Path) 
     assert conn.execute("SELECT id FROM messages WHERE id = 1").fetchone() is not None
 
 
+async def test_run_forever_counts_an_ignored_event_and_continues(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    settings = make_settings(tmp_path)
+    fake_source = FakeDiscordSource()
+    fake_source.push(MessageCreated(make_message(1, NOW, "hello", channel_id=2)))
+    fake_source.push(MessageCreated(make_message(2, NOW, "hello", channel_id=1)))
+    fake_source.close()
+    stop = asyncio.Event()
+    source = StoppingSource(fake_source, stop)
+
+    report = await asyncio.wait_for(
+        run_forever(
+            conn,
+            source,
+            MarkerExtractor(),
+            MarkerProbe(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            settings,
+            interval_seconds=1000.0,
+            stop=stop,
+        ),
+        timeout=2.0,
+    )
+
+    assert report.events_ignored == 1
+    assert report.events_handled == 1
+    assert report.events_failed == 0
+    assert conn.execute("SELECT id FROM messages WHERE id = 1").fetchone() is None
+    assert conn.execute("SELECT id FROM messages WHERE id = 2").fetchone() is not None
+
+
 async def test_run_forever_counts_a_failing_cycle_step_and_continues(tmp_path: Path) -> None:
     conn = db(tmp_path)
     settings = make_settings(tmp_path)
@@ -404,6 +438,7 @@ def test_run_command_once_flag_runs_one_cycle_and_exits_ok_and_closes_source(
     assert code == ExitCode.OK
     assert "cycles_completed=1" in out
     assert "cycles_failed=0" in out
+    assert "events_ignored=0" in out
     assert exited == [True]
 
 
