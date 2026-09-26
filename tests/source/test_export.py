@@ -1,11 +1,16 @@
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
+from infovore.db.connection import migrate, open_database
+from infovore.db.raw import get_backfill_checkpoint, get_message
+from infovore.ingest.backfill import backfill
 from infovore.rows import ChannelKind
 from infovore.source.export import ExportDiscordSource
 from infovore.source.protocol import SourceUnavailableError
+from infovore.timing import FixedClock, RecordingSleeper
 
 GUILD_ID = 900
 CHANNEL_ID = 100
@@ -511,3 +516,43 @@ async def test_raw_is_the_messages_own_json_object(tmp_path: Path) -> None:
     message = pages[0][0]
     assert message.raw["id"] == "1"
     assert message.raw["type"] == "Default"
+
+
+async def test_full_backfill_from_export_then_rerun_changes_nothing(tmp_path: Path) -> None:
+    export_dir = tmp_path / "export"
+    write_export(
+        export_dir / "general.json",
+        make_export(messages=[make_message(i) for i in range(1, 6)]),
+    )
+    source = ExportDiscordSource(export_dir)
+    conn = open_database(tmp_path / "test.db")
+    migrate(conn)
+
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        channel_ids=(CHANNEL_ID,),
+        clock=FixedClock(datetime(2026, 1, 1, tzinfo=UTC)),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert report.failed == []
+    assert report.channels[CHANNEL_ID].inserted == 5
+    for message_id in range(1, 6):
+        assert get_message(conn, message_id) is not None
+    assert get_backfill_checkpoint(conn, CHANNEL_ID) == 5
+
+    second_report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        channel_ids=(CHANNEL_ID,),
+        clock=FixedClock(datetime(2026, 1, 1, tzinfo=UTC)),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert second_report.channels[CHANNEL_ID].inserted == 0
+    assert second_report.channels[CHANNEL_ID].updated == 0
+    assert second_report.channels[CHANNEL_ID].unchanged == 0
+    assert second_report.channels[CHANNEL_ID].pages == 0
