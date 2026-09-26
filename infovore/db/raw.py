@@ -11,6 +11,7 @@ from infovore.rows import (
     ChannelRow,
     MessageRevisionRow,
     MessageRow,
+    ReactionRow,
 )
 
 
@@ -277,5 +278,37 @@ def attachments_for_messages(
             sha256=row["sha256"],
             local_path=row["local_path"],
         )
+        for row in rows
+    ]
+
+
+def set_reaction_count(conn: sqlite3.Connection, message_id: int, emoji: str, count: int) -> None:
+    with transaction(conn):
+        if count <= 0:
+            conn.execute(
+                "DELETE FROM reactions WHERE message_id = ? AND emoji = ?", (message_id, emoji)
+            )
+            return
+        conn.execute(
+            "INSERT INTO reactions (message_id, emoji, count) VALUES (?, ?, ?)"
+            " ON CONFLICT (message_id, emoji) DO UPDATE SET count = excluded.count",
+            (message_id, emoji, count),
+        )
+
+
+def reactions_for_messages(
+    conn: sqlite3.Connection, message_ids: Sequence[int]
+) -> list[ReactionRow]:
+    ids = list(message_ids)
+    if not ids:
+        return []
+    placeholders = ",".join("?" for _ in ids)
+    rows = conn.execute(
+        "SELECT message_id, emoji, count FROM reactions"
+        f" WHERE message_id IN ({placeholders}) ORDER BY message_id, emoji",
+        ids,
+    ).fetchall()
+    return [
+        ReactionRow(message_id=row["message_id"], emoji=row["emoji"], count=row["count"])
         for row in rows
     ]
