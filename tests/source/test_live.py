@@ -8,7 +8,12 @@ import discord
 
 from infovore.rows import ChannelKind
 from infovore.source.live import DiscordPySource, build_client, to_source_channel, to_source_message
-from infovore.source.protocol import SourceMessage, SourceRateLimitedError, SourceUnavailableError
+from infovore.source.protocol import (
+    SourceForbiddenError,
+    SourceMessage,
+    SourceRateLimitedError,
+    SourceUnavailableError,
+)
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -245,6 +250,10 @@ class FakeFetchableChannel:
     archived_error: Exception | None = None
     fetch_message_result: FakeMessage | None = None
     fetch_message_error: Exception | None = None
+    readable: bool = True
+
+    def permissions_for(self, member: object) -> "FakePermissions":
+        return FakePermissions(self.readable, self.readable)
 
     async def history(
         self, *, limit: int | None, after: object | None, oldest_first: bool | None
@@ -272,6 +281,12 @@ class FakeFetchableChannel:
 
 
 @dataclass
+class FakePermissions:
+    view_channel: bool
+    read_message_history: bool
+
+
+@dataclass
 class FakeRole:
     id: int
     name: str
@@ -290,6 +305,7 @@ class FakeGuild:
     threads: tuple[discord.Thread, ...] = ()
     roles: tuple[FakeRole, ...] = ()
     members: tuple[FakeMember, ...] = ()
+    me: object = None
 
 
 @dataclass
@@ -623,3 +639,37 @@ def test_build_client_enables_required_intents() -> None:
     assert client.intents.guilds is True
     assert client.intents.guild_messages is True
     assert client.intents.guild_reactions is True
+
+
+async def test_list_channels_skips_channels_the_bot_cannot_read() -> None:
+    guild_ref = FakeGuildRef(100)
+    readable = FakeFetchableChannel(10, guild_ref, "general")
+    hidden = FakeFetchableChannel(
+        11, guild_ref, "mods", readable=False, archived_error=make_http_exception(403)
+    )
+    hidden_thread = bare_thread(21, 100, parent_id=11, name="secret", archived=False)
+    open_thread = bare_thread(20, 100, parent_id=10, name="open", archived=False)
+    guild = FakeGuild(100, text_channels=(readable, hidden), threads=(open_thread, hidden_thread))
+    source = DiscordPySource(FakeClient(guilds={100: guild}))
+    assert {c.id for c in await source.list_channels(100)} == {10, 20}
+
+
+async def test_list_channels_skips_archived_threads_it_is_forbidden_to_list() -> None:
+    guild_ref = FakeGuildRef(100)
+    text_channel = FakeFetchableChannel(
+        10, guild_ref, "general", archived_error=make_http_exception(403)
+    )
+    guild = FakeGuild(100, text_channels=(text_channel,))
+    source = DiscordPySource(FakeClient(guilds={100: guild}))
+    assert {c.id for c in await source.list_channels(100)} == {10}
+
+
+async def test_history_forbidden_maps_to_source_forbidden_error() -> None:
+    guild_ref = FakeGuildRef(100)
+    channel = FakeFetchableChannel(10, guild_ref, "general", history_error=make_http_exception(403))
+    source = DiscordPySource(FakeClient(channels={10: channel}))
+    try:
+        await collect_history(source, 10, None, 10)
+        raise AssertionError("expected SourceForbiddenError")
+    except SourceForbiddenError as error:
+        assert isinstance(error, SourceUnavailableError)
