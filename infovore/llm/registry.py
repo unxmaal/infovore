@@ -4,6 +4,7 @@ from typing import Protocol
 from infovore.config import ConfigError, Settings, Stage, StageSettings
 from infovore.llm.claude_cli import ClaudeCliFactory
 from infovore.llm.fake import FakeBackend
+from infovore.llm.openai_compat import OpenAICompatFactory
 from infovore.llm.protocol import LLMBackend, LLMRequest, LLMResult
 
 
@@ -73,4 +74,5 @@ def default_registry() -> Registry:
     registry = Registry()
     registry.register(FakeBackendFactory())
     registry.register(ClaudeCliFactory())
+    registry.register(OpenAICompatFactory())
     return registry

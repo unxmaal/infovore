@@ -34,7 +34,7 @@ Each stage — `extract`, `probe`, `judge` — has its own backend selection, al
 | `INFOVORE_<STAGE>_TIMEOUT` | `60` | Per-request timeout in seconds for that stage. Must be a positive number. |
 | `INFOVORE_<STAGE>_<KEY>` | *(none)* | Any other `INFOVORE_<STAGE>_*` variable is passed through to that stage's `StageSettings.options` under its lowercased key (e.g. `INFOVORE_EXTRACT_BINARY_PATH` becomes `options["binary_path"]`), for backend-specific settings such as `claude_cli`'s binary path or `openai_compat`'s base URL and key. |
 
-`infovore.llm.registry.Registry` maps each stage's configured backend name to a `BackendFactory` (`name`, `validate(StageSettings) -> list[str]`, `build(StageSettings) -> LLMBackend`); `default_registry()` registers the `fake` and `claude_cli` factories. `Registry.validate(settings)` reports an unknown backend name per stage plus anything the matching factory's own `validate` rejects; `Registry.build_backends(settings)` raises `ConfigError` if validation fails, otherwise returns one backend per stage; `Registry.health_check(backends)` sends one trivial request per backend and reports `None` on success or the error message on failure, without ever raising.
+`infovore.llm.registry.Registry` maps each stage's configured backend name to a `BackendFactory` (`name`, `validate(StageSettings) -> list[str]`, `build(StageSettings) -> LLMBackend`); `default_registry()` registers the `fake`, `claude_cli`, and `openai_compat` factories. `Registry.validate(settings)` reports an unknown backend name per stage plus anything the matching factory's own `validate` rejects; `Registry.build_backends(settings)` raises `ConfigError` if validation fails, otherwise returns one backend per stage; `Registry.health_check(backends)` sends one trivial request per backend and reports `None` on success or the error message on failure, without ever raising.
 
 ### `claude_cli` backend
 
@@ -51,6 +51,39 @@ Argv, in exact order: `<binary> -p --model <model> --system-prompt <request.syst
 - Within a parsed `is_error` payload: `api_error_status == 429`, or `result`/`stderr` mentioning "usage limit", "rate limit", or "limit reached" (case-insensitive), is `usage_limit`, with `retry_after` parsed from an ISO-8601 timestamp or a 10-digit Unix epoch seconds value found in that text (rounded to the nearest second, floored at zero), defaulting to `300.0` seconds when no such timestamp is present. `api_error_status == 529` or in `500..599` is `transient`. `api_error_status` in `401`/`403`, or "not logged in"/"authentication" in the text, is `fatal`. Anything else `is_error` is `fatal`.
 
 Capabilities: `native_json_schema=True`, `max_concurrency` is the stage's configured concurrency.
+
+### `openai_compat` backend
+
+`infovore.llm.openai_compat.OpenAICompatFactory` (registered as `openai_compat`) drives any OpenAI-compatible Chat Completions endpoint through the `openai` SDK: vLLM, llama.cpp, Ollama, LM Studio/MLX, or a hosted provider. It is the only module allowed to import `openai` or `httpx2` (enforced by ruff `banned-api`; classic `httpx` stays banned everywhere too, in case a future dependency bump reintroduces it).
+
+A stage picks this backend with `INFOVORE_<STAGE>_BACKEND=openai_compat` and configures it with these `INFOVORE_<STAGE>_*` options (passed through `StageSettings.options`):
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `INFOVORE_<STAGE>_BASE_URL` | *(required)* | Base URL of the OpenAI-compatible endpoint, e.g. `http://localhost:11434/v1` for Ollama. |
+| `INFOVORE_<STAGE>_API_KEY` | *(required)* | API key sent to the endpoint. Never logged or included in error messages; local servers that don't check it still need a placeholder value such as `ollama`. |
+| `INFOVORE_<STAGE>_JSON_SCHEMA_SUPPORTED` | `false` | `true` or `false` (case-insensitive). Whether the endpoint supports native `response_format` json_schema output. When `false`, the backend asks for plain text and the extractor layer extracts the first JSON object from it instead. |
+
+Examples:
+
+```
+INFOVORE_EXTRACT_BACKEND=openai_compat
+INFOVORE_EXTRACT_BASE_URL=https://vllm.internal.example/v1
+INFOVORE_EXTRACT_API_KEY=sk-...
+INFOVORE_EXTRACT_JSON_SCHEMA_SUPPORTED=true
+
+INFOVORE_PROBE_BACKEND=openai_compat
+INFOVORE_PROBE_BASE_URL=http://localhost:11434/v1
+INFOVORE_PROBE_API_KEY=ollama
+INFOVORE_PROBE_MODEL=llama3.1
+INFOVORE_PROBE_JSON_SCHEMA_SUPPORTED=false
+
+INFOVORE_JUDGE_BACKEND=openai_compat
+INFOVORE_JUDGE_BASE_URL=http://localhost:1234/v1
+INFOVORE_JUDGE_API_KEY=lm-studio
+```
+
+Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, except when the response body reports the OpenAI error code `insufficient_quota`, which maps to `usage_limit` instead (a hard billing/plan cap rather than a retryable rate limit) — also honoring `retry-after` when present. HTTP 5xx and connection/timeout errors map to `transient`. HTTP 401/403/400/404 map to `fatal`. A `finish_reason` of `length` or `content_filter`, an empty completion, or (when a JSON schema was requested and natively supported) a response that fails to parse as JSON all map to `fatal`. Usage is recorded from the response when the endpoint reports it, `None` otherwise; the model id is whatever the server echoes back, falling back to the configured model if blank.
 
 ## Running
 
@@ -229,4 +262,4 @@ uv run mypy
 
 Every change is red/green TDD on a feature branch named `<issue>-<slug>`, opened as a PR that references its issue. Coverage is enforced at 100% line and branch.
 
-Import boundaries are enforced by ruff `banned-api`: `discord` only in `infovore/source/live.py`, process spawning only in `infovore/llm/claude_cli.py`, `openai`/`httpx` only in `infovore/llm/openai_compat.py`.
+Import boundaries are enforced by ruff `banned-api`: `discord` only in `infovore/source/live.py`, process spawning only in `infovore/llm/claude_cli.py`, `openai`/`httpx`/`httpx2` only in `infovore/llm/openai_compat.py`.
