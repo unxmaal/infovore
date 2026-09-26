@@ -31,3 +31,37 @@ def test_every_schema_object_is_documented_in_the_data_model_section(tmp_path: P
 def test_purpose_and_architecture_sections_are_written() -> None:
     assert len(section("Purpose").split()) > 40
     assert len(section("Architecture").split()) > 80
+
+
+def test_every_builtin_command_is_documented_in_running() -> None:
+    from infovore.cli import builtin_commands
+
+    running = section("Running")
+    missing = [
+        command.name
+        for command in builtin_commands()
+        if f"infovore {command.name}" not in running
+    ]
+    assert missing == []
+
+
+def test_runbook_covers_first_run_to_steady_state() -> None:
+    runbook = section("Running").split("### Runbook", 1)
+    assert len(runbook) == 2, "README 'Running' needs a '### Runbook' subsection"
+    body = runbook[1]
+    for needle in (
+        "Message Content",
+        "Server Members",
+        "no-archive",
+        "Server notice",
+        "infovore sync-optouts",
+        "infovore backfill",
+        "infovore chunk",
+        "infovore extract --mode trial",
+        "infovore probe",
+        "infovore review",
+        "infovore promote",
+        "infovore run",
+        "infovore snapshot",
+    ):
+        assert needle in body, needle
