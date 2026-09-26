@@ -9,7 +9,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.fake import FakeBackend
-from infovore.llm.protocol import ErrorKind, LLMBackend, LLMResult
+from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import Registry
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
 
@@ -197,3 +197,85 @@ def test_extract_health_check_failure_exits_backend(tmp_path: Path) -> None:
 
     assert code == ExitCode.BACKEND
     assert "not logged in" in err
+
+
+class FlushCountingIO(io.StringIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.flushes_at: list[int] = []
+
+    def flush(self) -> None:
+        self.flushes_at.append(self.getvalue().count("\n"))
+        super().flush()
+
+
+def test_extract_live_mode_streams_flushed_progress_lines(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = registry_with(success_results())
+    out = FlushCountingIO()
+    err = io.StringIO()
+    code = main(
+        ["extract"], environ=env, dotenv_path=None, stdout=out, stderr=err, registry=registry
+    )
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "extract: live mode, draining queued exchanges"
+    assert lines[1] == "exchange 1: 1 claims (1 done)"
+    assert out.flushes_at[:2] == [1, 2]
+
+
+def test_extract_trial_mode_streams_known_total_counter(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    exchange_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    registry = registry_with(success_results())
+
+    code, out, _ = run(
+        ["extract", "--mode", "trial", "--exchange-id", str(exchange_id)], env, registry
+    )
+
+    assert code == ExitCode.OK
+    lines = out.splitlines()
+    assert lines[0] == "extract: trial mode, 1 exchanges queued"
+    assert lines[1] == f"exchange {exchange_id}: 1 claims (1/1)"
+
+
+def test_extract_start_line_is_written_before_backend_processes_any_exchange(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    seen_first_line_early: list[bool] = []
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if request.system == "health check":
+            return HEALTH_OK
+        seen_first_line_early.append(
+            "extract: live mode, draining queued exchanges" in out.getvalue()
+        )
+        return LLMResult.ok_structured(VALID_EXTRACTION_OUT, "scripted-model")
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: StageSettings) -> list[str]:
+            return []
+
+        def build(self, settings: StageSettings) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    code = main(
+        ["extract"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert code == ExitCode.OK
+    assert seen_first_line_early == [True]

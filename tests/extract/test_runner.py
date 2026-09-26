@@ -26,7 +26,13 @@ from infovore.extract.protocol import (
     FailureKind,
 )
 from infovore.extract.runner import (
+    ExchangeClaimed,
+    ExchangeFailed,
+    ExchangePaused,
+    ExchangeSkipped,
+    ExtractionEvent,
     ExtractionReport,
+    ExtractionStarted,
     PromptNotPromotedError,
     run_extraction,
     select_trial_sample,
@@ -795,6 +801,137 @@ def test_select_trial_sample_skips_an_exhausted_stratum_in_round_robin(tmp_path:
     for exchange_id in sample:
         channel_counts[exchanges[exchange_id]] = channel_counts.get(exchanges[exchange_id], 0) + 1
     assert channel_counts == {1: 1, 2: 2}
+
+
+def test_progress_events_trial_mode_known_total(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = seed_exchange(conn, [a_message(1, content="FACT: Octane2 :: needs a jumper")])
+    assert exchange.id is not None
+    exchange_id = exchange.id
+    events: list[ExtractionEvent] = []
+
+    async def go() -> ExtractionReport:
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+            exchange_ids=[exchange_id],
+            progress=events.append,
+        )
+
+    asyncio.run(go())
+
+    assert events == [
+        ExtractionStarted(mode=RunMode.TRIAL, total=1),
+        ExchangeClaimed(exchange_id=exchange_id, claims=1, index=1, total=1),
+    ]
+
+
+def test_progress_events_live_mode_unknown_total_and_skip(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    opt_out(conn, 99)
+    exchange = seed_exchange(conn, [a_message(1, author_id=99, content="FACT: X :: y")])
+    assert exchange.id is not None
+    exchange_id = exchange.id
+    events: list[ExtractionEvent] = []
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+            progress=events.append,
+        )
+
+    asyncio.run(go())
+
+    assert events == [
+        ExtractionStarted(mode=RunMode.LIVE, total=None),
+        ExchangeSkipped(exchange_id=exchange_id, index=1, total=None),
+    ]
+
+
+def test_progress_events_pause_then_failure_in_order(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)])
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=None,
+                output_tokens=None,
+                failure=Failure(FailureKind.USAGE_LIMIT, "slow down", 5.0),
+            ),
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=None,
+                output_tokens=None,
+                failure=Failure(FailureKind.TRANSIENT, "boom", None),
+            ),
+        ]
+    )
+    events: list[ExtractionEvent] = []
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            extractor,
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=1,
+            concurrency=1,
+            progress=events.append,
+        )
+
+    asyncio.run(go())
+
+    assert events == [
+        ExtractionStarted(mode=RunMode.LIVE, total=None),
+        ExchangePaused(exchange_id=1, retry_after=5.0, index=0, total=None),
+        ExchangeFailed(exchange_id=1, kind="transient", index=1, total=None),
+    ]
+
+
+def test_progress_defaults_to_noop(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = seed_exchange(conn, [a_message(1, content="FACT: Octane2 :: needs a jumper")])
+    assert exchange.id is not None
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+        )
+
+    report = asyncio.run(go())
+    assert report.succeeded == 1
 
 
 def test_select_trial_sample_different_seeds_can_differ(tmp_path: Path) -> None:
