@@ -5,7 +5,8 @@ import httpx
 import openai
 import pytest
 
-from infovore.llm.openai_compat import OpenAICompatBackend
+from infovore.config import StageSettings
+from infovore.llm.openai_compat import OpenAICompatBackend, OpenAICompatFactory
 from infovore.llm.protocol import Capabilities, ErrorKind, LLMBackend, LLMRequest, Usage
 
 SCHEMA: Mapping[str, object] = {
@@ -251,6 +252,69 @@ async def test_bad_json_with_schema_maps_to_fatal() -> None:
     assert result.error is not None
     assert result.error.kind is ErrorKind.FATAL
     assert result.error.message
+
+
+def stage_settings(**options: str) -> StageSettings:
+    return StageSettings(
+        backend="openai_compat",
+        model="model-x",
+        concurrency=3,
+        timeout_seconds=9.0,
+        options=options,
+    )
+
+
+def test_factory_name() -> None:
+    assert OpenAICompatFactory().name == "openai_compat"
+
+
+def test_validate_requires_base_url_and_api_key() -> None:
+    errors = OpenAICompatFactory().validate(stage_settings())
+    assert "base_url is required" in errors
+    assert "api_key is required" in errors
+
+
+def test_validate_accepts_valid_settings() -> None:
+    errors = OpenAICompatFactory().validate(
+        stage_settings(base_url="http://localhost:11434/v1", api_key="k")
+    )
+    assert errors == []
+
+
+def test_validate_rejects_invalid_json_schema_supported() -> None:
+    errors = OpenAICompatFactory().validate(
+        stage_settings(base_url="http://x", api_key="k", json_schema_supported="maybe")
+    )
+    assert any("json_schema_supported" in error for error in errors)
+
+
+def test_validate_accepts_true_and_false_json_schema_supported() -> None:
+    for value in ("true", "false", "TRUE", "False"):
+        errors = OpenAICompatFactory().validate(
+            stage_settings(base_url="http://x", api_key="k", json_schema_supported=value)
+        )
+        assert errors == []
+
+
+def test_build_constructs_backend_with_capabilities() -> None:
+    settings = stage_settings(
+        base_url="http://localhost:11434/v1", api_key="k", json_schema_supported="true"
+    )
+    built = OpenAICompatFactory().build(settings)
+    assert built.capabilities() == Capabilities(native_json_schema=True, max_concurrency=3)
+
+
+def test_build_defaults_json_schema_supported_to_false() -> None:
+    settings = stage_settings(base_url="http://localhost:11434/v1", api_key="k")
+    built = OpenAICompatFactory().build(settings)
+    assert built.capabilities().native_json_schema is False
+
+
+def test_validate_never_includes_api_key_value() -> None:
+    settings = stage_settings(json_schema_supported="nonsense", api_key="super-secret-value")
+    errors = OpenAICompatFactory().validate(settings)
+    assert errors
+    assert all("super-secret-value" not in error for error in errors)
 
 
 class OpenAICompatHarness:

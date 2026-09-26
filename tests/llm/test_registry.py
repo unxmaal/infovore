@@ -144,6 +144,32 @@ def test_default_registry_builds_claude_cli_backend() -> None:
     assert isinstance(backends[Stage.EXTRACT], ClaudeCliBackend)
 
 
+def test_default_registry_builds_openai_compat_backends() -> None:
+    registry = default_registry()
+    settings = settings_with(
+        {
+            stage: stage_settings(
+                backend="openai_compat",
+                model=stage.value,
+                options={"base_url": "http://localhost:11434/v1", "api_key": "k"},
+            )
+            for stage in Stage
+        }
+    )
+    backends = registry.build_backends(settings)
+    assert set(backends) == set(Stage)
+
+
+def test_default_registry_reports_missing_openai_compat_options() -> None:
+    registry = default_registry()
+    settings = settings_with(
+        {stage: stage_settings(backend="openai_compat") for stage in Stage}
+    )
+    errors = registry.validate(settings)
+    assert len(errors) == 6
+    assert all("base_url is required" in error or "api_key is required" in error for error in errors)
+
+
 async def test_health_check_reports_none_when_backend_is_healthy() -> None:
     registry = default_registry()
     settings = settings_with({stage: stage_settings() for stage in Stage})
