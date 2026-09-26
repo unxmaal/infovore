@@ -91,3 +91,16 @@ def test_configuration_documents_the_shared_channel_allowlist() -> None:
     for needle in ("is_channel_allowed", "events_ignored"):
         assert needle in configuration or needle in running, needle
     assert "optional" in configuration
+
+
+def test_triage_section_documents_every_signal_and_the_version() -> None:
+    import inspect
+
+    from infovore.triage import score
+
+    triage = section("Triage")
+    names = set(re.findall(r'reasons\.append\(\("(\w+)"', inspect.getsource(score)))
+    names |= set(re.findall(r'\("(\w+)", [A-Z_]+, [A-Z_]+_WEIGHT\)', inspect.getsource(score)))
+    assert names
+    assert sorted(name for name in names if f"`{name}`" not in triage) == []
+    assert score.TRIAGE_VERSION in triage
