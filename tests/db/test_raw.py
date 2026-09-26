@@ -14,7 +14,9 @@ from infovore.db.raw import (
     mark_deleted,
     mark_edited,
     message_revisions,
+    reactions_for_messages,
     set_backfill_checkpoint,
+    set_reaction_count,
     upsert_attachment,
     upsert_channel,
     upsert_message,
@@ -308,3 +310,50 @@ def test_attachments_for_messages_filters_by_message_id(conn: sqlite3.Connection
     upsert_attachment(conn, make_attachment(attachment_id=2, message_id=2))
     fetched = attachments_for_messages(conn, [1])
     assert [a.id for a in fetched] == [1]
+
+
+def test_set_reaction_count_inserts_new(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message())
+    set_reaction_count(conn, 1, "\U0001f44d", 3)
+    reactions = reactions_for_messages(conn, [1])
+    assert len(reactions) == 1
+    assert reactions[0].message_id == 1
+    assert reactions[0].emoji == "\U0001f44d"
+    assert reactions[0].count == 3
+
+
+def test_set_reaction_count_updates_existing(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message())
+    set_reaction_count(conn, 1, "\U0001f44d", 3)
+    set_reaction_count(conn, 1, "\U0001f44d", 7)
+    reactions = reactions_for_messages(conn, [1])
+    assert len(reactions) == 1
+    assert reactions[0].count == 7
+
+
+def test_set_reaction_count_zero_deletes_row(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message())
+    set_reaction_count(conn, 1, "\U0001f44d", 3)
+    set_reaction_count(conn, 1, "\U0001f44d", 0)
+    assert reactions_for_messages(conn, [1]) == []
+
+
+def test_set_reaction_count_negative_deletes_row_when_absent(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message())
+    set_reaction_count(conn, 1, "\U0001f44d", -1)
+    assert reactions_for_messages(conn, [1]) == []
+
+
+def test_reactions_for_messages_returns_empty_list_for_empty_ids(
+    conn: sqlite3.Connection,
+) -> None:
+    assert reactions_for_messages(conn, []) == []
+
+
+def test_reactions_for_messages_filters_by_message_id(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message(message_id=1))
+    upsert_message(conn, make_message(message_id=2))
+    set_reaction_count(conn, 1, "\U0001f44d", 1)
+    set_reaction_count(conn, 2, "\U0001f44d", 1)
+    fetched = reactions_for_messages(conn, [1])
+    assert [r.message_id for r in fetched] == [1]
