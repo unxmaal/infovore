@@ -1,11 +1,13 @@
 import logging
 import sqlite3
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 
 from infovore.db.claims import retract_claims_with_all_sources_deleted
 from infovore.db.exchanges import mark_stale_for_message
 from infovore.db.raw import (
+    get_channel,
     get_message,
     mark_deleted,
     mark_edited,
@@ -14,6 +16,7 @@ from infovore.db.raw import (
     upsert_channel,
     upsert_message,
 )
+from infovore.ingest.allowlist import is_channel_allowed
 from infovore.ingest.normalize import NormalizedMessage, normalize_channel, normalize_message
 from infovore.privacy.optout import opted_out_user_ids, redact_normalized
 from infovore.source.protocol import (
@@ -38,12 +41,14 @@ class EventOutcome(StrEnum):
     REACTION_UPDATED = "reaction_updated"
     REACTION_SKIPPED = "reaction_skipped"
     THREAD_CREATED = "thread_created"
+    CHANNEL_IGNORED = "channel_ignored"
 
 
 @dataclass
 class ConsumeReport:
     processed: int = 0
     failed: int = 0
+    ignored: int = 0
 
 
 def _persist_message(conn: sqlite3.Connection, normalized: NormalizedMessage) -> None:
@@ -54,10 +59,39 @@ def _persist_message(conn: sqlite3.Connection, normalized: NormalizedMessage) ->
         set_reaction_count(conn, reaction.message_id, reaction.emoji, reaction.count)
 
 
+async def _channel_allowed(
+    conn: sqlite3.Connection,
+    source: DiscordSource | None,
+    channel_id: int,
+    guild_id: int,
+    channel_ids: Sequence[int],
+) -> bool:
+    if not channel_ids or channel_id in channel_ids:
+        return True
+    channel = get_channel(conn, channel_id)
+    if channel is None and source is not None:
+        for candidate in await source.list_channels(guild_id):
+            if candidate.id == channel_id:
+                upsert_channel(conn, normalize_channel(candidate))
+                channel = get_channel(conn, channel_id)
+                break
+    if channel is None:
+        return False
+    return is_channel_allowed(channel_id, channel.parent_id, channel_ids)
+
+
 async def _handle_message_created(
-    conn: sqlite3.Connection, event: MessageCreated, clock: Clock, include_bots: bool
+    conn: sqlite3.Connection,
+    event: MessageCreated,
+    clock: Clock,
+    include_bots: bool,
+    channel_ids: Sequence[int],
+    source: DiscordSource | None,
 ) -> EventOutcome:
-    normalized = normalize_message(event.message, clock.now(), include_bots)
+    message = event.message
+    if not await _channel_allowed(conn, source, message.channel_id, message.guild_id, channel_ids):
+        return EventOutcome.CHANNEL_IGNORED
+    normalized = normalize_message(message, clock.now(), include_bots)
     if normalized is None:
         return EventOutcome.MESSAGE_SKIPPED
     normalized = redact_normalized(normalized, opted_out_user_ids(conn))
@@ -66,9 +100,17 @@ async def _handle_message_created(
 
 
 async def _handle_message_edited(
-    conn: sqlite3.Connection, event: MessageEdited, clock: Clock, include_bots: bool
+    conn: sqlite3.Connection,
+    event: MessageEdited,
+    clock: Clock,
+    include_bots: bool,
+    channel_ids: Sequence[int],
+    source: DiscordSource | None,
 ) -> EventOutcome:
-    normalized = normalize_message(event.message, clock.now(), include_bots)
+    message = event.message
+    if not await _channel_allowed(conn, source, message.channel_id, message.guild_id, channel_ids):
+        return EventOutcome.CHANNEL_IGNORED
+    normalized = normalize_message(message, clock.now(), include_bots)
     if normalized is None:
         return EventOutcome.MESSAGE_SKIPPED
     normalized = redact_normalized(normalized, opted_out_user_ids(conn))
@@ -82,8 +124,13 @@ async def _handle_message_edited(
 
 
 async def _handle_message_deleted(
-    conn: sqlite3.Connection, event: MessageDeleted, clock: Clock
+    conn: sqlite3.Connection, event: MessageDeleted, clock: Clock, channel_ids: Sequence[int]
 ) -> EventOutcome:
+    if channel_ids and event.channel_id not in channel_ids:
+        channel = get_channel(conn, event.channel_id)
+        parent_id = channel.parent_id if channel is not None else None
+        if not is_channel_allowed(event.channel_id, parent_id, channel_ids):
+            return EventOutcome.CHANNEL_IGNORED
     mark_deleted(conn, event.message_id, clock.now())
     retract_claims_with_all_sources_deleted(conn, clock.now())
     return EventOutcome.MESSAGE_DELETED
@@ -98,39 +145,60 @@ async def _handle_reaction_changed(
     return EventOutcome.REACTION_UPDATED
 
 
-async def _handle_thread_created(conn: sqlite3.Connection, event: ThreadCreated) -> EventOutcome:
-    upsert_channel(conn, normalize_channel(event.channel))
+async def _handle_thread_created(
+    conn: sqlite3.Connection, event: ThreadCreated, channel_ids: Sequence[int]
+) -> EventOutcome:
+    channel = event.channel
+    if not is_channel_allowed(channel.id, channel.parent_id, channel_ids):
+        return EventOutcome.CHANNEL_IGNORED
+    upsert_channel(conn, normalize_channel(channel))
     return EventOutcome.THREAD_CREATED
 
 
 async def handle_event(
-    conn: sqlite3.Connection, event: SourceEvent, clock: Clock, include_bots: bool
+    conn: sqlite3.Connection,
+    event: SourceEvent,
+    clock: Clock,
+    include_bots: bool,
+    channel_ids: Sequence[int] = (),
+    source: DiscordSource | None = None,
 ) -> EventOutcome:
     match event:
         case MessageCreated():
-            return await _handle_message_created(conn, event, clock, include_bots)
+            return await _handle_message_created(
+                conn, event, clock, include_bots, channel_ids, source
+            )
         case MessageEdited():
-            return await _handle_message_edited(conn, event, clock, include_bots)
+            return await _handle_message_edited(
+                conn, event, clock, include_bots, channel_ids, source
+            )
         case MessageDeleted():
-            return await _handle_message_deleted(conn, event, clock)
+            return await _handle_message_deleted(conn, event, clock, channel_ids)
         case ReactionChanged():
             return await _handle_reaction_changed(conn, event)
         case ThreadCreated():
-            return await _handle_thread_created(conn, event)
+            return await _handle_thread_created(conn, event, channel_ids)
         case _:
             raise TypeError(f"unhandled event type: {type(event)!r}")
 
 
 async def consume(
-    conn: sqlite3.Connection, source: DiscordSource, clock: Clock, include_bots: bool
+    conn: sqlite3.Connection,
+    source: DiscordSource,
+    clock: Clock,
+    include_bots: bool,
+    channel_ids: Sequence[int] = (),
 ) -> ConsumeReport:
     report = ConsumeReport()
     async for event in source.events():
         try:
-            await handle_event(conn, event, clock, include_bots)
+            outcome = await handle_event(conn, event, clock, include_bots, channel_ids, source)
         except Exception:
             logger.exception("event handling failed: %r", event)
             report.failed += 1
         else:
-            report.processed += 1
+            if outcome is EventOutcome.CHANNEL_IGNORED:
+                report.ignored += 1
+            else:
+                report.processed += 1
     return report

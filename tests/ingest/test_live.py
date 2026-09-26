@@ -422,7 +422,10 @@ async def test_handle_message_created_in_allowed_channel_is_created(
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
     outcome = await handle_event(
-        conn, MessageCreated(make_message(channel_id=10)), clock, include_bots=False,
+        conn,
+        MessageCreated(make_message(channel_id=10)),
+        clock,
+        include_bots=False,
         channel_ids=(10,),
     )
     assert outcome is EventOutcome.MESSAGE_CREATED
@@ -433,7 +436,10 @@ async def test_handle_message_created_in_non_allowed_channel_is_ignored(
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
     outcome = await handle_event(
-        conn, MessageCreated(make_message(channel_id=20)), clock, include_bots=False,
+        conn,
+        MessageCreated(make_message(channel_id=20)),
+        clock,
+        include_bots=False,
         channel_ids=(10,),
     )
     assert outcome is EventOutcome.CHANNEL_IGNORED
@@ -476,13 +482,21 @@ async def test_handle_message_created_in_unknown_thread_resolves_parent_via_sour
     source = FakeDiscordSource(
         channels=[
             SourceChannel(
+                id=201,
+                guild_id=100,
+                parent_id=10,
+                name="another-thread",
+                kind=ChannelKind.THREAD,
+                archived=False,
+            ),
+            SourceChannel(
                 id=200,
                 guild_id=100,
                 parent_id=10,
                 name="a-thread",
                 kind=ChannelKind.THREAD,
                 archived=False,
-            )
+            ),
         ]
     )
     message = make_message(channel_id=200, thread_id=200)
@@ -545,7 +559,10 @@ async def test_handle_message_deleted_direct_channel_match_is_processed(
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
     await handle_event(
-        conn, MessageCreated(make_message(channel_id=10)), clock, include_bots=False,
+        conn,
+        MessageCreated(make_message(channel_id=10)),
+        clock,
+        include_bots=False,
         channel_ids=(10,),
     )
     outcome = await handle_event(
@@ -612,7 +629,10 @@ async def test_handle_reaction_changed_on_a_never_stored_ignored_message_is_skip
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
     await handle_event(
-        conn, MessageCreated(make_message(channel_id=20)), clock, include_bots=False,
+        conn,
+        MessageCreated(make_message(channel_id=20)),
+        clock,
+        include_bots=False,
         channel_ids=(10,),
     )
     outcome = await handle_event(
