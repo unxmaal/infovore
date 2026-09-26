@@ -57,6 +57,7 @@ def make_settings(tmp_path: Path) -> Settings:
         db_path=tmp_path / "infovore.db",
         scratch_dir=tmp_path / "scratch",
         stages={Stage.EXTRACT: stage, Stage.PROBE: stage, Stage.JUDGE: stage},
+        triage_min_score=0.0,
     )
 
 
@@ -386,6 +387,7 @@ async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path)
     assert events == [
         CycleStepStarted(step="sync-optouts"),
         CycleStepStarted(step="chunk"),
+        CycleStepStarted(step="triage"),
         CycleStepStarted(step="extract"),
         CycleStepStarted(step="probe"),
     ]
@@ -589,9 +591,10 @@ def test_run_command_once_flag_streams_flushed_progress_lines(tmp_path: Path) ->
     assert lines[3] == "opening discord source..."
     assert lines[4] == "cycle: sync-optouts"
     assert lines[5] == "cycle: chunk"
-    assert lines[6] == "cycle: extract"
-    assert lines[7] == "cycle: probe"
-    assert out.flushes_at[:8] == [1, 2, 3, 4, 5, 6, 7, 8]
+    assert lines[6] == "cycle: triage"
+    assert lines[7] == "cycle: extract"
+    assert lines[8] == "cycle: probe"
+    assert out.flushes_at[:9] == [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
 def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: Path) -> None:

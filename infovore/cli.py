@@ -96,7 +96,7 @@ class StatusCommand:
         return None
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
-        report = collect_status(context.conn)
+        report = collect_status(context.conn, context.settings.triage_min_score)
         lines = [
             f"channels: {report.channels}",
             f"messages: {report.messages} (deleted {report.deleted_messages})",
@@ -107,6 +107,8 @@ class StatusCommand:
             f"last extraction: {_format_time(report.last_extraction_at)}",
             f"last probe: {_format_time(report.last_probe_at)}",
             f"live prompt version: {report.live_prompt_version or 'none'}",
+            f"triaged: {report.triaged_exchanges}"
+            f" (above threshold {report.above_threshold_exchanges})",
             f"labels by source: {_format_nested_counts(report.labels_by_source)}",
             f"labels effective: {_format_counts(report.labels_effective)}",
             *(
@@ -265,6 +267,7 @@ def builtin_commands() -> list[Command]:
     from infovore.extract.novelty import ProbeCommand
     from infovore.extract.review import PromoteCommand, ReviewCommand
     from infovore.run import RunCommand
+    from infovore.triage.command import TriageCommand
     from infovore.triage.label import LabelCommand
 
     return [
@@ -274,6 +277,7 @@ def builtin_commands() -> list[Command]:
         BackfillCommand(),
         SnapshotCommand(),
         ProbeCommand(),
+        TriageCommand(),
         ExtractCommand(),
         RunCommand(),
         ReviewCommand(),

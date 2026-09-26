@@ -10,6 +10,7 @@ from infovore.extract.runner import (
     ExtractionEvent,
     ExtractionStarted,
     PromptNotPromotedError,
+    UntriagedExchangesError,
     run_extraction,
     select_trial_sample,
 )
@@ -51,6 +52,8 @@ class ExtractCommand:
         parser.add_argument("--sample", type=int, default=None)
         parser.add_argument("--seed", type=int, default=0)
         parser.add_argument("--exchange-id", type=int, action="append", default=[])
+        parser.add_argument("--min-score", type=float, default=None)
+        parser.add_argument("--max-score", type=float, default=None)
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode, _say, stage_backend
@@ -63,7 +66,15 @@ class ExtractCommand:
         if mode is RunMode.TRIAL:
             ids: list[int] = []
             if args.sample is not None:
-                ids.extend(select_trial_sample(context.conn, args.sample, args.seed))
+                ids.extend(
+                    select_trial_sample(
+                        context.conn,
+                        args.sample,
+                        args.seed,
+                        min_score=args.min_score,
+                        max_score=args.max_score,
+                    )
+                )
             ids.extend(args.exchange_id)
             exchange_ids = sorted(set(ids))
 
@@ -82,6 +93,7 @@ class ExtractCommand:
                 batch_size=context.settings.batch_size,
                 max_retries=context.settings.max_retries,
                 concurrency=stage_settings.concurrency,
+                min_score=context.settings.triage_min_score,
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
             )
@@ -89,6 +101,10 @@ class ExtractCommand:
             raise ConfigError(
                 f"prompt version {error.version} is not promoted;"
                 f" run `infovore promote --prompt-version {error.version}`"
+            ) from error
+        except UntriagedExchangesError as error:
+            raise ConfigError(
+                "pending exchanges are untriaged; run `infovore triage` first"
             ) from error
 
         context.stdout.write(

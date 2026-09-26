@@ -35,6 +35,9 @@ def _row_to_exchange(row: sqlite3.Row) -> ExchangeRow:
         extraction_status=ExtractionStatus(row["extraction_status"]),
         retry_count=row["retry_count"],
         last_error=row["last_error"],
+        triage_score=row["triage_score"],
+        triage_reasons=row["triage_reasons"],
+        triage_version=row["triage_version"],
     )
 
 
@@ -123,14 +126,38 @@ def grouped_message_ids(conn: sqlite3.Connection) -> set[int]:
 
 
 def claimable_exchanges(
-    conn: sqlite3.Connection, limit: int, max_retries: int
+    conn: sqlite3.Connection, limit: int, max_retries: int, min_score: float | None = None
 ) -> list[ExchangeRow]:
+    condition = "extraction_status IN (?, ?) AND retry_count < ?"
+    params: list[object] = [
+        ExtractionStatus.PENDING.value,
+        ExtractionStatus.STALE.value,
+        max_retries,
+    ]
+    if min_score is not None:
+        condition += " AND triage_score >= ?"
+        params.append(min_score)
     rows = conn.execute(
-        "SELECT * FROM exchanges WHERE extraction_status IN (?, ?) AND retry_count < ?"
-        " ORDER BY started_at, id LIMIT ?",
-        (ExtractionStatus.PENDING.value, ExtractionStatus.STALE.value, max_retries, limit),
+        f"SELECT * FROM exchanges WHERE {condition} ORDER BY started_at, id LIMIT ?",
+        (*params, limit),
     ).fetchall()
     return [_row_to_exchange(row) for row in rows]
+
+
+def has_untriaged_claimable(
+    conn: sqlite3.Connection, current_version: str, max_retries: int
+) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM exchanges WHERE extraction_status IN (?, ?) AND retry_count < ?"
+        " AND (triage_version IS NULL OR triage_version != ?) LIMIT 1",
+        (
+            ExtractionStatus.PENDING.value,
+            ExtractionStatus.STALE.value,
+            max_retries,
+            current_version,
+        ),
+    ).fetchone()
+    return row is not None
 
 
 def set_status(

@@ -15,6 +15,7 @@ from infovore.rows import ChannelKind, RunMode
 from infovore.source.fake import FakeDiscordSource
 from infovore.source.protocol import SourceChannel, SourceMessage
 from infovore.timing import FixedClock, RecordingSleeper
+from infovore.triage.runner import triage_pending
 
 GUILD = 9
 CHANNEL = 1
@@ -75,6 +76,7 @@ async def run_pipeline(conn: sqlite3.Connection, source: FakeDiscordSource) -> N
     await sync_opt_outs(conn, source, GUILD, "no-archive", clock)
     await backfill(conn, source, GUILD, (CHANNEL,), clock, sleeper, include_bots=False)
     group_pending(conn, clock)
+    triage_pending(conn)
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     promote_prompt_version(conn, PROMPT_VERSION, clock.now())
     await run_extraction(

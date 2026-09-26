@@ -4,6 +4,7 @@ from pathlib import Path
 
 from infovore.db.connection import migrate, open_database
 from infovore.db.status import collect_status
+from infovore.triage.score import TRIAGE_VERSION
 
 NOW = "2026-01-01T00:00:00+00:00"
 LATER = "2026-01-02T00:00:00+00:00"
@@ -27,8 +28,32 @@ def test_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert report.last_extraction_at is None
     assert report.last_probe_at is None
     assert report.live_prompt_version is None
+    assert report.triaged_exchanges == 0
+    assert report.above_threshold_exchanges == 0
     assert report.labels_by_source == {}
     assert report.labels_effective == {}
+
+
+def test_triaged_and_above_threshold_counts(tmp_path: Path) -> None:
+    conn = fresh(tmp_path)
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES (1, 9, 'general', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}'),
+                 (2, 1, 9, 1, 'a', '{NOW}', 'y', '{NOW}', '{{}}'),
+                 (3, 1, 9, 1, 'a', '{NOW}', 'z', '{NOW}', '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}'),
+                 (1, 2, 2, '{NOW}', '{NOW}', 1, 'quiet_gap', 'b', 0.1, '{TRIAGE_VERSION}'),
+                 (1, 3, 3, '{NOW}', '{NOW}', 1, 'quiet_gap', 'c', NULL, NULL);
+        """
+    )
+    report = collect_status(conn, triage_min_score=0.3)
+    assert report.triaged_exchanges == 2
+    assert report.above_threshold_exchanges == 1
 
 
 def test_counts_and_last_runs(tmp_path: Path) -> None:
