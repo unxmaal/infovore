@@ -122,6 +122,27 @@ def test_insert_exchange_message_already_grouped_rolls_back(conn: sqlite3.Connec
     assert grouped_message_ids(conn) == {1}
 
 
+def test_insert_exchange_invalid_parent_exchange_id_propagates_and_rolls_back(
+    conn: sqlite3.Connection,
+) -> None:
+    insert_messages(conn, [1])
+    exchange = make_exchange(message_count=1, content_hash="bad-parent", parent_exchange_id=999)
+    with pytest.raises(sqlite3.IntegrityError):
+        insert_exchange(conn, exchange, [1])
+    assert exchange_count(conn) == 0
+    assert grouped_message_ids(conn) == set()
+
+
+def test_insert_exchange_nonexistent_message_id_propagates_and_rolls_back(
+    conn: sqlite3.Connection,
+) -> None:
+    exchange = make_exchange(message_count=1, content_hash="bad-message")
+    with pytest.raises(sqlite3.IntegrityError):
+        insert_exchange(conn, exchange, [12345])
+    assert exchange_count(conn) == 0
+    assert grouped_message_ids(conn) == set()
+
+
 def test_get_exchange_returns_none_when_missing(conn: sqlite3.Connection) -> None:
     assert get_exchange(conn, 999) is None
 
