@@ -6,6 +6,9 @@ dependencies = [
     "pydantic>=2.13.5",
 ]
 
+[project.scripts]
+infovore = "infovore.cli:run"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

@@ -38,6 +38,14 @@ Each stage — `extract`, `probe`, `judge` — has its own backend selection, al
 
 ## Running
 
+```
+uv run infovore status
+```
+
+Every subcommand loads configuration (environment, then `.env` in the working directory for anything not set), opens and migrates the database, and runs. `status` prints row counts, the exchange queue by status, claims by novelty, run outcomes, the last extraction and probe times, the live prompt version, and each stage's backend and model.
+
+Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3` an LLM backend is unavailable.
+
 ## Grouping rules
 
 `infovore/chunk/rules.py` groups the `MessageRow`s of one channel (plus its threads, which carry a `thread_id`) into `Group`s. Each `Group` has a `rule` (`GroupingRule.THREAD` | `REPLY_CHAIN` | `QUIET_GAP`), an ordered `messages` tuple, and a `context` tuple of uncitable overlap messages, non-empty only for parts produced by the size-cap split below. Every message given to `group_messages` ends up in exactly one group's `messages`, or is dropped first. Messages within a group, and groups within the returned list, are ordered by `(created_at, id)` (a group's position is its first message's key).
