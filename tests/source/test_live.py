@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import discord
 
 from infovore.rows import ChannelKind
-from infovore.source.live import DiscordPySource, to_source_channel, to_source_message
+from infovore.source.live import DiscordPySource, build_client, to_source_channel, to_source_message
 from infovore.source.protocol import SourceMessage, SourceRateLimitedError, SourceUnavailableError
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -613,3 +613,13 @@ async def test_events_close_ends_stream_immediately() -> None:
     source.close()
     events = await collect_events(source)
     assert events == []
+
+
+def test_build_client_enables_required_intents() -> None:
+    client = build_client()
+    assert isinstance(client, discord.Client)
+    assert client.intents.message_content is True
+    assert client.intents.members is True
+    assert client.intents.guilds is True
+    assert client.intents.guild_messages is True
+    assert client.intents.guild_reactions is True
