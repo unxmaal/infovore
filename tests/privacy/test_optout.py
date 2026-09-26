@@ -371,3 +371,19 @@ async def test_sync_opt_outs_with_no_changes_does_not_touch_opt_outs(tmp_path: P
     assert result.retracted_claims == ()
     row = conn.execute("SELECT since FROM opt_outs WHERE user_id = 7").fetchone()
     assert row["since"] == to_db_time(NOW)
+
+
+def test_redact_stored_scales_past_the_sqlite_variable_limit(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    now = to_db_time(datetime(2026, 1, 1, tzinfo=UTC))
+    count = 40_000
+    conn.executemany(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json) VALUES (?, 1, 1, 7, 'prolific', ?, 'x', ?, '{}')",
+        [(message_id, now, now) for message_id in range(1, count + 1)],
+    )
+    assert redact_stored(conn, frozenset({7})) == count
+    remaining = conn.execute(
+        "SELECT COUNT(*) FROM messages WHERE content != ?", (REDACTED_CONTENT,)
+    ).fetchone()[0]
+    assert remaining == 0
