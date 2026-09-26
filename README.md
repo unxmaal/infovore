@@ -61,6 +61,7 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `claim_sources` | which messages each claim cites |
 | `claims_fts` | full-text index over claim subject and statement (`unicode61`, keeping `-./_` inside tokens) |
 | `lore` | the product view: current, live, probed, net-new claims (see "Consuming the database") |
+| `exchange_labels` | ground-truth `lore`/`noise` labels per exchange, one row per `(exchange_id, source)`: `llm` (derived from trial runs) or `human` (hand correction), with `source_ref` and `labeled_at`; a human label always wins over an LLM one (see "Triage") |
 
 ## Configuration
 
