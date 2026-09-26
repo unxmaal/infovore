@@ -208,8 +208,7 @@ def claims_for_runs_needing_probe(
     placeholders = ",".join("?" for _ in run_ids)
     params: list[object] = list(run_ids)
     query = (
-        f"SELECT * FROM claims WHERE extraction_run_id IN ({placeholders})"
-        " AND retracted_at IS NULL"
+        f"SELECT * FROM claims WHERE extraction_run_id IN ({placeholders}) AND retracted_at IS NULL"
     )
     if probe_model is None:
         query += " AND novelty = ?"

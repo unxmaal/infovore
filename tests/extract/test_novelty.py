@@ -3,7 +3,14 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
-from infovore.db.claims import get_claim, record_run, register_prompt_version, set_novelty
+from infovore.db.claims import (
+    NewClaim,
+    get_claim,
+    record_run,
+    register_prompt_version,
+    retract_claim,
+    set_novelty,
+)
 from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.extract.fake import MarkerProbe
@@ -62,9 +69,7 @@ def seed_claim(
     message_id: int = 1,
     mode: RunMode = RunMode.LIVE,
 ) -> int:
-    if conn.execute(
-        "SELECT 1 FROM exchanges WHERE id = ?", (exchange_id,)
-    ).fetchone() is None:
+    if conn.execute("SELECT 1 FROM exchanges WHERE id = ?", (exchange_id,)).fetchone() is None:
         insert_message(conn, message_id)
         insert_exchange(conn, exchange_id, message_id)
     result = record_run(
@@ -77,9 +82,7 @@ def seed_claim(
     return result.claim_ids[0]
 
 
-def _new_claim(exchange_id: int, statement: str, message_id: int):
-    from infovore.db.claims import NewClaim
-
+def _new_claim(exchange_id: int, statement: str, message_id: int) -> NewClaim:
     return NewClaim(
         exchange_id=exchange_id,
         statement=statement,
@@ -190,9 +193,7 @@ async def test_run_probe_usage_limit_pauses_then_retries_same_claim(tmp_path: Pa
     probe = ScriptedProbe(
         {
             claim_id: [
-                ProbeOutcome(
-                    None, None, None, Failure(FailureKind.USAGE_LIMIT, "limited", 12.0)
-                ),
+                ProbeOutcome(None, None, None, Failure(FailureKind.USAGE_LIMIT, "limited", 12.0)),
                 ProbeOutcome(Novelty.KNOWN, "fake-model", "answer", None),
             ]
         }
@@ -241,14 +242,24 @@ async def test_run_probe_idempotent_per_model_second_run_probes_nothing(tmp_path
     seed_claim(conn, "widget H [known]")
 
     first = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model="fake-probe", limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model="fake-probe",
+        limit=10,
+        concurrency=2,
     )
     assert first.probed == 1
 
     second = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model="fake-probe", limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model="fake-probe",
+        limit=10,
+        concurrency=2,
     )
     assert second.probed == 0
     assert second.failed == 0
@@ -260,14 +271,24 @@ async def test_run_probe_reprobes_on_probe_model_change(tmp_path: Path) -> None:
     set_novelty(conn, claim_id, Novelty.KNOWN, "old-model", "old answer", NOW)
 
     unchanged = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model="old-model", limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model="old-model",
+        limit=10,
+        concurrency=2,
     )
     assert unchanged.probed == 0
 
     reprobed = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model="fake-probe", limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model="fake-probe",
+        limit=10,
+        concurrency=2,
     )
     assert reprobed.probed == 1
     claim = get_claim(conn, claim_id)
@@ -275,8 +296,13 @@ async def test_run_probe_reprobes_on_probe_model_change(tmp_path: Path) -> None:
     assert claim.probe_model == "fake-probe"
 
     settled = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model="fake-probe", limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model="fake-probe",
+        limit=10,
+        concurrency=2,
     )
     assert settled.probed == 0
 
@@ -311,15 +337,18 @@ async def test_run_probe_run_ids_scopes_to_those_runs_claims(tmp_path: Path) -> 
 
 
 async def test_run_probe_skips_retracted_claims(tmp_path: Path) -> None:
-    from infovore.db.claims import retract_claim
-
     conn = setup_db(tmp_path)
     claim_id = seed_claim(conn, "widget L [known]")
     retract_claim(conn, claim_id, "sources_deleted", NOW)
 
     report = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model=None, limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=2,
     )
     assert report.probed == 0
     assert report.failed == 0
@@ -328,14 +357,20 @@ async def test_run_probe_skips_retracted_claims(tmp_path: Path) -> None:
 async def test_run_probe_bounds_concurrency(tmp_path: Path) -> None:
     conn = setup_db(tmp_path)
     ids = [
-        seed_claim(conn, f"widget M{i} [known]", exchange_id=i, message_id=i)
-        for i in range(1, 6)
+        seed_claim(conn, f"widget M{i} [known]", exchange_id=i, message_id=i) for i in range(1, 6)
     ]
-    probe = ScriptedProbe({claim_id: [ProbeOutcome(Novelty.KNOWN, "m", "a", None)] for claim_id in ids})
+    probe = ScriptedProbe(
+        {claim_id: [ProbeOutcome(Novelty.KNOWN, "m", "a", None)] for claim_id in ids}
+    )
 
     report = await run_probe(
-        conn, probe, FixedClock(NOW), RecordingSleeper(),
-        probe_model=None, limit=10, concurrency=2,
+        conn,
+        probe,
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=2,
     )
 
     assert report.probed == 5

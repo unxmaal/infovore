@@ -30,7 +30,7 @@ def environment(tmp_path: Path, **overrides: str) -> dict[str, str]:
 
 def seed(
     db_path: str, exchange_id: int = 1, message_id: int = 1, statement: str = "widget A"
-) -> int:
+) -> tuple[int, int]:
     conn = open_database(db_path)
     migrate(conn)
     conn.execute(
@@ -141,9 +141,7 @@ def test_probe_command_probes_unprobed_claims_and_prints_report(tmp_path: Path) 
 def test_probe_command_exits_failure_when_a_claim_fails(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
-    code, out, _ = run(
-        ["probe"], env, registry_with(ScriptedLLMFactory(fail_recall=True))
-    )
+    code, out, _ = run(["probe"], env, registry_with(ScriptedLLMFactory(fail_recall=True)))
     assert code == ExitCode.FAILURE
     assert "failed: 1" in out
 
@@ -173,9 +171,7 @@ def test_probe_command_probe_model_flag_idempotent(tmp_path: Path) -> None:
 def test_probe_command_run_id_flag_scopes_to_run(tmp_path: Path) -> None:
     env = environment(tmp_path)
     _, run_id_a = seed(env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, statement="widget A")
-    claim_b, run_id_b = seed(
-        env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, statement="widget B"
-    )
+    claim_b, _ = seed(env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, statement="widget B")
     code, out, _ = run(
         ["probe", "--run-id", str(run_id_a)],
         env,
