@@ -23,6 +23,7 @@ from infovore.triage.bayes import (
 def test_bayes_label_is_the_shared_rows_label() -> None:
     assert Label is RowsLabel
 
+
 START = datetime(2026, 1, 1, tzinfo=UTC)
 
 
