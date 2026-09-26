@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
+from infovore.rows import Label as RowsLabel
 from infovore.rows import MessageRow
 from infovore.triage.bayes import (
     Label,
@@ -17,6 +18,10 @@ from infovore.triage.bayes import (
     token_probability,
     train,
 )
+
+
+def test_bayes_label_is_the_shared_rows_label() -> None:
+    assert Label is RowsLabel
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 
