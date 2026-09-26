@@ -86,7 +86,8 @@ Settings are read from the process environment by `infovore.config.load_settings
 | `INFOVORE_EXCHANGE_MAX_MESSAGES` | `50` | Maximum messages in one exchange before it is split (Lifecycle rule 6). Must be a positive integer. |
 | `INFOVORE_OPT_OUT_ROLE` | `no-archive` | Name of the Discord role that opts a member's messages out of extraction. |
 | `INFOVORE_INCLUDE_BOT_MESSAGES` | `false` | Whether bot-authored messages are ingested. Accepts `1`/`true`/`yes`/`on` and `0`/`false`/`no`/`off` (case-insensitive). |
-| `INFOVORE_TRIAGE_MIN_SCORE` | `0.3` | Threshold (0..1) an exchange's triage score must meet or exceed for live `extract` to claim it; also the threshold `infovore triage --report` and `status` compare against. Must be a number between 0 and 1 inclusive. |
+| `INFOVORE_TRIAGE_MIN_SCORE` | `0.3` | Threshold (0..1) the rule `triage_score` must meet or exceed for live `extract` to claim an exchange — applied only when that exchange has no `p_lore` yet (cold start, before a classifier is trained); also the threshold `infovore triage --report` and `status` compare against. Must be a number between 0 and 1 inclusive. |
+| `INFOVORE_TRIAGE_MIN_P_LORE` | `0.5` | Threshold (0..1) the trained classifier's `p_lore` must meet or exceed for live `extract` to claim an exchange, once that exchange has been scored by a trained model — see "Triage". Must be a number between 0 and 1 inclusive. |
 
 Each stage — `extract`, `probe`, `judge` — has its own backend selection, all under an `INFOVORE_<STAGE>_*` prefix (`<STAGE>` is `EXTRACT`, `PROBE`, or `JUDGE`):
 
