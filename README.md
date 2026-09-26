@@ -65,6 +65,8 @@ Every subcommand loads configuration (environment, then `.env` in the working di
 
 Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3` an LLM backend is unavailable.
 
+`infovore.source.live.build_client` requires two privileged intents to be enabled for the bot application in the Discord Developer Portal (Bot tab): **Message Content** (message bodies) and **Server Members** (role membership sync for opt-out). Without both enabled, the gateway connection is rejected. The full first-run runbook lands with the `backfill`/`run` CLI subcommands.
+
 ## Grouping rules
 
 `infovore/chunk/rules.py` groups the `MessageRow`s of one channel (plus its threads, which carry a `thread_id`) into `Group`s. Each `Group` has a `rule` (`GroupingRule.THREAD` | `REPLY_CHAIN` | `QUIET_GAP`), an ordered `messages` tuple, and a `context` tuple of uncitable overlap messages, non-empty only for parts produced by the size-cap split below. Every message given to `group_messages` ends up in exactly one group's `messages`, or is dropped first. Messages within a group, and groups within the returned list, are ordered by `(created_at, id)` (a group's position is its first message's key).
@@ -112,8 +114,65 @@ Per lifecycle rule 5: when `sync_opt_outs` adds users, it also calls `db.claims.
 - `...` bodies: Protocol method stubs have no executable behavior; they define shapes that implementations are tested against.
 - `if TYPE_CHECKING:` blocks: imports needed only by the type checker never run at runtime.
 - `infovore.llm.claude_cli.SubprocessRunner.run`: this is the one place allowed to spawn a real process, and exercising it would mean either spawning the real `claude` binary (never done in tests: no network, no dependency on being logged in) or spawning some other process as a stand-in, which still violates "no test spawns a process." Every other `claude_cli` behavior (argv, stdin, cwd, result mapping, every `ErrorKind`) is tested against `ClaudeCliBackend` with a fake `ProcessRunner`; `SubprocessRunner` itself is a thin, direct translation of `asyncio.create_subprocess_exec` plus `asyncio.wait_for` with no branching of its own to verify beyond what the standard library already guarantees.
+- `infovore.source.live.connect`: performs the real Discord login/gateway handshake over the network; PLAN operating rule 4 forbids tests from opening a network connection, so this one-line wrapper around `discord.Client.start` cannot be exercised in the test suite.
 
 ## Consuming the database
+
+The SQLite file is the product. Read it directly; open it read-only (`file:infovore.db?mode=ro`) so readers never block the writer (the database runs in WAL mode).
+
+### The `lore` view
+
+`lore` is the contract. It contains only **current, net-new** claims:
+
+- from `live` extraction runs (trial runs are for prompt iteration and never appear);
+- not retracted (source messages deleted, or every source author opted out);
+- not superseded by a newer live, non-retracted correction;
+- novelty `unknown`, `partial`, or `contradicts` — claims the closed-book probe found the model did **not** already know. `known` and not-yet-probed (`unprobed`) claims are excluded.
+
+| column | meaning |
+| --- | --- |
+| `claim_id` | stable id of the claim |
+| `subject` | what the claim is about (e.g. `Octane2`, `IP35`) |
+| `statement` | the fact itself |
+| `kind` | `fact`, `correction`, `procedure`, or `reference` |
+| `confidence` | extractor confidence, 0–1 |
+| `novelty` | `unknown` (model had no idea), `partial`, or `contradicts` (model confidently believed something else — the most valuable) |
+| `permalink` | Discord link to the exchange the claim came from |
+| `source_message_ids` | comma-separated Discord message ids the claim cites, ascending |
+| `channel_id` | channel or thread the exchange belongs to |
+| `extracted_at` | when the extraction run started (ISO-8601 UTC) |
+| `supersedes_claim_id` | the claim this one corrects, if any |
+
+### Example queries
+
+What do we know about a subject:
+
+```sql
+SELECT subject, statement, novelty, permalink
+FROM lore
+WHERE subject LIKE '%Octane%'
+ORDER BY novelty = 'contradicts' DESC, confidence DESC;
+```
+
+Full-text search (the `claims_fts` index keeps part numbers, versions and paths such as `030-1234-001`, `6.5.22`, `/usr/sbin/inst` as single tokens; quote each term):
+
+```sql
+SELECT lore.subject, lore.statement, lore.permalink
+FROM claims_fts
+JOIN lore ON lore.claim_id = claims_fts.rowid
+WHERE claims_fts MATCH '"030-1234-001" OR "Octane2"'
+ORDER BY bm25(claims_fts, 2.0, 1.0);
+```
+
+Where the model is confidently wrong:
+
+```sql
+SELECT subject, statement, permalink FROM lore WHERE novelty = 'contradicts';
+```
+
+### Stability
+
+`PRAGMA user_version` holds the schema version (the latest applied migration). Columns of `lore` are only ever added; renaming or removing one bumps the version and is called out here.
 
 ## Deployment
 

@@ -104,7 +104,7 @@ All timestamps UTC ISO-8601. All Discord IDs stored as `INTEGER` (snowflakes fit
 
 **claims_fts** — FTS5 over claims(statement, subject), `unicode61` with domain `tokenchars` (`-./_`), subject weighted above statement in bm25; kept in sync by triggers.
 
-**lore** (view) — the consumer contract: current claims only (not retracted, not superseded, from `live` runs, novelty not `known`), with subject, statement, kind, confidence, novelty, permalink, and source message ids. Documented in README "Consuming the database"; schema version in `PRAGMA user_version`.
+**lore** (view) — the consumer contract: current claims only (not retracted, not superseded by a live non-retracted correction, from `live` runs, novelty `unknown` | `partial` | `contradicts` — i.e. probed and not `known`; `unprobed` claims are excluded until probed), with subject, statement, kind, confidence, novelty, permalink, and source message ids. Documented in README "Consuming the database"; schema version in `PRAGMA user_version`.
 
 **opt_outs** — user_id PK, since.
 
@@ -201,7 +201,7 @@ The SQLite file is the deliverable. Consumers (other tools, agents' own tooling)
 
 Tasks:
 
-1. `lore` view and schema contract (lead) — the view defined in the data model, `PRAGMA user_version` set by migrations, and README "Consuming the database" with the view's columns, their meaning, example queries (including FTS via `claims_fts`), and the stability promise (columns are only added, never renamed or removed, without a version bump). Tests: seeded DB where the view returns exactly the current, live, non-known, non-retracted claims; superseded and trial claims are excluded; a read-only connection (`mode=ro`) works while a writer holds the DB in WAL mode.
+1. `lore` view and schema contract (lead) — the view defined in the data model, `PRAGMA user_version` set by migrations, and README "Consuming the database" with the view's columns, their meaning, example queries (including FTS via `claims_fts`), and the stability promise (columns are only added, never renamed or removed, without a version bump). Tests: seeded DB where the view returns exactly the current, live, probed-and-not-known, non-retracted claims; superseded and trial claims are excluded; a read-only connection (`mode=ro`) works while a writer holds the DB in WAL mode.
 
 Acceptance: a consumer can answer "what do we know about X" with one documented SQL query against `lore`.
 
