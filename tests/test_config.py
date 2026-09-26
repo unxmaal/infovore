@@ -169,6 +169,38 @@ def test_load_settings_include_bot_messages_falsey_strings() -> None:
     assert load_settings(env).include_bot_messages is False
 
 
+def test_load_settings_triage_min_score_defaults_to_point_three() -> None:
+    assert load_settings(REQUIRED_ENV).triage_min_score == 0.3
+
+
+def test_load_settings_triage_min_score_from_env() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_SCORE": "0.45"}
+    assert load_settings(env).triage_min_score == 0.45
+
+
+def test_load_settings_triage_min_score_accepts_boundaries() -> None:
+    assert load_settings({**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_SCORE": "0"}).triage_min_score == 0.0
+    assert load_settings({**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_SCORE": "1"}).triage_min_score == 1.0
+
+
+def test_load_settings_triage_min_score_out_of_range_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_SCORE": "1.5"}
+    with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_MIN_SCORE"):
+        load_settings(env)
+
+
+def test_load_settings_triage_min_score_negative_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_SCORE": "-0.1"}
+    with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_MIN_SCORE"):
+        load_settings(env)
+
+
+def test_load_settings_triage_min_score_non_numeric_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_SCORE": "nope"}
+    with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_MIN_SCORE"):
+        load_settings(env)
+
+
 def test_load_settings_per_stage_backend_model_concurrency_timeout() -> None:
     env = {
         **REQUIRED_ENV,
