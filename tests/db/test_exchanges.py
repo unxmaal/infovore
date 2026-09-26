@@ -254,6 +254,58 @@ def test_claimable_exchanges_without_min_score_ignores_triage(conn: sqlite3.Conn
     assert [row.id for row in result] == [exchange_id]
 
 
+def _insert_stub_model(conn: sqlite3.Connection) -> int:
+    cursor = conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
+    )
+    return int(cursor.lastrowid or 0)
+
+
+def test_claimable_exchanges_prefers_p_lore_over_triage_score_when_set(
+    conn: sqlite3.Connection,
+) -> None:
+    model_version = _insert_stub_model(conn)
+    insert_messages(conn, [1, 2])
+    low_rule_high_p_lore = insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="a"), [1]
+    )
+    high_rule_low_p_lore = insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="b"), [2]
+    )
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.0, triage_version = 't1',"
+        " p_lore = 0.9, p_lore_model = ? WHERE id = ?",
+        (model_version, low_rule_high_p_lore),
+    )
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 1.0, triage_version = 't1',"
+        " p_lore = 0.1, p_lore_model = ? WHERE id = ?",
+        (model_version, high_rule_low_p_lore),
+    )
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5)
+
+    assert [row.id for row in result] == [low_rule_high_p_lore]
+
+
+def test_claimable_exchanges_respects_custom_min_p_lore(conn: sqlite3.Connection) -> None:
+    model_version = _insert_stub_model(conn)
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="a"), [1])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.0, triage_version = 't1', p_lore = 0.6,"
+        " p_lore_model = ? WHERE id = ?",
+        (model_version, exchange_id),
+    )
+
+    assert claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.7) == []
+    assert [
+        row.id
+        for row in claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5)
+    ] == [exchange_id]
+
+
 def test_has_untriaged_claimable_true_when_version_null(conn: sqlite3.Connection) -> None:
     insert_messages(conn, [1])
     insert_exchange(conn, make_exchange(message_count=1, content_hash="untriaged"), [1])
