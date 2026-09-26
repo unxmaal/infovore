@@ -409,3 +409,17 @@ class DiscordPySource:
 
     async def _on_thread_create(self, thread: _ChannelLike) -> None:
         self._queue.put_nowait(ThreadCreated(to_source_channel(thread)))
+
+
+def build_client() -> discord.Client:
+    intents = discord.Intents.default()
+    intents.message_content = True
+    intents.members = True
+    intents.guilds = True
+    intents.guild_messages = True
+    intents.guild_reactions = True
+    return discord.Client(intents=intents)
+
+
+async def connect(client: discord.Client, token: str) -> None:  # pragma: no cover
+    await client.start(token)

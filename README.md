@@ -49,6 +49,8 @@ Every subcommand loads configuration (environment, then `.env` in the working di
 
 Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3` an LLM backend is unavailable.
 
+`infovore.source.live.build_client` requires two privileged intents to be enabled for the bot application in the Discord Developer Portal (Bot tab): **Message Content** (message bodies) and **Server Members** (role membership sync for opt-out). Without both enabled, the gateway connection is rejected. The full first-run runbook lands with the `backfill`/`run` CLI subcommands.
+
 ## Grouping rules
 
 `infovore/chunk/rules.py` groups the `MessageRow`s of one channel (plus its threads, which carry a `thread_id`) into `Group`s. Each `Group` has a `rule` (`GroupingRule.THREAD` | `REPLY_CHAIN` | `QUIET_GAP`), an ordered `messages` tuple, and a `context` tuple of uncitable overlap messages, non-empty only for parts produced by the size-cap split below. Every message given to `group_messages` ends up in exactly one group's `messages`, or is dropped first. Messages within a group, and groups within the returned list, are ordered by `(created_at, id)` (a group's position is its first message's key).
@@ -83,6 +85,7 @@ A group matching none of these is a new, unparented exchange. Precedence matters
 
 - `...` bodies: Protocol method stubs have no executable behavior; they define shapes that implementations are tested against.
 - `if TYPE_CHECKING:` blocks: imports needed only by the type checker never run at runtime.
+- `infovore.source.live.connect`: performs the real Discord login/gateway handshake over the network; PLAN operating rule 4 forbids tests from opening a network connection, so this one-line wrapper around `discord.Client.start` cannot be exercised in the test suite.
 
 ## Consuming the database
 
