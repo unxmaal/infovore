@@ -53,7 +53,7 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `attachments` | attachment metadata per message (files are not downloaded) |
 | `reactions` | current reaction count per message and emoji |
 | `opt_outs` | users holding the opt-out role, and since when |
-| `exchanges` | grouped conversations: channel, thread, first/last message, grouping rule, `content_hash` (unique), `parent_exchange_id` for context, `extraction_status` (`pending`, `done`, `skipped`, `failed`, `stale`), retry count and last error |
+| `exchanges` | grouped conversations: channel, thread, first/last message, grouping rule, `content_hash` (unique), `parent_exchange_id` for context, `extraction_status` (`pending`, `done`, `skipped`, `failed`, `stale`), retry count and last error, and the deterministic `triage_score` / `triage_reasons` / `triage_version` (see "Triage") |
 | `exchange_messages` | ordered membership; a message belongs to at most one exchange |
 | `prompt_versions` | every extraction prompt version with its text hash; the most recently promoted one is live |
 | `extraction_runs` | one row per extraction attempt: exchange, model, prompt version, mode (`trial` or `live`), outcome, tokens, error |
@@ -274,6 +274,29 @@ This is the prompt-iteration loop: run the current prompt over a reproducible sa
 3. **Thread revival**: otherwise, if the group is a `thread` group and that `thread_id` already has at least one exchange, the parent is the most recently started one.
 
 A group matching none of these is a new, unparented exchange. Precedence matters because a group can match more than one case at once — a split part whose first message is also a late reply still links to the previous part, not to the reply target, and a revived thread whose first message is a late reply links to the reply target, not to the thread's own prior exchange.
+
+## Triage
+
+Most Discord chatter carries no lore, so exchanges are scored with deterministic, programmatic signals before any LLM sees them; only exchanges that score high enough are sent to extraction. Scoring is free, re-runs in seconds over the whole database, and is versioned (`TRIAGE_VERSION` = `t1`), so changing the rules simply re-scores everything. Scores live on `exchanges.triage_score` (0–1, clamped sum of the signals below), with the contributing signals in `triage_reasons` (JSON) and the rule version in `triage_version`.
+
+| signal | weight | fires when |
+| --- | --- | --- |
+| `domain_terms` | +0.15 per distinct term, max +0.45 | SGI/IRIX vocabulary: model and board names (Indy, Indigo2, O2, Octane, Fuel, Tezro, Onyx, Origin, IPxx), CPUs (R10000, R12k…), tools and subsystems (hinv, inst, swmgr, nvram, PROM, XFS, XLV, MIPSpro, sash, GIO/XIO, VPro, Odyssey, Impact…) |
+| `irix_version` | +0.2 | IRIX-style versions such as `6.5.22`, `6.5.30m`, `IRIX 5.3` |
+| `part_number` | +0.3 | SGI part numbers such as `030-1234-001` |
+| `unix_path` | +0.15 | paths under `/usr`, `/var`, `/etc`, `/opt`, `/dev`, `/stand`, `/hw`… |
+| `code` | +0.15 | code blocks or inline backticks |
+| `archive_link` | +0.15 | links to FTP, archive.org, bitsavers, techpubs, or SGI/IRIX sites |
+| `pdf_attachment` | +0.15 | a PDF attachment (manuals, datasheets) |
+| `answered_question` | +0.2 | a message with a `?` followed by a reply of 40+ characters from a different author |
+| `agreed_answer` | +0.05 | a ✅/👍/☑️/✔️/💯 reaction on a message after the first |
+| `thread` | +0.05 | the exchange is in a thread |
+| `substantial` | +0.1 | 400+ characters of text in total |
+| `mostly_tiny_messages` | −0.2 | more than 70% of messages are under 20 characters |
+| `gif_links` | −0.1 | tenor, giphy, or `.gif` links |
+| `laughter` | −0.1 | more than 30% of messages are just "lol", "lmao", "haha"… |
+
+Channel priors and the extraction threshold are applied by `infovore triage` and `extract` (see the triage issues); the threshold is chosen by calibrating against LLM extraction on samples above and below it.
 
 ## Extraction prompt
 
