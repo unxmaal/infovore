@@ -15,7 +15,7 @@ from infovore.extract.llm_extractor import LLMClaimExtractor, LLMNoveltyProbe
 from infovore.extract.novelty import run_probe
 from infovore.extract.protocol import ClaimExtractor, NoveltyProbe
 from infovore.extract.runner import PromptNotPromotedError, run_extraction
-from infovore.ingest.live import handle_event
+from infovore.ingest.live import EventOutcome, handle_event
 from infovore.privacy.optout import sync_opt_outs
 from infovore.rows import RunMode
 from infovore.source.protocol import DiscordSource
@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 class RunReport:
     events_handled: int = 0
     events_failed: int = 0
+    events_ignored: int = 0
     cycles_completed: int = 0
     cycles_failed: int = 0
 
@@ -40,16 +41,20 @@ async def _consume_events(
     source: DiscordSource,
     clock: Clock,
     include_bots: bool,
+    channel_ids: Sequence[int],
     report: RunReport,
 ) -> None:
     async for event in source.events():
         try:
-            await handle_event(conn, event, clock, include_bots)
+            outcome = await handle_event(conn, event, clock, include_bots, channel_ids, source)
         except Exception:
             logger.exception("live event handling failed: %r", event)
             report.events_failed += 1
         else:
-            report.events_handled += 1
+            if outcome is EventOutcome.CHANNEL_IGNORED:
+                report.events_ignored += 1
+            else:
+                report.events_handled += 1
 
 
 async def _run_cycle(
@@ -176,7 +181,9 @@ async def run_forever(
 ) -> RunReport:
     report = RunReport()
     consume_task = asyncio.ensure_future(
-        _consume_events(conn, source, clock, settings.include_bot_messages, report)
+        _consume_events(
+            conn, source, clock, settings.include_bot_messages, settings.channel_ids, report
+        )
     )
     cycle_task = asyncio.ensure_future(
         _cycle_until_stop(
@@ -254,6 +261,7 @@ class RunCommand:
 
         context.stdout.write(
             f"events_handled={report.events_handled} events_failed={report.events_failed}"
+            f" events_ignored={report.events_ignored}"
             f" cycles_completed={report.cycles_completed} cycles_failed={report.cycles_failed}\n"
         )
         return ExitCode.OK
