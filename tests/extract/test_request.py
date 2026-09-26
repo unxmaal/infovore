@@ -314,3 +314,57 @@ def test_build_request_related_claims_respects_related_limit(tmp_path: Path) -> 
     request = build_request(conn, exchange, related_limit=2)
 
     assert len(request.related_claims) == 2
+
+
+def test_build_request_related_claims_ignore_opted_out_authors_content(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    register_prompt_version(conn, "v1", "sha", NOW)
+    upsert_message(conn, a_message(1, content="Zorblatt jumper settings"))
+    prior_exchange_id = insert_exchange(
+        conn, an_exchange_row(None, first_message_id=1, last_message_id=1), [1]
+    )
+    record_run(
+        conn,
+        ExtractionRunRow(
+            id=None,
+            exchange_id=prior_exchange_id,
+            model="m",
+            prompt_version="v1",
+            started_at=NOW,
+            finished_at=NOW,
+            input_tokens=1,
+            output_tokens=1,
+            mode=RunMode.LIVE,
+            outcome=RunOutcome.OK,
+            error=None,
+        ),
+        [
+            NewClaim(
+                exchange_id=prior_exchange_id,
+                statement="Zorblatt needs a jumper on pin 3",
+                subject="Zorblatt",
+                kind=ClaimKind.FACT,
+                confidence=0.9,
+                probe_question="what does the zorblatt need?",
+                permalink="https://discord.com/channels/1/1/1",
+                supersedes_claim_id=None,
+                source_message_ids=(1,),
+            )
+        ],
+    )
+
+    upsert_message(conn, a_message(200, author_id=1, content="what a nice day"))
+    upsert_message(conn, a_message(201, author_id=99, content="Zorblatt Zorblatt Zorblatt"))
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (99, ?)", (to_db_time(NOW),))
+    exchange_id = insert_exchange(
+        conn,
+        an_exchange_row(None, first_message_id=200, last_message_id=201, message_count=2),
+        [200, 201],
+    )
+    exchange = an_exchange_row(
+        exchange_id, first_message_id=200, last_message_id=201, message_count=2
+    )
+
+    request = build_request(conn, exchange, related_limit=10)
+
+    assert request.related_claims == ()
