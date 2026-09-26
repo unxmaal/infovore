@@ -1,0 +1,63 @@
+from datetime import UTC, datetime
+from pathlib import Path
+
+from infovore.db.connection import migrate, open_database
+from infovore.db.status import collect_status
+
+NOW = "2026-01-01T00:00:00+00:00"
+LATER = "2026-01-02T00:00:00+00:00"
+
+
+def fresh(tmp_path: Path):  # type: ignore[no-untyped-def]
+    conn = open_database(tmp_path / "x.db")
+    migrate(conn)
+    return conn
+
+
+def test_fresh_database_reports_zeros(tmp_path: Path) -> None:
+    report = collect_status(fresh(tmp_path))
+    assert report.channels == 0
+    assert report.messages == 0
+    assert report.deleted_messages == 0
+    assert report.exchanges_by_status == {}
+    assert report.claims_by_novelty == {}
+    assert report.retracted_claims == 0
+    assert report.runs_by_outcome == {}
+    assert report.last_extraction_at is None
+    assert report.last_probe_at is None
+    assert report.live_prompt_version is None
+
+
+def test_counts_and_last_runs(tmp_path: Path) -> None:
+    conn = fresh(tmp_path)
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES (1, 9, 'general', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json, deleted_at)
+          VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}', NULL),
+                 (2, 1, 9, 1, 'a', '{NOW}', 'y', '{NOW}', '{{}}', '{NOW}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, extraction_status)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 'pending'),
+                 (1, 2, 2, '{NOW}', '{NOW}', 1, 'quiet_gap', 'b', 'done');
+        INSERT INTO prompt_versions VALUES ('v1', 'sha', '{NOW}', '{NOW}');
+        INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at, mode, outcome)
+          VALUES (2, 'm', 'v1', '{NOW}', 'live', 'ok'), (1, 'm', 'v1', '{LATER}', 'live', 'failed');
+        INSERT INTO claims (exchange_id, extraction_run_id, statement, subject, kind, confidence,
+          probe_question, permalink, novelty, probed_at, retracted_at)
+          VALUES (2, 1, 's', 'subj', 'fact', 0.5, 'q?', 'p', 'unknown', '{LATER}', NULL),
+                 (2, 1, 't', 'subj', 'fact', 0.5, 'q?', 'p', 'unprobed', NULL, '{NOW}');
+        """
+    )
+    report = collect_status(conn)
+    assert report.channels == 1
+    assert report.messages == 2
+    assert report.deleted_messages == 1
+    assert report.exchanges_by_status == {"pending": 1, "done": 1}
+    assert report.claims_by_novelty == {"unknown": 1, "unprobed": 1}
+    assert report.retracted_claims == 1
+    assert report.runs_by_outcome == {"ok": 1, "failed": 1}
+    assert report.last_extraction_at == datetime(2026, 1, 2, tzinfo=UTC)
+    assert report.last_probe_at == datetime(2026, 1, 2, tzinfo=UTC)
+    assert report.live_prompt_version == "v1"
