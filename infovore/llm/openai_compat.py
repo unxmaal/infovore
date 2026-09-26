@@ -62,7 +62,7 @@ class OpenAICompatBackend:
                 },
             }
         try:
-            response = await self._client.chat.completions.create(**kwargs)  # type: ignore[arg-type]
+            response = await self._client.chat.completions.create(**kwargs)  # type: ignore[call-overload]
         except openai.RateLimitError as exc:
             kind = ErrorKind.USAGE_LIMIT if _is_usage_limit(exc) else ErrorKind.TRANSIENT
             return LLMResult.failed(kind, str(exc), _retry_after(exc))
@@ -82,9 +82,7 @@ class OpenAICompatBackend:
 
         choice = response.choices[0]
         if choice.finish_reason in ("length", "content_filter"):
-            return LLMResult.failed(
-                ErrorKind.FATAL, f"finish_reason: {choice.finish_reason}", None
-            )
+            return LLMResult.failed(ErrorKind.FATAL, f"finish_reason: {choice.finish_reason}", None)
         content = choice.message.content
         if not content:
             return LLMResult.failed(ErrorKind.FATAL, "empty completion content", None)
@@ -94,9 +92,7 @@ class OpenAICompatBackend:
             try:
                 data = json.loads(content)
             except json.JSONDecodeError as exc:
-                return LLMResult.failed(
-                    ErrorKind.FATAL, f"invalid JSON in response: {exc}", None
-                )
+                return LLMResult.failed(ErrorKind.FATAL, f"invalid JSON in response: {exc}", None)
             return LLMResult.ok_structured(data, model, usage)
         return LLMResult.ok_text(content, model, usage)
 

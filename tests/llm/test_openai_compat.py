@@ -21,7 +21,7 @@ def make_client(handler: Callable[[httpx.Request], httpx.Response]) -> openai.As
     return openai.AsyncOpenAI(
         base_url="http://fake.local/v1",
         api_key="k",
-        http_client=httpx.AsyncClient(transport=transport),
+        http_client=httpx.AsyncClient(transport=transport),  # type: ignore[arg-type]
         timeout=5.0,
         max_retries=0,
     )
@@ -342,9 +342,8 @@ class OpenAICompatHarness:
         elif kind is ErrorKind.USAGE_LIMIT:
 
             def handler(req: httpx.Request) -> httpx.Response:
-                return httpx.Response(
-                    429, headers=headers, json={"error": {"message": "boom", "code": "insufficient_quota"}}
-                )
+                body = {"error": {"message": "boom", "code": "insufficient_quota"}}
+                return httpx.Response(429, headers=headers, json=body)
         else:
 
             def handler(req: httpx.Request) -> httpx.Response:

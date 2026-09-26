@@ -162,12 +162,12 @@ def test_default_registry_builds_openai_compat_backends() -> None:
 
 def test_default_registry_reports_missing_openai_compat_options() -> None:
     registry = default_registry()
-    settings = settings_with(
-        {stage: stage_settings(backend="openai_compat") for stage in Stage}
-    )
+    settings = settings_with({stage: stage_settings(backend="openai_compat") for stage in Stage})
     errors = registry.validate(settings)
     assert len(errors) == 6
-    assert all("base_url is required" in error or "api_key is required" in error for error in errors)
+    assert all(
+        "base_url is required" in error or "api_key is required" in error for error in errors
+    )
 
 
 async def test_health_check_reports_none_when_backend_is_healthy() -> None:
