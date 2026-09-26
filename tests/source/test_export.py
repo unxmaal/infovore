@@ -341,6 +341,35 @@ async def test_attachments_and_reactions_are_mapped(tmp_path: Path) -> None:
     assert message.reactions[0].count == 4
 
 
+async def test_reaction_emoji_falls_back_to_code_when_name_blank(tmp_path: Path) -> None:
+    write_export(
+        tmp_path / "general.json",
+        make_export(
+            messages=[
+                make_message(
+                    1,
+                    reactions=[
+                        {
+                            "emoji": {
+                                "id": "0",
+                                "name": "",
+                                "code": "thumbsup",
+                                "isAnimated": False,
+                                "imageUrl": "",
+                            },
+                            "count": 1,
+                            "users": [],
+                        }
+                    ],
+                )
+            ]
+        ),
+    )
+    source = ExportDiscordSource(tmp_path)
+    pages = [page async for page in source.history(CHANNEL_ID, None, 10)]
+    assert pages[0][0].reactions[0].emoji == "thumbsup"
+
+
 async def test_bot_author_is_marked(tmp_path: Path) -> None:
     write_export(
         tmp_path / "general.json",
@@ -354,9 +383,7 @@ async def test_bot_author_is_marked(tmp_path: Path) -> None:
 async def test_nickname_preferred_over_name(tmp_path: Path) -> None:
     write_export(
         tmp_path / "general.json",
-        make_export(
-            messages=[make_message(1, author=make_author(2, name="alice", nickname="Al"))]
-        ),
+        make_export(messages=[make_message(1, author=make_author(2, name="alice", nickname="Al"))]),
     )
     source = ExportDiscordSource(tmp_path)
     pages = [page async for page in source.history(CHANNEL_ID, None, 10)]
@@ -366,9 +393,7 @@ async def test_nickname_preferred_over_name(tmp_path: Path) -> None:
 async def test_empty_nickname_falls_back_to_name(tmp_path: Path) -> None:
     write_export(
         tmp_path / "general.json",
-        make_export(
-            messages=[make_message(1, author=make_author(2, name="alice", nickname=""))]
-        ),
+        make_export(messages=[make_message(1, author=make_author(2, name="alice", nickname=""))]),
     )
     source = ExportDiscordSource(tmp_path)
     pages = [page async for page in source.history(CHANNEL_ID, None, 10)]
@@ -401,7 +426,11 @@ async def test_role_member_ids_matches_case_insensitively(tmp_path: Path) -> Non
                 make_message(
                     1,
                     author=make_author(
-                        2, roles=[{"id": "1", "name": "Moderator", "color": None, "position": 1}]
+                        2,
+                        roles=[
+                            {"id": "0", "name": "", "color": None, "position": 0},
+                            {"id": "1", "name": "Moderator", "color": None, "position": 1},
+                        ],
                     ),
                 ),
                 make_message(
@@ -446,7 +475,7 @@ def test_empty_directory_has_no_channels_or_guilds(tmp_path: Path) -> None:
 def test_malformed_json_syntax_raises_source_unavailable_naming_file(tmp_path: Path) -> None:
     bad = tmp_path / "broken.json"
     bad.write_text("{not json")
-    with pytest.raises(SourceUnavailableError, match="broken.json"):
+    with pytest.raises(SourceUnavailableError, match=r"broken\.json"):
         ExportDiscordSource(tmp_path)
 
 
@@ -455,7 +484,7 @@ def test_malformed_missing_messages_key_raises_source_unavailable(tmp_path: Path
     del export["messages"]
     bad = tmp_path / "broken.json"
     write_export(bad, export)
-    with pytest.raises(SourceUnavailableError, match="broken.json"):
+    with pytest.raises(SourceUnavailableError, match=r"broken\.json"):
         ExportDiscordSource(tmp_path)
 
 
@@ -464,14 +493,14 @@ def test_malformed_message_missing_author_raises_source_unavailable(tmp_path: Pa
     del message["author"]
     bad = tmp_path / "broken.json"
     write_export(bad, make_export(messages=[message]))
-    with pytest.raises(SourceUnavailableError, match="broken.json"):
+    with pytest.raises(SourceUnavailableError, match=r"broken\.json"):
         ExportDiscordSource(tmp_path)
 
 
 def test_malformed_bad_timestamp_raises_source_unavailable(tmp_path: Path) -> None:
     bad = tmp_path / "broken.json"
     write_export(bad, make_export(messages=[make_message(1, timestamp="not-a-timestamp")]))
-    with pytest.raises(SourceUnavailableError, match="broken.json"):
+    with pytest.raises(SourceUnavailableError, match=r"broken\.json"):
         ExportDiscordSource(tmp_path)
 
 
