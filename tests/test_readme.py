@@ -83,3 +83,11 @@ def test_configuration_documents_export_source() -> None:
     configuration = section("Configuration")
     for needle in ("INFOVORE_SOURCE", "INFOVORE_EXPORT_DIR", "ExportDiscordSource"):
         assert needle in configuration, needle
+
+
+def test_configuration_documents_the_shared_channel_allowlist() -> None:
+    configuration = section("Configuration")
+    running = section("Running")
+    for needle in ("is_channel_allowed", "events_ignored"):
+        assert needle in configuration or needle in running, needle
+    assert "optional" in configuration
