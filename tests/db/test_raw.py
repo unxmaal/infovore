@@ -7,6 +7,7 @@ import pytest
 from infovore.db.connection import migrate, open_database
 from infovore.db.raw import (
     UpsertOutcome,
+    attachments_for_messages,
     get_backfill_checkpoint,
     get_channel,
     get_message,
@@ -14,10 +15,11 @@ from infovore.db.raw import (
     mark_edited,
     message_revisions,
     set_backfill_checkpoint,
+    upsert_attachment,
     upsert_channel,
     upsert_message,
 )
-from infovore.rows import ChannelKind, ChannelRow, MessageRow
+from infovore.rows import AttachmentRow, ChannelKind, ChannelRow, MessageRow
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -253,3 +255,56 @@ def test_mark_deleted_twice_keeps_first_deleted_at(conn: sqlite3.Connection) -> 
     fetched = get_message(conn, 1)
     assert fetched is not None
     assert fetched.deleted_at == first
+
+
+def make_attachment(
+    attachment_id: int = 1,
+    message_id: int = 1,
+    filename: str = "photo.png",
+    content_type: str | None = "image/png",
+    size: int = 1024,
+    url: str = "https://example.com/photo.png",
+    sha256: str | None = None,
+    local_path: str | None = None,
+) -> AttachmentRow:
+    return AttachmentRow(
+        id=attachment_id,
+        message_id=message_id,
+        filename=filename,
+        content_type=content_type,
+        size=size,
+        url=url,
+        sha256=sha256,
+        local_path=local_path,
+    )
+
+
+def test_upsert_attachment_inserts_then_query(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message())
+    upsert_attachment(conn, make_attachment())
+    assert attachments_for_messages(conn, [1]) == [make_attachment()]
+
+
+def test_upsert_attachment_is_idempotent_and_updates_fields(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message())
+    upsert_attachment(conn, make_attachment())
+    upsert_attachment(conn, make_attachment(sha256="abc123", local_path="/tmp/photo.png"))
+    fetched = attachments_for_messages(conn, [1])
+    assert len(fetched) == 1
+    assert fetched[0].sha256 == "abc123"
+    assert fetched[0].local_path == "/tmp/photo.png"
+
+
+def test_attachments_for_messages_returns_empty_list_for_empty_ids(
+    conn: sqlite3.Connection,
+) -> None:
+    assert attachments_for_messages(conn, []) == []
+
+
+def test_attachments_for_messages_filters_by_message_id(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message(message_id=1))
+    upsert_message(conn, make_message(message_id=2))
+    upsert_attachment(conn, make_attachment(attachment_id=1, message_id=1))
+    upsert_attachment(conn, make_attachment(attachment_id=2, message_id=2))
+    fetched = attachments_for_messages(conn, [1])
+    assert [a.id for a in fetched] == [1]
