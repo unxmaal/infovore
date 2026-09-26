@@ -2,9 +2,65 @@
 
 ## Purpose
 
+infovore is a passive archivist for a hobbyist SGI/IRIX Discord community. It reads channel history and live messages, groups them into conversations ("exchanges"), and uses a language model to pull out specific factual claims — part numbers, jumper settings, PROM and firmware versions, IRIX quirks and workarounds, repair procedures, compatibility facts, where to find software and manuals — each tied back to the Discord messages it came from.
+
+It keeps only **net-new** knowledge: things a frontier LLM does not already know from pretraining. Every claim is checked with a closed-book probe (the model is asked the question cold, and a judge compares its answer to the claim); only claims the model didn't know, only partly knew, or got wrong reach the product.
+
+The product is a SQLite file (see "Consuming the database"). Nothing talks to infovore at runtime: it has no API, no MCP server, and no Discord commands, and it never posts.
+
 ## Architecture
 
+```
+ Discord ──► DiscordSource ──► ingest ─────────► raw tables
+ (history,   source/live.py     backfill.py        channels, messages,
+  events)    source/fake.py     live.py            revisions, attachments,
+                                normalize.py       reactions
+                                privacy/optout.py  opt_outs (redaction before storage)
+                                        │
+                                        ▼
+                               chunk/rules.py + grouper.py ──► exchanges (+ members)
+                                        │
+                                        ▼
+            extract/request.py + prompt.py ──► extract/llm_extractor.py ──► claims + sources
+                  extract/runner.py (trial | live)      │
+                                        │               │  llm/protocol.py LLMBackend
+                                        ▼               │   ├ llm/claude_cli.py   (claude -p)
+                             extract/novelty.py ────────┤   ├ llm/openai_compat.py
+                             recall + judge per claim   │   └ llm/fake.py
+                                        │               │  llm/registry.py picks one per stage
+                                        ▼
+                                 lore view (the product) ──► infovore snapshot ──► consumers
+```
+
+- **Ingest.** `infovore backfill` walks every allowlisted channel and its threads oldest-first with a per-channel checkpoint, one transaction per page; `infovore run` consumes live events. Every message is normalized, then redacted if its author has opted out, then upserted — so a re-run never un-redacts anything.
+- **Chunking.** Messages are grouped by thread, then reply chain, then quiet gap, split when too large, and persisted only once closed (see "Grouping rules"). Late replies and thread revivals link to the earlier exchange as read-only context.
+- **Extraction.** For each pending or stale exchange the runner builds a request (messages, uncitable context, related existing claims found through `claims_fts`, opted-out authors), renders the versioned prompt, and asks the extract-stage backend for JSON matching a strict schema, with one repair attempt. `trial` runs are for prompt iteration and never touch exchange status or the product; `live` runs require the prompt version to be promoted.
+- **Novelty probe.** Each claim's `probe_question` is asked closed-book of the probe-stage model, and the judge-stage model classifies the answer as `unknown`, `partial`, `contradicts`, or `known`.
+- **Backends.** Every LLM call goes through `LLMBackend`; each stage (extract, probe, judge) picks its backend and model in configuration, so extraction can run on a local model while the probe stays on Claude. Nothing above `llm/` knows which backend is in use.
+- **Import boundaries** (enforced by ruff `banned-api`): `discord` only in `source/live.py`; process spawning only in `llm/claude_cli.py`; `openai`/`httpx2` only in `llm/openai_compat.py`.
+- **One writer.** SQLite runs in WAL mode; the whole pipeline runs on the host that holds the file, and readers open it read-only. LLM backends may be remote.
+
 ## Data model
+
+All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migrations in `infovore/db/migrations/` are applied in order and recorded in `schema_migrations`; `PRAGMA user_version` is the latest applied migration.
+
+| object | holds |
+| --- | --- |
+| `schema_migrations` | applied migration versions and when they ran |
+| `channels` | channels and threads (`parent_id` set for threads), their names, and each one's backfill checkpoint `last_backfilled_message_id` |
+| `messages` | every ingested message: author and display name at the time, content, reply and thread links, `edited_at`, `deleted_at` (rows are never deleted), raw JSON |
+| `message_revisions` | the prior content of every edited message; redacted in place on opt-out |
+| `attachments` | attachment metadata per message (files are not downloaded) |
+| `reactions` | current reaction count per message and emoji |
+| `opt_outs` | users holding the opt-out role, and since when |
+| `exchanges` | grouped conversations: channel, thread, first/last message, grouping rule, `content_hash` (unique), `parent_exchange_id` for context, `extraction_status` (`pending`, `done`, `skipped`, `failed`, `stale`), retry count and last error |
+| `exchange_messages` | ordered membership; a message belongs to at most one exchange |
+| `prompt_versions` | every extraction prompt version with its text hash; the most recently promoted one is live |
+| `extraction_runs` | one row per extraction attempt: exchange, model, prompt version, mode (`trial` or `live`), outcome, tokens, error |
+| `claims` | extracted claims: statement, subject, kind, confidence, `probe_question`, permalink, `supersedes_claim_id`, novelty verdict with probe model/answer/error, retraction |
+| `claim_sources` | which messages each claim cites |
+| `claims_fts` | full-text index over claim subject and statement (`unicode61`, keeping `-./_` inside tokens) |
+| `lore` | the product view: current, live, probed, net-new claims (see "Consuming the database") |
 
 ## Configuration
 
