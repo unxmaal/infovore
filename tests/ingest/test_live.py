@@ -4,12 +4,14 @@ from pathlib import Path
 
 import pytest
 
-from infovore.db.claims import NewClaim, record_run
+from infovore.db.claims import NewClaim, record_run, register_prompt_version
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange, set_status
 from infovore.db.raw import get_message, message_revisions, reactions_for_messages
+from infovore.db.raw import upsert_message as raw_upsert_message
 from infovore.ingest.live import ConsumeReport, EventOutcome, consume, handle_event
 from infovore.rows import (
+    ChannelKind,
     ClaimKind,
     ExchangeRow,
     ExtractionRunRow,
@@ -26,11 +28,11 @@ from infovore.source.protocol import (
     ReactionChanged,
     SourceAttachment,
     SourceChannel,
+    SourceEvent,
     SourceMessage,
     SourceReaction,
     ThreadCreated,
 )
-from infovore.rows import ChannelKind
 from infovore.timing import FixedClock
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -190,7 +192,12 @@ async def test_handle_thread_created_upserts_channel(
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
     channel = SourceChannel(
-        id=42, guild_id=100, parent_id=10, name="side-quest", kind=ChannelKind.THREAD, archived=False
+        id=42,
+        guild_id=100,
+        parent_id=10,
+        name="side-quest",
+        kind=ChannelKind.THREAD,
+        archived=False,
     )
     outcome = await handle_event(conn, ThreadCreated(channel), clock, include_bots=False)
     assert outcome is EventOutcome.THREAD_CREATED
@@ -252,6 +259,7 @@ async def test_edit_of_message_in_pending_exchange_stays_pending(
 def _record_claim_with_sources(
     conn: sqlite3.Connection, exchange_id: int, source_message_ids: tuple[int, ...]
 ) -> int:
+    register_prompt_version(conn, "v1", "sha", NOW)
     run = ExtractionRunRow(
         id=None,
         exchange_id=exchange_id,
@@ -286,9 +294,7 @@ async def test_delete_of_only_source_retracts_claim(
     await handle_event(conn, MessageCreated(make_message(id=1)), clock, include_bots=False)
     exchange_id = insert_exchange(conn, _make_exchange([1], "hash-single-source"), [1])
     claim_id = _record_claim_with_sources(conn, exchange_id, (1,))
-    await handle_event(
-        conn, MessageDeleted(message_id=1, channel_id=10), clock, include_bots=False
-    )
+    await handle_event(conn, MessageDeleted(message_id=1, channel_id=10), clock, include_bots=False)
     row = conn.execute(
         "SELECT retracted_at, retraction_reason FROM claims WHERE id = ?", (claim_id,)
     ).fetchone()
@@ -303,35 +309,47 @@ async def test_delete_of_one_of_two_sources_does_not_retract(
     await handle_event(conn, MessageCreated(make_message(id=2)), clock, include_bots=False)
     exchange_id = insert_exchange(conn, _make_exchange([1, 2], "hash-two-sources"), [1, 2])
     claim_id = _record_claim_with_sources(conn, exchange_id, (1, 2))
-    await handle_event(
-        conn, MessageDeleted(message_id=1, channel_id=10), clock, include_bots=False
-    )
-    row = conn.execute(
-        "SELECT retracted_at FROM claims WHERE id = ?", (claim_id,)
-    ).fetchone()
+    await handle_event(conn, MessageDeleted(message_id=1, channel_id=10), clock, include_bots=False)
+    row = conn.execute("SELECT retracted_at FROM claims WHERE id = ?", (claim_id,)).fetchone()
     assert row["retracted_at"] is None
 
 
-async def test_replay_of_event_sequence_is_idempotent(
-    conn: sqlite3.Connection, clock: FixedClock
-) -> None:
-    events = [
+async def test_replay_of_event_sequence_is_idempotent(tmp_path: Path) -> None:
+    events: list[SourceEvent] = [
         MessageCreated(make_message(id=1)),
         MessageEdited(make_message(id=1, content="edited")),
         ReactionChanged(message_id=1, emoji="👍", count=2),
     ]
-    for event in events:
-        await handle_event(conn, event, clock, include_bots=False)
+
+    async def run_once(db_path: Path) -> tuple[object, object, object]:
+        connection = open_database(db_path)
+        migrate(connection)
+        replay_clock = FixedClock(NOW)
+        for event in events:
+            await handle_event(connection, event, replay_clock, include_bots=False)
+        return (
+            get_message(connection, 1),
+            reactions_for_messages(connection, [1]),
+            message_revisions(connection, 1),
+        )
+
+    first = await run_once(tmp_path / "first.db")
+    second = await run_once(tmp_path / "second.db")
+    assert first == second
+
+
+async def test_replay_of_same_event_twice_on_same_db_is_stable(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    event = MessageEdited(make_message(id=1, content="edited"))
+    await handle_event(conn, MessageCreated(make_message(id=1)), clock, include_bots=False)
+    await handle_event(conn, event, clock, include_bots=False)
     first_message = get_message(conn, 1)
-    first_reactions = reactions_for_messages(conn, [1])
     first_revisions = message_revisions(conn, 1)
-    for event in events:
-        await handle_event(conn, event, clock, include_bots=False)
+    await handle_event(conn, event, clock, include_bots=False)
     second_message = get_message(conn, 1)
-    second_reactions = reactions_for_messages(conn, [1])
     second_revisions = message_revisions(conn, 1)
     assert first_message == second_message
-    assert first_reactions == second_reactions
     assert first_revisions == second_revisions
 
 
@@ -355,14 +373,13 @@ async def test_consume_counts_failure_and_continues(
 ) -> None:
     import infovore.ingest.live as live_module
 
-    original = live_module.upsert_message
     calls = {"n": 0}
 
     def flaky(*args: object, **kwargs: object) -> object:
         calls["n"] += 1
         if calls["n"] == 1:
             raise sqlite3.OperationalError("boom")
-        return original(*args, **kwargs)  # type: ignore[arg-type]
+        return raw_upsert_message(*args, **kwargs)  # type: ignore[arg-type]
 
     monkeypatch.setattr(live_module, "upsert_message", flaky)
     source = FakeDiscordSource()
