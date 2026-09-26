@@ -27,7 +27,9 @@ def test_outcomes_report_success_and_failure() -> None:
         source_message_ids=(1,),
         supersedes_claim_id=None,
     )
-    ok = ExtractionOutcome(claims=(claim,), model="m", input_tokens=1, output_tokens=2, failure=None)
+    ok = ExtractionOutcome(
+        claims=(claim,), model="m", input_tokens=1, output_tokens=2, failure=None
+    )
     assert ok.succeeded
     failed = ExtractionOutcome(
         claims=(),

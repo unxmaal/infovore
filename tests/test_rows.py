@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 import pytest
 
 from infovore.rows import (
+    AttachmentRow,
     ChannelKind,
     ChannelRow,
     ClaimKind,
@@ -20,7 +21,6 @@ from infovore.rows import (
     ReactionRow,
     RunMode,
     RunOutcome,
-    AttachmentRow,
 )
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
