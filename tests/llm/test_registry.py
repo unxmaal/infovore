@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from infovore.config import ConfigError, Settings, Stage, StageSettings
+from infovore.llm.claude_cli import ClaudeCliBackend
 from infovore.llm.protocol import Capabilities, ErrorKind, LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import BackendFactory, FakeBackendFactory, Registry, default_registry
 
@@ -132,6 +133,15 @@ def test_default_registry_builds_fake_backends() -> None:
     settings = settings_with({stage: stage_settings(model=stage.value) for stage in Stage})
     backends = registry.build_backends(settings)
     assert set(backends) == set(Stage)
+
+
+def test_default_registry_builds_claude_cli_backend() -> None:
+    registry = default_registry()
+    settings = settings_with(
+        {stage: stage_settings(backend="claude_cli", model=stage.value) for stage in Stage}
+    )
+    backends = registry.build_backends(settings)
+    assert isinstance(backends[Stage.EXTRACT], ClaudeCliBackend)
 
 
 async def test_health_check_reports_none_when_backend_is_healthy() -> None:

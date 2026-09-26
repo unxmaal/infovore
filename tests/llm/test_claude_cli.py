@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -16,9 +16,7 @@ class FakeProcessRunner:
     result: ProcessResult
     calls: list[tuple[list[str], str, str, float]] = field(default_factory=list)
 
-    async def run(
-        self, argv: Sequence[str], stdin: str, cwd: str, timeout: float
-    ) -> ProcessResult:
+    async def run(self, argv: Sequence[str], stdin: str, cwd: str, timeout: float) -> ProcessResult:
         self.calls.append((list(argv), stdin, cwd, timeout))
         return self.result
 
@@ -41,10 +39,8 @@ def make_backend(
     )
 
 
-def text_request(schema: dict[str, object] | None = None) -> LLMRequest:
-    return LLMRequest(
-        system="be terse", prompt="say hi", json_schema=schema, max_output_tokens=100
-    )
+def text_request(schema: Mapping[str, object] | None = None) -> LLMRequest:
+    return LLMRequest(system="be terse", prompt="say hi", json_schema=schema, max_output_tokens=100)
 
 
 def ok(**fields: object) -> ProcessResult:
@@ -62,7 +58,7 @@ async def test_argv_never_contains_bare_and_matches_exact_shape(tmp_path: Path) 
     runner = FakeProcessRunner(ok(result="hi", modelUsage={"claude-sonnet-5": {"outputTokens": 3}}))
     backend = make_backend(runner, tmp_path, model="sonnet", binary="claude")
     await backend.complete(text_request())
-    argv, stdin, cwd, timeout = runner.calls[0]
+    argv, stdin, _cwd, timeout = runner.calls[0]
     assert argv == [
         "claude",
         "-p",
@@ -176,6 +172,36 @@ async def test_model_usage_falls_back_to_alias_when_absent(tmp_path: Path) -> No
     assert result.model == "sonnet"
 
 
+async def test_model_usage_treats_missing_output_tokens_as_zero(tmp_path: Path) -> None:
+    runner = FakeProcessRunner(
+        ok(
+            result="hi",
+            modelUsage={
+                "claude-sonnet-5": {"outputTokens": 1},
+                "claude-legacy": {},
+            },
+        )
+    )
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.model == "claude-sonnet-5"
+
+
+async def test_model_usage_treats_non_mapping_entry_as_zero(tmp_path: Path) -> None:
+    runner = FakeProcessRunner(
+        ok(
+            result="hi",
+            modelUsage={
+                "claude-sonnet-5": {"outputTokens": 1},
+                "claude-weird": "not-a-mapping",
+            },
+        )
+    )
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.model == "claude-sonnet-5"
+
+
 async def test_model_usage_falls_back_to_alias_when_empty(tmp_path: Path) -> None:
     runner = FakeProcessRunner(ok(result="hi", modelUsage={}))
     backend = make_backend(runner, tmp_path, model="sonnet")
@@ -286,14 +312,27 @@ async def test_usage_limit_parses_retry_after_from_iso_timestamp(tmp_path: Path)
 
 
 async def test_usage_limit_parses_retry_after_from_epoch_seconds(tmp_path: Path) -> None:
-    target_epoch = int(datetime.now(UTC).timestamp()) + 120
+    target_epoch = round(datetime.now(UTC).timestamp()) + 120
     runner = FakeProcessRunner(
         ok(is_error=True, result=f"usage limit reached, resets at {target_epoch}")
     )
     backend = make_backend(runner, tmp_path)
     result = await backend.complete(text_request())
     assert result.error is not None
-    assert result.error.retry_after == 120.0
+    assert result.error.retry_after is not None
+    assert abs(result.error.retry_after - 120.0) <= 1.0
+
+
+async def test_usage_limit_parses_retry_after_from_naive_iso_timestamp(tmp_path: Path) -> None:
+    target = datetime.now(UTC).replace(tzinfo=None) + timedelta(seconds=120)
+    runner = FakeProcessRunner(
+        ok(is_error=True, result=f"usage limit reached, resets at {target.isoformat()}")
+    )
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.error is not None
+    assert result.error.retry_after is not None
+    assert abs(result.error.retry_after - 120.0) <= 1.0
 
 
 async def test_usage_limit_falls_back_to_default_on_unparseable_iso_timestamp(
@@ -309,9 +348,7 @@ async def test_usage_limit_falls_back_to_default_on_unparseable_iso_timestamp(
 
 
 async def test_is_error_529_is_transient(tmp_path: Path) -> None:
-    runner = FakeProcessRunner(
-        ok(is_error=True, api_error_status=529, result="overloaded_error")
-    )
+    runner = FakeProcessRunner(ok(is_error=True, api_error_status=529, result="overloaded_error"))
     backend = make_backend(runner, tmp_path)
     result = await backend.complete(text_request())
     assert result.error is not None
@@ -370,6 +407,14 @@ async def test_is_error_with_missing_result_uses_subtype_message(tmp_path: Path)
     assert result.error.message
 
 
+async def test_is_error_with_no_result_or_subtype_uses_default_message(tmp_path: Path) -> None:
+    runner = FakeProcessRunner(ok(is_error=True))
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.error is not None
+    assert result.error.message == "claude cli reported an error"
+
+
 def test_factory_name_is_claude_cli() -> None:
     assert ClaudeCliFactory().name == "claude_cli"
 
@@ -404,6 +449,7 @@ def test_factory_build_honors_binary_option() -> None:
         options={"binary": "/opt/claude/bin/claude"},
     )
     backend = ClaudeCliFactory().build(settings)
+    assert isinstance(backend, ClaudeCliBackend)
     assert backend._binary == "/opt/claude/bin/claude"
 
 
@@ -412,6 +458,7 @@ def test_factory_build_default_binary_is_claude() -> None:
         backend="claude_cli", model="sonnet", concurrency=1, timeout_seconds=1.0
     )
     backend = ClaudeCliFactory().build(settings)
+    assert isinstance(backend, ClaudeCliBackend)
     assert backend._binary == "claude"
 
 
@@ -424,6 +471,7 @@ def test_factory_build_honors_scratch_dir_option() -> None:
         options={"scratch_dir": "/tmp/somewhere"},
     )
     backend = ClaudeCliFactory().build(settings)
+    assert isinstance(backend, ClaudeCliBackend)
     assert backend._scratch_dir == Path("/tmp/somewhere")
 
 
