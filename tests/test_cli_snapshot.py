@@ -45,7 +45,7 @@ def test_snapshot_refuses_to_overwrite_existing_dest_without_force(tmp_path: Pat
 def test_snapshot_force_overwrites_existing_dest(tmp_path: Path) -> None:
     dest = tmp_path / "snap.db"
     dest.write_bytes(b"not a real snapshot")
-    code, out, _ = run(["snapshot", str(dest), "--force"], environment(tmp_path))
+    code, _, _ = run(["snapshot", str(dest), "--force"], environment(tmp_path))
     assert code == ExitCode.OK
     check = sqlite3.connect(dest)
     assert check.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] > 0

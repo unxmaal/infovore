@@ -13,6 +13,7 @@ from typing import Any, NoReturn, Protocol, TextIO
 
 from infovore.config import ConfigError, Settings, Stage, settings_from_environment
 from infovore.db.connection import migrate, open_database
+from infovore.db.snapshot import snapshot as snapshot_db
 from infovore.db.status import collect_status
 from infovore.ingest.backfill import BackfillReport, backfill
 from infovore.llm.protocol import LLMBackend
@@ -166,10 +167,37 @@ async def stage_backend(context: AppContext, stage: Stage) -> LLMBackend:
     return backend
 
 
+class SnapshotCommand:
+    name = "snapshot"
+    help = "write a consistent copy of the database via the SQLite backup API"
+
+    def configure(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("dest", type=Path)
+        parser.add_argument("--force", action="store_true")
+
+    async def run(self, context: AppContext, args: argparse.Namespace) -> int:
+        try:
+            report = snapshot_db(context.conn, args.dest, force=args.force)
+        except FileExistsError as error:
+            context.stdout.write(f"snapshot: {error}\n")
+            return ExitCode.FAILURE
+        context.stdout.write(
+            f"snapshot: {report.dest} ({report.size_bytes} bytes,"
+            f" user_version={report.user_version})\n"
+        )
+        return ExitCode.OK
+
+
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
 
-    return [StatusCommand(), SyncOptOutsCommand(), ChunkCommand(), BackfillCommand()]
+    return [
+        StatusCommand(),
+        SyncOptOutsCommand(),
+        ChunkCommand(),
+        BackfillCommand(),
+        SnapshotCommand(),
+    ]
 
 
 class _Parser(argparse.ArgumentParser):
