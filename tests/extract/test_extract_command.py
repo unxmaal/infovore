@@ -425,17 +425,14 @@ def test_extract_live_mode_only_claims_above_threshold(tmp_path: Path) -> None:
     conn.close()
 
 
-def test_extract_trial_mode_min_score_filters_the_sample(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    low_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False, triage_score=0.1)
-    conn = open_database(env["INFOVORE_DB_PATH"])
+def _seed_second_exchange(conn: sqlite3.Connection, triage_score: float) -> int:
     conn.execute(
         "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
         " created_at, content, ingested_at, raw_json)"
         " VALUES (2, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',"
         " '2026-01-01T00:00:00+00:00', '{}')"
     )
-    high_row = ExchangeRow(
+    row = ExchangeRow(
         id=None,
         channel_id=1,
         thread_id=None,
@@ -451,10 +448,18 @@ def test_extract_trial_mode_min_score_filters_the_sample(tmp_path: Path) -> None
         retry_count=0,
         last_error=None,
     )
-    high_id = insert_exchange(conn, high_row, [2])
-    mark_triaged(conn, high_id, 0.9)
+    exchange_id = insert_exchange(conn, row, [2])
+    mark_triaged(conn, exchange_id, triage_score)
+    return exchange_id
+
+
+def test_extract_trial_mode_min_score_filters_the_sample(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    qualifying_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False, triage_score=0.9)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    excluded_id = _seed_second_exchange(conn, triage_score=0.1)
     conn.close()
-    assert low_id != high_id
+    assert qualifying_id != excluded_id
     registry = registry_with(success_results())
 
     code, out, _ = run(
@@ -464,42 +469,18 @@ def test_extract_trial_mode_min_score_filters_the_sample(tmp_path: Path) -> None
     assert code == ExitCode.OK
     assert "processed=1" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
-    high_exchange = get_exchange(conn, high_id)
-    low_exchange = get_exchange(conn, low_id)
-    assert high_exchange is not None
-    assert low_exchange is not None
+    claims = conn.execute("SELECT exchange_id FROM claims").fetchall()
+    assert [row["exchange_id"] for row in claims] == [qualifying_id]
     conn.close()
 
 
 def test_extract_trial_mode_max_score_filters_the_sample(tmp_path: Path) -> None:
     env = environment(tmp_path)
-    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False, triage_score=0.9)
+    qualifying_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False, triage_score=0.1)
     conn = open_database(env["INFOVORE_DB_PATH"])
-    conn.execute(
-        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
-        " created_at, content, ingested_at, raw_json)"
-        " VALUES (2, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',"
-        " '2026-01-01T00:00:00+00:00', '{}')"
-    )
-    low_row = ExchangeRow(
-        id=None,
-        channel_id=1,
-        thread_id=None,
-        first_message_id=2,
-        last_message_id=2,
-        started_at=NOW,
-        ended_at=NOW,
-        message_count=1,
-        grouping_rule=GroupingRule.QUIET_GAP,
-        content_hash="hash-2",
-        parent_exchange_id=None,
-        extraction_status=ExtractionStatus.PENDING,
-        retry_count=0,
-        last_error=None,
-    )
-    low_id = insert_exchange(conn, low_row, [2])
-    mark_triaged(conn, low_id, 0.1)
+    excluded_id = _seed_second_exchange(conn, triage_score=0.9)
     conn.close()
+    assert qualifying_id != excluded_id
     registry = registry_with(success_results())
 
     code, out, _ = run(
@@ -508,6 +489,10 @@ def test_extract_trial_mode_max_score_filters_the_sample(tmp_path: Path) -> None
 
     assert code == ExitCode.OK
     assert "processed=1" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    claims = conn.execute("SELECT exchange_id FROM claims").fetchall()
+    assert [row["exchange_id"] for row in claims] == [qualifying_id]
+    conn.close()
 
 
 def test_extract_start_line_is_written_before_backend_processes_any_exchange(

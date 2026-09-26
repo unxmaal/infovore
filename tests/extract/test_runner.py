@@ -1090,7 +1090,9 @@ def test_live_refuses_when_pending_exchange_has_stale_triage_version(tmp_path: P
 def test_trial_mode_never_checked_for_untriaged_exchanges(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(
-        conn, [a_message(1, content="FACT: Octane2 :: a fact")], triage_score=None,
+        conn,
+        [a_message(1, content="FACT: Octane2 :: a fact")],
+        triage_score=None,
         triage_version=None,
     )
     assert exchange.id is not None
