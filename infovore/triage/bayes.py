@@ -1,0 +1,158 @@
+import hashlib
+import math
+import re
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass, field
+from enum import StrEnum
+
+from infovore.rows import AttachmentRow, MessageRow, ReactionRow
+from infovore.triage.score import score_exchange
+
+UNKNOWN_WORD_STRENGTH = 1.0
+UNKNOWN_WORD_PROBABILITY = 0.5
+MINIMUM_PROBABILITY_STRENGTH = 0.1
+MAX_CLUES = 150
+HOLDOUT_BUCKETS = 5
+TOKEN = re.compile(r"[\w/][\w'./+-]*")
+TRAILING_PUNCTUATION = ".,!?;:)'\"-"
+MAX_TOKEN_LENGTH = 40
+
+
+class Label(StrEnum):
+    LORE = "lore"
+    NOISE = "noise"
+
+
+@dataclass
+class Model:
+    lore_documents: int = 0
+    noise_documents: int = 0
+    counts: dict[str, tuple[int, int]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class Metrics:
+    threshold: float
+    tp: int
+    fp: int
+    fn: int
+    tn: int
+
+    @property
+    def precision(self) -> float:
+        return self.tp / (self.tp + self.fp) if self.tp + self.fp else 0.0
+
+    @property
+    def recall(self) -> float:
+        return self.tp / (self.tp + self.fn) if self.tp + self.fn else 0.0
+
+    @property
+    def f1(self) -> float:
+        total = self.precision + self.recall
+        return 2 * self.precision * self.recall / total if total else 0.0
+
+
+def _length_bucket(count: int) -> str:
+    if count <= 1:
+        return "LEN_1"
+    if count <= 5:
+        return "LEN_2-5"
+    if count <= 20:
+        return "LEN_6-20"
+    return "LEN_21+"
+
+
+def features(
+    messages: Sequence[MessageRow],
+    channel_id: int,
+    reactions: Sequence[ReactionRow] = (),
+    attachments: Sequence[AttachmentRow] = (),
+) -> frozenset[str]:
+    words = {
+        token.rstrip(TRAILING_PUNCTUATION)
+        for message in messages
+        for token in TOKEN.findall(message.content.lower())
+    }
+    words = {word for word in words if word and len(word) <= MAX_TOKEN_LENGTH}
+    triage = score_exchange(messages, reactions, attachments)
+    virtual = {f"SIG_{name}" for name, _ in triage.reasons}
+    return frozenset(words | virtual | {f"CHAN_{channel_id}", _length_bucket(len(messages))})
+
+
+def train(examples: Iterable[tuple[frozenset[str], Label]]) -> Model:
+    model = Model()
+    for tokens, label in examples:
+        if label is Label.LORE:
+            model.lore_documents += 1
+        else:
+            model.noise_documents += 1
+        for token in tokens:
+            lore, noise = model.counts.get(token, (0, 0))
+            model.counts[token] = (lore + 1, noise) if label is Label.LORE else (lore, noise + 1)
+    return model
+
+
+def token_probability(model: Model, token: str) -> float:
+    if model.lore_documents == 0 or model.noise_documents == 0:
+        return UNKNOWN_WORD_PROBABILITY
+    lore, noise = model.counts.get(token, (0, 0))
+    seen = lore + noise
+    if seen == 0:
+        return UNKNOWN_WORD_PROBABILITY
+    lore_ratio = lore / model.lore_documents
+    noise_ratio = noise / model.noise_documents
+    raw = lore_ratio / (lore_ratio + noise_ratio)
+    return (UNKNOWN_WORD_STRENGTH * UNKNOWN_WORD_PROBABILITY + seen * raw) / (
+        UNKNOWN_WORD_STRENGTH + seen
+    )
+
+
+def chi2q(x2: float, degrees: int) -> float:
+    half = x2 / 2.0
+    term = math.exp(-half)
+    total = term
+    for index in range(1, degrees // 2):
+        term *= half / index
+        total += term
+    return min(total, 1.0)
+
+
+def p_lore(model: Model, tokens: frozenset[str], max_clues: int = MAX_CLUES) -> float:
+    clues = sorted(
+        (
+            (abs(probability - 0.5), token, probability)
+            for token in tokens
+            if abs((probability := token_probability(model, token)) - 0.5)
+            >= MINIMUM_PROBABILITY_STRENGTH
+        ),
+        reverse=True,
+    )[:max_clues]
+    if not clues:
+        return 0.5
+    lore_evidence = sum(math.log(1.0 - probability) for _, _, probability in clues)
+    noise_evidence = sum(math.log(probability) for _, _, probability in clues)
+    degrees = 2 * len(clues)
+    lore_strength = 1.0 - chi2q(-2.0 * lore_evidence, degrees)
+    noise_strength = 1.0 - chi2q(-2.0 * noise_evidence, degrees)
+    return (lore_strength - noise_strength + 1.0) / 2.0
+
+
+def in_holdout(exchange_id: int) -> bool:
+    digest = hashlib.sha256(str(exchange_id).encode()).digest()
+    return digest[0] % HOLDOUT_BUCKETS == 0
+
+
+def evaluate(scored: Sequence[tuple[float, Label]], thresholds: Sequence[float]) -> list[Metrics]:
+    table: list[Metrics] = []
+    for threshold in thresholds:
+        tp = sum(1 for p, label in scored if p >= threshold and label is Label.LORE)
+        fp = sum(1 for p, label in scored if p >= threshold and label is Label.NOISE)
+        fn = sum(1 for p, label in scored if p < threshold and label is Label.LORE)
+        tn = sum(1 for p, label in scored if p < threshold and label is Label.NOISE)
+        table.append(Metrics(threshold, tp=tp, fp=fp, fn=fn, tn=tn))
+    return table
+
+
+def recommend_threshold(table: Sequence[Metrics], min_recall: float) -> Metrics | None:
+    qualifying = [row for row in table if row.recall >= min_recall]
+    return max(qualifying, key=lambda row: row.threshold) if qualifying else None
