@@ -93,6 +93,8 @@ uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
 uv run infovore extract [--mode trial|live] [--sample N] [--seed S] [--exchange-id ID ...]
 uv run infovore probe [--run-id ID ...] [--limit N] [--probe-model CANONICAL_ID] [--retry-failed]
+uv run infovore review --run-ids ID [ID ...] [--out PATH]
+uv run infovore promote --prompt-version V
 uv run infovore snapshot <dest> [--force]
 uv run infovore run [--interval SECONDS] [--once]
 ```
@@ -100,6 +102,10 @@ uv run infovore run [--interval SECONDS] [--once]
 `chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill.
 
 `probe` runs the closed-book novelty probe (`infovore.extract.novelty.run_probe`) over claims that still need it, built from the `probe` and `judge` stage backends (`infovore.extract.llm_extractor.LLMNoveltyProbe`), with the `probe` stage's configured concurrency. `--run-id` (repeatable) scopes the run to the non-retracted claims of those extraction runs only, instead of the whole database. `--limit` (default `INFOVORE_BATCH_SIZE`) is the number of candidates fetched per batch; the command loops fetching batches until a fetch turns up nothing left to probe. `--probe-model` names the canonical model id (e.g. `claude-sonnet-5`) the operator expects the configured probe backend to resolve to; passing it after a probe model upgrade re-probes exactly the claims that model hasn't seen (`db.claims.claims_needing_probe` / `claims_for_runs_needing_probe`), since probing is idempotent per `(claim, probe_model)`. Without `--probe-model`, only claims with novelty `unprobed` are considered, because the canonical model id is only known from a call's own result, not in advance. A claim whose `probe_error` is set (a `transient`/`fatal`/`invalid_output` failure from a previous probe attempt) is parked: it is skipped by every future `probe` run, on this or any other invocation, until `--retry-failed` is passed, which includes parked claims in the candidate set again for this run only. `probe` prints `probed`, `by verdict` (counts per `Novelty`), `failed`, and `pauses`, and exits `1` if any claim failed (`0` otherwise, even if some claims paused on a usage limit and later succeeded, or were parked and skipped).
+
+`review` (`infovore.extract.review.build_review`/`render_review_html`, `ReviewCommand`) renders a prompt-iteration report over one or two prompt-version "run sets": the run ids in `--run-ids` (repeatable, at least one; trial mode creates one run per exchange, so this is typically every run id `extract --mode trial` printed) are grouped by their `prompt_version`, and every exchange covered by any of them is rendered with its messages, and, per version present for that exchange, that version's claims (kind, subject, statement, confidence, cited message ids, novelty and probe answer), run outcome/error, and tokens. With exactly two versions covering the same exchange, a per-exchange diff shows claims added, dropped, and changed (claims are matched by `(subject, statement)` normalized; a "changed" match is the same subject with a different statement or kind, found among claims left over after the exact match pass) plus verdict shifts on matched claims. A summary header gives, per version: exchanges, claims per exchange, verdict distribution, share of `known`, failed runs, and tokens per 100 exchanges (runs don't record a dollar cost, so token counts are the number to watch). The report is one self-contained HTML file — inline CSS only, no external requests, readable in light and dark, collapsible per-exchange `<details>` sections — written to `--out` (default `review.html` under `INFOVORE_SCRATCH_DIR`, parent directories created as needed) and the path is printed. An unknown run id exits `2`.
+
+`promote` (`infovore.db.claims.promote_prompt_version`, `PromoteCommand`) records `--prompt-version V` as the live prompt version, so the next `extract` without `--mode trial` uses it. If `V` equals the current `infovore.extract.prompt.PROMPT_VERSION`, it is registered first (same as `extract` would); any other version must already be registered (by a prior `extract --mode trial` run, which registers the prompt version it ran with) or the command exits `2` with a clear message. It prints the resulting live prompt version.
 
 `snapshot` writes a consistent copy of the product database to `<dest>` using the SQLite backup API (`infovore.db.snapshot.snapshot`), safe to run at any time, including while `backfill`/`chunk`/`extract`/`run` is mid-write against the same file: the backup only ever sees committed data, never a writer's in-flight transaction. It refuses to overwrite an existing `<dest>` unless `--force` is given, creates `<dest>`'s parent directories as needed, and writes through a temporary file in the same directory that it atomically renames into place, so a reader never observes a partially written snapshot. It reports the destination path, its size in bytes, and its `PRAGMA user_version` (the schema version). This is how the product database leaves a host — see "Deployment" below.
 
@@ -120,6 +126,20 @@ Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3
 3. Create the opt-out role (default name `no-archive`, `INFOVORE_OPT_OUT_ROLE`) and post the server notice explaining what is archived and how to opt out.
 4. Set `INFOVORE_DISCORD_TOKEN`, `INFOVORE_GUILD_ID`, `INFOVORE_CHANNEL_IDS` and `INFOVORE_DB_PATH` (see Configuration).
 5. `infovore sync-optouts`, then `infovore backfill`, then `infovore chunk`. Run `sync-optouts` before any extraction, and again whenever the role changes.
+
+### Iterating the prompt
+
+This is the M1 loop: run the current prompt over a reproducible sample of the backfill, look at what it extracted, and either promote it or change the prompt and compare. Every step is `--mode trial`, so it never touches `live` claims or exchange status.
+
+1. `infovore backfill` then `infovore chunk`, once, to populate exchanges from the real history.
+2. `infovore extract --mode trial --sample 50 --seed 1` — runs `infovore.extract.prompt.PROMPT_VERSION` over 50 exchanges, stratified by channel and size, chosen deterministically by `--seed`. Note the run ids it prints.
+3. `infovore probe --run-id <the run ids from step 2>` — closed-book novelty probe over the trial's claims.
+4. `infovore review --run-ids <the same run ids>` — writes `review.html`; open it and read the claims, verdicts, and summary numbers (claims per exchange, share of `known`, tokens per 100 exchanges).
+5. Edit the prompt in `infovore/extract/prompt.py` and bump `PROMPT_VERSION` (this changes `PROMPT_SHA256` too, so the new version is distinguishable from the old one in the database).
+6. Repeat step 2 with the same `--seed` (`infovore extract --mode trial --sample 50 --seed 1`) so the new version runs over the same exchanges, then step 3 against the new run ids.
+7. `infovore review --run-ids <old run ids from step 2> <new run ids from step 6>` — with two prompt versions covering the same exchanges, the report adds a side-by-side diff per exchange (added/dropped/changed claims, verdict shifts) so a wording change's effect is visible exchange by exchange, not just in the summary.
+8. Once a version looks right, `infovore promote --prompt-version vN` makes it live.
+9. `infovore extract` (no `--mode`, so it defaults to `live`) now runs the promoted version over the real pending/stale queue.
 
 ## Grouping rules
 
