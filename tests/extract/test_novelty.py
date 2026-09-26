@@ -245,6 +245,25 @@ async def test_run_probe_usage_limit_defaults_retry_after(tmp_path: Path) -> Non
     assert sleeper.slept == [300.0]
 
 
+async def test_run_probe_zero_retry_after_sleeps_zero_not_default(tmp_path: Path) -> None:
+    conn = setup_db(tmp_path)
+    claim_id = seed_claim(conn, "widget ZZ [known]")
+    probe = ScriptedProbe(
+        {
+            claim_id: [
+                ProbeOutcome(None, None, None, Failure(FailureKind.USAGE_LIMIT, "limited", 0.0)),
+                ProbeOutcome(Novelty.KNOWN, "fake-model", "answer", None),
+            ]
+        }
+    )
+    sleeper = RecordingSleeper()
+
+    await run_probe(
+        conn, probe, FixedClock(NOW), sleeper, probe_model=None, limit=10, concurrency=2
+    )
+    assert sleeper.slept == [0.0]
+
+
 async def test_run_probe_idempotent_per_model_second_run_probes_nothing(tmp_path: Path) -> None:
     conn = setup_db(tmp_path)
     seed_claim(conn, "widget H [known]")

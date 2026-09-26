@@ -382,6 +382,49 @@ def test_usage_limit_defaults_retry_after_to_300(tmp_path: Path) -> None:
     assert sleeper.slept == [300.0]
 
 
+def test_usage_limit_zero_retry_after_sleeps_zero_not_default(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)])
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=None,
+                output_tokens=None,
+                failure=Failure(FailureKind.USAGE_LIMIT, "slow down", 0.0),
+            ),
+            ExtractionOutcome(
+                claims=(), model="model-y", input_tokens=None, output_tokens=None, failure=None
+            ),
+        ]
+    )
+    sleeper = RecordingSleeper()
+    events: list[ExtractionEvent] = []
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            extractor,
+            FixedClock(NOW),
+            sleeper,
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            progress=events.append,
+        )
+
+    asyncio.run(go())
+
+    assert sleeper.slept == [0.0]
+    paused = events[1]
+    assert isinstance(paused, ExchangePaused)
+    assert paused.retry_after == 0.0
+
+
 def test_retries_until_failed_after_max_retries(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content="FAIL: transient")])
