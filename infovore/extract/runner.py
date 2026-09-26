@@ -3,6 +3,7 @@ import random
 import sqlite3
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from enum import StrEnum
 
 from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
@@ -33,6 +34,16 @@ class PromptNotPromotedError(Exception):
 
 class UntriagedExchangesError(Exception):
     pass
+
+
+class NoScoredExchangesError(Exception):
+    pass
+
+
+class TrialSampleStrategy(StrEnum):
+    STRATIFIED = "stratified"
+    RANDOM = "random"
+    UNCERTAIN = "uncertain"
 
 
 @dataclass(frozen=True)
@@ -141,12 +152,29 @@ def _size_bucket(message_count: int) -> str:
     return "21+"
 
 
+def _select_uncertain(rows: Sequence[sqlite3.Row], n: int) -> list[int]:
+    eligible = [row for row in rows if row["p_lore"] is not None]
+    if not eligible:
+        raise NoScoredExchangesError
+    ordered = sorted(eligible, key=lambda row: (abs(row["p_lore"] - 0.5), row["id"]))
+    return sorted(row["id"] for row in ordered[:n])
+
+
+def _select_random(rows: Sequence[sqlite3.Row], n: int, seed: int) -> list[int]:
+    ids = [row["id"] for row in rows]
+    if n >= len(ids):
+        return sorted(ids)
+    rng = random.Random(seed)
+    return sorted(rng.sample(ids, n))
+
+
 def select_trial_sample(
     conn: sqlite3.Connection,
     n: int,
     seed: int,
     min_score: float | None = None,
     max_score: float | None = None,
+    strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
 ) -> list[int]:
     conditions: list[str] = []
     params: list[object] = []
@@ -158,8 +186,14 @@ def select_trial_sample(
         params.append(max_score)
     where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
     rows = conn.execute(
-        f"SELECT id, channel_id, message_count FROM exchanges{where} ORDER BY id", params
+        f"SELECT id, channel_id, message_count, p_lore FROM exchanges{where} ORDER BY id", params
     ).fetchall()
+
+    if strategy is TrialSampleStrategy.UNCERTAIN:
+        return _select_uncertain(rows, n)
+    if strategy is TrialSampleStrategy.RANDOM:
+        return _select_random(rows, n, seed)
+
     if n >= len(rows):
         return [row["id"] for row in rows]
 
