@@ -49,10 +49,8 @@ class TriageReport:
     global_mean: float
 
 
-def _raw_score(reasons_json: str | None) -> float:
-    if not reasons_json:
-        return 0.0
-    reasons = json.loads(reasons_json)
+def _raw_score(reasons_json: str) -> float:
+    reasons: list[tuple[str, float]] = json.loads(reasons_json)
     raw = sum(weight for name, weight in reasons if name != CHANNEL_PRIOR_REASON)
     return round(min(1.0, max(0.0, raw)), 4)
 
