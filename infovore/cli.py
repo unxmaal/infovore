@@ -13,6 +13,7 @@ from typing import Any, NoReturn, Protocol, TextIO
 from infovore.config import ConfigError, Settings, settings_from_environment
 from infovore.db.connection import migrate, open_database
 from infovore.db.status import collect_status
+from infovore.ingest.backfill import BackfillReport, backfill
 from infovore.llm.registry import Registry, default_registry
 from infovore.privacy.optout import sync_opt_outs
 from infovore.source.protocol import DiscordSource
@@ -114,10 +115,45 @@ def _default_source_factory(settings: Settings) -> DiscordSource:
     raise BackendUnavailableError("discord source not configured")
 
 
+def _write_backfill_report(stdout: TextIO, report: BackfillReport) -> None:
+    for channel_id in sorted(report.channels):
+        channel_report = report.channels[channel_id]
+        stdout.write(
+            f"channel {channel_id}: pages={channel_report.pages}"
+            f" inserted={channel_report.inserted} updated={channel_report.updated}"
+            f" unchanged={channel_report.unchanged} skipped={channel_report.skipped}\n"
+        )
+    for failure in report.failed:
+        stdout.write(f"channel {failure.channel_id} failed: {failure.reason}\n")
+
+
+class BackfillCommand:
+    name = "backfill"
+    help = "walk allowlisted channels' history into raw tables, resuming from checkpoint"
+
+    def configure(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("--page-size", type=int, default=100)
+
+    async def run(self, context: AppContext, args: argparse.Namespace) -> int:
+        source = context.source_factory(context.settings)
+        report = await backfill(
+            context.conn,
+            source,
+            context.settings.guild_id,
+            context.settings.channel_ids,
+            context.clock,
+            context.sleeper,
+            context.settings.include_bot_messages,
+            page_size=args.page_size,
+        )
+        _write_backfill_report(context.stdout, report)
+        return ExitCode.FAILURE if report.failed else ExitCode.OK
+
+
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
 
-    return [StatusCommand(), SyncOptOutsCommand(), ChunkCommand()]
+    return [StatusCommand(), SyncOptOutsCommand(), ChunkCommand(), BackfillCommand()]
 
 
 class _Parser(argparse.ArgumentParser):

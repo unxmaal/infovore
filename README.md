@@ -56,12 +56,15 @@ Capabilities: `native_json_schema=True`, `max_concurrency` is the stage's config
 
 ```
 uv run infovore status
+uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
 ```
 
 `chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill.
 
 Every subcommand loads configuration (environment, then `.env` in the working directory for anything not set), opens and migrates the database, and runs. `status` prints row counts, the exchange queue by status, claims by novelty, run outcomes, the last extraction and probe times, the live prompt version, and each stage's backend and model.
+
+`backfill` walks every channel in `INFOVORE_CHANNEL_IDS`, plus their threads (including archived ones), oldest message first, from `infovore.ingest.backfill.backfill`. Each channel's checkpoint (`channels.last_backfilled_message_id`) is stored after every page of messages, in the same transaction as that page's rows, so an interrupted run resumes exactly where it left off and never re-walks or loses data. A page that fails with a rate limit sleeps for the retry-after duration and retries from the checkpoint; a page that fails because the source is unavailable backs off exponentially (1s, 2s, 4s, ...); a channel that fails five consecutive times (configurable via the `backfill()` function's `max_attempts`) is recorded as failed and the walk continues with the remaining channels. `backfill` prints one line per channel (pages walked, messages inserted/updated/unchanged, messages skipped as system or bot) and one line per failed channel, then exits `0` if every channel completed or `1` if any channel failed. `--page-size` (default `100`) controls how many messages are requested per history page. The command needs a `DiscordSource`; until the discord.py adapter (#14) lands, running it without an injected `source_factory` exits `3` with "discord source not configured".
 
 Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3` an LLM backend is unavailable.
 
