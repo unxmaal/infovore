@@ -209,11 +209,10 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
         request = build_request(context.conn, exchange)
         context.accumulator.processed += 1
 
-        if context.mode is RunMode.LIVE and all(
-            message.author_id in request.opted_out_user_ids for message in request.messages
-        ):
-            assert exchange.id is not None
-            set_status(context.conn, exchange.id, ExtractionStatus.SKIPPED)
+        if all(message.author_id in request.opted_out_user_ids for message in request.messages):
+            if context.mode is RunMode.LIVE:
+                assert exchange.id is not None
+                set_status(context.conn, exchange.id, ExtractionStatus.SKIPPED)
             context.accumulator.skipped += 1
             return
 
