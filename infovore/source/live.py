@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from datetime import datetime
-from typing import Protocol, cast
+from typing import Any, Protocol, cast
 
 import discord
 
@@ -15,6 +15,7 @@ from infovore.source.protocol import (
     SourceAttachment,
     SourceChannel,
     SourceEvent,
+    SourceForbiddenError,
     SourceMessage,
     SourceRateLimitedError,
     SourceReaction,
@@ -218,6 +219,8 @@ def _map_http_error(
 ) -> SourceRateLimitedError | SourceUnavailableError:
     if error.status == 429:
         return SourceRateLimitedError(_retry_after(error))
+    if error.status == 403:
+        return SourceForbiddenError(str(error))
     return SourceUnavailableError(str(error))
 
 
@@ -234,8 +237,22 @@ class _FetchableChannelLike(Protocol):
     async def fetch_message(self, message_id: int) -> _MessageLike: ...
 
 
+class _PermissionsLike(Protocol):
+    @property
+    def view_channel(self) -> bool: ...
+
+    @property
+    def read_message_history(self) -> bool: ...
+
+
 class _MessageableLike(_ChannelLike, _FetchableChannelLike, Protocol):
     def archived_threads(self, *, limit: int | None) -> AsyncIterator[_ChannelLike]: ...
+
+    def permissions_for(self, member: Any) -> _PermissionsLike: ...
+
+
+def _can_read(permissions: _PermissionsLike) -> bool:
+    return permissions.view_channel and permissions.read_message_history
 
 
 class _RoleLike(Protocol):
@@ -269,6 +286,9 @@ class _GuildLike(Protocol):
 
     @property
     def members(self) -> Sequence[_MemberLike]: ...
+
+    @property
+    def me(self) -> Any: ...
 
 
 class _ClientLike(Protocol):
@@ -311,17 +331,35 @@ class DiscordPySource:
         guild = self._client.get_guild(guild_id)
         if guild is None:
             return ()
-        channels = [to_source_channel(channel) for channel in guild.text_channels]
-        channels += [to_source_channel(thread) for thread in guild.threads]
+        readable = [
+            channel
+            for channel in guild.text_channels
+            if _can_read(channel.permissions_for(guild.me))
+        ]
+        readable_ids = {channel.id for channel in readable}
+        channels = [to_source_channel(channel) for channel in readable]
+        channels += [
+            to_source_channel(thread)
+            for thread in guild.threads
+            if to_source_channel(thread).parent_id in readable_ids
+        ]
+        for text_channel in readable:
+            channels += await self._archived_threads(text_channel)
+        return tuple(channels)
+
+    async def _archived_threads(self, channel: _MessageableLike) -> list[SourceChannel]:
+        found: list[SourceChannel] = []
         try:
-            for text_channel in guild.text_channels:
-                async for archived in text_channel.archived_threads(limit=None):
-                    channels.append(to_source_channel(archived))
+            async for archived in channel.archived_threads(limit=None):
+                found.append(to_source_channel(archived))
         except discord.HTTPException as error:
-            raise _map_http_error(error) from error
+            mapped = _map_http_error(error)
+            if isinstance(mapped, SourceForbiddenError):
+                return found
+            raise mapped from error
         except OSError as error:
             raise SourceUnavailableError(str(error)) from error
-        return tuple(channels)
+        return found
 
     async def history(
         self, channel_id: int, after_id: int | None, page_size: int
