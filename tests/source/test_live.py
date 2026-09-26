@@ -128,7 +128,7 @@ def test_to_source_channel_thread() -> None:
 
 def test_to_source_message_basic_channel_message() -> None:
     message = make_message()
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.id == 1
     assert result.channel_id == 10
     assert result.guild_id == 100
@@ -147,28 +147,28 @@ def test_to_source_message_basic_channel_message() -> None:
 
 def test_to_source_message_system_message() -> None:
     message = make_message(system=True, type=FakeMessageType("pins_add"))
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.is_system is True
     assert result.raw["type"] == "pins_add"
 
 
 def test_to_source_message_reply() -> None:
     message = make_message(reference=FakeReference(message_id=99))
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.reply_to_id == 99
     assert result.raw["reference"] == 99
 
 
 def test_to_source_message_reply_reference_without_message_id() -> None:
     message = make_message(reference=FakeReference(message_id=None))
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.reply_to_id is None
 
 
 def test_to_source_message_in_thread() -> None:
     thread = bare_thread(20, 100, parent_id=10, name="sub-thread", archived=False)
     message = make_message(channel=thread)
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.channel_id == 20
     assert result.thread_id == 20
 
@@ -178,7 +178,7 @@ def test_to_source_message_attachments_and_reactions() -> None:
         attachments=(FakeAttachment(7, "a.txt", "text/plain", 3, "https://x"),),
         reactions=(FakeReaction("👍", 2),),
     )
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.attachments[0].id == 7
     assert result.attachments[0].filename == "a.txt"
     assert result.attachments[0].content_type == "text/plain"
@@ -194,26 +194,26 @@ def test_to_source_message_attachments_and_reactions() -> None:
 def test_to_source_message_edited() -> None:
     edited_at = NOW.replace(hour=2)
     message = make_message(edited_at=edited_at)
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.edited_at == edited_at
     assert result.raw["edited_at"] == edited_at.isoformat()
 
 
 def test_to_source_message_bot_author() -> None:
     message = make_message(author=FakeAuthor(9, "helper-bot", True))
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.author_is_bot is True
     assert result.raw["author"] == {"id": 9, "name": "helper-bot", "bot": True}
 
 
 def test_to_source_message_no_guild_defaults_zero() -> None:
     message = make_message(guild=None)
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     assert result.guild_id == 0
     assert result.raw["guild_id"] == 0
 
 
 def test_to_source_message_raw_is_json_safe() -> None:
     message = make_message()
-    result = to_source_message(message)  # type: ignore[arg-type]
+    result = to_source_message(message)
     json.dumps(result.raw)
