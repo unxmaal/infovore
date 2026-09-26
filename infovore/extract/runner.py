@@ -57,6 +57,19 @@ class _Accumulator:
         )
 
 
+@dataclass(frozen=True)
+class _RunContext:
+    conn: sqlite3.Connection
+    extractor: ClaimExtractor
+    clock: Clock
+    sleeper: Sleeper
+    semaphore: asyncio.Semaphore
+    mode: RunMode
+    model_label: str
+    max_retries: int
+    accumulator: _Accumulator
+
+
 def _size_bucket(message_count: int) -> str:
     if message_count == 1:
         return "1"
@@ -107,21 +120,17 @@ def _previous_live_claim_ids(conn: sqlite3.Connection, exchange_id: int) -> list
 
 
 def _finish_success(
-    conn: sqlite3.Connection,
-    clock: Clock,
-    mode: RunMode,
-    model_label: str,
+    context: _RunContext,
     exchange: ExchangeRow,
-    request_guild_id: int,
+    guild_id: int,
     outcome_model: str | None,
     input_tokens: int | None,
     output_tokens: int | None,
     claims: Sequence[ExtractedClaim],
-    accumulator: _Accumulator,
 ) -> None:
     assert exchange.id is not None
-    now = clock.now()
-    link = permalink(request_guild_id, exchange.channel_id, exchange.first_message_id)
+    now = context.clock.now()
+    link = permalink(guild_id, exchange.channel_id, exchange.first_message_id)
     new_claims = [
         NewClaim(
             exchange_id=exchange.id,
@@ -139,161 +148,103 @@ def _finish_success(
     run_row = ExtractionRunRow(
         id=None,
         exchange_id=exchange.id,
-        model=outcome_model or model_label,
+        model=outcome_model or context.model_label,
         prompt_version=PROMPT_VERSION,
         started_at=now,
         finished_at=now,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
-        mode=mode,
+        mode=context.mode,
         outcome=RunOutcome.OK,
         error=None,
     )
 
     previous_claim_ids: list[int] = []
-    if mode is RunMode.LIVE and exchange.extraction_status is ExtractionStatus.STALE:
-        previous_claim_ids = _previous_live_claim_ids(conn, exchange.id)
+    if context.mode is RunMode.LIVE and exchange.extraction_status is ExtractionStatus.STALE:
+        previous_claim_ids = _previous_live_claim_ids(context.conn, exchange.id)
 
-    recorded = record_run(conn, run_row, new_claims)
-    accumulator.run_ids.append(recorded.run_id)
-    accumulator.claims_recorded += len(recorded.claim_ids)
-    accumulator.succeeded += 1
+    recorded = record_run(context.conn, run_row, new_claims)
+    context.accumulator.run_ids.append(recorded.run_id)
+    context.accumulator.claims_recorded += len(recorded.claim_ids)
+    context.accumulator.succeeded += 1
 
-    if mode is RunMode.LIVE:
+    if context.mode is RunMode.LIVE:
         for claim_id in previous_claim_ids:
-            db_retract_claim(conn, claim_id, "reextracted", now)
-        set_status(conn, exchange.id, ExtractionStatus.DONE)
+            db_retract_claim(context.conn, claim_id, "reextracted", now)
+        set_status(context.conn, exchange.id, ExtractionStatus.DONE)
 
 
 def _finish_failure(
-    conn: sqlite3.Connection,
-    clock: Clock,
-    mode: RunMode,
-    model_label: str,
-    max_retries: int,
+    context: _RunContext,
     exchange: ExchangeRow,
     failure: Failure,
     input_tokens: int | None,
     output_tokens: int | None,
-    accumulator: _Accumulator,
 ) -> None:
     assert exchange.id is not None
-    now = clock.now()
+    now = context.clock.now()
     run_row = ExtractionRunRow(
         id=None,
         exchange_id=exchange.id,
-        model=model_label,
+        model=context.model_label,
         prompt_version=PROMPT_VERSION,
         started_at=now,
         finished_at=now,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
-        mode=mode,
+        mode=context.mode,
         outcome=RunOutcome.FAILED,
         error=failure.message,
     )
-    recorded = record_run(conn, run_row, [])
-    accumulator.run_ids.append(recorded.run_id)
-    accumulator.failed += 1
+    recorded = record_run(context.conn, run_row, [])
+    context.accumulator.run_ids.append(recorded.run_id)
+    context.accumulator.failed += 1
 
-    if mode is RunMode.LIVE:
-        db_record_failure(conn, exchange.id, failure.message, max_retries)
+    if context.mode is RunMode.LIVE:
+        db_record_failure(context.conn, exchange.id, failure.message, context.max_retries)
 
 
-async def _handle_exchange(
-    conn: sqlite3.Connection,
-    extractor: ClaimExtractor,
-    clock: Clock,
-    sleeper: Sleeper,
-    semaphore: asyncio.Semaphore,
-    mode: RunMode,
-    model_label: str,
-    max_retries: int,
-    exchange: ExchangeRow,
-    accumulator: _Accumulator,
-) -> None:
-    async with semaphore:
-        request = build_request(conn, exchange)
-        accumulator.processed += 1
+async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
+    async with context.semaphore:
+        request = build_request(context.conn, exchange)
+        context.accumulator.processed += 1
 
-        if mode is RunMode.LIVE and all(
+        if context.mode is RunMode.LIVE and all(
             message.author_id in request.opted_out_user_ids for message in request.messages
         ):
             assert exchange.id is not None
-            set_status(conn, exchange.id, ExtractionStatus.SKIPPED)
-            accumulator.skipped += 1
+            set_status(context.conn, exchange.id, ExtractionStatus.SKIPPED)
+            context.accumulator.skipped += 1
             return
 
         guild_id = request.messages[0].guild_id
         while True:
-            outcome = await extractor.extract(request)
+            outcome = await context.extractor.extract(request)
             if outcome.succeeded:
                 _finish_success(
-                    conn,
-                    clock,
-                    mode,
-                    model_label,
+                    context,
                     exchange,
                     guild_id,
                     outcome.model,
                     outcome.input_tokens,
                     outcome.output_tokens,
                     outcome.claims,
-                    accumulator,
                 )
                 return
 
             failure = outcome.failure
             assert failure is not None
             if failure.kind is FailureKind.USAGE_LIMIT:
-                accumulator.pauses += 1
-                await sleeper.sleep(failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_AFTER)
+                context.accumulator.pauses += 1
+                await context.sleeper.sleep(failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_AFTER)
                 continue
 
-            _finish_failure(
-                conn,
-                clock,
-                mode,
-                model_label,
-                max_retries,
-                exchange,
-                failure,
-                outcome.input_tokens,
-                outcome.output_tokens,
-                accumulator,
-            )
+            _finish_failure(context, exchange, failure, outcome.input_tokens, outcome.output_tokens)
             return
 
 
-async def _process_batch(
-    conn: sqlite3.Connection,
-    extractor: ClaimExtractor,
-    clock: Clock,
-    sleeper: Sleeper,
-    semaphore: asyncio.Semaphore,
-    mode: RunMode,
-    model_label: str,
-    max_retries: int,
-    batch: Sequence[ExchangeRow],
-    accumulator: _Accumulator,
-) -> None:
-    await asyncio.gather(
-        *(
-            _handle_exchange(
-                conn,
-                extractor,
-                clock,
-                sleeper,
-                semaphore,
-                mode,
-                model_label,
-                max_retries,
-                exchange,
-                accumulator,
-            )
-            for exchange in batch
-        )
-    )
+async def _process_batch(context: _RunContext, batch: Sequence[ExchangeRow]) -> None:
+    await asyncio.gather(*(_handle_exchange(context, exchange) for exchange in batch))
 
 
 async def run_extraction(
@@ -313,43 +264,30 @@ async def run_extraction(
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
         raise PromptNotPromotedError(PROMPT_VERSION)
 
-    accumulator = _Accumulator()
-    semaphore = asyncio.Semaphore(concurrency)
+    context = _RunContext(
+        conn=conn,
+        extractor=extractor,
+        clock=clock,
+        sleeper=sleeper,
+        semaphore=asyncio.Semaphore(concurrency),
+        mode=mode,
+        model_label=model_label,
+        max_retries=max_retries,
+        accumulator=_Accumulator(),
+    )
 
     if mode is RunMode.LIVE:
         while True:
             batch = claimable_exchanges(conn, batch_size, max_retries)
             if not batch:
                 break
-            await _process_batch(
-                conn,
-                extractor,
-                clock,
-                sleeper,
-                semaphore,
-                mode,
-                model_label,
-                max_retries,
-                batch,
-                accumulator,
-            )
+            await _process_batch(context, batch)
     else:
         batch = [
             exchange
             for exchange in (get_exchange(conn, id) for id in exchange_ids or ())
             if exchange is not None
         ]
-        await _process_batch(
-            conn,
-            extractor,
-            clock,
-            sleeper,
-            semaphore,
-            mode,
-            model_label,
-            max_retries,
-            batch,
-            accumulator,
-        )
+        await _process_batch(context, batch)
 
-    return accumulator.to_report()
+    return context.accumulator.to_report()
