@@ -18,7 +18,8 @@ from infovore.db.claims import promote_prompt_version, register_prompt_version
 from infovore.db.connection import migrate, open_database
 from infovore.extract.fake import MarkerExtractor, MarkerProbe
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
-from infovore.llm.registry import default_registry
+from infovore.llm.protocol import ErrorKind, LLMBackend, LLMResult
+from infovore.llm.registry import Registry, default_registry
 from infovore.run import RunCommand, install_stop_handlers, remove_stop_handlers, run_forever
 from infovore.source.fake import FakeDiscordSource
 from infovore.source.protocol import (
@@ -345,7 +346,10 @@ def environment(tmp_path: Path) -> dict[str, str]:
 
 
 def run_cli(
-    argv: list[str], env: dict[str, str], source_factory: object = None
+    argv: list[str],
+    env: dict[str, str],
+    source_factory: object = None,
+    registry: Registry | None = None,
 ) -> tuple[int, str, str]:
     out, err = io.StringIO(), io.StringIO()
     code = main(
@@ -355,8 +359,21 @@ def run_cli(
         stdout=out,
         stderr=err,
         source_factory=source_factory,  # type: ignore[arg-type]
+        registry=registry,
     )
     return code, out.getvalue(), err.getvalue()
+
+
+class UnhealthyFactory:
+    name = "unhealthy"
+
+    def validate(self, settings: StageSettings) -> list[str]:
+        return []
+
+    def build(self, settings: StageSettings) -> LLMBackend:
+        from infovore.llm.fake import FakeBackend
+
+        return FakeBackend.scripted([LLMResult.failed(ErrorKind.FATAL, "not logged in", None)])
 
 
 def test_run_is_a_builtin_command() -> None:
@@ -390,11 +407,25 @@ def test_run_command_once_flag_runs_one_cycle_and_exits_ok_and_closes_source(
     assert exited == [True]
 
 
+def test_run_command_once_flag_counts_a_failing_cycle(tmp_path: Path) -> None:
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        yield ExplodingSource(FakeDiscordSource(), asyncio.Event())
+
+    code, out, _ = run_cli(["run", "--once"], environment(tmp_path), source_factory=factory)
+
+    assert code == ExitCode.OK
+    assert "cycles_failed=1" in out
+    assert "cycles_completed=0" in out
+
+
 def test_run_command_health_check_failure_exits_backend(tmp_path: Path) -> None:
     env = environment(tmp_path)
-    env["INFOVORE_EXTRACT_BACKEND"] = "nope"
+    env["INFOVORE_EXTRACT_BACKEND"] = "unhealthy"
+    registry = Registry()
+    registry.register(UnhealthyFactory())
 
-    code, _, err = run_cli(["run", "--once"], env)
+    code, _, _ = run_cli(["run", "--once"], env, registry=registry)
 
     assert code == ExitCode.BACKEND
 
@@ -432,4 +463,4 @@ async def test_run_command_continuous_mode_stops_on_signal_and_closes_source(
 
     assert code == ExitCode.OK
     assert exited == [True]
-    assert "cycles_completed=1" in stdout.getvalue()
+    assert "cycles_failed=0" in stdout.getvalue()
