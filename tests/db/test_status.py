@@ -32,6 +32,10 @@ def test_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert report.above_threshold_exchanges == 0
     assert report.labels_by_source == {}
     assert report.labels_effective == {}
+    assert report.latest_model_version is None
+    assert report.latest_model_labels_used is None
+    assert report.p_lore_scored == 0
+    assert report.passing_gate == 0
 
 
 def test_triaged_and_above_threshold_counts(tmp_path: Path) -> None:
@@ -95,3 +99,29 @@ def test_counts_and_last_runs(tmp_path: Path) -> None:
     assert report.live_prompt_version == "v1"
     assert report.labels_by_source == {"llm": {"lore": 1}, "human": {"noise": 2}}
     assert report.labels_effective == {"noise": 2}
+
+
+def test_reports_latest_model_p_lore_scored_and_passing_gate(tmp_path: Path) -> None:
+    conn = fresh(tmp_path)
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES (1, 9, 'general', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}'),
+                 (2, 1, 9, 1, 'a', '{NOW}', 'y', '{NOW}', '{{}}');
+        INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)
+          VALUES ('{NOW}', 40, 8, '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version,
+          p_lore, p_lore_model)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.0, '{TRIAGE_VERSION}', 0.9, 1),
+                 (1, 2, 2, '{NOW}', '{NOW}', 1, 'quiet_gap', 'b', 1.0, '{TRIAGE_VERSION}', NULL,
+                  NULL);
+        """
+    )
+    report = collect_status(conn, triage_min_score=0.3, triage_min_p_lore=0.5)
+    assert report.latest_model_version == 1
+    assert report.latest_model_labels_used == 40
+    assert report.p_lore_scored == 1
+    assert report.passing_gate == 2
