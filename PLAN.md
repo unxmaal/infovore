@@ -68,7 +68,7 @@ infovore/
     registry.py      config -> backend instance per stage
   privacy/
     optout.py        opt-out role and per-user redaction
-  cli.py             entrypoint; subcommands backfill / extract / probe / review / promote / status / snapshot / run, each added by the task that builds its feature
+  cli.py             entrypoint; subcommands backfill / chunk / extract / probe / review / promote / status / snapshot / run, each added by the task that builds its feature
 tests/               mirrors package layout, one test module per source module
 README.md
 pyproject.toml
@@ -143,7 +143,7 @@ Tasks (one subagent each):
 3. `db/exchanges.py` — insert exchange with members, get pending and stale (respecting the retry limit), set status, increment retry, mark stale by member message. Tests: duplicate content_hash is rejected without partial writes; membership positions are contiguous from 0.
 4. `db/claims.py` — insert run, insert claims with `claim_sources`, record/promote prompt versions, record probe error, set novelty verdict, retract claim, retract-by-sources (deleted or opted-out), related-claims lookup via `claims_fts`. Tests: claims reference an existing run; supersedes links resolve; FTS stays in sync on insert and retract; retracted claims are excluded from related-claims results.
 5. `config.py` — env-driven (optional `.env` file); required: bot token, guild id, channel allowlist, DB path; per stage (extract, probe, judge): backend name plus that backend's settings (`claude_cli`: binary path, model alias, timeout; `openai_compat`: base URL, key, model, `json_schema_supported`), each with a concurrency limit; optional: quiet gap, batch size, max retries, exchange size cap, opt-out role name, bot-messages toggle. Startup fails loudly on any missing required value and runs a health check against each configured backend (one trivial request). Lands in Phase 1 with the core settings and a registry that knows only the `fake` backend; each backend task registers itself and its settings, and later phases add their own settings.
-6. `cli.py` skeleton — console entrypoint, config and DB bootstrap, a subcommand registration pattern, and `status` (row counts, pending queues, last run per stage, each stage's backend and model). Every later task that builds a user-facing feature adds its own subcommand: `backfill` (Phase 2), `extract` and `probe` (Phase 4), `review` and `promote` (Phase 4), `snapshot` and `run` (Phase 6). Tests invoke the entrypoint in-process with fakes.
+6. `cli.py` skeleton — console entrypoint, config and DB bootstrap, a subcommand registration pattern, and `status` (row counts, pending queues, last run per stage, each stage's backend and model). Every later task that builds a user-facing feature adds its own subcommand: `backfill` (Phase 2), `chunk` (Phase 3), `extract` and `probe` (Phase 4), `review` and `promote` (Phase 4), `snapshot` and `run` (Phase 6). Tests invoke the entrypoint in-process with fakes.
 
 Acceptance: every repository method has a test for the happy path and every failure branch; `uv run infovore status` on a fresh DB reports zeros without error; 100% coverage.
 

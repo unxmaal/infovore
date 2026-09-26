@@ -84,7 +84,9 @@ class StatusCommand:
 
 
 def builtin_commands() -> list[Command]:
-    return [StatusCommand()]
+    from infovore.chunk.command import ChunkCommand
+
+    return [StatusCommand(), ChunkCommand()]
 
 
 class _Parser(argparse.ArgumentParser):
