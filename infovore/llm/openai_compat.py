@@ -1,6 +1,8 @@
 import json
 
 import openai
+from openai.types.chat import ChatCompletionMessageParam
+from openai.types.shared_params import ResponseFormatJSONSchema
 
 from infovore.config import StageSettings
 from infovore.llm.protocol import Capabilities, ErrorKind, LLMBackend, LLMRequest, LLMResult, Usage
@@ -43,26 +45,34 @@ class OpenAICompatBackend:
 
     async def complete(self, request: LLMRequest) -> LLMResult:
         send_schema = self._json_schema_supported and request.json_schema is not None
-        kwargs: dict[str, object] = {
-            "model": self._model,
-            "messages": [
-                {"role": "system", "content": request.system},
-                {"role": "user", "content": request.prompt},
-            ],
-            "max_tokens": request.max_output_tokens,
-            "timeout": self._timeout,
-        }
-        if send_schema:
-            kwargs["response_format"] = {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "output",
-                    "schema": request.json_schema,
-                    "strict": True,
-                },
-            }
+        messages: list[ChatCompletionMessageParam] = [
+            {"role": "system", "content": request.system},
+            {"role": "user", "content": request.prompt},
+        ]
         try:
-            response = await self._client.chat.completions.create(**kwargs)  # type: ignore[call-overload]
+            if send_schema and request.json_schema is not None:
+                response_format: ResponseFormatJSONSchema = {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "output",
+                        "schema": dict(request.json_schema),
+                        "strict": True,
+                    },
+                }
+                response = await self._client.chat.completions.create(
+                    model=self._model,
+                    messages=messages,
+                    max_tokens=request.max_output_tokens,
+                    timeout=self._timeout,
+                    response_format=response_format,
+                )
+            else:
+                response = await self._client.chat.completions.create(
+                    model=self._model,
+                    messages=messages,
+                    max_tokens=request.max_output_tokens,
+                    timeout=self._timeout,
+                )
         except openai.RateLimitError as exc:
             kind = ErrorKind.USAGE_LIMIT if _is_usage_limit(exc) else ErrorKind.TRANSIENT
             return LLMResult.failed(kind, str(exc), _retry_after(exc))

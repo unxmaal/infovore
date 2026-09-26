@@ -1,7 +1,7 @@
 import json
 from collections.abc import Callable, Mapping
 
-import httpx
+import httpx2
 import openai
 import pytest
 
@@ -16,12 +16,12 @@ SCHEMA: Mapping[str, object] = {
 }
 
 
-def make_client(handler: Callable[[httpx.Request], httpx.Response]) -> openai.AsyncOpenAI:
-    transport = httpx.MockTransport(handler)
+def make_client(handler: Callable[[httpx2.Request], httpx2.Response]) -> openai.AsyncOpenAI:
+    transport = httpx2.MockTransport(handler)
     return openai.AsyncOpenAI(
         base_url="http://fake.local/v1",
         api_key="k",
-        http_client=httpx.AsyncClient(transport=transport),  # type: ignore[arg-type]
+        http_client=httpx2.AsyncClient(transport=transport),
         timeout=5.0,
         max_retries=0,
     )
@@ -32,7 +32,7 @@ def completion_response(
     model: str = "model-x",
     finish_reason: str = "stop",
     usage: dict[str, int] | None = None,
-) -> httpx.Response:
+) -> httpx2.Response:
     body: dict[str, object] = {
         "id": "cmpl-1",
         "object": "chat.completion",
@@ -48,11 +48,11 @@ def completion_response(
     }
     if usage is not None:
         body["usage"] = usage
-    return httpx.Response(200, json=body)
+    return httpx2.Response(200, json=body)
 
 
 def backend(
-    handler: Callable[[httpx.Request], httpx.Response],
+    handler: Callable[[httpx2.Request], httpx2.Response],
     json_schema_supported: bool = True,
     model: str = "model-x",
 ) -> OpenAICompatBackend:
@@ -94,7 +94,7 @@ async def test_structured_success_parses_json() -> None:
 async def test_schema_not_sent_when_unsupported() -> None:
     captured: dict[str, object] = {}
 
-    def handler(req: httpx.Request) -> httpx.Response:
+    def handler(req: httpx2.Request) -> httpx2.Response:
         captured.update(json.loads(req.content))
         return completion_response('{"answer": "raw"}')
 
@@ -109,7 +109,7 @@ async def test_schema_not_sent_when_unsupported() -> None:
 async def test_schema_sent_when_supported() -> None:
     captured: dict[str, object] = {}
 
-    def handler(req: httpx.Request) -> httpx.Response:
+    def handler(req: httpx2.Request) -> httpx2.Response:
         captured.update(json.loads(req.content))
         return completion_response('{"answer": "42"}')
 
@@ -144,8 +144,8 @@ async def test_model_falls_back_to_configured_when_blank() -> None:
 
 
 async def test_rate_limit_maps_to_transient_with_retry_after() -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        return httpx.Response(429, headers={"retry-after": "30"}, json={"error": {"message": "s"}})
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(429, headers={"retry-after": "30"}, json={"error": {"message": "s"}})
 
     back = backend(handler)
     result = await back.complete(request())
@@ -155,8 +155,8 @@ async def test_rate_limit_maps_to_transient_with_retry_after() -> None:
 
 
 async def test_rate_limit_without_retry_after_header() -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        return httpx.Response(429, json={"error": {"message": "s"}})
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(429, json={"error": {"message": "s"}})
 
     back = backend(handler)
     result = await back.complete(request())
@@ -166,8 +166,8 @@ async def test_rate_limit_without_retry_after_header() -> None:
 
 
 async def test_rate_limit_insufficient_quota_maps_to_usage_limit() -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        return httpx.Response(
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(
             429,
             headers={"retry-after": "120"},
             json={"error": {"message": "q", "code": "insufficient_quota"}},
@@ -182,8 +182,8 @@ async def test_rate_limit_insufficient_quota_maps_to_usage_limit() -> None:
 
 @pytest.mark.parametrize("status", [500, 502, 503])
 async def test_server_errors_map_to_transient(status: int) -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        return httpx.Response(status, json={"error": {"message": "boom"}})
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(status, json={"error": {"message": "boom"}})
 
     back = backend(handler)
     result = await back.complete(request())
@@ -193,8 +193,8 @@ async def test_server_errors_map_to_transient(status: int) -> None:
 
 
 async def test_timeout_maps_to_transient() -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        raise httpx.TimeoutException("timed out")
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        raise httpx2.TimeoutException("timed out")
 
     back = backend(handler)
     result = await back.complete(request())
@@ -203,8 +203,8 @@ async def test_timeout_maps_to_transient() -> None:
 
 
 async def test_connection_error_maps_to_transient() -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        raise httpx.ConnectError("refused")
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        raise httpx2.ConnectError("refused")
 
     back = backend(handler)
     result = await back.complete(request())
@@ -214,8 +214,8 @@ async def test_connection_error_maps_to_transient() -> None:
 
 @pytest.mark.parametrize("status", [401, 403, 400, 404])
 async def test_client_errors_map_to_fatal(status: int) -> None:
-    def handler(req: httpx.Request) -> httpx.Response:
-        return httpx.Response(status, json={"error": {"message": "bad"}})
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(status, json={"error": {"message": "bad"}})
 
     back = backend(handler)
     result = await back.complete(request())
@@ -318,17 +318,17 @@ def test_validate_never_includes_api_key_value() -> None:
 
 
 class OpenAICompatHarness:
-    def _completion(self, content: str, model: str) -> httpx.Response:
+    def _completion(self, content: str, model: str) -> httpx2.Response:
         return completion_response(content, model=model)
 
     def structured(self, data: Mapping[str, object], model: str) -> LLMBackend:
-        def handler(req: httpx.Request) -> httpx.Response:
+        def handler(req: httpx2.Request) -> httpx2.Response:
             return self._completion(json.dumps(dict(data)), model)
 
         return backend(handler, json_schema_supported=True, model=model)
 
     def text(self, text: str, model: str) -> LLMBackend:
-        def handler(req: httpx.Request) -> httpx.Response:
+        def handler(req: httpx2.Request) -> httpx2.Response:
             return self._completion(text, model)
 
         return backend(handler, json_schema_supported=True, model=model)
@@ -337,16 +337,16 @@ class OpenAICompatHarness:
         headers = {} if retry_after is None else {"retry-after": str(retry_after)}
         if kind is ErrorKind.FATAL:
 
-            def handler(req: httpx.Request) -> httpx.Response:
-                return httpx.Response(401, json={"error": {"message": "boom"}})
+            def handler(req: httpx2.Request) -> httpx2.Response:
+                return httpx2.Response(401, json={"error": {"message": "boom"}})
         elif kind is ErrorKind.USAGE_LIMIT:
 
-            def handler(req: httpx.Request) -> httpx.Response:
+            def handler(req: httpx2.Request) -> httpx2.Response:
                 body = {"error": {"message": "boom", "code": "insufficient_quota"}}
-                return httpx.Response(429, headers=headers, json=body)
+                return httpx2.Response(429, headers=headers, json=body)
         else:
 
-            def handler(req: httpx.Request) -> httpx.Response:
-                return httpx.Response(500, headers=headers, json={"error": {"message": "boom"}})
+            def handler(req: httpx2.Request) -> httpx2.Response:
+                return httpx2.Response(500, headers=headers, json={"error": {"message": "boom"}})
 
         return backend(handler, json_schema_supported=True)
