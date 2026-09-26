@@ -1,9 +1,13 @@
 from pathlib import Path
 
+import pytest
+
 from infovore.config import (
+    ConfigError,
     Settings,
     Stage,
     StageSettings,
+    load_settings,
     read_dotenv,
     settings_from_environment,
 )
@@ -119,3 +123,184 @@ def test_settings_from_environment_uses_dotenv_when_not_overridden(tmp_path: Pat
     envfile.write_text("INFOVORE_BATCH_SIZE=9\n")
     settings = settings_from_environment(REQUIRED_ENV, envfile)
     assert settings.batch_size == 9
+
+
+def test_load_settings_happy_path_has_stage_defaults() -> None:
+    settings = load_settings(REQUIRED_ENV)
+    assert settings.discord_token == "tok"
+    assert settings.guild_id == 1
+    assert settings.channel_ids == (10, 20)
+    assert settings.db_path == Path("db.sqlite")
+    assert settings.scratch_dir == Path("scratch")
+    assert settings.stages[Stage.EXTRACT] == StageSettings("claude_cli", "sonnet", 2, 60.0, {})
+    assert settings.stages[Stage.PROBE] == StageSettings("claude_cli", "sonnet", 2, 60.0, {})
+    assert settings.stages[Stage.JUDGE] == StageSettings("claude_cli", "haiku", 2, 60.0, {})
+
+
+def test_load_settings_scratch_dir_from_env() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_SCRATCH_DIR": "/tmp/x"}
+    settings = load_settings(env)
+    assert settings.scratch_dir == Path("/tmp/x")
+
+
+def test_load_settings_optional_overrides() -> None:
+    env = {
+        **REQUIRED_ENV,
+        "INFOVORE_QUIET_GAP_MINUTES": "15",
+        "INFOVORE_BATCH_SIZE": "5",
+        "INFOVORE_MAX_RETRIES": "1",
+        "INFOVORE_EXCHANGE_MAX_MESSAGES": "20",
+        "INFOVORE_OPT_OUT_ROLE": "lurker",
+        "INFOVORE_INCLUDE_BOT_MESSAGES": "true",
+    }
+    settings = load_settings(env)
+    assert settings.quiet_gap_minutes == 15
+    assert settings.batch_size == 5
+    assert settings.max_retries == 1
+    assert settings.exchange_max_messages == 20
+    assert settings.opt_out_role_name == "lurker"
+    assert settings.include_bot_messages is True
+
+
+def test_load_settings_include_bot_messages_falsey_strings() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_INCLUDE_BOT_MESSAGES": "no"}
+    assert load_settings(env).include_bot_messages is False
+
+
+def test_load_settings_per_stage_backend_model_concurrency_timeout() -> None:
+    env = {
+        **REQUIRED_ENV,
+        "INFOVORE_EXTRACT_BACKEND": "openai_compat",
+        "INFOVORE_EXTRACT_MODEL": "gpt",
+        "INFOVORE_EXTRACT_CONCURRENCY": "8",
+        "INFOVORE_EXTRACT_TIMEOUT": "12.5",
+    }
+    settings = load_settings(env)
+    stage = settings.stages[Stage.EXTRACT]
+    assert stage.backend == "openai_compat"
+    assert stage.model == "gpt"
+    assert stage.concurrency == 8
+    assert stage.timeout_seconds == 12.5
+
+
+def test_load_settings_stage_extra_keys_become_options() -> None:
+    env = {
+        **REQUIRED_ENV,
+        "INFOVORE_EXTRACT_BINARY_PATH": "/usr/bin/claude",
+        "INFOVORE_JUDGE_BASE_URL": "http://localhost",
+    }
+    settings = load_settings(env)
+    assert settings.stages[Stage.EXTRACT].options == {"binary_path": "/usr/bin/claude"}
+    assert settings.stages[Stage.JUDGE].options == {"base_url": "http://localhost"}
+    assert settings.stages[Stage.PROBE].options == {}
+
+
+def test_load_settings_missing_required_reports_all() -> None:
+    with pytest.raises(ConfigError) as excinfo:
+        load_settings({})
+    message = str(excinfo.value)
+    assert "INFOVORE_DISCORD_TOKEN" in message
+    assert "INFOVORE_GUILD_ID" in message
+    assert "INFOVORE_CHANNEL_IDS" in message
+    assert "INFOVORE_DB_PATH" in message
+
+
+def test_load_settings_bad_int_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_GUILD_ID": "notanint"}
+    with pytest.raises(ConfigError, match="INFOVORE_GUILD_ID"):
+        load_settings(env)
+
+
+def test_load_settings_bad_bool_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_INCLUDE_BOT_MESSAGES": "maybe"}
+    with pytest.raises(ConfigError, match="INFOVORE_INCLUDE_BOT_MESSAGES"):
+        load_settings(env)
+
+
+def test_load_settings_empty_channel_list_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_CHANNEL_IDS": " , , "}
+    with pytest.raises(ConfigError, match="INFOVORE_CHANNEL_IDS"):
+        load_settings(env)
+
+
+def test_load_settings_channel_list_with_bad_value_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_CHANNEL_IDS": "10,nope,20"}
+    with pytest.raises(ConfigError, match="INFOVORE_CHANNEL_IDS"):
+        load_settings(env)
+
+
+def test_load_settings_channel_list_with_non_positive_value_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_CHANNEL_IDS": "10,-1"}
+    with pytest.raises(ConfigError, match="INFOVORE_CHANNEL_IDS"):
+        load_settings(env)
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "INFOVORE_QUIET_GAP_MINUTES",
+        "INFOVORE_BATCH_SIZE",
+        "INFOVORE_MAX_RETRIES",
+        "INFOVORE_EXCHANGE_MAX_MESSAGES",
+    ],
+)
+def test_load_settings_non_positive_optional_int_reported(key: str) -> None:
+    env = {**REQUIRED_ENV, key: "0"}
+    with pytest.raises(ConfigError, match=key):
+        load_settings(env)
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "INFOVORE_QUIET_GAP_MINUTES",
+        "INFOVORE_BATCH_SIZE",
+        "INFOVORE_MAX_RETRIES",
+        "INFOVORE_EXCHANGE_MAX_MESSAGES",
+    ],
+)
+def test_load_settings_non_integer_optional_int_reported(key: str) -> None:
+    env = {**REQUIRED_ENV, key: "nope"}
+    with pytest.raises(ConfigError, match=key):
+        load_settings(env)
+
+
+def test_load_settings_stage_concurrency_non_positive_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_EXTRACT_CONCURRENCY": "0"}
+    with pytest.raises(ConfigError, match="INFOVORE_EXTRACT_CONCURRENCY"):
+        load_settings(env)
+
+
+def test_load_settings_stage_concurrency_non_integer_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_EXTRACT_CONCURRENCY": "nope"}
+    with pytest.raises(ConfigError, match="INFOVORE_EXTRACT_CONCURRENCY"):
+        load_settings(env)
+
+
+def test_load_settings_stage_timeout_non_positive_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_PROBE_TIMEOUT": "-1"}
+    with pytest.raises(ConfigError, match="INFOVORE_PROBE_TIMEOUT"):
+        load_settings(env)
+
+
+def test_load_settings_stage_timeout_non_numeric_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_PROBE_TIMEOUT": "nope"}
+    with pytest.raises(ConfigError, match="INFOVORE_PROBE_TIMEOUT"):
+        load_settings(env)
+
+
+def test_load_settings_collects_every_problem_at_once() -> None:
+    with pytest.raises(ConfigError) as excinfo:
+        load_settings({"INFOVORE_CHANNEL_IDS": "", "INFOVORE_GUILD_ID": "bad"})
+    message = str(excinfo.value)
+    assert "INFOVORE_DISCORD_TOKEN" in message
+    assert "INFOVORE_GUILD_ID" in message
+    assert "INFOVORE_CHANNEL_IDS" in message
+    assert "INFOVORE_DB_PATH" in message
+
+
+def test_load_settings_never_leaks_secret_in_error_message() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_DISCORD_TOKEN": "", "INFOVORE_GUILD_ID": "bad"}
+    with pytest.raises(ConfigError) as excinfo:
+        load_settings(env)
+    assert "super-secret" not in str(excinfo.value)
