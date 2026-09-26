@@ -172,13 +172,18 @@ def claims_for_run(conn: sqlite3.Connection, run_id: int) -> list[ClaimRow]:
 
 
 def unprobed_claims(
-    conn: sqlite3.Connection, limit: int, mode: RunMode | None = None
+    conn: sqlite3.Connection,
+    limit: int,
+    mode: RunMode | None = None,
+    include_failed: bool = False,
 ) -> list[ClaimRow]:
     query = (
         "SELECT c.* FROM claims c JOIN extraction_runs r ON r.id = c.extraction_run_id"
         " WHERE c.novelty = ? AND c.retracted_at IS NULL"
     )
     params: list[object] = [Novelty.UNPROBED.value]
+    if not include_failed:
+        query += " AND c.probe_error IS NULL"
     if mode is not None:
         query += " AND r.mode = ?"
         params.append(mode.value)
@@ -188,12 +193,19 @@ def unprobed_claims(
     return [_row_to_claim(row) for row in rows]
 
 
-def claims_needing_probe(conn: sqlite3.Connection, probe_model: str, limit: int) -> list[ClaimRow]:
-    rows = conn.execute(
+def claims_needing_probe(
+    conn: sqlite3.Connection, probe_model: str, limit: int, include_failed: bool = False
+) -> list[ClaimRow]:
+    query = (
         "SELECT * FROM claims WHERE retracted_at IS NULL"
-        " AND (probe_model IS NULL OR probe_model != ?) ORDER BY id LIMIT ?",
-        (probe_model, limit),
-    ).fetchall()
+        " AND (probe_model IS NULL OR probe_model != ?)"
+    )
+    params: list[object] = [probe_model]
+    if not include_failed:
+        query += " AND probe_error IS NULL"
+    query += " ORDER BY id LIMIT ?"
+    params.append(limit)
+    rows = conn.execute(query, params).fetchall()
     return [_row_to_claim(row) for row in rows]
 
 
@@ -202,6 +214,7 @@ def claims_for_runs_needing_probe(
     run_ids: Sequence[int],
     probe_model: str | None,
     limit: int,
+    include_failed: bool = False,
 ) -> list[ClaimRow]:
     if not run_ids:
         return []
@@ -216,6 +229,8 @@ def claims_for_runs_needing_probe(
     else:
         query += " AND (probe_model IS NULL OR probe_model != ?)"
         params.append(probe_model)
+    if not include_failed:
+        query += " AND probe_error IS NULL"
     query += " ORDER BY id LIMIT ?"
     params.append(limit)
     rows = conn.execute(query, params).fetchall()
