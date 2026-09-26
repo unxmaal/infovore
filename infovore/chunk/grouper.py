@@ -1,6 +1,6 @@
 import hashlib
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import timedelta
 
@@ -26,6 +26,26 @@ class GroupingReport:
     exchanges_created: int
     messages_grouped: int
     groups_deferred: int
+
+
+@dataclass(frozen=True)
+class GroupingStarted:
+    channels: int
+
+
+@dataclass(frozen=True)
+class ChannelGrouped:
+    channel_id: int
+    exchanges_created: int
+    groups_deferred: int
+
+
+GroupingEvent = GroupingStarted | ChannelGrouped
+GroupingProgress = Callable[[GroupingEvent], None]
+
+
+def _ignore_grouping_progress(event: GroupingEvent) -> None:
+    return None
 
 
 def _content_hash(message_ids: Sequence[int]) -> str:
@@ -76,22 +96,36 @@ def group_pending(
     quiet_gap: timedelta = DEFAULT_QUIET_GAP,
     max_messages: int = DEFAULT_MAX_MESSAGES,
     include_bots: bool = False,
+    progress: GroupingProgress = _ignore_grouping_progress,
 ) -> GroupingReport:
     exchanges_created = 0
     messages_grouped = 0
     groups_deferred = 0
     now = clock.now()
-    for channel_id in ungrouped_channel_ids(conn):
+    channel_ids = ungrouped_channel_ids(conn)
+    progress(GroupingStarted(channels=len(channel_ids)))
+    for channel_id in channel_ids:
+        channel_exchanges = 0
+        channel_deferred = 0
         messages = ungrouped_messages_for_channel(conn, channel_id)
         groups = group_messages(messages, quiet_gap, max_messages, include_bots)
         for group in groups:
             if not is_closed(group, now, quiet_gap):
                 groups_deferred += 1
+                channel_deferred += 1
                 continue
             try:
                 grouped_count = _persist_group(conn, channel_id, group)
             except DuplicateExchangeError:
                 continue
             exchanges_created += 1
+            channel_exchanges += 1
             messages_grouped += grouped_count
+        progress(
+            ChannelGrouped(
+                channel_id=channel_id,
+                exchanges_created=channel_exchanges,
+                groups_deferred=channel_deferred,
+            )
+        )
     return GroupingReport(exchanges_created, messages_grouped, groups_deferred)
