@@ -33,14 +33,16 @@ These apply to every task below and to every subagent.
 ```
 infovore/
   config.py          settings from env; validated at startup
+  rows.py            frozen row dataclasses and enums matching the data model
+  timing.py          Clock and Sleeper protocols with system and fake implementations
   db/
     connection.py    open, migrate, WAL, foreign keys on
     migrations/      0001_raw.sql, 0002_exchanges.sql, 0003_claims.sql, ...
     raw.py           repository for messages/attachments/reactions
     exchanges.py     repository for exchanges
     claims.py        repository for extracted claims and extraction runs
-  discord/
-    protocol.py      DiscordSource protocol: iter_history, subscribe
+  source/            (not named `discord` to avoid shadowing discord.py)
+    protocol.py      DiscordSource protocol: list_channels, history, events, role_member_ids
     live.py          discord.py client implementing DiscordSource
     fake.py          in-memory DiscordSource for tests (shipped, not test-only)
   ingest/
@@ -62,6 +64,7 @@ infovore/
     claude_cli.py    headless `claude -p` backend; the only module that spawns a process
     openai_compat.py OpenAI-compatible Chat Completions backend; the only module importing openai
     fake.py          deterministic backend (shipped, not test-only)
+    process.py       ProcessRunner protocol used by claude_cli
     registry.py      config -> backend instance per stage
   privacy/
     optout.py        opt-out role and per-user redaction
@@ -148,11 +151,11 @@ Acceptance: every repository method has a test for the happy path and every fail
 
 Tasks:
 
-1. `discord/fake.py` — in-memory `DiscordSource` seeded from a list of dataclass messages; supports history paging with a configurable page size and an async event stream. This is shipped code and must itself be fully tested.
+1. `source/fake.py` — in-memory `DiscordSource` seeded from a list of dataclass messages; supports history paging with a configurable page size and an async event stream. This is shipped code and must itself be fully tested.
 2. `ingest/normalize.py` — pure functions from a minimal discord-like object to row dataclasses. Tests: replies, threads, attachments, edited, system messages (skipped), bots (skipped, configurable).
 3. `ingest/backfill.py` + `infovore backfill` — for each allowlisted channel and its threads (including archived), page history oldest-first, normalize, upsert, checkpoint the last message id per channel so an interrupted run resumes. Tests against the fake: full walk, resume from checkpoint, rate-limit backoff path via an injected sleeper.
 4. `ingest/live.py` — handlers for message create, edit, delete, reaction add/remove, thread create; an edit to a message in an extracted exchange marks it `stale`; a delete triggers retract-by-sources. Tests against the fake event stream.
-5. `discord/live.py` — the only module that imports `discord.py`. Thin. Tests cover the mapping into the protocol using fake discord objects; no client connection is ever made in tests.
+5. `source/live.py` — the only module that imports `discord.py`. Thin. Tests cover the mapping into the protocol using fake discord objects; no client connection is ever made in tests.
 6. `privacy/optout.py` — sync the opt-out role from Discord into `opt_outs`; redaction replaces content and author of opted-out users with a placeholder before chunking and extraction; already-stored raw rows for a newly opted-out user are redacted in place and the change is logged. Tests for each path. Retracts claims whose sources are all opted-out users. Placed in Phase 2 because it gates any extraction against real data.
 
 Acceptance: a full backfill of the fake produces exactly the expected rows; running it twice changes nothing; interrupting mid-page and resuming produces the same result as an uninterrupted run.
@@ -217,7 +220,7 @@ Acceptance: `infovore run` against the fake source and fake backend ingests, gro
 - All phases merged to main; CI green; coverage 100% line and branch.
 - `README.md` is the only documentation and is complete.
 - A single fixture-driven end-to-end test exercises backfill → chunk → extract → probe → `lore` view using only fakes.
-- Import boundaries enforced by ruff `banned-api`: `discord` only in `discord/live.py`; `subprocess` / `asyncio.create_subprocess_exec` only in `llm/claude_cli.py`; `openai` / `httpx` only in `llm/openai_compat.py`. Nothing above `llm/` knows which backend is in use.
+- Import boundaries enforced by ruff `banned-api`: `discord` only in `source/live.py`; `subprocess` / `asyncio.create_subprocess_exec` only in `llm/claude_cli.py`; `openai` / `httpx` only in `llm/openai_compat.py`. Nothing above `llm/` knows which backend is in use.
 
 ## Deferred (do not build yet)
 

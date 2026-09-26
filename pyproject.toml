@@ -21,7 +21,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=infovore --cov-branch --cov-report=term-missing --cov-fail-under=100"
+addopts = "--import-mode=importlib --cov=infovore --cov-branch --cov-report=term-missing --cov-fail-under=100"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
@@ -44,15 +44,15 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "TID", "RUF"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"discord".msg = "discord is only imported in infovore/discord/live.py"
+"discord".msg = "discord is only imported in infovore/source/live.py"
 "subprocess".msg = "processes are only spawned in infovore/llm/claude_cli.py"
 "asyncio.create_subprocess_exec".msg = "processes are only spawned in infovore/llm/claude_cli.py"
 "openai".msg = "openai is only imported in infovore/llm/openai_compat.py"
 "httpx".msg = "httpx is only imported in infovore/llm/openai_compat.py"
 
 [tool.ruff.lint.per-file-ignores]
-"infovore/discord/live.py" = ["TID251"]
+"infovore/source/live.py" = ["TID251"]
 "infovore/llm/claude_cli.py" = ["TID251"]
 "infovore/llm/openai_compat.py" = ["TID251"]
 "tests/llm/test_openai_compat.py" = ["TID251"]
-"tests/discord/test_live.py" = ["TID251"]
+"tests/source/test_live.py" = ["TID251"]
