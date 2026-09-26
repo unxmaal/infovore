@@ -52,7 +52,7 @@ def test_fresh_database_migrates_to_latest(tmp_path: Path) -> None:
     assert newly_applied == [m.version for m in load_migrations()]
     assert applied_versions(conn) == newly_applied
     assert conn.execute("PRAGMA user_version").fetchone()[0] == latest
-    assert EXPECTED_TABLES <= tables(conn)
+    assert tables(conn) >= EXPECTED_TABLES
 
 
 def test_remigrating_is_a_noop(tmp_path: Path) -> None:
@@ -118,9 +118,7 @@ def test_foreign_keys_are_enforced(tmp_path: Path) -> None:
     conn = open_database(tmp_path / "x.db")
     migrate(conn)
     with pytest.raises(sqlite3.IntegrityError):
-        conn.execute(
-            "INSERT INTO reactions (message_id, emoji, count) VALUES (999, 'x', 1)"
-        )
+        conn.execute("INSERT INTO reactions (message_id, emoji, count) VALUES (999, 'x', 1)")
 
 
 def test_a_message_belongs_to_at_most_one_exchange(tmp_path: Path) -> None:
@@ -151,7 +149,8 @@ def test_claims_fts_tracks_inserts_updates_and_deletes(tmp_path: Path) -> None:
     conn.executescript(
         f"""
         INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
-          created_at, content, ingested_at, raw_json) VALUES (1, 1, 1, 1, 'a', '{now}', 'x', '{now}', '{{}}');
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 1, 1, 'a', '{now}', 'x', '{now}', '{{}}');
         INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
           ended_at, message_count, grouping_rule, content_hash)
           VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'h');
@@ -165,7 +164,10 @@ def test_claims_fts_tracks_inserts_updates_and_deletes(tmp_path: Path) -> None:
     )
 
     def match(term: str) -> list[int]:
-        return [r[0] for r in conn.execute("SELECT rowid FROM claims_fts WHERE claims_fts MATCH ?", (term,))]
+        return [
+            r[0]
+            for r in conn.execute("SELECT rowid FROM claims_fts WHERE claims_fts MATCH ?", (term,))
+        ]
 
     assert match("IP30") == [1]
     assert match('"6.5"') == [1]
@@ -186,3 +188,14 @@ def test_time_codec_round_trips_and_requires_timezone() -> None:
     assert from_db_time(None) is None
     with pytest.raises(ValueError, match="timezone"):
         to_db_time(datetime(2026, 1, 1))
+
+
+def test_failure_after_a_migration_ends_its_own_transaction_is_still_reported(
+    tmp_path: Path,
+) -> None:
+    write(tmp_path, "0001_rogue.sql", "CREATE TABLE a (id INTEGER);\nCOMMIT;\nNOT SQL;")
+    conn = open_database(tmp_path / "x.db")
+    with pytest.raises(MigrationError, match="0001_rogue"):
+        migrate(conn, load_migrations(tmp_path))
+    assert not conn.in_transaction
+    assert applied_versions(conn) == []
