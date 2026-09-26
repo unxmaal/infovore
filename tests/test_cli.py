@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from infovore import cli
-from infovore.cli import AppContext, BackendUnavailableError, ExitCode, main
+from infovore.cli import AppContext, BackendUnavailableError, Command, ExitCode, main
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -18,9 +18,11 @@ def environment(tmp_path: Path) -> dict[str, str]:
     }
 
 
-def run(argv: list[str], env: dict[str, str], **kwargs: object) -> tuple[int, str, str]:
+def run(
+    argv: list[str], env: dict[str, str], commands: list[Command] | None = None
+) -> tuple[int, str, str]:
     out, err = io.StringIO(), io.StringIO()
-    code = main(argv, environ=env, dotenv_path=None, stdout=out, stderr=err, **kwargs)  # type: ignore[arg-type]
+    code = main(argv, environ=env, dotenv_path=None, stdout=out, stderr=err, commands=commands)
     return code, out.getvalue(), err.getvalue()
 
 

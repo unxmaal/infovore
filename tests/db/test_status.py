@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -8,7 +9,7 @@ NOW = "2026-01-01T00:00:00+00:00"
 LATER = "2026-01-02T00:00:00+00:00"
 
 
-def fresh(tmp_path: Path):  # type: ignore[no-untyped-def]
+def fresh(tmp_path: Path) -> sqlite3.Connection:
     conn = open_database(tmp_path / "x.db")
     migrate(conn)
     return conn
@@ -55,7 +56,7 @@ def test_counts_and_last_runs(tmp_path: Path) -> None:
     assert report.messages == 2
     assert report.deleted_messages == 1
     assert report.exchanges_by_status == {"pending": 1, "done": 1}
-    assert report.claims_by_novelty == {"unknown": 1, "unprobed": 1}
+    assert report.claims_by_novelty == {"unknown": 1}
     assert report.retracted_claims == 1
     assert report.runs_by_outcome == {"ok": 1, "failed": 1}
     assert report.last_extraction_at == datetime(2026, 1, 2, tzinfo=UTC)
