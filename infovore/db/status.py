@@ -2,9 +2,10 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 
-from infovore.config import DEFAULT_TRIAGE_MIN_SCORE
+from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE, DEFAULT_TRIAGE_MIN_SCORE
 from infovore.db.codec import from_db_time
 from infovore.db.labels import label_counts
+from infovore.triage.gate import gate_sql
 from infovore.triage.score import TRIAGE_VERSION
 
 
@@ -24,6 +25,10 @@ class StatusReport:
     above_threshold_exchanges: int
     labels_by_source: dict[str, dict[str, int]]
     labels_effective: dict[str, int]
+    latest_model_version: int | None
+    latest_model_labels_used: int | None
+    p_lore_scored: int
+    passing_gate: int
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
@@ -51,10 +56,23 @@ def _live_prompt_version(conn: sqlite3.Connection) -> str | None:
     return str(row[0]) if row is not None else None
 
 
+def _latest_model(conn: sqlite3.Connection) -> tuple[int | None, int | None]:
+    row = conn.execute(
+        "SELECT version, labels_used FROM triage_model ORDER BY version DESC LIMIT 1"
+    ).fetchone()
+    if row is None:
+        return None, None
+    return int(row["version"]), int(row["labels_used"])
+
+
 def collect_status(
-    conn: sqlite3.Connection, triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
+    conn: sqlite3.Connection,
+    triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE,
+    triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
 ) -> StatusReport:
     counts = label_counts(conn)
+    latest_model_version, latest_model_labels_used = _latest_model(conn)
+    gate_clause, gate_params = gate_sql(triage_min_score, triage_min_p_lore)
     return StatusReport(
         channels=_count(conn, "SELECT COUNT(*) FROM channels"),
         messages=_count(conn, "SELECT COUNT(*) FROM messages"),
@@ -83,4 +101,10 @@ def collect_status(
         ),
         labels_by_source=counts.by_source,
         labels_effective=counts.effective,
+        latest_model_version=latest_model_version,
+        latest_model_labels_used=latest_model_labels_used,
+        p_lore_scored=_count(conn, "SELECT COUNT(*) FROM exchanges WHERE p_lore IS NOT NULL"),
+        passing_gate=_count_params(
+            conn, f"SELECT COUNT(*) FROM exchanges WHERE {gate_clause}", gate_params
+        ),
     )

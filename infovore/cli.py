@@ -96,7 +96,9 @@ class StatusCommand:
         return None
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
-        report = collect_status(context.conn, context.settings.triage_min_score)
+        report = collect_status(
+            context.conn, context.settings.triage_min_score, context.settings.triage_min_p_lore
+        )
         lines = [
             f"channels: {report.channels}",
             f"messages: {report.messages} (deleted {report.deleted_messages})",
@@ -111,6 +113,14 @@ class StatusCommand:
             f" (above threshold {report.above_threshold_exchanges})",
             f"labels by source: {_format_nested_counts(report.labels_by_source)}",
             f"labels effective: {_format_counts(report.labels_effective)}",
+            "triage model: "
+            + (
+                f"v{report.latest_model_version} (labels_used={report.latest_model_labels_used})"
+                if report.latest_model_version is not None
+                else "none"
+            ),
+            f"p_lore scored: {report.p_lore_scored}",
+            f"passing gate: {report.passing_gate}",
             *(
                 f"{stage.value}: {stage_settings.backend} / {stage_settings.model}"
                 for stage, stage_settings in context.settings.stages.items()
