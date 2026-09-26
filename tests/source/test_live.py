@@ -391,6 +391,16 @@ async def test_history_pages_and_respects_after_id() -> None:
     assert [len(page) for page in pages] == [2, 2, 1]
 
 
+async def test_history_pages_evenly_with_no_leftover() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", messages=[make_message(id=i) for i in range(1, 5)]
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    pages = await collect_history(source, 10, None, 2)
+    assert [len(page) for page in pages] == [2, 2]
+
+
 async def test_history_respects_after_id_cursor() -> None:
     channel = FakeFetchableChannel(
         10, FakeGuildRef(100), "general", messages=[make_message(id=i) for i in range(1, 4)]
@@ -460,3 +470,146 @@ async def test_role_member_ids_unknown_role_returns_empty() -> None:
     client = FakeClient(guilds={100: guild})
     source = DiscordPySource(client)
     assert await source.role_member_ids(100, "missing") == frozenset()
+
+
+@dataclass
+class FakeRawMessageRef:
+    channel_id: int
+    message_id: int
+
+
+@dataclass
+class FakeRawReaction:
+    channel_id: int
+    message_id: int
+    emoji: object
+
+
+async def collect_events(source: DiscordPySource) -> list[object]:
+    events: list[object] = []
+    async for event in source.events():
+        events.append(event)
+    return events
+
+
+async def test_events_on_message_relays_created() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    message = make_message()
+    await client.on_message(message)  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert len(events) == 1
+    assert events[0].message.id == message.id  # type: ignore[attr-defined]
+
+
+async def test_events_on_raw_message_edit_fetches_and_relays() -> None:
+    edited_message = make_message(content="edited")
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", fetch_message_result=edited_message
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    await client.on_raw_message_edit(FakeRawMessageRef(10, 1))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert len(events) == 1
+    assert events[0].message.content == "edited"  # type: ignore[attr-defined]
+
+
+async def test_events_on_raw_message_edit_dropped_when_message_gone() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", fetch_message_error=make_http_exception(404)
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    await client.on_raw_message_edit(FakeRawMessageRef(10, 1))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert events == []
+
+
+async def test_events_on_raw_message_edit_unknown_channel_is_dropped() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    await client.on_raw_message_edit(FakeRawMessageRef(999, 1))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert events == []
+
+
+async def test_events_on_raw_message_delete_relays() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    await client.on_raw_message_delete(FakeRawMessageRef(10, 1))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert len(events) == 1
+    assert events[0].message_id == 1  # type: ignore[attr-defined]
+    assert events[0].channel_id == 10  # type: ignore[attr-defined]
+
+
+async def test_events_on_raw_reaction_add_relays_current_count() -> None:
+    message = make_message(reactions=(FakeReaction("👍", 3),))
+    channel = FakeFetchableChannel(10, FakeGuildRef(100), "general", fetch_message_result=message)
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    await client.on_raw_reaction_add(FakeRawReaction(10, 1, "👍"))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert len(events) == 1
+    assert events[0].emoji == "👍"  # type: ignore[attr-defined]
+    assert events[0].count == 3  # type: ignore[attr-defined]
+
+
+async def test_events_on_raw_reaction_add_skips_non_matching_reactions() -> None:
+    message = make_message(reactions=(FakeReaction("😀", 1), FakeReaction("👍", 5)))
+    channel = FakeFetchableChannel(10, FakeGuildRef(100), "general", fetch_message_result=message)
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    await client.on_raw_reaction_add(FakeRawReaction(10, 1, "👍"))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert events[0].count == 5  # type: ignore[attr-defined]
+
+
+async def test_events_on_raw_reaction_remove_zero_when_reaction_gone() -> None:
+    message = make_message(reactions=())
+    channel = FakeFetchableChannel(10, FakeGuildRef(100), "general", fetch_message_result=message)
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    await client.on_raw_reaction_remove(FakeRawReaction(10, 1, "👍"))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert events[0].count == 0  # type: ignore[attr-defined]
+
+
+async def test_events_reaction_fetch_failure_defaults_zero_count() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", fetch_message_error=make_http_exception(404)
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    await client.on_raw_reaction_add(FakeRawReaction(10, 1, "👍"))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert events[0].count == 0  # type: ignore[attr-defined]
+
+
+async def test_events_on_thread_create_relays() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    thread = bare_thread(20, 100, parent_id=10, name="new-thread", archived=False)
+    await client.on_thread_create(thread)  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert len(events) == 1
+    assert events[0].channel.id == 20  # type: ignore[attr-defined]
+
+
+async def test_events_close_ends_stream_immediately() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    source.close()
+    events = await collect_events(source)
+    assert events == []
