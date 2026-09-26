@@ -13,8 +13,8 @@ The product is a SQLite file (see "Consuming the database"). Nothing talks to in
 ```
  Discord ──► DiscordSource ──► ingest ─────────► raw tables
  (history,   source/live.py     backfill.py        channels, messages,
-  events)    source/fake.py     live.py            revisions, attachments,
-                                normalize.py       reactions
+  events)    source/export.py   live.py            revisions, attachments,
+             source/fake.py     normalize.py       reactions
                                 privacy/optout.py  opt_outs (redaction before storage)
                                         │
                                         ▼
@@ -32,7 +32,7 @@ The product is a SQLite file (see "Consuming the database"). Nothing talks to in
                                  lore view (the product) ──► infovore snapshot ──► consumers
 ```
 
-- **Ingest.** `infovore backfill` walks every allowlisted channel and its threads oldest-first with a per-channel checkpoint, one transaction per page; `infovore run` consumes live events. Every message is normalized, then redacted if its author has opted out, then upserted — so a re-run never un-redacts anything.
+- **Ingest.** `infovore backfill` walks every allowlisted channel and its threads oldest-first with a per-channel checkpoint, one transaction per page, against whichever `DiscordSource` is configured: `source/live.py` (`discord.py`, live Discord) or `source/export.py` (a DiscordChatExporter JSON export, no Discord API access at all — see "Configuration" and "Running" → "Runbook"). `infovore run` consumes live events, which only `source/live.py` produces. Every message is normalized, then redacted if its author has opted out, then upserted — so a re-run never un-redacts anything.
 - **Chunking.** Messages are grouped by thread, then reply chain, then quiet gap, split when too large, and persisted only once closed (see "Grouping rules"). Late replies and thread revivals link to the earlier exchange as read-only context.
 - **Extraction.** For each pending or stale exchange the runner builds a request (messages, uncitable context, related existing claims found through `claims_fts`, opted-out authors), renders the versioned prompt, and asks the extract-stage backend for JSON matching a strict schema, with one repair attempt. `trial` runs are for prompt iteration and never touch exchange status or the product; `live` runs require the prompt version to be promoted.
 - **Novelty probe.** Each claim's `probe_question` is asked closed-book of the probe-stage model, and the judge-stage model classifies the answer as `unknown`, `partial`, `contradicts`, or `known`.
@@ -66,11 +66,15 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 
 Settings are read from the process environment by `infovore.config.load_settings`. `infovore.config.settings_from_environment(environ, dotenv_path)` first loads an optional `.env` file (`infovore.config.read_dotenv`: `KEY=VALUE` lines, blank lines and lines starting with `#` are ignored, surrounding single or double quotes on the value are stripped, a missing file yields no values) and then overlays the real environment on top of it, so real environment variables always win over the `.env` file. Startup fails loudly: every problem (missing required value, a value that fails to parse, an empty channel list, a non-positive number) is collected and raised together in one `ConfigError`, so all problems are visible at once instead of one at a time. The discord token is never included in any error message or in `repr()`/`str()` of the settings object.
 
+`INFOVORE_SOURCE` (`discord` default, or `export`) picks which `DiscordSource` implementation backs every command, and shifts which of the settings below are required, per the "Default" column. **`export` is the recommended source for the historic backfill**: fetch from Discord's API exactly once, with DiscordChatExporter (see "Running" → "Runbook", step 1), and every `infovore` command afterwards reads only that export's local JSON files and the SQLite database — re-runnable as often as needed with zero further Discord API traffic. `discord` (talking to Discord live via `discord.py`) is only needed for `infovore run`, which is optional.
+
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `INFOVORE_DISCORD_TOKEN` | *(required)* | Discord bot token. Never logged or included in error messages. |
-| `INFOVORE_GUILD_ID` | *(required)* | Discord guild (server) id to operate in. Must be a positive integer. |
-| `INFOVORE_CHANNEL_IDS` | *(required)* | Comma-separated list of allowlisted channel ids. Must be non-empty; every entry must be a positive integer. |
+| `INFOVORE_SOURCE` | `discord` | `discord` or `export`. `discord` talks to Discord live (`infovore backfill`, `sync-optouts`, `infovore run`); `export` reads a DiscordChatExporter JSON export from `INFOVORE_EXPORT_DIR` and never touches Discord's API. |
+| `INFOVORE_EXPORT_DIR` | *(required when `INFOVORE_SOURCE=export`)* | Root directory of a DiscordChatExporter JSON export, searched recursively for `*.json` files (`infovore.source.export.ExportDiscordSource`). |
+| `INFOVORE_DISCORD_TOKEN` | *(required when `INFOVORE_SOURCE=discord`)* | Discord bot token. Never logged or included in error messages. Not needed with `INFOVORE_SOURCE=export` — DiscordChatExporter uses its own token, once, outside of infovore. |
+| `INFOVORE_GUILD_ID` | *(required when `INFOVORE_SOURCE=discord`; optional with `export`)* | Discord guild (server) id to operate in. Must be a positive integer. With `INFOVORE_SOURCE=export` and unset, it is inferred from the export at source-open time (`infovore.config.resolve_guild_id`); a `ConfigError` if the export holds more than one guild and none is configured. |
+| `INFOVORE_CHANNEL_IDS` | *(required when `INFOVORE_SOURCE=discord`; optional with `export`)* | Comma-separated list of allowlisted channel ids; every entry must be a positive integer. With `INFOVORE_SOURCE=discord` it must be non-empty. With `INFOVORE_SOURCE=export`, unset or blank means every channel in the export. |
 | `INFOVORE_DB_PATH` | *(required)* | Filesystem path to the SQLite database file. |
 | `INFOVORE_SCRATCH_DIR` | `scratch` | Working directory for backend scratch files (e.g. an empty cwd for `claude_cli` subprocesses). |
 | `INFOVORE_QUIET_GAP_MINUTES` | `30` | Minutes of silence in a channel before the quiet-gap grouping rule closes an exchange. Must be a positive integer. |
@@ -177,17 +181,29 @@ Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3
 
 ### Runbook
 
-**1. Create the bot.** In the Discord Developer Portal, create an application and add a bot. On the Bot tab, enable the two privileged intents **Message Content** (message bodies) and **Server Members** (role membership, for opt-out sync); without both, the gateway rejects the connection. Copy the bot token.
+The guiding principle: **fetch from the Discord API once, then do everything else as a secondary step.** Step 1 below (exporting with DiscordChatExporter) is the only step that touches Discord's API, and it is done by DCE, not infovore. With `INFOVORE_SOURCE=export`, every infovore command — `infovore sync-optouts`, `infovore backfill`, `infovore chunk`, `infovore extract --mode trial`, `infovore probe`, `infovore review`, `infovore promote`, a real `infovore extract`/`infovore probe`, and `infovore snapshot` — reads only the export's local JSON files and the SQLite database. None of them make Discord API calls, so the whole pipeline is re-runnable as often as needed with zero further Discord API traffic; re-export and re-run `infovore backfill` whenever the channel history has moved on. `infovore run` (live ingest, step 9) is the only thing that talks to Discord at all, and it is optional.
 
-**2. Invite it read-only.** Invite the bot with the `bot` scope and only the **View Channels** and **Read Message History** permissions on the channels you want archived. It never sends messages.
+**1. Export the server with DiscordChatExporter.** Download [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) (Tyrrrz), create a Discord bot application for **DCE's own use** (not infovore's — infovore's `discord.py` client, set up in steps 2–3, is only needed for the optional `infovore run`), and on that bot's application enable the same two privileged intents DCE needs to read message bodies and resolve member/role info: **Message Content** and **Server Members**. Invite it read-only (**View Channels**, **Read Message History**), then export:
 
-**3. Create the opt-out role and post the notice.** Create a role named `no-archive` (or set `INFOVORE_OPT_OUT_ROLE`), make it self-assignable (e.g. through your roles bot or onboarding), and post this Server notice in an announcements channel before the first backfill:
+```
+DiscordChatExporter.Cli exportguild -t <bot-token> -g <guild-id> -f Json --include-threads all -o export/
+```
+
+`-f Json` is the JSON export format `infovore.source.export.ExportDiscordSource` reads; `--include-threads all` is required — a lot of the lore lives in threads. Set `INFOVORE_SOURCE=export` and `INFOVORE_EXPORT_DIR=export/` (see "Configuration"); `INFOVORE_DISCORD_TOKEN` is not needed by infovore in this mode.
+
+**2. Create infovore's own bot** (only if you plan to use `infovore run` for live ingest — step 9; skip to step 4 otherwise). In the Discord Developer Portal, create an application and add a bot. On the Bot tab, enable the two privileged intents **Message Content** (message bodies) and **Server Members** (role membership, for opt-out sync); without both, the gateway rejects the connection. Copy the bot token.
+
+**3. Invite it read-only.** Invite the bot with the `bot` scope and only the **View Channels** and **Read Message History** permissions on the channels you want archived. It never sends messages.
+
+**4. Create the opt-out role and post the notice.** Create a role named `no-archive` (or set `INFOVORE_OPT_OUT_ROLE`), make it self-assignable (e.g. through your roles bot or onboarding), and post this Server notice in an announcements channel before the first backfill:
 
 > **Server notice — channel archiving.** A read-only bot is archiving the technical history of #channel-a and #channel-b so that hard-won SGI/IRIX knowledge (part numbers, jumper settings, PROM versions, fixes, procedures) isn't lost. It reads messages, never posts, and keeps specific technical facts with a link back to the original message. If you don't want your messages archived, give yourself the `no-archive` role: your past and future messages will be redacted in the archive (content and name replaced with `[redacted]`), and facts that came only from you will be removed. Removing the role later only affects future messages; redacted history stays redacted.
 
-**4. Configure.** Set at least `INFOVORE_DISCORD_TOKEN`, `INFOVORE_GUILD_ID`, `INFOVORE_CHANNEL_IDS` and `INFOVORE_DB_PATH` (see Configuration), and make sure the extract/probe/judge backends work: `infovore status` shows each stage's backend and model, and every LLM command health-checks its backend first (exit `3` if it's unavailable).
+With `INFOVORE_SOURCE=export`, `infovore sync-optouts` derives role membership from `ExportDiscordSource.role_member_ids`, i.e. from the roles recorded on authors in the export — so only members who have posted somewhere in the exported history can be recognized as opted out; a member who never posted has nothing to redact regardless.
 
-**5. First backfill.** Always sync opt-outs first so nothing from an opted-out user is ever stored unredacted:
+**5. Configure.** With the export (recommended): set at least `INFOVORE_SOURCE=export`, `INFOVORE_EXPORT_DIR` and `INFOVORE_DB_PATH` (see Configuration) — `INFOVORE_GUILD_ID` and `INFOVORE_CHANNEL_IDS` are optional and default to "every guild/channel the export holds" (one guild only). With live Discord: set at least `INFOVORE_DISCORD_TOKEN`, `INFOVORE_GUILD_ID`, `INFOVORE_CHANNEL_IDS` and `INFOVORE_DB_PATH`. Either way, make sure the extract/probe/judge backends work: `infovore status` shows each stage's backend and model, and every LLM command health-checks its backend first (exit `3` if it's unavailable).
+
+**6. First backfill.** Always sync opt-outs first so nothing from an opted-out user is ever stored unredacted:
 
 ```
 infovore sync-optouts
@@ -196,18 +212,18 @@ infovore chunk
 infovore status
 ```
 
-`backfill` is resumable; if it's interrupted, run it again.
+`backfill` is resumable; if it's interrupted, run it again. With the export source, re-running it after re-exporting only ingests what's new (per-channel checkpoints), and a re-run over unchanged data changes nothing.
 
-**6. Settle the prompt** with the trial loop (next section): `infovore extract --mode trial`, `infovore probe`, `infovore review`, then `infovore promote` once a prompt version looks right.
+**7. Settle the prompt** with the trial loop (next section): `infovore extract --mode trial`, `infovore probe`, `infovore review`, then `infovore promote` once a prompt version looks right.
 
-**7. Extract for real:**
+**8. Extract for real:**
 
 ```
 infovore extract
 infovore probe
 ```
 
-**8. Steady state.** Either keep one process running, which follows live messages and runs a sync → chunk → extract → probe cycle every `--interval` seconds:
+**9. Steady state (optional).** Everything above is re-runnable by hand with the export source and needs no live connection. If you also want live ingest, either keep one process running, which follows live messages and runs a sync → chunk → extract → probe cycle every `--interval` seconds (this requires `INFOVORE_SOURCE=discord`):
 
 ```
 infovore run --interval 600
@@ -215,7 +231,7 @@ infovore run --interval 600
 
 or schedule `infovore run --once` from cron, launchd, or a systemd timer (see Deployment). Stop `run` with SIGTERM or Ctrl-C; it finishes the current step and closes the Discord connection.
 
-**9. Ship the product.** `infovore snapshot /path/to/lore-2026-10-01.db` writes a consistent copy of the database, safe while `run` is writing; consumers read its `lore` view (see "Consuming the database").
+**10. Ship the product.** `infovore snapshot /path/to/lore-2026-10-01.db` writes a consistent copy of the database, safe while `run` is writing; consumers read its `lore` view (see "Consuming the database").
 
 **When things go wrong:** exit `2` is configuration (the message names every problem), exit `3` is Discord or an LLM backend being unavailable (bad token, missing intents, `claude` not logged in), exit `1` means some exchanges or claims failed and were counted — `infovore status` shows the queues, failed exchanges retry until `INFOVORE_MAX_RETRIES`, and parked probe failures come back with `infovore probe --retry-failed`.
 

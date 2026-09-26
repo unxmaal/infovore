@@ -63,3 +63,23 @@ def test_runbook_covers_first_run_to_steady_state() -> None:
         "infovore snapshot",
     ):
         assert needle in body, needle
+
+
+def test_runbook_leads_with_a_one_time_export_and_documents_it_as_the_only_api_call() -> None:
+    runbook = section("Running").split("### Runbook", 1)[1]
+    for needle in (
+        "fetch from the Discord API once",
+        "DiscordChatExporter",
+        "exportguild",
+        "--include-threads all",
+        "INFOVORE_SOURCE=export",
+        "INFOVORE_EXPORT_DIR",
+    ):
+        assert needle in runbook, needle
+    assert runbook.index("Export the server with DiscordChatExporter") < runbook.index("**2.")
+
+
+def test_configuration_documents_export_source() -> None:
+    configuration = section("Configuration")
+    for needle in ("INFOVORE_SOURCE", "INFOVORE_EXPORT_DIR", "ExportDiscordSource"):
+        assert needle in configuration, needle
