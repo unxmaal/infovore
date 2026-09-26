@@ -77,6 +77,13 @@ def _format_counts(counts: Mapping[str, int]) -> str:
     return " ".join(f"{key}={value}" for key, value in counts.items()) or "none"
 
 
+def _format_nested_counts(nested: Mapping[str, Mapping[str, int]]) -> str:
+    return (
+        " ".join(f"{source}({_format_counts(counts)})" for source, counts in nested.items())
+        or "none"
+    )
+
+
 def _format_time(value: datetime | None) -> str:
     return value.isoformat() if value is not None else "never"
 
@@ -100,6 +107,8 @@ class StatusCommand:
             f"last extraction: {_format_time(report.last_extraction_at)}",
             f"last probe: {_format_time(report.last_probe_at)}",
             f"live prompt version: {report.live_prompt_version or 'none'}",
+            f"labels by source: {_format_nested_counts(report.labels_by_source)}",
+            f"labels effective: {_format_counts(report.labels_effective)}",
             *(
                 f"{stage.value}: {stage_settings.backend} / {stage_settings.model}"
                 for stage, stage_settings in context.settings.stages.items()
@@ -256,6 +265,7 @@ def builtin_commands() -> list[Command]:
     from infovore.extract.novelty import ProbeCommand
     from infovore.extract.review import PromoteCommand, ReviewCommand
     from infovore.run import RunCommand
+    from infovore.triage.label import LabelCommand
 
     return [
         StatusCommand(),
@@ -268,6 +278,7 @@ def builtin_commands() -> list[Command]:
         RunCommand(),
         ReviewCommand(),
         PromoteCommand(),
+        LabelCommand(),
     ]
 
 

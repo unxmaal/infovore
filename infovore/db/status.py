@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.db.codec import from_db_time
+from infovore.db.labels import label_counts
 
 
 @dataclass(frozen=True)
@@ -17,6 +18,8 @@ class StatusReport:
     last_extraction_at: datetime | None
     last_probe_at: datetime | None
     live_prompt_version: str | None
+    labels_by_source: dict[str, dict[str, int]]
+    labels_effective: dict[str, int]
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
@@ -41,6 +44,7 @@ def _live_prompt_version(conn: sqlite3.Connection) -> str | None:
 
 
 def collect_status(conn: sqlite3.Connection) -> StatusReport:
+    counts = label_counts(conn)
     return StatusReport(
         channels=_count(conn, "SELECT COUNT(*) FROM channels"),
         messages=_count(conn, "SELECT COUNT(*) FROM messages"),
@@ -59,4 +63,6 @@ def collect_status(conn: sqlite3.Connection) -> StatusReport:
         last_extraction_at=_latest_time(conn, "SELECT MAX(started_at) FROM extraction_runs"),
         last_probe_at=_latest_time(conn, "SELECT MAX(probed_at) FROM claims"),
         live_prompt_version=_live_prompt_version(conn),
+        labels_by_source=counts.by_source,
+        labels_effective=counts.effective,
     )

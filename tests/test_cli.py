@@ -56,6 +56,8 @@ def test_status_on_a_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert "claims: none" in out
     assert "last extraction: never" in out
     assert "live prompt version: none" in out
+    assert "labels by source: none" in out
+    assert "labels effective: none" in out
     assert "extract: claude_cli / sonnet" in out
     assert "judge: fake / haiku" in out
     assert "secret-token" not in out
@@ -83,6 +85,8 @@ def test_status_lists_non_empty_counts(tmp_path: Path) -> None:
         INSERT INTO claims (exchange_id, extraction_run_id, statement, subject, kind, confidence,
           probe_question, permalink, novelty, probed_at)
           VALUES (1, 1, 's', 'subj', 'fact', 0.5, 'q?', 'p', 'unknown', '{now}');
+        INSERT INTO exchange_labels (exchange_id, label, source, labeled_at)
+          VALUES (1, 'lore', 'llm', '{now}');
         """
     )
     code, out, _ = run(["status"], env)
@@ -93,6 +97,8 @@ def test_status_lists_non_empty_counts(tmp_path: Path) -> None:
     assert "last extraction: 2026-01-01T00:00:00+00:00" in out
     assert "last probe: 2026-01-01T00:00:00+00:00" in out
     assert "live prompt version: v1" in out
+    assert "labels by source: llm(lore=1)" in out
+    assert "labels effective: lore=1" in out
 
 
 def test_missing_configuration_exits_with_config_code(tmp_path: Path) -> None:
