@@ -1,0 +1,157 @@
+import json
+import sqlite3
+from collections.abc import Callable
+from dataclasses import dataclass
+
+from infovore.db.connection import transaction
+from infovore.db.exchanges import exchange_message_ids
+from infovore.db.raw import attachments_for_messages, messages_by_ids, reactions_for_messages
+from infovore.triage.score import TRIAGE_VERSION, score_exchange
+
+CHANNEL_PRIOR_WEIGHT = 0.3
+CHANNEL_PRIOR_CAP = 0.1
+CHANNEL_PRIOR_REASON = "channel_prior"
+
+
+@dataclass(frozen=True)
+class TriageStarted:
+    total: int
+
+
+@dataclass(frozen=True)
+class TriageExchangeScored:
+    exchange_id: int
+    score: float
+    index: int
+    total: int
+
+
+@dataclass(frozen=True)
+class TriagePriorsApplied:
+    channels: int
+
+
+TriageEvent = TriageStarted | TriageExchangeScored | TriagePriorsApplied
+TriageProgress = Callable[[TriageEvent], None]
+
+
+def _ignore_triage_progress(event: TriageEvent) -> None:
+    return None
+
+
+@dataclass(frozen=True)
+class TriageReport:
+    candidates: int
+    scored: int
+    channels_adjusted: int
+    channel_means: dict[int, float]
+    channel_priors: dict[int, float]
+    global_mean: float
+
+
+def _raw_score(reasons_json: str | None) -> float:
+    if not reasons_json:
+        return 0.0
+    reasons = json.loads(reasons_json)
+    raw = sum(weight for name, weight in reasons if name != CHANNEL_PRIOR_REASON)
+    return round(min(1.0, max(0.0, raw)), 4)
+
+
+def _score_one(conn: sqlite3.Connection, exchange_id: int) -> float:
+    message_ids = exchange_message_ids(conn, exchange_id)
+    messages = messages_by_ids(conn, message_ids)
+    reactions = reactions_for_messages(conn, message_ids)
+    attachments = attachments_for_messages(conn, message_ids)
+    result = score_exchange(messages, reactions, attachments)
+    with transaction(conn):
+        conn.execute(
+            "UPDATE exchanges SET triage_score = ?, triage_reasons = ?, triage_version = ?"
+            " WHERE id = ?",
+            (
+                result.score,
+                json.dumps([list(pair) for pair in result.reasons]),
+                TRIAGE_VERSION,
+                exchange_id,
+            ),
+        )
+    return result.score
+
+
+def _channel_means(conn: sqlite3.Connection) -> tuple[dict[int, float], float]:
+    rows = conn.execute(
+        "SELECT channel_id, triage_reasons FROM exchanges WHERE triage_version = ?",
+        (TRIAGE_VERSION,),
+    ).fetchall()
+    raw_by_channel: dict[int, list[float]] = {}
+    all_raw: list[float] = []
+    for row in rows:
+        raw = _raw_score(row["triage_reasons"])
+        raw_by_channel.setdefault(row["channel_id"], []).append(raw)
+        all_raw.append(raw)
+    channel_means = {
+        channel_id: sum(values) / len(values) for channel_id, values in raw_by_channel.items()
+    }
+    global_mean = sum(all_raw) / len(all_raw) if all_raw else 0.0
+    return channel_means, global_mean
+
+
+def _clip_delta(delta: float) -> float:
+    return max(-CHANNEL_PRIOR_CAP, min(CHANNEL_PRIOR_CAP, delta))
+
+
+def _apply_channel_priors(
+    conn: sqlite3.Connection, channel_means: dict[int, float], global_mean: float
+) -> dict[int, float]:
+    priors: dict[int, float] = {}
+    rows = conn.execute(
+        "SELECT id, channel_id, triage_reasons FROM exchanges WHERE triage_version = ?",
+        (TRIAGE_VERSION,),
+    ).fetchall()
+    for row in rows:
+        channel_id = row["channel_id"]
+        channel_mean = channel_means.get(channel_id, global_mean)
+        delta = round(_clip_delta(CHANNEL_PRIOR_WEIGHT * (channel_mean - global_mean)), 4)
+        raw = _raw_score(row["triage_reasons"])
+        adjusted = round(min(1.0, max(0.0, raw + delta)), 4)
+        reasons = [
+            pair for pair in json.loads(row["triage_reasons"]) if pair[0] != CHANNEL_PRIOR_REASON
+        ]
+        reasons.append([CHANNEL_PRIOR_REASON, delta])
+        with transaction(conn):
+            conn.execute(
+                "UPDATE exchanges SET triage_score = ?, triage_reasons = ? WHERE id = ?",
+                (adjusted, json.dumps(reasons), row["id"]),
+            )
+        priors[channel_id] = delta
+    return priors
+
+
+def triage_pending(
+    conn: sqlite3.Connection, progress: TriageProgress = _ignore_triage_progress
+) -> TriageReport:
+    candidate_rows = conn.execute(
+        "SELECT id FROM exchanges WHERE triage_version IS NULL OR triage_version != ? ORDER BY id",
+        (TRIAGE_VERSION,),
+    ).fetchall()
+    candidate_ids = [row["id"] for row in candidate_rows]
+    progress(TriageStarted(total=len(candidate_ids)))
+    for index, exchange_id in enumerate(candidate_ids, start=1):
+        score = _score_one(conn, exchange_id)
+        progress(
+            TriageExchangeScored(
+                exchange_id=exchange_id, score=score, index=index, total=len(candidate_ids)
+            )
+        )
+
+    channel_means, global_mean = _channel_means(conn)
+    channel_priors = _apply_channel_priors(conn, channel_means, global_mean)
+    progress(TriagePriorsApplied(channels=len(channel_priors)))
+
+    return TriageReport(
+        candidates=len(candidate_ids),
+        scored=len(candidate_ids),
+        channels_adjusted=len(channel_priors),
+        channel_means=channel_means,
+        channel_priors=channel_priors,
+        global_mean=global_mean,
+    )
