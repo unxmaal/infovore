@@ -35,8 +35,11 @@ def build_request(
 
     message_ids = exchange_message_ids(conn, exchange.id)
     messages = tuple(messages_by_ids(conn, message_ids))
+    opted_out = opted_out_user_ids(conn)
 
-    query_text = " ".join(message.content for message in messages)
+    query_text = " ".join(
+        message.content for message in messages if message.author_id not in opted_out
+    )
 
     return ExtractionRequest(
         exchange=exchange,
@@ -46,5 +49,5 @@ def build_request(
         attachments=tuple(attachments_for_messages(conn, message_ids)),
         reactions=tuple(reactions_for_messages(conn, message_ids)),
         related_claims=tuple(related_claims(conn, query_text, related_limit)),
-        opted_out_user_ids=opted_out_user_ids(conn),
+        opted_out_user_ids=opted_out,
     )

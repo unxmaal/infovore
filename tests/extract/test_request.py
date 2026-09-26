@@ -353,7 +353,7 @@ def test_build_request_related_claims_ignore_opted_out_authors_content(tmp_path:
         ],
     )
 
-    upsert_message(conn, a_message(200, author_id=1, content="what a nice day"))
+    upsert_message(conn, a_message(200, author_id=1, content="totally unrelated chatter today"))
     upsert_message(conn, a_message(201, author_id=99, content="Zorblatt Zorblatt Zorblatt"))
     conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (99, ?)", (to_db_time(NOW),))
     exchange_id = insert_exchange(
