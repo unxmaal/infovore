@@ -5,9 +5,15 @@ from pathlib import Path
 import pytest
 
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
+from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange, set_status
-from infovore.db.raw import get_message, message_revisions, reactions_for_messages
+from infovore.db.raw import (
+    attachments_for_messages,
+    get_message,
+    message_revisions,
+    reactions_for_messages,
+)
 from infovore.db.raw import upsert_message as raw_upsert_message
 from infovore.ingest.live import ConsumeReport, EventOutcome, consume, handle_event
 from infovore.rows import (
@@ -72,6 +78,12 @@ def make_message(**overrides: object) -> SourceMessage:
     return SourceMessage(**fields)  # type: ignore[arg-type]
 
 
+def opt_out(conn: sqlite3.Connection, user_id: int) -> None:
+    conn.execute(
+        "INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, to_db_time(NOW))
+    )
+
+
 async def test_handle_message_created_upserts_message(
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
@@ -109,6 +121,27 @@ async def test_handle_message_created_skips_bot_message(
     assert get_message(conn, 1) is None
 
 
+async def test_handle_message_created_redacts_opted_out_author(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    opt_out(conn, 5)
+    message = make_message(
+        attachments=(
+            SourceAttachment(
+                id=1, filename="a.png", content_type="image/png", size=10, url="http://x/a.png"
+            ),
+        )
+    )
+    outcome = await handle_event(conn, MessageCreated(message), clock, include_bots=False)
+    assert outcome is EventOutcome.MESSAGE_CREATED
+    row = get_message(conn, 1)
+    assert row is not None
+    assert row.content == "[redacted]"
+    assert row.author_name_at_time == "[redacted]"
+    assert row.raw_json == "{}"
+    assert attachments_for_messages(conn, [1]) == []
+
+
 async def test_handle_message_edited_known_message_marks_revision(
     conn: sqlite3.Connection, clock: FixedClock
 ) -> None:
@@ -141,6 +174,24 @@ async def test_handle_message_edited_unknown_message_treated_as_create(
     row = get_message(conn, 1)
     assert row is not None
     assert row.content == "hello"
+
+
+async def test_handle_message_edited_of_opted_out_author_stays_redacted_no_revision(
+    conn: sqlite3.Connection, clock: FixedClock
+) -> None:
+    opt_out(conn, 5)
+    await handle_event(conn, MessageCreated(make_message()), clock, include_bots=False)
+    row = get_message(conn, 1)
+    assert row is not None
+    assert row.content == "[redacted]"
+    edited = make_message(content="the real original content", edited_at=NOW + timedelta(minutes=1))
+    outcome = await handle_event(conn, MessageEdited(edited), clock, include_bots=False)
+    assert outcome is EventOutcome.MESSAGE_EDITED
+    row = get_message(conn, 1)
+    assert row is not None
+    assert row.content == "[redacted]"
+    assert row.author_name_at_time == "[redacted]"
+    assert message_revisions(conn, 1) == []
 
 
 async def test_handle_message_deleted_unknown_message_is_noop(
