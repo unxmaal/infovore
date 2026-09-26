@@ -142,6 +142,11 @@ class SequencedExtractor:
         return outcome
 
 
+class ExplodingExtractor:
+    async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
+        raise AssertionError("extractor should not be called")
+
+
 class ConcurrencyTrackingExtractor:
     def __init__(self) -> None:
         self.active = 0
@@ -621,7 +626,9 @@ def test_opted_out_only_exchange_is_skipped_without_calling_extractor_in_live_mo
     assert count == 0
 
 
-def test_opted_out_only_exchange_is_still_processed_in_trial_mode(tmp_path: Path) -> None:
+def test_opted_out_only_exchange_is_skipped_in_trial_mode_without_status_change(
+    tmp_path: Path,
+) -> None:
     conn = db(tmp_path)
     opt_out(conn, 99)
     exchange = seed_exchange(conn, [a_message(1, author_id=99, content="FACT: X :: y")])
@@ -631,7 +638,7 @@ def test_opted_out_only_exchange_is_still_processed_in_trial_mode(tmp_path: Path
     async def go() -> ExtractionReport:
         return await run_extraction(
             conn,
-            MarkerExtractor(),
+            ExplodingExtractor(),
             FixedClock(NOW),
             RecordingSleeper(),
             mode=RunMode.TRIAL,
@@ -644,9 +651,16 @@ def test_opted_out_only_exchange_is_still_processed_in_trial_mode(tmp_path: Path
 
     report = asyncio.run(go())
 
-    assert report.skipped == 0
-    assert report.succeeded == 1
+    assert report.skipped == 1
+    assert report.succeeded == 0
     assert report.claims_recorded == 0
+    assert report.run_ids == ()
+    updated = get_exchange(conn, exchange.id)
+    assert updated is not None
+    assert updated.extraction_status is ExtractionStatus.PENDING
+    assert updated.retry_count == 0
+    count = conn.execute("SELECT COUNT(*) AS n FROM extraction_runs").fetchone()["n"]
+    assert count == 0
 
 
 def test_batch_loop_drains_across_multiple_batches(tmp_path: Path) -> None:
