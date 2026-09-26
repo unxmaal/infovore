@@ -190,6 +190,7 @@ class SnapshotCommand:
 
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
+    from infovore.extract.novelty import ProbeCommand
 
     return [
         StatusCommand(),
@@ -197,6 +198,7 @@ def builtin_commands() -> list[Command]:
         ChunkCommand(),
         BackfillCommand(),
         SnapshotCommand(),
+        ProbeCommand(),
     ]
 
 

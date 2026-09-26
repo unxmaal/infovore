@@ -1,8 +1,12 @@
+import argparse
 import asyncio
 import sqlite3
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
+from infovore.cli import ExitCode, stage_backend
+from infovore.config import Stage
 from infovore.db.claims import (
     claims_for_runs_needing_probe,
     claims_needing_probe,
@@ -10,9 +14,13 @@ from infovore.db.claims import (
     set_probe_error,
     unprobed_claims,
 )
+from infovore.extract.llm_extractor import LLMNoveltyProbe
 from infovore.extract.protocol import FailureKind, NoveltyProbe
 from infovore.rows import ClaimRow, Novelty
 from infovore.timing import Clock, Sleeper
+
+if TYPE_CHECKING:
+    from infovore.cli import AppContext
 
 DEFAULT_USAGE_LIMIT_RETRY_SECONDS = 300.0
 
@@ -95,3 +103,43 @@ async def run_probe(
         await asyncio.gather(*(handle(claim) for claim in candidates))
 
     return ProbeReport(probed=probed, by_verdict=by_verdict, failed=failed, pauses=pauses)
+
+
+def _format_by_verdict(by_verdict: dict[Novelty, int]) -> str:
+    return " ".join(f"{verdict.value}={count}" for verdict, count in by_verdict.items()) or "none"
+
+
+class ProbeCommand:
+    name = "probe"
+    help = "closed-book novelty probe over unprobed claims"
+
+    def configure(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("--run-id", type=int, action="append", dest="run_ids", default=None)
+        parser.add_argument("--limit", type=int, default=None)
+        parser.add_argument("--probe-model", type=str, default=None)
+
+    async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
+        probe_backend = await stage_backend(context, Stage.PROBE)
+        judge_backend = await stage_backend(context, Stage.JUDGE)
+        probe = LLMNoveltyProbe(probe_backend, judge_backend)
+        limit = args.limit if args.limit is not None else context.settings.batch_size
+        concurrency = context.settings.stages[Stage.PROBE].concurrency
+        run_ids = tuple(args.run_ids) if args.run_ids else None
+
+        report = await run_probe(
+            context.conn,
+            probe,
+            context.clock,
+            context.sleeper,
+            probe_model=args.probe_model,
+            limit=limit,
+            concurrency=concurrency,
+            run_ids=run_ids,
+        )
+        context.stdout.write(
+            f"probed: {report.probed}\n"
+            f"by verdict: {_format_by_verdict(report.by_verdict)}\n"
+            f"failed: {report.failed}\n"
+            f"pauses: {report.pauses}\n"
+        )
+        return ExitCode.FAILURE if report.failed else ExitCode.OK
