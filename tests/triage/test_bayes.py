@@ -7,6 +7,7 @@ from infovore.rows import MessageRow
 from infovore.triage.bayes import (
     Label,
     Metrics,
+    Model,
     chi2q,
     evaluate,
     features,
@@ -68,7 +69,7 @@ def test_chi2q_matches_closed_forms() -> None:
     assert chi2q(1e6, 4) == pytest.approx(0.0)
 
 
-def lore_noise_model():  # type: ignore[no-untyped-def]
+def lore_noise_model() -> Model:
     return train(
         [
             (frozenset({"prom", "octane"}), Label.LORE),
