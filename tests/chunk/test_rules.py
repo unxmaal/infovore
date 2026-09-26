@@ -135,6 +135,16 @@ def test_reply_chain_missing_parent_single_child_falls_through() -> None:
     assert leftover == [orphan]
 
 
+def test_reply_chain_tolerates_a_cycle() -> None:
+    a = make_message(1, created_at=at(0), reply_to_id=3)
+    b = make_message(2, created_at=at(1), reply_to_id=1)
+    c = make_message(3, created_at=at(2), reply_to_id=2)
+    chains, leftover = group_by_reply_chain([a, b, c])
+    assert len(chains) == 1
+    assert ids(chains[0].messages) == [1, 2, 3]
+    assert leftover == []
+
+
 def test_quiet_gap_splits_on_large_gap() -> None:
     a = make_message(1, created_at=at(0))
     b = make_message(2, created_at=at(10))
@@ -167,7 +177,7 @@ def test_quiet_gap_empty_input_yields_no_groups() -> None:
 
 
 def test_default_quiet_gap_is_thirty_minutes() -> None:
-    assert DEFAULT_QUIET_GAP == timedelta(minutes=30)
+    assert timedelta(minutes=30) == DEFAULT_QUIET_GAP
 
 
 def test_thread_precedence_wins_over_reply_to_message_outside_thread() -> None:
@@ -300,7 +310,9 @@ def test_is_closed_uses_newest_message_in_group() -> None:
 
 @st.composite
 def _message_lists(draw: st.DrawFn) -> list[MessageRow]:
-    id_list = draw(st.lists(st.integers(min_value=1, max_value=30), unique=True, min_size=1, max_size=20))
+    id_list = draw(
+        st.lists(st.integers(min_value=1, max_value=30), unique=True, min_size=1, max_size=20)
+    )
     thread_pool = [None, 1001, 1002, 1003]
     messages = []
     for index, message_id in enumerate(id_list):
@@ -347,9 +359,7 @@ def test_messages_within_each_group_are_ordered(
 
 
 @given(_message_lists(), st.integers(min_value=1, max_value=8))
-def test_every_group_respects_the_size_cap(
-    messages: list[MessageRow], max_messages: int
-) -> None:
+def test_every_group_respects_the_size_cap(messages: list[MessageRow], max_messages: int) -> None:
     groups = group_messages(messages, quiet_gap=timedelta(minutes=30), max_messages=max_messages)
     assert all(len(g.messages) <= max_messages for g in groups)
 
