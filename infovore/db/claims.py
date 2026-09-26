@@ -197,6 +197,32 @@ def claims_needing_probe(conn: sqlite3.Connection, probe_model: str, limit: int)
     return [_row_to_claim(row) for row in rows]
 
 
+def claims_for_runs_needing_probe(
+    conn: sqlite3.Connection,
+    run_ids: Sequence[int],
+    probe_model: str | None,
+    limit: int,
+) -> list[ClaimRow]:
+    if not run_ids:
+        return []
+    placeholders = ",".join("?" for _ in run_ids)
+    params: list[object] = list(run_ids)
+    query = (
+        f"SELECT * FROM claims WHERE extraction_run_id IN ({placeholders})"
+        " AND retracted_at IS NULL"
+    )
+    if probe_model is None:
+        query += " AND novelty = ?"
+        params.append(Novelty.UNPROBED.value)
+    else:
+        query += " AND (probe_model IS NULL OR probe_model != ?)"
+        params.append(probe_model)
+    query += " ORDER BY id LIMIT ?"
+    params.append(limit)
+    rows = conn.execute(query, params).fetchall()
+    return [_row_to_claim(row) for row in rows]
+
+
 def set_novelty(
     conn: sqlite3.Connection,
     claim_id: int,
