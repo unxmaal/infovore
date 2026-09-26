@@ -38,9 +38,7 @@ def test_every_builtin_command_is_documented_in_running() -> None:
 
     running = section("Running")
     missing = [
-        command.name
-        for command in builtin_commands()
-        if f"infovore {command.name}" not in running
+        command.name for command in builtin_commands() if f"infovore {command.name}" not in running
     ]
     assert missing == []
 
