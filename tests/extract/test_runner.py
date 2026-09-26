@@ -33,7 +33,9 @@ from infovore.extract.runner import (
     ExtractionEvent,
     ExtractionReport,
     ExtractionStarted,
+    NoScoredExchangesError,
     PromptNotPromotedError,
+    TrialSampleStrategy,
     UntriagedExchangesError,
     run_extraction,
     select_trial_sample,
@@ -1041,6 +1043,130 @@ def test_select_trial_sample_without_filters_ignores_triage(tmp_path: Path) -> N
     seed_exchange(conn, [a_message(1, channel_id=1)], triage_score=None, triage_version=None)
 
     assert select_trial_sample(conn, 10, seed=0) == [1]
+
+
+def _insert_stub_model(conn: sqlite3.Connection) -> int:
+    cursor = conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
+    )
+    return int(cursor.lastrowid or 0)
+
+
+def test_select_trial_sample_random_strategy_is_reproducible_for_same_seed(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    for i in range(1, 11):
+        seed_exchange(conn, [a_message(i, channel_id=1)])
+
+    first = select_trial_sample(conn, 4, seed=3, strategy=TrialSampleStrategy.RANDOM)
+    second = select_trial_sample(conn, 4, seed=3, strategy=TrialSampleStrategy.RANDOM)
+
+    assert first == second
+    assert len(first) == 4
+    assert first == sorted(first)
+
+
+def test_select_trial_sample_random_strategy_returns_all_when_n_ge_total(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    for i in range(1, 4):
+        seed_exchange(conn, [a_message(i, channel_id=1)])
+
+    sample = select_trial_sample(conn, 10, seed=0, strategy=TrialSampleStrategy.RANDOM)
+
+    assert sample == [1, 2, 3]
+
+
+def test_select_trial_sample_random_strategy_differs_from_stratified(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    message_id = 1
+    for _ in range(10):
+        seed_exchange(conn, [a_message(message_id, channel_id=1)])
+        message_id += 1
+    for _ in range(10):
+        seed_exchange(conn, [a_message(message_id + offset, channel_id=2) for offset in range(25)])
+        message_id += 25
+
+    stratified = select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.STRATIFIED)
+    random_sample = select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.RANDOM)
+
+    assert stratified != random_sample
+
+
+def test_select_trial_sample_uncertain_strategy_orders_by_distance_from_half(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    version = _insert_stub_model(conn)
+    certain_lore = seed_exchange(conn, [a_message(1, channel_id=1)])
+    uncertain = seed_exchange(conn, [a_message(2, channel_id=1)])
+    certain_noise = seed_exchange(conn, [a_message(3, channel_id=1)])
+    assert certain_lore.id is not None
+    assert uncertain.id is not None
+    assert certain_noise.id is not None
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.95, p_lore_model = ? WHERE id = ?",
+        (version, certain_lore.id),
+    )
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?",
+        (version, uncertain.id),
+    )
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.02, p_lore_model = ? WHERE id = ?",
+        (version, certain_noise.id),
+    )
+
+    sample = select_trial_sample(conn, 2, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
+
+    assert sample == sorted([uncertain.id, certain_lore.id])
+
+
+def test_select_trial_sample_uncertain_strategy_ties_broken_by_id(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    version = _insert_stub_model(conn)
+    first = seed_exchange(conn, [a_message(1, channel_id=1)])
+    second = seed_exchange(conn, [a_message(2, channel_id=1)])
+    assert first.id is not None
+    assert second.id is not None
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, first.id)
+    )
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, second.id)
+    )
+
+    sample = select_trial_sample(conn, 1, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
+
+    assert sample == [first.id]
+
+
+def test_select_trial_sample_uncertain_strategy_ignores_unscored_exchanges(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    version = _insert_stub_model(conn)
+    scored = seed_exchange(conn, [a_message(1, channel_id=1)])
+    seed_exchange(conn, [a_message(2, channel_id=1)])
+    assert scored.id is not None
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, scored.id)
+    )
+
+    sample = select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
+
+    assert sample == [scored.id]
+
+
+def test_select_trial_sample_uncertain_strategy_without_any_scored_exchange_raises(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)])
+
+    with pytest.raises(NoScoredExchangesError):
+        select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
 
 
 def test_live_refuses_when_pending_exchange_untriaged(tmp_path: Path) -> None:
