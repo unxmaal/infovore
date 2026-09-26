@@ -30,6 +30,8 @@ def test_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert report.live_prompt_version is None
     assert report.triaged_exchanges == 0
     assert report.above_threshold_exchanges == 0
+    assert report.labels_by_source == {}
+    assert report.labels_effective == {}
 
 
 def test_triaged_and_above_threshold_counts(tmp_path: Path) -> None:
@@ -74,6 +76,10 @@ def test_counts_and_last_runs(tmp_path: Path) -> None:
           probe_question, permalink, novelty, probed_at, retracted_at)
           VALUES (2, 1, 's', 'subj', 'fact', 0.5, 'q?', 'p', 'unknown', '{LATER}', NULL),
                  (2, 1, 't', 'subj', 'fact', 0.5, 'q?', 'p', 'unprobed', NULL, '{NOW}');
+        INSERT INTO exchange_labels (exchange_id, label, source, labeled_at)
+          VALUES (1, 'lore', 'llm', '{NOW}'),
+                 (1, 'noise', 'human', '{LATER}'),
+                 (2, 'noise', 'human', '{NOW}');
         """
     )
     report = collect_status(conn)
@@ -87,3 +93,5 @@ def test_counts_and_last_runs(tmp_path: Path) -> None:
     assert report.last_extraction_at == datetime(2026, 1, 2, tzinfo=UTC)
     assert report.last_probe_at == datetime(2026, 1, 2, tzinfo=UTC)
     assert report.live_prompt_version == "v1"
+    assert report.labels_by_source == {"llm": {"lore": 1}, "human": {"noise": 2}}
+    assert report.labels_effective == {"noise": 2}

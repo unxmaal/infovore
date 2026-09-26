@@ -4,6 +4,7 @@ from datetime import datetime
 
 from infovore.config import DEFAULT_TRIAGE_MIN_SCORE
 from infovore.db.codec import from_db_time
+from infovore.db.labels import label_counts
 from infovore.triage.score import TRIAGE_VERSION
 
 
@@ -21,6 +22,8 @@ class StatusReport:
     live_prompt_version: str | None
     triaged_exchanges: int
     above_threshold_exchanges: int
+    labels_by_source: dict[str, dict[str, int]]
+    labels_effective: dict[str, int]
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
@@ -51,6 +54,7 @@ def _live_prompt_version(conn: sqlite3.Connection) -> str | None:
 def collect_status(
     conn: sqlite3.Connection, triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
 ) -> StatusReport:
+    counts = label_counts(conn)
     return StatusReport(
         channels=_count(conn, "SELECT COUNT(*) FROM channels"),
         messages=_count(conn, "SELECT COUNT(*) FROM messages"),
@@ -77,4 +81,6 @@ def collect_status(
             "SELECT COUNT(*) FROM exchanges WHERE triage_version = ? AND triage_score >= ?",
             (TRIAGE_VERSION, triage_min_score),
         ),
+        labels_by_source=counts.by_source,
+        labels_effective=counts.effective,
     )

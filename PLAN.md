@@ -216,6 +216,15 @@ Tasks:
 
 Acceptance: `infovore run` against the fake source and fake backend ingests, groups, extracts, and probes a scripted event sequence, then shuts down cleanly on SIGTERM; the image runs `infovore status` on both arches; README sections match the code as built.
 
+### M3 — deterministic triage
+
+Most Discord chatter carries no lore. **M3** builds a triage pipeline, tracked as GitHub milestone "M3: deterministic triage", so most exchanges never reach an LLM. Each step depends on the one before it and is its own issue:
+
+1. **Rules (#82)** — `infovore/triage/score.py` scores every exchange deterministically and for free from programmatic signals (part numbers, IRIX versions, code, tiny-message ratio, and the rest; see README "Triage"), writing `exchanges.triage_score` / `triage_reasons` / `triage_version`.
+2. **Labels (#87)** — `exchange_labels`, `infovore/db/labels.py`, and `infovore label` turn rule scores and trial extraction into ground truth: `--from-runs` derives an `llm`-sourced `lore`/`noise` label per trial run from its claims' novelty verdicts, and `--exchange-id --lore|--noise` records a `human`-sourced hand correction that always wins over an LLM label for the same exchange. Labels accumulate over time and are never thrown away; they are the training data for the next step.
+3. **Bayes classifier (#84)** — `infovore/triage/bayes.py` trains a naive Bayes classifier (Robinson/Fisher, standard library only) on the accumulated labels via `effective_labels`, evaluates precision/recall/F1 on a deterministic held-out split, and recommends an extraction threshold from measured recall at that split, not a guess. `infovore extract --mode trial --strategy uncertain|stratified|random` samples cheaply to grow the label set faster.
+4. **Gating (#83)** — `extract` (and `run`'s periodic cycle) skip exchanges scoring below the calibrated threshold — `p_lore` once a model exists, the rule score before that (cold start) — so the LLM only ever sees the exchanges worth its cost. The comparison lives behind one function, `infovore.triage.gate.passes_gate`, so #84 only has to switch its input once a trained model exists. Live `extract` refuses to run at all (exit `2`) while any queued exchange is still untriaged, and `infovore triage --report` (histogram, per-channel means, counts above/below the threshold, top reasons) is how the threshold gets picked and re-checked as the rules or the channel mix change. Workflow order: backfill → chunk → triage → extract.
+
 ## Definition of done
 
 - All phases merged to main; CI green; coverage 100% line and branch.

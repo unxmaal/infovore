@@ -61,6 +61,7 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `claim_sources` | which messages each claim cites |
 | `claims_fts` | full-text index over claim subject and statement (`unicode61`, keeping `-./_` inside tokens) |
 | `lore` | the product view: current, live, probed, net-new claims (see "Consuming the database") |
+| `exchange_labels` | ground-truth `lore`/`noise` labels per exchange, one row per `(exchange_id, source)`: `llm` (derived from trial runs) or `human` (hand correction), with `source_ref` and `labeled_at`; a human label always wins over an LLM one (see "Triage") |
 
 ## Configuration
 
@@ -158,6 +159,8 @@ uv run infovore extract [--mode trial|live] [--sample N] [--seed S] [--exchange-
 uv run infovore probe [--run-id ID ...] [--limit N] [--probe-model CANONICAL_ID] [--retry-failed]
 uv run infovore review --run-ids ID [ID ...] [--out PATH]
 uv run infovore promote --prompt-version V
+uv run infovore label --from-runs RUN_ID [RUN_ID ...]
+uv run infovore label --exchange-id ID --lore|--noise
 uv run infovore snapshot <dest> [--force]
 uv run infovore run [--interval SECONDS] [--once]
 ```
@@ -171,6 +174,8 @@ uv run infovore run [--interval SECONDS] [--once]
 `review` (`infovore.extract.review.build_review`/`render_review_html`, `ReviewCommand`) renders a prompt-iteration report over one or two prompt-version "run sets": the run ids in `--run-ids` (repeatable, at least one; trial mode creates one run per exchange, so this is typically every run id `extract --mode trial` printed) are grouped by their `prompt_version`, and every exchange covered by any of them is rendered with its messages, and, per version present for that exchange, that version's claims (kind, subject, statement, confidence, cited message ids, novelty and probe answer), run outcome/error, and tokens. With exactly two versions covering the same exchange, a per-exchange diff shows claims added, dropped, and changed (claims are matched by `(subject, statement)` normalized; a "changed" match is the same subject with a different statement or kind, found among claims left over after the exact match pass) plus verdict shifts on matched claims. A summary header gives, per version: exchanges, claims per exchange, verdict distribution, share of `known`, failed runs, and tokens per 100 exchanges (runs don't record a dollar cost, so token counts are the number to watch). The report is one self-contained HTML file — inline CSS only, no external requests, readable in light and dark, collapsible per-exchange `<details>` sections — written to `--out` (default `review.html` under `INFOVORE_SCRATCH_DIR`, parent directories created as needed) and the path is printed. An unknown run id exits `2`.
 
 `promote` (`infovore.db.claims.promote_prompt_version`, `PromoteCommand`) records `--prompt-version V` as the live prompt version, so the next `extract` without `--mode trial` uses it. If `V` equals the current `infovore.extract.prompt.PROMPT_VERSION`, it is registered first (same as `extract` would); any other version must already be registered (by a prior `extract --mode trial` run, which registers the prompt version it ran with) or the command exits `2` with a clear message. It prints the resulting live prompt version.
+
+`label` (`infovore.triage.label.LabelCommand`, `infovore.db.labels`) records ground-truth `lore`/`noise` labels on `exchange_labels` (see "Data model" and "Triage"). `--from-runs RUN_ID [RUN_ID ...]` derives an `llm`-sourced label per run (`infovore.triage.label.derive_labels_from_runs`), one `run {id}: {outcome}` progress line per run id (flushed immediately) followed by a `labeled: lore=N noise=N skipped=N` summary line (with the skipped run ids and their reasons in parentheses when any were skipped): a run whose outcome is `failed` is skipped ("failed run"); otherwise, a run with at least one claim probed `unknown`, `partial`, or `contradicts` is labeled `lore`; a run whose claims are all `known` (including a run with zero claims) is labeled `noise`; a run with neither — i.e. it still has an `unprobed` claim and no `unknown`/`partial`/`contradicts` claim — is skipped ("unprobed claims"). An unknown run id exits `2`. `--exchange-id ID --lore` or `--exchange-id ID --noise` instead records a `human`-sourced label directly, for hand corrections; `--lore` and `--noise` are mutually exclusive, `--exchange-id` requires exactly one of them, and `--from-runs`/`--exchange-id` are themselves mutually exclusive — every missing or conflicting combination exits `2`. Since `exchange_labels` has one row per `(exchange_id, source)`, re-labelling the same exchange from the same source (a later trial run, or a corrected hand label) replaces the earlier row rather than accumulating duplicates, and a human label always wins over an LLM one for the same exchange regardless of insert order.
 
 `snapshot` writes a consistent copy of the product database to `<dest>` using the SQLite backup API (`infovore.db.snapshot.snapshot`), safe to run at any time, including while `backfill`/`chunk`/`extract`/`run` is mid-write against the same file: the backup only ever sees committed data, never a writer's in-flight transaction. It refuses to overwrite an existing `<dest>` unless `--force` is given, creates `<dest>`'s parent directories as needed, and writes through a temporary file in the same directory that it atomically renames into place, so a reader never observes a partially written snapshot. It reports the destination path, its size in bytes, and its `PRAGMA user_version` (the schema version). This is how the product database leaves a host — see "Deployment" below.
 
@@ -304,6 +309,8 @@ Most Discord chatter carries no lore, so exchanges are scored with deterministic
 | `laughter` | −0.1 | more than 30% of messages are just "lol", "lmao", "haha"… |
 
 Channel priors and the extraction threshold are applied by `infovore triage` and `extract` (see the triage issues); the threshold is chosen by calibrating against LLM extraction on samples above and below it.
+
+The rule score above is a cold-start heuristic. Ground truth accumulates in `exchange_labels` (see "Data model") and never shrinks: `infovore label --from-runs` derives `lore`/`noise` labels from trial extraction runs, and `infovore label --exchange-id ID --lore|--noise` records hand corrections, which always win over a derived label for the same exchange (see "Running"). Those labels are the training data for the Bayesian classifier that replaces the rule score once enough of them exist.
 
 ## Extraction prompt
 

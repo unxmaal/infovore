@@ -156,6 +156,27 @@ def get_claim(conn: sqlite3.Connection, claim_id: int) -> ClaimRow | None:
     return _row_to_claim(row) if row is not None else None
 
 
+def _row_to_run(row: sqlite3.Row) -> ExtractionRunRow:
+    return ExtractionRunRow(
+        id=row["id"],
+        exchange_id=row["exchange_id"],
+        model=row["model"],
+        prompt_version=row["prompt_version"],
+        started_at=from_db_time(row["started_at"]),
+        finished_at=from_db_time(row["finished_at"]),
+        input_tokens=row["input_tokens"],
+        output_tokens=row["output_tokens"],
+        mode=RunMode(row["mode"]),
+        outcome=RunOutcome(row["outcome"]),
+        error=row["error"],
+    )
+
+
+def get_run(conn: sqlite3.Connection, run_id: int) -> ExtractionRunRow | None:
+    row = conn.execute("SELECT * FROM extraction_runs WHERE id = ?", (run_id,)).fetchone()
+    return _row_to_run(row) if row is not None else None
+
+
 def claim_source_ids(conn: sqlite3.Connection, claim_id: int) -> list[int]:
     rows = conn.execute(
         "SELECT message_id FROM claim_sources WHERE claim_id = ? ORDER BY message_id",

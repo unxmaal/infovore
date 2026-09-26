@@ -47,6 +47,16 @@ class Novelty(StrEnum):
     KNOWN = "known"
 
 
+class Label(StrEnum):
+    LORE = "lore"
+    NOISE = "noise"
+
+
+class LabelSource(StrEnum):
+    LLM = "llm"
+    HUMAN = "human"
+
+
 @dataclass(frozen=True)
 class ChannelRow:
     id: int
