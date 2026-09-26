@@ -1,13 +1,26 @@
 import json
-from dataclasses import dataclass
+from collections.abc import AsyncIterator
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 import discord
 
 from infovore.rows import ChannelKind
-from infovore.source.live import to_source_channel, to_source_message
+from infovore.source.live import DiscordPySource, to_source_channel, to_source_message
+from infovore.source.protocol import SourceRateLimitedError, SourceUnavailableError
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
+
+
+def make_http_exception(
+    status: int, retry_after: str | None = None, cls: type[discord.HTTPException] = discord.HTTPException
+) -> discord.HTTPException:
+    headers: dict[str, str] = {}
+    if retry_after is not None:
+        headers["Retry-After"] = retry_after
+    response = SimpleNamespace(status=status, reason="error", headers=headers)
+    return cls(response, "boom")  # type: ignore[arg-type]
 
 
 @dataclass
@@ -217,3 +230,229 @@ def test_to_source_message_raw_is_json_safe() -> None:
     message = make_message()
     result = to_source_message(message)
     json.dumps(result.raw)
+
+
+@dataclass
+class FakeFetchableChannel:
+    id: int
+    guild: FakeGuildRef
+    name: str
+    messages: list[FakeMessage] = field(default_factory=list)
+    archived: list[FakeChannel | discord.Thread] = field(default_factory=list)
+    history_error: Exception | None = None
+    archived_error: Exception | None = None
+    fetch_message_result: FakeMessage | None = None
+    fetch_message_error: Exception | None = None
+
+    async def history(
+        self, *, limit: int | None, after: object | None, oldest_first: bool | None
+    ) -> AsyncIterator[FakeMessage]:
+        if self.history_error is not None:
+            raise self.history_error
+        after_id = after.id if isinstance(after, discord.Object) else None
+        for message in self.messages:
+            if after_id is None or message.id > after_id:
+                yield message
+
+    async def archived_threads(
+        self, *, limit: int | None
+    ) -> AsyncIterator[FakeChannel | discord.Thread]:
+        if self.archived_error is not None:
+            raise self.archived_error
+        for thread in self.archived:
+            yield thread
+
+    async def fetch_message(self, message_id: int) -> FakeMessage:
+        if self.fetch_message_error is not None:
+            raise self.fetch_message_error
+        assert self.fetch_message_result is not None
+        return self.fetch_message_result
+
+
+@dataclass
+class FakeRole:
+    id: int
+    name: str
+
+
+@dataclass
+class FakeMember:
+    id: int
+    roles: tuple[FakeRole, ...]
+
+
+@dataclass
+class FakeGuild:
+    id: int
+    text_channels: tuple[FakeFetchableChannel, ...] = ()
+    threads: tuple[discord.Thread, ...] = ()
+    roles: tuple[FakeRole, ...] = ()
+    members: tuple[FakeMember, ...] = ()
+
+
+@dataclass
+class FakeClient:
+    guilds: dict[int, FakeGuild] = field(default_factory=dict)
+    channels: dict[int, FakeFetchableChannel] = field(default_factory=dict)
+
+    def get_guild(self, guild_id: int) -> FakeGuild | None:
+        return self.guilds.get(guild_id)
+
+    def get_channel(self, channel_id: int) -> FakeFetchableChannel | None:
+        return self.channels.get(channel_id)
+
+
+async def collect_history(
+    source: DiscordPySource, channel_id: int, after_id: int | None, page_size: int
+) -> list[tuple[object, ...]]:
+    pages: list[tuple[object, ...]] = []
+    async for page in source.history(channel_id, after_id, page_size):
+        pages.append(tuple(page))
+    return pages
+
+
+async def test_list_channels_includes_text_active_and_archived_threads() -> None:
+    guild_ref = FakeGuildRef(100)
+    archived_thread = bare_thread(30, 100, parent_id=10, name="closed", archived=True)
+    active_thread = bare_thread(20, 100, parent_id=10, name="open", archived=False)
+    text_channel = FakeFetchableChannel(10, guild_ref, "general", archived=[archived_thread])
+    guild = FakeGuild(100, text_channels=(text_channel,), threads=(active_thread,))
+    client = FakeClient(guilds={100: guild})
+    source = DiscordPySource(client)
+    channels = await source.list_channels(100)
+    assert {c.id for c in channels} == {10, 20, 30}
+    by_id = {c.id: c for c in channels}
+    assert by_id[10].kind == ChannelKind.TEXT
+    assert by_id[20].archived is False
+    assert by_id[30].archived is True
+
+
+async def test_list_channels_unknown_guild_returns_empty() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    assert await source.list_channels(999) == ()
+
+
+async def test_list_channels_maps_rate_limit_error() -> None:
+    guild_ref = FakeGuildRef(100)
+    text_channel = FakeFetchableChannel(
+        10, guild_ref, "general", archived_error=make_http_exception(429, retry_after="2.5")
+    )
+    guild = FakeGuild(100, text_channels=(text_channel,))
+    client = FakeClient(guilds={100: guild})
+    source = DiscordPySource(client)
+    try:
+        await source.list_channels(100)
+        raise AssertionError("expected SourceRateLimitedError")
+    except SourceRateLimitedError as error:
+        assert error.retry_after == 2.5
+
+
+async def test_list_channels_maps_other_http_error() -> None:
+    guild_ref = FakeGuildRef(100)
+    text_channel = FakeFetchableChannel(
+        10, guild_ref, "general", archived_error=make_http_exception(500)
+    )
+    guild = FakeGuild(100, text_channels=(text_channel,))
+    client = FakeClient(guilds={100: guild})
+    source = DiscordPySource(client)
+    try:
+        await source.list_channels(100)
+        raise AssertionError("expected SourceUnavailableError")
+    except SourceUnavailableError:
+        pass
+
+
+async def test_list_channels_maps_connection_error() -> None:
+    guild_ref = FakeGuildRef(100)
+    text_channel = FakeFetchableChannel(
+        10, guild_ref, "general", archived_error=ConnectionError("no route")
+    )
+    guild = FakeGuild(100, text_channels=(text_channel,))
+    client = FakeClient(guilds={100: guild})
+    source = DiscordPySource(client)
+    try:
+        await source.list_channels(100)
+        raise AssertionError("expected SourceUnavailableError")
+    except SourceUnavailableError:
+        pass
+
+
+async def test_history_pages_and_respects_after_id() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", messages=[make_message(id=i) for i in range(1, 6)]
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    pages = await collect_history(source, 10, None, 2)
+    assert [msg.id for page in pages for msg in page] == [1, 2, 3, 4, 5]
+    assert [len(page) for page in pages] == [2, 2, 1]
+
+
+async def test_history_respects_after_id_cursor() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", messages=[make_message(id=i) for i in range(1, 4)]
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    pages = await collect_history(source, 10, 1, 10)
+    assert [msg.id for page in pages for msg in page] == [2, 3]
+
+
+async def test_history_unknown_channel_raises_unavailable() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    try:
+        await collect_history(source, 999, None, 10)
+        raise AssertionError("expected SourceUnavailableError")
+    except SourceUnavailableError:
+        pass
+
+
+async def test_history_maps_rate_limit_error() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", history_error=make_http_exception(429, retry_after="1.0")
+    )
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    try:
+        await collect_history(source, 10, None, 10)
+        raise AssertionError("expected SourceRateLimitedError")
+    except SourceRateLimitedError as error:
+        assert error.retry_after == 1.0
+
+
+async def test_history_maps_connection_error() -> None:
+    channel = FakeFetchableChannel(10, FakeGuildRef(100), "general", history_error=OSError("down"))
+    client = FakeClient(channels={10: channel})
+    source = DiscordPySource(client)
+    try:
+        await collect_history(source, 10, None, 10)
+        raise AssertionError("expected SourceUnavailableError")
+    except SourceUnavailableError:
+        pass
+
+
+async def test_role_member_ids_filters_by_role_name() -> None:
+    role = FakeRole(1, "opted-out")
+    other_role = FakeRole(2, "other")
+    member_with_role = FakeMember(5, (role,))
+    member_without_role = FakeMember(6, (other_role,))
+    guild = FakeGuild(100, roles=(role, other_role), members=(member_with_role, member_without_role))
+    client = FakeClient(guilds={100: guild})
+    source = DiscordPySource(client)
+    ids = await source.role_member_ids(100, "opted-out")
+    assert ids == frozenset({5})
+
+
+async def test_role_member_ids_unknown_guild_returns_empty() -> None:
+    client = FakeClient()
+    source = DiscordPySource(client)
+    assert await source.role_member_ids(999, "opted-out") == frozenset()
+
+
+async def test_role_member_ids_unknown_role_returns_empty() -> None:
+    guild = FakeGuild(100, roles=())
+    client = FakeClient(guilds={100: guild})
+    source = DiscordPySource(client)
+    assert await source.role_member_ids(100, "missing") == frozenset()
