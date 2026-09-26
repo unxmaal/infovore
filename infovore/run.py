@@ -112,6 +112,7 @@ async def _run_cycle(
             max_retries=settings.max_retries,
             concurrency=extract_stage.concurrency,
             min_score=settings.triage_min_score,
+            min_p_lore=settings.triage_min_p_lore,
         )
     except PromptNotPromotedError as error:
         logger.warning(

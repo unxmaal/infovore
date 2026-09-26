@@ -62,6 +62,9 @@ def test_status_on_a_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert "judge: fake / haiku" in out
     assert "secret-token" not in out
     assert "triaged: 0 (above threshold 0)" in out
+    assert "triage model: none" in out
+    assert "p_lore scored: 0" in out
+    assert "passing gate: 0" in out
     assert (tmp_path / "nested" / "dir" / "infovore.db").exists()
 
 
@@ -125,6 +128,33 @@ def test_status_shows_triaged_and_above_threshold_counts(tmp_path: Path) -> None
     code, out, _ = run(["status"], env)
     assert code == ExitCode.OK
     assert "triaged: 2 (above threshold 1)" in out
+
+
+def test_status_shows_latest_model_p_lore_scored_and_passing_gate(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    assert run(["status"], env)[0] == ExitCode.OK
+    from infovore.db.connection import open_database
+
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    now = "2026-01-01T00:00:00+00:00"
+    conn.executescript(
+        f"""
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{now}', 'x', '{now}', '{{}}');
+        INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)
+          VALUES ('{now}', 40, 8, '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version,
+          p_lore, p_lore_model)
+          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.0, 't1', 0.9, 1);
+        """
+    )
+    code, out, _ = run(["status"], env)
+    assert code == ExitCode.OK
+    assert "triage model: v1 (labels_used=40)" in out
+    assert "p_lore scored: 1" in out
+    assert "passing gate: 1" in out
 
 
 def test_missing_configuration_exits_with_config_code(tmp_path: Path) -> None:

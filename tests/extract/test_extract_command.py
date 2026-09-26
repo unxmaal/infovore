@@ -495,6 +495,43 @@ def test_extract_trial_mode_max_score_filters_the_sample(tmp_path: Path) -> None
     conn.close()
 
 
+def test_extract_trial_mode_strategy_uncertain_requires_a_trained_model(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    registry = registry_with(success_results())
+
+    code, _, err = run(
+        ["extract", "--mode", "trial", "--sample", "10", "--strategy", "uncertain"], env, registry
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "triage --train" in err
+
+
+def test_extract_trial_mode_strategy_uncertain_picks_scored_exchanges(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    qualifying_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
+    )
+    version = conn.execute("SELECT version FROM triage_model").fetchone()["version"]
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?",
+        (version, qualifying_id),
+    )
+    conn.close()
+    registry = registry_with(success_results())
+
+    code, out, _ = run(
+        ["extract", "--mode", "trial", "--sample", "10", "--strategy", "uncertain"], env, registry
+    )
+
+    assert code == ExitCode.OK
+    assert "processed=1" in out
+
+
 def test_extract_start_line_is_written_before_backend_processes_any_exchange(
     tmp_path: Path,
 ) -> None:

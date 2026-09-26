@@ -9,7 +9,9 @@ from infovore.extract.runner import (
     ExchangeSkipped,
     ExtractionEvent,
     ExtractionStarted,
+    NoScoredExchangesError,
     PromptNotPromotedError,
+    TrialSampleStrategy,
     UntriagedExchangesError,
     run_extraction,
     select_trial_sample,
@@ -54,6 +56,11 @@ class ExtractCommand:
         parser.add_argument("--exchange-id", type=int, action="append", default=[])
         parser.add_argument("--min-score", type=float, default=None)
         parser.add_argument("--max-score", type=float, default=None)
+        parser.add_argument(
+            "--strategy",
+            choices=[strategy.value for strategy in TrialSampleStrategy],
+            default=TrialSampleStrategy.STRATIFIED.value,
+        )
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode, _say, stage_backend
@@ -66,15 +73,22 @@ class ExtractCommand:
         if mode is RunMode.TRIAL:
             ids: list[int] = []
             if args.sample is not None:
-                ids.extend(
-                    select_trial_sample(
-                        context.conn,
-                        args.sample,
-                        args.seed,
-                        min_score=args.min_score,
-                        max_score=args.max_score,
+                try:
+                    ids.extend(
+                        select_trial_sample(
+                            context.conn,
+                            args.sample,
+                            args.seed,
+                            min_score=args.min_score,
+                            max_score=args.max_score,
+                            strategy=TrialSampleStrategy(args.strategy),
+                        )
                     )
-                )
+                except NoScoredExchangesError as error:
+                    raise ConfigError(
+                        "--strategy uncertain requires a trained model;"
+                        " run `infovore triage --train` first"
+                    ) from error
             ids.extend(args.exchange_id)
             exchange_ids = sorted(set(ids))
 
@@ -94,6 +108,7 @@ class ExtractCommand:
                 max_retries=context.settings.max_retries,
                 concurrency=stage_settings.concurrency,
                 min_score=context.settings.triage_min_score,
+                min_p_lore=context.settings.triage_min_p_lore,
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
             )

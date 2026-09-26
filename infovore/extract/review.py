@@ -1,5 +1,6 @@
 import argparse
 import html
+import json
 import sqlite3
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -17,14 +18,25 @@ from infovore.db.claims import (
     register_prompt_version,
 )
 from infovore.db.exchanges import exchange_message_ids, get_exchange
+from infovore.db.labels import effective_labels
 from infovore.db.raw import get_channel, messages_by_ids
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION, permalink
-from infovore.rows import ClaimKind, ClaimRow, Novelty, RunOutcome
+from infovore.rows import ClaimKind, ClaimRow, Label, Novelty, RunOutcome
 
 if TYPE_CHECKING:
     from datetime import datetime
 
     from infovore.cli import AppContext
+
+
+@dataclass(frozen=True)
+class VersionKey:
+    prompt_version: str
+    model: str
+
+    @property
+    def label(self) -> str:
+        return f"{self.prompt_version} / {self.model}"
 
 
 class UnknownRunIdsError(Exception):
@@ -87,13 +99,17 @@ class ExchangeReview:
     channel_name: str
     permalink: str
     messages: tuple[ReviewMessage, ...]
-    runs: dict[str, ReviewRun]
+    runs: dict[VersionKey, ReviewRun]
     diff: ExchangeDiff | None
+    triage_score: float | None
+    p_lore: float | None
+    triage_reasons: tuple[tuple[str, float], ...]
+    effective_label: Label | None
 
 
 @dataclass(frozen=True)
 class VersionSummary:
-    prompt_version: str
+    version: VersionKey
     exchanges: int
     claims: int
     claims_per_exchange: float
@@ -106,9 +122,9 @@ class VersionSummary:
 
 @dataclass(frozen=True)
 class Review:
-    versions: tuple[str, ...]
+    versions: tuple[VersionKey, ...]
     exchanges: tuple[ExchangeReview, ...]
-    summaries: dict[str, VersionSummary]
+    summaries: dict[VersionKey, VersionSummary]
 
 
 @dataclass(frozen=True)
@@ -228,8 +244,9 @@ def _diff_claims(before: Sequence[ReviewClaim], after: Sequence[ReviewClaim]) ->
 def _build_exchange_review(
     conn: sqlite3.Connection,
     exchange_id: int,
-    versions: Sequence[str],
-    runs_by_version_and_exchange: dict[str, dict[int, _RunRow]],
+    versions: Sequence[VersionKey],
+    runs_by_version_and_exchange: dict[VersionKey, dict[int, _RunRow]],
+    labels: dict[int, Label],
 ) -> ExchangeReview:
     exchange = get_exchange(conn, exchange_id)
     assert exchange is not None
@@ -250,7 +267,7 @@ def _build_exchange_review(
     guild_id = messages[0].guild_id
     link = permalink(guild_id, exchange.channel_id, exchange.first_message_id)
 
-    runs: dict[str, ReviewRun] = {}
+    runs: dict[VersionKey, ReviewRun] = {}
     for version in versions:
         run_row = runs_by_version_and_exchange.get(version, {}).get(exchange_id)
         if run_row is None:
@@ -271,6 +288,8 @@ def _build_exchange_review(
     if len(present_versions) == 2:
         diff = _diff_claims(runs[present_versions[0]].claims, runs[present_versions[1]].claims)
 
+    reasons = tuple((name, weight) for name, weight in json.loads(exchange.triage_reasons or "[]"))
+
     return ExchangeReview(
         exchange_id=exchange_id,
         channel_name=channel_name,
@@ -278,10 +297,16 @@ def _build_exchange_review(
         messages=review_messages,
         runs=runs,
         diff=diff,
+        triage_score=exchange.triage_score,
+        p_lore=exchange.p_lore,
+        triage_reasons=reasons,
+        effective_label=labels.get(exchange_id),
     )
 
 
-def _summarize_version(version: str, exchange_reviews: Sequence[ExchangeReview]) -> VersionSummary:
+def _summarize_version(
+    version: VersionKey, exchange_reviews: Sequence[ExchangeReview]
+) -> VersionSummary:
     runs = [exchange.runs[version] for exchange in exchange_reviews if version in exchange.runs]
     exchanges = len(runs)
     claims = [claim for run in runs for claim in run.claims]
@@ -299,7 +324,7 @@ def _summarize_version(version: str, exchange_reviews: Sequence[ExchangeReview])
     scale = 100 / exchanges if exchanges else 0.0
 
     return VersionSummary(
-        prompt_version=version,
+        version=version,
         exchanges=exchanges,
         claims=claim_count,
         claims_per_exchange=claims_per_exchange,
@@ -320,18 +345,20 @@ def build_review(conn: sqlite3.Connection, run_ids: Sequence[int]) -> Review:
     if missing:
         raise UnknownRunIdsError(missing)
 
-    versions: list[str] = []
-    runs_by_version_and_exchange: dict[str, dict[int, _RunRow]] = {}
+    versions: list[VersionKey] = []
+    runs_by_version_and_exchange: dict[VersionKey, dict[int, _RunRow]] = {}
     for run_id in unique_ids:
         run_row = runs_by_id[run_id]
-        by_exchange = runs_by_version_and_exchange.setdefault(run_row.prompt_version, {})
-        if run_row.prompt_version not in versions:
-            versions.append(run_row.prompt_version)
+        key = VersionKey(run_row.prompt_version, run_row.model)
+        by_exchange = runs_by_version_and_exchange.setdefault(key, {})
+        if key not in versions:
+            versions.append(key)
         by_exchange[run_row.exchange_id] = run_row
 
+    labels = effective_labels(conn)
     exchange_ids = sorted({run_row.exchange_id for run_row in runs_by_id.values()})
     exchange_reviews = [
-        _build_exchange_review(conn, exchange_id, versions, runs_by_version_and_exchange)
+        _build_exchange_review(conn, exchange_id, versions, runs_by_version_and_exchange, labels)
         for exchange_id in exchange_ids
     ]
 
@@ -472,14 +499,10 @@ def _render_claim(claim: ReviewClaim) -> str:
     )
 
 
-def _render_run_column(version: str, run: ReviewRun | None) -> str:
+def _render_run_column(version: VersionKey, run: ReviewRun | None) -> str:
+    label = html.escape(version.label)
     if run is None:
-        return (
-            '<div class="version-column">'
-            f"<h4>{html.escape(version)}</h4>"
-            '<p class="missing">no run</p>'
-            "</div>"
-        )
+        return f'<div class="version-column"><h4>{label}</h4><p class="missing">no run</p></div>'
     input_tokens = run.input_tokens if run.input_tokens is not None else "—"
     output_tokens = run.output_tokens if run.output_tokens is not None else "—"
     error_html = (
@@ -492,7 +515,7 @@ def _render_run_column(version: str, run: ReviewRun | None) -> str:
     )
     return (
         '<div class="version-column">'
-        f"<h4>{html.escape(version)}</h4>"
+        f"<h4>{label}</h4>"
         f'<div class="run-meta">run #{run.run_id} · {html.escape(run.outcome.value)} · '
         f"{html.escape(run.model)} · tokens {input_tokens} in / {output_tokens} out</div>"
         f"{error_html}{claims_html}"
@@ -530,7 +553,20 @@ def _render_diff(diff: ExchangeDiff | None) -> str:
     return '<div class="diff">' + "\n".join(sections) + "</div>"
 
 
-def _render_exchange(exchange: ExchangeReview, versions: Sequence[str]) -> str:
+def _render_exchange_meta(exchange: ExchangeReview) -> str:
+    score = f"{exchange.triage_score:.3f}" if exchange.triage_score is not None else "—"
+    p_lore = f"{exchange.p_lore:.3f}" if exchange.p_lore is not None else "—"
+    label = exchange.effective_label.value if exchange.effective_label is not None else "—"
+    reasons = ", ".join(f"{name}={weight:+.2f}" for name, weight in exchange.triage_reasons) or "—"
+    return (
+        '<div class="exchange-meta">'
+        f"rule score: {score} &middot; p_lore: {p_lore} &middot; label: {html.escape(label)}"
+        f" &middot; reasons: {html.escape(reasons)}"
+        "</div>"
+    )
+
+
+def _render_exchange(exchange: ExchangeReview, versions: Sequence[VersionKey]) -> str:
     columns = "\n".join(
         _render_run_column(version, exchange.runs.get(version)) for version in versions
     )
@@ -539,6 +575,7 @@ def _render_exchange(exchange: ExchangeReview, versions: Sequence[str]) -> str:
         f"<summary>Exchange #{exchange.exchange_id} · {html.escape(exchange.channel_name)} "
         f'· <a href="{html.escape(exchange.permalink)}">permalink</a></summary>'
         '<div class="exchange-body">'
+        f"{_render_exchange_meta(exchange)}"
         f'<div class="messages">{_render_messages(exchange.messages)}</div>'
         f'<div class="versions">{columns}</div>'
         f"{_render_diff(exchange.diff)}"
@@ -575,7 +612,7 @@ _SUMMARY_METRICS = (
 
 
 def _render_summary_table(review: Review) -> str:
-    header = "".join(f"<th>{html.escape(version)}</th>" for version in review.versions)
+    header = "".join(f"<th>{html.escape(version.label)}</th>" for version in review.versions)
     rows = ["<tr><th>metric</th>" + header + "</tr>"]
     for metric, label in _SUMMARY_METRICS:
         cells = "".join(

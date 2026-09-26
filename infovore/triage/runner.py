@@ -7,6 +7,7 @@ from infovore.db.connection import transaction
 from infovore.db.exchanges import exchange_message_ids
 from infovore.db.raw import attachments_for_messages, messages_by_ids, reactions_for_messages
 from infovore.triage.score import TRIAGE_VERSION, score_exchange
+from infovore.triage.train import load_latest_model, score_stale
 
 CHANNEL_PRIOR_WEIGHT = 0.3
 CHANNEL_PRIOR_CAP = 0.1
@@ -144,6 +145,11 @@ def triage_pending(
     channel_means, global_mean = _channel_means(conn)
     channel_priors = _apply_channel_priors(conn, channel_means, global_mean)
     progress(TriagePriorsApplied(channels=len(channel_priors)))
+
+    loaded_model = load_latest_model(conn)
+    if loaded_model is not None:
+        model_version, model = loaded_model
+        score_stale(conn, model, model_version)
 
     return TriageReport(
         candidates=len(candidate_ids),

@@ -1,4 +1,5 @@
 import io
+import sqlite3
 from pathlib import Path
 
 from infovore.cli import ExitCode, builtin_commands, main
@@ -124,3 +125,112 @@ def test_triage_is_idempotent_over_two_cli_runs(tmp_path: Path) -> None:
 
     assert code == ExitCode.OK
     assert "scored=0" in out
+
+
+LORE_CONTENT = "PROM 6.5.22 part 030-1234-001 /usr/sbin/inst"
+NOISE_CONTENT = "lol gg no cap"
+
+
+def _insert_labeled_exchange(
+    conn: sqlite3.Connection, message_id: int, channel_id: int, content: str, label: str
+) -> None:
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (?, ?, 9, 1, 'a', '2026-01-01T00:00:00+00:00', ?,"
+        " '2026-01-01T00:00:00+00:00', '{}')",
+        (message_id, channel_id, content),
+    )
+    content_hash = f"h{message_id}"
+    conn.execute(
+        "INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,"
+        " ended_at, message_count, grouping_rule, content_hash, extraction_status)"
+        " VALUES (?, ?, ?, '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00', 1,"
+        " 'quiet_gap', ?, 'pending')",
+        (channel_id, message_id, message_id, content_hash),
+    )
+    exchange_id = conn.execute(
+        "SELECT id FROM exchanges WHERE content_hash = ?", (content_hash,)
+    ).fetchone()["id"]
+    conn.execute(
+        "INSERT INTO exchange_labels (exchange_id, label, source, source_ref, labeled_at)"
+        " VALUES (?, ?, 'human', NULL, '2026-01-01T00:00:00+00:00')",
+        (exchange_id, label),
+    )
+
+
+def seed_labeled(db_path: str, lore_count: int, noise_count: int) -> None:
+    conn = open_database(db_path)
+    migrate(conn)
+    message_id = 1
+    for _ in range(lore_count):
+        _insert_labeled_exchange(conn, message_id, channel_id=1, content=LORE_CONTENT, label="lore")
+        message_id += 1
+    for _ in range(noise_count):
+        _insert_labeled_exchange(
+            conn, message_id, channel_id=2, content=NOISE_CONTENT, label="noise"
+        )
+        message_id += 1
+    conn.close()
+
+
+def test_triage_train_refuses_with_insufficient_labels(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 3, 3)
+
+    code, _, err = run(["triage", "--train"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "10" in err
+
+
+def test_triage_train_prints_report_and_scores_every_exchange(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+
+    code, out, _ = run(["triage", "--train"], env)
+
+    assert code == ExitCode.OK
+    assert "trained model v" in out
+    assert "threshold" in out
+    assert "confusion" in out
+    assert "top tokens:" in out
+    assert "scored 40 exchanges" in out
+
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    rows = conn.execute("SELECT p_lore, p_lore_model FROM exchanges").fetchall()
+    assert len(rows) == 40
+    assert all(row["p_lore"] is not None for row in rows)
+
+
+def test_triage_recommend_threshold_without_a_model_exits_config_error(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+
+    code, _, err = run(["triage", "--recommend-threshold"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "triage --train" in err
+
+
+def test_triage_recommend_threshold_prints_recommendation(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage", "--recommend-threshold", "--min-recall", "0.5"], env)
+
+    assert code == ExitCode.OK
+    assert "INFOVORE_TRIAGE_MIN_P_LORE=" in out
+    assert "expected share" in out
+
+
+def test_triage_recommend_threshold_with_unreachable_recall_reports_none(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage", "--recommend-threshold", "--min-recall", "1.01"], env)
+
+    assert code == ExitCode.OK
+    assert "no threshold meets recall" in out

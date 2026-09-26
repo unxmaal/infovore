@@ -15,6 +15,7 @@ DEFAULT_SCRATCH_DIR = "scratch"
 DEFAULT_STAGE_CONCURRENCY = 2
 DEFAULT_STAGE_TIMEOUT_SECONDS = 60.0
 DEFAULT_TRIAGE_MIN_SCORE = 0.3
+DEFAULT_TRIAGE_MIN_P_LORE = 0.5
 
 STAGE_ENV_KEYS = ("BACKEND", "MODEL", "CONCURRENCY", "TIMEOUT")
 
@@ -67,6 +68,7 @@ class Settings:
     opt_out_role_name: str = DEFAULT_OPT_OUT_ROLE_NAME
     include_bot_messages: bool = DEFAULT_INCLUDE_BOT_MESSAGES
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
+    triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE
 
 
 def _parse_int(raw: str) -> int | None:
@@ -289,6 +291,12 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         "INFOVORE_TRIAGE_MIN_SCORE",
         errors,
     )
+    triage_min_p_lore = _optional_unit_float(
+        env.get("INFOVORE_TRIAGE_MIN_P_LORE"),
+        DEFAULT_TRIAGE_MIN_P_LORE,
+        "INFOVORE_TRIAGE_MIN_P_LORE",
+        errors,
+    )
     stages = {stage: _parse_stage(env, stage, errors) for stage in Stage}
 
     if errors:
@@ -310,6 +318,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         opt_out_role_name=opt_out_role_name,
         include_bot_messages=include_bot_messages,
         triage_min_score=triage_min_score,
+        triage_min_p_lore=triage_min_p_lore,
     )
 
 
