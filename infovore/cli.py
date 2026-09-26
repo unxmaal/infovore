@@ -256,6 +256,7 @@ def builtin_commands() -> list[Command]:
     from infovore.extract.novelty import ProbeCommand
     from infovore.extract.review import PromoteCommand, ReviewCommand
     from infovore.run import RunCommand
+    from infovore.triage.command import TriageCommand
 
     return [
         StatusCommand(),
@@ -264,6 +265,7 @@ def builtin_commands() -> list[Command]:
         BackfillCommand(),
         SnapshotCommand(),
         ProbeCommand(),
+        TriageCommand(),
         ExtractCommand(),
         RunCommand(),
         ReviewCommand(),
