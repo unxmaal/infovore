@@ -8,19 +8,21 @@ import discord
 
 from infovore.rows import ChannelKind
 from infovore.source.live import DiscordPySource, to_source_channel, to_source_message
-from infovore.source.protocol import SourceRateLimitedError, SourceUnavailableError
+from infovore.source.protocol import SourceMessage, SourceRateLimitedError, SourceUnavailableError
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def make_http_exception(
-    status: int, retry_after: str | None = None, cls: type[discord.HTTPException] = discord.HTTPException
+    status: int,
+    retry_after: str | None = None,
+    cls: type[discord.HTTPException] = discord.HTTPException,
 ) -> discord.HTTPException:
     headers: dict[str, str] = {}
     if retry_after is not None:
         headers["Retry-After"] = retry_after
     response = SimpleNamespace(status=status, reason="error", headers=headers)
-    return cls(response, "boom")  # type: ignore[arg-type]
+    return cls(response, "boom")
 
 
 @dataclass
@@ -304,8 +306,8 @@ class FakeClient:
 
 async def collect_history(
     source: DiscordPySource, channel_id: int, after_id: int | None, page_size: int
-) -> list[tuple[object, ...]]:
-    pages: list[tuple[object, ...]] = []
+) -> list[tuple[SourceMessage, ...]]:
+    pages: list[tuple[SourceMessage, ...]] = []
     async for page in source.history(channel_id, after_id, page_size):
         pages.append(tuple(page))
     return pages
@@ -438,7 +440,9 @@ async def test_role_member_ids_filters_by_role_name() -> None:
     other_role = FakeRole(2, "other")
     member_with_role = FakeMember(5, (role,))
     member_without_role = FakeMember(6, (other_role,))
-    guild = FakeGuild(100, roles=(role, other_role), members=(member_with_role, member_without_role))
+    guild = FakeGuild(
+        100, roles=(role, other_role), members=(member_with_role, member_without_role)
+    )
     client = FakeClient(guilds={100: guild})
     source = DiscordPySource(client)
     ids = await source.role_member_ids(100, "opted-out")
