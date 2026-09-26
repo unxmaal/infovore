@@ -128,6 +128,42 @@ The user prompt (`RenderedPrompt.prompt`) lays out, in order:
 
 Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message id is kept so citations and ordering stay consistent. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
 
+### Backend-neutral extraction
+
+`infovore.extract.llm_extractor.LLMClaimExtractor` implements `ClaimExtractor` (#5) against any `LLMBackend` (#5), never branching on which backend is configured. `LLMClaimExtractor(backend, max_output_tokens=8000)` renders the prompt (above), requests `json_schema_for(ExtractionOut)`, and reads the result: when `backend.capabilities().native_json_schema` is true and `result.structured` is present, that structured payload is used directly; otherwise the first JSON object is extracted from `result.text` (`schema.first_json_object`). The payload is always validated with `schema.parse_extraction`, given the exchange's own message ids as the citable set and the ids of the supplied related claims as the valid `supersedes` targets.
+
+On `InvalidExtractionError`, exactly one repair call is made: same system prompt, and a user prompt that is the original prompt plus a clearly delimited section (`--- PREVIOUS OUTPUT (invalid) ---` / `--- VALIDATION ERROR ---`) quoting the previous output verbatim and the validation error, asking for a corrected JSON object only. If the repair call itself returns an `LLMResult` error, that error is mapped normally (below); if the repair call succeeds but its payload still fails `parse_extraction`, the outcome is `Failure(FailureKind.INVALID_OUTPUT, <validation error>)` with `model=None`. There is no second repair attempt.
+
+`LLMResult` errors map to `Failure` kinds one-for-one: `ErrorKind.TRANSIENT` -> `FailureKind.TRANSIENT`, `ErrorKind.FATAL` -> `FailureKind.FATAL`, `ErrorKind.USAGE_LIMIT` -> `FailureKind.USAGE_LIMIT` (carrying `retry_after`). This applies to an error from either the initial call or the repair call. `ExtractionOutcome.model` is always the canonical model id from `LLMResult.model` (the backend's own resolved id, never a configured alias) on the call that ultimately produced the claims — the initial call's model normally, or the repair call's model when a repair was needed. `input_tokens`/`output_tokens` are summed across the initial and repair calls (a missing count from one call is treated as zero once the other call reports a count); if neither call reports token counts, both fields are `None`.
+
+### Novelty probe
+
+`infovore.extract.llm_extractor.LLMNoveltyProbe` implements `NoveltyProbe` (#5) as two backend-neutral calls, `LLMNoveltyProbe(probe_backend, judge_backend)`:
+
+1. **Recall** — `probe_backend` is asked the claim's `probe_question`, and nothing else: no exchange text, no statement, no claim id. The system prompt (`RECALL_SYSTEM_PROMPT`, verbatim below) tells it to answer from its own knowledge only, briefly, and to say exactly "I don't know" if unsure. The schema is `RecallOut`; native structured output is used when the backend reports it, otherwise `first_json_object` on the text, same as extraction.
+2. **Judge** — `judge_backend` is given the recall answer alongside the claim's subject and statement, and asked to return a `JudgeOut` verdict: `unknown` (the answer says it doesn't know, or is unrelated), `partial` (some but not all of the specifics), `contradicts` (the answer confidently asserts something incompatible with the claim), or `known` (substantively the same fact). The system prompt is `JUDGE_SYSTEM_PROMPT`, verbatim below.
+
+`ProbeOutcome.model` is always the **recall** call's canonical model id — that is the model whose knowledge was actually probed; the judge model is not recorded, since "net-new" is defined relative to the probe model's knowledge, not the judge's. `ProbeOutcome.answer` is the recall answer once the recall call has produced one, even if a later step (the judge call) fails. An error from either call maps to a `Failure` exactly as in extraction (`TRANSIENT`/`FATAL`/`USAGE_LIMIT`); invalid JSON from either call is `FailureKind.INVALID_OUTPUT`. Unlike extraction, the probe makes **no repair call** on invalid output from either the recall or the judge call — keeping the probe simple was chosen over matching the extractor's one-repair-attempt behavior, since a probe/judge failure just leaves the claim `unprobed` for a later run (Phase 4 task 6), rather than losing a batch of extracted claims.
+
+`RECALL_SYSTEM_PROMPT`, verbatim:
+
+```
+Answer the following question using only your own knowledge, with no other context. Be brief. If you are not sure of the answer, respond with exactly "I don't know".
+```
+
+`JUDGE_SYSTEM_PROMPT`, verbatim:
+
+```
+You are comparing a closed-book recall answer against a claim, to judge how much the answering model already knew.
+
+Return unknown if the answer says it does not know, or is unrelated to the claim.
+Return partial if the answer gives some but not all of the claim's specifics.
+Return contradicts if the answer confidently asserts something incompatible with the claim.
+Return known if the answer is substantively the same fact as the claim.
+
+Output ONLY a JSON object matching the given schema. No other text.
+```
+
 ## Privacy and opt-out
 
 A Discord role (`INFOVORE_OPT_OUT_ROLE`, default `no-archive`) lets a guild member opt their messages out of extraction. `infovore sync-optouts` fetches the role's current members via `DiscordSource.role_member_ids` and reconciles them against the `opt_outs` table (`infovore.privacy.optout.sync_opt_outs`): a member holding the role who is not yet in `opt_outs` is added with `since` set to now; a member in `opt_outs` who no longer holds the role is removed. Removing a user from `opt_outs` only stops future redaction — **opting back in never restores previously redacted history**, since redaction is destructive (the original content is overwritten, not merely hidden).
