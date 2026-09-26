@@ -3,14 +3,22 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from infovore.db.connection import migrate, open_database
-from infovore.db.raw import get_backfill_checkpoint, get_channel, get_message
+from infovore.db.raw import (
+    attachments_for_messages,
+    get_backfill_checkpoint,
+    get_channel,
+    get_message,
+    reactions_for_messages,
+)
 from infovore.ingest.backfill import BackfillReport, backfill
 from infovore.rows import ChannelKind
 from infovore.source.fake import FakeDiscordSource
 from infovore.source.protocol import (
+    SourceAttachment,
     SourceChannel,
     SourceMessage,
     SourceRateLimitedError,
+    SourceReaction,
     SourceUnavailableError,
 )
 from infovore.timing import FixedClock, RecordingSleeper
@@ -48,6 +56,8 @@ def make_message(
     author_is_bot: bool = False,
     is_system: bool = False,
     content: str = "hi",
+    attachments: tuple[SourceAttachment, ...] = (),
+    reactions: tuple[SourceReaction, ...] = (),
 ) -> SourceMessage:
     return SourceMessage(
         id=msg_id,
@@ -62,8 +72,8 @@ def make_message(
         content=content,
         reply_to_id=None,
         thread_id=None,
-        attachments=(),
-        reactions=(),
+        attachments=attachments,
+        reactions=reactions,
         raw={},
     )
 
@@ -354,3 +364,126 @@ async def test_no_channels_match_allowlist_produces_empty_report(tmp_path: Path)
     )
     assert report.channels == {}
     assert report.failed == []
+
+
+async def test_attachments_and_reactions_are_persisted(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    attachment = SourceAttachment(
+        id=1, filename="a.png", content_type="image/png", size=10, url="https://x/a.png"
+    )
+    message = make_message(
+        1,
+        channel_id=1,
+        attachments=(attachment,),
+        reactions=(SourceReaction("👍", 3),),
+    )
+    source = FakeDiscordSource(channels=[make_channel(1)], messages=[message])
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert report.channels[1].inserted == 1
+    attachments = attachments_for_messages(conn, [1])
+    assert len(attachments) == 1
+    assert attachments[0].filename == "a.png"
+    reactions = reactions_for_messages(conn, [1])
+    assert len(reactions) == 1
+    assert reactions[0].emoji == "👍"
+    assert reactions[0].count == 3
+
+
+async def test_edited_message_reprocessed_after_checkpoint_reset_is_updated(
+    tmp_path: Path,
+) -> None:
+    conn = make_conn(tmp_path)
+    source = FakeDiscordSource(
+        channels=[make_channel(1)], messages=[make_message(1, channel_id=1, content="original")]
+    )
+    await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    source.edit_message(make_message(1, channel_id=1, content="edited"))
+    from infovore.db.raw import set_backfill_checkpoint
+
+    set_backfill_checkpoint(conn, 1, 0)
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert report.channels[1].updated == 1
+    message = get_message(conn, 1)
+    assert message is not None
+    assert message.content == "edited"
+
+
+async def test_reprocessing_same_content_after_checkpoint_reset_is_unchanged(
+    tmp_path: Path,
+) -> None:
+    conn = make_conn(tmp_path)
+    source = FakeDiscordSource(
+        channels=[make_channel(1)], messages=[make_message(1, channel_id=1, content="same")]
+    )
+    await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    from infovore.db.raw import set_backfill_checkpoint
+
+    set_backfill_checkpoint(conn, 1, 0)
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert report.channels[1].unchanged == 1
+    assert report.channels[1].inserted == 0
+
+
+async def test_rate_limit_exhausting_attempts_fails_channel(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    source = FakeDiscordSource(
+        channels=[make_channel(1)],
+        messages=[make_message(1, channel_id=1)],
+    )
+    source.fail_next_history_call(SourceRateLimitedError(1.0), channel_id=1)
+    source.fail_next_history_call(SourceRateLimitedError(1.0), channel_id=1)
+    sleeper = RecordingSleeper()
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=sleeper,
+        include_bots=False,
+        max_attempts=2,
+    )
+    assert len(report.failed) == 1
+    assert "rate limited" in report.failed[0].reason
+    assert sleeper.slept == [1.0]
+    assert get_message(conn, 1) is None

@@ -6,7 +6,12 @@ from infovore.cli import ExitCode, main
 from infovore.config import Settings
 from infovore.rows import ChannelKind
 from infovore.source.fake import FakeDiscordSource
-from infovore.source.protocol import DiscordSource, SourceChannel, SourceMessage, SourceUnavailableError
+from infovore.source.protocol import (
+    DiscordSource,
+    SourceChannel,
+    SourceMessage,
+    SourceUnavailableError,
+)
 
 GUILD_ID = 9
 BASE = datetime(2026, 1, 1, tzinfo=UTC)
@@ -23,7 +28,9 @@ def environment(tmp_path: Path) -> dict[str, str]:
 
 
 def make_channel(channel_id: int) -> SourceChannel:
-    return SourceChannel(channel_id, GUILD_ID, None, f"channel-{channel_id}", ChannelKind.TEXT, False)
+    return SourceChannel(
+        channel_id, GUILD_ID, None, f"channel-{channel_id}", ChannelKind.TEXT, False
+    )
 
 
 def make_message(msg_id: int, channel_id: int = 1) -> SourceMessage:

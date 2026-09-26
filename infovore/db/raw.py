@@ -66,12 +66,16 @@ def get_backfill_checkpoint(conn: sqlite3.Connection, channel_id: int) -> int | 
     return checkpoint
 
 
+def _set_backfill_checkpoint(conn: sqlite3.Connection, channel_id: int, message_id: int) -> None:
+    conn.execute(
+        "UPDATE channels SET last_backfilled_message_id = ? WHERE id = ?",
+        (message_id, channel_id),
+    )
+
+
 def set_backfill_checkpoint(conn: sqlite3.Connection, channel_id: int, message_id: int) -> None:
     with transaction(conn):
-        conn.execute(
-            "UPDATE channels SET last_backfilled_message_id = ? WHERE id = ?",
-            (message_id, channel_id),
-        )
+        _set_backfill_checkpoint(conn, channel_id, message_id)
 
 
 def _message_core(conn: sqlite3.Connection, message_id: int) -> sqlite3.Row | None:
@@ -145,18 +149,20 @@ def _insert_message(conn: sqlite3.Connection, message: MessageRow) -> None:
     )
 
 
+def _upsert_message(conn: sqlite3.Connection, message: MessageRow) -> UpsertOutcome:
+    existing = _message_core(conn, message.id)
+    if existing is None:
+        _insert_message(conn, message)
+        return UpsertOutcome.INSERTED
+    if existing["content"] == message.content:
+        return UpsertOutcome.UNCHANGED
+    _apply_edit(conn, message.id, existing, message.content, message.edited_at, message.raw_json)
+    return UpsertOutcome.UPDATED
+
+
 def upsert_message(conn: sqlite3.Connection, message: MessageRow) -> UpsertOutcome:
     with transaction(conn):
-        existing = _message_core(conn, message.id)
-        if existing is None:
-            _insert_message(conn, message)
-            return UpsertOutcome.INSERTED
-        if existing["content"] == message.content:
-            return UpsertOutcome.UNCHANGED
-        _apply_edit(
-            conn, message.id, existing, message.content, message.edited_at, message.raw_json
-        )
-        return UpsertOutcome.UPDATED
+        return _upsert_message(conn, message)
 
 
 def mark_edited(
@@ -233,26 +239,30 @@ def message_revisions(conn: sqlite3.Connection, message_id: int) -> list[Message
     ]
 
 
+def _upsert_attachment(conn: sqlite3.Connection, attachment: AttachmentRow) -> None:
+    conn.execute(
+        "INSERT INTO attachments (id, message_id, filename, content_type, size, url,"
+        " sha256, local_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        " ON CONFLICT (id) DO UPDATE SET message_id = excluded.message_id,"
+        " filename = excluded.filename, content_type = excluded.content_type,"
+        " size = excluded.size, url = excluded.url, sha256 = excluded.sha256,"
+        " local_path = excluded.local_path",
+        (
+            attachment.id,
+            attachment.message_id,
+            attachment.filename,
+            attachment.content_type,
+            attachment.size,
+            attachment.url,
+            attachment.sha256,
+            attachment.local_path,
+        ),
+    )
+
+
 def upsert_attachment(conn: sqlite3.Connection, attachment: AttachmentRow) -> None:
     with transaction(conn):
-        conn.execute(
-            "INSERT INTO attachments (id, message_id, filename, content_type, size, url,"
-            " sha256, local_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            " ON CONFLICT (id) DO UPDATE SET message_id = excluded.message_id,"
-            " filename = excluded.filename, content_type = excluded.content_type,"
-            " size = excluded.size, url = excluded.url, sha256 = excluded.sha256,"
-            " local_path = excluded.local_path",
-            (
-                attachment.id,
-                attachment.message_id,
-                attachment.filename,
-                attachment.content_type,
-                attachment.size,
-                attachment.url,
-                attachment.sha256,
-                attachment.local_path,
-            ),
-        )
+        _upsert_attachment(conn, attachment)
 
 
 def attachments_for_messages(
@@ -282,18 +292,22 @@ def attachments_for_messages(
     ]
 
 
+def _set_reaction_count(conn: sqlite3.Connection, message_id: int, emoji: str, count: int) -> None:
+    if count <= 0:
+        conn.execute(
+            "DELETE FROM reactions WHERE message_id = ? AND emoji = ?", (message_id, emoji)
+        )
+        return
+    conn.execute(
+        "INSERT INTO reactions (message_id, emoji, count) VALUES (?, ?, ?)"
+        " ON CONFLICT (message_id, emoji) DO UPDATE SET count = excluded.count",
+        (message_id, emoji, count),
+    )
+
+
 def set_reaction_count(conn: sqlite3.Connection, message_id: int, emoji: str, count: int) -> None:
     with transaction(conn):
-        if count <= 0:
-            conn.execute(
-                "DELETE FROM reactions WHERE message_id = ? AND emoji = ?", (message_id, emoji)
-            )
-            return
-        conn.execute(
-            "INSERT INTO reactions (message_id, emoji, count) VALUES (?, ?, ?)"
-            " ON CONFLICT (message_id, emoji) DO UPDATE SET count = excluded.count",
-            (message_id, emoji, count),
-        )
+        _set_reaction_count(conn, message_id, emoji, count)
 
 
 def reactions_for_messages(
