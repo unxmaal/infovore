@@ -85,8 +85,9 @@ class ClaudeCliBackend:
 
     async def complete(self, request: LLMRequest) -> LLMResult:
         argv = self._build_argv(request)
-        cwd = self._make_cwd()
-        result = await self._runner.run(argv, request.prompt, cwd, self._timeout)
+        self._scratch_dir.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=str(self._scratch_dir)) as cwd:
+            result = await self._runner.run(argv, request.prompt, cwd, self._timeout)
         return self._map_result(result, request)
 
     def _build_argv(self, request: LLMRequest) -> list[str]:
@@ -109,10 +110,6 @@ class ClaudeCliBackend:
         if request.json_schema is not None:
             argv.extend(["--json-schema", json.dumps(request.json_schema, sort_keys=True)])
         return argv
-
-    def _make_cwd(self) -> str:
-        self._scratch_dir.mkdir(parents=True, exist_ok=True)
-        return tempfile.mkdtemp(dir=str(self._scratch_dir))
 
     def _map_result(self, result: ProcessResult, request: LLMRequest) -> LLMResult:
         if result.timed_out:
