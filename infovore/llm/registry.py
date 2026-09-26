@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from typing import Protocol
 
 from infovore.config import ConfigError, Settings, Stage, StageSettings
+from infovore.llm.claude_cli import ClaudeCliFactory
 from infovore.llm.fake import FakeBackend
 from infovore.llm.protocol import LLMBackend, LLMRequest, LLMResult
 
@@ -71,4 +72,5 @@ class Registry:
 def default_registry() -> Registry:
     registry = Registry()
     registry.register(FakeBackendFactory())
+    registry.register(ClaudeCliFactory())
     return registry

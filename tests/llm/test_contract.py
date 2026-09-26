@@ -1,9 +1,15 @@
-from collections.abc import Mapping
+import json
+import tempfile
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Protocol
 
 import pytest
 
+from infovore.llm.claude_cli import ClaudeCliBackend
 from infovore.llm.fake import FakeBackend
+from infovore.llm.process import ProcessResult
 from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
 
 
@@ -24,7 +30,56 @@ class FakeHarness:
         return FakeBackend.scripted([LLMResult.failed(kind, "boom", retry_after)])
 
 
-HARNESSES: list[BackendHarness] = [FakeHarness()]
+class _ScriptedRunner:
+    def __init__(self, result: ProcessResult) -> None:
+        self._result = result
+
+    async def run(self, argv: Sequence[str], stdin: str, cwd: str, timeout: float) -> ProcessResult:
+        return self._result
+
+
+def _ok(**fields: object) -> ProcessResult:
+    return ProcessResult(exit_code=0, stdout=json.dumps(fields), stderr="", timed_out=False)
+
+
+def _failure_payload(kind: ErrorKind, retry_after: float | None) -> ProcessResult:
+    if kind is ErrorKind.TRANSIENT:
+        return _ok(is_error=True, api_error_status=529, result="overloaded_error")
+    if kind is ErrorKind.USAGE_LIMIT:
+        if retry_after is None:
+            return _ok(is_error=True, api_error_status=429, result="usage limit reached")
+        target = datetime.now(UTC) + timedelta(seconds=retry_after)
+        return _ok(
+            is_error=True,
+            api_error_status=429,
+            result=f"usage limit reached, resets at {target.isoformat()}",
+        )
+    return _ok(is_error=True, result="something odd happened")
+
+
+class ClaudeCliHarness:
+    def structured(self, data: Mapping[str, object], model: str) -> LLMBackend:
+        payload = _ok(structured_output=dict(data), modelUsage={model: {"outputTokens": 1}})
+        return self._backend(payload)
+
+    def text(self, text: str, model: str) -> LLMBackend:
+        payload = _ok(result=text, modelUsage={model: {"outputTokens": 1}})
+        return self._backend(payload)
+
+    def failing(self, kind: ErrorKind, retry_after: float | None) -> LLMBackend:
+        return self._backend(_failure_payload(kind, retry_after))
+
+    def _backend(self, result: ProcessResult) -> LLMBackend:
+        return ClaudeCliBackend(
+            _ScriptedRunner(result),
+            "model-x",
+            timeout=30.0,
+            scratch_dir=Path(tempfile.mkdtemp()),
+            concurrency=2,
+        )
+
+
+HARNESSES: list[BackendHarness] = [FakeHarness(), ClaudeCliHarness()]
 
 SCHEMA: Mapping[str, object] = {
     "type": "object",
