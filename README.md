@@ -98,6 +98,62 @@ Per lifecycle rule 5: when `sync_opt_outs` adds users, it also calls `db.claims.
 
 ## Consuming the database
 
+The SQLite file is the product. Read it directly; open it read-only (`file:infovore.db?mode=ro`) so readers never block the writer (the database runs in WAL mode).
+
+### The `lore` view
+
+`lore` is the contract. It contains only **current, net-new** claims:
+
+- from `live` extraction runs (trial runs are for prompt iteration and never appear);
+- not retracted (source messages deleted, or every source author opted out);
+- not superseded by a newer live, non-retracted correction;
+- novelty `unknown`, `partial`, or `contradicts` — claims the closed-book probe found the model did **not** already know. `known` and not-yet-probed (`unprobed`) claims are excluded.
+
+| column | meaning |
+| --- | --- |
+| `claim_id` | stable id of the claim |
+| `subject` | what the claim is about (e.g. `Octane2`, `IP35`) |
+| `statement` | the fact itself |
+| `kind` | `fact`, `correction`, `procedure`, or `reference` |
+| `confidence` | extractor confidence, 0–1 |
+| `novelty` | `unknown` (model had no idea), `partial`, or `contradicts` (model confidently believed something else — the most valuable) |
+| `permalink` | Discord link to the exchange the claim came from |
+| `source_message_ids` | comma-separated Discord message ids the claim cites, ascending |
+| `channel_id` | channel or thread the exchange belongs to |
+| `extracted_at` | when the extraction run started (ISO-8601 UTC) |
+| `supersedes_claim_id` | the claim this one corrects, if any |
+
+### Example queries
+
+What do we know about a subject:
+
+```sql
+SELECT subject, statement, novelty, permalink
+FROM lore
+WHERE subject LIKE '%Octane%'
+ORDER BY novelty = 'contradicts' DESC, confidence DESC;
+```
+
+Full-text search (the `claims_fts` index keeps part numbers, versions and paths such as `030-1234-001`, `6.5.22`, `/usr/sbin/inst` as single tokens; quote each term):
+
+```sql
+SELECT lore.subject, lore.statement, lore.permalink
+FROM claims_fts
+JOIN lore ON lore.claim_id = claims_fts.rowid
+WHERE claims_fts MATCH '"030-1234-001" OR "Octane2"'
+ORDER BY bm25(claims_fts, 2.0, 1.0);
+```
+
+Where the model is confidently wrong:
+
+```sql
+SELECT subject, statement, permalink FROM lore WHERE novelty = 'contradicts';
+```
+
+### Stability
+
+`PRAGMA user_version` holds the schema version (the latest applied migration). Columns of `lore` are only ever added; renaming or removing one bumps the version and is called out here.
+
 ## Deployment
 
 ## Development workflow
