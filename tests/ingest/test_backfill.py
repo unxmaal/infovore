@@ -464,6 +464,115 @@ async def test_reprocessing_same_content_after_checkpoint_reset_is_unchanged(
     assert report.channels[1].inserted == 0
 
 
+def opt_out_user(conn: sqlite3.Connection, user_id: int) -> None:
+    conn.execute(
+        "INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, NOW.isoformat())
+    )
+
+
+async def test_opted_out_author_messages_are_stored_redacted(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    opt_out_user(conn, 5)
+    attachment = SourceAttachment(
+        id=1, filename="a.png", content_type="image/png", size=10, url="https://x/a.png"
+    )
+    source = FakeDiscordSource(
+        channels=[make_channel(1)],
+        messages=[
+            SourceMessage(
+                id=1,
+                channel_id=1,
+                guild_id=GUILD_ID,
+                author_id=5,
+                author_name="alice",
+                author_is_bot=False,
+                is_system=False,
+                created_at=NOW + timedelta(minutes=1),
+                edited_at=None,
+                content="secret plans",
+                reply_to_id=None,
+                thread_id=None,
+                attachments=(attachment,),
+                reactions=(SourceReaction("👍", 2),),
+                raw={"content": "secret plans"},
+            ),
+            make_message(2, channel_id=1, content="not opted out"),
+        ],
+    )
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert report.channels[1].inserted == 2
+    redacted = get_message(conn, 1)
+    assert redacted is not None
+    assert redacted.content == "[redacted]"
+    assert redacted.author_name_at_time == "[redacted]"
+    assert redacted.raw_json == "{}"
+    assert attachments_for_messages(conn, [1]) == []
+    assert reactions_for_messages(conn, [1])[0].count == 2
+    kept = get_message(conn, 2)
+    assert kept is not None
+    assert kept.content == "not opted out"
+
+
+async def test_rerun_never_unredacts_opted_out_messages(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    opt_out_user(conn, 5)
+    source = FakeDiscordSource(
+        channels=[make_channel(1)],
+        messages=[
+            SourceMessage(
+                id=1,
+                channel_id=1,
+                guild_id=GUILD_ID,
+                author_id=5,
+                author_name="alice",
+                author_is_bot=False,
+                is_system=False,
+                created_at=NOW + timedelta(minutes=1),
+                edited_at=None,
+                content="secret plans",
+                reply_to_id=None,
+                thread_id=None,
+                attachments=(),
+                reactions=(),
+                raw={},
+            ),
+        ],
+    )
+    await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    from infovore.db.raw import set_backfill_checkpoint
+
+    set_backfill_checkpoint(conn, 1, 0)
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert report.channels[1].unchanged == 1
+    redacted = get_message(conn, 1)
+    assert redacted is not None
+    assert redacted.content == "[redacted]"
+
+
 async def test_rate_limit_exhausting_attempts_fails_channel(tmp_path: Path) -> None:
     conn = make_conn(tmp_path)
     source = FakeDiscordSource(
