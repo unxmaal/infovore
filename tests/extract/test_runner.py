@@ -20,14 +20,17 @@ from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.extract.fake import MarkerExtractor
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION, permalink
 from infovore.extract.protocol import (
-    ExtractedClaim,
     ExtractionOutcome,
     ExtractionRequest,
     Failure,
     FailureKind,
 )
-from infovore.extract.runner import PromptNotPromotedError, select_trial_sample
-from infovore.extract.runner import run_extraction as run_extraction
+from infovore.extract.runner import (
+    ExtractionReport,
+    PromptNotPromotedError,
+    run_extraction,
+    select_trial_sample,
+)
 from infovore.rows import (
     ClaimKind,
     ExchangeRow,
@@ -125,9 +128,7 @@ def seed_exchange(
 
 
 def opt_out(conn: sqlite3.Connection, user_id: int) -> None:
-    conn.execute(
-        "INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, NOW.isoformat())
-    )
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, NOW.isoformat()))
 
 
 class SequencedExtractor:
@@ -186,8 +187,9 @@ def test_live_requires_promotion(tmp_path: Path) -> None:
 def test_success_records_claims_with_provenance_and_permalink(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content="FACT: Octane2 :: needs a jumper")])
+    assert exchange.id is not None
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -213,6 +215,7 @@ def test_success_records_claims_with_provenance_and_permalink(tmp_path: Path) ->
     assert claim.subject == "Octane2"
     assert claim.statement == "needs a jumper"
     assert claim.permalink == permalink(GUILD_ID, exchange.channel_id, exchange.first_message_id)
+    assert claim.id is not None
     assert claim_source_ids(conn, claim.id) == [1]
     updated = get_exchange(conn, exchange.id)
     assert updated is not None
@@ -222,8 +225,9 @@ def test_success_records_claims_with_provenance_and_permalink(tmp_path: Path) ->
 def test_zero_claim_exchange_is_done(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content="just chatting, nothing to see")])
+    assert exchange.id is not None
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -254,8 +258,9 @@ def test_each_failure_kind_records_failed_run_and_increments_retry(
 ) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content=f"FAIL: {kind.value}")])
+    assert exchange.id is not None
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -265,7 +270,7 @@ def test_each_failure_kind_records_failed_run_and_increments_retry(
             mode=RunMode.LIVE,
             model_label="model-x",
             batch_size=10,
-            max_retries=5,
+            max_retries=1,
             concurrency=2,
         )
 
@@ -275,7 +280,7 @@ def test_each_failure_kind_records_failed_run_and_increments_retry(
     assert report.succeeded == 0
     updated = get_exchange(conn, exchange.id)
     assert updated is not None
-    assert updated.extraction_status is ExtractionStatus.PENDING
+    assert updated.extraction_status is ExtractionStatus.FAILED
     assert updated.retry_count == 1
     assert updated.last_error is not None
     row = conn.execute(
@@ -305,7 +310,7 @@ def test_usage_limit_pauses_then_succeeds(tmp_path: Path) -> None:
     )
     sleeper = RecordingSleeper()
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -347,7 +352,7 @@ def test_usage_limit_defaults_retry_after_to_300(tmp_path: Path) -> None:
     )
     sleeper = RecordingSleeper()
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -369,8 +374,9 @@ def test_usage_limit_defaults_retry_after_to_300(tmp_path: Path) -> None:
 def test_retries_until_failed_after_max_retries(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content="FAIL: transient")])
+    assert exchange.id is not None
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -399,6 +405,7 @@ def test_stale_reextraction_retracts_previous_live_claims(tmp_path: Path) -> Non
     exchange = seed_exchange(
         conn, [a_message(1, content="FACT: Octane2 :: new fact")], status=ExtractionStatus.STALE
     )
+    assert exchange.id is not None
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
     recorded = record_run(
         conn,
@@ -431,7 +438,7 @@ def test_stale_reextraction_retracts_previous_live_claims(tmp_path: Path) -> Non
     )
     old_claim_id = recorded.claim_ids[0]
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -462,8 +469,10 @@ def test_stale_reextraction_retracts_previous_live_claims(tmp_path: Path) -> Non
 def test_trial_mode_success_never_mutates_status_or_retries(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content="FACT: Octane2 :: a fact")])
+    assert exchange.id is not None
+    exchange_id = exchange.id
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         return await run_extraction(
             conn,
             MarkerExtractor(),
@@ -474,7 +483,7 @@ def test_trial_mode_success_never_mutates_status_or_retries(tmp_path: Path) -> N
             batch_size=10,
             max_retries=3,
             concurrency=2,
-            exchange_ids=[exchange.id],
+            exchange_ids=[exchange_id],
         )
 
     report = asyncio.run(go())
@@ -489,8 +498,10 @@ def test_trial_mode_success_never_mutates_status_or_retries(tmp_path: Path) -> N
 def test_trial_mode_failure_never_mutates_status_or_retries(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = seed_exchange(conn, [a_message(1, content="FAIL: transient")])
+    assert exchange.id is not None
+    exchange_id = exchange.id
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         return await run_extraction(
             conn,
             MarkerExtractor(),
@@ -501,7 +512,7 @@ def test_trial_mode_failure_never_mutates_status_or_retries(tmp_path: Path) -> N
             batch_size=10,
             max_retries=1,
             concurrency=2,
-            exchange_ids=[exchange.id],
+            exchange_ids=[exchange_id],
         )
 
     report = asyncio.run(go())
@@ -518,6 +529,8 @@ def test_trial_mode_never_retracts_stale_exchange_claims(tmp_path: Path) -> None
     exchange = seed_exchange(
         conn, [a_message(1, content="FACT: Octane2 :: new fact")], status=ExtractionStatus.STALE
     )
+    assert exchange.id is not None
+    exchange_id = exchange.id
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
     recorded = record_run(
         conn,
@@ -550,7 +563,7 @@ def test_trial_mode_never_retracts_stale_exchange_claims(tmp_path: Path) -> None
     )
     old_claim_id = recorded.claim_ids[0]
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         return await run_extraction(
             conn,
             MarkerExtractor(),
@@ -561,7 +574,7 @@ def test_trial_mode_never_retracts_stale_exchange_claims(tmp_path: Path) -> None
             batch_size=10,
             max_retries=3,
             concurrency=2,
-            exchange_ids=[exchange.id],
+            exchange_ids=[exchange_id],
         )
 
     asyncio.run(go())
@@ -580,8 +593,9 @@ def test_opted_out_only_exchange_is_skipped_without_calling_extractor_in_live_mo
     conn = db(tmp_path)
     opt_out(conn, 99)
     exchange = seed_exchange(conn, [a_message(1, author_id=99, content="FACT: X :: y")])
+    assert exchange.id is not None
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -611,8 +625,10 @@ def test_opted_out_only_exchange_is_still_processed_in_trial_mode(tmp_path: Path
     conn = db(tmp_path)
     opt_out(conn, 99)
     exchange = seed_exchange(conn, [a_message(1, author_id=99, content="FACT: X :: y")])
+    assert exchange.id is not None
+    exchange_id = exchange.id
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         return await run_extraction(
             conn,
             MarkerExtractor(),
@@ -623,7 +639,7 @@ def test_opted_out_only_exchange_is_still_processed_in_trial_mode(tmp_path: Path
             batch_size=10,
             max_retries=3,
             concurrency=2,
-            exchange_ids=[exchange.id],
+            exchange_ids=[exchange_id],
         )
 
     report = asyncio.run(go())
@@ -638,7 +654,7 @@ def test_batch_loop_drains_across_multiple_batches(tmp_path: Path) -> None:
     for i in range(1, 4):
         seed_exchange(conn, [a_message(i, channel_id=i, content=f"FACT: s{i} :: v{i}")])
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -665,7 +681,7 @@ def test_concurrency_never_exceeds_the_limit(tmp_path: Path) -> None:
         seed_exchange(conn, [a_message(i, channel_id=i)])
     extractor = ConcurrencyTrackingExtractor()
 
-    async def go() -> None:
+    async def go() -> ExtractionReport:
         await promote(conn)
         return await run_extraction(
             conn,
@@ -730,10 +746,41 @@ def test_select_trial_sample_stratifies_across_channels(tmp_path: Path) -> None:
 
     sample = select_trial_sample(conn, 4, seed=0)
 
-    exchanges = {row["id"]: row["channel_id"] for row in conn.execute("SELECT id, channel_id FROM exchanges")}
+    exchanges = {
+        row["id"]: row["channel_id"] for row in conn.execute("SELECT id, channel_id FROM exchanges")
+    }
     sampled_channels = {exchanges[i] for i in sample}
     assert sampled_channels == {1, 2}
     assert len(sample) == 4
+
+
+def test_select_trial_sample_covers_all_size_buckets(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)])
+    seed_exchange(conn, [a_message(i, channel_id=2) for i in range(10, 13)])
+    seed_exchange(conn, [a_message(i, channel_id=3) for i in range(20, 30)])
+    seed_exchange(conn, [a_message(i, channel_id=4) for i in range(40, 62)])
+
+    sample = select_trial_sample(conn, 3, seed=0)
+
+    assert len(sample) == 3
+
+
+def test_select_trial_sample_skips_an_exhausted_stratum_in_round_robin(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)])
+    for message_id in range(2, 7):
+        seed_exchange(conn, [a_message(message_id, channel_id=2)])
+
+    sample = select_trial_sample(conn, 3, seed=0)
+
+    exchanges = {
+        row["id"]: row["channel_id"] for row in conn.execute("SELECT id, channel_id FROM exchanges")
+    }
+    channel_counts: dict[int, int] = {}
+    for exchange_id in sample:
+        channel_counts[exchanges[exchange_id]] = channel_counts.get(exchanges[exchange_id], 0) + 1
+    assert channel_counts == {1: 1, 2: 2}
 
 
 def test_select_trial_sample_different_seeds_can_differ(tmp_path: Path) -> None:

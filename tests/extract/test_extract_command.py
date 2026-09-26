@@ -9,7 +9,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.fake import FakeBackend
-from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
+from infovore.llm.protocol import ErrorKind, LLMBackend, LLMResult
 from infovore.llm.registry import Registry
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
 
@@ -123,6 +123,7 @@ def test_extract_live_mode_success_end_to_end(tmp_path: Path) -> None:
 
 def test_extract_live_mode_failure_exits_1(tmp_path: Path) -> None:
     env = environment(tmp_path)
+    env["INFOVORE_MAX_RETRIES"] = "1"
     seed_pending_exchange(env["INFOVORE_DB_PATH"])
     registry = registry_with([HEALTH_OK, LLMResult.failed(ErrorKind.FATAL, "boom", None)])
 
