@@ -16,6 +16,8 @@ from infovore.db.raw import (
     mark_deleted,
     mark_edited,
     message_revisions,
+    messages_by_ids,
+    opted_out_user_ids,
     reactions_for_messages,
     set_backfill_checkpoint,
     set_reaction_count,
@@ -479,3 +481,31 @@ def test_latest_exchange_for_thread_ignores_other_threads(conn: sqlite3.Connecti
         conn, make_exchange_row("h6", channel_id=1, thread_id=88, first_message_id=1), [1]
     )
     assert latest_exchange_for_thread(conn, 77) is None
+
+
+def test_messages_by_ids_returns_empty_list_for_empty_ids(conn: sqlite3.Connection) -> None:
+    assert messages_by_ids(conn, []) == []
+
+
+def test_messages_by_ids_preserves_requested_order(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message(message_id=1))
+    upsert_message(conn, make_message(message_id=2))
+    upsert_message(conn, make_message(message_id=3))
+    fetched = messages_by_ids(conn, [3, 1, 2])
+    assert [m.id for m in fetched] == [3, 1, 2]
+
+
+def test_messages_by_ids_skips_ids_that_do_not_exist(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message(message_id=1))
+    fetched = messages_by_ids(conn, [1, 999])
+    assert [m.id for m in fetched] == [1]
+
+
+def test_opted_out_user_ids_empty_when_none(conn: sqlite3.Connection) -> None:
+    assert opted_out_user_ids(conn) == frozenset()
+
+
+def test_opted_out_user_ids_returns_all_opted_out_users(conn: sqlite3.Connection) -> None:
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (42, '2026-01-01T00:00:00+00:00')")
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (7, '2026-01-01T00:00:00+00:00')")
+    assert opted_out_user_ids(conn) == frozenset({42, 7})
