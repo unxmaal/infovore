@@ -106,7 +106,7 @@ The user prompt (`RenderedPrompt.prompt`) lays out, in order:
 - `CHANNEL:` the channel name (falls back to the numeric channel id when the channel is unknown) and `PERMALINK:` the exchange's permalink, `https://discord.com/channels/{guild_id}/{channel_id}/{first_message_id}` (built by `infovore.extract.prompt.permalink`).
 - `CONTEXT (do not cite):`, present only when the exchange has a `parent_exchange_id` — the last `context_size` messages of the parent exchange, read-only and never citable.
 - `EXCHANGE:` — every message of the exchange itself, each rendered as `[id] author @ ISO-8601 timestamp:` followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
-- `RELATED EXISTING CLAIMS:` — up to `related_limit` claims from `claims_fts` matching the exchange's own message contents, each as `[claim:<id>] (<kind>) <subject>: <statement>`, or the literal `none` when there are no matches.
+- `RELATED EXISTING CLAIMS:` — up to `related_limit` claims from `claims_fts` matching the exchange's own message contents (excluding any message authored by an opted-out user, so their words never influence what is sent to the model), each as `[claim:<id>] (<kind>) <subject>: <statement>`, or the literal `none` when there are no matches.
 
 Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message id is kept so citations and ordering stay consistent. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
 
