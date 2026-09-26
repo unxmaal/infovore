@@ -16,6 +16,7 @@ from infovore.db.claims import (
     claims_for_runs_needing_probe,
     claims_needing_probe,
     get_claim,
+    get_run,
     live_prompt_version,
     promote_prompt_version,
     record_run,
@@ -142,6 +143,30 @@ def test_live_prompt_version_is_most_recently_promoted(tmp_path: Path) -> None:
     assert live_prompt_version(conn) == "v1"
     promote_prompt_version(conn, "v2", NOW + timedelta(seconds=1))
     assert live_prompt_version(conn) == "v2"
+
+
+def test_get_run_returns_none_for_unknown_id(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    assert get_run(conn, 999) is None
+
+
+def test_get_run_returns_the_recorded_run(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    result = record_run(conn, a_run(), [a_claim()])
+    run = get_run(conn, result.run_id)
+    assert run is not None
+    assert run.id == result.run_id
+    assert run.exchange_id == 1
+    assert run.model == "m"
+    assert run.prompt_version == "v1"
+    assert run.mode is RunMode.LIVE
+    assert run.outcome is RunOutcome.OK
+    assert run.started_at == NOW
+    assert run.finished_at == NOW
+    assert run.input_tokens == 1
+    assert run.output_tokens == 1
+    assert run.error is None
 
 
 def test_record_run_inserts_run_and_claims_with_sources(tmp_path: Path) -> None:
