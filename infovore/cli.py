@@ -216,6 +216,11 @@ class BackfillCommand:
 
 
 async def stage_backend(context: AppContext, stage: Stage) -> LLMBackend:
+    stage_settings = context.settings.stages[stage]
+    _say(
+        context.stdout,
+        f"checking {stage.value} backend ({stage_settings.backend} / {stage_settings.model})...",
+    )
     backend = context.registry.build_stage(context.settings, stage)
     health = await context.registry.health_check({stage: backend})
     problem = health[stage]

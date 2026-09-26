@@ -218,9 +218,11 @@ def test_probe_command_streams_flushed_progress_lines(tmp_path: Path) -> None:
     )
     assert code == ExitCode.OK
     lines = out.getvalue().splitlines()
-    assert lines[0] == "probe: 1 candidates"
-    assert lines[1] == f"claim {claim_id}: known"
-    assert out.flushes_at[:2] == [1, 2]
+    assert lines[0] == "checking probe backend (scripted / sonnet)..."
+    assert lines[1] == "checking judge backend (scripted / haiku)..."
+    assert lines[2] == "probe: 1 candidates"
+    assert lines[3] == f"claim {claim_id}: known"
+    assert out.flushes_at[:4] == [1, 2, 3, 4]
 
 
 def test_probe_command_streams_failed_progress_line(tmp_path: Path) -> None:
@@ -237,8 +239,10 @@ def test_probe_command_streams_failed_progress_line(tmp_path: Path) -> None:
     )
     assert code == ExitCode.FAILURE
     lines = out.getvalue().splitlines()
-    assert lines[0] == "probe: 1 candidates"
-    assert lines[1] == f"claim {claim_id}: failed"
+    assert lines[0] == "checking probe backend (scripted / sonnet)..."
+    assert lines[1] == "checking judge backend (scripted / haiku)..."
+    assert lines[2] == "probe: 1 candidates"
+    assert lines[3] == f"claim {claim_id}: failed"
 
 
 def test_probe_command_streams_paused_then_probed_progress_lines(tmp_path: Path) -> None:
@@ -282,9 +286,11 @@ def test_probe_command_streams_paused_then_probed_progress_lines(tmp_path: Path)
 
     assert code == ExitCode.OK
     lines = out.getvalue().splitlines()
-    assert lines[0] == "probe: 1 candidates"
-    assert lines[1] == f"claim {claim_id}: paused"
-    assert lines[2] == f"claim {claim_id}: known"
+    assert lines[0] == "checking probe backend (scripted / sonnet)..."
+    assert lines[1] == "checking judge backend (scripted / haiku)..."
+    assert lines[2] == "probe: 1 candidates"
+    assert lines[3] == f"claim {claim_id}: paused"
+    assert lines[4] == f"claim {claim_id}: known"
 
 
 def test_probe_prints_checking_backend_lines_before_each_stage_health_check(

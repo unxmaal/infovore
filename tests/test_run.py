@@ -583,12 +583,15 @@ def test_run_command_once_flag_streams_flushed_progress_lines(tmp_path: Path) ->
     )
     assert code == ExitCode.OK
     lines = out.getvalue().splitlines()
-    assert lines[0] == "opening discord source..."
-    assert lines[1] == "cycle: sync-optouts"
-    assert lines[2] == "cycle: chunk"
-    assert lines[3] == "cycle: extract"
-    assert lines[4] == "cycle: probe"
-    assert out.flushes_at[:5] == [1, 2, 3, 4, 5]
+    assert lines[0] == "checking extract backend (fake / sonnet)..."
+    assert lines[1] == "checking probe backend (fake / sonnet)..."
+    assert lines[2] == "checking judge backend (fake / haiku)..."
+    assert lines[3] == "opening discord source..."
+    assert lines[4] == "cycle: sync-optouts"
+    assert lines[5] == "cycle: chunk"
+    assert lines[6] == "cycle: extract"
+    assert lines[7] == "cycle: probe"
+    assert out.flushes_at[:8] == [1, 2, 3, 4, 5, 6, 7, 8]
 
 
 def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: Path) -> None:

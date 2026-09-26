@@ -220,9 +220,10 @@ def test_extract_live_mode_streams_flushed_progress_lines(tmp_path: Path) -> Non
     )
     assert code == ExitCode.OK
     lines = out.getvalue().splitlines()
-    assert lines[0] == "extract: live mode, draining queued exchanges"
-    assert lines[1] == "exchange 1: 1 claims (1 done)"
-    assert out.flushes_at[:2] == [1, 2]
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == "exchange 1: 1 claims (1 done)"
+    assert out.flushes_at[:3] == [1, 2, 3]
 
 
 def test_extract_trial_mode_streams_known_total_counter(tmp_path: Path) -> None:
@@ -236,8 +237,9 @@ def test_extract_trial_mode_streams_known_total_counter(tmp_path: Path) -> None:
 
     assert code == ExitCode.OK
     lines = out.splitlines()
-    assert lines[0] == "extract: trial mode, 1 exchanges queued"
-    assert lines[1] == f"exchange {exchange_id}: 1 claims (1/1)"
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: trial mode, 1 exchanges queued"
+    assert lines[2] == f"exchange {exchange_id}: 1 claims (1/1)"
 
 
 def test_extract_streams_skipped_progress_line_for_opted_out_exchange(tmp_path: Path) -> None:
@@ -280,8 +282,9 @@ def test_extract_streams_skipped_progress_line_for_opted_out_exchange(tmp_path: 
 
     assert code == ExitCode.OK
     lines = out.splitlines()
-    assert lines[0] == "extract: live mode, draining queued exchanges"
-    assert lines[1] == f"exchange {exchange_id}: skipped (1 done)"
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == f"exchange {exchange_id}: skipped (1 done)"
 
 
 def test_extract_streams_failed_progress_line(tmp_path: Path) -> None:
@@ -294,8 +297,9 @@ def test_extract_streams_failed_progress_line(tmp_path: Path) -> None:
 
     assert code == ExitCode.FAILURE
     lines = out.splitlines()
-    assert lines[0] == "extract: live mode, draining queued exchanges"
-    assert lines[1] == f"exchange {exchange_id}: failed: fatal (1 done)"
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == f"exchange {exchange_id}: failed: fatal (1 done)"
 
 
 def test_extract_streams_paused_then_claimed_progress_lines(tmp_path: Path) -> None:
@@ -327,9 +331,10 @@ def test_extract_streams_paused_then_claimed_progress_lines(tmp_path: Path) -> N
 
     assert code == ExitCode.OK
     lines = out.splitlines()
-    assert lines[0] == "extract: live mode, draining queued exchanges"
-    assert lines[1] == f"exchange {exchange_id}: paused 0.01s (usage limit) (0 done)"
-    assert lines[2] == f"exchange {exchange_id}: 1 claims (1 done)"
+    assert lines[0] == "checking extract backend (scripted / sonnet)..."
+    assert lines[1] == "extract: live mode, draining queued exchanges"
+    assert lines[2] == f"exchange {exchange_id}: paused 0.01s (usage limit) (0 done)"
+    assert lines[3] == f"exchange {exchange_id}: 1 claims (1 done)"
 
 
 def test_extract_prints_checking_backend_line_before_health_check(tmp_path: Path) -> None:
