@@ -3,7 +3,7 @@ import asyncio
 import os
 import sqlite3
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
@@ -14,6 +14,8 @@ from infovore.config import ConfigError, Settings, settings_from_environment
 from infovore.db.connection import migrate, open_database
 from infovore.db.status import collect_status
 from infovore.llm.registry import Registry, default_registry
+from infovore.privacy.optout import sync_opt_outs
+from infovore.source.protocol import DiscordSource
 from infovore.timing import AsyncioSleeper, Clock, Sleeper, SystemClock
 
 
@@ -36,6 +38,7 @@ class AppContext:
     clock: Clock
     sleeper: Sleeper
     stdout: TextIO
+    source_factory: Callable[[Settings], DiscordSource]
 
 
 class Command(Protocol):
@@ -83,10 +86,38 @@ class StatusCommand:
         return ExitCode.OK
 
 
+class SyncOptOutsCommand:
+    name = "sync-optouts"
+    help = "sync the opt-out role and redact newly opted-out users' history"
+
+    def configure(self, parser: argparse.ArgumentParser) -> None:
+        return None
+
+    async def run(self, context: AppContext, args: argparse.Namespace) -> int:
+        source = context.source_factory(context.settings)
+        report = await sync_opt_outs(
+            context.conn,
+            source,
+            context.settings.guild_id,
+            context.settings.opt_out_role_name,
+            context.clock,
+        )
+        context.stdout.write(
+            f"added={len(report.added)} removed={len(report.removed)}"
+            f" redacted_messages={report.redacted_messages}"
+            f" retracted_claims={len(report.retracted_claims)}\n"
+        )
+        return ExitCode.OK
+
+
+def _default_source_factory(settings: Settings) -> DiscordSource:
+    raise BackendUnavailableError("discord source not configured")
+
+
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
 
-    return [StatusCommand(), ChunkCommand()]
+    return [StatusCommand(), SyncOptOutsCommand(), ChunkCommand()]
 
 
 class _Parser(argparse.ArgumentParser):
@@ -120,6 +151,7 @@ def main(
     stdout: TextIO = sys.stdout,
     stderr: TextIO = sys.stderr,
     commands: Sequence[Command] | None = None,
+    source_factory: Callable[[Settings], DiscordSource] | None = None,
 ) -> int:
     available = list(commands) if commands is not None else builtin_commands()
     try:
@@ -139,7 +171,13 @@ def main(
     try:
         migrate(conn)
         context = AppContext(
-            settings, conn, default_registry(), SystemClock(), AsyncioSleeper(), stdout
+            settings,
+            conn,
+            default_registry(),
+            SystemClock(),
+            AsyncioSleeper(),
+            stdout,
+            source_factory if source_factory is not None else _default_source_factory,
         )
         command = next(command for command in available if command.name == args.command)
         return asyncio.run(command.run(context, args))

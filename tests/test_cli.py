@@ -1,11 +1,14 @@
 import argparse
 import io
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
 from infovore import cli
 from infovore.cli import AppContext, BackendUnavailableError, Command, ExitCode, main
+from infovore.config import Settings
+from infovore.source.protocol import DiscordSource
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -19,10 +22,21 @@ def environment(tmp_path: Path) -> dict[str, str]:
 
 
 def run(
-    argv: list[str], env: dict[str, str], commands: list[Command] | None = None
+    argv: list[str],
+    env: dict[str, str],
+    commands: list[Command] | None = None,
+    source_factory: Callable[[Settings], DiscordSource] | None = None,
 ) -> tuple[int, str, str]:
     out, err = io.StringIO(), io.StringIO()
-    code = main(argv, environ=env, dotenv_path=None, stdout=out, stderr=err, commands=commands)
+    code = main(
+        argv,
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=err,
+        commands=commands,
+        source_factory=source_factory,
+    )
     return code, out.getvalue(), err.getvalue()
 
 
@@ -148,3 +162,30 @@ def test_console_entrypoint_exits_with_mains_code(
 
 def test_builtin_commands_include_status() -> None:
     assert "status" in [command.name for command in cli.builtin_commands()]
+
+
+def test_builtin_commands_include_sync_optouts() -> None:
+    assert "sync-optouts" in [command.name for command in cli.builtin_commands()]
+
+
+def test_sync_optouts_without_source_factory_exits_backend_code(tmp_path: Path) -> None:
+    code, _, err = run(["sync-optouts"], environment(tmp_path))
+    assert code == ExitCode.BACKEND
+    assert "discord source not configured" in err
+
+
+def test_sync_optouts_command_reports_results(tmp_path: Path) -> None:
+    from infovore.source.fake import FakeDiscordSource
+
+    fake_source = FakeDiscordSource(role_members={9: {"no-archive": [11]}})
+
+    def factory(settings: Settings) -> DiscordSource:
+        assert settings.guild_id == 9
+        return fake_source
+
+    code, out, _ = run(["sync-optouts"], environment(tmp_path), source_factory=factory)
+    assert code == ExitCode.OK
+    assert "added=1" in out
+    assert "removed=0" in out
+    assert "redacted_messages=0" in out
+    assert "retracted_claims=0" in out
