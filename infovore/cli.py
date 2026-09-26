@@ -115,7 +115,9 @@ def _default_source_factory(settings: Settings) -> DiscordSource:
 
 
 def builtin_commands() -> list[Command]:
-    return [StatusCommand(), SyncOptOutsCommand()]
+    from infovore.chunk.command import ChunkCommand
+
+    return [StatusCommand(), SyncOptOutsCommand(), ChunkCommand()]
 
 
 class _Parser(argparse.ArgumentParser):
