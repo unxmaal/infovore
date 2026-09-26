@@ -1,10 +1,17 @@
 import sqlite3
+from collections.abc import Sequence
 from datetime import datetime
 from enum import StrEnum
 
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
-from infovore.rows import ChannelKind, ChannelRow, MessageRevisionRow, MessageRow
+from infovore.rows import (
+    AttachmentRow,
+    ChannelKind,
+    ChannelRow,
+    MessageRevisionRow,
+    MessageRow,
+)
 
 
 class UpsertOutcome(StrEnum):
@@ -220,6 +227,55 @@ def message_revisions(conn: sqlite3.Connection, message_id: int) -> list[Message
             content=row["content"],
             edited_at=from_db_time(row["edited_at"]),
             raw_json=row["raw_json"],
+        )
+        for row in rows
+    ]
+
+
+def upsert_attachment(conn: sqlite3.Connection, attachment: AttachmentRow) -> None:
+    with transaction(conn):
+        conn.execute(
+            "INSERT INTO attachments (id, message_id, filename, content_type, size, url,"
+            " sha256, local_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            " ON CONFLICT (id) DO UPDATE SET message_id = excluded.message_id,"
+            " filename = excluded.filename, content_type = excluded.content_type,"
+            " size = excluded.size, url = excluded.url, sha256 = excluded.sha256,"
+            " local_path = excluded.local_path",
+            (
+                attachment.id,
+                attachment.message_id,
+                attachment.filename,
+                attachment.content_type,
+                attachment.size,
+                attachment.url,
+                attachment.sha256,
+                attachment.local_path,
+            ),
+        )
+
+
+def attachments_for_messages(
+    conn: sqlite3.Connection, message_ids: Sequence[int]
+) -> list[AttachmentRow]:
+    ids = list(message_ids)
+    if not ids:
+        return []
+    placeholders = ",".join("?" for _ in ids)
+    rows = conn.execute(
+        "SELECT id, message_id, filename, content_type, size, url, sha256, local_path"
+        f" FROM attachments WHERE message_id IN ({placeholders}) ORDER BY message_id, id",
+        ids,
+    ).fetchall()
+    return [
+        AttachmentRow(
+            id=row["id"],
+            message_id=row["message_id"],
+            filename=row["filename"],
+            content_type=row["content_type"],
+            size=row["size"],
+            url=row["url"],
+            sha256=row["sha256"],
+            local_path=row["local_path"],
         )
         for row in rows
     ]
