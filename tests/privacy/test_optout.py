@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from infovore.db.claims import NewClaim, get_claim, record_run
+from infovore.db.claims import NewClaim, get_claim, record_run, register_prompt_version
 from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.db.raw import (
@@ -225,6 +225,16 @@ def test_redact_stored_is_idempotent_and_writes_no_revision(tmp_path: Path) -> N
     assert message.content == REDACTED_CONTENT
 
 
+def test_redact_stored_with_user_ids_but_no_matching_messages(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_message(conn, 1, author_id=9, content="hi")
+
+    assert redact_stored(conn, frozenset({5})) == 0
+    message = get_message(conn, 1)
+    assert message is not None
+    assert message.content == "hi"
+
+
 def test_redact_stored_with_empty_user_ids_is_noop(tmp_path: Path) -> None:
     conn = db(tmp_path)
     insert_message(conn, 1, author_id=5, content="hello")
@@ -237,30 +247,34 @@ def test_redact_stored_with_empty_user_ids_is_noop(tmp_path: Path) -> None:
 
 def test_backfill_rerun_after_opt_out_never_unredacts_row_or_revisions(tmp_path: Path) -> None:
     conn = db(tmp_path)
-    source_message = make_source_message(author_id=5, content="original secret")
+    empty: frozenset[int] = frozenset()
+    original = make_source_message(author_id=5, content="original secret")
 
-    first_pass = normalize_message(source_message, NOW, include_bots=False)
-    assert first_pass is not None
-    upsert_message(conn, redact_normalized(first_pass, frozenset({5})).message)
+    original_normalized = normalize_message(original, NOW, include_bots=False)
+    assert original_normalized is not None
+    upsert_message(conn, redact_normalized(original_normalized, empty).message)
 
     edited = make_source_message(
         author_id=5, content="edited secret", edited_at=NOW + timedelta(minutes=1)
     )
     edited_normalized = normalize_message(edited, NOW, include_bots=False)
     assert edited_normalized is not None
-    upsert_message(conn, redact_normalized(edited_normalized, frozenset({5})).message)
+    upsert_message(conn, redact_normalized(edited_normalized, empty).message)
 
     redact_stored(conn, frozenset({5}))
+    revisions_after_redaction = message_revisions(conn, edited.id)
+    assert len(revisions_after_redaction) == 1
+    assert revisions_after_redaction[0].content == REDACTED_CONTENT
 
-    rerun_normalized = normalize_message(source_message, NOW, include_bots=False)
+    rerun_normalized = normalize_message(edited, NOW, include_bots=False)
     assert rerun_normalized is not None
     outcome = upsert_message(conn, redact_normalized(rerun_normalized, frozenset({5})).message)
 
-    message = get_message(conn, source_message.id)
+    message = get_message(conn, edited.id)
     assert message is not None
     assert message.content == REDACTED_CONTENT
     assert message.author_name_at_time == REDACTED_AUTHOR
-    revisions = message_revisions(conn, source_message.id)
+    revisions = message_revisions(conn, edited.id)
     assert len(revisions) == 1
     assert revisions[0].content == REDACTED_CONTENT
     assert revisions[0].raw_json == "{}"
@@ -281,6 +295,7 @@ async def test_sync_opt_outs_adds_removes_redacts_and_retracts(
     insert_message(conn, 2, author_id=3, content="other author")
     insert_exchange(conn, 1, 1)
     insert_exchange(conn, 2, 2)
+    register_prompt_version(conn, "v1", "sha", NOW)
     all_opted_out = record_run(conn, a_run(1), [a_claim(1, source_message_ids=(1,))])
     mixed = record_run(conn, a_run(2), [a_claim(2, source_message_ids=(2,))])
 
