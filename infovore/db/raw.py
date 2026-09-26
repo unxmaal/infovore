@@ -339,3 +339,18 @@ def latest_exchange_for_thread(conn: sqlite3.Connection, thread_id: int) -> int 
     if row is None:
         return None
     return int(row["id"])
+
+
+def messages_by_ids(conn: sqlite3.Connection, message_ids: Sequence[int]) -> list[MessageRow]:
+    ids = list(message_ids)
+    if not ids:
+        return []
+    placeholders = ",".join("?" for _ in ids)
+    rows = conn.execute(f"SELECT * FROM messages WHERE id IN ({placeholders})", ids).fetchall()
+    by_id = {row["id"]: _message_from_row(row) for row in rows}
+    return [by_id[message_id] for message_id in ids if message_id in by_id]
+
+
+def opted_out_user_ids(conn: sqlite3.Connection) -> frozenset[int]:
+    rows = conn.execute("SELECT user_id FROM opt_outs").fetchall()
+    return frozenset(row["user_id"] for row in rows)
