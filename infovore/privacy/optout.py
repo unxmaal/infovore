@@ -45,30 +45,22 @@ def redact_normalized(
 def redact_stored(conn: sqlite3.Connection, user_ids: frozenset[int]) -> int:
     if not user_ids:
         return 0
+    placeholders = ",".join("?" for _ in user_ids)
+    params = tuple(user_ids)
+    authored = f"SELECT id FROM messages WHERE author_id IN ({placeholders})"
     with transaction(conn):
-        placeholders = ",".join("?" for _ in user_ids)
-        params = tuple(user_ids)
-        message_rows = conn.execute(
-            f"SELECT id FROM messages WHERE author_id IN ({placeholders})", params
-        ).fetchall()
-        message_ids = [row["id"] for row in message_rows]
-        conn.execute(
-            f"UPDATE messages SET content = ?, author_name_at_time = ?, raw_json = ?"
+        redacted = conn.execute(
+            "UPDATE messages SET content = ?, author_name_at_time = ?, raw_json = ?"
             f" WHERE author_id IN ({placeholders})",
             (REDACTED_CONTENT, REDACTED_AUTHOR, "{}", *params),
+        ).rowcount
+        conn.execute(
+            "UPDATE message_revisions SET content = ?, raw_json = ?"
+            f" WHERE message_id IN ({authored})",
+            (REDACTED_CONTENT, "{}", *params),
         )
-        if message_ids:
-            message_placeholders = ",".join("?" for _ in message_ids)
-            conn.execute(
-                "UPDATE message_revisions SET content = ?, raw_json = ?"
-                f" WHERE message_id IN ({message_placeholders})",
-                (REDACTED_CONTENT, "{}", *message_ids),
-            )
-            conn.execute(
-                f"DELETE FROM attachments WHERE message_id IN ({message_placeholders})",
-                message_ids,
-            )
-    return len(message_ids)
+        conn.execute(f"DELETE FROM attachments WHERE message_id IN ({authored})", params)
+    return redacted
 
 
 async def sync_opt_outs(

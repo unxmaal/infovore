@@ -379,7 +379,8 @@ def test_redact_stored_scales_past_the_sqlite_variable_limit(tmp_path: Path) -> 
     count = 40_000
     conn.executemany(
         "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
-        " created_at, content, ingested_at, raw_json) VALUES (?, 1, 1, 7, 'prolific', ?, 'x', ?, '{}')",
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (?, 1, 1, 7, 'prolific', ?, 'x', ?, '{}')",
         [(message_id, now, now) for message_id in range(1, count + 1)],
     )
     assert redact_stored(conn, frozenset({7})) == count
