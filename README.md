@@ -40,7 +40,10 @@ Each stage — `extract`, `probe`, `judge` — has its own backend selection, al
 
 ```
 uv run infovore status
+uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
 ```
+
+`chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill.
 
 Every subcommand loads configuration (environment, then `.env` in the working directory for anything not set), opens and migrates the database, and runs. `status` prints row counts, the exchange queue by status, claims by novelty, run outcomes, the last extraction and probe times, the live prompt version, and each stage's backend and model.
 
