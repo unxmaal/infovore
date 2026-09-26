@@ -91,10 +91,13 @@ Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, e
 uv run infovore status
 uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
+uv run infovore probe [--run-id ID ...] [--limit N] [--probe-model CANONICAL_ID]
 uv run infovore snapshot <dest> [--force]
 ```
 
 `chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill.
+
+`probe` runs the closed-book novelty probe (`infovore.extract.novelty.run_probe`) over claims that still need it, built from the `probe` and `judge` stage backends (`infovore.extract.llm_extractor.LLMNoveltyProbe`), with the `probe` stage's configured concurrency. `--run-id` (repeatable) scopes the run to the non-retracted claims of those extraction runs only, instead of the whole database. `--limit` (default `INFOVORE_BATCH_SIZE`) is the number of candidates fetched per batch; the command loops fetching batches until a fetch turns up nothing left to probe. `--probe-model` names the canonical model id (e.g. `claude-sonnet-5`) the operator expects the configured probe backend to resolve to; passing it after a probe model upgrade re-probes exactly the claims that model hasn't seen (`db.claims.claims_needing_probe` / `claims_for_runs_needing_probe`), since probing is idempotent per `(claim, probe_model)`. Without `--probe-model`, only claims with novelty `unprobed` are considered, because the canonical model id is only known from a call's own result, not in advance. `probe` prints `probed`, `by verdict` (counts per `Novelty`), `failed`, and `pauses`, and exits `1` if any claim failed (`0` otherwise, even if some claims paused on a usage limit and later succeeded).
 
 `snapshot` writes a consistent copy of the product database to `<dest>` using the SQLite backup API (`infovore.db.snapshot.snapshot`), safe to run at any time, including while `backfill`/`chunk`/`extract`/`run` is mid-write against the same file: the backup only ever sees committed data, never a writer's in-flight transaction. It refuses to overwrite an existing `<dest>` unless `--force` is given, creates `<dest>`'s parent directories as needed, and writes through a temporary file in the same directory that it atomically renames into place, so a reader never observes a partially written snapshot. It reports the destination path, its size in bytes, and its `PRAGMA user_version` (the schema version). This is how the product database leaves a host — see "Deployment" below.
 
@@ -208,6 +211,18 @@ Return known if the answer is substantively the same fact as the claim.
 
 Output ONLY a JSON object matching the given schema. No other text.
 ```
+
+`infovore.extract.novelty.run_probe(conn, probe, clock, sleeper, *, probe_model, limit, concurrency, run_ids=None)` drives a `NoveltyProbe` (`LLMNoveltyProbe` or the fake `MarkerProbe`) over the database. Candidates come from one of three `db.claims` queries, in this precedence:
+
+1. `run_ids` given: `db.claims.claims_for_runs_needing_probe(conn, run_ids, probe_model, limit)` — the non-retracted claims of exactly those extraction runs, that are `unprobed` or (when `probe_model` is given) whose recorded `probe_model` differs from it.
+2. `run_ids` is `None` and `probe_model` is given: `db.claims.claims_needing_probe(conn, probe_model, limit)` — every non-retracted claim database-wide that is `unprobed` or whose `probe_model` differs.
+3. Neither: `db.claims.unprobed_claims(conn, limit)` — every non-retracted claim with novelty `unprobed`, since without a target model there is nothing to compare a claim's existing `probe_model` against.
+
+Each candidate is probed at most once per fetched batch, with an `asyncio.Semaphore(concurrency)` bounding how many `probe.probe()` calls are in flight at once. A successful outcome calls `db.claims.set_novelty(conn, claim.id, outcome.verdict, outcome.model, outcome.answer, clock.now())`. A `TRANSIENT`, `FATAL`, or `INVALID_OUTPUT` failure calls `db.claims.set_probe_error(conn, claim.id, failure.message)`, leaving the claim `unprobed`, counts it in `failed`, and gives up on that claim **for the remainder of this run** (it is not re-fetched in a later batch of the same `run_probe` call, though a later invocation will see it again, since only `probe_error` was recorded, not a terminal state). A `USAGE_LIMIT` failure counts in `pauses`, calls `sleeper.sleep(failure.retry_after or 300)`, and retries the same claim — indefinitely, if the backend keeps returning `USAGE_LIMIT` — rather than pausing other claims already in flight.
+
+`run_probe` fetches a batch of up to `limit` candidates, processes it fully (concurrently, bounded as above), then fetches again; it stops once a fetch returns nothing left to process. Because a claim given up on this run keeps its `unprobed`/mismatched `probe_model` in the database, a fetch would otherwise return it again forever; `run_probe` tracks given-up claim ids in memory for the run and filters them out of each new batch, so the loop always terminates. A corollary: if `limit` claims given up on early in a run happen to occupy the entire front of the `id`-ordered candidate window, later real candidates behind them are not reached until a subsequent `probe` invocation (a fresh in-memory exclusion set) or a larger `--limit`; this is an accepted simplification rather than a paged/offset query.
+
+`run_probe` returns a `ProbeReport(probed, by_verdict, failed, pauses)`: `probed` is the count of claims that got a verdict this run; `by_verdict` maps `Novelty` (`unknown`/`partial`/`contradicts`/`known`) to how many of those probed claims got that verdict; `failed` is the count given up on; `pauses` is the number of `USAGE_LIMIT` sleeps taken (a single claim retried three times before succeeding counts three pauses).
 
 ## Privacy and opt-out
 
