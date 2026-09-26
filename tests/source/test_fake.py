@@ -42,7 +42,10 @@ def make_message(msg_id: int, channel_id: int = 1, content: str = "hi") -> Sourc
 
 
 def make_channel(
-    channel_id: int, guild_id: int = 100, parent_id: int | None = None, kind: ChannelKind = ChannelKind.TEXT
+    channel_id: int,
+    guild_id: int = 100,
+    parent_id: int | None = None,
+    kind: ChannelKind = ChannelKind.TEXT,
 ) -> SourceChannel:
     return SourceChannel(channel_id, guild_id, parent_id, f"channel-{channel_id}", kind, False)
 
