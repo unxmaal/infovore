@@ -604,9 +604,7 @@ def test_claims_needing_probe_excludes_failed_unless_include_failed(tmp_path: Pa
     assert ok_result.claim_ids[0] in default_ids
     assert failed_result.claim_ids[0] not in default_ids
 
-    with_failed_ids = {
-        c.id for c in claims_needing_probe(conn, "m", limit=10, include_failed=True)
-    }
+    with_failed_ids = {c.id for c in claims_needing_probe(conn, "m", limit=10, include_failed=True)}
     assert ok_result.claim_ids[0] in with_failed_ids
     assert failed_result.claim_ids[0] in with_failed_ids
 

@@ -422,21 +422,37 @@ async def test_run_probe_retry_failed_reattempts_parked_claims(tmp_path: Path) -
     fail_id = seed_claim(conn, "widget O [probe-fail]")
 
     parked = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model=None, limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=2,
     )
     assert parked.failed == 1
 
     not_retried = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model=None, limit=10, concurrency=2,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=2,
     )
     assert not_retried.failed == 0
     assert not_retried.probed == 0
 
     retried = await run_probe(
-        conn, MarkerProbe(), FixedClock(NOW), RecordingSleeper(),
-        probe_model=None, limit=10, concurrency=2, retry_failed=True,
+        conn,
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        probe_model=None,
+        limit=10,
+        concurrency=2,
+        retry_failed=True,
     )
     assert retried.failed == 1
     claim = get_claim(conn, fail_id)

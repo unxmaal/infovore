@@ -146,6 +146,31 @@ def test_probe_command_exits_failure_when_a_claim_fails(tmp_path: Path) -> None:
     assert "failed: 1" in out
 
 
+def test_probe_command_retry_failed_flag(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    claim_id, _ = seed(env["INFOVORE_DB_PATH"])
+    code, out, _ = run(["probe"], env, registry_with(ScriptedLLMFactory(fail_recall=True)))
+    assert code == ExitCode.FAILURE
+    assert "failed: 1" in out
+
+    code, out, _ = run(["probe"], env, registry_with(ScriptedLLMFactory(fail_recall=True)))
+    assert code == ExitCode.OK
+    assert "failed: 0" in out
+    assert "probed: 0" in out
+
+    code, out, _ = run(
+        ["probe", "--retry-failed"],
+        env,
+        registry_with(ScriptedLLMFactory(verdict="known")),
+    )
+    assert code == ExitCode.OK
+    assert "probed: 1" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    claim = get_claim(conn, claim_id)
+    assert claim is not None
+    assert claim.novelty is Novelty.KNOWN
+
+
 def test_probe_command_limit_flag(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])

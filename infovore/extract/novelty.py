@@ -38,12 +38,15 @@ def _fetch_candidates(
     probe_model: str | None,
     limit: int,
     run_ids: Sequence[int] | None,
+    include_failed: bool,
 ) -> list[ClaimRow]:
     if run_ids is not None:
-        return claims_for_runs_needing_probe(conn, run_ids, probe_model, limit)
+        return claims_for_runs_needing_probe(
+            conn, run_ids, probe_model, limit, include_failed=include_failed
+        )
     if probe_model is not None:
-        return claims_needing_probe(conn, probe_model, limit)
-    return unprobed_claims(conn, limit)
+        return claims_needing_probe(conn, probe_model, limit, include_failed=include_failed)
+    return unprobed_claims(conn, limit, include_failed=include_failed)
 
 
 async def run_probe(
@@ -56,6 +59,7 @@ async def run_probe(
     limit: int,
     concurrency: int,
     run_ids: Sequence[int] | None = None,
+    retry_failed: bool = False,
 ) -> ProbeReport:
     probed = 0
     failed = 0
@@ -95,7 +99,7 @@ async def run_probe(
     while True:
         candidates = [
             claim
-            for claim in _fetch_candidates(conn, probe_model, limit, run_ids)
+            for claim in _fetch_candidates(conn, probe_model, limit, run_ids, retry_failed)
             if claim.id not in gave_up
         ]
         if not candidates:
@@ -117,6 +121,7 @@ class ProbeCommand:
         parser.add_argument("--run-id", type=int, action="append", dest="run_ids", default=None)
         parser.add_argument("--limit", type=int, default=None)
         parser.add_argument("--probe-model", type=str, default=None)
+        parser.add_argument("--retry-failed", action="store_true")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         probe_backend = await stage_backend(context, Stage.PROBE)
@@ -135,6 +140,7 @@ class ProbeCommand:
             limit=limit,
             concurrency=concurrency,
             run_ids=run_ids,
+            retry_failed=args.retry_failed,
         )
         context.stdout.write(
             f"probed: {report.probed}\n"
