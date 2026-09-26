@@ -1,6 +1,19 @@
 from pathlib import Path
 
-from infovore.config import Settings, Stage, StageSettings
+from infovore.config import (
+    Settings,
+    Stage,
+    StageSettings,
+    read_dotenv,
+    settings_from_environment,
+)
+
+REQUIRED_ENV = {
+    "INFOVORE_DISCORD_TOKEN": "tok",
+    "INFOVORE_GUILD_ID": "1",
+    "INFOVORE_CHANNEL_IDS": "10,20",
+    "INFOVORE_DB_PATH": "db.sqlite",
+}
 
 
 def make_stage_settings(**overrides: object) -> StageSettings:
@@ -63,3 +76,46 @@ def test_settings_is_frozen() -> None:
     except AttributeError:
         return
     raise AssertionError("Settings should be frozen")
+
+
+def test_read_dotenv_missing_file_returns_empty(tmp_path: Path) -> None:
+    assert read_dotenv(tmp_path / "missing.env") == {}
+
+
+def test_read_dotenv_parses_key_value_lines(tmp_path: Path) -> None:
+    envfile = tmp_path / ".env"
+    envfile.write_text(
+        "\n".join(
+            [
+                "# a comment",
+                "",
+                "FOO=bar",
+                'QUOTED="quoted value"',
+                "SINGLE='single value'",
+                "  SPACED = spaced value  ",
+                "NOEQUALS",
+            ]
+        )
+    )
+    assert read_dotenv(envfile) == {
+        "FOO": "bar",
+        "QUOTED": "quoted value",
+        "SINGLE": "single value",
+        "SPACED": "spaced value",
+    }
+
+
+def test_settings_from_environment_merges_dotenv_and_environ(tmp_path: Path) -> None:
+    envfile = tmp_path / ".env"
+    envfile.write_text("INFOVORE_DISCORD_TOKEN=from-file\nINFOVORE_BATCH_SIZE=7\n")
+    environ = {**REQUIRED_ENV, "INFOVORE_DISCORD_TOKEN": "from-environ"}
+    settings = settings_from_environment(environ, envfile)
+    assert settings.discord_token == "from-environ"
+    assert settings.batch_size == 7
+
+
+def test_settings_from_environment_uses_dotenv_when_not_overridden(tmp_path: Path) -> None:
+    envfile = tmp_path / ".env"
+    envfile.write_text("INFOVORE_BATCH_SIZE=9\n")
+    settings = settings_from_environment(REQUIRED_ENV, envfile)
+    assert settings.batch_size == 9
