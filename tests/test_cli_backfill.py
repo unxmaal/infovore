@@ -127,3 +127,37 @@ def test_builtin_commands_include_backfill() -> None:
     from infovore.cli import builtin_commands
 
     assert "backfill" in [command.name for command in builtin_commands()]
+
+
+class FlushCountingIO(io.StringIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.flushes_at: list[int] = []
+
+    def flush(self) -> None:
+        self.flushes_at.append(self.getvalue().count("\n"))
+        super().flush()
+
+
+def test_backfill_streams_flushed_progress_lines(tmp_path: Path) -> None:
+    source = FakeDiscordSource(
+        channels=[make_channel(1)], messages=[make_message(i) for i in range(1, 3)]
+    )
+    out, err = FlushCountingIO(), io.StringIO()
+    code = main(
+        ["backfill", "--page-size", "1"],
+        environ=environment(tmp_path),
+        dotenv_path=None,
+        stdout=out,
+        stderr=err,
+        source_factory=serving(source),
+    )
+    assert code == ExitCode.OK
+    lines = out.getvalue().splitlines()
+    assert lines[0] == "opening discord source..."
+    assert lines[1] == "found 1 channels (1 selected)"
+    assert lines[2] == "channel 1 channel-1: start"
+    assert lines[3] == "channel 1: page +1 new, 0 updated, 0 unchanged (1 messages so far)"
+    assert lines[4] == "channel 1: page +1 new, 0 updated, 0 unchanged (2 messages so far)"
+    assert lines[5] == "channel 1: done (2 pages, 2 new)"
+    assert out.flushes_at[:6] == [1, 2, 3, 4, 5, 6]

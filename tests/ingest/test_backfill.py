@@ -10,7 +10,16 @@ from infovore.db.raw import (
     get_message,
     reactions_for_messages,
 )
-from infovore.ingest.backfill import BackfillReport, backfill
+from infovore.ingest.backfill import (
+    BackfillEvent,
+    BackfillReport,
+    ChannelFailed,
+    ChannelFinished,
+    ChannelsFound,
+    ChannelStarted,
+    PageSaved,
+    backfill,
+)
 from infovore.rows import ChannelKind
 from infovore.source.fake import FakeDiscordSource
 from infovore.source.protocol import (
@@ -648,3 +657,37 @@ async def test_forbidden_channel_fails_immediately_without_retrying(tmp_path: Pa
     assert report.failed[0].reason.startswith("forbidden:")
     assert sleeper.slept == []
     assert report.channels[2].inserted == 1
+
+
+async def test_progress_events_stream_in_order(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    source = FakeDiscordSource(
+        channels=[make_channel(1), make_channel(2), make_channel(3)],
+        messages=[make_message(1, channel_id=1), make_message(2, channel_id=1)],
+    )
+    source.fail_next_history_call(SourceForbiddenError("403"), channel_id=2)
+    events: list[BackfillEvent] = []
+    await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1, 2],
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+        page_size=1,
+        progress=events.append,
+    )
+    assert events[0] == ChannelsFound(total=3, selected=2)
+    assert events[1] == ChannelStarted(channel_id=1, name="channel-1", resume_after=None)
+    assert [type(event) for event in events[2:4]] == [PageSaved, PageSaved]
+    page = events[3]
+    assert isinstance(page, PageSaved)
+    assert (page.channel_id, page.inserted, page.messages_total) == (1, 1, 2)
+    assert isinstance(events[4], ChannelFinished)
+    assert events[5] == ChannelStarted(channel_id=2, name="channel-2", resume_after=None)
+    failed = events[6]
+    assert isinstance(failed, ChannelFailed)
+    assert failed.channel_id == 2
+    assert failed.reason.startswith("forbidden:")
+    assert len(events) == 7
