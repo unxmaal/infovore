@@ -366,6 +366,19 @@ def test_load_settings_export_source_bad_guild_id_reported(tmp_path: Path) -> No
         load_settings(env)
 
 
+def test_load_settings_export_source_whitespace_only_channel_ids_means_all(
+    tmp_path: Path,
+) -> None:
+    env = {
+        "INFOVORE_SOURCE": "export",
+        "INFOVORE_EXPORT_DIR": str(tmp_path),
+        "INFOVORE_DB_PATH": "db.sqlite",
+        "INFOVORE_CHANNEL_IDS": " , , ",
+    }
+    settings = load_settings(env)
+    assert settings.channel_ids == ()
+
+
 def test_load_settings_export_source_bad_channel_ids_reported(tmp_path: Path) -> None:
     env = {
         "INFOVORE_SOURCE": "export",
