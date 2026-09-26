@@ -317,9 +317,44 @@ Most Discord chatter carries no lore, so exchanges are scored with deterministic
 | `gif_links` | −0.1 | tenor, giphy, or `.gif` links |
 | `laughter` | −0.1 | more than 30% of messages are just "lol", "lmao", "haha"… |
 
-Channel priors and the extraction threshold are applied by `infovore triage` and `extract` (see the triage issues); the threshold is chosen by calibrating against LLM extraction on samples above and below it.
+Channel priors and gating are applied by `infovore triage` and `extract` (see "Running"). The rule score above is a cold-start heuristic, not the final word: it only ever governs gating for an exchange the trained classifier below hasn't scored yet.
 
-The rule score above is a cold-start heuristic. Ground truth accumulates in `exchange_labels` (see "Data model") and never shrinks: `infovore label --from-runs` derives `lore`/`noise` labels from trial extraction runs, and `infovore label --exchange-id ID --lore|--noise` records hand corrections, which always win over a derived label for the same exchange (see "Running"). Those labels are the training data for the Bayesian classifier that replaces the rule score once enough of them exist.
+### Ground truth: labels
+
+Ground truth accumulates in `exchange_labels` (see "Data model") and never shrinks: `infovore label --from-runs` derives `lore`/`noise` labels from trial extraction runs (a run with a claim probed `unknown`/`partial`/`contradicts` is `lore`; all-`known` or zero claims is `noise`), and `infovore label --exchange-id ID --lore|--noise` records hand corrections, which always win over a derived label for the same exchange (see "Running"). `infovore.db.labels.effective_labels` resolves one label per exchange this way. Those labels are the training data for the Bayesian classifier below.
+
+### The classifier
+
+`infovore/triage/bayes.py` (standard library only, deterministic) is a naive Bayes spam-filter classifier in the tradition of Graham's "A Plan for Spam" and Robinson's refinements:
+
+- **Features** (`features`): lower-cased word tokens (bounded to 40 characters) from the exchange's messages, plus *virtual tokens* for every rule signal from the table above that fired (`SIG_<name>`, e.g. `SIG_part_number`), a `CHAN_<channel_id>` token, and a message-count bucket token (`LEN_1`, `LEN_2-5`, `LEN_6-20`, `LEN_21+`) — so the classifier learns channel and length priors from data instead of the hand-tuned channel-prior formula above.
+- **Per-token probability** (`token_probability`): Robinson's smoothed estimate, `(s * x + n * p) / (s + n)`, where `n` is how many labeled documents contain the token, `p` is that token's raw `lore / (lore + noise)` document ratio, and `s = 1.0` (`UNKNOWN_WORD_STRENGTH`), `x = 0.5` (`UNKNOWN_WORD_PROBABILITY`) pull an unseen or rare token toward "uninformative" rather than overfitting on one example. A token seen in no labeled document, or before either class has any labeled document at all, is exactly `0.5`.
+- **Combining** (`p_lore`): only the `MAX_CLUES = 150` most "interesting" tokens are used — those with `|p - 0.5| >= MINIMUM_PROBABILITY_STRENGTH` (`0.1`), ranked by that distance — same as the classic filters, so one exchange's score isn't diluted by hundreds of uninformative common words. Fisher's method combines their probabilities into two independent chi-square statistics (evidence for lore, evidence for noise via `1 - p`) with `chi2q` (the regularized upper incomplete gamma function for an even-degrees chi-square, computed by direct series summation — no `scipy` dependency), and `p_lore` is `(lore_strength - noise_strength + 1) / 2`, back in 0..1. No informative clues at all scores exactly `0.5`.
+- **Held-out split** (`in_holdout`): `sha256(str(exchange_id))`'s first byte mod `HOLDOUT_BUCKETS` (`5`) — deterministic and stable across runs (adding new exchanges never reshuffles old ones' bucket), about a fifth of labels.
+
+`infovore/triage/train.py` wires the classifier to the database:
+
+- `infovore triage --train` (`train_and_store`) builds features for every exchange with an effective label, trains on the non-holdout examples, evaluates on the holdout at thresholds `0.1` through `0.9` (`Metrics`: `tp`/`fp`/`fn`/`tn`, `precision`/`recall`/`f1`), and refuses (exit `2`) with fewer than 10 labels of either class. It prints that metrics table, the confusion matrix at `INFOVORE_TRIAGE_MIN_P_LORE`, and the 15 most informative tokens (largest `|p - 0.5|`) with their lore/noise counts — the transparency that makes a naive Bayes filter debuggable, unlike a black-box model. The trained model is a full, idempotent rebuild each time (never incremental), stored in `triage_model`/`triage_tokens` (see "Data model"); every exchange is then scored (`score_all`), writing `exchanges.p_lore` and `p_lore_model` (that model's `version`).
+- Afterwards, plain `infovore triage` also rescopes `p_lore` for any exchange whose `p_lore_model` isn't the latest version yet (`score_stale`), so a normal triage run keeps `p_lore` current without retraining.
+- `infovore triage --recommend-threshold [--min-recall R]` (default `R = 0.9`) reuses the latest model's own holdout evaluation to find the highest `p_lore` threshold keeping recall at or above `R`, and reports it as a ready-to-set `INFOVORE_TRIAGE_MIN_P_LORE=<threshold>` line with that threshold's recall/precision and the expected share of `p_lore`-scored exchanges that would reach the LLM at it.
+
+### The gate
+
+Gating compares one *score* against one *threshold*, computed once (`infovore.triage.gate.passes_gate`/`gate_sql`, used identically by `claimable_exchanges`'s SQL and `extract`'s Python path — a drift test asserts they agree over every case): if an exchange has a `p_lore` (a trained model has scored it), the score is `p_lore` and the threshold is `INFOVORE_TRIAGE_MIN_P_LORE` (default `0.5`); otherwise (cold start, or a model exists but hasn't reached this exchange yet) the score is the rule `triage_score` and the threshold is `INFOVORE_TRIAGE_MIN_SCORE` (default `0.3`). The two thresholds are independent because the two scores aren't calibrated against each other — `triage_score` is a clamped sum of hand-picked weights, `p_lore` is a Bayesian posterior — so each gets tuned against its own measured precision/recall.
+
+### The active-learning loop
+
+Getting from zero labels to a calibrated `INFOVORE_TRIAGE_MIN_P_LORE` is cheap because every step reuses infrastructure that already exists for prompt iteration:
+
+1. `infovore extract --mode trial --sample N --strategy stratified` (the default strategy) — draws across every channel and size bucket, including rule-score-zero exchanges, so the label set isn't biased by the rules it's about to replace.
+2. `infovore probe --run-id <ids from step 1>` — get novelty verdicts for the trial's claims.
+3. `infovore label --from-runs <ids from step 1>` — turn those verdicts into `lore`/`noise` labels.
+4. `infovore triage --train` — train on whatever labels exist so far; refuses under 10 labels per class (run more of steps 1–3 first).
+5. `infovore extract --mode trial --sample N --strategy uncertain` — now that a model exists, sample the exchanges nearest `p_lore = 0.5`: the ones a label teaches the classifier the most. Repeat steps 2–5, growing the label set with `uncertain` samples, until precision and recall on the holdout look stable across retrains.
+6. `infovore triage --recommend-threshold --min-recall 0.9` (or whatever recall the operator wants to keep) — read off the recommended `INFOVORE_TRIAGE_MIN_P_LORE`.
+7. Set `INFOVORE_TRIAGE_MIN_P_LORE` to that value (environment or `.env`) and run `infovore extract` (live) as usual — it gates on `p_lore` for every exchange the classifier has scored, per "The gate" above.
+
+`review` (see "Running") shows each exchange's rule score, `p_lore`, reasons, and effective label alongside its claims, grouped by `(prompt_version, model)`, so a local model and Claude on the same sample — or the rule score and the classifier — are easy to compare side by side.
 
 ## Extraction prompt
 
