@@ -2,9 +2,11 @@ import sqlite3
 from collections.abc import Sequence
 from typing import cast
 
+from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
+from infovore.triage.gate import gate_sql
 
 
 class DuplicateExchangeError(Exception):
@@ -128,7 +130,11 @@ def grouped_message_ids(conn: sqlite3.Connection) -> set[int]:
 
 
 def claimable_exchanges(
-    conn: sqlite3.Connection, limit: int, max_retries: int, min_score: float | None = None
+    conn: sqlite3.Connection,
+    limit: int,
+    max_retries: int,
+    min_score: float | None = None,
+    min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
 ) -> list[ExchangeRow]:
     condition = "extraction_status IN (?, ?) AND retry_count < ?"
     params: list[object] = [
@@ -137,8 +143,9 @@ def claimable_exchanges(
         max_retries,
     ]
     if min_score is not None:
-        condition += " AND triage_score >= ?"
-        params.append(min_score)
+        clause, gate_params = gate_sql(min_score, min_p_lore)
+        condition += f" AND {clause}"
+        params.extend(gate_params)
     rows = conn.execute(
         f"SELECT * FROM exchanges WHERE {condition} ORDER BY started_at, id LIMIT ?",
         (*params, limit),

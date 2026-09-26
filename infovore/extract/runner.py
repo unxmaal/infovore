@@ -4,6 +4,7 @@ import sqlite3
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
+from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
 from infovore.db.claims import live_prompt_version as db_live_prompt_version
 from infovore.db.claims import retract_claim as db_retract_claim
@@ -374,6 +375,7 @@ async def run_extraction(
     max_retries: int,
     concurrency: int,
     min_score: float = 0.0,
+    min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     exchange_ids: Sequence[int] | None = None,
     progress: Progress = _ignore_progress,
 ) -> ExtractionReport:
@@ -410,7 +412,9 @@ async def run_extraction(
 
     if mode is RunMode.LIVE:
         while True:
-            batch = claimable_exchanges(conn, batch_size, max_retries, min_score=min_score)
+            batch = claimable_exchanges(
+                conn, batch_size, max_retries, min_score=min_score, min_p_lore=min_p_lore
+            )
             if not batch:
                 break
             await _process_batch(context, batch)

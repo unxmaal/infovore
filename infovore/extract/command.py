@@ -94,6 +94,7 @@ class ExtractCommand:
                 max_retries=context.settings.max_retries,
                 concurrency=stage_settings.concurrency,
                 min_score=context.settings.triage_min_score,
+                min_p_lore=context.settings.triage_min_p_lore,
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
             )
