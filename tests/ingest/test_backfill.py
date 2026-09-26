@@ -261,6 +261,35 @@ async def test_exhausting_attempts_fails_channel_but_others_complete(tmp_path: P
     assert message_2.channel_id == 2
 
 
+async def test_empty_channel_allowlist_selects_all_channels(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    source = FakeDiscordSource(
+        channels=[
+            make_channel(1),
+            make_channel(2, parent_id=1, kind=ChannelKind.THREAD),
+            make_channel(4),
+        ],
+        messages=[
+            make_message(10, channel_id=1),
+            make_message(11, channel_id=2),
+            make_message(12, channel_id=4),
+        ],
+    )
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        channel_ids=(),
+        clock=FixedClock(NOW),
+        sleeper=RecordingSleeper(),
+        include_bots=False,
+    )
+    assert set(report.channels.keys()) == {1, 2, 4}
+    assert get_message(conn, 10) is not None
+    assert get_message(conn, 11) is not None
+    assert get_message(conn, 12) is not None
+
+
 async def test_threads_under_allowlisted_parent_included_others_excluded(tmp_path: Path) -> None:
     conn = make_conn(tmp_path)
     source = FakeDiscordSource(
