@@ -75,7 +75,12 @@ def test_normalize_message_thread_keeps_channel_and_thread_ids_as_given() -> Non
 
 def test_normalize_channel_for_thread_parent() -> None:
     thread_channel = SourceChannel(
-        id=555, guild_id=100, parent_id=10, name="thread-name", kind=ChannelKind.THREAD, archived=False
+        id=555,
+        guild_id=100,
+        parent_id=10,
+        name="thread-name",
+        kind=ChannelKind.THREAD,
+        archived=False,
     )
     row = normalize_channel(thread_channel)
     assert row.id == 555
@@ -100,7 +105,9 @@ def test_normalize_channel_text() -> None:
 
 
 def test_normalize_message_attachments() -> None:
-    attachment = SourceAttachment(id=7, filename="a.txt", content_type="text/plain", size=3, url="https://x")
+    attachment = SourceAttachment(
+        id=7, filename="a.txt", content_type="text/plain", size=3, url="https://x"
+    )
     message = make_source_message(attachments=(attachment,))
     result = normalize_message(message, INGESTED_AT, include_bots=False)
     assert result is not None
