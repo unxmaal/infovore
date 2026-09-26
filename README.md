@@ -34,7 +34,23 @@ Each stage — `extract`, `probe`, `judge` — has its own backend selection, al
 | `INFOVORE_<STAGE>_TIMEOUT` | `60` | Per-request timeout in seconds for that stage. Must be a positive number. |
 | `INFOVORE_<STAGE>_<KEY>` | *(none)* | Any other `INFOVORE_<STAGE>_*` variable is passed through to that stage's `StageSettings.options` under its lowercased key (e.g. `INFOVORE_EXTRACT_BINARY_PATH` becomes `options["binary_path"]`), for backend-specific settings such as `claude_cli`'s binary path or `openai_compat`'s base URL and key. |
 
-`infovore.llm.registry.Registry` maps each stage's configured backend name to a `BackendFactory` (`name`, `validate(StageSettings) -> list[str]`, `build(StageSettings) -> LLMBackend`); `default_registry()` currently registers only the `fake` factory. `Registry.validate(settings)` reports an unknown backend name per stage plus anything the matching factory's own `validate` rejects; `Registry.build_backends(settings)` raises `ConfigError` if validation fails, otherwise returns one backend per stage; `Registry.health_check(backends)` sends one trivial request per backend and reports `None` on success or the error message on failure, without ever raising.
+`infovore.llm.registry.Registry` maps each stage's configured backend name to a `BackendFactory` (`name`, `validate(StageSettings) -> list[str]`, `build(StageSettings) -> LLMBackend`); `default_registry()` registers the `fake` and `claude_cli` factories. `Registry.validate(settings)` reports an unknown backend name per stage plus anything the matching factory's own `validate` rejects; `Registry.build_backends(settings)` raises `ConfigError` if validation fails, otherwise returns one backend per stage; `Registry.health_check(backends)` sends one trivial request per backend and reports `None` on success or the error message on failure, without ever raising.
+
+### `claude_cli` backend
+
+`infovore.llm.claude_cli.ClaudeCliBackend` runs the `claude` CLI headless, once per `complete()` call, through an injected `infovore.llm.process.ProcessRunner`; it is the only module allowed to spawn a process (`subprocess`/`asyncio.create_subprocess_exec` banned everywhere else by ruff `banned-api`). `ClaudeCliFactory` (registry name `claude_cli`) validates that `StageSettings.model` is non-empty and builds a backend with `SubprocessRunner`, the stage's `model`, `concurrency`, and `timeout_seconds`, `options["binary"]` (default `claude`), and `options["scratch_dir"]` (default `scratch`, the same default as the top-level `INFOVORE_SCRATCH_DIR`).
+
+Argv, in exact order: `<binary> -p --model <model> --system-prompt <request.system> --tools "" --strict-mcp-config --setting-sources "" --no-session-persistence --output-format json`, plus `--json-schema <json.dumps(request.json_schema, sort_keys=True)>` when the request carries a schema. `--bare` is never passed — it makes the CLI read only `ANTHROPIC_API_KEY` and ignore the Max-plan OAuth login or a `claude setup-token` token. The prompt goes on stdin. `cwd` is a fresh, empty directory created with `tempfile.mkdtemp` under `scratch_dir` for every call, so no `CLAUDE.md` is ever discovered there.
+
+`claude -p --output-format json` emits one JSON object on stdout. Mapping to `LLMResult`:
+
+- `structured_output` (schema requests) or `result` (plain text); a schema request whose response has no `structured_output` object is `fatal`.
+- The canonical model id is the `modelUsage` key with the highest `outputTokens` (ties broken arbitrarily by iteration order); if `modelUsage` is absent or empty, the requested model alias is used instead.
+- `usage.input_tokens` / `usage.output_tokens` and `total_cost_usd` (an API-equivalent cost, informational) populate `Usage`.
+- A timed-out run is `transient`. A non-zero exit with stdout that isn't a JSON object is `transient` when stderr looks like a network error (connection refused/reset, unreachable network, DNS/`getaddrinfo`, a socket error) and `fatal` otherwise.
+- Within a parsed `is_error` payload: `api_error_status == 429`, or `result`/`stderr` mentioning "usage limit", "rate limit", or "limit reached" (case-insensitive), is `usage_limit`, with `retry_after` parsed from an ISO-8601 timestamp or a 10-digit Unix epoch seconds value found in that text (rounded to the nearest second, floored at zero), defaulting to `300.0` seconds when no such timestamp is present. `api_error_status == 529` or in `500..599` is `transient`. `api_error_status` in `401`/`403`, or "not logged in"/"authentication" in the text, is `fatal`. Anything else `is_error` is `fatal`.
+
+Capabilities: `native_json_schema=True`, `max_concurrency` is the stage's configured concurrency.
 
 ## Running
 
@@ -95,6 +111,7 @@ Per lifecycle rule 5: when `sync_opt_outs` adds users, it also calls `db.claims.
 
 - `...` bodies: Protocol method stubs have no executable behavior; they define shapes that implementations are tested against.
 - `if TYPE_CHECKING:` blocks: imports needed only by the type checker never run at runtime.
+- `infovore.llm.claude_cli.SubprocessRunner.run`: this is the one place allowed to spawn a real process, and exercising it would mean either spawning the real `claude` binary (never done in tests: no network, no dependency on being logged in) or spawning some other process as a stand-in, which still violates "no test spawns a process." Every other `claude_cli` behavior (argv, stdin, cwd, result mapping, every `ErrorKind`) is tested against `ClaudeCliBackend` with a fake `ProcessRunner`; `SubprocessRunner` itself is a thin, direct translation of `asyncio.create_subprocess_exec` plus `asyncio.wait_for` with no branching of its own to verify beyond what the standard library already guarantees.
 
 ## Consuming the database
 
