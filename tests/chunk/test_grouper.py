@@ -6,7 +6,14 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from infovore.chunk.grouper import GroupingReport, _resolve_parent, group_pending
+from infovore.chunk.grouper import (
+    ChannelGrouped,
+    GroupingEvent,
+    GroupingReport,
+    GroupingStarted,
+    _resolve_parent,
+    group_pending,
+)
 from infovore.chunk.rules import Group, drop_ungroupable
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import (
@@ -275,6 +282,43 @@ def test_group_pending_no_ungrouped_messages_is_a_noop(conn: sqlite3.Connection)
     clock = FixedClock(at(1000))
     report = group_pending(conn, clock, quiet_gap=timedelta(minutes=30))
     assert report == GroupingReport(exchanges_created=0, messages_grouped=0, groups_deferred=0)
+
+
+def test_group_pending_progress_events_stream_in_order(conn: sqlite3.Connection) -> None:
+    seed(
+        conn,
+        make_message(1, channel_id=1, created_at=at(0)),
+        make_message(2, channel_id=1, created_at=at(1)),
+        make_message(3, channel_id=2, created_at=at(0)),
+    )
+    clock = FixedClock(at(1000))
+    events: list[GroupingEvent] = []
+    group_pending(conn, clock, quiet_gap=timedelta(minutes=30), progress=events.append)
+    assert events == [
+        GroupingStarted(channels=2),
+        ChannelGrouped(channel_id=1, exchanges_created=1, groups_deferred=0),
+        ChannelGrouped(channel_id=2, exchanges_created=1, groups_deferred=0),
+    ]
+
+
+def test_group_pending_progress_counts_deferred_groups_per_channel(
+    conn: sqlite3.Connection,
+) -> None:
+    seed(conn, make_message(1, channel_id=1, created_at=at(0)))
+    clock = FixedClock(at(1))
+    events: list[GroupingEvent] = []
+    group_pending(conn, clock, quiet_gap=timedelta(minutes=30), progress=events.append)
+    assert events == [
+        GroupingStarted(channels=1),
+        ChannelGrouped(channel_id=1, exchanges_created=0, groups_deferred=1),
+    ]
+
+
+def test_group_pending_progress_defaults_to_noop(conn: sqlite3.Connection) -> None:
+    seed(conn, make_message(1, created_at=at(0)), make_message(2, created_at=at(1)))
+    clock = FixedClock(at(1000))
+    report = group_pending(conn, clock, quiet_gap=timedelta(minutes=30))
+    assert report == GroupingReport(exchanges_created=1, messages_grouped=2, groups_deferred=0)
 
 
 def test_group_pending_split_part_parent_wins_over_late_reply(
