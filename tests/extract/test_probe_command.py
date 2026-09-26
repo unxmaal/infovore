@@ -287,6 +287,43 @@ def test_probe_command_streams_paused_then_probed_progress_lines(tmp_path: Path)
     assert lines[2] == f"claim {claim_id}: known"
 
 
+def test_probe_prints_checking_backend_lines_before_each_stage_health_check(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    snapshots: list[str] = []
+
+    def responder(request: LLMRequest) -> LLMResult:
+        snapshots.append(out.getvalue())
+        return LLMResult.ok_text("pong", "m")
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: object) -> list[str]:
+            return []
+
+        def build(self, settings: object) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    main(
+        ["probe"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert "checking probe backend (scripted / sonnet)..." in snapshots[0]
+    assert "checking judge backend (scripted / haiku)..." in snapshots[1]
+
+
 def test_probe_start_line_is_written_before_backend_processes_any_claim(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])

@@ -332,6 +332,45 @@ def test_extract_streams_paused_then_claimed_progress_lines(tmp_path: Path) -> N
     assert lines[2] == f"exchange {exchange_id}: 1 claims (1 done)"
 
 
+def test_extract_prints_checking_backend_line_before_health_check(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    out = io.StringIO()
+    seen_before_health_check: list[bool] = []
+    checked = {"done": False}
+
+    def responder(request: LLMRequest) -> LLMResult:
+        if not checked["done"]:
+            seen_before_health_check.append(
+                "checking extract backend (scripted / sonnet)..." in out.getvalue()
+            )
+            checked["done"] = True
+        return HEALTH_OK
+
+    class SpyFactory:
+        name = "scripted"
+
+        def validate(self, settings: StageSettings) -> list[str]:
+            return []
+
+        def build(self, settings: StageSettings) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    main(
+        ["extract"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        registry=registry,
+    )
+
+    assert seen_before_health_check == [True]
+
+
 def test_extract_start_line_is_written_before_backend_processes_any_exchange(
     tmp_path: Path,
 ) -> None:

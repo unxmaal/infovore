@@ -18,7 +18,8 @@ from infovore.db.claims import promote_prompt_version, register_prompt_version
 from infovore.db.connection import migrate, open_database
 from infovore.extract.fake import MarkerExtractor, MarkerProbe
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
-from infovore.llm.protocol import ErrorKind, LLMBackend, LLMResult
+from infovore.llm.fake import FakeBackend
+from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import Registry, default_registry
 from infovore.run import (
     CycleStepStarted,
@@ -610,3 +611,51 @@ def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: P
     )
     assert code == ExitCode.OK
     assert seen_before_connect == [True]
+
+
+def test_run_command_prints_checking_backend_lines_before_each_stage_health_check(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_EXTRACT_BACKEND"] = "spy"
+    env["INFOVORE_PROBE_BACKEND"] = "spy"
+    env["INFOVORE_JUDGE_BACKEND"] = "spy"
+    fake_source = FakeDiscordSource()
+
+    @asynccontextmanager
+    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        yield fake_source
+
+    out = io.StringIO()
+    snapshots: list[str] = []
+
+    def responder(request: LLMRequest) -> LLMResult:
+        snapshots.append(out.getvalue())
+        return LLMResult.ok_text("pong", "m")
+
+    class SpyFactory:
+        name = "spy"
+
+        def validate(self, settings: object) -> list[str]:
+            return []
+
+        def build(self, settings: object) -> LLMBackend:
+            return FakeBackend(responder)
+
+    registry = Registry()
+    registry.register(SpyFactory())
+
+    code = main(
+        ["run", "--once"],
+        environ=env,
+        dotenv_path=None,
+        stdout=out,
+        stderr=io.StringIO(),
+        source_factory=factory,
+        registry=registry,
+    )
+
+    assert code == ExitCode.OK
+    assert "checking extract backend (spy / sonnet)..." in snapshots[0]
+    assert "checking probe backend (spy / sonnet)..." in snapshots[1]
+    assert "checking judge backend (spy / haiku)..." in snapshots[2]
