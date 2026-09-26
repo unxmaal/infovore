@@ -175,17 +175,53 @@ Every subcommand loads configuration (environment, then `.env` in the working di
 
 Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3` Discord or an LLM backend is unavailable.
 
-### First run against a real server
+### Runbook
 
-1. In the Discord Developer Portal, create an application and add a bot. On the Bot tab, enable the two privileged intents **Message Content** (message bodies) and **Server Members** (role membership, for opt-out sync). Without both, the gateway rejects the connection.
-2. Invite the bot to the server with the `bot` scope and the **View Channels** and **Read Message History** permissions. It never needs to send messages.
-3. Create the opt-out role (default name `no-archive`, `INFOVORE_OPT_OUT_ROLE`) and post the server notice explaining what is archived and how to opt out.
-4. Set `INFOVORE_DISCORD_TOKEN`, `INFOVORE_GUILD_ID`, `INFOVORE_CHANNEL_IDS` and `INFOVORE_DB_PATH` (see Configuration).
-5. `infovore sync-optouts`, then `infovore backfill`, then `infovore chunk`. Run `sync-optouts` before any extraction, and again whenever the role changes.
+**1. Create the bot.** In the Discord Developer Portal, create an application and add a bot. On the Bot tab, enable the two privileged intents **Message Content** (message bodies) and **Server Members** (role membership, for opt-out sync); without both, the gateway rejects the connection. Copy the bot token.
+
+**2. Invite it read-only.** Invite the bot with the `bot` scope and only the **View Channels** and **Read Message History** permissions on the channels you want archived. It never sends messages.
+
+**3. Create the opt-out role and post the notice.** Create a role named `no-archive` (or set `INFOVORE_OPT_OUT_ROLE`), make it self-assignable (e.g. through your roles bot or onboarding), and post this Server notice in an announcements channel before the first backfill:
+
+> **Server notice — channel archiving.** A read-only bot is archiving the technical history of #channel-a and #channel-b so that hard-won SGI/IRIX knowledge (part numbers, jumper settings, PROM versions, fixes, procedures) isn't lost. It reads messages, never posts, and keeps specific technical facts with a link back to the original message. If you don't want your messages archived, give yourself the `no-archive` role: your past and future messages will be redacted in the archive (content and name replaced with `[redacted]`), and facts that came only from you will be removed. Removing the role later only affects future messages; redacted history stays redacted.
+
+**4. Configure.** Set at least `INFOVORE_DISCORD_TOKEN`, `INFOVORE_GUILD_ID`, `INFOVORE_CHANNEL_IDS` and `INFOVORE_DB_PATH` (see Configuration), and make sure the extract/probe/judge backends work: `infovore status` shows each stage's backend and model, and every LLM command health-checks its backend first (exit `3` if it's unavailable).
+
+**5. First backfill.** Always sync opt-outs first so nothing from an opted-out user is ever stored unredacted:
+
+```
+infovore sync-optouts
+infovore backfill
+infovore chunk
+infovore status
+```
+
+`backfill` is resumable; if it's interrupted, run it again.
+
+**6. Settle the prompt** with the trial loop (next section): `infovore extract --mode trial`, `infovore probe`, `infovore review`, then `infovore promote` once a prompt version looks right.
+
+**7. Extract for real:**
+
+```
+infovore extract
+infovore probe
+```
+
+**8. Steady state.** Either keep one process running, which follows live messages and runs a sync → chunk → extract → probe cycle every `--interval` seconds:
+
+```
+infovore run --interval 600
+```
+
+or schedule `infovore run --once` from cron, launchd, or a systemd timer (see Deployment). Stop `run` with SIGTERM or Ctrl-C; it finishes the current step and closes the Discord connection.
+
+**9. Ship the product.** `infovore snapshot /path/to/lore-2026-10-01.db` writes a consistent copy of the database, safe while `run` is writing; consumers read its `lore` view (see "Consuming the database").
+
+**When things go wrong:** exit `2` is configuration (the message names every problem), exit `3` is Discord or an LLM backend being unavailable (bad token, missing intents, `claude` not logged in), exit `1` means some exchanges or claims failed and were counted — `infovore status` shows the queues, failed exchanges retry until `INFOVORE_MAX_RETRIES`, and parked probe failures come back with `infovore probe --retry-failed`.
 
 ### Iterating the prompt
 
-This is the M1 loop: run the current prompt over a reproducible sample of the backfill, look at what it extracted, and either promote it or change the prompt and compare. Every step is `--mode trial`, so it never touches `live` claims or exchange status.
+This is the prompt-iteration loop: run the current prompt over a reproducible sample of the backfill, look at what it extracted, and either promote it or change the prompt and compare. Every step is `--mode trial`, so it never touches `live` claims or exchange status.
 
 1. `infovore backfill` then `infovore chunk`, once, to populate exchanges from the real history.
 2. `infovore extract --mode trial --sample 50 --seed 1` — runs `infovore.extract.prompt.PROMPT_VERSION` over 50 exchanges, stratified by channel and size, chosen deterministically by `--seed`. Note the run ids it prints.
@@ -300,7 +336,7 @@ Output ONLY a JSON object matching the given schema. No other text.
 2. `run_ids` is `None` and `probe_model` is given: `db.claims.claims_needing_probe(conn, probe_model, limit, include_failed)` — every non-retracted claim database-wide that is `unprobed` or whose `probe_model` differs.
 3. Neither: `db.claims.unprobed_claims(conn, limit, include_failed=include_failed)` — every non-retracted claim with novelty `unprobed`, since without a target model there is nothing to compare a claim's existing `probe_model` against.
 
-Each of these three queries additionally requires `probe_error IS NULL` unless `include_failed` is true. This means a claim that previously failed with a non-`USAGE_LIMIT` error is **parked**: once `db.claims.set_probe_error` has recorded a `probe_error` for it, no candidate query returns it again — in this run or any future one — until something clears `probe_error` (a successful `set_novelty` call, which always clears it) or the caller explicitly asks for parked claims back with `include_failed=True` (`retry_failed=True` from `run_probe`, `--retry-failed` from the CLI). This is what keeps a handful of permanently-failing claims (e.g. persistent model refusals) from occupying the front of the `id`-ordered candidate window forever and starving every claim behind them: earlier revisions of this probe treated `probe_error` as informational only, so a claim that failed once kept re-appearing in every batch of every future run, and with `limit` small enough, later claims were never reached at all.
+Each of these three queries additionally requires `probe_error IS NULL` unless `include_failed` is true. This means a claim that previously failed with a non-`USAGE_LIMIT` error is **parked**: once `db.claims.set_probe_error` has recorded a `probe_error` for it, no candidate query returns it again — in this run or any future one — until something clears `probe_error` (a successful `set_novelty` call, which always clears it) or the caller explicitly asks for parked claims back with `include_failed=True` (`retry_failed=True` from `run_probe`, `--retry-failed` from the CLI). This keeps a handful of permanently failing claims (e.g. persistent model refusals) from occupying the front of the `id`-ordered candidate window and starving every claim behind them.
 
 Each candidate is probed at most once per fetched batch, with an `asyncio.Semaphore(concurrency)` bounding how many `probe.probe()` calls are in flight at once. A successful outcome calls `db.claims.set_novelty(conn, claim.id, outcome.verdict, outcome.model, outcome.answer, clock.now())`, which also clears `probe_error`. A `TRANSIENT`, `FATAL`, or `INVALID_OUTPUT` failure calls `db.claims.set_probe_error(conn, claim.id, failure.message)` (parking the claim as above), counts it in `failed`, and — for this run only — is not retried again even if `retry_failed=True` keeps returning it as a candidate; an in-memory "gave up this run" set filters it out of later batches so a claim that fails on every attempt cannot loop forever within a single `--retry-failed` run. A `USAGE_LIMIT` failure counts in `pauses`, calls `sleeper.sleep(failure.retry_after or 300)`, and retries the same claim — indefinitely, if the backend keeps returning `USAGE_LIMIT` — rather than pausing other claims already in flight; it never sets `probe_error` and so never parks the claim.
 
@@ -320,7 +356,7 @@ Per lifecycle rule 5: when `sync_opt_outs` adds users, it also calls `db.claims.
 
 `sync_opt_outs` logs one `logging` info line per added or removed user id (never message content), so the change is auditable without exposing what was said.
 
-**M1 gate**: no extraction may run against real Discord data until this module is merged (Phase 2 task 6). Prompt-time redaction (`extract/prompt.py`, `ExtractionRequest.opted_out_user_ids`) depends on `opted_out_user_ids` from this module.
+**Before any extraction** against real Discord data, run `infovore sync-optouts`; `backfill`, live ingest and `run` redact opted-out authors before storing anything, and prompt rendering (`extract/prompt.py`, `ExtractionRequest.opted_out_user_ids`) redacts them again.
 
 ## Coverage exclusions
 
