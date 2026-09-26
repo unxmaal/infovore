@@ -304,7 +304,11 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
             assert failure is not None
             if failure.kind is FailureKind.USAGE_LIMIT:
                 context.accumulator.pauses += 1
-                retry_after = failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_AFTER
+                retry_after = (
+                    DEFAULT_USAGE_LIMIT_RETRY_AFTER
+                    if failure.retry_after is None
+                    else failure.retry_after
+                )
                 context.progress(
                     ExchangePaused(
                         exchange_id=exchange_id,

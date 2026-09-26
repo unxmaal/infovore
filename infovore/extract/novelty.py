@@ -121,7 +121,12 @@ async def run_probe(
                 if failure.kind is FailureKind.USAGE_LIMIT:
                     pauses += 1
                     progress(ClaimPaused(claim_id=claim_id))
-                    await sleeper.sleep(failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_SECONDS)
+                    retry_after = (
+                        DEFAULT_USAGE_LIMIT_RETRY_SECONDS
+                        if failure.retry_after is None
+                        else failure.retry_after
+                    )
+                    await sleeper.sleep(retry_after)
                     continue
                 set_probe_error(conn, claim_id, failure.message)
                 failed += 1
