@@ -13,9 +13,9 @@ from infovore.db.raw import (
     get_backfill_checkpoint,
     upsert_channel,
 )
+from infovore.ingest.allowlist import is_channel_allowed
 from infovore.ingest.normalize import normalize_channel, normalize_message
 from infovore.privacy.optout import opted_out_user_ids, redact_normalized
-from infovore.rows import ChannelKind
 from infovore.source.protocol import (
     DiscordSource,
     SourceChannel,
@@ -51,16 +51,11 @@ class BackfillReport:
 def _select_channels(
     channels: Sequence[SourceChannel], channel_ids: Sequence[int]
 ) -> list[SourceChannel]:
-    if not channel_ids:
-        selected = list(channels)
-    else:
-        allowlist = set(channel_ids)
-        selected = [
-            channel
-            for channel in channels
-            if channel.id in allowlist
-            or (channel.kind is ChannelKind.THREAD and channel.parent_id in allowlist)
-        ]
+    selected = [
+        channel
+        for channel in channels
+        if is_channel_allowed(channel.id, channel.parent_id, channel_ids)
+    ]
     selected.sort(key=lambda channel: channel.id)
     return selected
 
