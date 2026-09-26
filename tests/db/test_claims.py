@@ -54,9 +54,7 @@ def insert_message(
     )
 
 
-def insert_exchange(
-    conn: sqlite3.Connection, exchange_id: int = 1, message_id: int = 1
-) -> None:
+def insert_exchange(conn: sqlite3.Connection, exchange_id: int = 1, message_id: int = 1) -> None:
     conn.execute(
         "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
         " ended_at, message_count, grouping_rule, content_hash)"
@@ -233,7 +231,9 @@ def test_unprobed_claims_excludes_retracted_and_respects_mode_and_limit(
     insert_exchange(conn, 2, 2)
     live_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
     trial_result = record_run(
-        conn, a_run(exchange_id=2, mode=RunMode.TRIAL), [a_claim(exchange_id=2, statement="b", subject="s")]
+        conn,
+        a_run(exchange_id=2, mode=RunMode.TRIAL),
+        [a_claim(exchange_id=2, statement="b", subject="s")],
     )
     retracted_result = record_run(conn, a_run(), [a_claim(statement="c", subject="s")])
     retract_claim(conn, retracted_result.claim_ids[0], "sources_deleted", NOW)
@@ -261,11 +261,17 @@ def test_claims_needing_probe(tmp_path: Path) -> None:
     insert_exchange(conn, 2, 2)
     insert_exchange(conn, 3, 3)
     unprobed_result = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
-    stale_result = record_run(conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")])
+    stale_result = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, statement="b", subject="s")]
+    )
     set_novelty(conn, stale_result.claim_ids[0], Novelty.KNOWN, "old-model", "answer", NOW)
-    fresh_result = record_run(conn, a_run(exchange_id=3), [a_claim(exchange_id=3, statement="c", subject="s")])
+    fresh_result = record_run(
+        conn, a_run(exchange_id=3), [a_claim(exchange_id=3, statement="c", subject="s")]
+    )
     set_novelty(conn, fresh_result.claim_ids[0], Novelty.KNOWN, "new-model", "answer", NOW)
-    retracted_result = record_run(conn, a_run(exchange_id=3), [a_claim(exchange_id=3, statement="d", subject="s")])
+    retracted_result = record_run(
+        conn, a_run(exchange_id=3), [a_claim(exchange_id=3, statement="d", subject="s")]
+    )
     retract_claim(conn, retracted_result.claim_ids[0], "sources_deleted", NOW)
 
     needing = {c.id for c in claims_needing_probe(conn, "new-model", limit=10)}
@@ -324,7 +330,6 @@ def test_retract_claims_with_all_sources_deleted(tmp_path: Path) -> None:
     insert_message(conn, 2)
     insert_message(conn, 3, deleted_at=NOW)
     result_all_deleted = record_run(conn, a_run(), [a_claim(source_message_ids=(1,))])
-    conn.execute("UPDATE messages SET deleted_at = ? WHERE id = 1", (to_db_time(NOW),))
     result_partial = record_run(conn, a_run(), [a_claim(source_message_ids=(2, 3))])
 
     assert retract_claims_with_all_sources_deleted(conn, NOW) == []
@@ -390,13 +395,19 @@ def test_related_claims_excludes_retracted_and_trial(tmp_path: Path) -> None:
     insert_message(conn, 3)
     insert_exchange(conn, 2, 2)
     insert_exchange(conn, 3, 3)
-    retracted_result = record_run(conn, a_run(), [a_claim(statement="Zeta widget info", subject="s")])
+    retracted_result = record_run(
+        conn, a_run(), [a_claim(statement="Zeta widget info", subject="s")]
+    )
     retract_claim(conn, retracted_result.claim_ids[0], "sources_deleted", NOW)
-    trial_result = record_run(
-        conn, a_run(exchange_id=2, mode=RunMode.TRIAL), [a_claim(exchange_id=2, statement="Zeta widget trial", subject="s")]
+    record_run(
+        conn,
+        a_run(exchange_id=2, mode=RunMode.TRIAL),
+        [a_claim(exchange_id=2, statement="Zeta widget trial", subject="s")],
     )
     live_result = record_run(
-        conn, a_run(exchange_id=3), [a_claim(exchange_id=3, statement="Zeta widget live", subject="s")]
+        conn,
+        a_run(exchange_id=3),
+        [a_claim(exchange_id=3, statement="Zeta widget live", subject="s")],
     )
     ids = [c.id for c in related_claims(conn, "Zeta widget", limit=10)]
     assert ids == [live_result.claim_ids[0]]
@@ -409,7 +420,11 @@ def test_related_claims_respects_limit(tmp_path: Path) -> None:
         insert_message(conn, i)
         insert_exchange(conn, i, i)
     for i in range(2, 5):
-        record_run(conn, a_run(exchange_id=i), [a_claim(exchange_id=i, statement=f"Widget model {i}", subject="s")])
+        record_run(
+            conn,
+            a_run(exchange_id=i),
+            [a_claim(exchange_id=i, statement=f"Widget model {i}", subject="s")],
+        )
     results = related_claims(conn, "Widget", limit=2)
     assert len(results) == 2
 
