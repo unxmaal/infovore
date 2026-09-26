@@ -1,7 +1,7 @@
 import asyncio
 import random
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
@@ -43,6 +43,7 @@ class _Accumulator:
     skipped: int = 0
     claims_recorded: int = 0
     pauses: int = 0
+    outcomes: int = 0
     run_ids: list[int] = field(default_factory=list)
 
     def to_report(self) -> ExtractionReport:
@@ -58,6 +59,53 @@ class _Accumulator:
 
 
 @dataclass(frozen=True)
+class ExtractionStarted:
+    mode: RunMode
+    total: int | None
+
+
+@dataclass(frozen=True)
+class ExchangeClaimed:
+    exchange_id: int
+    claims: int
+    index: int
+    total: int | None
+
+
+@dataclass(frozen=True)
+class ExchangeSkipped:
+    exchange_id: int
+    index: int
+    total: int | None
+
+
+@dataclass(frozen=True)
+class ExchangeFailed:
+    exchange_id: int
+    kind: str
+    index: int
+    total: int | None
+
+
+@dataclass(frozen=True)
+class ExchangePaused:
+    exchange_id: int
+    retry_after: float
+    index: int
+    total: int | None
+
+
+ExtractionEvent = (
+    ExtractionStarted | ExchangeClaimed | ExchangeSkipped | ExchangeFailed | ExchangePaused
+)
+Progress = Callable[[ExtractionEvent], None]
+
+
+def _ignore_progress(event: ExtractionEvent) -> None:
+    return None
+
+
+@dataclass(frozen=True)
 class _RunContext:
     conn: sqlite3.Connection
     extractor: ClaimExtractor
@@ -68,6 +116,8 @@ class _RunContext:
     model_label: str
     max_retries: int
     accumulator: _Accumulator
+    progress: Progress
+    total: int | None
 
 
 def _size_bucket(message_count: int) -> str:
@@ -208,18 +258,28 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
     async with context.semaphore:
         request = build_request(context.conn, exchange)
         context.accumulator.processed += 1
+        assert exchange.id is not None
+        exchange_id = exchange.id
 
         if all(message.author_id in request.opted_out_user_ids for message in request.messages):
             if context.mode is RunMode.LIVE:
-                assert exchange.id is not None
-                set_status(context.conn, exchange.id, ExtractionStatus.SKIPPED)
+                set_status(context.conn, exchange_id, ExtractionStatus.SKIPPED)
             context.accumulator.skipped += 1
+            context.accumulator.outcomes += 1
+            context.progress(
+                ExchangeSkipped(
+                    exchange_id=exchange_id,
+                    index=context.accumulator.outcomes,
+                    total=context.total,
+                )
+            )
             return
 
         guild_id = request.messages[0].guild_id
         while True:
             outcome = await context.extractor.extract(request)
             if outcome.succeeded:
+                claims_before = context.accumulator.claims_recorded
                 _finish_success(
                     context,
                     exchange,
@@ -229,16 +289,43 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
                     outcome.output_tokens,
                     outcome.claims,
                 )
+                context.accumulator.outcomes += 1
+                context.progress(
+                    ExchangeClaimed(
+                        exchange_id=exchange_id,
+                        claims=context.accumulator.claims_recorded - claims_before,
+                        index=context.accumulator.outcomes,
+                        total=context.total,
+                    )
+                )
                 return
 
             failure = outcome.failure
             assert failure is not None
             if failure.kind is FailureKind.USAGE_LIMIT:
                 context.accumulator.pauses += 1
-                await context.sleeper.sleep(failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_AFTER)
+                retry_after = failure.retry_after or DEFAULT_USAGE_LIMIT_RETRY_AFTER
+                context.progress(
+                    ExchangePaused(
+                        exchange_id=exchange_id,
+                        retry_after=retry_after,
+                        index=context.accumulator.outcomes,
+                        total=context.total,
+                    )
+                )
+                await context.sleeper.sleep(retry_after)
                 continue
 
             _finish_failure(context, exchange, failure, outcome.input_tokens, outcome.output_tokens)
+            context.accumulator.outcomes += 1
+            context.progress(
+                ExchangeFailed(
+                    exchange_id=exchange_id,
+                    kind=failure.kind.value,
+                    index=context.accumulator.outcomes,
+                    total=context.total,
+                )
+            )
             return
 
 
@@ -258,10 +345,21 @@ async def run_extraction(
     max_retries: int,
     concurrency: int,
     exchange_ids: Sequence[int] | None = None,
+    progress: Progress = _ignore_progress,
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
         raise PromptNotPromotedError(PROMPT_VERSION)
+
+    trial_batch: list[ExchangeRow] | None = None
+    total: int | None = None
+    if mode is RunMode.TRIAL:
+        trial_batch = [
+            exchange
+            for exchange in (get_exchange(conn, id) for id in exchange_ids or ())
+            if exchange is not None
+        ]
+        total = len(trial_batch)
 
     context = _RunContext(
         conn=conn,
@@ -273,7 +371,10 @@ async def run_extraction(
         model_label=model_label,
         max_retries=max_retries,
         accumulator=_Accumulator(),
+        progress=progress,
+        total=total,
     )
+    progress(ExtractionStarted(mode=mode, total=total))
 
     if mode is RunMode.LIVE:
         while True:
@@ -282,11 +383,7 @@ async def run_extraction(
                 break
             await _process_batch(context, batch)
     else:
-        batch = [
-            exchange
-            for exchange in (get_exchange(conn, id) for id in exchange_ids or ())
-            if exchange is not None
-        ]
-        await _process_batch(context, batch)
+        assert trial_batch is not None
+        await _process_batch(context, trial_batch)
 
     return context.accumulator.to_report()
