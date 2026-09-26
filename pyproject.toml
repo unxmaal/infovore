@@ -37,6 +37,7 @@ exclude_also = [
 strict = true
 files = ["infovore", "tests"]
 python_version = "3.12"
+plugins = ["pydantic.mypy"]
 
 [tool.ruff]
 line-length = 100

@@ -1,4 +1,6 @@
+import contextlib
 import json
+from typing import cast
 
 import pytest
 from hypothesis import given
@@ -117,7 +119,7 @@ def test_claim_out_rejects_probe_question_containing_statement_case_insensitive(
 def test_claim_out_is_frozen() -> None:
     claim = ClaimOut.model_validate(_claim())
     with pytest.raises(ValidationError):
-        claim.statement = "changed"
+        claim.statement = "changed"  # type: ignore[misc]
 
 
 def test_extraction_out_accepts_empty_claims() -> None:
@@ -184,7 +186,8 @@ def test_recall_out_requires_answer() -> None:
 def test_json_schema_for_claim_out_forbids_additional_properties() -> None:
     schema = json_schema_for(ClaimOut)
     assert schema["additionalProperties"] is False
-    assert set(schema["required"]) == {  # type: ignore[arg-type]
+    required = cast(list[str], schema["required"])
+    assert set(required) == {
         "statement",
         "subject",
         "kind",
@@ -198,8 +201,8 @@ def test_json_schema_for_claim_out_forbids_additional_properties() -> None:
 def test_json_schema_for_extraction_out_nested_defs_forbid_additional_properties() -> None:
     schema = json_schema_for(ExtractionOut)
     assert schema["additionalProperties"] is False
-    defs = schema["$defs"]  # type: ignore[index]
-    assert defs["ClaimOut"]["additionalProperties"] is False  # type: ignore[index]
+    defs = cast(dict[str, dict[str, object]], schema["$defs"])
+    assert defs["ClaimOut"]["additionalProperties"] is False
 
 
 def test_json_schema_for_judge_out_and_recall_out() -> None:
@@ -224,13 +227,18 @@ def test_first_json_object_ignores_braces_inside_strings() -> None:
     assert first_json_object(text) == {"note": 'a { brace and " quote } inside'}
 
 
+def test_first_json_object_handles_nested_objects() -> None:
+    text = 'prefix {"a": {"b": 1}} suffix'
+    assert first_json_object(text) == {"a": {"b": 1}}
+
+
 def test_first_json_object_ignores_stray_closing_brace() -> None:
     text = 'junk } prose {"a": 1}'
     assert first_json_object(text) == {"a": 1}
 
 
 def test_first_json_object_skips_unparsable_span_for_next_one() -> None:
-    text = "{not json} then {\"ok\": true}"
+    text = '{not json} then {"ok": true}'
     assert first_json_object(text) == {"ok": True}
 
 
@@ -248,10 +256,8 @@ def test_first_json_object_raises_when_never_balanced() -> None:
 def test_first_json_object_never_raises_anything_but_invalid_extraction_error(
     text: str,
 ) -> None:
-    try:
+    with contextlib.suppress(InvalidExtractionError):
         first_json_object(text)
-    except InvalidExtractionError:
-        pass
 
 
 def test_parse_extraction_returns_extracted_claims() -> None:
