@@ -117,6 +117,7 @@ class SyncOptOutsCommand:
         return None
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
+        _say(context.stdout, f"opening {context.settings.source.value} source...")
         async with context.source_factory(context.settings) as source:
             guild_id = resolve_guild_id(context.settings, source)
             report = await sync_opt_outs(
