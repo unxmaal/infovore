@@ -6,10 +6,10 @@ from infovore.db.raw import (
     attachments_for_messages,
     get_channel,
     messages_by_ids,
-    opted_out_user_ids,
     reactions_for_messages,
 )
 from infovore.extract.protocol import ExtractionRequest
+from infovore.privacy.optout import opted_out_user_ids
 from infovore.rows import ExchangeRow, MessageRow
 
 

@@ -17,7 +17,6 @@ from infovore.db.raw import (
     mark_edited,
     message_revisions,
     messages_by_ids,
-    opted_out_user_ids,
     reactions_for_messages,
     set_backfill_checkpoint,
     set_reaction_count,
@@ -499,13 +498,3 @@ def test_messages_by_ids_skips_ids_that_do_not_exist(conn: sqlite3.Connection) -
     upsert_message(conn, make_message(message_id=1))
     fetched = messages_by_ids(conn, [1, 999])
     assert [m.id for m in fetched] == [1]
-
-
-def test_opted_out_user_ids_empty_when_none(conn: sqlite3.Connection) -> None:
-    assert opted_out_user_ids(conn) == frozenset()
-
-
-def test_opted_out_user_ids_returns_all_opted_out_users(conn: sqlite3.Connection) -> None:
-    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (42, '2026-01-01T00:00:00+00:00')")
-    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (7, '2026-01-01T00:00:00+00:00')")
-    assert opted_out_user_ids(conn) == frozenset({42, 7})
