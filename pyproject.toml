@@ -33,6 +33,7 @@ exclude_also = [
 
 [tool.mypy]
 strict = true
+files = ["infovore", "tests"]
 python_version = "3.12"
 
 [tool.ruff]
