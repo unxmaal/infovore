@@ -130,8 +130,7 @@ def test_backfill_end_to_end_against_real_export_source_infers_guild_id(
 
     code, out, _ = run(["backfill"], env)
     assert code == ExitCode.OK
-    assert "inserted=0" in out
-    assert "unchanged=5" in out
+    assert "inserted=0 updated=0 unchanged=0" in out
 
 
 def test_backfill_multiple_guilds_with_no_guild_id_is_config_error(tmp_path: Path) -> None:

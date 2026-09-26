@@ -1,9 +1,10 @@
 import argparse
 import asyncio
+import contextlib
 import os
 import sqlite3
 import sys
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from datetime import datetime
@@ -11,7 +12,14 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Any, NoReturn, Protocol, TextIO
 
-from infovore.config import ConfigError, Settings, Stage, settings_from_environment
+from infovore.config import (
+    ConfigError,
+    Settings,
+    SourceKind,
+    Stage,
+    resolve_guild_id,
+    settings_from_environment,
+)
 from infovore.db.connection import migrate, open_database
 from infovore.db.snapshot import snapshot as snapshot_db
 from infovore.db.status import collect_status
@@ -102,10 +110,11 @@ class SyncOptOutsCommand:
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
         async with context.source_factory(context.settings) as source:
+            guild_id = resolve_guild_id(context.settings, source)
             report = await sync_opt_outs(
                 context.conn,
                 source,
-                context.settings.guild_id,
+                guild_id,
                 context.settings.opt_out_role_name,
                 context.clock,
             )
@@ -118,9 +127,20 @@ class SyncOptOutsCommand:
 
 
 def default_source_factory(settings: Settings) -> AbstractAsyncContextManager[DiscordSource]:
+    if settings.source is SourceKind.EXPORT:
+        return _open_export_source(settings)
     from infovore.source.live import open_discord_source
 
     return open_discord_source(settings.discord_token)
+
+
+@contextlib.asynccontextmanager
+async def _open_export_source(settings: Settings) -> AsyncIterator[DiscordSource]:
+    if settings.export_dir is None:
+        raise ConfigError("INFOVORE_EXPORT_DIR is required")
+    from infovore.source.export import ExportDiscordSource
+
+    yield ExportDiscordSource(settings.export_dir)
 
 
 def _write_backfill_report(stdout: TextIO, report: BackfillReport) -> None:
@@ -144,10 +164,11 @@ class BackfillCommand:
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
         async with context.source_factory(context.settings) as source:
+            guild_id = resolve_guild_id(context.settings, source)
             report = await backfill(
                 context.conn,
                 source,
-                context.settings.guild_id,
+                guild_id,
                 context.settings.channel_ids,
                 context.clock,
                 context.sleeper,

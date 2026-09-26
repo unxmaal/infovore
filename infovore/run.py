@@ -10,7 +10,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from infovore.chunk.grouper import group_pending
-from infovore.config import Settings, Stage
+from infovore.config import Settings, Stage, resolve_guild_id
 from infovore.extract.llm_extractor import LLMClaimExtractor, LLMNoveltyProbe
 from infovore.extract.novelty import run_probe
 from infovore.extract.protocol import ClaimExtractor, NoveltyProbe
@@ -64,7 +64,7 @@ async def _run_cycle(
     await sync_opt_outs(
         conn,
         source,
-        settings.guild_id,
+        resolve_guild_id(settings, source),
         settings.opt_out_role_name,
         clock,
     )
