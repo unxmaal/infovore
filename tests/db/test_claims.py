@@ -446,3 +446,47 @@ def test_related_claims_never_raises_for_arbitrary_text(text: str) -> None:
     migrate(conn)
     result = related_claims(conn, text, limit=10)
     assert isinstance(result, list)
+
+
+def test_related_claims_matches_hyphenated_part_numbers_as_a_single_token(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    record_run(
+        conn, a_run(), [a_claim(statement="Replace assembly 030-1234-001 on failure", subject="s")]
+    )
+    results = related_claims(
+        conn, "Is part 030-1234-001 right? Confirm 030-1234-001 please.", limit=10
+    )
+    assert len(results) == 1
+
+
+def test_related_claims_matches_dotted_version_with_sentence_final_period(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    record_run(conn, a_run(), [a_claim(statement="xyzzy142 uses 6.5.22 internally", subject="s")])
+    results = related_claims(conn, "Only 6.5.22.", limit=10)
+    assert len(results) == 1
+
+
+def test_related_claims_matches_paths_with_trailing_period(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    record_run(
+        conn, a_run(), [a_claim(statement="xyzzy142 uses /usr/sbin/inst internally", subject="s")]
+    )
+    results = related_claims(conn, "Only /usr/sbin/inst.", limit=10)
+    assert len(results) == 1
+
+
+def test_related_claims_matches_non_ascii_words(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    record_run(
+        conn, a_run(), [a_claim(statement="check chassis Größe before shipping", subject="s")]
+    )
+    results = related_claims(conn, "Was ist die Größe?", limit=10)
+    assert len(results) == 1
