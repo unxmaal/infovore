@@ -44,40 +44,52 @@ def insert_exchange(
     if not message_ids or len(message_ids) != exchange.message_count:
         raise ValueError("message_ids must be non-empty and match exchange.message_count")
     with transaction(conn):
-        try:
-            cursor = conn.execute(
-                "INSERT INTO exchanges (channel_id, thread_id, first_message_id,"
-                " last_message_id, started_at, ended_at, message_count, grouping_rule,"
-                " content_hash, parent_exchange_id, extraction_status, retry_count,"
-                " last_error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    exchange.channel_id,
-                    exchange.thread_id,
-                    exchange.first_message_id,
-                    exchange.last_message_id,
-                    to_db_time(exchange.started_at),
-                    to_db_time(exchange.ended_at),
-                    exchange.message_count,
-                    exchange.grouping_rule.value,
-                    exchange.content_hash,
-                    exchange.parent_exchange_id,
-                    exchange.extraction_status.value,
-                    exchange.retry_count,
-                    exchange.last_error,
-                ),
+        duplicate = conn.execute(
+            "SELECT 1 FROM exchanges WHERE content_hash = ?", (exchange.content_hash,)
+        ).fetchone()
+        if duplicate is not None:
+            raise DuplicateExchangeError(exchange.content_hash)
+        placeholders = ", ".join("?" * len(message_ids))
+        already_grouped = {
+            row["message_id"]
+            for row in conn.execute(
+                f"SELECT message_id FROM exchange_messages WHERE message_id IN ({placeholders})",
+                tuple(message_ids),
+            ).fetchall()
+        }
+        if already_grouped:
+            offender = next(
+                message_id for message_id in message_ids if message_id in already_grouped
             )
-        except sqlite3.IntegrityError as error:
-            raise DuplicateExchangeError(exchange.content_hash) from error
+            raise MessageAlreadyGroupedError(offender)
+        cursor = conn.execute(
+            "INSERT INTO exchanges (channel_id, thread_id, first_message_id,"
+            " last_message_id, started_at, ended_at, message_count, grouping_rule,"
+            " content_hash, parent_exchange_id, extraction_status, retry_count,"
+            " last_error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                exchange.channel_id,
+                exchange.thread_id,
+                exchange.first_message_id,
+                exchange.last_message_id,
+                to_db_time(exchange.started_at),
+                to_db_time(exchange.ended_at),
+                exchange.message_count,
+                exchange.grouping_rule.value,
+                exchange.content_hash,
+                exchange.parent_exchange_id,
+                exchange.extraction_status.value,
+                exchange.retry_count,
+                exchange.last_error,
+            ),
+        )
         exchange_id = cast(int, cursor.lastrowid)
         for position, message_id in enumerate(message_ids):
-            try:
-                conn.execute(
-                    "INSERT INTO exchange_messages (exchange_id, message_id, position)"
-                    " VALUES (?, ?, ?)",
-                    (exchange_id, message_id, position),
-                )
-            except sqlite3.IntegrityError as error:
-                raise MessageAlreadyGroupedError(message_id) from error
+            conn.execute(
+                "INSERT INTO exchange_messages (exchange_id, message_id, position)"
+                " VALUES (?, ?, ?)",
+                (exchange_id, message_id, position),
+            )
     return exchange_id
 
 
