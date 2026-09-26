@@ -20,6 +20,7 @@ from infovore.privacy.optout import sync_opt_outs
 from infovore.rows import RunMode
 from infovore.source.protocol import DiscordSource
 from infovore.timing import Clock, Sleeper
+from infovore.triage.runner import triage_pending
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -95,6 +96,8 @@ async def _run_cycle(
         max_messages=settings.exchange_max_messages,
         include_bots=settings.include_bot_messages,
     )
+    progress(CycleStepStarted(step="triage"))
+    triage_pending(conn)
     extract_stage = settings.stages[Stage.EXTRACT]
     progress(CycleStepStarted(step="extract"))
     try:
@@ -108,6 +111,7 @@ async def _run_cycle(
             batch_size=settings.batch_size,
             max_retries=settings.max_retries,
             concurrency=extract_stage.concurrency,
+            min_score=settings.triage_min_score,
         )
     except PromptNotPromotedError as error:
         logger.warning(

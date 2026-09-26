@@ -7,13 +7,19 @@ from dataclasses import dataclass, field
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
 from infovore.db.claims import live_prompt_version as db_live_prompt_version
 from infovore.db.claims import retract_claim as db_retract_claim
-from infovore.db.exchanges import claimable_exchanges, get_exchange, set_status
+from infovore.db.exchanges import (
+    claimable_exchanges,
+    get_exchange,
+    has_untriaged_claimable,
+    set_status,
+)
 from infovore.db.exchanges import record_failure as db_record_failure
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION, permalink
 from infovore.extract.protocol import ClaimExtractor, ExtractedClaim, Failure, FailureKind
 from infovore.extract.request import build_request
 from infovore.rows import ExchangeRow, ExtractionRunRow, ExtractionStatus, RunMode, RunOutcome
 from infovore.timing import Clock, Sleeper
+from infovore.triage.score import TRIAGE_VERSION
 
 DEFAULT_USAGE_LIMIT_RETRY_AFTER = 300.0
 
@@ -22,6 +28,10 @@ class PromptNotPromotedError(Exception):
     def __init__(self, version: str) -> None:
         super().__init__(version)
         self.version = version
+
+
+class UntriagedExchangesError(Exception):
+    pass
 
 
 @dataclass(frozen=True)
@@ -130,9 +140,24 @@ def _size_bucket(message_count: int) -> str:
     return "21+"
 
 
-def select_trial_sample(conn: sqlite3.Connection, n: int, seed: int) -> list[int]:
+def select_trial_sample(
+    conn: sqlite3.Connection,
+    n: int,
+    seed: int,
+    min_score: float | None = None,
+    max_score: float | None = None,
+) -> list[int]:
+    conditions: list[str] = []
+    params: list[object] = []
+    if min_score is not None:
+        conditions.append("triage_score >= ?")
+        params.append(min_score)
+    if max_score is not None:
+        conditions.append("triage_score <= ?")
+        params.append(max_score)
+    where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
     rows = conn.execute(
-        "SELECT id, channel_id, message_count FROM exchanges ORDER BY id"
+        f"SELECT id, channel_id, message_count FROM exchanges{where} ORDER BY id", params
     ).fetchall()
     if n >= len(rows):
         return [row["id"] for row in rows]
@@ -348,12 +373,15 @@ async def run_extraction(
     batch_size: int,
     max_retries: int,
     concurrency: int,
+    min_score: float = 0.0,
     exchange_ids: Sequence[int] | None = None,
     progress: Progress = _ignore_progress,
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
         raise PromptNotPromotedError(PROMPT_VERSION)
+    if mode is RunMode.LIVE and has_untriaged_claimable(conn, TRIAGE_VERSION, max_retries):
+        raise UntriagedExchangesError()
 
     trial_batch: list[ExchangeRow] | None = None
     total: int | None = None
@@ -382,7 +410,7 @@ async def run_extraction(
 
     if mode is RunMode.LIVE:
         while True:
-            batch = claimable_exchanges(conn, batch_size, max_retries)
+            batch = claimable_exchanges(conn, batch_size, max_retries, min_score=min_score)
             if not batch:
                 break
             await _process_batch(context, batch)
