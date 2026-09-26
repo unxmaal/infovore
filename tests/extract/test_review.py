@@ -7,10 +7,12 @@ import pytest
 from infovore.db.claims import NewClaim, record_run, register_prompt_version, set_novelty
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import insert_exchange
+from infovore.db.labels import set_label
 from infovore.db.raw import upsert_channel
 from infovore.extract.review import (
     Review,
     UnknownRunIdsError,
+    VersionKey,
     build_review,
     render_review_html,
 )
@@ -22,6 +24,8 @@ from infovore.rows import (
     ExtractionRunRow,
     ExtractionStatus,
     GroupingRule,
+    Label,
+    LabelSource,
     MessageRow,
     Novelty,
     RunMode,
@@ -30,6 +34,8 @@ from infovore.rows import (
 
 GUILD_ID = 500
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
+V1 = VersionKey("v1", "m")
+V2 = VersionKey("v2", "m")
 
 
 def db(tmp_path: Path) -> sqlite3.Connection:
@@ -173,13 +179,13 @@ def test_build_review_single_version_has_no_diff(tmp_path: Path) -> None:
 
     review = build_review(conn, [run_id])
 
-    assert review.versions == ("v1",)
+    assert review.versions == (V1,)
     assert len(review.exchanges) == 1
     exchange_review = review.exchanges[0]
     assert exchange_review.exchange_id == exchange_id
     assert exchange_review.diff is None
-    assert set(exchange_review.runs) == {"v1"}
-    run = exchange_review.runs["v1"]
+    assert set(exchange_review.runs) == {V1}
+    run = exchange_review.runs[V1]
     assert run.run_id == run_id
     assert run.outcome is RunOutcome.OK
     assert len(run.claims) == 1
@@ -189,7 +195,11 @@ def test_build_review_single_version_has_no_diff(tmp_path: Path) -> None:
     assert review_claim.novelty is Novelty.UNKNOWN
     assert review_claim.probe_answer == "I don't know"
     assert review_claim.source_message_ids == (1001,)
-    summary = review.summaries["v1"]
+    assert exchange_review.triage_score is None
+    assert exchange_review.p_lore is None
+    assert exchange_review.triage_reasons == ()
+    assert exchange_review.effective_label is None
+    summary = review.summaries[V1]
     assert summary.exchanges == 1
     assert summary.claims == 1
     assert summary.claims_per_exchange == 1.0
@@ -262,7 +272,7 @@ def test_build_review_two_versions_diff_added_dropped_changed_verdict_shift(
 
     review = build_review(conn, [run1_id, run2_id])
 
-    assert review.versions == ("v1", "v2")
+    assert review.versions == (V1, V2)
     assert len(review.exchanges) == 1
     diff = review.exchanges[0].diff
     assert diff is not None
@@ -282,7 +292,7 @@ def test_build_review_two_versions_diff_added_dropped_changed_verdict_shift(
     assert octane_shift.before is Novelty.UNKNOWN
     assert octane_shift.after is Novelty.CONTRADICTS
 
-    v1_summary = review.summaries["v1"]
+    v1_summary = review.summaries[V1]
     assert v1_summary.claims == 3
     assert v1_summary.known_share == pytest.approx(1 / 3)
     assert v1_summary.verdict_distribution == {
@@ -292,7 +302,7 @@ def test_build_review_two_versions_diff_added_dropped_changed_verdict_shift(
     assert v1_summary.input_tokens_per_100_exchanges == pytest.approx(10000.0)
     assert v1_summary.output_tokens_per_100_exchanges == pytest.approx(5000.0)
 
-    v2_summary = review.summaries["v2"]
+    v2_summary = review.summaries[V2]
     assert v2_summary.claims == 3
     assert v2_summary.known_share == pytest.approx(1 / 3)
     assert v2_summary.verdict_distribution == {
@@ -325,21 +335,21 @@ def test_build_review_spans_multiple_exchanges_and_partial_version_coverage(
 
     review = build_review(conn, [run1_id, run2_id, run3_id])
 
-    assert review.versions == ("v1", "v2")
+    assert review.versions == (V1, V2)
     assert {exchange.exchange_id for exchange in review.exchanges} == {exchange1, exchange2}
     exchange1_review = next(e for e in review.exchanges if e.exchange_id == exchange1)
     exchange2_review = next(e for e in review.exchanges if e.exchange_id == exchange2)
-    assert set(exchange1_review.runs) == {"v1", "v2"}
+    assert set(exchange1_review.runs) == {V1, V2}
     assert exchange1_review.diff is not None
-    assert set(exchange2_review.runs) == {"v1"}
+    assert set(exchange2_review.runs) == {V1}
     assert exchange2_review.diff is None
 
-    v1_summary = review.summaries["v1"]
+    v1_summary = review.summaries[V1]
     assert v1_summary.exchanges == 2
     assert v1_summary.claims == 2
     assert v1_summary.claims_per_exchange == 1.0
 
-    v2_summary = review.summaries["v2"]
+    v2_summary = review.summaries[V2]
     assert v2_summary.exchanges == 1
     assert v2_summary.claims == 1
 
@@ -353,11 +363,11 @@ def test_build_review_records_a_failed_run(tmp_path: Path) -> None:
 
     review = build_review(conn, [run_id])
 
-    run = review.exchanges[0].runs["v1"]
+    run = review.exchanges[0].runs[V1]
     assert run.outcome is RunOutcome.FAILED
     assert run.error == "invalid_output: bad json"
     assert run.claims == ()
-    summary = review.summaries["v1"]
+    summary = review.summaries[V1]
     assert summary.failed_runs == 1
     assert summary.claims == 0
     assert summary.claims_per_exchange == 0.0
@@ -438,7 +448,7 @@ def test_render_review_html_renders_two_version_diff_sections(tmp_path: Path) ->
 def test_review_dataclass_is_frozen() -> None:
     review = Review(versions=(), exchanges=(), summaries={})
     with pytest.raises(AttributeError):
-        review.versions = ("x",)  # type: ignore[misc]
+        review.versions = ("x",)  # type: ignore[misc,assignment]
 
 
 def test_build_review_rejects_empty_run_ids(tmp_path: Path) -> None:
@@ -465,3 +475,51 @@ def test_render_review_html_shows_no_differences_when_versions_agree(tmp_path: P
 
     output = render_review_html(review)
     assert "no differences" in output
+
+
+def test_build_review_groups_runs_by_prompt_version_and_model(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1, "h1", [a_message(1001)])
+    claim_local = a_claim(exchange_id, "local model claim")
+    claim_claude = a_claim(exchange_id, "claude claim")
+    run_local_id, _ = seed_run(conn, exchange_id, "v1", [claim_local], model="local-llama")
+    run_claude_id, _ = seed_run(conn, exchange_id, "v1", [claim_claude], model="claude-sonnet-5")
+
+    review = build_review(conn, [run_local_id, run_claude_id])
+
+    local_key = VersionKey("v1", "local-llama")
+    claude_key = VersionKey("v1", "claude-sonnet-5")
+    assert set(review.versions) == {local_key, claude_key}
+    exchange_review = review.exchanges[0]
+    assert exchange_review.runs[local_key].claims[0].statement == "local model claim"
+    assert exchange_review.runs[claude_key].claims[0].statement == "claude claim"
+    assert exchange_review.diff is not None
+
+
+def test_build_review_exposes_rule_score_p_lore_reasons_and_effective_label(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1, "h1", [a_message(1001)])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.6, triage_reasons = ?, triage_version = 't1',"
+        " p_lore = 0.8 WHERE id = ?",
+        ('[["domain_terms", 0.15]]', exchange_id),
+    )
+    set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+    claim = a_claim(exchange_id, "needs a jumper on pin 3")
+    run_id, _ = seed_run(conn, exchange_id, "v1", [claim])
+
+    review = build_review(conn, [run_id])
+
+    exchange_review = review.exchanges[0]
+    assert exchange_review.triage_score == 0.6
+    assert exchange_review.p_lore == 0.8
+    assert exchange_review.triage_reasons == (("domain_terms", 0.15),)
+    assert exchange_review.effective_label is Label.LORE
+
+    output = render_review_html(review)
+    assert "0.600" in output
+    assert "0.800" in output
+    assert "domain_terms" in output
+    assert "lore" in output
