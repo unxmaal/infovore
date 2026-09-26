@@ -312,3 +312,30 @@ def reactions_for_messages(
         ReactionRow(message_id=row["message_id"], emoji=row["emoji"], count=row["count"])
         for row in rows
     ]
+
+
+def ungrouped_channel_ids(conn: sqlite3.Connection) -> list[int]:
+    rows = conn.execute(
+        "SELECT DISTINCT channel_id FROM messages WHERE id NOT IN"
+        " (SELECT message_id FROM exchange_messages) ORDER BY channel_id"
+    ).fetchall()
+    return [int(row["channel_id"]) for row in rows]
+
+
+def ungrouped_messages_for_channel(conn: sqlite3.Connection, channel_id: int) -> list[MessageRow]:
+    rows = conn.execute(
+        "SELECT * FROM messages WHERE channel_id = ? AND id NOT IN"
+        " (SELECT message_id FROM exchange_messages) ORDER BY created_at, id",
+        (channel_id,),
+    ).fetchall()
+    return [_message_from_row(row) for row in rows]
+
+
+def latest_exchange_for_thread(conn: sqlite3.Connection, thread_id: int) -> int | None:
+    row = conn.execute(
+        "SELECT id FROM exchanges WHERE thread_id = ? ORDER BY started_at DESC, id DESC LIMIT 1",
+        (thread_id,),
+    ).fetchone()
+    if row is None:
+        return None
+    return int(row["id"])

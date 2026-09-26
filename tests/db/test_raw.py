@@ -1,27 +1,39 @@
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from infovore.db.connection import migrate, open_database
+from infovore.db.exchanges import insert_exchange
 from infovore.db.raw import (
     UpsertOutcome,
     attachments_for_messages,
     get_backfill_checkpoint,
     get_channel,
     get_message,
+    latest_exchange_for_thread,
     mark_deleted,
     mark_edited,
     message_revisions,
     reactions_for_messages,
     set_backfill_checkpoint,
     set_reaction_count,
+    ungrouped_channel_ids,
+    ungrouped_messages_for_channel,
     upsert_attachment,
     upsert_channel,
     upsert_message,
 )
-from infovore.rows import AttachmentRow, ChannelKind, ChannelRow, MessageRow
+from infovore.rows import (
+    AttachmentRow,
+    ChannelKind,
+    ChannelRow,
+    ExchangeRow,
+    ExtractionStatus,
+    GroupingRule,
+    MessageRow,
+)
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -357,3 +369,113 @@ def test_reactions_for_messages_filters_by_message_id(conn: sqlite3.Connection) 
     set_reaction_count(conn, 2, "\U0001f44d", 1)
     fetched = reactions_for_messages(conn, [1])
     assert [r.message_id for r in fetched] == [1]
+
+
+def make_exchange_row(
+    content_hash: str,
+    channel_id: int = 1,
+    thread_id: int | None = None,
+    first_message_id: int = 1,
+    last_message_id: int = 1,
+    message_count: int = 1,
+    started_at: datetime = NOW,
+) -> ExchangeRow:
+    return ExchangeRow(
+        id=None,
+        channel_id=channel_id,
+        thread_id=thread_id,
+        first_message_id=first_message_id,
+        last_message_id=last_message_id,
+        started_at=started_at,
+        ended_at=started_at,
+        message_count=message_count,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash=content_hash,
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+
+
+def test_ungrouped_channel_ids_returns_only_channels_with_ungrouped_messages(
+    conn: sqlite3.Connection,
+) -> None:
+    upsert_message(conn, make_message(message_id=1, channel_id=1))
+    upsert_message(conn, make_message(message_id=2, channel_id=2))
+    insert_exchange(conn, make_exchange_row("h1", channel_id=1, first_message_id=1), [1])
+    assert ungrouped_channel_ids(conn) == [2]
+
+
+def test_ungrouped_channel_ids_empty_when_all_grouped(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message(message_id=1, channel_id=1))
+    insert_exchange(conn, make_exchange_row("h2", channel_id=1, first_message_id=1), [1])
+    assert ungrouped_channel_ids(conn) == []
+
+
+def test_ungrouped_messages_for_channel_excludes_grouped_and_other_channels(
+    conn: sqlite3.Connection,
+) -> None:
+    upsert_message(conn, make_message(message_id=1, channel_id=1, created_at=NOW))
+    upsert_message(
+        conn,
+        make_message(message_id=2, channel_id=1, created_at=NOW + timedelta(minutes=1)),
+    )
+    upsert_message(conn, make_message(message_id=3, channel_id=2, created_at=NOW))
+    insert_exchange(conn, make_exchange_row("h3", channel_id=1, first_message_id=1), [1])
+    result = ungrouped_messages_for_channel(conn, 1)
+    assert [message.id for message in result] == [2]
+
+
+def test_ungrouped_messages_for_channel_orders_by_created_at_then_id(
+    conn: sqlite3.Connection,
+) -> None:
+    upsert_message(conn, make_message(message_id=2, channel_id=1, created_at=NOW))
+    upsert_message(conn, make_message(message_id=1, channel_id=1, created_at=NOW))
+    upsert_message(
+        conn,
+        make_message(message_id=3, channel_id=1, created_at=NOW - timedelta(minutes=1)),
+    )
+    result = ungrouped_messages_for_channel(conn, 1)
+    assert [message.id for message in result] == [3, 1, 2]
+
+
+def test_latest_exchange_for_thread_returns_none_when_no_exchanges(
+    conn: sqlite3.Connection,
+) -> None:
+    assert latest_exchange_for_thread(conn, 77) is None
+
+
+def test_latest_exchange_for_thread_returns_most_recently_started(
+    conn: sqlite3.Connection,
+) -> None:
+    upsert_message(conn, make_message(message_id=1, channel_id=1))
+    upsert_message(
+        conn, make_message(message_id=2, channel_id=1, created_at=NOW + timedelta(hours=1))
+    )
+    older_id = insert_exchange(
+        conn,
+        make_exchange_row("h4", channel_id=1, thread_id=77, first_message_id=1, started_at=NOW),
+        [1],
+    )
+    newer_id = insert_exchange(
+        conn,
+        make_exchange_row(
+            "h5",
+            channel_id=1,
+            thread_id=77,
+            first_message_id=2,
+            started_at=NOW + timedelta(hours=1),
+        ),
+        [2],
+    )
+    assert older_id != newer_id
+    assert latest_exchange_for_thread(conn, 77) == newer_id
+
+
+def test_latest_exchange_for_thread_ignores_other_threads(conn: sqlite3.Connection) -> None:
+    upsert_message(conn, make_message(message_id=1, channel_id=1))
+    insert_exchange(
+        conn, make_exchange_row("h6", channel_id=1, thread_id=88, first_message_id=1), [1]
+    )
+    assert latest_exchange_for_thread(conn, 77) is None

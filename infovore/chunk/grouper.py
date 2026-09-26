@@ -1,0 +1,97 @@
+import hashlib
+import sqlite3
+from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import timedelta
+
+from infovore.chunk.rules import (
+    DEFAULT_MAX_MESSAGES,
+    DEFAULT_QUIET_GAP,
+    Group,
+    group_messages,
+    is_closed,
+)
+from infovore.db.exchanges import DuplicateExchangeError, exchange_for_message, insert_exchange
+from infovore.db.raw import (
+    latest_exchange_for_thread,
+    ungrouped_channel_ids,
+    ungrouped_messages_for_channel,
+)
+from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
+from infovore.timing import Clock
+
+
+@dataclass(frozen=True)
+class GroupingReport:
+    exchanges_created: int
+    messages_grouped: int
+    groups_deferred: int
+
+
+def _content_hash(message_ids: Sequence[int]) -> str:
+    joined = ",".join(str(message_id) for message_id in message_ids)
+    return hashlib.sha256(joined.encode()).hexdigest()
+
+
+def _resolve_parent(conn: sqlite3.Connection, group: Group) -> int | None:
+    if group.context:
+        parent = exchange_for_message(conn, group.context[0].id)
+        if parent is not None:
+            return parent
+    first_message = group.messages[0]
+    if first_message.reply_to_id is not None:
+        parent = exchange_for_message(conn, first_message.reply_to_id)
+        if parent is not None:
+            return parent
+    if group.rule == GroupingRule.THREAD and first_message.thread_id is not None:
+        return latest_exchange_for_thread(conn, first_message.thread_id)
+    return None
+
+
+def _persist_group(conn: sqlite3.Connection, channel_id: int, group: Group) -> int:
+    message_ids = [message.id for message in group.messages]
+    exchange = ExchangeRow(
+        id=None,
+        channel_id=channel_id,
+        thread_id=group.messages[0].thread_id,
+        first_message_id=message_ids[0],
+        last_message_id=message_ids[-1],
+        started_at=group.messages[0].created_at,
+        ended_at=group.messages[-1].created_at,
+        message_count=len(message_ids),
+        grouping_rule=group.rule,
+        content_hash=_content_hash(message_ids),
+        parent_exchange_id=_resolve_parent(conn, group),
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    insert_exchange(conn, exchange, message_ids)
+    return len(message_ids)
+
+
+def group_pending(
+    conn: sqlite3.Connection,
+    clock: Clock,
+    quiet_gap: timedelta = DEFAULT_QUIET_GAP,
+    max_messages: int = DEFAULT_MAX_MESSAGES,
+    include_bots: bool = False,
+) -> GroupingReport:
+    exchanges_created = 0
+    messages_grouped = 0
+    groups_deferred = 0
+    now = clock.now()
+    for channel_id in ungrouped_channel_ids(conn):
+        messages = ungrouped_messages_for_channel(conn, channel_id)
+        groups = group_messages(messages, quiet_gap, max_messages, include_bots)
+        for group in groups:
+            if not is_closed(group, now, quiet_gap):
+                groups_deferred += 1
+                continue
+            try:
+                grouped_count = _persist_group(conn, channel_id, group)
+            except DuplicateExchangeError:
+                continue
+            exchanges_created += 1
+            messages_grouped += grouped_count
+    return GroupingReport(exchanges_created, messages_grouped, groups_deferred)
