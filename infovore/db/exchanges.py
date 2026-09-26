@@ -38,6 +38,8 @@ def _row_to_exchange(row: sqlite3.Row) -> ExchangeRow:
         triage_score=row["triage_score"],
         triage_reasons=row["triage_reasons"],
         triage_version=row["triage_version"],
+        p_lore=row["p_lore"],
+        p_lore_model=row["p_lore_model"],
     )
 
 

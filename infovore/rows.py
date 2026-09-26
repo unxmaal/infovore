@@ -133,6 +133,8 @@ class ExchangeRow:
     triage_score: float | None = None
     triage_reasons: str | None = None
     triage_version: str | None = None
+    p_lore: float | None = None
+    p_lore_model: int | None = None
 
 
 @dataclass(frozen=True)

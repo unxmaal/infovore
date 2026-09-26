@@ -53,7 +53,7 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `attachments` | attachment metadata per message (files are not downloaded) |
 | `reactions` | current reaction count per message and emoji |
 | `opt_outs` | users holding the opt-out role, and since when |
-| `exchanges` | grouped conversations: channel, thread, first/last message, grouping rule, `content_hash` (unique), `parent_exchange_id` for context, `extraction_status` (`pending`, `done`, `skipped`, `failed`, `stale`), retry count and last error, and the deterministic `triage_score` / `triage_reasons` / `triage_version` (see "Triage") |
+| `exchanges` | grouped conversations: channel, thread, first/last message, grouping rule, `content_hash` (unique), `parent_exchange_id` for context, `extraction_status` (`pending`, `done`, `skipped`, `failed`, `stale`), retry count and last error, the deterministic `triage_score` / `triage_reasons` / `triage_version`, and the trained classifier's `p_lore` / `p_lore_model` (the `triage_model.version` that produced it; `NULL` until a model has scored the exchange) (see "Triage") |
 | `exchange_messages` | ordered membership; a message belongs to at most one exchange |
 | `prompt_versions` | every extraction prompt version with its text hash; the most recently promoted one is live |
 | `extraction_runs` | one row per extraction attempt: exchange, model, prompt version, mode (`trial` or `live`), outcome, tokens, error |
@@ -62,6 +62,8 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `claims_fts` | full-text index over claim subject and statement (`unicode61`, keeping `-./_` inside tokens) |
 | `lore` | the product view: current, live, probed, net-new claims (see "Consuming the database") |
 | `exchange_labels` | ground-truth `lore`/`noise` labels per exchange, one row per `(exchange_id, source)`: `llm` (derived from trial runs) or `human` (hand correction), with `source_ref` and `labeled_at`; a human label always wins over an LLM one (see "Triage") |
+| `triage_model` | one row per trained Bayes classifier: `version` (autoincrementing primary key), `trained_at`, `labels_used`, `holdout_size`, and `params_json` (the Robinson/Fisher hyperparameters plus the trained `lore_documents`/`noise_documents` totals needed to reconstruct the model) (see "Triage") |
+| `triage_tokens` | that model version's per-token counts: `(model_version, token)` primary key, `lore_count`, `noise_count` (see "Triage") |
 
 ## Configuration
 
