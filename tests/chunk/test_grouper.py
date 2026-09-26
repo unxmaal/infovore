@@ -6,8 +6,8 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from infovore.chunk.grouper import GroupingReport, group_pending
-from infovore.chunk.rules import drop_ungroupable
+from infovore.chunk.grouper import GroupingReport, _resolve_parent, group_pending
+from infovore.chunk.rules import Group, drop_ungroupable
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import (
     DuplicateExchangeError,
@@ -165,6 +165,35 @@ def test_group_pending_thread_revival_sets_parent_to_latest_thread_exchange(
     assert revived.parent_exchange_id == first_thread_exchange.id
 
 
+def test_group_pending_late_reply_parent_wins_over_thread_revival(
+    conn: sqlite3.Connection,
+) -> None:
+    seed(conn, make_message(100, channel_id=1, created_at=at(-1000)))
+    seed(
+        conn,
+        make_message(1, channel_id=77, thread_id=77, created_at=at(0)),
+        make_message(2, channel_id=77, thread_id=77, created_at=at(1)),
+    )
+    clock = FixedClock(at(1000))
+    group_pending(conn, clock, quiet_gap=timedelta(minutes=30))
+    unrelated = get_exchange(conn, 1)
+    thread_exchange = get_exchange(conn, 2)
+    assert unrelated is not None and thread_exchange is not None
+
+    seed(
+        conn,
+        make_message(3, channel_id=77, thread_id=77, created_at=at(2000), reply_to_id=100),
+        make_message(4, channel_id=77, thread_id=77, created_at=at(2001)),
+    )
+    clock.advance(timedelta(minutes=2000))
+    group_pending(conn, clock, quiet_gap=timedelta(minutes=30))
+    revived = get_exchange(conn, 3)
+    assert revived is not None
+    assert revived.grouping_rule == GroupingRule.THREAD
+    assert revived.parent_exchange_id == unrelated.id
+    assert revived.parent_exchange_id != thread_exchange.id
+
+
 def test_group_pending_duplicate_content_hash_is_tolerated(
     conn: sqlite3.Connection, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -233,6 +262,15 @@ def test_group_pending_include_bots_flag(conn: sqlite3.Connection) -> None:
     assert grouped_message_ids(conn) == {1, 2}
 
 
+def test_resolve_parent_falls_through_when_context_message_is_ungrouped(
+    conn: sqlite3.Connection,
+) -> None:
+    context_message = make_message(999, created_at=at(0))
+    current = make_message(1000, created_at=at(1))
+    group = Group(GroupingRule.QUIET_GAP, (current,), (context_message,))
+    assert _resolve_parent(conn, group) is None
+
+
 def test_group_pending_no_ungrouped_messages_is_a_noop(conn: sqlite3.Connection) -> None:
     clock = FixedClock(at(1000))
     report = group_pending(conn, clock, quiet_gap=timedelta(minutes=30))
@@ -248,9 +286,7 @@ def test_group_pending_split_part_parent_wins_over_late_reply(
     unrelated = get_exchange(conn, 1)
     assert unrelated is not None
 
-    messages = [
-        make_message(i, created_at=at(i), reply_to_id=100 if i == 0 else None) for i in range(5)
-    ]
+    messages = [make_message(i, created_at=at(i), reply_to_id=100) for i in range(5)]
     seed(conn, *messages)
     clock.advance(timedelta(minutes=100000))
     group_pending(conn, clock, quiet_gap=timedelta(minutes=30), max_messages=2)
