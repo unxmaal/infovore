@@ -1,6 +1,7 @@
 import json
 
 import openai
+from openai.types import CompletionUsage
 from openai.types.chat import ChatCompletionMessageParam
 from openai.types.shared_params import ResponseFormatJSONSchema
 
@@ -17,10 +18,10 @@ def _is_usage_limit(exc: openai.RateLimitError) -> bool:
     return "insufficient_quota" in (exc.code, exc.type)
 
 
-def _usage(raw: object) -> Usage:
+def _usage(raw: CompletionUsage | None) -> Usage:
     if raw is None:
         return Usage(None, None, None)
-    return Usage(raw.prompt_tokens, raw.completion_tokens, None)  # type: ignore[attr-defined]
+    return Usage(raw.prompt_tokens, raw.completion_tokens, None)
 
 
 class OpenAICompatBackend:
