@@ -153,12 +153,20 @@ def test_build_request_context_is_last_n_messages_of_parent_exchange(tmp_path: P
     child_id = insert_exchange(
         conn,
         an_exchange_row(
-            None, first_message_id=6, last_message_id=6, message_count=1, parent_exchange_id=parent_id
+            None,
+            first_message_id=6,
+            last_message_id=6,
+            message_count=1,
+            parent_exchange_id=parent_id,
         ),
         [6],
     )
     exchange = an_exchange_row(
-        child_id, first_message_id=6, last_message_id=6, message_count=1, parent_exchange_id=parent_id
+        child_id,
+        first_message_id=6,
+        last_message_id=6,
+        message_count=1,
+        parent_exchange_id=parent_id,
     )
 
     request = build_request(conn, exchange, context_size=3)
