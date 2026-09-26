@@ -14,6 +14,7 @@ from infovore.db.raw import (
     upsert_channel,
 )
 from infovore.ingest.normalize import normalize_channel, normalize_message
+from infovore.privacy.optout import opted_out_user_ids, redact_normalized
 from infovore.rows import ChannelKind
 from infovore.source.protocol import (
     DiscordSource,
@@ -70,11 +71,13 @@ def _commit_page(
     channel_report: ChannelReport,
 ) -> None:
     with transaction(conn):
+        opted_out = opted_out_user_ids(conn)
         for message in page:
             normalized = normalize_message(message, ingested_at, include_bots)
             if normalized is None:
                 channel_report.skipped += 1
                 continue
+            normalized = redact_normalized(normalized, opted_out)
             outcome = _upsert_message(conn, normalized.message)
             if outcome is UpsertOutcome.INSERTED:
                 channel_report.inserted += 1

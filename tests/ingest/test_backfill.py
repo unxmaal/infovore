@@ -53,6 +53,7 @@ def make_channel(
 def make_message(
     msg_id: int,
     channel_id: int = 1,
+    author_id: int = 5,
     author_is_bot: bool = False,
     is_system: bool = False,
     content: str = "hi",
@@ -63,7 +64,7 @@ def make_message(
         id=msg_id,
         channel_id=channel_id,
         guild_id=GUILD_ID,
-        author_id=5,
+        author_id=author_id,
         author_name="alice",
         author_is_bot=author_is_bot,
         is_system=is_system,
@@ -465,9 +466,7 @@ async def test_reprocessing_same_content_after_checkpoint_reset_is_unchanged(
 
 
 def opt_out_user(conn: sqlite3.Connection, user_id: int) -> None:
-    conn.execute(
-        "INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, NOW.isoformat())
-    )
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (?, ?)", (user_id, NOW.isoformat()))
 
 
 async def test_opted_out_author_messages_are_stored_redacted(tmp_path: Path) -> None:
@@ -496,7 +495,7 @@ async def test_opted_out_author_messages_are_stored_redacted(tmp_path: Path) -> 
                 reactions=(SourceReaction("👍", 2),),
                 raw={"content": "secret plans"},
             ),
-            make_message(2, channel_id=1, content="not opted out"),
+            make_message(2, channel_id=1, author_id=6, content="not opted out"),
         ],
     )
     report = await backfill(
