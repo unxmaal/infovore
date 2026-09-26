@@ -2,7 +2,9 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 
+from infovore.config import DEFAULT_TRIAGE_MIN_SCORE
 from infovore.db.codec import from_db_time
+from infovore.triage.score import TRIAGE_VERSION
 
 
 @dataclass(frozen=True)
@@ -17,10 +19,16 @@ class StatusReport:
     last_extraction_at: datetime | None
     last_probe_at: datetime | None
     live_prompt_version: str | None
+    triaged_exchanges: int
+    above_threshold_exchanges: int
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
     return int(conn.execute(sql).fetchone()[0])
+
+
+def _count_params(conn: sqlite3.Connection, sql: str, params: tuple[object, ...]) -> int:
+    return int(conn.execute(sql, params).fetchone()[0])
 
 
 def _counts(conn: sqlite3.Connection, sql: str) -> dict[str, int]:
@@ -40,7 +48,9 @@ def _live_prompt_version(conn: sqlite3.Connection) -> str | None:
     return str(row[0]) if row is not None else None
 
 
-def collect_status(conn: sqlite3.Connection) -> StatusReport:
+def collect_status(
+    conn: sqlite3.Connection, triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
+) -> StatusReport:
     return StatusReport(
         channels=_count(conn, "SELECT COUNT(*) FROM channels"),
         messages=_count(conn, "SELECT COUNT(*) FROM messages"),
@@ -59,4 +69,12 @@ def collect_status(conn: sqlite3.Connection) -> StatusReport:
         last_extraction_at=_latest_time(conn, "SELECT MAX(started_at) FROM extraction_runs"),
         last_probe_at=_latest_time(conn, "SELECT MAX(probed_at) FROM claims"),
         live_prompt_version=_live_prompt_version(conn),
+        triaged_exchanges=_count_params(
+            conn, "SELECT COUNT(*) FROM exchanges WHERE triage_version = ?", (TRIAGE_VERSION,)
+        ),
+        above_threshold_exchanges=_count_params(
+            conn,
+            "SELECT COUNT(*) FROM exchanges WHERE triage_version = ? AND triage_score >= ?",
+            (TRIAGE_VERSION, triage_min_score),
+        ),
     )
