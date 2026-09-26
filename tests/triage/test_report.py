@@ -2,6 +2,8 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import insert_exchange
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, MessageRow
@@ -107,7 +109,7 @@ def test_channel_stats_report_mean_and_count(tmp_path: Path) -> None:
     stats = compute_triage_stats(conn, min_score=0.3)
 
     mean1, count1 = stats.channel_stats[1]
-    assert mean1 == 0.3
+    assert mean1 == pytest.approx(0.3)
     assert count1 == 2
     mean2, count2 = stats.channel_stats[2]
     assert mean2 == 0.9
