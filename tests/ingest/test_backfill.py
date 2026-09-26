@@ -14,9 +14,9 @@ from infovore.ingest.backfill import BackfillReport, backfill
 from infovore.rows import ChannelKind
 from infovore.source.fake import FakeDiscordSource
 from infovore.source.protocol import (
-    SourceForbiddenError,
     SourceAttachment,
     SourceChannel,
+    SourceForbiddenError,
     SourceMessage,
     SourceRateLimitedError,
     SourceReaction,

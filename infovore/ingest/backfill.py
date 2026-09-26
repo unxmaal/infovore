@@ -19,6 +19,7 @@ from infovore.privacy.optout import opted_out_user_ids, redact_normalized
 from infovore.source.protocol import (
     DiscordSource,
     SourceChannel,
+    SourceForbiddenError,
     SourceMessage,
     SourceRateLimitedError,
     SourceUnavailableError,
@@ -110,6 +111,8 @@ async def _walk_channel(
                 _commit_page(conn, channel_id, page, clock.now(), include_bots, channel_report)
                 attempts = 0
             return None
+        except SourceForbiddenError as error:
+            return f"forbidden: {error}"
         except SourceRateLimitedError as error:
             attempts += 1
             if attempts >= max_attempts:

@@ -91,6 +91,10 @@ class SourceUnavailableError(Exception):
     pass
 
 
+class SourceForbiddenError(SourceUnavailableError):
+    pass
+
+
 class DiscordSource(Protocol):
     async def list_channels(self, guild_id: int) -> Sequence[SourceChannel]: ...
 
