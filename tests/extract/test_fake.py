@@ -155,12 +155,8 @@ async def test_correction_marker_without_supersedes() -> None:
 
 async def test_correction_marker_with_valid_supersedes() -> None:
     related = make_claim_row(7)
-    message = make_message(
-        5, "CORRECTION: widget :: it is a 50-pin connector [supersedes 7]"
-    )
-    outcome = await MarkerExtractor().extract(
-        make_request((message,), related_claims=(related,))
-    )
+    message = make_message(5, "CORRECTION: widget :: it is a 50-pin connector [supersedes 7]")
+    outcome = await MarkerExtractor().extract(make_request((message,), related_claims=(related,)))
     claim = outcome.claims[0]
     assert claim.statement == "it is a 50-pin connector"
     assert claim.supersedes_claim_id == 7
@@ -168,12 +164,8 @@ async def test_correction_marker_with_valid_supersedes() -> None:
 
 async def test_correction_marker_with_unknown_supersedes_is_ignored() -> None:
     related = make_claim_row(7)
-    message = make_message(
-        6, "CORRECTION: widget :: it is a 50-pin connector [supersedes 99]"
-    )
-    outcome = await MarkerExtractor().extract(
-        make_request((message,), related_claims=(related,))
-    )
+    message = make_message(6, "CORRECTION: widget :: it is a 50-pin connector [supersedes 99]")
+    outcome = await MarkerExtractor().extract(make_request((message,), related_claims=(related,)))
     claim = outcome.claims[0]
     assert claim.statement == "it is a 50-pin connector"
     assert claim.supersedes_claim_id is None
