@@ -1431,8 +1431,11 @@ class CrashOnSecondCallExtractor:
 
 def test_runs_are_stamped_with_batch_id_as_they_are_recorded(tmp_path: Path) -> None:
     conn = db(tmp_path)
-    seed_exchange(conn, [a_message(1, content="first")])
-    seed_exchange(conn, [a_message(2, content="second")])
+    first = seed_exchange(conn, [a_message(1, content="first")])
+    second = seed_exchange(conn, [a_message(2, content="second")])
+    assert first.id is not None
+    assert second.id is not None
+    exchange_ids = [first.id, second.id]
 
     async def go() -> None:
         await run_extraction(
@@ -1445,7 +1448,7 @@ def test_runs_are_stamped_with_batch_id_as_they_are_recorded(tmp_path: Path) -> 
             batch_size=10,
             max_retries=3,
             concurrency=1,
-            exchange_ids=None,
+            exchange_ids=exchange_ids,
             batch_id="batch-1",
         )
 

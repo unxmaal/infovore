@@ -150,6 +150,7 @@ class ExtractionRunRow:
     mode: RunMode
     outcome: RunOutcome
     error: str | None
+    batch_id: str | None = None
 
 
 @dataclass(frozen=True)

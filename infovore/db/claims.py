@@ -83,8 +83,8 @@ def record_run(
     with transaction(conn):
         cursor = conn.execute(
             "INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at,"
-            " finished_at, input_tokens, output_tokens, mode, outcome, error)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            " finished_at, input_tokens, output_tokens, mode, outcome, error, batch_id)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 run.exchange_id,
                 run.model,
@@ -96,6 +96,7 @@ def record_run(
                 run.mode.value,
                 run.outcome.value,
                 run.error,
+                run.batch_id,
             ),
         )
         run_id = cursor.lastrowid
