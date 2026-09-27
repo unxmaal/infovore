@@ -125,8 +125,8 @@ def test_permalink_formats_discord_url() -> None:
     assert permalink(1, 2, 3) == "https://discord.com/channels/1/2/3"
 
 
-def test_prompt_version_is_v2() -> None:
-    assert PROMPT_VERSION == "v2"
+def test_prompt_version_is_v3() -> None:
+    assert PROMPT_VERSION == "v3"
 
 
 def test_prompt_sha256_matches_system_prompt() -> None:
@@ -254,7 +254,7 @@ def test_render_prompt_snapshot() -> None:
     )
     rendered = render_prompt(request)
     assert rendered.system == SYSTEM_PROMPT
-    assert rendered.version == "v2"
+    assert rendered.version == "v3"
     assert rendered.prompt == (
         "CHANNEL: hardware\n"
         "\n"
@@ -297,3 +297,24 @@ def test_render_prompt_context_refs_are_not_citable() -> None:
     context = (a_message(50, content="earlier message"),)
     rendered = render_prompt(a_request(context_messages=context))
     assert rendered.refs == {"m1": 1, "m2": 2}
+
+
+def test_system_prompt_forbids_outside_knowledge() -> None:
+    assert "only what the messages say" in SYSTEM_PROMPT
+    assert "your own knowledge" in SYSTEM_PROMPT
+
+
+def test_system_prompt_preserves_uncertainty() -> None:
+    assert "reportedly" in SYSTEM_PROMPT
+    assert "lower the confidence" in SYSTEM_PROMPT
+
+
+def test_system_prompt_protects_private_individuals() -> None:
+    assert "usernames" in SYSTEM_PROMPT
+    assert "a community member" in SYSTEM_PROMPT
+    assert "Businesses and resellers may be named" in SYSTEM_PROMPT
+
+
+def test_system_prompt_keeps_market_history_in_scope() -> None:
+    assert "prices" in SYSTEM_PROMPT
+    assert "sales" in SYSTEM_PROMPT

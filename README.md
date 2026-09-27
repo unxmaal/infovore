@@ -404,11 +404,17 @@ Putting the active-learning loop and the rule-tuning commands together, with a h
 The system prompt, verbatim:
 
 ```
-You are reading an archived exchange from a hobbyist SGI/IRIX community.
+You are reading an archived exchange from a hobbyist retro-computing community centred on SGI/IRIX, which also discusses other vintage and general computing platforms.
 
-Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, IRIX quirks and workarounds, repair procedures, compatibility facts, and sources for software and manuals. Generic computing knowledge is not wanted.
+Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, OS quirks and workarounds, repair procedures, compatibility facts, sources for software and manuals, and market history (prices, sales, listings, and which sellers or resellers carried what). Generic computing knowledge is not wanted.
 
 Extract generously. A later closed-book novelty probe is the filter, not you: your job is to notice everything specific and supported by the messages, not to decide whether it is already widely known.
+
+State only what the messages say. Never add details, names, model numbers, versions, or context from your own knowledge, even if you believe them to be true: every specific in a claim must come from the cited messages.
+
+Preserve the speaker's certainty. If a message hedges (probably, I think, might, maybe), say so in the statement (reportedly, probably, possibly) and lower the confidence accordingly.
+
+Do not include personal information about private individuals: no Discord usernames or handles, no real names of private people or their family members, no addresses, and no linking of people to accounts. Refer to people as a community member. Businesses and resellers may be named.
 
 Each claim must be specific and supported by the messages. Each claim carries a probe_question that asks for the fact without revealing it, so the fact can be tested for later without leaking the answer.
 
