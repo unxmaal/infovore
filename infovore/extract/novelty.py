@@ -6,13 +6,18 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from infovore.cli import ExitCode, _say, stage_backend
-from infovore.config import Stage
+from infovore.config import ConfigError, Stage
 from infovore.db.claims import (
     claims_for_runs_needing_probe,
     claims_needing_probe,
     set_novelty,
     set_probe_error,
     unprobed_claims,
+)
+from infovore.db.run_selection import (
+    InvalidRunSelectorError,
+    NoTrialBatchError,
+    resolve_run_selector,
 )
 from infovore.extract.llm_extractor import LLMNoveltyProbe
 from infovore.extract.protocol import FailureKind, NoveltyProbe
@@ -172,7 +177,9 @@ class ProbeCommand:
     help = "closed-book novelty probe over unprobed claims"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument("--run-id", type=int, action="append", dest="run_ids", default=None)
+        parser.add_argument(
+            "--run-id", nargs="*", dest="run_ids", default=None, metavar="RUN_ID_OR_RANGE"
+        )
         parser.add_argument("--limit", type=int, default=None)
         parser.add_argument("--probe-model", type=str, default=None)
         parser.add_argument("--retry-failed", action="store_true")
@@ -183,7 +190,18 @@ class ProbeCommand:
         probe = LLMNoveltyProbe(probe_backend, judge_backend)
         limit = args.limit if args.limit is not None else context.settings.batch_size
         concurrency = context.settings.stages[Stage.PROBE].concurrency
-        run_ids = tuple(args.run_ids) if args.run_ids else None
+
+        run_ids: tuple[int, ...] | None = None
+        if args.run_ids is not None:
+            try:
+                run_ids = tuple(resolve_run_selector(context.conn, args.run_ids))
+            except NoTrialBatchError as error:
+                raise ConfigError(
+                    "no trial batch found; pass --run-id explicitly, or run"
+                    " `infovore extract --mode trial` first"
+                ) from error
+            except InvalidRunSelectorError as error:
+                raise ConfigError(str(error)) from error
 
         report = await run_probe(
             context.conn,

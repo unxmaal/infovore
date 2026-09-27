@@ -20,6 +20,11 @@ from infovore.db.claims import (
 from infovore.db.exchanges import exchange_message_ids, get_exchange
 from infovore.db.labels import effective_labels
 from infovore.db.raw import get_channel, messages_by_ids
+from infovore.db.run_selection import (
+    InvalidRunSelectorError,
+    NoTrialBatchError,
+    resolve_run_selector,
+)
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION, permalink
 from infovore.rows import ClaimKind, ClaimRow, Label, Novelty, RunOutcome
 
@@ -670,13 +675,23 @@ class ReviewCommand:
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument(
-            "--run-ids", type=int, nargs="+", required=True, dest="run_ids", metavar="ID"
+            "--run-ids", nargs="*", default=None, dest="run_ids", metavar="RUN_ID_OR_RANGE"
         )
         parser.add_argument("--out", type=Path, default=None)
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         try:
-            review = build_review(context.conn, args.run_ids)
+            run_ids = resolve_run_selector(context.conn, args.run_ids)
+        except NoTrialBatchError as error:
+            raise ConfigError(
+                "no trial batch found; pass --run-ids explicitly, or run"
+                " `infovore extract --mode trial` first"
+            ) from error
+        except InvalidRunSelectorError as error:
+            raise ConfigError(str(error)) from error
+
+        try:
+            review = build_review(context.conn, run_ids)
         except UnknownRunIdsError as error:
             raise ConfigError(str(error)) from error
 

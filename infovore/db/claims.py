@@ -129,6 +129,16 @@ def record_run(
     return RecordedRun(run_id, tuple(claim_ids))
 
 
+def set_batch_id(conn: sqlite3.Connection, run_ids: Sequence[int], batch_id: str) -> None:
+    if not run_ids:
+        return
+    placeholders = ",".join("?" for _ in run_ids)
+    conn.execute(
+        f"UPDATE extraction_runs SET batch_id = ? WHERE id IN ({placeholders})",
+        (batch_id, *run_ids),
+    )
+
+
 def _row_to_claim(row: sqlite3.Row) -> ClaimRow:
     return ClaimRow(
         id=row["id"],

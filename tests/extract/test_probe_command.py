@@ -404,7 +404,7 @@ def test_probe_command_run_id_accepts_range_syntax(tmp_path: Path) -> None:
 
 def test_probe_command_bare_run_id_flag_uses_latest_trial_batch(tmp_path: Path) -> None:
     env = environment(tmp_path)
-    _, run_id_a = seed(env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, statement="widget A")
+    seed(env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, statement="widget A")
     claim_b, run_id_b = seed(
         env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, statement="widget B"
     )

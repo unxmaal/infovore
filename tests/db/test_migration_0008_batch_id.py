@@ -54,7 +54,5 @@ def test_batch_id_can_be_set_and_indexed(tmp_path: Path) -> None:
         "INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at, mode,"
         " outcome, batch_id) VALUES (1, 'm', 'v1', 'now', 'trial', 'ok', 'batch-1')"
     )
-    row = conn.execute(
-        "SELECT batch_id FROM extraction_runs WHERE exchange_id = 1"
-    ).fetchone()
+    row = conn.execute("SELECT batch_id FROM extraction_runs WHERE exchange_id = 1").fetchone()
     assert row["batch_id"] == "batch-1"

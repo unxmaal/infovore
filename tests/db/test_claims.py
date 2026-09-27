@@ -228,13 +228,13 @@ def test_set_batch_id_stamps_the_given_runs(tmp_path: Path) -> None:
     insert_message(conn, 2)
     insert_exchange(conn, 2, 2)
     first = record_run(conn, a_run(exchange_id=1), [a_claim(exchange_id=1)])
-    second = record_run(conn, a_run(exchange_id=2), [a_claim(exchange_id=2, source_message_ids=(2,))])
+    second = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, source_message_ids=(2,))]
+    )
 
     set_batch_id(conn, [first.run_id, second.run_id], "batch-1")
 
-    rows = conn.execute(
-        "SELECT id, batch_id FROM extraction_runs ORDER BY id"
-    ).fetchall()
+    rows = conn.execute("SELECT id, batch_id FROM extraction_runs ORDER BY id").fetchall()
     assert [row["batch_id"] for row in rows] == ["batch-1", "batch-1"]
 
 

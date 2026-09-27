@@ -2,6 +2,8 @@ import argparse
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError, Stage
+from infovore.db.claims import set_batch_id
+from infovore.db.codec import to_db_time
 from infovore.extract.llm_extractor import LLMClaimExtractor
 from infovore.extract.runner import (
     ExchangeClaimed,
@@ -121,6 +123,8 @@ class ExtractCommand:
             raise ConfigError(
                 "pending exchanges are untriaged; run `infovore triage` first"
             ) from error
+
+        set_batch_id(context.conn, report.run_ids, to_db_time(context.clock.now()))
 
         context.stdout.write(
             f"processed={report.processed} succeeded={report.succeeded}"
