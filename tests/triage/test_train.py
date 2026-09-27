@@ -321,3 +321,21 @@ def test_recommend_table_accepts_custom_recall_targets(tmp_path: Path) -> None:
     rows = recommend_table(conn, min_recalls=(0.5,))
 
     assert [row.min_recall for row in rows] == [0.5]
+
+
+def test_recommend_table_share_is_measured_at_the_printed_threshold(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, version)
+    raw_share = recommend_table(conn, min_recalls=(0.5,))[0].share
+    assert raw_share is not None and raw_share < 1.0
+
+    monkeypatch.setattr("infovore.triage.train.format_threshold", lambda threshold, scored: "0")
+    row = recommend_table(conn, min_recalls=(0.5,))[0]
+
+    assert row.formatted_threshold == "0"
+    assert row.share == 1.0
