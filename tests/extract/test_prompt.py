@@ -126,7 +126,7 @@ def test_permalink_formats_discord_url() -> None:
 
 
 def test_prompt_version_is_v3() -> None:
-    assert PROMPT_VERSION == "v4"
+    assert PROMPT_VERSION == "v5"
 
 
 def test_prompt_sha256_matches_system_prompt() -> None:
@@ -254,7 +254,7 @@ def test_render_prompt_snapshot() -> None:
     )
     rendered = render_prompt(request)
     assert rendered.system == SYSTEM_PROMPT
-    assert rendered.version == "v4"
+    assert rendered.version == "v5"
     assert rendered.prompt == (
         "CHANNEL: hardware\n"
         "\n"
@@ -306,11 +306,13 @@ def test_system_prompt_forbids_adding_specifics() -> None:
 
 def test_system_prompt_still_extracts_generously() -> None:
     assert "Extract generously" in SYSTEM_PROMPT
-    assert "capture it" in SYSTEM_PROMPT
 
 
-def test_system_prompt_counts_general_software_history() -> None:
-    assert "general software" in SYSTEM_PROMPT
+def test_system_prompt_keeps_v2_framing_minimal() -> None:
+    assert SYSTEM_PROMPT.startswith(
+        "You are reading an archived exchange from a hobbyist SGI/IRIX community."
+    )
+    assert "general software" not in SYSTEM_PROMPT
 
 
 def test_system_prompt_preserves_uncertainty() -> None:
