@@ -287,7 +287,7 @@ def recommend_table(
         if metric is None:
             rows.append(RecommendationRow(min_recall, None, None, None))
             continue
-        share = _corpus_share(conn, metric.threshold)
         formatted = format_threshold(metric.threshold, holdout_scored)
+        share = _corpus_share(conn, float(formatted))
         rows.append(RecommendationRow(min_recall, metric, share, formatted))
     return rows
