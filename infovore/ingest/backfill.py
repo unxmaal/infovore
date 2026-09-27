@@ -21,6 +21,7 @@ from infovore.source.protocol import (
     SourceChannel,
     SourceForbiddenError,
     SourceMessage,
+    SourceNotFoundError,
     SourceRateLimitedError,
     SourceUnavailableError,
 )
@@ -171,6 +172,8 @@ async def _walk_channel(
             return None
         except SourceForbiddenError as error:
             return f"forbidden: {error}"
+        except SourceNotFoundError as error:
+            return f"not found: {error}"
         except SourceRateLimitedError as error:
             attempts += 1
             if attempts >= max_attempts:

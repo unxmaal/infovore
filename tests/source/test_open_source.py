@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Awaitable, Callable
-from typing import Any
+from typing import Any, NoReturn
 
 import pytest
 
@@ -20,6 +20,9 @@ class SessionClient:
 
     def get_channel(self, channel_id: int) -> None:
         return None
+
+    async def fetch_channel(self, channel_id: int) -> NoReturn:
+        raise SourceUnavailableError(f"channel {channel_id} not found")
 
     async def wait_until_ready(self) -> None:
         await self.ready.wait()

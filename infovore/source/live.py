@@ -17,6 +17,7 @@ from infovore.source.protocol import (
     SourceEvent,
     SourceForbiddenError,
     SourceMessage,
+    SourceNotFoundError,
     SourceRateLimitedError,
     SourceReaction,
     SourceUnavailableError,
@@ -221,6 +222,8 @@ def _map_http_error(
         return SourceRateLimitedError(_retry_after(error))
     if error.status == 403:
         return SourceForbiddenError(str(error))
+    if error.status == 404:
+        return SourceNotFoundError(str(error))
     return SourceUnavailableError(str(error))
 
 
@@ -296,6 +299,8 @@ class _ClientLike(Protocol):
 
     def get_channel(self, channel_id: int) -> _FetchableChannelLike | None: ...
 
+    async def fetch_channel(self, channel_id: int) -> _FetchableChannelLike: ...
+
 
 class _RawMessageRefLike(Protocol):
     @property
@@ -361,12 +366,21 @@ class DiscordPySource:
             raise SourceUnavailableError(str(error)) from error
         return found
 
+    async def _resolve_channel(self, channel_id: int) -> _FetchableChannelLike:
+        channel = self._client.get_channel(channel_id)
+        if channel is not None:
+            return channel
+        try:
+            return await self._client.fetch_channel(channel_id)
+        except discord.HTTPException as error:
+            raise _map_http_error(error) from error
+        except OSError as error:
+            raise SourceUnavailableError(str(error)) from error
+
     async def history(
         self, channel_id: int, after_id: int | None, page_size: int
     ) -> AsyncIterator[Sequence[SourceMessage]]:
-        channel = self._client.get_channel(channel_id)
-        if channel is None:
-            raise SourceUnavailableError(f"channel {channel_id} not found")
+        channel = await self._resolve_channel(channel_id)
         after = discord.Object(after_id) if after_id is not None else None
         page: list[SourceMessage] = []
         try:
@@ -406,8 +420,9 @@ class DiscordPySource:
         self._queue.put_nowait(None)
 
     async def _fetch_message(self, channel_id: int, message_id: int) -> _MessageLike | None:
-        channel = self._client.get_channel(channel_id)
-        if channel is None:
+        try:
+            channel = await self._resolve_channel(channel_id)
+        except SourceUnavailableError:
             return None
         try:
             return await channel.fetch_message(message_id)
