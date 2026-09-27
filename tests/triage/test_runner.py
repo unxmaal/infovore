@@ -9,7 +9,7 @@ import pytest
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, MessageRow
-from infovore.triage.rules import DEFAULT_RULES
+from infovore.triage.rules import DEFAULT_RULES, parse_rules
 from infovore.triage.runner import (
     CHANNEL_PRIOR_CAP,
     CHANNEL_PRIOR_WEIGHT,
@@ -19,6 +19,35 @@ from infovore.triage.runner import (
     triage_pending,
 )
 from infovore.triage.score import TRIAGE_VERSION, score_exchange
+
+CUSTOM_RULES_DATA: dict[str, object] = {
+    "domain_term_weight": 0.15,
+    "domain_term_cap": 0.45,
+    "irix_version_weight": 0.2,
+    "part_number_weight": 0.3,
+    "unix_path_weight": 0.15,
+    "code_weight": 0.15,
+    "archive_link_weight": 0.15,
+    "pdf_attachment_weight": 0.15,
+    "answered_question_weight": 0.2,
+    "agreed_answer_weight": 0.05,
+    "thread_weight": 0.05,
+    "substantial_weight": 0.1,
+    "tiny_penalty": -0.2,
+    "gif_penalty": -0.1,
+    "laughter_penalty": -0.1,
+    "substantial_characters": 400,
+    "answer_min_characters": 40,
+    "tiny_message_characters": 20,
+    "tiny_share_threshold": 0.7,
+    "laughter_share_threshold": 0.3,
+    "domain_terms": ["bananarama"],
+    "archive_link_hosts": ["bitsavers"],
+    "gif_hosts": ["tenor\\.com"],
+    "laughter_tokens": ["lol+"],
+    "agreement_emoji": ["✅"],
+}
+CUSTOM_RULES = parse_rules(CUSTOM_RULES_DATA, source="test")
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -375,3 +404,28 @@ def test_triage_pending_only_rescopes_exchanges_behind_the_model(tmp_path: Path)
     row = conn.execute("SELECT p_lore FROM exchanges WHERE id = ?", (exchange.id,)).fetchone()
     assert row["p_lore"] == -1.0
     assert version is not None
+
+
+def test_triage_pending_scores_p_lore_using_the_provided_rules(tmp_path: Path) -> None:
+    # SIG_domain_terms only fires for "bananarama" under CUSTOM_RULES, not DEFAULT_RULES: a
+    # model whose SIG_domain_terms token is strongly lore-weighted must be scored with the
+    # same rules it was trained under, or the virtual token it depends on never fires.
+    conn = db(tmp_path)
+    exchange = seed_exchange(conn, [a_message(1, "bananarama forever", 1)], "custom1")
+    assert exchange.id is not None
+    cursor = conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES ('2026-01-01T00:00:00Z', 20, 4, ?)",
+        (json.dumps({"lore_documents": 10, "noise_documents": 10}),),
+    )
+    version = int(cursor.lastrowid or 0)
+    conn.execute(
+        "INSERT INTO triage_tokens (model_version, token, lore_count, noise_count)"
+        " VALUES (?, 'SIG_domain_terms', 10, 0)",
+        (version,),
+    )
+
+    triage_pending(conn, rules=CUSTOM_RULES)
+
+    row = conn.execute("SELECT p_lore FROM exchanges WHERE id = ?", (exchange.id,)).fetchone()
+    assert row["p_lore"] > 0.5
