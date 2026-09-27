@@ -97,7 +97,10 @@ class StatusCommand:
 
     async def run(self, context: AppContext, args: argparse.Namespace) -> int:
         report = collect_status(
-            context.conn, context.settings.triage_min_score, context.settings.triage_min_p_lore
+            context.conn,
+            context.settings.triage_min_score,
+            context.settings.triage_min_p_lore,
+            rules=context.settings.triage_rules,
         )
         lines = [
             f"channels: {report.channels}",

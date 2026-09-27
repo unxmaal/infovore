@@ -2,7 +2,7 @@ import json
 import sqlite3
 from dataclasses import dataclass
 
-from infovore.triage.score import TRIAGE_VERSION
+from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
 TOP_REASONS_LIMIT = 10
 
@@ -21,10 +21,12 @@ def _bucket_label(score: float) -> str:
     return f"{index / 10:.1f}-{(index + 1) / 10:.1f}"
 
 
-def compute_triage_stats(conn: sqlite3.Connection, min_score: float) -> TriageStats:
+def compute_triage_stats(
+    conn: sqlite3.Connection, min_score: float, rules: TriageRules = DEFAULT_RULES
+) -> TriageStats:
     rows = conn.execute(
         "SELECT channel_id, triage_score, triage_reasons FROM exchanges WHERE triage_version = ?",
-        (TRIAGE_VERSION,),
+        (rules.version,),
     ).fetchall()
     histogram: dict[str, int] = {}
     channel_scores: dict[int, list[float]] = {}

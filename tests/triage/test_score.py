@@ -40,7 +40,7 @@ def signals(*messages: MessageRow, **kwargs: object) -> set[str]:
 
 
 def test_version_is_derived_from_the_rules_content_hash() -> None:
-    assert TRIAGE_VERSION == DEFAULT_RULES.version
+    assert DEFAULT_RULES.version == TRIAGE_VERSION
     assert TRIAGE_VERSION.startswith("r-")
 
 

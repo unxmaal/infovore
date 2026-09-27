@@ -68,24 +68,24 @@ def test_parse_rules_rejects_non_table() -> None:
 
 
 def test_parse_rules_rejects_unknown_key() -> None:
-    with pytest.raises(RulesError, match="unknown key.*bogus"):
+    with pytest.raises(RulesError, match=r"unknown key.*bogus"):
         parse_rules(valid_data(bogus=1), source="test")
 
 
 def test_parse_rules_rejects_missing_key() -> None:
     data = valid_data()
     del data["domain_term_weight"]
-    with pytest.raises(RulesError, match="missing key.*domain_term_weight"):
+    with pytest.raises(RulesError, match=r"missing key.*domain_term_weight"):
         parse_rules(data, source="test")
 
 
 def test_parse_rules_rejects_wrong_type_float() -> None:
-    with pytest.raises(RulesError, match="domain_term_weight.*must be a number"):
+    with pytest.raises(RulesError, match=r"domain_term_weight.*must be a number"):
         parse_rules(valid_data(domain_term_weight="a lot"), source="test")
 
 
 def test_parse_rules_rejects_bool_for_float_field() -> None:
-    with pytest.raises(RulesError, match="domain_term_weight.*must be a number"):
+    with pytest.raises(RulesError, match=r"domain_term_weight.*must be a number"):
         parse_rules(valid_data(domain_term_weight=True), source="test")
 
 
@@ -95,22 +95,22 @@ def test_parse_rules_accepts_int_for_float_field() -> None:
 
 
 def test_parse_rules_rejects_wrong_type_int() -> None:
-    with pytest.raises(RulesError, match="substantial_characters.*must be an integer"):
+    with pytest.raises(RulesError, match=r"substantial_characters.*must be an integer"):
         parse_rules(valid_data(substantial_characters=400.0), source="test")
 
 
 def test_parse_rules_rejects_bool_for_int_field() -> None:
-    with pytest.raises(RulesError, match="substantial_characters.*must be an integer"):
+    with pytest.raises(RulesError, match=r"substantial_characters.*must be an integer"):
         parse_rules(valid_data(substantial_characters=True), source="test")
 
 
 def test_parse_rules_rejects_wrong_type_list() -> None:
-    with pytest.raises(RulesError, match="domain_terms.*must be a list of strings"):
+    with pytest.raises(RulesError, match=r"domain_terms.*must be a list of strings"):
         parse_rules(valid_data(domain_terms="sgi"), source="test")
 
 
 def test_parse_rules_rejects_non_string_list_items() -> None:
-    with pytest.raises(RulesError, match="domain_terms.*must be a list of strings"):
+    with pytest.raises(RulesError, match=r"domain_terms.*must be a list of strings"):
         parse_rules(valid_data(domain_terms=["sgi", 1]), source="test")
 
 

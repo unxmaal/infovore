@@ -50,9 +50,7 @@ def test_golden_empty_exchange() -> None:
 
 
 def test_golden_chatter_only() -> None:
-    result = score_exchange(
-        [msg(1, "lol"), msg(2, "haha same", author_id=2), msg(3, "gm")]
-    )
+    result = score_exchange([msg(1, "lol"), msg(2, "haha same", author_id=2), msg(3, "gm")])
     assert result == TriageResult(0.0, (("mostly_tiny_messages", -0.2), ("laughter", -0.1)))
 
 
@@ -88,9 +86,7 @@ def test_golden_irix_version() -> None:
 
 def test_golden_irix_version_old_style() -> None:
     result = score_exchange([msg(1, "this was on IRIX 5.3 originally")])
-    assert result == TriageResult(
-        0.35, (("domain_terms", 0.15), ("irix_version", 0.2))
-    )
+    assert result == TriageResult(0.35, (("domain_terms", 0.15), ("irix_version", 0.2)))
 
 
 def test_golden_part_number() -> None:
@@ -159,9 +155,7 @@ def test_golden_self_reply_not_answered() -> None:
 
 
 def test_golden_thread_and_substantial() -> None:
-    result = score_exchange(
-        [msg(1, "the Octane needs the right PSU revision " * 12, thread_id=77)]
-    )
+    result = score_exchange([msg(1, "the Octane needs the right PSU revision " * 12, thread_id=77)])
     assert result == TriageResult(
         0.3, (("domain_terms", 0.15), ("thread", 0.05), ("substantial", 0.1))
     )
@@ -216,8 +210,7 @@ def test_golden_everything_maxed() -> None:
         [
             msg(
                 1,
-                "Octane Fuel Tezro Onyx Origin IP30 hinv PROM 6.5.22 060-0035-003"
-                " /usr/sbin/inst",
+                "Octane Fuel Tezro Onyx Origin IP30 hinv PROM 6.5.22 060-0035-003 /usr/sbin/inst",
             ),
             msg(
                 2,

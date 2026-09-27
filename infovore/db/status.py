@@ -6,7 +6,7 @@ from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE, DEFAULT_TRIAGE_MIN_SCORE
 from infovore.db.codec import from_db_time
 from infovore.db.labels import label_counts
 from infovore.triage.gate import gate_sql
-from infovore.triage.score import TRIAGE_VERSION
+from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
 
 @dataclass(frozen=True)
@@ -69,6 +69,7 @@ def collect_status(
     conn: sqlite3.Connection,
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE,
     triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
+    rules: TriageRules = DEFAULT_RULES,
 ) -> StatusReport:
     counts = label_counts(conn)
     latest_model_version, latest_model_labels_used = _latest_model(conn)
@@ -92,12 +93,12 @@ def collect_status(
         last_probe_at=_latest_time(conn, "SELECT MAX(probed_at) FROM claims"),
         live_prompt_version=_live_prompt_version(conn),
         triaged_exchanges=_count_params(
-            conn, "SELECT COUNT(*) FROM exchanges WHERE triage_version = ?", (TRIAGE_VERSION,)
+            conn, "SELECT COUNT(*) FROM exchanges WHERE triage_version = ?", (rules.version,)
         ),
         above_threshold_exchanges=_count_params(
             conn,
             "SELECT COUNT(*) FROM exchanges WHERE triage_version = ? AND triage_score >= ?",
-            (TRIAGE_VERSION, triage_min_score),
+            (rules.version, triage_min_score),
         ),
         labels_by_source=counts.by_source,
         labels_effective=counts.effective,

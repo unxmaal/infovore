@@ -1,0 +1,116 @@
+# Triage rule weights, thresholds and term lists (infovore.triage.rules.TriageRules).
+#
+# This is the shipped default. Override it with INFOVORE_TRIAGE_RULES=<path to a
+# copy of this file>, edited as needed; see the README's "Triage" section for the
+# meaning of each key. Editing this file (or the override) changes its content
+# hash, which is `infovore.triage.score.TRIAGE_VERSION` (e.g. `r-3f9a2b7c1d04`):
+# the next `infovore triage` run will treat every already-scored exchange as
+# stale and rescore it with the new rules. Whitespace-only and comment-only
+# edits do not change the hash (only the parsed values do).
+#
+# Every key below is required; unknown keys are a config error.
+
+# --- weights: added to the score when the signal fires --------------------
+domain_term_weight = 0.15       # per distinct domain term, up to domain_term_cap
+domain_term_cap = 0.45
+irix_version_weight = 0.2
+part_number_weight = 0.3
+unix_path_weight = 0.15
+code_weight = 0.15
+archive_link_weight = 0.15
+pdf_attachment_weight = 0.15
+answered_question_weight = 0.2
+agreed_answer_weight = 0.05
+thread_weight = 0.05
+substantial_weight = 0.1
+
+# --- penalties: subtracted from the score when the signal fires -----------
+tiny_penalty = -0.2
+gif_penalty = -0.1
+laughter_penalty = -0.1
+
+# --- thresholds -------------------------------------------------------------
+substantial_characters = 400     # total exchange character count for "substantial"
+answer_min_characters = 40       # a reply must be at least this long to count as an answer
+tiny_message_characters = 20     # a message shorter than this counts as "tiny"
+tiny_share_threshold = 0.7       # share of tiny messages that triggers the penalty
+laughter_share_threshold = 0.3   # share of laughter-only messages that triggers the penalty
+
+# --- term lists -------------------------------------------------------------
+
+# Regex fragments, ORed together inside `\b(?:...)\b` (case-insensitive): SGI/IRIX
+# model and board names, CPUs, tools and subsystems.
+domain_terms = [
+    'sgi',
+    'silicon graphics',
+    'irix',
+    'indy',
+    'indigo2?',
+    'o2',
+    'octane2?',
+    'fuel',
+    'tezro',
+    'onyx[234]?',
+    'origin',
+    'crimson',
+    'challenge',
+    'personal iris',
+    'ip\d{2}',
+    'r\d{4,5}',
+    'r1[0-6]k',
+    'hinv',
+    'inst',
+    'swmgr',
+    'nvram',
+    'prom',
+    'xfs',
+    'xlv',
+    'mipspro',
+    'sash',
+    'gio',
+    'xio',
+    'xtalk',
+    'vpro',
+    'odyssey',
+    'impact',
+    'infinitereality',
+    'reality engine',
+    'irixpro',
+    'nekoware',
+    'sgug',
+    'mipsel',
+    'mips',
+]
+
+# Regex fragments, ORed together inside `(?:https?|ftp)://\S*(?:...)\S*` (case-insensitive).
+archive_link_hosts = [
+    'ftp\.',
+    'archive\.org',
+    'techpubs',
+    'bitsavers',
+    'irix',
+    'sgi',
+    'nekochan',
+]
+
+# Regex fragments, ORed together inside `https?://\S*(?:...)\S*` (case-insensitive).
+gif_hosts = [
+    'tenor\.com',
+    'giphy\.com',
+    '\.gif\b',
+]
+
+# Regex fragments, ORed together inside `^\W*(?:...)\W*$` (case-insensitive): a
+# message that is nothing but laughter.
+laughter_tokens = [
+    'lol+',
+    'lmao+',
+    'rofl',
+    'ha(?:ha)+',
+    'hehe+',
+    'xd+',
+    'kek',
+]
+
+# Reactions on a later message that count as agreement with an answer.
+agreement_emoji = ["✅", "👍", "☑️", "✔️", "💯"]

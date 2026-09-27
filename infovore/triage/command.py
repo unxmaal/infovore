@@ -127,12 +127,15 @@ class TriageCommand:
         report = triage_pending(
             context.conn,
             progress=lambda event: _say(context.stdout, _describe_triage_event(event)),
+            rules=context.settings.triage_rules,
         )
         context.stdout.write(
             f"scored={report.scored} channels_adjusted={report.channels_adjusted}\n"
         )
         if args.report:
-            stats = compute_triage_stats(context.conn, context.settings.triage_min_score)
+            stats = compute_triage_stats(
+                context.conn, context.settings.triage_min_score, rules=context.settings.triage_rules
+            )
             context.stdout.write(_render_report(stats))
         return ExitCode.OK
 
