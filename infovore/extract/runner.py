@@ -127,6 +127,20 @@ def _ignore_progress(event: ExtractionEvent) -> None:
     return None
 
 
+@dataclass
+class _CanonicalModel:
+    """Tracks the backend's canonical model id (e.g. "claude-sonnet-5") once known.
+
+    Populated from the first successful extractor call in a `run_extraction`
+    invocation. A failed run has no canonical model of its own to report (the
+    backend never resolved one), so it falls back to whatever this invocation
+    has already learned, and only to the configured alias when nothing
+    canonical has been seen yet.
+    """
+
+    value: str | None = None
+
+
 @dataclass(frozen=True)
 class _RunContext:
     conn: sqlite3.Connection
@@ -140,6 +154,7 @@ class _RunContext:
     accumulator: _Accumulator
     progress: Progress
     total: int | None
+    canonical_model: _CanonicalModel
 
 
 def _size_bucket(message_count: int) -> str:
@@ -255,6 +270,8 @@ def _finish_success(
         )
         for claim in claims
     ]
+    if outcome_model is not None:
+        context.canonical_model.value = outcome_model
     run_row = ExtractionRunRow(
         id=None,
         exchange_id=exchange.id,
@@ -296,7 +313,7 @@ def _finish_failure(
     run_row = ExtractionRunRow(
         id=None,
         exchange_id=exchange.id,
-        model=context.model_label,
+        model=context.canonical_model.value or context.model_label,
         prompt_version=PROMPT_VERSION,
         started_at=now,
         finished_at=now,
@@ -441,6 +458,7 @@ async def run_extraction(
         accumulator=_Accumulator(),
         progress=progress,
         total=total,
+        canonical_model=_CanonicalModel(),
     )
     progress(ExtractionStarted(mode=mode, total=total))
 

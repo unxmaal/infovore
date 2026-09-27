@@ -318,6 +318,140 @@ def test_each_failure_kind_records_failed_run_and_increments_retry(
     assert kind.value in row["error"]
 
 
+def test_failure_after_a_prior_success_records_the_canonical_model_not_the_alias(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    succeeding_exchange = seed_exchange(conn, [a_message(1, content="hi")])
+    failing_exchange = seed_exchange(conn, [a_message(2, content="bye")])
+    assert succeeding_exchange.id is not None
+    assert failing_exchange.id is not None
+    succeeding_id = succeeding_exchange.id
+    failing_id = failing_exchange.id
+
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model="canonical-model",
+                input_tokens=None,
+                output_tokens=None,
+                failure=None,
+            ),
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=None,
+                output_tokens=None,
+                failure=Failure(FailureKind.FATAL, "boom", None),
+            ),
+        ]
+    )
+
+    async def go() -> ExtractionReport:
+        return await run_extraction(
+            conn,
+            extractor,
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="alias-model",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            exchange_ids=[succeeding_id, failing_id],
+        )
+
+    report = asyncio.run(go())
+
+    assert report.succeeded == 1
+    assert report.failed == 1
+    rows = {
+        row["exchange_id"]: row["model"]
+        for row in conn.execute("SELECT exchange_id, model FROM extraction_runs").fetchall()
+    }
+    assert rows[succeeding_id] == "canonical-model"
+    assert rows[failing_id] == "canonical-model"
+
+
+def test_success_without_a_reported_model_falls_back_to_the_alias(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = seed_exchange(conn, [a_message(1, content="hi")])
+    assert exchange.id is not None
+    exchange_id = exchange.id
+
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(), model=None, input_tokens=None, output_tokens=None, failure=None
+            )
+        ]
+    )
+
+    async def go() -> ExtractionReport:
+        return await run_extraction(
+            conn,
+            extractor,
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="alias-model",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            exchange_ids=[exchange_id],
+        )
+
+    report = asyncio.run(go())
+
+    assert report.succeeded == 1
+    row = conn.execute(
+        "SELECT model FROM extraction_runs WHERE id = ?", (report.run_ids[0],)
+    ).fetchone()
+    assert row["model"] == "alias-model"
+
+
+def test_failure_before_any_success_still_records_the_alias(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    failing_exchange = seed_exchange(conn, [a_message(1, content="bye")])
+    assert failing_exchange.id is not None
+    failing_id = failing_exchange.id
+
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=None,
+                output_tokens=None,
+                failure=Failure(FailureKind.FATAL, "boom", None),
+            )
+        ]
+    )
+
+    async def go() -> ExtractionReport:
+        return await run_extraction(
+            conn,
+            extractor,
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="alias-model",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            exchange_ids=[failing_id],
+        )
+
+    report = asyncio.run(go())
+
+    assert report.failed == 1
+    row = conn.execute(
+        "SELECT model FROM extraction_runs WHERE id = ?", (report.run_ids[0],)
+    ).fetchone()
+    assert row["model"] == "alias-model"
+
+
 def test_usage_limit_pauses_then_succeeds(tmp_path: Path) -> None:
     conn = db(tmp_path)
     seed_exchange(conn, [a_message(1)])
