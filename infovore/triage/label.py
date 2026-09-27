@@ -8,6 +8,11 @@ from typing import TYPE_CHECKING, TextIO
 from infovore.config import ConfigError
 from infovore.db.claims import claims_for_run, get_run
 from infovore.db.labels import set_label
+from infovore.db.run_selection import (
+    InvalidRunSelectorError,
+    NoTrialBatchError,
+    resolve_run_selector,
+)
 from infovore.rows import Label, LabelSource, Novelty, RunOutcome
 
 if TYPE_CHECKING:
@@ -98,7 +103,11 @@ class LabelCommand:
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument(
-            "--from-runs", type=int, nargs="+", dest="from_runs", default=None, metavar="RUN_ID"
+            "--from-runs",
+            nargs="*",
+            dest="from_runs",
+            default=None,
+            metavar="RUN_ID_OR_RANGE",
         )
         parser.add_argument("--exchange-id", type=int, default=None)
         group = parser.add_mutually_exclusive_group()
@@ -114,9 +123,18 @@ class LabelCommand:
             if args.lore or args.noise:
                 raise ConfigError("--lore/--noise apply only with --exchange-id")
             try:
+                run_ids = resolve_run_selector(context.conn, args.from_runs)
+            except NoTrialBatchError as error:
+                raise ConfigError(
+                    "no trial batch found; pass --from-runs explicitly, or run"
+                    " `infovore extract --mode trial` first"
+                ) from error
+            except InvalidRunSelectorError as error:
+                raise ConfigError(str(error)) from error
+            try:
                 report = derive_labels_from_runs(
                     context.conn,
-                    args.from_runs,
+                    run_ids,
                     context.clock.now(),
                     progress=lambda run_id, outcome: _say(
                         context.stdout, f"run {run_id}: {outcome}"

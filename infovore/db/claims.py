@@ -83,8 +83,8 @@ def record_run(
     with transaction(conn):
         cursor = conn.execute(
             "INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at,"
-            " finished_at, input_tokens, output_tokens, mode, outcome, error)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            " finished_at, input_tokens, output_tokens, mode, outcome, error, batch_id)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 run.exchange_id,
                 run.model,
@@ -96,6 +96,7 @@ def record_run(
                 run.mode.value,
                 run.outcome.value,
                 run.error,
+                run.batch_id,
             ),
         )
         run_id = cursor.lastrowid
@@ -127,6 +128,16 @@ def record_run(
                     (claim_id, message_id),
                 )
     return RecordedRun(run_id, tuple(claim_ids))
+
+
+def set_batch_id(conn: sqlite3.Connection, run_ids: Sequence[int], batch_id: str) -> None:
+    if not run_ids:
+        return
+    placeholders = ",".join("?" for _ in run_ids)
+    conn.execute(
+        f"UPDATE extraction_runs SET batch_id = ? WHERE id IN ({placeholders})",
+        (batch_id, *run_ids),
+    )
 
 
 def _row_to_claim(row: sqlite3.Row) -> ClaimRow:

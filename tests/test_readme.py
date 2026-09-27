@@ -93,6 +93,17 @@ def test_configuration_documents_the_shared_channel_allowlist() -> None:
     assert "optional" in configuration
 
 
+def test_running_section_documents_the_shared_run_selector() -> None:
+    running = section("Running")
+    for needle in (
+        "infovore.db.run_selection",
+        "latest trial batch",
+        "batch_id",
+        "220-419",
+    ):
+        assert needle in running, needle
+
+
 def test_triage_section_documents_every_signal_and_the_version() -> None:
     import inspect
 

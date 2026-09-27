@@ -155,6 +155,7 @@ class _RunContext:
     progress: Progress
     total: int | None
     canonical_model: _CanonicalModel
+    batch_id: str | None
 
 
 def _size_bucket(message_count: int) -> str:
@@ -284,6 +285,7 @@ def _finish_success(
         mode=context.mode,
         outcome=RunOutcome.OK,
         error=None,
+        batch_id=context.batch_id,
     )
 
     previous_claim_ids: list[int] = []
@@ -322,6 +324,7 @@ def _finish_failure(
         mode=context.mode,
         outcome=RunOutcome.FAILED,
         error=failure.message,
+        batch_id=context.batch_id,
     )
     recorded = record_run(context.conn, run_row, [])
     context.accumulator.run_ids.append(recorded.run_id)
@@ -429,6 +432,7 @@ async def run_extraction(
     min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     exchange_ids: Sequence[int] | None = None,
     progress: Progress = _ignore_progress,
+    batch_id: str | None = None,
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
@@ -459,6 +463,7 @@ async def run_extraction(
         progress=progress,
         total=total,
         canonical_model=_CanonicalModel(),
+        batch_id=batch_id,
     )
     progress(ExtractionStarted(mode=mode, total=total))
 

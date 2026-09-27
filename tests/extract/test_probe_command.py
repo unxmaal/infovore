@@ -386,3 +386,68 @@ def test_probe_command_run_id_flag_scopes_to_run(tmp_path: Path) -> None:
     claim = get_claim(conn, claim_b)
     assert claim is not None
     assert claim.novelty is Novelty.UNPROBED
+
+
+def test_probe_command_run_id_accepts_range_syntax(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    _, run_id_a = seed(env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, statement="widget A")
+    _, run_id_b = seed(env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, statement="widget B")
+    low, high = sorted((run_id_a, run_id_b))
+    code, out, _ = run(
+        ["probe", "--run-id", f"{low}-{high}"],
+        env,
+        registry_with(ScriptedLLMFactory(verdict="known")),
+    )
+    assert code == ExitCode.OK
+    assert "probed: 2" in out
+
+
+def test_probe_command_bare_run_id_flag_uses_latest_trial_batch(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, statement="widget A")
+    claim_b, run_id_b = seed(
+        env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, statement="widget B"
+    )
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    conn.execute(
+        "UPDATE extraction_runs SET mode = 'trial', batch_id = ? WHERE id = ?",
+        ("2026-01-02T00:00:00+00:00", run_id_b),
+    )
+    conn.close()
+
+    code, out, _ = run(
+        ["probe", "--run-id"], env, registry_with(ScriptedLLMFactory(verdict="known"))
+    )
+
+    assert code == ExitCode.OK
+    assert "probed: 1" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    claim = get_claim(conn, claim_b)
+    assert claim is not None
+    assert claim.novelty is Novelty.KNOWN
+
+
+def test_probe_command_bare_run_id_flag_without_a_trial_batch_exits_config(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+
+    code, _, err = run(
+        ["probe", "--run-id"], env, registry_with(ScriptedLLMFactory(verdict="known"))
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "extract --mode trial" in err
+
+
+def test_probe_command_run_id_rejects_an_invalid_selector_token(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+
+    code, _, err = run(
+        ["probe", "--run-id", "abc"], env, registry_with(ScriptedLLMFactory(verdict="known"))
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "abc" in err

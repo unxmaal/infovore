@@ -1,4 +1,5 @@
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -25,6 +26,7 @@ from infovore.db.claims import (
     retract_claim,
     retract_claims_with_all_sources_deleted,
     retract_claims_with_all_sources_opted_out,
+    set_batch_id,
     set_novelty,
     set_probe_error,
     unprobed_claims,
@@ -219,6 +221,35 @@ def test_record_run_supersedes_link_resolves(tmp_path: Path) -> None:
     superseding = get_claim(conn, second.claim_ids[0])
     assert superseding is not None
     assert superseding.supersedes_claim_id == original_id
+
+
+def test_set_batch_id_stamps_the_given_runs(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    first = record_run(conn, a_run(exchange_id=1), [a_claim(exchange_id=1)])
+    second = record_run(
+        conn, a_run(exchange_id=2), [a_claim(exchange_id=2, source_message_ids=(2,))]
+    )
+
+    set_batch_id(conn, [first.run_id, second.run_id], "batch-1")
+
+    rows = conn.execute("SELECT id, batch_id FROM extraction_runs ORDER BY id").fetchall()
+    assert [row["batch_id"] for row in rows] == ["batch-1", "batch-1"]
+
+
+def test_set_batch_id_is_a_noop_for_an_empty_list_of_run_ids(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    result = record_run(conn, a_run(), [a_claim()])
+
+    set_batch_id(conn, [], "batch-1")
+
+    row = conn.execute(
+        "SELECT batch_id FROM extraction_runs WHERE id = ?", (result.run_id,)
+    ).fetchone()
+    assert row["batch_id"] is None
 
 
 def test_record_run_rolls_back_everything_on_failure(tmp_path: Path) -> None:
@@ -668,3 +699,14 @@ def test_related_claims_matches_non_ascii_words(tmp_path: Path) -> None:
     )
     results = related_claims(conn, "Was ist die Größe?", limit=10)
     assert len(results) == 1
+
+
+def test_record_run_persists_batch_id(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    run = replace(a_run(exchange_id=1), batch_id="batch-7")
+    recorded = record_run(conn, run, [a_claim(exchange_id=1)])
+    row = conn.execute(
+        "SELECT batch_id FROM extraction_runs WHERE id = ?", (recorded.run_id,)
+    ).fetchone()
+    assert row["batch_id"] == "batch-7"

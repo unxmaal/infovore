@@ -2,6 +2,7 @@ import argparse
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError, Stage
+from infovore.db.codec import to_db_time
 from infovore.extract.llm_extractor import LLMClaimExtractor
 from infovore.extract.runner import (
     ExchangeClaimed,
@@ -111,6 +112,7 @@ class ExtractCommand:
                 min_p_lore=context.settings.triage_min_p_lore,
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
+                batch_id=to_db_time(context.clock.now()),
             )
         except PromptNotPromotedError as error:
             raise ConfigError(
