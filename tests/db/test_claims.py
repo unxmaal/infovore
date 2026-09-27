@@ -710,3 +710,26 @@ def test_record_run_persists_batch_id(tmp_path: Path) -> None:
         "SELECT batch_id FROM extraction_runs WHERE id = ?", (recorded.run_id,)
     ).fetchone()
     assert row["batch_id"] == "batch-7"
+
+
+def test_related_claims_can_exclude_one_exchanges_own_claims(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    insert_message(conn, 2)
+    insert_exchange(conn, 2, 2)
+    own = record_run(
+        conn, a_run(exchange_id=1), [a_claim(statement="Zeta widget own", subject="s")]
+    )
+    other = record_run(
+        conn,
+        a_run(exchange_id=2),
+        [
+            a_claim(
+                exchange_id=2, statement="Zeta widget other", subject="s", source_message_ids=(2,)
+            )
+        ],
+    )
+    everything = [c.id for c in related_claims(conn, "Zeta widget", limit=10)]
+    assert set(everything) == {own.claim_ids[0], other.claim_ids[0]}
+    excluded = [c.id for c in related_claims(conn, "Zeta widget", limit=10, exclude_exchange_id=1)]
+    assert excluded == [other.claim_ids[0]]

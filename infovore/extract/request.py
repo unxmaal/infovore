@@ -48,6 +48,8 @@ def build_request(
         context_messages=_context_messages(conn, exchange, context_size),
         attachments=tuple(attachments_for_messages(conn, message_ids)),
         reactions=tuple(reactions_for_messages(conn, message_ids)),
-        related_claims=tuple(related_claims(conn, query_text, related_limit)),
+        related_claims=tuple(
+            related_claims(conn, query_text, related_limit, exclude_exchange_id=exchange.id)
+        ),
         opted_out_user_ids=opted_out,
     )

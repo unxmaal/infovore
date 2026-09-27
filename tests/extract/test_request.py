@@ -368,3 +368,46 @@ def test_build_request_related_claims_ignore_opted_out_authors_content(tmp_path:
     request = build_request(conn, exchange, related_limit=10)
 
     assert request.related_claims == ()
+
+
+def test_build_request_never_offers_an_exchanges_own_claims_as_related(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    upsert_message(conn, a_message(100, content="Octane2 PROM jumper settings"))
+    exchange_id = insert_exchange(
+        conn, an_exchange_row(None, first_message_id=100, last_message_id=100), [100]
+    )
+    register_prompt_version(conn, "v1", "sha", NOW)
+    record_run(
+        conn,
+        ExtractionRunRow(
+            id=None,
+            exchange_id=exchange_id,
+            model="m",
+            prompt_version="v1",
+            started_at=NOW,
+            finished_at=NOW,
+            input_tokens=1,
+            output_tokens=1,
+            mode=RunMode.LIVE,
+            outcome=RunOutcome.OK,
+            error=None,
+        ),
+        [
+            NewClaim(
+                exchange_id=exchange_id,
+                statement="Octane2 needs a jumper for the PROM socket",
+                subject="Octane2",
+                kind=ClaimKind.FACT,
+                confidence=0.9,
+                probe_question="what does the octane2 need?",
+                permalink="https://discord.com/channels/1/1/100",
+                supersedes_claim_id=None,
+                source_message_ids=(100,),
+            )
+        ],
+    )
+    exchange = an_exchange_row(exchange_id, first_message_id=100, last_message_id=100)
+
+    request = build_request(conn, exchange, related_limit=10)
+
+    assert request.related_claims == ()

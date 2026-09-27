@@ -357,7 +357,9 @@ def _match_expression(text: str) -> str | None:
     return " OR ".join('"' + token.replace('"', '""') + '"' for token in tokens)
 
 
-def related_claims(conn: sqlite3.Connection, text: str, limit: int) -> list[ClaimRow]:
+def related_claims(
+    conn: sqlite3.Connection, text: str, limit: int, exclude_exchange_id: int | None = None
+) -> list[ClaimRow]:
     expression = _match_expression(text)
     if expression is None:
         return []
@@ -366,7 +368,8 @@ def related_claims(conn: sqlite3.Connection, text: str, limit: int) -> list[Clai
         " JOIN claims c ON c.id = claims_fts.rowid"
         " JOIN extraction_runs r ON r.id = c.extraction_run_id"
         " WHERE claims_fts MATCH ? AND c.retracted_at IS NULL AND r.mode = ?"
+        " AND c.exchange_id IS NOT ?"
         " ORDER BY bm25(claims_fts, 2.0, 1.0) LIMIT ?",
-        (expression, RunMode.LIVE.value, limit),
+        (expression, RunMode.LIVE.value, exclude_exchange_id, limit),
     ).fetchall()
     return [_row_to_claim(row) for row in rows]
