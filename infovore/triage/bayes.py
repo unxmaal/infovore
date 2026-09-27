@@ -5,6 +5,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 
 from infovore.rows import AttachmentRow, Label, MessageRow, ReactionRow
+from infovore.triage.rules import DEFAULT_RULES, TriageRules
 from infovore.triage.score import score_exchange
 
 UNKNOWN_WORD_STRENGTH = 1.0
@@ -80,6 +81,7 @@ def features(
     channel_id: int,
     reactions: Sequence[ReactionRow] = (),
     attachments: Sequence[AttachmentRow] = (),
+    rules: TriageRules = DEFAULT_RULES,
 ) -> frozenset[str]:
     words = {
         token.rstrip(TRAILING_PUNCTUATION)
@@ -87,7 +89,7 @@ def features(
         for token in TOKEN.findall(message.content.lower())
     }
     words = {word for word in words if word and len(word) <= MAX_TOKEN_LENGTH}
-    triage = score_exchange(messages, reactions, attachments)
+    triage = score_exchange(messages, reactions, attachments, rules)
     virtual = {f"SIG_{name}" for name, _ in triage.reasons}
     return frozenset(words | virtual | {f"CHAN_{channel_id}", _length_bucket(len(messages))})
 

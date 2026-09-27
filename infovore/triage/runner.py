@@ -155,7 +155,7 @@ def triage_pending(
     loaded_model = load_latest_model(conn)
     if loaded_model is not None:
         model_version, model = loaded_model
-        score_stale(conn, model, model_version)
+        score_stale(conn, model, model_version, rules)
 
     return TriageReport(
         candidates=len(candidate_ids),
