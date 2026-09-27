@@ -1,11 +1,12 @@
 import hashlib
 import math
+import re
 from dataclasses import dataclass
 
 from infovore.extract.protocol import ExtractionRequest
 from infovore.rows import AttachmentRow, MessageRow, ReactionRow
 
-PROMPT_VERSION = "v3"
+PROMPT_VERSION = "v4"
 
 SYSTEM_PROMPT = (
     "You are reading an archived exchange from a hobbyist retro-computing "
@@ -15,28 +16,27 @@ SYSTEM_PROMPT = (
     "Your job is to capture domain knowledge a general-purpose LLM would not "
     "already have: specific part numbers, jumper settings, PROM/firmware "
     "versions, OS quirks and workarounds, repair procedures, compatibility "
-    "facts, sources for software and manuals, and market history (prices, "
-    "sales, listings, and which sellers or resellers carried what). Generic "
-    "computing knowledge is not wanted.\n"
+    "facts, sources for software and manuals, the history and community "
+    "experience of general software and hardware, and market history "
+    "(prices, sales, listings, and which sellers or resellers carried what). "
+    "Generic textbook computing knowledge is not wanted.\n"
     "\n"
     "Extract generously. A later closed-book novelty probe is the filter, not "
     "you: your job is to notice everything specific and supported by the "
-    "messages, not to decide whether it is already widely known.\n"
+    "messages, not to decide whether it is already widely known. When unsure "
+    "whether something is worth keeping, capture it.\n"
     "\n"
-    "State only what the messages say. Never add details, names, model "
-    "numbers, versions, or context from your own knowledge, even if you "
-    "believe them to be true: every specific in a claim must come from the "
-    "cited messages.\n"
+    "Do not add specifics that are not in the messages: no numbers, versions, "
+    "model names, or other details from your own knowledge, even if you "
+    "believe them to be true.\n"
     "\n"
     "Preserve the speaker's certainty. If a message hedges (probably, I "
     "think, might, maybe), say so in the statement (reportedly, probably, "
     "possibly) and lower the confidence accordingly.\n"
     "\n"
-    "Do not include personal information about private individuals: no "
-    "Discord usernames or handles, no real names of private people or their "
-    "family members, no addresses, and no linking of people to accounts. "
-    "Refer to people as a community member. Businesses and resellers may be "
-    "named.\n"
+    "Authors appear as pseudonyms (member-A, member-B, ...). Never put a "
+    "pseudonym or any other person's name in a claim; say a community "
+    "member instead. Businesses and resellers may be named.\n"
     "\n"
     "Each claim must be specific and supported by the messages. Each claim "
     "carries a probe_question that asks for the fact without revealing it, so "
@@ -77,12 +77,47 @@ def permalink(guild_id: int, channel_id: int, message_id: int) -> str:
     return f"https://discord.com/channels/{guild_id}/{channel_id}/{message_id}"
 
 
+MENTION = re.compile(r"<@!?(\d+)>")
+REDACTED = "[redacted]"
+UNKNOWN_MEMBER = "another member"
+
+
+def pseudonym(index: int) -> str:
+    letters = ""
+    index += 1
+    while index:
+        index, remainder = divmod(index - 1, 26)
+        letters = chr(ord("A") + remainder) + letters
+    return f"member-{letters}"
+
+
+def _pseudonyms(request: ExtractionRequest) -> dict[int, str]:
+    names: dict[int, str] = {}
+    for message in (*request.context_messages, *request.messages):
+        if message.author_id in request.opted_out_user_ids or message.author_id in names:
+            continue
+        names[message.author_id] = pseudonym(len(names))
+    return names
+
+
+def _replace_mentions(
+    content: str, names: dict[int, str], opted_out_user_ids: frozenset[int]
+) -> str:
+    def replace(match: re.Match[str]) -> str:
+        user_id = int(match.group(1))
+        if user_id in opted_out_user_ids:
+            return REDACTED
+        return names.get(user_id, UNKNOWN_MEMBER)
+
+    return MENTION.sub(replace, content)
+
+
 def _redacted_author_and_content(
-    message: MessageRow, opted_out_user_ids: frozenset[int]
+    message: MessageRow, opted_out_user_ids: frozenset[int], names: dict[int, str]
 ) -> tuple[str, str]:
     if message.author_id in opted_out_user_ids:
-        return "[redacted]", "[redacted]"
-    return message.author_name_at_time, message.content
+        return REDACTED, REDACTED
+    return names[message.author_id], _replace_mentions(message.content, names, opted_out_user_ids)
 
 
 def _reactions_line(message_id: int, reactions: tuple[ReactionRow, ...]) -> str | None:
@@ -103,10 +138,11 @@ def _render_message(
     ref: str,
     message: MessageRow,
     opted_out_user_ids: frozenset[int],
+    names: dict[int, str],
     reactions: tuple[ReactionRow, ...] = (),
     attachments: tuple[AttachmentRow, ...] = (),
 ) -> str:
-    author, content = _redacted_author_and_content(message, opted_out_user_ids)
+    author, content = _redacted_author_and_content(message, opted_out_user_ids, names)
     lines = [f"[{ref}] {author} @ {message.created_at.isoformat()}:", content]
     reactions_line = _reactions_line(message.id, reactions)
     if reactions_line is not None:
@@ -133,16 +169,22 @@ def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
         f"CHANNEL: {request.channel_name}",
         f"PERMALINK: {link}",
     ]
+    names = _pseudonyms(request)
     if request.context_messages:
         rendered_context = "\n\n".join(
-            _render_message(f"c{index}", message, request.opted_out_user_ids)
+            _render_message(f"c{index}", message, request.opted_out_user_ids, names)
             for index, message in enumerate(request.context_messages, start=1)
         )
         sections.append(f"CONTEXT (do not cite):\n{rendered_context}")
     refs = {f"m{index}": message.id for index, message in enumerate(request.messages, start=1)}
     rendered_exchange = "\n\n".join(
         _render_message(
-            ref, message, request.opted_out_user_ids, request.reactions, request.attachments
+            ref,
+            message,
+            request.opted_out_user_ids,
+            names,
+            request.reactions,
+            request.attachments,
         )
         for ref, message in zip(refs, request.messages, strict=True)
     )

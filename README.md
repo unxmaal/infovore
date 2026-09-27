@@ -406,15 +406,15 @@ The system prompt, verbatim:
 ```
 You are reading an archived exchange from a hobbyist retro-computing community centred on SGI/IRIX, which also discusses other vintage and general computing platforms.
 
-Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, OS quirks and workarounds, repair procedures, compatibility facts, sources for software and manuals, and market history (prices, sales, listings, and which sellers or resellers carried what). Generic computing knowledge is not wanted.
+Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, OS quirks and workarounds, repair procedures, compatibility facts, sources for software and manuals, the history and community experience of general software and hardware, and market history (prices, sales, listings, and which sellers or resellers carried what). Generic textbook computing knowledge is not wanted.
 
-Extract generously. A later closed-book novelty probe is the filter, not you: your job is to notice everything specific and supported by the messages, not to decide whether it is already widely known.
+Extract generously. A later closed-book novelty probe is the filter, not you: your job is to notice everything specific and supported by the messages, not to decide whether it is already widely known. When unsure whether something is worth keeping, capture it.
 
-State only what the messages say. Never add details, names, model numbers, versions, or context from your own knowledge, even if you believe them to be true: every specific in a claim must come from the cited messages.
+Do not add specifics that are not in the messages: no numbers, versions, model names, or other details from your own knowledge, even if you believe them to be true.
 
 Preserve the speaker's certainty. If a message hedges (probably, I think, might, maybe), say so in the statement (reportedly, probably, possibly) and lower the confidence accordingly.
 
-Do not include personal information about private individuals: no Discord usernames or handles, no real names of private people or their family members, no addresses, and no linking of people to accounts. Refer to people as a community member. Businesses and resellers may be named.
+Authors appear as pseudonyms (member-A, member-B, ...). Never put a pseudonym or any other person's name in a claim; say a community member instead. Businesses and resellers may be named.
 
 Each claim must be specific and supported by the messages. Each claim carries a probe_question that asks for the fact without revealing it, so the fact can be tested for later without leaking the answer.
 
@@ -433,10 +433,10 @@ The user prompt (`RenderedPrompt.prompt`) lays out, in order:
 
 - `CHANNEL:` the channel name (falls back to the numeric channel id when the channel is unknown) and `PERMALINK:` the exchange's permalink, `https://discord.com/channels/{guild_id}/{channel_id}/{first_message_id}` (built by `infovore.extract.prompt.permalink`).
 - `CONTEXT (do not cite):`, present only when the exchange has a `parent_exchange_id` — the last `context_size` messages of the parent exchange, read-only and never citable, each labelled with a context ref `c1`, `c2`, ... in order.
-- `EXCHANGE:` — every message of the exchange itself, each rendered as `[ref] author @ ISO-8601 timestamp:` where `ref` is `m1`, `m2`, ... in exchange order, followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
+- `EXCHANGE:` — every message of the exchange itself, each rendered as `[ref] member-X @ ISO-8601 timestamp:` where `ref` is `m1`, `m2`, ... in exchange order, followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
 - `RELATED EXISTING CLAIMS:` — up to `related_limit` claims from `claims_fts` matching the exchange's own message contents (excluding any message authored by an opted-out user, so their words never influence what is sent to the model), each as `[claim:<id>] (<kind>) <subject>: <statement>`, or the literal `none` when there are no matches.
 
-Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message keeps its ref so citations and ordering stay consistent.
+Authors are never shown to the model by name: each distinct author in the context and exchange gets a stable pseudonym (`member-A`, `member-B`, ..., `member-AA` after `member-Z`) in order of first appearance, and Discord mentions (`<@id>`, `<@!id>`) in message text are rewritten to the mentioned author's pseudonym, to `another member` if they aren't in the exchange, or to `[redacted]` if they opted out — so a claim can't leak a username the model never saw (issue #120's v3 trial showed instructions alone didn't prevent it). Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message keeps its ref so citations and ordering stay consistent.
 
 Messages are labelled with short refs rather than Discord message ids because snowflakes exceed 2^53: a backend whose JSON runtime uses IEEE-754 doubles (the Node-based `claude -p`) rounds them, so a cited id would no longer match any message. `RenderedPrompt.refs` maps each exchange ref (`m1`, ...) to its real message id; context refs are deliberately absent from it, so citing one is rejected like any other unknown ref. Claims cite refs in `sources` (a list of strings), and `schema.parse_extraction` maps them back to message ids, so `ExtractedClaim.source_message_ids` and everything downstream still hold real Discord ids. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
 
