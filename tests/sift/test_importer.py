@@ -181,6 +181,36 @@ def test_import_with_an_empty_kept_csv_marks_everything_trash(tmp_path: Path) ->
     assert report.trash == 3
 
 
+def test_import_ignores_batch_log_lines_without_a_msg_tag(tmp_path: Path) -> None:
+    conn, out_dir = seeded_batch(tmp_path)
+    with (out_dir / "batch.log").open("a") as handle:
+        handle.write("not a real sift line at all\n")
+    (out_dir / TRASH_REGEXES_CSV_NAME).write_text("pattern\nlol\n")
+
+    report = import_batch(conn, out_dir, IMPORTED_AT)
+
+    assert report.keep == 2
+    assert report.trash == 1
+
+
+def test_import_an_empty_batch_has_no_channel_counts(tmp_path: Path) -> None:
+    conn = open_database(tmp_path / "x.db")
+    migrate(conn)
+    out_dir = tmp_path / "empty_batch"
+    out_dir.mkdir()
+    (out_dir / "manifest.json").write_text(
+        '{"message_ids": [], "strategy": "random", "seed": 0,'
+        ' "created_at": "2026-01-02T00:00:00+00:00"}'
+    )
+    (out_dir / KEPT_CSV_NAME).write_text("msg\n")
+
+    report = import_batch(conn, out_dir, IMPORTED_AT)
+
+    assert report.keep == 0
+    assert report.trash == 0
+    assert report.by_channel == {}
+
+
 def test_save_trash_rules_writes_a_json_file(tmp_path: Path) -> None:
     scratch = tmp_path / "scratch"
     at = datetime(2026, 1, 5, tzinfo=UTC)

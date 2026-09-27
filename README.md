@@ -177,6 +177,7 @@ uv run infovore label --exchange-id ID --lore|--noise
 uv run infovore snapshot <dest> [--force]
 uv run infovore run [--interval SECONDS] [--once]
 uv run infovore sift export [--size N] [--strategy random|uncertain|mixed] [--seed S] [--mix FRACTION] --out DIR
+uv run infovore sift import DIR [--save-rules NAME]
 ```
 
 `chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill. While it runs, `chunk` streams progress, one flushed line at a time: `grouping: N channels with ungrouped messages`, then one `channel <id>: +E exchanges, D deferred` line per channel that has ungrouped messages, before the existing summary.
@@ -202,6 +203,8 @@ Separately, `infovore.db.batches.record_extraction_batch` writes one `extraction
 `sift export` (`infovore.sift.command.SiftCommand`, issue #128) writes one **message-level** trash-sifting batch to `--out DIR`, for a human to filter in lnav (the maintainer's log viewer of choice — see `man lnav` / https://lnav.org) and hand back with `infovore sift import` (issue #128 PR 2). Every message that belongs to an exchange (`exchange_messages`; ungrouped messages aren't part of the corpus this loop triages), isn't from an opted-out author, and doesn't already carry a `human` `message_labels` row is eligible (`infovore.sift.sampling.eligible_message_pool`). `--size` (default `1000`) picks how many messages the batch holds; `--seed` (default `0`) makes the draw reproducible. Every strategy allocates `--size` round-robin across channels first (`infovore.sift.sampling._allocate_round_robin`, the same round-robin stratification `extract --strategy stratified` uses), so a batch can't be dominated by a single chatty channel like `#general`: `random` (default) then draws uniformly within each channel's share; `uncertain` takes, within that same per-channel share, the messages whose `p_trash` is closest to `0.5` (least sure) — this requires at least one message already scored (`infovore.sift.train`, PR 3) and exits `2` with a clear message otherwise (mirrors `extract --strategy uncertain`); `mixed` (`--mix`, default `0.5`) splits the batch between `uncertain` and `random` the same way `extract --strategy mixed` does, but falls back to an all-`random` batch when nothing anywhere has a `p_trash` yet, rather than waiting on a trained classifier. `--mix` outside `[0, 1]` exits `2`.
 
 `DIR` gets three files: `batch.log`, one line per message — ISO timestamp, `#channel`, author display name (local use only; this file never leaves the host), a `[msg:<id> ex:<exchange_id> p:<p_trash or ->]` tag, then the message text collapsed to one line and truncated to 300 characters with an ellipsis — in chronological order; `infovore-sift.json`, an lnav (0.14) JSON log format file, verified against real lnav on the maintainer's Mac, that parses `batch.log` into a queryable `infovore_sift` table with `channel` and `author` marked as filter identifiers, so `:filter-expr :channel = 'food'` works; and `manifest.json` (the batch's message ids in batch order, `strategy`, `seed`, `created_at`). The command prints where the files went and the exact lnav invocation: install the format once with `lnav -i DIR/infovore-sift.json`, then open the batch with `lnav DIR/batch.log`.
+
+`sift import DIR` (`infovore.sift.importer.import_batch`, issue #128 PR 2) reads back a human's lnav sift session over a batch previously written by `sift export`, and records `message_labels` rows with `source='human'` (re-importing the same `DIR` replaces the earlier human labels, same "human always wins, latest human label wins" rule as `exchange_labels`). It looks in `DIR` for either of two result files a human produces in lnav (see "Sifting" below), preferring `kept.csv` when both are present since it's a direct enumeration of the outcome rather than a derived one: **(a)** `kept.csv` — every message id still visible after filtering (a SQL export of `infovore_sift`'s `msg` column); every other id from the batch's `manifest.json` is recorded `trash`, every id in `kept.csv` is recorded `keep`. **(b)** `trash-regexes.csv` — the regex patterns actually applied as `:filter-out` filters (a SQL export of `lnav_view_filters`); each batch message is recorded `trash` if any pattern matches its `batch.log` line (the same text lnav filtered against), `keep` otherwise. Neither file present exits `2` with the exact lnav commands to produce one; no `manifest.json` in `DIR` exits `2` pointing at `infovore sift export`. `--save-rules NAME` (path (b) only; exits `2` on path (a), which has no regexes) stores the batch's trash regexes to `<INFOVORE_SCRATCH_DIR>/sift_trash_rules/<NAME>.json` for later corpus-wide use — issue #128 only stores them here, applying them corpus-wide is a later issue. It prints total and per-channel `keep=`/`trash=` counts.
 
 `snapshot` writes a consistent copy of the product database to `<dest>` using the SQLite backup API (`infovore.db.snapshot.snapshot`), safe to run at any time, including while `backfill`/`chunk`/`extract`/`run` is mid-write against the same file: the backup only ever sees committed data, never a writer's in-flight transaction. It refuses to overwrite an existing `<dest>` unless `--force` is given, creates `<dest>`'s parent directories as needed, and writes through a temporary file in the same directory that it atomically renames into place, so a reader never observes a partially written snapshot. It reports the destination path, its size in bytes, and its `PRAGMA user_version` (the schema version). This is how the product database leaves a host — see "Deployment" below.
 
@@ -286,6 +289,29 @@ This is the prompt-iteration loop: run the current prompt over a reproducible sa
 7. `infovore review --run-ids <old run ids from step 2> <new run ids from step 6>` — with two prompt versions covering the same exchanges, the report adds a side-by-side diff per exchange (added/dropped/changed claims, verdict shifts) so a wording change's effect is visible exchange by exchange, not just in the summary.
 8. Once a version looks right, `infovore promote --prompt-version vN` makes it live.
 9. `infovore extract` (no `--mode`, so it defaults to `live`) now runs the promoted version over the real pending/stale queue.
+
+### Sifting
+
+Message-level trash sifting (issue #128): a subtractive, human-in-the-loop loop that hands small batches of messages to the maintainer in [lnav](https://lnav.org) (0.14+) and feeds the result back as `message_labels`. Every command below was verified against real lnav 0.14.0.
+
+1. `infovore sift export --out DIR` (see "Running" above for `--size`/`--strategy`/`--seed`/`--mix`) writes `DIR/batch.log`, `DIR/infovore-sift.json` (the lnav format), and `DIR/manifest.json`.
+2. `lnav -i DIR/infovore-sift.json` — install the format, once ever (it's remembered across lnav sessions; skip this step on every later batch).
+3. `lnav DIR/batch.log` — open the batch. `#channel`/author/`msg`/`ex`/`p` are queryable columns on the `infovore_sift` table (`:filter-expr :channel = 'food'` scopes the view to one channel); the message body is displayed and searched in the log view but isn't a separate SQL column.
+4. Filter out trash, repeating as needed: `:filter-out <regex>` hides every line whose text (the same `#channel author [msg:... ex:... p:...] body` text `batch.log` holds) matches `<regex>`; `:filter-in <regex>` keeps only matching lines. Preview highlights the matched portion in red before you commit.
+5. Save the result — either path (b) below alone, or path (a) for a final "here's exactly what's left" export; `sift import` accepts either, or both (preferring (a)):
+   - **(a) kept lines** — the exact set of messages still visible:
+     ```
+     ;SELECT msg FROM infovore_sift
+     :write-csv-to DIR/kept.csv
+     ```
+   - **(b) the trash regexes themselves** — every `:filter-out` regex you applied:
+     ```
+     ;SELECT pattern FROM lnav_view_filters WHERE view_name='log' AND type='out' AND language='regex' AND enabled=1
+     :write-csv-to DIR/trash-regexes.csv
+     ```
+6. `infovore sift import DIR` (optionally `--save-rules NAME` to keep path (b)'s regexes for later corpus-wide use) records the labels and prints keep/trash counts per channel.
+
+**What surprised me verifying this on real lnav:** `:write-to`/`:write-view-to`/`:write-raw-to` only ever operate on lines you've *bookmarked* (pressed `m` on) — a `:filter-out` alone doesn't make a line eligible for them, so they're a poor fit for a headless/scripted workflow. `;`-prefixed SQL queries against a log format's table, though, only ever return currently-*visible* rows — filtered-out lines simply aren't in the result set — and `:write-csv-to` writes any query's result straight to a file. That combination (steps 5 above) needs no bookmarking at all and is exactly as scriptable non-interactively (`lnav -n -c ...`) as it is interactively, which is how this was verified: synthetic batches in a throwaway temp directory on the maintainer's Mac, with `lnav -I <temp-config-dir>` so the real `~/.config/lnav` was never touched.
 
 ## Grouping rules
 

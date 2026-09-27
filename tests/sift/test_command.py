@@ -192,9 +192,7 @@ def test_sift_import_records_labels_and_prints_counts(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
     out_dir = tmp_path / "batch"
-    export_code, _, _ = run(
-        ["sift", "export", "--size", "6", "--out", str(out_dir)], env
-    )
+    export_code, _, _ = run(["sift", "export", "--size", "6", "--out", str(out_dir)], env)
     assert export_code == ExitCode.OK
     (out_dir / "kept.csv").write_text("msg\n4\n5\n6\n")
 
@@ -253,9 +251,7 @@ def test_sift_import_save_rules_requires_a_regex_file(tmp_path: Path) -> None:
     run(["sift", "export", "--size", "6", "--out", str(out_dir)], env)
     (out_dir / "kept.csv").write_text("msg\n4\n5\n6\n")
 
-    code, _, err = run(
-        ["sift", "import", str(out_dir), "--save-rules", "food-chatter"], env
-    )
+    code, _, err = run(["sift", "import", str(out_dir), "--save-rules", "food-chatter"], env)
 
     assert code == ExitCode.CONFIG
     assert "--save-rules" in err
@@ -268,9 +264,7 @@ def test_sift_import_save_rules_writes_a_file(tmp_path: Path) -> None:
     run(["sift", "export", "--size", "6", "--out", str(out_dir)], env)
     (out_dir / "trash-regexes.csv").write_text("pattern\ngeneral chatter\n")
 
-    code, out, _ = run(
-        ["sift", "import", str(out_dir), "--save-rules", "food-chatter"], env
-    )
+    code, out, _ = run(["sift", "import", str(out_dir), "--save-rules", "food-chatter"], env)
 
     assert code == ExitCode.OK
     assert "food-chatter" in out
