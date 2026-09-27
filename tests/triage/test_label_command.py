@@ -3,7 +3,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from infovore.cli import ExitCode, builtin_commands, main
-from infovore.db.claims import NewClaim, record_run, register_prompt_version, set_novelty
+from infovore.db.claims import (
+    NewClaim,
+    record_run,
+    register_prompt_version,
+    set_batch_id,
+    set_novelty,
+)
 from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.rows import ClaimKind, ExtractionRunRow, Novelty, RunMode, RunOutcome
@@ -203,3 +209,52 @@ def test_label_from_runs_unknown_run_id_exits_config(tmp_path: Path) -> None:
     code, _, err = run(["label", "--from-runs", "999"], env)
     assert code == ExitCode.CONFIG
     assert "999" in err
+
+
+def test_label_from_runs_accepts_range_syntax(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    lore_run = seed_run(
+        env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, verdict=Novelty.UNKNOWN
+    )
+    noise_run = seed_run(
+        env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, verdict=Novelty.KNOWN
+    )
+    code, out, _ = run(["label", "--from-runs", f"{lore_run}-{noise_run}"], env)
+    assert code == ExitCode.OK
+    assert "labeled: lore=1 noise=1 skipped=0" in out
+
+
+def test_label_from_runs_bare_flag_uses_latest_trial_batch(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    old_run = seed_run(
+        env["INFOVORE_DB_PATH"], exchange_id=1, message_id=1, verdict=Novelty.UNKNOWN
+    )
+    new_run = seed_run(
+        env["INFOVORE_DB_PATH"], exchange_id=2, message_id=2, verdict=Novelty.UNKNOWN
+    )
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    set_batch_id(conn, [old_run], "2026-01-01T00:00:00+00:00")
+    set_batch_id(conn, [new_run], "2026-01-02T00:00:00+00:00")
+    conn.close()
+
+    code, out, _ = run(["label", "--from-runs"], env)
+
+    assert code == ExitCode.OK
+    assert f"run {new_run}: lore" in out
+    assert f"run {old_run}" not in out
+
+
+def test_label_from_runs_bare_flag_without_a_trial_batch_exits_config(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_exchange(env["INFOVORE_DB_PATH"])
+    code, _, err = run(["label", "--from-runs"], env)
+    assert code == ExitCode.CONFIG
+    assert "extract --mode trial" in err
+
+
+def test_label_from_runs_rejects_an_invalid_selector_token(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_exchange(env["INFOVORE_DB_PATH"])
+    code, _, err = run(["label", "--from-runs", "abc"], env)
+    assert code == ExitCode.CONFIG
+    assert "abc" in err

@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from infovore.cli import ExitCode, builtin_commands, main
-from infovore.db.claims import NewClaim, record_run, register_prompt_version
+from infovore.db.claims import NewClaim, record_run, register_prompt_version, set_batch_id
 from infovore.db.connection import migrate, open_database
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.rows import (
@@ -154,6 +154,79 @@ def test_review_command_accepts_multiple_run_ids(tmp_path: Path) -> None:
     written_path = Path(out.strip())
     assert "v1" in written_path.read_text()
     assert "v2" in written_path.read_text()
+
+
+def test_review_command_accepts_range_syntax(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    run1 = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v1", message_id=1)
+    run2 = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v2", message_id=2)
+
+    code, out, _ = run(["review", "--run-ids", f"{run1}-{run2}"], env)
+
+    assert code == ExitCode.OK
+    text = Path(out.strip()).read_text()
+    assert "v1" in text
+    assert "v2" in text
+
+
+def test_review_command_defaults_to_latest_trial_batch_when_run_ids_omitted(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    old_run = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v1", message_id=1)
+    new_run = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v2", message_id=2)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    set_batch_id(conn, [old_run], "2026-01-01T00:00:00+00:00")
+    set_batch_id(conn, [new_run], "2026-01-02T00:00:00+00:00")
+    conn.close()
+
+    code, out, _ = run(["review"], env)
+
+    assert code == ExitCode.OK
+    text = Path(out.strip()).read_text()
+    assert "v2" in text
+    assert "v1" not in text
+
+
+def test_review_command_bare_run_ids_flag_defaults_to_latest_trial_batch(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    old_run = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v1", message_id=1)
+    new_run = seed_run(env["INFOVORE_DB_PATH"], prompt_version="v2", message_id=2)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    set_batch_id(conn, [old_run], "2026-01-01T00:00:00+00:00")
+    set_batch_id(conn, [new_run], "2026-01-02T00:00:00+00:00")
+    conn.close()
+
+    code, out, _ = run(["review", "--run-ids"], env)
+
+    assert code == ExitCode.OK
+    text = Path(out.strip()).read_text()
+    assert "v2" in text
+    assert "v1" not in text
+
+
+def test_review_command_without_run_ids_and_no_trial_batch_exits_config(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    migrate(conn)
+    conn.close()
+
+    code, _, err = run(["review"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "extract --mode trial" in err
+
+
+def test_review_command_rejects_an_invalid_selector_token(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_run(env["INFOVORE_DB_PATH"])
+
+    code, _, err = run(["review", "--run-ids", "abc"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "abc" in err
 
 
 def test_promote_registers_and_promotes_current_prompt_version(tmp_path: Path) -> None:
