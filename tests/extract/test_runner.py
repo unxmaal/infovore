@@ -1,5 +1,6 @@
 import asyncio
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -51,6 +52,7 @@ from infovore.rows import (
     RunOutcome,
 )
 from infovore.timing import FixedClock, RecordingSleeper
+from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.score import TRIAGE_VERSION
 
 GUILD_ID = 500
@@ -1345,6 +1347,30 @@ def test_live_refuses_when_pending_exchange_has_stale_triage_version(tmp_path: P
             )
 
     asyncio.run(go())
+
+
+def test_live_untriaged_check_uses_the_provided_rules_version(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    custom = replace(DEFAULT_RULES, version="custom-extract")
+    seed_exchange(conn, [a_message(1)], triage_score=0.9, triage_version="custom-extract")
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            rules=custom,
+        )
+
+    report = asyncio.run(go())
+    assert report.processed == 1
 
 
 def test_trial_mode_never_checked_for_untriaged_exchanges(tmp_path: Path) -> None:

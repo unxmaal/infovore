@@ -1,8 +1,10 @@
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from infovore.rows import AttachmentRow, MessageRow, ReactionRow
+from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.score import TRIAGE_VERSION, score_exchange
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
@@ -37,8 +39,9 @@ def signals(*messages: MessageRow, **kwargs: object) -> set[str]:
     return {name for name, _ in result.reasons}
 
 
-def test_version_is_a_string() -> None:
-    assert TRIAGE_VERSION.startswith("t")
+def test_version_is_derived_from_the_rules_content_hash() -> None:
+    assert TRIAGE_VERSION == DEFAULT_RULES.version
+    assert TRIAGE_VERSION.startswith("r-")
 
 
 def test_chatter_scores_zero() -> None:
@@ -133,3 +136,50 @@ def test_score_is_bounded_and_deterministic() -> None:
 
 def test_empty_exchange_scores_zero() -> None:
     assert score_exchange([]).score == 0.0
+
+
+def test_score_exchange_defaults_to_default_rules() -> None:
+    default_result = score_exchange([msg(1, "here you go")])
+    explicit_result = score_exchange([msg(1, "here you go")], rules=DEFAULT_RULES)
+    assert default_result == explicit_result
+
+
+def test_score_exchange_uses_provided_rules_weight() -> None:
+    pdf = AttachmentRow(1, 1, "manual.pdf", "application/pdf", 10, "u", None, None)
+    custom = replace(DEFAULT_RULES, pdf_attachment_weight=0.9, version="custom-a")
+    result = score_exchange([msg(1, "here you go")], attachments=[pdf], rules=custom)
+    assert dict(result.reasons)["pdf_attachment"] == 0.9
+
+
+def test_score_exchange_domain_terms_are_driven_by_rules() -> None:
+    custom = replace(
+        DEFAULT_RULES, domain_terms=(*DEFAULT_RULES.domain_terms, "zorptech"), version="custom-b"
+    )
+    with_term = score_exchange([msg(1, "got a zorptech unit today")], rules=custom)
+    without_term = score_exchange([msg(1, "got a zorptech unit today")])
+    assert "domain_terms" in dict(with_term.reasons)
+    assert "domain_terms" not in dict(without_term.reasons)
+
+
+def test_score_exchange_archive_and_gif_hosts_are_driven_by_rules() -> None:
+    custom = replace(
+        DEFAULT_RULES,
+        archive_link_hosts=("example-archive",),
+        gif_hosts=("example-gif",),
+        version="custom-c",
+    )
+    archive = signals(msg(1, "see https://example-archive.test/manual"), rules=custom)
+    gif = signals(msg(1, "https://example-gif.test/cat"), rules=custom)
+    assert "archive_link" in archive
+    assert "gif_links" in gif
+
+
+def test_score_exchange_laughter_tokens_are_driven_by_rules() -> None:
+    custom = replace(DEFAULT_RULES, laughter_tokens=("giggle",), version="custom-d")
+    found = signals(
+        msg(1, "octane pdu"),
+        msg(2, "giggle", author_id=2),
+        msg(3, "giggle", author_id=3),
+        rules=custom,
+    )
+    assert "laughter" in found
