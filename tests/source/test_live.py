@@ -607,6 +607,15 @@ async def test_events_on_raw_message_edit_unknown_channel_is_dropped() -> None:
     assert events == []
 
 
+async def test_events_on_raw_message_edit_rate_limited_channel_fetch_is_dropped() -> None:
+    client = FakeClient(fetch_channel_error=make_http_exception(429, retry_after="1"))
+    source = DiscordPySource(client)
+    await client.on_raw_message_edit(FakeRawMessageRef(999, 1))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert events == []
+
+
 async def test_events_on_raw_message_edit_fetches_channel_when_not_cached() -> None:
     edited_message = make_message(content="edited")
     channel = FakeFetchableChannel(
