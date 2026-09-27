@@ -287,6 +287,43 @@ async def test_usage_defaults_when_payload_has_none(tmp_path: Path) -> None:
     assert result.usage.cost_usd is None
 
 
+async def test_usage_input_tokens_sums_cache_creation_and_cache_read(tmp_path: Path) -> None:
+    runner = FakeProcessRunner(
+        ok(
+            result="hi",
+            usage={
+                "input_tokens": 3,
+                "cache_creation_input_tokens": 1200,
+                "cache_read_input_tokens": 15000,
+                "output_tokens": 34,
+            },
+            total_cost_usd=0.05,
+        )
+    )
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.usage.input_tokens == 16203
+    assert result.usage.output_tokens == 34
+    assert result.usage.cost_usd == 0.05
+
+
+async def test_usage_input_tokens_treats_missing_cache_fields_as_zero(tmp_path: Path) -> None:
+    runner = FakeProcessRunner(ok(result="hi", usage={"cache_read_input_tokens": 500}))
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.usage.input_tokens == 500
+
+
+async def test_usage_input_tokens_is_none_when_usage_mapping_has_no_token_fields(
+    tmp_path: Path,
+) -> None:
+    runner = FakeProcessRunner(ok(result="hi", usage={"output_tokens": 7}))
+    backend = make_backend(runner, tmp_path)
+    result = await backend.complete(text_request())
+    assert result.usage.input_tokens is None
+    assert result.usage.output_tokens == 7
+
+
 async def test_timeout_is_transient(tmp_path: Path) -> None:
     runner = FakeProcessRunner(ProcessResult(exit_code=None, stdout="", stderr="", timed_out=True))
     backend = make_backend(runner, tmp_path)

@@ -62,6 +62,16 @@ def _output_tokens(entry: object) -> int:
     return 0
 
 
+_INPUT_TOKEN_KEYS = ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens")
+
+
+def _sum_input_tokens(usage_payload: Mapping[str, object]) -> int | None:
+    values = [_as_int(usage_payload.get(key)) for key in _INPUT_TOKEN_KEYS]
+    if all(value is None for value in values):
+        return None
+    return sum(value for value in values if value is not None)
+
+
 class ClaudeCliBackend:
     def __init__(
         self,
@@ -163,7 +173,7 @@ class ClaudeCliBackend:
         input_tokens = None
         output_tokens = None
         if isinstance(usage_payload, Mapping):
-            input_tokens = _as_int(usage_payload.get("input_tokens"))
+            input_tokens = _sum_input_tokens(usage_payload)
             output_tokens = _as_int(usage_payload.get("output_tokens"))
         cost = payload.get("total_cost_usd")
         cost_usd = float(cost) if isinstance(cost, int | float) else None
