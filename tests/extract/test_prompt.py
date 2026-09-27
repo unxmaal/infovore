@@ -126,7 +126,7 @@ def test_permalink_formats_discord_url() -> None:
 
 
 def test_prompt_version_is_v3() -> None:
-    assert PROMPT_VERSION == "v3"
+    assert PROMPT_VERSION == "v4"
 
 
 def test_prompt_sha256_matches_system_prompt() -> None:
@@ -254,23 +254,23 @@ def test_render_prompt_snapshot() -> None:
     )
     rendered = render_prompt(request)
     assert rendered.system == SYSTEM_PROMPT
-    assert rendered.version == "v3"
+    assert rendered.version == "v4"
     assert rendered.prompt == (
         "CHANNEL: hardware\n"
         "\n"
         "PERMALINK: https://discord.com/channels/100/10/1\n"
         "\n"
         "CONTEXT (do not cite):\n"
-        "[c1] alice @ 2026-01-01T00:00:00+00:00:\n"
+        "[c1] member-A @ 2026-01-01T00:00:00+00:00:\n"
         "earlier context\n"
         "\n"
         "EXCHANGE:\n"
-        "[m1] alice @ 2026-01-01T00:00:00+00:00:\n"
+        "[m1] member-A @ 2026-01-01T00:00:00+00:00:\n"
         "What PROM does an Octane2 need?\n"
         "Reactions: \U0001f44d\u00d72\n"
         "Attachments: jumpers.png\n"
         "\n"
-        "[m2] bob @ 2026-01-01T00:00:00+00:00:\n"
+        "[m2] member-B @ 2026-01-01T00:00:00+00:00:\n"
         "6.5 works fine.\n"
         "\n"
         "RELATED EXISTING CLAIMS:\n"
@@ -299,9 +299,18 @@ def test_render_prompt_context_refs_are_not_citable() -> None:
     assert rendered.refs == {"m1": 1, "m2": 2}
 
 
-def test_system_prompt_forbids_outside_knowledge() -> None:
-    assert "only what the messages say" in SYSTEM_PROMPT
+def test_system_prompt_forbids_adding_specifics() -> None:
+    assert "Do not add specifics" in SYSTEM_PROMPT
     assert "your own knowledge" in SYSTEM_PROMPT
+
+
+def test_system_prompt_still_extracts_generously() -> None:
+    assert "Extract generously" in SYSTEM_PROMPT
+    assert "capture it" in SYSTEM_PROMPT
+
+
+def test_system_prompt_counts_general_software_history() -> None:
+    assert "general software" in SYSTEM_PROMPT
 
 
 def test_system_prompt_preserves_uncertainty() -> None:
@@ -310,7 +319,7 @@ def test_system_prompt_preserves_uncertainty() -> None:
 
 
 def test_system_prompt_protects_private_individuals() -> None:
-    assert "usernames" in SYSTEM_PROMPT
+    assert "member-A" in SYSTEM_PROMPT
     assert "a community member" in SYSTEM_PROMPT
     assert "Businesses and resellers may be named" in SYSTEM_PROMPT
 
@@ -318,3 +327,48 @@ def test_system_prompt_protects_private_individuals() -> None:
 def test_system_prompt_keeps_market_history_in_scope() -> None:
     assert "prices" in SYSTEM_PROMPT
     assert "sales" in SYSTEM_PROMPT
+
+
+def test_render_prompt_replaces_author_names_with_stable_pseudonyms() -> None:
+    context = (a_message(50, author_id=2, author_name="bob", content="earlier"),)
+    messages = (
+        a_message(1, author_id=1, author_name="alice", content="q"),
+        a_message(2, author_id=2, author_name="bob", content="a"),
+        a_message(3, author_id=1, author_name="alice", content="thanks"),
+    )
+    rendered = render_prompt(a_request(messages=messages, context_messages=context))
+    assert "alice" not in rendered.prompt
+    assert "bob" not in rendered.prompt
+    assert "[c1] member-A @" in rendered.prompt
+    assert "[m1] member-B @" in rendered.prompt
+    assert "[m2] member-A @" in rendered.prompt
+    assert "[m3] member-B @" in rendered.prompt
+
+
+def test_render_prompt_replaces_mentions_with_pseudonyms() -> None:
+    messages = (
+        a_message(1, author_id=11, author_name="alice", content="hi"),
+        a_message(2, author_id=22, author_name="bob", content="<@11> and <@!11> try <@99>"),
+    )
+    rendered = render_prompt(a_request(messages=messages))
+    assert "member-A and member-A try another member" in rendered.prompt
+    assert "<@" not in rendered.prompt
+
+
+def test_render_prompt_redacts_mentions_of_opted_out_members() -> None:
+    messages = (
+        a_message(1, author_id=11, author_name="alice", content="hi"),
+        a_message(2, author_id=22, author_name="bob", content="ask <@11>"),
+    )
+    rendered = render_prompt(a_request(messages=messages, opted_out_user_ids=frozenset({11})))
+    assert "ask [redacted]" in rendered.prompt
+    assert "member-A" in rendered.prompt
+
+
+def test_pseudonym_letters_extend_past_z() -> None:
+    from infovore.extract.prompt import pseudonym
+
+    assert pseudonym(0) == "member-A"
+    assert pseudonym(25) == "member-Z"
+    assert pseudonym(26) == "member-AA"
+    assert pseudonym(27) == "member-AB"
