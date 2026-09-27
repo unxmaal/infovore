@@ -3,11 +3,11 @@ import sqlite3
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from infovore.db.batch import BATCH_SIZE, exchange_inputs_for_ids
 from infovore.db.codec import to_db_time
 from infovore.db.connection import transaction
-from infovore.db.exchanges import exchange_message_ids, get_exchange
+from infovore.db.exchanges import get_exchange
 from infovore.db.labels import effective_labels
-from infovore.db.raw import attachments_for_messages, messages_by_ids, reactions_for_messages
 from infovore.rows import Label
 from infovore.timing import Clock
 from infovore.triage.bayes import (
@@ -73,24 +73,24 @@ class TrainReport:
     top_tokens: tuple[TokenInfo, ...]
 
 
-def _exchange_tokens(
-    conn: sqlite3.Connection, exchange_id: int, channel_id: int, rules: TriageRules = DEFAULT_RULES
-) -> frozenset[str]:
-    message_ids = exchange_message_ids(conn, exchange_id)
-    messages = messages_by_ids(conn, message_ids)
-    reactions = reactions_for_messages(conn, message_ids)
-    attachments = attachments_for_messages(conn, message_ids)
-    return features(messages, channel_id, reactions, attachments, rules)
-
-
 def build_examples(conn: sqlite3.Connection, rules: TriageRules = DEFAULT_RULES) -> list[Example]:
     labels = effective_labels(conn)
-    examples: list[Example] = []
-    for exchange_id in sorted(labels):
+    exchange_ids = sorted(labels)
+    channel_ids: dict[int, int] = {}
+    for exchange_id in exchange_ids:
         exchange = get_exchange(conn, exchange_id)
         assert exchange is not None
-        tokens = _exchange_tokens(conn, exchange_id, exchange.channel_id, rules)
-        examples.append(Example(exchange_id, exchange.channel_id, tokens, labels[exchange_id]))
+        channel_ids[exchange_id] = exchange.channel_id
+
+    examples: list[Example] = []
+    for start in range(0, len(exchange_ids), BATCH_SIZE):
+        batch = exchange_ids[start : start + BATCH_SIZE]
+        inputs = exchange_inputs_for_ids(conn, batch)
+        for exchange_id in batch:
+            channel_id = channel_ids[exchange_id]
+            one = inputs[exchange_id]
+            tokens = features(one.messages, channel_id, one.reactions, one.attachments, rules)
+            examples.append(Example(exchange_id, channel_id, tokens, labels[exchange_id]))
     return examples
 
 
@@ -206,15 +206,22 @@ def _score_rows(
     rules: TriageRules = DEFAULT_RULES,
 ) -> int:
     count = 0
-    with transaction(conn):
-        for row in rows:
-            tokens = _exchange_tokens(conn, row["id"], row["channel_id"], rules)
-            score = p_lore(model, tokens)
-            conn.execute(
-                "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?",
-                (score, model_version, row["id"]),
+    for start in range(0, len(rows), BATCH_SIZE):
+        batch = rows[start : start + BATCH_SIZE]
+        inputs = exchange_inputs_for_ids(conn, [row["id"] for row in batch])
+        updates: list[tuple[float, int, int]] = []
+        for row in batch:
+            one = inputs[row["id"]]
+            tokens = features(
+                one.messages, row["channel_id"], one.reactions, one.attachments, rules
             )
-            count += 1
+            score = p_lore(model, tokens)
+            updates.append((score, model_version, row["id"]))
+        with transaction(conn):
+            conn.executemany(
+                "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?", updates
+            )
+        count += len(batch)
     return count
 
 
