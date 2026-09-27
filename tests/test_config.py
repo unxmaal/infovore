@@ -228,9 +228,7 @@ def test_load_settings_triage_min_p_lore_non_numeric_reported() -> None:
         load_settings(env)
 
 
-def test_load_settings_triage_min_p_lore_round_trips_a_formatted_high_precision_threshold() -> (
-    None
-):
+def test_load_settings_triage_min_p_lore_round_trips_a_formatted_high_precision_threshold() -> None:
     from infovore.rows import Label
     from infovore.triage.bayes import candidate_thresholds, format_threshold
 

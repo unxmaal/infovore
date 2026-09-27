@@ -266,6 +266,19 @@ def test_recommend_evaluates_holdout_scores_not_a_fixed_grid(tmp_path: Path) -> 
     assert 0.0 <= share <= 1.0
 
 
+def test_recommend_share_is_zero_when_no_exchange_has_been_p_lore_scored(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    # Deliberately skip score_all: no exchange has p_lore yet.
+
+    result = recommend(conn, min_recall=0.5)
+
+    assert result is not None
+    _, share = result
+    assert share == 0.0
+
+
 def test_recommend_table_raises_without_a_trained_model(tmp_path: Path) -> None:
     conn = db(tmp_path)
     with pytest.raises(NoTrainedModelError):

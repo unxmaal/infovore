@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from infovore.db.codec import to_db_time
@@ -12,8 +13,10 @@ from infovore.timing import Clock
 from infovore.triage.bayes import (
     Metrics,
     Model,
+    candidate_thresholds,
     evaluate,
     features,
+    format_threshold,
     in_holdout,
     p_lore,
     recommend_threshold,
@@ -25,6 +28,7 @@ MIN_LABELS_PER_CLASS = 10
 EVAL_THRESHOLDS = tuple(round(i / 10, 1) for i in range(1, 10))
 DEFAULT_CONFUSION_THRESHOLD = 0.5
 TOP_TOKENS_LIMIT = 15
+RECALL_TARGETS: tuple[float, ...] = (0.95, 0.9, 0.8, 0.7, 0.5)
 
 
 class InsufficientLabelsError(Exception):
@@ -219,28 +223,71 @@ def score_stale(conn: sqlite3.Connection, model: Model, model_version: int) -> i
     return _score_rows(conn, model, model_version, rows)
 
 
+def _holdout_scored_for_model(conn: sqlite3.Connection, model: Model) -> list[tuple[float, Label]]:
+    examples = build_examples(conn)
+    return [
+        (p_lore(model, example.tokens), example.label)
+        for example in examples
+        if in_holdout(example.exchange_id)
+    ]
+
+
+def _corpus_share(conn: sqlite3.Connection, threshold: float) -> float:
+    total = int(
+        conn.execute("SELECT COUNT(*) FROM exchanges WHERE p_lore IS NOT NULL").fetchone()[0]
+    )
+    if not total:
+        return 0.0
+    passing = int(
+        conn.execute("SELECT COUNT(*) FROM exchanges WHERE p_lore >= ?", (threshold,)).fetchone()[0]
+    )
+    return passing / total
+
+
 def recommend(conn: sqlite3.Connection, min_recall: float) -> tuple[Metrics, float] | None:
     loaded = load_latest_model(conn)
     if loaded is None:
         raise NoTrainedModelError
     _, model = loaded
-    examples = build_examples(conn)
-    holdout_scored = [
-        (p_lore(model, example.tokens), example.label)
-        for example in examples
-        if in_holdout(example.exchange_id)
-    ]
-    table = evaluate(holdout_scored, EVAL_THRESHOLDS)
+    holdout_scored = _holdout_scored_for_model(conn, model)
+    table = evaluate(holdout_scored, candidate_thresholds(holdout_scored))
     metric = recommend_threshold(table, min_recall)
     if metric is None:
         return None
-    total = int(
-        conn.execute("SELECT COUNT(*) FROM exchanges WHERE p_lore IS NOT NULL").fetchone()[0]
-    )
-    passing = int(
-        conn.execute(
-            "SELECT COUNT(*) FROM exchanges WHERE p_lore >= ?", (metric.threshold,)
-        ).fetchone()[0]
-    )
-    share = passing / total if total else 0.0
-    return metric, share
+    return metric, _corpus_share(conn, metric.threshold)
+
+
+@dataclass(frozen=True)
+class RecommendationRow:
+    min_recall: float
+    metric: Metrics | None
+    share: float | None
+    formatted_threshold: str | None
+
+
+def recommend_table(
+    conn: sqlite3.Connection, min_recalls: Sequence[float] = RECALL_TARGETS
+) -> list[RecommendationRow]:
+    """Recommend a threshold for each of `min_recalls` in one holdout pass.
+
+    Reuses the same candidate thresholds (the holdout's own distinct p_lore
+    scores) for every target, so this is a single scoring/evaluation pass no
+    matter how many recall targets are requested.
+    """
+    loaded = load_latest_model(conn)
+    if loaded is None:
+        raise NoTrainedModelError
+    _, model = loaded
+    holdout_scored = _holdout_scored_for_model(conn, model)
+    table = evaluate(holdout_scored, candidate_thresholds(holdout_scored))
+
+    rows: list[RecommendationRow] = []
+    for min_recall in min_recalls:
+        metric = recommend_threshold(table, min_recall)
+        if metric is None:
+            rows.append(RecommendationRow(min_recall, None, None, None))
+            continue
+        share = _corpus_share(conn, metric.threshold)
+        formatted = format_threshold(metric.threshold, holdout_scored)
+        rows.append(RecommendationRow(min_recall, metric, share, formatted))
+    return rows
