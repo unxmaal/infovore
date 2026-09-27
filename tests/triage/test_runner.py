@@ -1,4 +1,5 @@
 import json
+import math
 import sqlite3
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -6,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from infovore.db.batch import BATCH_SIZE
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, MessageRow
@@ -429,3 +431,75 @@ def test_triage_pending_scores_p_lore_using_the_provided_rules(tmp_path: Path) -
 
     row = conn.execute("SELECT p_lore FROM exchanges WHERE id = ?", (exchange.id,)).fetchone()
     assert row["p_lore"] > 0.5
+
+
+# --- issue #104: batched commits, changed-only channel priors ---------------
+
+
+def _traced(conn: sqlite3.Connection) -> list[str]:
+    statements: list[str] = []
+    conn.set_trace_callback(statements.append)
+    return statements
+
+
+def test_triage_pending_full_rescore_commits_in_o_of_n_over_batch_size(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    n = int(BATCH_SIZE * 2.25)
+    for i in range(n):
+        zero_exchange(conn, i + 1, channel_id=i % 3)
+
+    statements = _traced(conn)
+    triage_pending(conn)
+    conn.set_trace_callback(None)
+
+    commits = [s for s in statements if s.strip().upper() == "COMMIT"]
+    # One batch of commits for scoring, one for channel priors (every current
+    # row gets its first channel_prior reason on this first full rescore).
+    expected = 2 * math.ceil(n / BATCH_SIZE)
+    assert len(commits) == expected
+    assert len(commits) < n / 10
+
+
+def test_triage_pending_second_run_with_nothing_new_writes_nothing(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    for i in range(50):
+        zero_exchange(conn, i + 1, channel_id=i % 4)
+    triage_pending(conn)
+
+    statements = _traced(conn)
+    second = triage_pending(conn)
+    conn.set_trace_callback(None)
+
+    assert second.candidates == 0
+    assert second.scored == 0
+    assert not any(s.strip().upper() == "COMMIT" for s in statements)
+    assert not any("UPDATE" in s.upper() for s in statements)
+
+
+def test_triage_pending_channel_priors_skip_rows_whose_adjusted_value_is_unchanged(
+    tmp_path: Path,
+) -> None:
+    # Re-deriving channel priors from the exact same (unchanged) rows must
+    # recompute the identical (score, reasons) for every current-version
+    # row, so the "only write what changed" filter in `_apply_channel_priors`
+    # writes nothing on its own -- isolating that pass from the scoring pass
+    # (which test_triage_pending_second_run_with_nothing_new_writes_nothing
+    # already covers end-to-end).
+    from infovore.triage.runner import _apply_channel_priors, _channel_means
+
+    conn = db(tmp_path)
+    half_exchange(conn, 1, channel_id=1)
+    zero_exchange(conn, 2, channel_id=2)
+    full_exchange(conn, 3, channel_id=2)
+    triage_pending(conn)  # untraced: sets triage_version + the first channel_prior reason
+
+    channel_means, global_mean = _channel_means(conn, DEFAULT_RULES)
+    statements = _traced(conn)
+    priors = _apply_channel_priors(conn, channel_means, global_mean, DEFAULT_RULES)
+    conn.set_trace_callback(None)
+
+    assert priors  # sanity: we did compute real per-channel priors
+    assert not any(s.strip().upper() == "COMMIT" for s in statements)
+    assert not any("UPDATE" in s.upper() for s in statements)
