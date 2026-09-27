@@ -422,7 +422,7 @@ class DiscordPySource:
     async def _fetch_message(self, channel_id: int, message_id: int) -> _MessageLike | None:
         try:
             channel = await self._resolve_channel(channel_id)
-        except SourceUnavailableError:
+        except (SourceUnavailableError, SourceRateLimitedError):
             return None
         try:
             return await channel.fetch_message(message_id)
