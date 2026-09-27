@@ -611,6 +611,30 @@ def test_extract_trial_mode_strategy_mixed_splits_the_sample(tmp_path: Path) -> 
     conn = open_database(env["INFOVORE_DB_PATH"])
     second_id = _seed_second_exchange(conn, triage_score=1.0)
     conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (3, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',"
+        " '2026-01-01T00:00:00+00:00', '{}')"
+    )
+    third_row = ExchangeRow(
+        id=None,
+        channel_id=1,
+        thread_id=None,
+        first_message_id=3,
+        last_message_id=3,
+        started_at=NOW,
+        ended_at=NOW,
+        message_count=1,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash="hash-3",
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    third_id = insert_exchange(conn, third_row, [3])
+    mark_triaged(conn, third_id, triage_score=1.0)  # left unscored (no p_lore): the "random" half
+    conn.execute(
         "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
         " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
     )
@@ -637,9 +661,7 @@ def test_extract_trial_mode_strategy_mixed_splits_the_sample(tmp_path: Path) -> 
     assert code == ExitCode.OK
     assert "processed=2" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
-    origins = {
-        row["sampled_by"] for row in conn.execute("SELECT sampled_by FROM extraction_runs")
-    }
+    origins = {row["sampled_by"] for row in conn.execute("SELECT sampled_by FROM extraction_runs")}
     conn.close()
     assert origins == {"uncertain", "random"}
 

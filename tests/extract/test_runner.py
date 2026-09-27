@@ -1641,6 +1641,9 @@ def test_trial_runs_are_stamped_with_their_sampled_by_origin(tmp_path: Path) -> 
     assert succeeding.id is not None
     assert failing.id is not None
     assert unsampled.id is not None
+    succeeding_id = succeeding.id
+    failing_id = failing.id
+    unsampled_id = unsampled.id
 
     async def go() -> ExtractionReport:
         return await run_extraction(
@@ -1653,8 +1656,8 @@ def test_trial_runs_are_stamped_with_their_sampled_by_origin(tmp_path: Path) -> 
             batch_size=10,
             max_retries=3,
             concurrency=1,
-            exchange_ids=[succeeding.id, failing.id, unsampled.id],
-            sampled_by={succeeding.id: "uncertain", failing.id: "random"},
+            exchange_ids=[succeeding_id, failing_id, unsampled_id],
+            sampled_by={succeeding_id: "uncertain", failing_id: "random"},
         )
 
     asyncio.run(go())
@@ -1663,6 +1666,6 @@ def test_trial_runs_are_stamped_with_their_sampled_by_origin(tmp_path: Path) -> 
         row["exchange_id"]: row["sampled_by"]
         for row in conn.execute("SELECT exchange_id, sampled_by FROM extraction_runs").fetchall()
     }
-    assert rows[succeeding.id] == "uncertain"
-    assert rows[failing.id] == "random"
-    assert rows[unsampled.id] is None
+    assert rows[succeeding_id] == "uncertain"
+    assert rows[failing_id] == "random"
+    assert rows[unsampled_id] is None
