@@ -117,7 +117,7 @@ def _claim_payload(**overrides: object) -> dict[str, object]:
         "kind": "fact",
         "confidence": 0.9,
         "probe_question": "What overlay version does IRIX 6.5.30 require?",
-        "source_message_ids": [1],
+        "sources": ["m1"],
         "supersedes": None,
     }
     base.update(overrides)
@@ -169,7 +169,7 @@ async def test_extract_falls_back_to_text_when_native_but_no_structured_present(
 
 
 async def test_extract_repair_succeeds_after_invalid_output() -> None:
-    bad = LLMResult.ok_structured({"claims": [_claim_payload(source_message_ids=[999])]}, "m1")
+    bad = LLMResult.ok_structured({"claims": [_claim_payload(sources=["m999"])]}, "m1")
     good = LLMResult.ok_structured(_extraction_payload(), "m2")
     backend = FakeBackend.scripted([bad, good], capabilities=NATIVE_CAPABILITIES)
     extractor = LLMClaimExtractor(backend)
@@ -184,10 +184,8 @@ async def test_extract_repair_succeeds_after_invalid_output() -> None:
 
 
 async def test_extract_repair_fails_returns_invalid_output_failure() -> None:
-    bad = LLMResult.ok_structured({"claims": [_claim_payload(source_message_ids=[999])]}, "m1")
-    still_bad = LLMResult.ok_structured(
-        {"claims": [_claim_payload(source_message_ids=[998])]}, "m2"
-    )
+    bad = LLMResult.ok_structured({"claims": [_claim_payload(sources=["m999"])]}, "m1")
+    still_bad = LLMResult.ok_structured({"claims": [_claim_payload(sources=["m998"])]}, "m2")
     backend = FakeBackend.scripted([bad, still_bad], capabilities=NATIVE_CAPABILITIES)
     extractor = LLMClaimExtractor(backend)
     outcome = await extractor.extract(a_request())
@@ -255,7 +253,7 @@ async def test_extract_initial_call_usage_limit_error_carries_retry_after() -> N
 
 
 async def test_extract_repair_call_backend_error_maps_error_kind() -> None:
-    bad = LLMResult.ok_structured({"claims": [_claim_payload(source_message_ids=[999])]}, "m1")
+    bad = LLMResult.ok_structured({"claims": [_claim_payload(sources=["m999"])]}, "m1")
     backend = FakeBackend.scripted(
         [bad, LLMResult.failed(ErrorKind.USAGE_LIMIT, "limit reached", 7.0)],
         capabilities=NATIVE_CAPABILITIES,
@@ -272,7 +270,7 @@ async def test_extract_repair_call_backend_error_maps_error_kind() -> None:
 async def test_extract_sums_tokens_across_initial_and_repair_calls() -> None:
     bad = LLMResult(
         text=None,
-        structured={"claims": [_claim_payload(source_message_ids=[999])]},
+        structured={"claims": [_claim_payload(sources=["m999"])]},
         model="m1",
         usage=Usage(input_tokens=100, output_tokens=50, cost_usd=None),
     )
@@ -303,7 +301,7 @@ async def test_extract_tokens_none_when_backend_never_reports_them() -> None:
 async def test_extract_tokens_partial_reporting_treats_missing_as_zero() -> None:
     bad = LLMResult(
         text=None,
-        structured={"claims": [_claim_payload(source_message_ids=[999])]},
+        structured={"claims": [_claim_payload(sources=["m999"])]},
         model="m1",
         usage=Usage(input_tokens=None, output_tokens=None, cost_usd=None),
     )
@@ -586,3 +584,16 @@ def test_readme_contains_recall_and_judge_system_prompts_verbatim() -> None:
     text = readme.read_text()
     assert RECALL_SYSTEM_PROMPT in text
     assert JUDGE_SYSTEM_PROMPT in text
+
+
+async def test_extract_cites_snowflake_ids_via_refs_without_precision_loss() -> None:
+    messages = (a_message(706732704137478123), a_message(706733682781847611))
+    payload = _extraction_payload(claims=[_claim_payload(sources=["m2"])])
+    backend = FakeBackend.scripted(
+        [LLMResult.ok_structured(json.loads(json.dumps(payload)), "claude-sonnet-5")],
+        capabilities=NATIVE_CAPABILITIES,
+    )
+    outcome = await LLMClaimExtractor(backend).extract(a_request(messages=messages))
+    assert outcome.succeeded
+    assert outcome.claims[0].source_message_ids == (706733682781847611,)
+    assert len(backend.requests) == 1

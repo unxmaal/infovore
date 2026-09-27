@@ -111,7 +111,6 @@ class LLMClaimExtractor:
 
     async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
         rendered = render_prompt(request)
-        citable_ids = {message.id for message in request.messages}
         related_claim_ids = {claim.id for claim in request.related_claims if claim.id is not None}
         schema = json_schema_for(ExtractionOut)
         native = self._backend.capabilities().native_json_schema
@@ -137,7 +136,7 @@ class LLMClaimExtractor:
 
         try:
             payload = _payload_from_result(initial_result, native)
-            claims = parse_extraction(payload, citable_ids, related_claim_ids)
+            claims = parse_extraction(payload, rendered.refs, related_claim_ids)
         except InvalidExtractionError as exc:
             repair_request = LLMRequest(
                 system=rendered.system,
@@ -158,7 +157,7 @@ class LLMClaimExtractor:
                 )
             try:
                 repair_payload = _payload_from_result(repair_result, native)
-                claims = parse_extraction(repair_payload, citable_ids, related_claim_ids)
+                claims = parse_extraction(repair_payload, rendered.refs, related_claim_ids)
             except InvalidExtractionError as repair_exc:
                 return ExtractionOutcome(
                     claims=(),

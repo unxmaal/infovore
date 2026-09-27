@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from infovore.extract.protocol import ExtractionRequest
 from infovore.rows import AttachmentRow, MessageRow, ReactionRow
 
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "v2"
 
 SYSTEM_PROMPT = (
     "You are reading an archived exchange from a hobbyist SGI/IRIX community.\n"
@@ -32,10 +32,10 @@ SYSTEM_PROMPT = (
     "Chatter, opinions, and questions that are never answered yield zero "
     "claims.\n"
     "\n"
-    "Every claim must cite the ids of the messages in this exchange that "
-    "support it. Never cite a message from the CONTEXT section: those "
-    "messages are read-only background from a prior exchange and cannot be "
-    "cited.\n"
+    "Every claim must list in sources the refs (m1, m2, ...) of the "
+    "messages in this exchange that support it. Never cite a message from "
+    "the CONTEXT section (refs c1, c2, ...): those messages are read-only "
+    "background from a prior exchange and cannot be cited.\n"
     "\n"
     "Reactions are provided as a weak signal of community agreement, not "
     "proof.\n"
@@ -52,6 +52,7 @@ class RenderedPrompt:
     prompt: str
     version: str
     token_estimate: int
+    refs: dict[str, int]
 
 
 def permalink(guild_id: int, channel_id: int, message_id: int) -> str:
@@ -81,13 +82,14 @@ def _attachments_line(message_id: int, attachments: tuple[AttachmentRow, ...]) -
 
 
 def _render_message(
+    ref: str,
     message: MessageRow,
     opted_out_user_ids: frozenset[int],
     reactions: tuple[ReactionRow, ...] = (),
     attachments: tuple[AttachmentRow, ...] = (),
 ) -> str:
     author, content = _redacted_author_and_content(message, opted_out_user_ids)
-    lines = [f"[{message.id}] {author} @ {message.created_at.isoformat()}:", content]
+    lines = [f"[{ref}] {author} @ {message.created_at.isoformat()}:", content]
     reactions_line = _reactions_line(message.id, reactions)
     if reactions_line is not None:
         lines.append(reactions_line)
@@ -115,13 +117,16 @@ def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
     ]
     if request.context_messages:
         rendered_context = "\n\n".join(
-            _render_message(message, request.opted_out_user_ids)
-            for message in request.context_messages
+            _render_message(f"c{index}", message, request.opted_out_user_ids)
+            for index, message in enumerate(request.context_messages, start=1)
         )
         sections.append(f"CONTEXT (do not cite):\n{rendered_context}")
+    refs = {f"m{index}": message.id for index, message in enumerate(request.messages, start=1)}
     rendered_exchange = "\n\n".join(
-        _render_message(message, request.opted_out_user_ids, request.reactions, request.attachments)
-        for message in request.messages
+        _render_message(
+            ref, message, request.opted_out_user_ids, request.reactions, request.attachments
+        )
+        for ref, message in zip(refs, request.messages, strict=True)
     )
     sections.append(f"EXCHANGE:\n{rendered_exchange}")
     sections.append(f"RELATED EXISTING CLAIMS:\n{_render_related_claims(request)}")
@@ -132,4 +137,5 @@ def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
         prompt=prompt,
         version=PROMPT_VERSION,
         token_estimate=token_estimate,
+        refs=refs,
     )
