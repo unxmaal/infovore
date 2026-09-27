@@ -27,6 +27,7 @@ from infovore.extract.protocol import (
     FailureKind,
 )
 from infovore.extract.runner import (
+    DEFAULT_MIX_FRACTION_UNCERTAIN,
     ExchangeClaimed,
     ExchangeFailed,
     ExchangePaused,
@@ -40,6 +41,7 @@ from infovore.extract.runner import (
     UntriagedExchangesError,
     run_extraction,
     select_trial_sample,
+    select_trial_sample_origins,
 )
 from infovore.rows import (
     ClaimKind,
@@ -1483,3 +1485,184 @@ def test_runs_are_stamped_with_batch_id_as_they_are_recorded(tmp_path: Path) -> 
 
     rows = conn.execute("SELECT batch_id FROM extraction_runs").fetchall()
     assert [row["batch_id"] for row in rows] == ["batch-1"]
+
+
+# --- select_trial_sample_origins / --strategy mixed (issue #107) ------------
+
+
+def test_select_trial_sample_origins_non_mixed_labels_every_id_with_its_strategy(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    for i in range(1, 4):
+        seed_exchange(conn, [a_message(i, channel_id=1)])
+
+    origins = select_trial_sample_origins(conn, 10, seed=0, strategy=TrialSampleStrategy.STRATIFIED)
+
+    assert origins == {1: "stratified", 2: "stratified", 3: "stratified"}
+
+
+def test_select_trial_sample_origins_random_strategy_labels_every_id_random(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    for i in range(1, 4):
+        seed_exchange(conn, [a_message(i, channel_id=1)])
+
+    origins = select_trial_sample_origins(conn, 2, seed=1, strategy=TrialSampleStrategy.RANDOM)
+
+    assert set(origins.values()) == {"random"}
+    assert len(origins) == 2
+
+
+def test_select_trial_sample_origins_uncertain_strategy_labels_every_id_uncertain(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    version = _insert_stub_model(conn)
+    first = seed_exchange(conn, [a_message(1, channel_id=1)])
+    second = seed_exchange(conn, [a_message(2, channel_id=1)])
+    assert first.id is not None
+    assert second.id is not None
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, first.id)
+    )
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.9, p_lore_model = ? WHERE id = ?", (version, second.id)
+    )
+
+    origins = select_trial_sample_origins(conn, 2, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
+
+    assert origins == {first.id: "uncertain", second.id: "uncertain"}
+
+
+def test_select_trial_sample_origins_uncertain_strategy_without_a_model_still_raises(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, channel_id=1)])
+
+    with pytest.raises(NoScoredExchangesError):
+        select_trial_sample_origins(conn, 5, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
+
+
+def test_select_trial_sample_delegates_mixed_to_origins(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    for i in range(1, 11):
+        seed_exchange(conn, [a_message(i, channel_id=1)])
+
+    sample = select_trial_sample(conn, 4, seed=0, strategy=TrialSampleStrategy.MIXED)
+    origins = select_trial_sample_origins(conn, 4, seed=0, strategy=TrialSampleStrategy.MIXED)
+
+    assert sample == sorted(origins)
+    assert set(origins.values()) == {"random"}  # no p_lore anywhere: falls back to all-random
+
+
+def _seed_scored_pool(conn: sqlite3.Connection, count: int) -> list[int]:
+    version = _insert_stub_model(conn)
+    ids: list[int] = []
+    for i in range(count):
+        exchange = seed_exchange(conn, [a_message(i + 1, channel_id=1)])
+        assert exchange.id is not None
+        ids.append(exchange.id)
+        conn.execute(
+            "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?",
+            (0.1 * (i % 10), version, exchange.id),
+        )
+    return ids
+
+
+def test_mixed_strategy_splits_the_sample_between_uncertain_and_random(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    _seed_scored_pool(conn, 20)
+
+    origins = select_trial_sample_origins(conn, 10, seed=3, strategy=TrialSampleStrategy.MIXED)
+
+    assert len(origins) == 10
+    counts = {origin: list(origins.values()).count(origin) for origin in set(origins.values())}
+    assert counts.get("uncertain", 0) == 5
+    assert counts.get("random", 0) == 5
+    assert len(set(origins)) == len(origins)  # no id chosen twice
+
+
+def test_mixed_strategy_is_deterministic_for_the_same_seed(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    _seed_scored_pool(conn, 20)
+
+    first = select_trial_sample_origins(conn, 10, seed=9, strategy=TrialSampleStrategy.MIXED)
+    second = select_trial_sample_origins(conn, 10, seed=9, strategy=TrialSampleStrategy.MIXED)
+
+    assert first == second
+
+
+def test_mixed_strategy_mix_fraction_controls_the_split(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    _seed_scored_pool(conn, 20)
+
+    all_random = select_trial_sample_origins(
+        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, mix=0.0
+    )
+    mostly_uncertain = select_trial_sample_origins(
+        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, mix=1.0
+    )
+
+    assert set(all_random.values()) == {"random"}
+    assert list(mostly_uncertain.values()).count("uncertain") == 10
+
+
+def test_mixed_strategy_default_mix_is_fifty_fifty() -> None:
+    assert DEFAULT_MIX_FRACTION_UNCERTAIN == 0.5
+
+
+def test_mixed_strategy_returns_all_when_n_ge_total(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    version = _insert_stub_model(conn)
+    scored = seed_exchange(conn, [a_message(1, channel_id=1)])
+    unscored = seed_exchange(conn, [a_message(2, channel_id=1)])
+    assert scored.id is not None
+    assert unscored.id is not None
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, scored.id)
+    )
+
+    origins = select_trial_sample_origins(conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED)
+
+    assert origins == {scored.id: "uncertain", unscored.id: "random"}
+
+
+# --- run_extraction stamps sampled_by (issue #107) ---------------------------
+
+
+def test_trial_runs_are_stamped_with_their_sampled_by_origin(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    succeeding = seed_exchange(conn, [a_message(1, content="hi")])
+    failing = seed_exchange(conn, [a_message(2, content="FAIL: transient")])
+    unsampled = seed_exchange(conn, [a_message(3, content="hi")])
+    assert succeeding.id is not None
+    assert failing.id is not None
+    assert unsampled.id is not None
+
+    async def go() -> ExtractionReport:
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+            exchange_ids=[succeeding.id, failing.id, unsampled.id],
+            sampled_by={succeeding.id: "uncertain", failing.id: "random"},
+        )
+
+    asyncio.run(go())
+
+    rows = {
+        row["exchange_id"]: row["sampled_by"]
+        for row in conn.execute("SELECT exchange_id, sampled_by FROM extraction_runs").fetchall()
+    }
+    assert rows[succeeding.id] == "uncertain"
+    assert rows[failing.id] == "random"
+    assert rows[unsampled.id] is None

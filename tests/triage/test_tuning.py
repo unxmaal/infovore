@@ -14,11 +14,13 @@ from infovore.triage.rules import DEFAULT_RULES, parse_rules
 from infovore.triage.runner import triage_pending
 from infovore.triage.train import NoTrainedModelError, load_latest_model, score_all, train_and_store
 from infovore.triage.tuning import (
+    UNCERTAIN_SAMPLING_WARNING_THRESHOLD,
     NoLabelsError,
     bayes_bin,
     compute_report_card,
     fit_weights,
     render_rules_toml,
+    sampling_bias_warning,
     signal_report,
     suggest_terms,
 )
@@ -98,6 +100,41 @@ def seed_fixture(conn: sqlite3.Connection) -> tuple[list[int], list[int]]:
         noise_ids.append(exchange_id)
 
     return lore_ids, noise_ids
+
+
+def _ensure_prompt_version(conn: sqlite3.Connection, version: str = "v1") -> None:
+    conn.execute(
+        "INSERT OR IGNORE INTO prompt_versions (version, text_sha256, created_at)"
+        " VALUES (?, 'sha', ?)",
+        (version, NOW.isoformat()),
+    )
+
+
+def seed_llm_labeled_exchange(
+    conn: sqlite3.Connection,
+    message_id: int,
+    channel_id: int,
+    content: str,
+    label: Label,
+    source_ref: str | None,
+    sampled_by: str | None = None,
+) -> int:
+    """A LORE/NOISE-labeled exchange whose label came (per `source_ref`) from
+    a trial extraction run, so `--fit-weights`/`--signal-report`'s sampling-
+    origin warning (issue #107) can trace it back to `sampled_by`. Passing a
+    `source_ref` that isn't `derive_labels_from_runs`'s own `run:<id> ...`
+    format (or `None`) exercises the "provenance unknown" fallback."""
+    _ensure_prompt_version(conn)
+    exchange_id = seed_exchange(conn, message_id, channel_id, content)
+    cursor = conn.execute(
+        "INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at, mode,"
+        " outcome, sampled_by) VALUES (?, 'm', 'v1', ?, 'trial', 'ok', ?)",
+        (exchange_id, NOW.isoformat(), sampled_by),
+    )
+    run_id = cursor.lastrowid
+    ref = source_ref.format(run_id=run_id) if source_ref is not None else None
+    set_label(conn, exchange_id, label, LabelSource.LLM, ref, NOW)
+    return exchange_id
 
 
 # --- signal_report ------------------------------------------------------------
@@ -292,6 +329,170 @@ def test_fit_weights_fits_rule_signals_alone_not_conditioned_on_p_lore(tmp_path:
 
     assert len(result.changes) == 14
     assert result.changes == baseline.changes
+
+
+# --- sampling_bias_warning / fit_weights's new fields (issue #107) ----------
+
+
+def test_sampling_bias_warning_raises_without_any_labels(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    with pytest.raises(NoLabelsError):
+        sampling_bias_warning(conn, DEFAULT_RULES)
+
+
+def test_sampling_bias_warning_falls_back_to_class_imbalance_when_provenance_is_unknown(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_fixture(conn)  # all labels are HUMAN: no sampling provenance at all
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    assert warning.uncertain_sampling_share is None
+    assert warning.uncertain_sampling_warning is False
+    assert warning.class_imbalance == pytest.approx(0.5)
+    assert warning.class_imbalance_warning is False
+
+
+def test_sampling_bias_warning_flags_class_imbalance_when_provenance_unknown_and_skewed(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    for i in range(15):
+        exchange_id = seed_exchange(conn, i + 1, channel_id=1, content=LORE_BASE)
+        set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+    for i in range(2):
+        exchange_id = seed_exchange(conn, 100 + i, channel_id=2, content=NOISE_BASE)
+        set_label(conn, exchange_id, Label.NOISE, LabelSource.HUMAN, None, NOW)
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    assert warning.uncertain_sampling_share is None
+    assert warning.class_imbalance > 0.7
+    assert warning.class_imbalance_warning is True
+
+
+def test_sampling_bias_warning_uses_recorded_sampling_origin_when_available(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    origins = ["uncertain", "uncertain", "uncertain", "random"]
+    for i, label in enumerate((Label.LORE,) * 4):
+        seed_llm_labeled_exchange(
+            conn, i + 1, 1, LORE_BASE, label, "run:{run_id} model:m", origins[i]
+        )
+    for i, label in enumerate((Label.NOISE,) * 4):
+        seed_llm_labeled_exchange(
+            conn, 100 + i, 2, NOISE_BASE, label, "run:{run_id} model:m", origins[i]
+        )
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    # 4 labels balanced per class (imbalance would not warn), but 6/8 labels
+    # trace to `uncertain` sampling: the sampling check, not class imbalance,
+    # is what should fire here.
+    assert warning.class_imbalance == pytest.approx(0.5)
+    assert warning.class_imbalance_warning is False
+    assert warning.uncertain_sampling_share == pytest.approx(0.75)
+    assert warning.uncertain_sampling_warning is True
+
+
+def test_sampling_bias_warning_does_not_warn_at_or_below_the_threshold(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    # 7 uncertain, 3 random: share is exactly the threshold, not over it.
+    origins = ["uncertain"] * 7 + ["random"] * 3
+    for i, origin in enumerate(origins):
+        label = Label.LORE if i % 2 == 0 else Label.NOISE
+        content = LORE_BASE if label is Label.LORE else NOISE_BASE
+        seed_llm_labeled_exchange(conn, i + 1, 1, content, label, "run:{run_id} model:m", origin)
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    assert warning.uncertain_sampling_share == pytest.approx(UNCERTAIN_SAMPLING_WARNING_THRESHOLD)
+    assert warning.uncertain_sampling_warning is False
+
+
+def test_sampling_bias_warning_ignores_llm_labels_with_no_run_reference(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    for i in range(6):
+        seed_llm_labeled_exchange(conn, i + 1, 1, LORE_BASE, Label.LORE, None)
+    for i in range(6):
+        seed_llm_labeled_exchange(
+            conn, 100 + i, 2, NOISE_BASE, Label.NOISE, "hand-entered, no run id"
+        )
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    assert warning.uncertain_sampling_share is None
+    assert warning.uncertain_sampling_warning is False
+
+
+def test_sampling_bias_warning_ignores_runs_without_a_recorded_sampling_origin(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    for i in range(6):
+        seed_llm_labeled_exchange(
+            conn, i + 1, 1, LORE_BASE, Label.LORE, "run:{run_id} model:m", sampled_by=None
+        )
+    for i in range(6):
+        seed_llm_labeled_exchange(
+            conn, 100 + i, 2, NOISE_BASE, Label.NOISE, "run:{run_id} model:m", sampled_by=None
+        )
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    assert warning.uncertain_sampling_share is None  # every run predates `sampled_by`
+    assert warning.class_imbalance == pytest.approx(0.5)
+
+
+def test_sampling_bias_warning_prefers_a_human_label_over_llm_provenance(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_llm_labeled_exchange(
+        conn, 1, 1, LORE_BASE, Label.LORE, "run:{run_id} model:m", "uncertain"
+    )
+    set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)  # wins, no provenance
+    for i in range(5):
+        seed_llm_labeled_exchange(
+            conn, 100 + i, 2, NOISE_BASE, Label.NOISE, "run:{run_id} model:m", "uncertain"
+        )
+
+    warning = sampling_bias_warning(conn, DEFAULT_RULES)
+
+    # The human-labeled exchange is excluded from the known-provenance set
+    # entirely, so its `uncertain` run doesn't count toward the share.
+    assert warning.uncertain_sampling_share == pytest.approx(1.0)
+
+
+def test_fit_weights_reports_the_recorded_sampling_origin_when_known(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    origins = ["uncertain", "uncertain", "uncertain", "random"]
+    for i, label in enumerate((Label.LORE,) * 4):
+        seed_llm_labeled_exchange(
+            conn, i + 1, 1, LORE_BASE, label, "run:{run_id} model:m", origins[i]
+        )
+    for i, label in enumerate((Label.NOISE,) * 4):
+        seed_llm_labeled_exchange(
+            conn, 100 + i, 2, NOISE_BASE, label, "run:{run_id} model:m", origins[i]
+        )
+
+    result = fit_weights(conn, DEFAULT_RULES)
+
+    assert result.uncertain_sampling_share == pytest.approx(0.75)
+    assert result.uncertain_sampling_warning is True
+    assert result.class_imbalance_warning is False
+
+
+def test_fit_weights_uncertain_sampling_share_is_none_when_provenance_is_unknown(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_fixture(conn)
+
+    result = fit_weights(conn, DEFAULT_RULES)
+
+    assert result.uncertain_sampling_share is None
+    assert result.uncertain_sampling_warning is False
 
 
 # --- suggest_terms --------------------------------------------------------
