@@ -9,6 +9,7 @@ from infovore.triage.bayes import (
     Label,
     Metrics,
     Model,
+    auc,
     candidate_thresholds,
     chi2q,
     evaluate,
@@ -199,6 +200,47 @@ def test_evaluate_and_recommend_threshold() -> None:
     assert recommend_threshold(table, min_recall=0.6) == table[1]
     assert recommend_threshold(table, min_recall=1.0) == table[0]
     assert recommend_threshold(evaluate([(0.1, Label.LORE)], [0.5]), min_recall=0.5) is None
+
+
+def test_auc_is_one_for_perfect_separation() -> None:
+    scored = [
+        (0.9, Label.LORE),
+        (0.8, Label.LORE),
+        (0.2, Label.NOISE),
+        (0.1, Label.NOISE),
+    ]
+    assert auc(scored) == pytest.approx(1.0)
+
+
+def test_auc_is_zero_for_perfectly_reversed_scores() -> None:
+    assert auc([(0.1, Label.LORE), (0.9, Label.NOISE)]) == pytest.approx(0.0)
+
+
+def test_auc_of_a_tie_between_classes_is_one_half() -> None:
+    assert auc([(0.5, Label.LORE), (0.5, Label.NOISE)]) == pytest.approx(0.5)
+
+
+def test_auc_handles_a_larger_tied_block() -> None:
+    scored = [
+        (0.5, Label.LORE),
+        (0.5, Label.LORE),
+        (0.5, Label.NOISE),
+        (0.5, Label.NOISE),
+        (0.9, Label.LORE),
+        (0.1, Label.NOISE),
+    ]
+    # AUC = mean, over all 3 lore * 3 noise = 9 pairs, of 1 (lore > noise),
+    # 0.5 (tied), or 0 (lore < noise): the two lore=0.5 scores each tie both
+    # noise=0.5 scores (2*2 pairs * 0.5 = 2.0) and each beat the noise=0.1
+    # score outright (2 pairs * 1 = 2.0); the lore=0.9 score beats all three
+    # noise scores outright (3 pairs * 1 = 3.0). Total wins = 2.0 + 2.0 + 3.0
+    # = 7.0, out of 9 pairs.
+    assert auc(scored) == pytest.approx(7 / 9)
+
+
+def test_auc_is_none_without_both_classes() -> None:
+    assert auc([(0.5, Label.LORE), (0.9, Label.LORE)]) is None
+    assert auc([]) is None
 
 
 def test_metrics_with_no_positives_are_zero_not_errors() -> None:
