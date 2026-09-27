@@ -13,11 +13,13 @@ from infovore.triage.runner import (
     triage_pending,
 )
 from infovore.triage.train import (
+    RECALL_TARGETS,
     InsufficientLabelsError,
     NoTrainedModelError,
+    RecommendationRow,
     TokenInfo,
     load_latest_model,
-    recommend,
+    recommend_table,
     score_all,
     train_and_store,
 )
@@ -80,6 +82,26 @@ def _render_top_tokens(tokens: Sequence[TokenInfo]) -> str:
             f" lore={token.lore_count} noise={token.noise_count}"
         )
     return "\n".join(lines)
+
+
+def _ordered_unique(values: Sequence[float]) -> tuple[float, ...]:
+    seen: list[float] = []
+    for value in values:
+        if value not in seen:
+            seen.append(value)
+    return tuple(seen)
+
+
+def _render_recall_table(rows: Sequence[RecommendationRow]) -> str:
+    lines = ["recall table (target recall -> threshold, corpus share):"]
+    for row in rows:
+        if row.metric is None:
+            lines.append(f"  {row.min_recall:.2f}  unreachable")
+        else:
+            lines.append(
+                f"  {row.min_recall:.2f}  threshold={row.formatted_threshold} share={row.share:.3f}"
+            )
+    return "\n".join(lines) + "\n"
 
 
 class TriageCommand:
@@ -147,18 +169,21 @@ class TriageCommand:
         from infovore.cli import ExitCode
 
         try:
-            result = recommend(context.conn, args.min_recall)
+            min_recalls = _ordered_unique((args.min_recall, *RECALL_TARGETS))
+            main_row, *table_rows = recommend_table(context.conn, min_recalls)
         except NoTrainedModelError as error:
             raise ConfigError("no trained model; run `infovore triage --train` first") from error
 
-        if result is None:
+        if main_row.metric is None:
             context.stdout.write(f"no threshold meets recall >= {args.min_recall}\n")
-            return ExitCode.OK
-
-        metric, share = result
-        context.stdout.write(
-            f"recommended INFOVORE_TRIAGE_MIN_P_LORE={metric.threshold:.2f}"
-            f" (recall={metric.recall:.3f} precision={metric.precision:.3f})\n"
-            f"expected share of exchanges sent to the LLM: {share:.3f}\n"
-        )
+        else:
+            assert main_row.share is not None
+            assert main_row.formatted_threshold is not None
+            metric = main_row.metric
+            context.stdout.write(
+                f"recommended INFOVORE_TRIAGE_MIN_P_LORE={main_row.formatted_threshold}"
+                f" (recall={metric.recall:.3f} precision={metric.precision:.3f})\n"
+                f"expected share of exchanges sent to the LLM: {main_row.share:.3f}\n"
+            )
+        context.stdout.write(_render_recall_table(table_rows))
         return ExitCode.OK
