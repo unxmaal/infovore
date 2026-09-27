@@ -4,6 +4,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from infovore.source.protocol import DiscordSource
+from infovore.triage.rules import DEFAULT_RULES, RulesError, TriageRules, load_rules
 
 DEFAULT_QUIET_GAP_MINUTES = 30
 DEFAULT_BATCH_SIZE = 10
@@ -69,6 +70,7 @@ class Settings:
     include_bot_messages: bool = DEFAULT_INCLUDE_BOT_MESSAGES
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
     triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE
+    triage_rules: TriageRules = DEFAULT_RULES
 
 
 def _parse_int(raw: str) -> int | None:
@@ -230,6 +232,16 @@ def _parse_stage(env: Mapping[str, str], stage: Stage, errors: list[str]) -> Sta
     )
 
 
+def _load_triage_rules(raw: str | None, errors: list[str]) -> TriageRules:
+    if raw is None or not raw.strip():
+        return DEFAULT_RULES
+    try:
+        return load_rules(raw)
+    except RulesError as error:
+        errors.append(str(error))
+        return DEFAULT_RULES
+
+
 def _parse_source_kind(raw: str | None, errors: list[str]) -> SourceKind:
     text = raw or SourceKind.DISCORD.value
     try:
@@ -298,6 +310,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         errors,
     )
     stages = {stage: _parse_stage(env, stage, errors) for stage in Stage}
+    triage_rules = _load_triage_rules(env.get("INFOVORE_TRIAGE_RULES"), errors)
 
     if errors:
         raise ConfigError("; ".join(errors))
@@ -319,6 +332,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         include_bot_messages=include_bot_messages,
         triage_min_score=triage_min_score,
         triage_min_p_lore=triage_min_p_lore,
+        triage_rules=triage_rules,
     )
 
 

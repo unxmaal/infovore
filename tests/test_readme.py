@@ -111,7 +111,9 @@ def test_triage_section_documents_every_signal_and_the_version() -> None:
 
     triage = section("Triage")
     names = set(re.findall(r'reasons\.append\(\("(\w+)"', inspect.getsource(score)))
-    names |= set(re.findall(r'\("(\w+)", [A-Z_]+, [A-Z_]+_WEIGHT\)', inspect.getsource(score)))
+    names |= set(re.findall(r'\("(\w+)", [\w.]+, rules\.\w+_weight\)', inspect.getsource(score)))
     assert names
     assert sorted(name for name in names if f"`{name}`" not in triage) == []
-    assert score.TRIAGE_VERSION in triage
+    assert "TRIAGE_VERSION" in triage
+    assert re.search(r"r-[0-9a-f]{12}", triage) is not None
+    assert "INFOVORE_TRIAGE_RULES" in triage

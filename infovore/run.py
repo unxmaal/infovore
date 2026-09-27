@@ -97,7 +97,7 @@ async def _run_cycle(
         include_bots=settings.include_bot_messages,
     )
     progress(CycleStepStarted(step="triage"))
-    triage_pending(conn)
+    triage_pending(conn, rules=settings.triage_rules)
     extract_stage = settings.stages[Stage.EXTRACT]
     progress(CycleStepStarted(step="extract"))
     try:
@@ -113,6 +113,7 @@ async def _run_cycle(
             concurrency=extract_stage.concurrency,
             min_score=settings.triage_min_score,
             min_p_lore=settings.triage_min_p_lore,
+            rules=settings.triage_rules,
         )
     except PromptNotPromotedError as error:
         logger.warning(

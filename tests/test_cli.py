@@ -17,6 +17,7 @@ from infovore.cli import (
 )
 from infovore.config import Settings
 from infovore.source.protocol import DiscordSource, SourceUnavailableError
+from infovore.triage.score import TRIAGE_VERSION
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -121,8 +122,8 @@ def test_status_shows_triaged_and_above_threshold_counts(tmp_path: Path) -> None
                  (2, 1, 9, 1, 'a', '{now}', 'y', '{now}', '{{}}');
         INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
           ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
-          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.9, 't1'),
-                 (1, 2, 2, '{now}', '{now}', 1, 'quiet_gap', 'b', 0.1, 't1');
+          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}'),
+                 (1, 2, 2, '{now}', '{now}', 1, 'quiet_gap', 'b', 0.1, '{TRIAGE_VERSION}');
         """
     )
     code, out, _ = run(["status"], env)

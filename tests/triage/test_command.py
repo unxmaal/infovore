@@ -4,6 +4,7 @@ from pathlib import Path
 
 from infovore.cli import ExitCode, builtin_commands, main
 from infovore.db.connection import migrate, open_database
+from infovore.triage.score import TRIAGE_VERSION
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -56,7 +57,7 @@ def test_triage_scores_pending_exchanges(tmp_path: Path) -> None:
     assert "scored=1" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
     row = conn.execute("SELECT triage_version FROM exchanges").fetchone()
-    assert row["triage_version"] == "t1"
+    assert row["triage_version"] == TRIAGE_VERSION
 
 
 def test_triage_streams_progress_lines(tmp_path: Path) -> None:

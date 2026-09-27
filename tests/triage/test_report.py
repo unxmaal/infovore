@@ -1,4 +1,5 @@
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import insert_exchange
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, MessageRow
 from infovore.triage.report import compute_triage_stats
+from infovore.triage.rules import DEFAULT_RULES
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -43,7 +45,7 @@ def seed_scored_exchange(
     channel_id: int,
     score: float,
     reasons: str,
-    version: str = "t1",
+    version: str = DEFAULT_RULES.version,
 ) -> None:
     message = a_message(message_id, channel_id)
     conn.execute(
@@ -160,6 +162,19 @@ def test_untriaged_exchanges_excluded_from_stats(tmp_path: Path) -> None:
     assert stats.above_threshold == 0
     assert stats.below_threshold == 0
     assert stats.channel_stats == {}
+
+
+def test_compute_triage_stats_uses_the_provided_rules_version(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    custom = replace(DEFAULT_RULES, version="custom-report")
+    seed_scored_exchange(conn, 1, 1, 0.6, "[]", version="custom-report")
+    seed_scored_exchange(conn, 2, 1, 0.6, "[]", version="some-other-version")
+
+    default_stats = compute_triage_stats(conn, min_score=0.3)
+    custom_stats = compute_triage_stats(conn, min_score=0.3, rules=custom)
+
+    assert default_stats.above_threshold == 0
+    assert custom_stats.above_threshold == 1
 
 
 def test_empty_database_reports_zeros(tmp_path: Path) -> None:

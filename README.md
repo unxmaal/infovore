@@ -88,6 +88,7 @@ Settings are read from the process environment by `infovore.config.load_settings
 | `INFOVORE_INCLUDE_BOT_MESSAGES` | `false` | Whether bot-authored messages are ingested. Accepts `1`/`true`/`yes`/`on` and `0`/`false`/`no`/`off` (case-insensitive). |
 | `INFOVORE_TRIAGE_MIN_SCORE` | `0.3` | Threshold (0..1) the rule `triage_score` must meet or exceed for live `extract` to claim an exchange — applied only when that exchange has no `p_lore` yet (cold start, before a classifier is trained); also the threshold `infovore triage --report` and `status` compare against. Must be a number between 0 and 1 inclusive. |
 | `INFOVORE_TRIAGE_MIN_P_LORE` | `0.5` | Threshold (0..1) the trained classifier's `p_lore` must meet or exceed for live `extract` to claim an exchange, once that exchange has been scored by a trained model — see "Triage". Must be a number between 0 and 1 inclusive. |
+| `INFOVORE_TRIAGE_RULES` | *(optional, shipped `infovore/triage/rules.toml`)* | Path to a triage rules TOML file (`infovore.triage.rules.TriageRules`), overriding the shipped defaults — see "Triage". A missing file, invalid TOML, or a rules file with an unknown/missing/mistyped key is a `ConfigError` (exit `2`). |
 
 Each stage — `extract`, `probe`, `judge` — has its own backend selection, all under an `INFOVORE_<STAGE>_*` prefix (`<STAGE>` is `EXTRACT`, `PROBE`, or `JUDGE`):
 
@@ -300,7 +301,11 @@ A group matching none of these is a new, unparented exchange. Precedence matters
 
 ## Triage
 
-Most Discord chatter carries no lore, so exchanges are scored with deterministic, programmatic signals before any LLM sees them; only exchanges that score high enough are sent to extraction. Scoring is free, re-runs in seconds over the whole database, and is versioned (`TRIAGE_VERSION` = `t1`), so changing the rules simply re-scores everything. Scores live on `exchanges.triage_score` (0–1, clamped sum of the signals below), with the contributing signals in `triage_reasons` (JSON) and the rule version in `triage_version`.
+Most Discord chatter carries no lore, so exchanges are scored with deterministic, programmatic signals before any LLM sees them; only exchanges that score high enough are sent to extraction. Scoring is free and re-runs in seconds over the whole database. Scores live on `exchanges.triage_score` (0–1, clamped sum of the signals below), with the contributing signals in `triage_reasons` (JSON) and the rule version in `triage_version`.
+
+Every weight, cap, penalty, threshold, and term list below (the `domain_terms`, `archive_link`, and `gif_links` word lists included) is data, not code: it lives in the shipped `infovore/triage/rules.toml` (`infovore.triage.rules.TriageRules`, loaded with `tomllib`, validated so unknown/missing keys and wrong types are a clear config error). `INFOVORE_TRIAGE_RULES=<path>` points at an edited copy instead — copy `rules.toml`, change what you need, and set the variable (see "Configuration"). Only `irix_version`, `part_number`, `unix_path`, and `code` stay as regexes in `infovore/triage/score.py`, since they're structural rather than word lists; their weights still come from the rules file.
+
+`infovore.triage.score.TRIAGE_VERSION` (`"r-" + sha256(canonical rules)[:12]`, e.g. `r-3f9a2b7c1d04`) is a hash of the loaded rules' parsed content, canonicalized (`json.dumps(..., sort_keys=True)`) so whitespace-only or comment-only edits never change it — only the values do. **Editing the rules file changes this hash**, so the next `infovore triage` treats every already-scored exchange as stale (`triage_version` no longer matches) and rescores it with the new rules; `infovore extract` refuses to run live until that rescore is done (`has_untriaged_claimable`), so the very first `triage` after an upgrade or a rules edit rescores the whole database once, and every run after that is incremental again.
 
 | signal | weight | fires when |
 | --- | --- | --- |

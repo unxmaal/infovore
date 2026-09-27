@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -8,6 +9,7 @@ import pytest
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, MessageRow
+from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.runner import (
     CHANNEL_PRIOR_CAP,
     CHANNEL_PRIOR_WEIGHT,
@@ -176,23 +178,46 @@ def test_triage_pending_is_idempotent_when_version_unchanged(tmp_path: Path) -> 
     assert first.channel_priors == second.channel_priors
 
 
-def test_triage_pending_rescans_after_version_bump(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_triage_pending_rescans_after_version_bump(tmp_path: Path) -> None:
     conn = db(tmp_path)
     exchange = zero_exchange(conn, 1, channel_id=1)
     assert exchange.id is not None
     triage_pending(conn)
 
-    monkeypatch.setattr("infovore.triage.runner.TRIAGE_VERSION", "t2")
-
-    report = triage_pending(conn)
+    bumped_rules = replace(DEFAULT_RULES, version="t2")
+    report = triage_pending(conn, rules=bumped_rules)
 
     assert report.candidates == 1
     assert report.scored == 1
     updated = get_exchange(conn, exchange.id)
     assert updated is not None
     assert updated.triage_version == "t2"
+
+
+def test_triage_pending_defaults_to_default_rules(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = zero_exchange(conn, 1, channel_id=1)
+    assert exchange.id is not None
+
+    triage_pending(conn)
+
+    updated = get_exchange(conn, exchange.id)
+    assert updated is not None
+    assert updated.triage_version == DEFAULT_RULES.version
+
+
+def test_triage_pending_scores_with_the_provided_rules(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange = half_exchange(conn, 1, channel_id=1)
+    assert exchange.id is not None
+
+    boosted = replace(DEFAULT_RULES, domain_term_weight=1.0, version="boosted")
+    triage_pending(conn, rules=boosted)
+
+    updated = get_exchange(conn, exchange.id)
+    assert updated is not None
+    assert updated.triage_version == "boosted"
+    assert updated.triage_score == 0.8
 
 
 def test_channel_prior_shifts_score_toward_channel_mean(tmp_path: Path) -> None:

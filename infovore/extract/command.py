@@ -113,6 +113,7 @@ class ExtractCommand:
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
                 batch_id=to_db_time(context.clock.now()),
+                rules=context.settings.triage_rules,
             )
         except PromptNotPromotedError as error:
             raise ConfigError(

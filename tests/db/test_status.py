@@ -1,9 +1,11 @@
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
 from infovore.db.connection import migrate, open_database
 from infovore.db.status import collect_status
+from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.score import TRIAGE_VERSION
 
 NOW = "2026-01-01T00:00:00+00:00"
@@ -58,6 +60,26 @@ def test_triaged_and_above_threshold_counts(tmp_path: Path) -> None:
     report = collect_status(conn, triage_min_score=0.3)
     assert report.triaged_exchanges == 2
     assert report.above_threshold_exchanges == 1
+
+
+def test_triaged_counts_use_the_provided_rules_version(tmp_path: Path) -> None:
+    conn = fresh(tmp_path)
+    custom = replace(DEFAULT_RULES, version="custom-status")
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES (1, 9, 'general', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.9, 'custom-status');
+        """
+    )
+    default_report = collect_status(conn, triage_min_score=0.3)
+    custom_report = collect_status(conn, triage_min_score=0.3, rules=custom)
+    assert default_report.triaged_exchanges == 0
+    assert custom_report.triaged_exchanges == 1
 
 
 def test_counts_and_last_runs(tmp_path: Path) -> None:

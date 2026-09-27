@@ -1,3 +1,4 @@
+from importlib import resources
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from infovore.config import (
     resolve_guild_id,
     settings_from_environment,
 )
+from infovore.triage.rules import DEFAULT_RULES
 
 REQUIRED_ENV = {
     "INFOVORE_DISCORD_TOKEN": "tok",
@@ -510,3 +512,60 @@ def test_resolve_guild_id_raises_when_source_has_multiple_guilds() -> None:
     settings = make_settings(guild_id=None)
     with pytest.raises(ConfigError, match="INFOVORE_GUILD_ID"):
         resolve_guild_id(settings, _SourceWithGuildIds(frozenset({1, 2})))  # type: ignore[arg-type]
+
+
+def _shipped_rules_text() -> str:
+    return resources.files("infovore.triage").joinpath("rules.toml").read_text(encoding="utf-8")
+
+
+def test_load_settings_triage_rules_defaults_to_shipped_rules() -> None:
+    settings = load_settings(REQUIRED_ENV)
+    assert settings.triage_rules == DEFAULT_RULES
+
+
+def test_load_settings_triage_rules_override_from_env(tmp_path: Path) -> None:
+    custom_text = _shipped_rules_text().replace(
+        "domain_term_weight = 0.15", "domain_term_weight = 0.99"
+    )
+    custom_path = tmp_path / "custom-rules.toml"
+    custom_path.write_text(custom_text)
+
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_RULES": str(custom_path)}
+    settings = load_settings(env)
+
+    assert settings.triage_rules.domain_term_weight == 0.99
+    assert settings.triage_rules.version != DEFAULT_RULES.version
+
+
+def test_load_settings_triage_rules_missing_file_reported(tmp_path: Path) -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_RULES": str(tmp_path / "missing.toml")}
+    with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_RULES"):
+        load_settings(env)
+
+
+def test_load_settings_triage_rules_invalid_toml_reported(tmp_path: Path) -> None:
+    bad_path = tmp_path / "bad.toml"
+    bad_path.write_text("this is not [valid toml")
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_RULES": str(bad_path)}
+    with pytest.raises(ConfigError, match="triage rules"):
+        load_settings(env)
+
+
+def test_load_settings_triage_rules_invalid_schema_reported(tmp_path: Path) -> None:
+    bad_path = tmp_path / "bad.toml"
+    bad_path.write_text("domain_term_weight = 0.15\n")
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_RULES": str(bad_path)}
+    with pytest.raises(ConfigError, match="missing key"):
+        load_settings(env)
+
+
+def test_load_settings_triage_rules_error_combines_with_other_errors(tmp_path: Path) -> None:
+    env = {
+        "INFOVORE_TRIAGE_RULES": str(tmp_path / "missing.toml"),
+        "INFOVORE_GUILD_ID": "bad",
+    }
+    with pytest.raises(ConfigError) as excinfo:
+        load_settings(env)
+    message = str(excinfo.value)
+    assert "INFOVORE_TRIAGE_RULES" in message
+    assert "INFOVORE_GUILD_ID" in message

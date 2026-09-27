@@ -21,7 +21,7 @@ from infovore.extract.protocol import ClaimExtractor, ExtractedClaim, Failure, F
 from infovore.extract.request import build_request
 from infovore.rows import ExchangeRow, ExtractionRunRow, ExtractionStatus, RunMode, RunOutcome
 from infovore.timing import Clock, Sleeper
-from infovore.triage.score import TRIAGE_VERSION
+from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
 DEFAULT_USAGE_LIMIT_RETRY_AFTER = 300.0
 
@@ -433,11 +433,12 @@ async def run_extraction(
     exchange_ids: Sequence[int] | None = None,
     progress: Progress = _ignore_progress,
     batch_id: str | None = None,
+    rules: TriageRules = DEFAULT_RULES,
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
         raise PromptNotPromotedError(PROMPT_VERSION)
-    if mode is RunMode.LIVE and has_untriaged_claimable(conn, TRIAGE_VERSION, max_retries):
+    if mode is RunMode.LIVE and has_untriaged_claimable(conn, rules.version, max_retries):
         raise UntriagedExchangesError()
 
     trial_batch: list[ExchangeRow] | None = None
