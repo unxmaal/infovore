@@ -195,7 +195,7 @@ def mark_deleted(conn: sqlite3.Connection, message_id: int, at: datetime) -> boo
         return True
 
 
-def _message_from_row(row: sqlite3.Row) -> MessageRow:
+def message_from_row(row: sqlite3.Row) -> MessageRow:
     return MessageRow(
         id=row["id"],
         channel_id=row["channel_id"],
@@ -218,7 +218,7 @@ def get_message(conn: sqlite3.Connection, message_id: int) -> MessageRow | None:
     row = conn.execute("SELECT * FROM messages WHERE id = ?", (message_id,)).fetchone()
     if row is None:
         return None
-    return _message_from_row(row)
+    return message_from_row(row)
 
 
 def message_revisions(conn: sqlite3.Connection, message_id: int) -> list[MessageRevisionRow]:
@@ -342,7 +342,7 @@ def ungrouped_messages_for_channel(conn: sqlite3.Connection, channel_id: int) ->
         " (SELECT message_id FROM exchange_messages) ORDER BY created_at, id",
         (channel_id,),
     ).fetchall()
-    return [_message_from_row(row) for row in rows]
+    return [message_from_row(row) for row in rows]
 
 
 def latest_exchange_for_thread(conn: sqlite3.Connection, thread_id: int) -> int | None:
@@ -361,5 +361,5 @@ def messages_by_ids(conn: sqlite3.Connection, message_ids: Sequence[int]) -> lis
         return []
     placeholders = ",".join("?" for _ in ids)
     rows = conn.execute(f"SELECT * FROM messages WHERE id IN ({placeholders})", ids).fetchall()
-    by_id = {row["id"]: _message_from_row(row) for row in rows}
+    by_id = {row["id"]: message_from_row(row) for row in rows}
     return [by_id[message_id] for message_id in ids if message_id in by_id]

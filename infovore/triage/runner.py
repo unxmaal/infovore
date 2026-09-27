@@ -1,11 +1,10 @@
 import json
 import sqlite3
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
+from infovore.db.batch import BATCH_SIZE, exchange_inputs_for_ids
 from infovore.db.connection import transaction
-from infovore.db.exchanges import exchange_message_ids
-from infovore.db.raw import attachments_for_messages, messages_by_ids, reactions_for_messages
 from infovore.triage.rules import DEFAULT_RULES, TriageRules
 from infovore.triage.score import score_exchange
 from infovore.triage.train import load_latest_model, score_stale
@@ -57,24 +56,41 @@ def _raw_score(reasons_json: str) -> float:
     return round(min(1.0, max(0.0, raw)), 4)
 
 
-def _score_one(conn: sqlite3.Connection, exchange_id: int, rules: TriageRules) -> float:
-    message_ids = exchange_message_ids(conn, exchange_id)
-    messages = messages_by_ids(conn, message_ids)
-    reactions = reactions_for_messages(conn, message_ids)
-    attachments = attachments_for_messages(conn, message_ids)
-    result = score_exchange(messages, reactions, attachments, rules)
-    with transaction(conn):
-        conn.execute(
-            "UPDATE exchanges SET triage_score = ?, triage_reasons = ?, triage_version = ?"
-            " WHERE id = ?",
+def _score_batch(
+    conn: sqlite3.Connection,
+    exchange_ids: Sequence[int],
+    rules: TriageRules,
+    progress: TriageProgress,
+    total: int,
+    scored_before_this_batch: int,
+) -> None:
+    inputs = exchange_inputs_for_ids(conn, exchange_ids)
+    updates: list[tuple[float, str, str, int]] = []
+    for offset, exchange_id in enumerate(exchange_ids):
+        one = inputs[exchange_id]
+        result = score_exchange(one.messages, one.reactions, one.attachments, rules)
+        updates.append(
             (
                 result.score,
                 json.dumps([list(pair) for pair in result.reasons]),
                 rules.version,
                 exchange_id,
-            ),
+            )
         )
-    return result.score
+        progress(
+            TriageExchangeScored(
+                exchange_id=exchange_id,
+                score=result.score,
+                index=scored_before_this_batch + offset + 1,
+                total=total,
+            )
+        )
+    with transaction(conn):
+        conn.executemany(
+            "UPDATE exchanges SET triage_score = ?, triage_reasons = ?, triage_version = ?"
+            " WHERE id = ?",
+            updates,
+        )
 
 
 def _channel_means(conn: sqlite3.Connection, rules: TriageRules) -> tuple[dict[int, float], float]:
@@ -107,25 +123,33 @@ def _apply_channel_priors(
 ) -> dict[int, float]:
     priors: dict[int, float] = {}
     rows = conn.execute(
-        "SELECT id, channel_id, triage_reasons FROM exchanges WHERE triage_version = ?",
+        "SELECT id, channel_id, triage_score, triage_reasons FROM exchanges"
+        " WHERE triage_version = ?",
         (rules.version,),
     ).fetchall()
+    updates: list[tuple[float, str, int]] = []
     for row in rows:
         channel_id = row["channel_id"]
         channel_mean = channel_means.get(channel_id, global_mean)
         delta = round(_clip_delta(CHANNEL_PRIOR_WEIGHT * (channel_mean - global_mean)), 4)
+        priors[channel_id] = delta
         raw = _raw_score(row["triage_reasons"])
         adjusted = round(min(1.0, max(0.0, raw + delta)), 4)
         reasons = [
             pair for pair in json.loads(row["triage_reasons"]) if pair[0] != CHANNEL_PRIOR_REASON
         ]
         reasons.append([CHANNEL_PRIOR_REASON, delta])
+        reasons_json = json.dumps(reasons)
+        if adjusted == row["triage_score"] and reasons_json == row["triage_reasons"]:
+            continue
+        updates.append((adjusted, reasons_json, row["id"]))
+
+    for start in range(0, len(updates), BATCH_SIZE):
+        batch = updates[start : start + BATCH_SIZE]
         with transaction(conn):
-            conn.execute(
-                "UPDATE exchanges SET triage_score = ?, triage_reasons = ? WHERE id = ?",
-                (adjusted, json.dumps(reasons), row["id"]),
+            conn.executemany(
+                "UPDATE exchanges SET triage_score = ?, triage_reasons = ? WHERE id = ?", batch
             )
-        priors[channel_id] = delta
     return priors
 
 
@@ -140,13 +164,9 @@ def triage_pending(
     ).fetchall()
     candidate_ids = [row["id"] for row in candidate_rows]
     progress(TriageStarted(total=len(candidate_ids)))
-    for index, exchange_id in enumerate(candidate_ids, start=1):
-        score = _score_one(conn, exchange_id, rules)
-        progress(
-            TriageExchangeScored(
-                exchange_id=exchange_id, score=score, index=index, total=len(candidate_ids)
-            )
-        )
+    for start in range(0, len(candidate_ids), BATCH_SIZE):
+        batch = candidate_ids[start : start + BATCH_SIZE]
+        _score_batch(conn, batch, rules, progress, len(candidate_ids), start)
 
     channel_means, global_mean = _channel_means(conn, rules)
     channel_priors = _apply_channel_priors(conn, channel_means, global_mean, rules)
