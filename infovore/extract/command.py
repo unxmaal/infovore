@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from infovore.config import ConfigError, Stage
 from infovore.db.batches import record_extraction_batch
 from infovore.db.codec import to_db_time
+from infovore.db.exchanges import ExchangeOrder
 from infovore.extract.llm_extractor import LLMClaimExtractor
 from infovore.extract.runner import (
     DEFAULT_MIX_FRACTION_UNCERTAIN,
@@ -65,6 +66,12 @@ class ExtractCommand:
             default=TrialSampleStrategy.STRATIFIED.value,
         )
         parser.add_argument("--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix")
+        parser.add_argument(
+            "--order",
+            choices=[order.value for order in ExchangeOrder],
+            default=ExchangeOrder.CHRONOLOGICAL.value,
+            help="live mode: chronological (default) or best (highest p_lore first)",
+        )
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode, _say, stage_backend
@@ -129,6 +136,7 @@ class ExtractCommand:
                 concurrency=stage_settings.concurrency,
                 min_score=context.settings.triage_min_score,
                 min_p_lore=context.settings.triage_min_p_lore,
+                order=ExchangeOrder(args.order),
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
                 batch_id=batch_id,

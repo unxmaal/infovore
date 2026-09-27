@@ -1,5 +1,6 @@
 import sqlite3
 from collections.abc import Sequence
+from enum import StrEnum
 from typing import cast
 
 from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
@@ -129,12 +130,24 @@ def grouped_message_ids(conn: sqlite3.Connection) -> set[int]:
     return {row["message_id"] for row in rows}
 
 
+class ExchangeOrder(StrEnum):
+    CHRONOLOGICAL = "chronological"
+    BEST = "best"
+
+
+_ORDER_BY: dict[ExchangeOrder, str] = {
+    ExchangeOrder.CHRONOLOGICAL: "started_at, id",
+    ExchangeOrder.BEST: "p_lore IS NULL, p_lore DESC, triage_score DESC, started_at, id",
+}
+
+
 def claimable_exchanges(
     conn: sqlite3.Connection,
     limit: int,
     max_retries: int,
     min_score: float | None = None,
     min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
+    order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
 ) -> list[ExchangeRow]:
     condition = "extraction_status IN (?, ?) AND retry_count < ?"
     params: list[object] = [
@@ -147,7 +160,7 @@ def claimable_exchanges(
         condition += f" AND {clause}"
         params.extend(gate_params)
     rows = conn.execute(
-        f"SELECT * FROM exchanges WHERE {condition} ORDER BY started_at, id LIMIT ?",
+        f"SELECT * FROM exchanges WHERE {condition} ORDER BY {_ORDER_BY[order]} LIMIT ?",
         (*params, limit),
     ).fetchall()
     return [_row_to_exchange(row) for row in rows]

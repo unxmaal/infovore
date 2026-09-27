@@ -10,6 +10,7 @@ from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import (
     DuplicateExchangeError,
+    ExchangeOrder,
     MessageAlreadyGroupedError,
     claimable_exchanges,
     exchange_for_message,
@@ -450,3 +451,65 @@ def test_mark_stale_for_message_ignores_non_done_exchange(conn: sqlite3.Connecti
 def test_mark_stale_for_message_returns_none_when_ungrouped(conn: sqlite3.Connection) -> None:
     insert_messages(conn, [1])
     assert mark_stale_for_message(conn, 1) is None
+
+
+def _seed_ordering(conn: sqlite3.Connection) -> tuple[int, int, int, int]:
+    model_version = _insert_stub_model(conn)
+    insert_messages(conn, [1, 2, 3, 4])
+    early_low = insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="a", started_at=NOW), [1]
+    )
+    mid_high = insert_exchange(
+        conn,
+        make_exchange(message_count=1, content_hash="b", started_at=NOW + timedelta(hours=1)),
+        [2],
+    )
+    late_best = insert_exchange(
+        conn,
+        make_exchange(message_count=1, content_hash="c", started_at=NOW + timedelta(hours=2)),
+        [3],
+    )
+    unscored = insert_exchange(
+        conn,
+        make_exchange(message_count=1, content_hash="d", started_at=NOW + timedelta(hours=3)),
+        [4],
+    )
+    for exchange_id, p_lore, rule in (
+        (early_low, 0.6, 0.9),
+        (mid_high, 0.9, 0.1),
+        (late_best, 0.99, 0.5),
+    ):
+        conn.execute(
+            "UPDATE exchanges SET triage_score = ?, triage_version = 't1',"
+            " p_lore = ?, p_lore_model = ? WHERE id = ?",
+            (rule, p_lore, model_version, exchange_id),
+        )
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 0.95, triage_version = 't1' WHERE id = ?",
+        (unscored,),
+    )
+    return early_low, mid_high, late_best, unscored
+
+
+def test_claimable_exchanges_default_order_is_chronological(conn: sqlite3.Connection) -> None:
+    early_low, mid_high, late_best, unscored = _seed_ordering(conn)
+    result = claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5)
+    assert [row.id for row in result] == [early_low, mid_high, late_best, unscored]
+
+
+def test_claimable_exchanges_best_order_puts_highest_p_lore_first(
+    conn: sqlite3.Connection,
+) -> None:
+    early_low, mid_high, late_best, unscored = _seed_ordering(conn)
+    result = claimable_exchanges(
+        conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5, order=ExchangeOrder.BEST
+    )
+    assert [row.id for row in result] == [late_best, mid_high, early_low, unscored]
+
+
+def test_claimable_exchanges_best_order_respects_limit(conn: sqlite3.Connection) -> None:
+    _, mid_high, late_best, _ = _seed_ordering(conn)
+    result = claimable_exchanges(
+        conn, limit=2, max_retries=3, min_score=0.3, min_p_lore=0.5, order=ExchangeOrder.BEST
+    )
+    assert [row.id for row in result] == [late_best, mid_high]

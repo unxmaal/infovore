@@ -10,6 +10,7 @@ from infovore.db.claims import NewClaim, record_run, register_prompt_version
 from infovore.db.claims import live_prompt_version as db_live_prompt_version
 from infovore.db.claims import retract_claim as db_retract_claim
 from infovore.db.exchanges import (
+    ExchangeOrder,
     claimable_exchanges,
     get_exchange,
     has_untriaged_claimable,
@@ -506,6 +507,7 @@ async def run_extraction(
     exchange_ids: Sequence[int] | None = None,
     progress: Progress = _ignore_progress,
     batch_id: str | None = None,
+    order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
     rules: TriageRules = DEFAULT_RULES,
     sampled_by: Mapping[int, str] | None = None,
 ) -> ExtractionReport:
@@ -546,7 +548,12 @@ async def run_extraction(
     if mode is RunMode.LIVE:
         while True:
             batch = claimable_exchanges(
-                conn, batch_size, max_retries, min_score=min_score, min_p_lore=min_p_lore
+                conn,
+                batch_size,
+                max_retries,
+                min_score=min_score,
+                min_p_lore=min_p_lore,
+                order=order,
             )
             if not batch:
                 break
