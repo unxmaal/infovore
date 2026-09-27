@@ -86,7 +86,9 @@ def test_chunk_pool_workers_two_matches_workers_one_results() -> None:
     with ChunkPool(_add_offset_chunk, workers=1, initializer=_init_offset, initargs=(5,)) as serial:
         serial_result = [value for chunk in serial.map_chunks(items) for value in chunk]
 
-    with ChunkPool(_add_offset_chunk, workers=2, initializer=_init_offset, initargs=(5,)) as parallel:
+    with ChunkPool(
+        _add_offset_chunk, workers=2, initializer=_init_offset, initargs=(5,)
+    ) as parallel:
         parallel_result = [value for chunk in parallel.map_chunks(items) for value in chunk]
 
     assert parallel_result == serial_result == [item + 5 for item in items]

@@ -3,7 +3,7 @@ import sqlite3
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from infovore.db.batch import BATCH_SIZE, exchange_inputs_for_ids
+from infovore.db.batch import BATCH_SIZE, ExchangeInputs, exchange_inputs_for_ids
 from infovore.db.codec import to_db_time
 from infovore.db.connection import transaction
 from infovore.db.exchanges import get_exchange
@@ -23,6 +23,7 @@ from infovore.triage.bayes import (
     token_probability,
     train,
 )
+from infovore.triage.parallel import ChunkPool
 from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
 MIN_LABELS_PER_CLASS = 10
@@ -198,49 +199,92 @@ def load_latest_model(conn: sqlite3.Connection) -> tuple[int, Model] | None:
     return int(row["version"]), model
 
 
+# Module-level (spawn-safe) worker state for `ChunkPool`: the model and rules
+# a `ProcessPoolExecutor` worker needs are sent once, via the pool's
+# `initializer`, not per task (issue #113). `_init_p_lore_worker` also runs
+# directly, in-process, for the `workers <= 1` path -- see
+# `infovore.triage.parallel`'s module docstring.
+_worker_model: Model | None = None
+_worker_rules: TriageRules = DEFAULT_RULES
+
+
+def _init_p_lore_worker(model: Model, rules: TriageRules) -> None:
+    global _worker_model, _worker_rules
+    _worker_model = model
+    _worker_rules = rules
+
+
+def _p_lore_worker_chunk(
+    items: list[tuple[int, int, ExchangeInputs]],
+) -> list[tuple[int, float]]:
+    """`items`: `(exchange_id, channel_id, inputs)` for a chunk of exchanges.
+    Returns `(exchange_id, p_lore)` for each, in the same order."""
+    model = _worker_model
+    rules = _worker_rules
+    assert model is not None, "ChunkPool must call _init_p_lore_worker before this"
+    return [
+        (
+            exchange_id,
+            p_lore(
+                model,
+                features(inputs.messages, channel_id, inputs.reactions, inputs.attachments, rules),
+            ),
+        )
+        for exchange_id, channel_id, inputs in items
+    ]
+
+
 def _score_rows(
     conn: sqlite3.Connection,
     model: Model,
     model_version: int,
     rows: list[sqlite3.Row],
     rules: TriageRules = DEFAULT_RULES,
+    workers: int = 1,
 ) -> int:
     count = 0
-    for start in range(0, len(rows), BATCH_SIZE):
-        batch = rows[start : start + BATCH_SIZE]
-        inputs = exchange_inputs_for_ids(conn, [row["id"] for row in batch])
-        updates: list[tuple[float, int, int]] = []
-        for row in batch:
-            one = inputs[row["id"]]
-            tokens = features(
-                one.messages, row["channel_id"], one.reactions, one.attachments, rules
-            )
-            score = p_lore(model, tokens)
-            updates.append((score, model_version, row["id"]))
-        with transaction(conn):
-            conn.executemany(
-                "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?", updates
-            )
-        count += len(batch)
+    with ChunkPool(_p_lore_worker_chunk, workers, _init_p_lore_worker, (model, rules)) as pool:
+        for start in range(0, len(rows), BATCH_SIZE):
+            batch = rows[start : start + BATCH_SIZE]
+            inputs = exchange_inputs_for_ids(conn, [row["id"] for row in batch])
+            items = [(row["id"], row["channel_id"], inputs[row["id"]]) for row in batch]
+            updates = [
+                (score, model_version, exchange_id)
+                for chunk_result in pool.map_chunks(items)
+                for exchange_id, score in chunk_result
+            ]
+            with transaction(conn):
+                conn.executemany(
+                    "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?", updates
+                )
+            count += len(batch)
     return count
 
 
 def score_all(
-    conn: sqlite3.Connection, model: Model, model_version: int, rules: TriageRules = DEFAULT_RULES
+    conn: sqlite3.Connection,
+    model: Model,
+    model_version: int,
+    rules: TriageRules = DEFAULT_RULES,
+    workers: int = 1,
 ) -> int:
     rows = conn.execute("SELECT id, channel_id FROM exchanges ORDER BY id").fetchall()
-    return _score_rows(conn, model, model_version, rows, rules)
+    return _score_rows(conn, model, model_version, rows, rules, workers)
 
 
 def score_stale(
-    conn: sqlite3.Connection, model: Model, model_version: int, rules: TriageRules = DEFAULT_RULES
+    conn: sqlite3.Connection,
+    model: Model,
+    model_version: int,
+    rules: TriageRules = DEFAULT_RULES,
+    workers: int = 1,
 ) -> int:
     rows = conn.execute(
         "SELECT id, channel_id FROM exchanges"
         " WHERE p_lore_model IS NULL OR p_lore_model != ? ORDER BY id",
         (model_version,),
     ).fetchall()
-    return _score_rows(conn, model, model_version, rows, rules)
+    return _score_rows(conn, model, model_version, rows, rules, workers)
 
 
 def model_rules_version(conn: sqlite3.Connection) -> str | None:

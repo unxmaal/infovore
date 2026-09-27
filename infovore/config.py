@@ -1,3 +1,4 @@
+import os
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -17,6 +18,12 @@ DEFAULT_STAGE_CONCURRENCY = 2
 DEFAULT_STAGE_TIMEOUT_SECONDS = 60.0
 DEFAULT_TRIAGE_MIN_SCORE = 0.3
 DEFAULT_TRIAGE_MIN_P_LORE = 0.5
+
+# Worker processes for triage's CPU-bound scoring (issue #113): `p_lore`,
+# rule-based `score_exchange`, and the `--suggest-terms` corpus
+# document-frequency scan. `1` means "no process pool" (in-process, what the
+# test suite defaults to); otherwise defaults to every core the machine has.
+DEFAULT_WORKERS = os.cpu_count() or 1
 
 STAGE_ENV_KEYS = ("BACKEND", "MODEL", "CONCURRENCY", "TIMEOUT")
 
@@ -71,6 +78,7 @@ class Settings:
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
     triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE
     triage_rules: TriageRules = DEFAULT_RULES
+    workers: int = DEFAULT_WORKERS
 
 
 def _parse_int(raw: str) -> int | None:
@@ -311,6 +319,9 @@ def load_settings(env: Mapping[str, str]) -> Settings:
     )
     stages = {stage: _parse_stage(env, stage, errors) for stage in Stage}
     triage_rules = _load_triage_rules(env.get("INFOVORE_TRIAGE_RULES"), errors)
+    workers = _optional_positive_int(
+        env.get("INFOVORE_WORKERS"), DEFAULT_WORKERS, "INFOVORE_WORKERS", errors
+    )
 
     if errors:
         raise ConfigError("; ".join(errors))
@@ -333,6 +344,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         triage_min_score=triage_min_score,
         triage_min_p_lore=triage_min_p_lore,
         triage_rules=triage_rules,
+        workers=workers,
     )
 
 

@@ -544,12 +544,10 @@ def test_triage_pending_workers_two_matches_workers_one(tmp_path: Path) -> None:
     assert report_serial.channel_priors == report_parallel.channel_priors
 
     serial_rows = conn_serial.execute(
-        "SELECT id, triage_score, triage_reasons, triage_version, p_lore FROM exchanges"
-        " ORDER BY id"
+        "SELECT id, triage_score, triage_reasons, triage_version, p_lore FROM exchanges ORDER BY id"
     ).fetchall()
     parallel_rows = conn_parallel.execute(
-        "SELECT id, triage_score, triage_reasons, triage_version, p_lore FROM exchanges"
-        " ORDER BY id"
+        "SELECT id, triage_score, triage_reasons, triage_version, p_lore FROM exchanges ORDER BY id"
     ).fetchall()
     assert [
         (row["id"], row["triage_score"], row["triage_reasons"], row["triage_version"])
@@ -571,6 +569,6 @@ def test_triage_pending_streams_progress_events_with_multiple_workers(tmp_path: 
     scored_events = [event for event in events if isinstance(event, TriageExchangeScored)]
     assert len(scored_events) == 6
     assert [event.index for event in scored_events] == list(range(1, 7))
-    assert {event.exchange_id for event in scored_events} == {row["id"] for row in conn.execute(
-        "SELECT id FROM exchanges"
-    )}
+    assert {event.exchange_id for event in scored_events} == {
+        row["id"] for row in conn.execute("SELECT id FROM exchanges")
+    }
