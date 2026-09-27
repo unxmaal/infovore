@@ -19,6 +19,7 @@ from infovore.triage.train import (
     RecommendationRow,
     TokenInfo,
     load_latest_model,
+    model_rules_version,
     recommend_table,
     score_all,
     train_and_store,
@@ -84,6 +85,24 @@ def _render_top_tokens(tokens: Sequence[TokenInfo]) -> str:
     return "\n".join(lines)
 
 
+def _rules_staleness_warning(context: "AppContext") -> str | None:
+    """A one-line warning when the latest trained model's rules version differs
+    from the currently active rules, or `None` when they match or there is no
+    trained model yet. Rules edits change `SIG_<signal>` virtual tokens, so a
+    model trained under different rules should be retrained, not silently
+    reused (issue #95)."""
+    trained_version = model_rules_version(context.conn)
+    if trained_version is None:
+        return None
+    active_version = context.settings.triage_rules.version
+    if trained_version == active_version:
+        return None
+    return (
+        f"warning: the latest trained triage model was trained under rules {trained_version!r},"
+        f" but the active rules are {active_version!r}; run `infovore triage --train` to retrain\n"
+    )
+
+
 def _ordered_unique(values: Sequence[float]) -> tuple[float, ...]:
     seen: list[float] = []
     for value in values:
@@ -132,6 +151,9 @@ class TriageCommand:
         context.stdout.write(
             f"scored={report.scored} channels_adjusted={report.channels_adjusted}\n"
         )
+        warning = _rules_staleness_warning(context)
+        if warning is not None:
+            context.stdout.write(warning)
         if args.report:
             stats = compute_triage_stats(
                 context.conn, context.settings.triage_min_score, rules=context.settings.triage_rules
@@ -147,6 +169,7 @@ class TriageCommand:
                 context.conn,
                 context.clock,
                 confusion_threshold=context.settings.triage_min_p_lore,
+                rules=context.settings.triage_rules,
             )
         except InsufficientLabelsError as error:
             raise ConfigError(str(error)) from error
@@ -164,7 +187,7 @@ class TriageCommand:
         loaded = load_latest_model(context.conn)
         assert loaded is not None
         version, model = loaded
-        scored = score_all(context.conn, model, version)
+        scored = score_all(context.conn, model, version, rules=context.settings.triage_rules)
         context.stdout.write(f"scored {scored} exchanges with p_lore\n")
         return ExitCode.OK
 
@@ -173,10 +196,15 @@ class TriageCommand:
 
         try:
             min_recalls = _ordered_unique((args.min_recall, *RECALL_TARGETS))
-            main_row, *table_rows = recommend_table(context.conn, min_recalls)
+            main_row, *table_rows = recommend_table(
+                context.conn, min_recalls, rules=context.settings.triage_rules
+            )
         except NoTrainedModelError as error:
             raise ConfigError("no trained model; run `infovore triage --train` first") from error
 
+        warning = _rules_staleness_warning(context)
+        if warning is not None:
+            context.stdout.write(warning)
         if main_row.metric is None:
             context.stdout.write(f"no threshold meets recall >= {args.min_recall}\n")
         else:

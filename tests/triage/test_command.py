@@ -1,5 +1,6 @@
 import io
 import sqlite3
+from importlib import resources
 from pathlib import Path
 
 from infovore.cli import ExitCode, builtin_commands, main
@@ -14,6 +15,16 @@ def environment(tmp_path: Path) -> dict[str, str]:
         "INFOVORE_CHANNEL_IDS": "1",
         "INFOVORE_DB_PATH": str(tmp_path / "infovore.db"),
     }
+
+
+def custom_rules_path(tmp_path: Path) -> Path:
+    """A copy of the shipped rules.toml with one value changed, so its version differs."""
+    shipped = resources.files("infovore.triage").joinpath("rules.toml").read_text(encoding="utf-8")
+    changed = shipped.replace("domain_term_weight = 0.15", "domain_term_weight = 0.16", 1)
+    assert changed != shipped
+    path = tmp_path / "custom_rules.toml"
+    path.write_text(changed)
+    return path
 
 
 def seed(db_path: str, content: str = "just chatting, nothing to see") -> int:
@@ -282,3 +293,57 @@ def test_render_recall_table_marks_unreachable_targets_plainly() -> None:
 
     assert "0.95  unreachable" in rendered
     assert "0.50  threshold=0.9 share=0.500" in rendered
+
+
+# --- issue #95 PR A: staleness warning when the active rules changed -------
+
+
+def test_triage_warns_when_the_trained_model_used_different_rules(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    stale_env = dict(env)
+    stale_env["INFOVORE_TRIAGE_RULES"] = str(custom_rules_path(tmp_path))
+    code, out, _ = run(["triage"], stale_env)
+
+    assert code == ExitCode.OK
+    assert "warning" in out
+    assert "triage --train" in out
+
+
+def test_triage_recommend_threshold_warns_when_the_trained_model_used_different_rules(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    stale_env = dict(env)
+    stale_env["INFOVORE_TRIAGE_RULES"] = str(custom_rules_path(tmp_path))
+    code, out, _ = run(["triage", "--recommend-threshold"], stale_env)
+
+    assert code == ExitCode.OK
+    assert "warning" in out
+    assert "triage --train" in out
+
+
+def test_triage_does_not_warn_when_rules_match_the_trained_model(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage"], env)
+
+    assert code == ExitCode.OK
+    assert "warning" not in out
+
+
+def test_triage_does_not_warn_without_a_trained_model(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["triage"], env)
+
+    assert code == ExitCode.OK
+    assert "warning" not in out

@@ -11,6 +11,7 @@ from infovore.db.labels import set_label
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, Label, LabelSource
 from infovore.timing import FixedClock
 from infovore.triage.bayes import Model, token_probability
+from infovore.triage.rules import DEFAULT_RULES, parse_rules
 from infovore.triage.train import (
     RECALL_TARGETS,
     InsufficientLabelsError,
@@ -18,6 +19,7 @@ from infovore.triage.train import (
     TrainReport,
     build_examples,
     load_latest_model,
+    model_rules_version,
     recommend,
     recommend_table,
     score_all,
@@ -29,6 +31,35 @@ NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 LORE_CONTENT = "PROM 6.5.22 part 030-1234-001 /usr/sbin/inst"
 NOISE_CONTENT = "lol gg no cap"
+
+CUSTOM_RULES_DATA: dict[str, object] = {
+    "domain_term_weight": 0.15,
+    "domain_term_cap": 0.45,
+    "irix_version_weight": 0.2,
+    "part_number_weight": 0.3,
+    "unix_path_weight": 0.15,
+    "code_weight": 0.15,
+    "archive_link_weight": 0.15,
+    "pdf_attachment_weight": 0.15,
+    "answered_question_weight": 0.2,
+    "agreed_answer_weight": 0.05,
+    "thread_weight": 0.05,
+    "substantial_weight": 0.1,
+    "tiny_penalty": -0.2,
+    "gif_penalty": -0.1,
+    "laughter_penalty": -0.1,
+    "substantial_characters": 400,
+    "answer_min_characters": 40,
+    "tiny_message_characters": 20,
+    "tiny_share_threshold": 0.7,
+    "laughter_share_threshold": 0.3,
+    "domain_terms": ["bananarama"],
+    "archive_link_hosts": ["bitsavers"],
+    "gif_hosts": ["tenor\\.com"],
+    "laughter_tokens": ["lol+"],
+    "agreement_emoji": ["✅"],
+}
+CUSTOM_RULES = parse_rules(CUSTOM_RULES_DATA, source="test")
 
 
 def db(tmp_path: Path) -> sqlite3.Connection:
@@ -98,6 +129,18 @@ def test_build_examples_returns_tokens_and_effective_label_per_labeled_exchange(
     assert lore_example.channel_id == 1
     assert "prom" in lore_example.tokens
     assert "SIG_part_number" in lore_example.tokens
+
+
+def test_build_examples_respects_a_rules_override(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1000, channel_id=1, content="bananarama forever")
+    set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+
+    default_examples = build_examples(conn)
+    custom_examples = build_examples(conn, rules=CUSTOM_RULES)
+
+    assert "SIG_domain_terms" not in default_examples[0].tokens
+    assert "SIG_domain_terms" in custom_examples[0].tokens
 
 
 def test_train_and_store_refuses_with_fewer_than_ten_labels_per_class(tmp_path: Path) -> None:
@@ -339,3 +382,128 @@ def test_recommend_table_share_is_measured_at_the_printed_threshold(
 
     assert row.formatted_threshold == "0"
     assert row.share == 1.0
+
+
+# --- issue #95 PR A: rules threaded consistently, staleness recorded -------
+
+
+def test_train_and_store_records_the_rules_version_it_trained_under(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+
+    default_report = train_and_store(conn, FixedClock(NOW))
+    custom_report = train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+
+    default_params = json.loads(
+        conn.execute(
+            "SELECT params_json FROM triage_model WHERE version = ?", (default_report.version,)
+        ).fetchone()["params_json"]
+    )
+    custom_params = json.loads(
+        conn.execute(
+            "SELECT params_json FROM triage_model WHERE version = ?", (custom_report.version,)
+        ).fetchone()["params_json"]
+    )
+    assert default_params["rules_version"] == DEFAULT_RULES.version
+    assert custom_params["rules_version"] == CUSTOM_RULES.version
+
+
+def test_train_and_store_uses_the_given_rules_to_build_features(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1000, channel_id=1, content="bananarama forever")
+    set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+    seed_labeled_exchanges(conn, 19, 20)
+
+    report = train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+
+    counts = conn.execute(
+        "SELECT lore_count, noise_count FROM triage_tokens"
+        " WHERE model_version = ? AND token = 'SIG_domain_terms'",
+        (report.version,),
+    ).fetchone()
+    assert counts is not None
+    assert counts["lore_count"] >= 1
+
+
+def test_model_rules_version_is_none_without_a_trained_model(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    assert model_rules_version(conn) is None
+
+
+def test_model_rules_version_reads_the_latest_models_recorded_version(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+
+    assert model_rules_version(conn) == DEFAULT_RULES.version
+
+    train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+
+    assert model_rules_version(conn) == CUSTOM_RULES.version
+
+
+def test_model_rules_version_is_empty_string_for_a_model_trained_before_this_was_recorded(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES (?, 40, 8, ?)",
+        (NOW.isoformat(), json.dumps({"lore_documents": 20, "noise_documents": 20})),
+    )
+
+    assert model_rules_version(conn) == ""
+
+
+def test_score_all_uses_the_given_rules_consistently_with_training(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1000, channel_id=1, content="bananarama forever")
+    set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+    seed_labeled_exchanges(conn, 19, 20)
+    report = train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+    _, model = load_latest_model(conn)  # type: ignore[misc]
+
+    score_all(conn, model, report.version, rules=CUSTOM_RULES)
+
+    row = conn.execute("SELECT p_lore FROM exchanges WHERE id = ?", (exchange_id,)).fetchone()
+    assert row["p_lore"] > 0.5
+
+
+def test_score_stale_uses_the_given_rules(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    exchange_id = seed_exchange(conn, 1000, channel_id=1, content="bananarama forever")
+    set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+    seed_labeled_exchanges(conn, 19, 20)
+    report = train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+    _, model = load_latest_model(conn)  # type: ignore[misc]
+
+    scored = score_stale(conn, model, report.version, rules=CUSTOM_RULES)
+
+    assert scored > 0
+    row = conn.execute("SELECT p_lore FROM exchanges WHERE id = ?", (exchange_id,)).fetchone()
+    assert row["p_lore"] > 0.5
+
+
+def test_recommend_accepts_a_rules_override(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+    _, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, load_latest_model(conn)[0], rules=CUSTOM_RULES)  # type: ignore[index]
+
+    result = recommend(conn, min_recall=0.5, rules=CUSTOM_RULES)
+
+    assert result is not None
+
+
+def test_recommend_table_accepts_a_rules_override(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW), rules=CUSTOM_RULES)
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, version, rules=CUSTOM_RULES)
+
+    rows = recommend_table(conn, min_recalls=(0.5,), rules=CUSTOM_RULES)
+
+    assert rows[0].min_recall == 0.5

@@ -23,6 +23,7 @@ from infovore.triage.bayes import (
     token_probability,
     train,
 )
+from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
 MIN_LABELS_PER_CLASS = 10
 EVAL_THRESHOLDS = tuple(round(i / 10, 1) for i in range(1, 10))
@@ -72,21 +73,23 @@ class TrainReport:
     top_tokens: tuple[TokenInfo, ...]
 
 
-def _exchange_tokens(conn: sqlite3.Connection, exchange_id: int, channel_id: int) -> frozenset[str]:
+def _exchange_tokens(
+    conn: sqlite3.Connection, exchange_id: int, channel_id: int, rules: TriageRules = DEFAULT_RULES
+) -> frozenset[str]:
     message_ids = exchange_message_ids(conn, exchange_id)
     messages = messages_by_ids(conn, message_ids)
     reactions = reactions_for_messages(conn, message_ids)
     attachments = attachments_for_messages(conn, message_ids)
-    return features(messages, channel_id, reactions, attachments)
+    return features(messages, channel_id, reactions, attachments, rules)
 
 
-def build_examples(conn: sqlite3.Connection) -> list[Example]:
+def build_examples(conn: sqlite3.Connection, rules: TriageRules = DEFAULT_RULES) -> list[Example]:
     labels = effective_labels(conn)
     examples: list[Example] = []
     for exchange_id in sorted(labels):
         exchange = get_exchange(conn, exchange_id)
         assert exchange is not None
-        tokens = _exchange_tokens(conn, exchange_id, exchange.channel_id)
+        tokens = _exchange_tokens(conn, exchange_id, exchange.channel_id, rules)
         examples.append(Example(exchange_id, exchange.channel_id, tokens, labels[exchange_id]))
     return examples
 
@@ -104,8 +107,9 @@ def train_and_store(
     conn: sqlite3.Connection,
     clock: Clock,
     confusion_threshold: float = DEFAULT_CONFUSION_THRESHOLD,
+    rules: TriageRules = DEFAULT_RULES,
 ) -> TrainReport:
-    examples = build_examples(conn)
+    examples = build_examples(conn, rules)
     lore_count = sum(1 for example in examples if example.label is Label.LORE)
     noise_count = sum(1 for example in examples if example.label is Label.NOISE)
     if lore_count < MIN_LABELS_PER_CLASS or noise_count < MIN_LABELS_PER_CLASS:
@@ -141,6 +145,7 @@ def train_and_store(
     params = {
         "lore_documents": model.lore_documents,
         "noise_documents": model.noise_documents,
+        "rules_version": rules.version,
     }
     with transaction(conn):
         cursor = conn.execute(
@@ -194,12 +199,16 @@ def load_latest_model(conn: sqlite3.Connection) -> tuple[int, Model] | None:
 
 
 def _score_rows(
-    conn: sqlite3.Connection, model: Model, model_version: int, rows: list[sqlite3.Row]
+    conn: sqlite3.Connection,
+    model: Model,
+    model_version: int,
+    rows: list[sqlite3.Row],
+    rules: TriageRules = DEFAULT_RULES,
 ) -> int:
     count = 0
     with transaction(conn):
         for row in rows:
-            tokens = _exchange_tokens(conn, row["id"], row["channel_id"])
+            tokens = _exchange_tokens(conn, row["id"], row["channel_id"], rules)
             score = p_lore(model, tokens)
             conn.execute(
                 "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?",
@@ -209,22 +218,45 @@ def _score_rows(
     return count
 
 
-def score_all(conn: sqlite3.Connection, model: Model, model_version: int) -> int:
+def score_all(
+    conn: sqlite3.Connection, model: Model, model_version: int, rules: TriageRules = DEFAULT_RULES
+) -> int:
     rows = conn.execute("SELECT id, channel_id FROM exchanges ORDER BY id").fetchall()
-    return _score_rows(conn, model, model_version, rows)
+    return _score_rows(conn, model, model_version, rows, rules)
 
 
-def score_stale(conn: sqlite3.Connection, model: Model, model_version: int) -> int:
+def score_stale(
+    conn: sqlite3.Connection, model: Model, model_version: int, rules: TriageRules = DEFAULT_RULES
+) -> int:
     rows = conn.execute(
         "SELECT id, channel_id FROM exchanges"
         " WHERE p_lore_model IS NULL OR p_lore_model != ? ORDER BY id",
         (model_version,),
     ).fetchall()
-    return _score_rows(conn, model, model_version, rows)
+    return _score_rows(conn, model, model_version, rows, rules)
 
 
-def _holdout_scored_for_model(conn: sqlite3.Connection, model: Model) -> list[tuple[float, Label]]:
-    examples = build_examples(conn)
+def model_rules_version(conn: sqlite3.Connection) -> str | None:
+    """The `rules.version` the latest trained model's features were built under.
+
+    `None` when no model has been trained yet. `""` for a model trained before
+    this was recorded (params_json has no `rules_version` key) — treated as
+    "definitely not the active rules" so a stale model from an old build still
+    triggers the staleness warning rather than silently passing as current.
+    """
+    row = conn.execute(
+        "SELECT params_json FROM triage_model ORDER BY version DESC LIMIT 1"
+    ).fetchone()
+    if row is None:
+        return None
+    params = json.loads(row["params_json"])
+    return str(params.get("rules_version", ""))
+
+
+def _holdout_scored_for_model(
+    conn: sqlite3.Connection, model: Model, rules: TriageRules = DEFAULT_RULES
+) -> list[tuple[float, Label]]:
+    examples = build_examples(conn, rules)
     return [
         (p_lore(model, example.tokens), example.label)
         for example in examples
@@ -244,12 +276,14 @@ def _corpus_share(conn: sqlite3.Connection, threshold: float) -> float:
     return passing / total
 
 
-def recommend(conn: sqlite3.Connection, min_recall: float) -> tuple[Metrics, float] | None:
+def recommend(
+    conn: sqlite3.Connection, min_recall: float, rules: TriageRules = DEFAULT_RULES
+) -> tuple[Metrics, float] | None:
     loaded = load_latest_model(conn)
     if loaded is None:
         raise NoTrainedModelError
     _, model = loaded
-    holdout_scored = _holdout_scored_for_model(conn, model)
+    holdout_scored = _holdout_scored_for_model(conn, model, rules)
     table = evaluate(holdout_scored, candidate_thresholds(holdout_scored))
     metric = recommend_threshold(table, min_recall)
     if metric is None:
@@ -266,7 +300,9 @@ class RecommendationRow:
 
 
 def recommend_table(
-    conn: sqlite3.Connection, min_recalls: Sequence[float] = RECALL_TARGETS
+    conn: sqlite3.Connection,
+    min_recalls: Sequence[float] = RECALL_TARGETS,
+    rules: TriageRules = DEFAULT_RULES,
 ) -> list[RecommendationRow]:
     """Recommend a threshold for each of `min_recalls` in one holdout pass.
 
@@ -278,7 +314,7 @@ def recommend_table(
     if loaded is None:
         raise NoTrainedModelError
     _, model = loaded
-    holdout_scored = _holdout_scored_for_model(conn, model)
+    holdout_scored = _holdout_scored_for_model(conn, model, rules)
     table = evaluate(holdout_scored, candidate_thresholds(holdout_scored))
 
     rows: list[RecommendationRow] = []

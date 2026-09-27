@@ -20,6 +20,35 @@ from infovore.triage.bayes import (
     token_probability,
     train,
 )
+from infovore.triage.rules import DEFAULT_RULES, parse_rules
+
+CUSTOM_DOMAIN_TERM_DATA: dict[str, object] = {
+    "domain_term_weight": 0.15,
+    "domain_term_cap": 0.45,
+    "irix_version_weight": 0.2,
+    "part_number_weight": 0.3,
+    "unix_path_weight": 0.15,
+    "code_weight": 0.15,
+    "archive_link_weight": 0.15,
+    "pdf_attachment_weight": 0.15,
+    "answered_question_weight": 0.2,
+    "agreed_answer_weight": 0.05,
+    "thread_weight": 0.05,
+    "substantial_weight": 0.1,
+    "tiny_penalty": -0.2,
+    "gif_penalty": -0.1,
+    "laughter_penalty": -0.1,
+    "substantial_characters": 400,
+    "answer_min_characters": 40,
+    "tiny_message_characters": 20,
+    "tiny_share_threshold": 0.7,
+    "laughter_share_threshold": 0.3,
+    "domain_terms": ["bananarama"],
+    "archive_link_hosts": ["bitsavers"],
+    "gif_hosts": ["tenor\\.com"],
+    "laughter_tokens": ["lol+"],
+    "agreement_emoji": ["✅"],
+}
 
 
 def test_bayes_label_is_the_shared_rows_label() -> None:
@@ -55,6 +84,21 @@ def test_features_are_lowercased_words_plus_virtual_tokens() -> None:
     assert "CHAN_42" in found
     assert "LEN_1" in found
     assert "inst!" not in found
+
+
+def test_features_uses_default_rules_when_none_given() -> None:
+    found = features([msg(1, "the Octane is great")], channel_id=1)
+    assert "SIG_domain_terms" in found
+
+
+def test_features_respects_a_rules_override() -> None:
+    custom = parse_rules(CUSTOM_DOMAIN_TERM_DATA, source="test")
+
+    default_found = features([msg(1, "bananarama forever")], channel_id=1, rules=DEFAULT_RULES)
+    custom_found = features([msg(1, "bananarama forever")], channel_id=1, rules=custom)
+
+    assert "SIG_domain_terms" not in default_found
+    assert "SIG_domain_terms" in custom_found
 
 
 def test_length_buckets() -> None:
