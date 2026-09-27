@@ -1,4 +1,5 @@
 import json
+from collections.abc import Mapping
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
@@ -19,7 +20,7 @@ class ClaimOut(BaseModel):
     kind: ClaimKind
     confidence: float = Field(ge=0.0, le=1.0)
     probe_question: str
-    source_message_ids: list[int] = Field(min_length=1)
+    sources: list[str] = Field(min_length=1)
     supersedes: int | None
 
     @field_validator("statement", "subject", "probe_question")
@@ -30,11 +31,11 @@ class ClaimOut(BaseModel):
             raise ValueError("must not be blank")
         return stripped
 
-    @field_validator("source_message_ids")
+    @field_validator("sources")
     @classmethod
-    def _no_duplicate_sources(cls, value: list[int]) -> list[int]:
+    def _no_duplicate_sources(cls, value: list[str]) -> list[str]:
         if len(set(value)) != len(value):
-            raise ValueError("source_message_ids must not contain duplicates")
+            raise ValueError("sources must not contain duplicates")
         return value
 
     @model_validator(mode="after")
@@ -111,7 +112,7 @@ def _coerce_payload(payload: object) -> object:
 
 def parse_extraction(
     payload: object,
-    citable_ids: set[int],
+    citable_refs: Mapping[str, int],
     related_claim_ids: set[int],
 ) -> tuple[ExtractedClaim, ...]:
     data = _coerce_payload(payload)
@@ -122,9 +123,9 @@ def parse_extraction(
 
     problems: list[str] = []
     for position, claim in enumerate(parsed.claims):
-        uncitable = [sid for sid in claim.source_message_ids if sid not in citable_ids]
+        uncitable = [ref for ref in claim.sources if ref not in citable_refs]
         if uncitable:
-            problems.append(f"claim {position}: uncitable source ids {uncitable}")
+            problems.append(f"claim {position}: uncitable sources {uncitable}")
         if claim.supersedes is not None and claim.supersedes not in related_claim_ids:
             problems.append(
                 f"claim {position}: supersedes {claim.supersedes} is not a related claim id"
@@ -139,7 +140,7 @@ def parse_extraction(
             kind=claim.kind,
             confidence=claim.confidence,
             probe_question=claim.probe_question,
-            source_message_ids=tuple(claim.source_message_ids),
+            source_message_ids=tuple(citable_refs[ref] for ref in claim.sources),
             supersedes_claim_id=claim.supersedes,
         )
         for claim in parsed.claims

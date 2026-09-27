@@ -375,7 +375,7 @@ If a claim corrects one of the supplied related existing claims, cite that claim
 
 Chatter, opinions, and questions that are never answered yield zero claims.
 
-Every claim must cite the ids of the messages in this exchange that support it. Never cite a message from the CONTEXT section: those messages are read-only background from a prior exchange and cannot be cited.
+Every claim must list in sources the refs (m1, m2, ...) of the messages in this exchange that support it. Never cite a message from the CONTEXT section (refs c1, c2, ...): those messages are read-only background from a prior exchange and cannot be cited.
 
 Reactions are provided as a weak signal of community agreement, not proof.
 
@@ -385,15 +385,17 @@ Output ONLY a JSON object matching the given schema. No other text.
 The user prompt (`RenderedPrompt.prompt`) lays out, in order:
 
 - `CHANNEL:` the channel name (falls back to the numeric channel id when the channel is unknown) and `PERMALINK:` the exchange's permalink, `https://discord.com/channels/{guild_id}/{channel_id}/{first_message_id}` (built by `infovore.extract.prompt.permalink`).
-- `CONTEXT (do not cite):`, present only when the exchange has a `parent_exchange_id` — the last `context_size` messages of the parent exchange, read-only and never citable.
-- `EXCHANGE:` — every message of the exchange itself, each rendered as `[id] author @ ISO-8601 timestamp:` followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
+- `CONTEXT (do not cite):`, present only when the exchange has a `parent_exchange_id` — the last `context_size` messages of the parent exchange, read-only and never citable, each labelled with a context ref `c1`, `c2`, ... in order.
+- `EXCHANGE:` — every message of the exchange itself, each rendered as `[ref] author @ ISO-8601 timestamp:` where `ref` is `m1`, `m2`, ... in exchange order, followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
 - `RELATED EXISTING CLAIMS:` — up to `related_limit` claims from `claims_fts` matching the exchange's own message contents (excluding any message authored by an opted-out user, so their words never influence what is sent to the model), each as `[claim:<id>] (<kind>) <subject>: <statement>`, or the literal `none` when there are no matches.
 
-Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message id is kept so citations and ordering stay consistent. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
+Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message keeps its ref so citations and ordering stay consistent.
+
+Messages are labelled with short refs rather than Discord message ids because snowflakes exceed 2^53: a backend whose JSON runtime uses IEEE-754 doubles (the Node-based `claude -p`) rounds them, so a cited id would no longer match any message. `RenderedPrompt.refs` maps each exchange ref (`m1`, ...) to its real message id; context refs are deliberately absent from it, so citing one is rejected like any other unknown ref. Claims cite refs in `sources` (a list of strings), and `schema.parse_extraction` maps them back to message ids, so `ExtractedClaim.source_message_ids` and everything downstream still hold real Discord ids. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
 
 ### Backend-neutral extraction
 
-`infovore.extract.llm_extractor.LLMClaimExtractor` implements `ClaimExtractor` (#5) against any `LLMBackend` (#5), never branching on which backend is configured. `LLMClaimExtractor(backend, max_output_tokens=8000)` renders the prompt (above), requests `json_schema_for(ExtractionOut)`, and reads the result: when `backend.capabilities().native_json_schema` is true and `result.structured` is present, that structured payload is used directly; otherwise the first JSON object is extracted from `result.text` (`schema.first_json_object`). The payload is always validated with `schema.parse_extraction`, given the exchange's own message ids as the citable set and the ids of the supplied related claims as the valid `supersedes` targets.
+`infovore.extract.llm_extractor.LLMClaimExtractor` implements `ClaimExtractor` (#5) against any `LLMBackend` (#5), never branching on which backend is configured. `LLMClaimExtractor(backend, max_output_tokens=8000)` renders the prompt (above), requests `json_schema_for(ExtractionOut)`, and reads the result: when `backend.capabilities().native_json_schema` is true and `result.structured` is present, that structured payload is used directly; otherwise the first JSON object is extracted from `result.text` (`schema.first_json_object`). The payload is always validated with `schema.parse_extraction`, given `RenderedPrompt.refs` (the exchange's own message refs mapped to message ids) as the citable set and the ids of the supplied related claims as the valid `supersedes` targets.
 
 On `InvalidExtractionError`, exactly one repair call is made: same system prompt, and a user prompt that is the original prompt plus a clearly delimited section (`--- PREVIOUS OUTPUT (invalid) ---` / `--- VALIDATION ERROR ---`) quoting the previous output verbatim and the validation error, asking for a corrected JSON object only. If the repair call itself returns an `LLMResult` error, that error is mapped normally (below); if the repair call succeeds but its payload still fails `parse_extraction`, the outcome is `Failure(FailureKind.INVALID_OUTPUT, <validation error>)` with `model=None`. There is no second repair attempt.
 

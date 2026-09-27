@@ -185,9 +185,7 @@ async def test_extract_repair_succeeds_after_invalid_output() -> None:
 
 async def test_extract_repair_fails_returns_invalid_output_failure() -> None:
     bad = LLMResult.ok_structured({"claims": [_claim_payload(sources=["m999"])]}, "m1")
-    still_bad = LLMResult.ok_structured(
-        {"claims": [_claim_payload(sources=["m998"])]}, "m2"
-    )
+    still_bad = LLMResult.ok_structured({"claims": [_claim_payload(sources=["m998"])]}, "m2")
     backend = FakeBackend.scripted([bad, still_bad], capabilities=NATIVE_CAPABILITIES)
     extractor = LLMClaimExtractor(backend)
     outcome = await extractor.extract(a_request())
