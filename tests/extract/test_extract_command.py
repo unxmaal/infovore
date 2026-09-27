@@ -705,3 +705,24 @@ def test_extract_start_line_is_written_before_backend_processes_any_exchange(
 
     assert code == ExitCode.OK
     assert seen_first_line_early == [True]
+
+
+def test_extract_accepts_order_best(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = registry_with(success_results())
+
+    code, out, _ = run(["extract", "--order", "best"], env, registry)
+
+    assert code == ExitCode.OK
+    assert "succeeded=1" in out
+
+
+def test_extract_rejects_unknown_order(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    registry = registry_with(success_results())
+
+    code, _, err = run(["extract", "--order", "sideways"], env, registry)
+
+    assert code == ExitCode.CONFIG
+    assert "--order" in err
