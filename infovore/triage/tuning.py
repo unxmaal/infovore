@@ -28,7 +28,7 @@ import sqlite3
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, fields
 
-from infovore.rows import Label
+from infovore.rows import Label, LabelSource
 from infovore.triage.bayes import auc, candidate_thresholds, evaluate, recommend_threshold
 from infovore.triage.bayes import token_probability as bayes_token_probability
 from infovore.triage.logistic import LogisticModel, predict_proba, train_logistic
@@ -522,9 +522,112 @@ class FitWeightsResult:
     changes: tuple[WeightChange, ...]
     class_imbalance: float
     class_imbalance_warning: bool
+    uncertain_sampling_share: float | None
+    uncertain_sampling_warning: bool
 
 
 CLASS_IMBALANCE_WARNING_THRESHOLD = 0.7
+UNCERTAIN_SAMPLING_WARNING_THRESHOLD = 0.7
+
+# infovore.extract.runner.TrialSampleStrategy.UNCERTAIN.value — not imported
+# directly to avoid a triage -> extract dependency for one string constant.
+_UNCERTAIN_SAMPLING_ORIGIN = "uncertain"
+_SOURCE_REF_RUN = re.compile(r"^run:(\d+)\b")
+
+
+def _sampling_origins(conn: sqlite3.Connection, exchange_ids: Sequence[int]) -> dict[int, str]:
+    """`{exchange_id: origin}` for every one of `exchange_ids` (assumed
+    non-empty) whose *effective* label traces back to a trial run recorded
+    with a sampling origin (`extraction_runs.sampled_by`, issue #107).
+
+    A human label has no sampling provenance of its own and always wins over
+    an LLM label for the same exchange (`infovore.db.labels.effective_labels`),
+    so that exchange is left out entirely here. An LLM label whose
+    `source_ref` isn't the `run:<id> ...` format `derive_labels_from_runs`
+    writes (missing, or hand-written some other way), or whose run predates
+    `sampled_by` (still `NULL`) or doesn't exist, is left out too — those
+    exchanges have "unknown" provenance, not "known and not uncertain"."""
+    placeholders = ",".join("?" * len(exchange_ids))
+    rows = conn.execute(
+        "SELECT exchange_id, source, source_ref FROM exchange_labels"
+        f" WHERE exchange_id IN ({placeholders})",
+        exchange_ids,
+    ).fetchall()
+    by_exchange: dict[int, dict[str, str | None]] = {}
+    for row in rows:
+        by_exchange.setdefault(row["exchange_id"], {})[row["source"]] = row["source_ref"]
+
+    run_id_by_exchange: dict[int, int] = {}
+    for exchange_id, by_source in by_exchange.items():
+        if LabelSource.HUMAN.value in by_source:
+            continue
+        source_ref = by_source.get(LabelSource.LLM.value)
+        if source_ref is None:
+            continue
+        match = _SOURCE_REF_RUN.match(source_ref)
+        if match is None:
+            continue
+        run_id_by_exchange[exchange_id] = int(match.group(1))
+
+    if not run_id_by_exchange:
+        return {}
+    run_ids = sorted(set(run_id_by_exchange.values()))
+    run_placeholders = ",".join("?" * len(run_ids))
+    sampled_by = {
+        row["id"]: row["sampled_by"]
+        for row in conn.execute(
+            f"SELECT id, sampled_by FROM extraction_runs WHERE id IN ({run_placeholders})",
+            run_ids,
+        ).fetchall()
+        if row["sampled_by"] is not None
+    }
+    return {
+        exchange_id: sampled_by[run_id]
+        for exchange_id, run_id in run_id_by_exchange.items()
+        if run_id in sampled_by
+    }
+
+
+@dataclass(frozen=True)
+class SamplingBiasWarning:
+    class_imbalance: float
+    class_imbalance_warning: bool
+    uncertain_sampling_share: float | None
+    uncertain_sampling_warning: bool
+
+
+def _sampling_bias(conn: sqlite3.Connection, examples: Sequence[Example]) -> SamplingBiasWarning:
+    lore_count = sum(1 for example in examples if example.label is Label.LORE)
+    class_imbalance = max(lore_count, len(examples) - lore_count) / len(examples)
+    class_imbalance_warning = class_imbalance > CLASS_IMBALANCE_WARNING_THRESHOLD
+
+    exchange_ids = [example.exchange_id for example in examples]
+    origins = _sampling_origins(conn, exchange_ids)
+    if not origins:
+        return SamplingBiasWarning(class_imbalance, class_imbalance_warning, None, False)
+
+    uncertain_count = sum(1 for origin in origins.values() if origin == _UNCERTAIN_SAMPLING_ORIGIN)
+    uncertain_share = uncertain_count / len(origins)
+    return SamplingBiasWarning(
+        class_imbalance,
+        class_imbalance_warning,
+        uncertain_share,
+        uncertain_share > UNCERTAIN_SAMPLING_WARNING_THRESHOLD,
+    )
+
+
+def sampling_bias_warning(conn: sqlite3.Connection, rules: TriageRules) -> SamplingBiasWarning:
+    """Whether the labeled exchanges `--fit-weights`/`--signal-report` train
+    or report on lean too hard on one sampling origin (issue #107) — or, when
+    no label traces back to a recorded sampling origin at all (hand labels,
+    or labels from before `extraction_runs.sampled_by` existed), the
+    class-imbalance fallback the issue names for exactly that case.
+
+    Raises `NoLabelsError` if no exchange has an effective label yet."""
+    examples = build_examples(conn, rules)
+    if not examples:
+        raise NoLabelsError
+    return _sampling_bias(conn, examples)
 
 
 def _scale_signal_weights(fitted: LogisticModel) -> dict[str, float]:
@@ -599,14 +702,15 @@ def fit_weights(conn: sqlite3.Connection, rules: TriageRules) -> FitWeightsResul
         )
         for name, field in SIGNAL_WEIGHT_FIELDS
     )
-    lore_count = sum(1 for example in examples if example.label is Label.LORE)
-    class_imbalance = max(lore_count, len(examples) - lore_count) / len(examples)
+    bias = _sampling_bias(conn, examples)
 
     return FitWeightsResult(
         rules_toml=render_rules_toml(rules, scaled),
         changes=changes,
-        class_imbalance=class_imbalance,
-        class_imbalance_warning=class_imbalance > CLASS_IMBALANCE_WARNING_THRESHOLD,
+        class_imbalance=bias.class_imbalance,
+        class_imbalance_warning=bias.class_imbalance_warning,
+        uncertain_sampling_share=bias.uncertain_sampling_share,
+        uncertain_sampling_warning=bias.uncertain_sampling_warning,
     )
 
 
@@ -791,10 +895,12 @@ __all__ = [
     "MIN_SIGNAL_SUPPORT",
     "SIGNAL_WEIGHT_FIELDS",
     "STOPWORDS",
+    "UNCERTAIN_SAMPLING_WARNING_THRESHOLD",
     "USELESS_LIFT_BAND",
     "FitWeightsResult",
     "NoLabelsError",
     "ReportCard",
+    "SamplingBiasWarning",
     "ScoreCard",
     "SignalStats",
     "SuggestTermsResult",
@@ -804,6 +910,7 @@ __all__ = [
     "compute_report_card",
     "fit_weights",
     "render_rules_toml",
+    "sampling_bias_warning",
     "signal_report",
     "suggest_terms",
 ]

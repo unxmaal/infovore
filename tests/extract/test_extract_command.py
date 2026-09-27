@@ -532,6 +532,140 @@ def test_extract_trial_mode_strategy_uncertain_picks_scored_exchanges(tmp_path: 
     assert "processed=1" in out
 
 
+def test_extract_records_an_extraction_batch_for_live_mode(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = registry_with(success_results())
+
+    code, _, _ = run(["extract"], env, registry)
+
+    assert code == ExitCode.OK
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    rows = conn.execute("SELECT mode, strategy, seed, sample FROM extraction_batches").fetchall()
+    conn.close()
+    assert len(rows) == 1
+    assert rows[0]["mode"] == "live"
+    assert rows[0]["strategy"] is None
+    assert rows[0]["sample"] is None
+
+
+def test_extract_records_an_extraction_batch_for_trial_mode_with_sample(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    registry = registry_with(success_results())
+
+    code, _, _ = run(
+        ["extract", "--mode", "trial", "--sample", "1", "--seed", "5", "--strategy", "random"],
+        env,
+        registry,
+    )
+
+    assert code == ExitCode.OK
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    rows = conn.execute("SELECT mode, strategy, seed, sample FROM extraction_batches").fetchall()
+    conn.close()
+    assert len(rows) == 1
+    assert rows[0]["mode"] == "trial"
+    assert rows[0]["strategy"] == "random"
+    assert rows[0]["seed"] == 5
+    assert rows[0]["sample"] == 1
+
+
+def test_extract_trial_mode_with_only_exchange_id_records_a_batch_with_no_strategy(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    exchange_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    registry = registry_with(success_results())
+
+    code, _, _ = run(
+        ["extract", "--mode", "trial", "--exchange-id", str(exchange_id)], env, registry
+    )
+
+    assert code == ExitCode.OK
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    rows = conn.execute("SELECT mode, strategy, sample FROM extraction_batches").fetchall()
+    conn.close()
+    assert len(rows) == 1
+    assert rows[0]["mode"] == "trial"
+    assert rows[0]["strategy"] is None
+    assert rows[0]["sample"] is None
+
+
+def test_extract_mix_out_of_range_is_a_config_error(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    registry = registry_with(success_results())
+
+    code, _, err = run(
+        ["extract", "--mode", "trial", "--sample", "1", "--mix", "1.5"], env, registry
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "--mix" in err
+
+
+def test_extract_trial_mode_strategy_mixed_splits_the_sample(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    qualifying_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    second_id = _seed_second_exchange(conn, triage_score=1.0)
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (3, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',"
+        " '2026-01-01T00:00:00+00:00', '{}')"
+    )
+    third_row = ExchangeRow(
+        id=None,
+        channel_id=1,
+        thread_id=None,
+        first_message_id=3,
+        last_message_id=3,
+        started_at=NOW,
+        ended_at=NOW,
+        message_count=1,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash="hash-3",
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    third_id = insert_exchange(conn, third_row, [3])
+    mark_triaged(conn, third_id, triage_score=1.0)  # left unscored (no p_lore): the "random" half
+    conn.execute(
+        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
+        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
+    )
+    version = conn.execute("SELECT version FROM triage_model").fetchone()["version"]
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?",
+        (version, qualifying_id),
+    )
+    conn.execute(
+        "UPDATE exchanges SET p_lore = 0.9, p_lore_model = ? WHERE id = ?",
+        (version, second_id),
+    )
+    conn.close()
+    registry = registry_with(
+        [HEALTH_OK, *([LLMResult.ok_structured(VALID_EXTRACTION_OUT, "scripted-model")] * 2)]
+    )
+
+    code, out, _ = run(
+        ["extract", "--mode", "trial", "--sample", "2", "--strategy", "mixed", "--seed", "0"],
+        env,
+        registry,
+    )
+
+    assert code == ExitCode.OK
+    assert "processed=2" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    origins = {row["sampled_by"] for row in conn.execute("SELECT sampled_by FROM extraction_runs")}
+    conn.close()
+    assert origins == {"uncertain", "random"}
+
+
 def test_extract_start_line_is_written_before_backend_processes_any_exchange(
     tmp_path: Path,
 ) -> None:

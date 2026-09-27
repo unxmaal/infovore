@@ -142,6 +142,24 @@ def test_triage_section_documents_the_tuning_flags() -> None:
         assert needle in triage, needle
 
 
+def test_running_section_documents_strategy_mixed_and_the_batches_table() -> None:
+    running = section("Running")
+    for needle in ("mixed", "--mix", "extraction_batches", "sampled_by"):
+        assert needle in running, needle
+
+
+def test_triage_section_documents_the_uncertain_sampling_warning() -> None:
+    triage = section("Triage")
+    for needle in ("sampling_bias_warning", "sampled_by", "--strategy mixed"):
+        assert needle in triage, needle
+
+
+def test_tuning_loop_recommends_mixed_rounds() -> None:
+    triage = section("Triage")
+    body = triage.split("### Tuning loop", 1)[1]
+    assert "mixed" in body
+
+
 def test_triage_section_documents_every_signal_and_the_version() -> None:
     import inspect
 
