@@ -37,6 +37,7 @@ GIF_LINK = " https://tenor.com/view/cat-party"
 
 
 def db(tmp_path: Path) -> sqlite3.Connection:
+    tmp_path.mkdir(parents=True, exist_ok=True)
     conn = open_database(tmp_path / "x.db")
     migrate(conn)
     return conn
@@ -274,16 +275,23 @@ def test_fit_weights_flags_class_imbalance_over_the_threshold(tmp_path: Path) ->
     assert result.class_imbalance_warning is True
 
 
-def test_fit_weights_uses_p_lore_bins_when_a_model_is_trained(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    seed_fixture(conn)
-    train_and_store(conn, FixedClock(NOW))
-    version, model = load_latest_model(conn)  # type: ignore[misc]
-    score_all(conn, model, version)
+def test_fit_weights_fits_rule_signals_alone_not_conditioned_on_p_lore(tmp_path: Path) -> None:
+    # The written rules file drives the stand-alone rule score, so its weights
+    # must come from the rule signals alone: training a Bayes model and
+    # scoring p_lore must not change them.
+    without_model = db(tmp_path / "a")
+    seed_fixture(without_model)
+    baseline = fit_weights(without_model, DEFAULT_RULES)
 
-    result = fit_weights(conn, DEFAULT_RULES)
+    with_model = db(tmp_path / "b")
+    seed_fixture(with_model)
+    train_and_store(with_model, FixedClock(NOW))
+    version, model = load_latest_model(with_model)  # type: ignore[misc]
+    score_all(with_model, model, version)
+    result = fit_weights(with_model, DEFAULT_RULES)
 
     assert len(result.changes) == 14
+    assert result.changes == baseline.changes
 
 
 # --- suggest_terms --------------------------------------------------------
