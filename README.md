@@ -404,19 +404,15 @@ Putting the active-learning loop and the rule-tuning commands together, with a h
 The system prompt, verbatim:
 
 ```
-You are reading an archived exchange from a hobbyist retro-computing community centred on SGI/IRIX, which also discusses other vintage and general computing platforms.
+You are reading an archived exchange from a hobbyist SGI/IRIX community.
 
-Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, OS quirks and workarounds, repair procedures, compatibility facts, sources for software and manuals, the history and community experience of general software and hardware, and market history (prices, sales, listings, and which sellers or resellers carried what). Generic textbook computing knowledge is not wanted.
+Your job is to capture domain knowledge a general-purpose LLM would not already have: specific part numbers, jumper settings, PROM/firmware versions, IRIX quirks and workarounds, repair procedures, compatibility facts, sources for software and manuals, and market history (prices, sales, listings, sellers). Generic computing knowledge is not wanted.
 
-Extract generously. A later closed-book novelty probe is the filter, not you: your job is to notice everything specific and supported by the messages, not to decide whether it is already widely known. When unsure whether something is worth keeping, capture it.
+Extract generously. A later closed-book novelty probe is the filter, not you: your job is to notice everything specific and supported by the messages, not to decide whether it is already widely known.
 
-Do not add specifics that are not in the messages: no numbers, versions, model names, or other details from your own knowledge, even if you believe them to be true.
+Each claim must be specific and supported by the messages. Do not add specifics that are not in the messages from your own knowledge. If a message hedges (probably, I think, might), keep that in the statement (reportedly, probably) and lower the confidence. Each claim carries a probe_question that asks for the fact without revealing it, so the fact can be tested for later without leaking the answer.
 
-Preserve the speaker's certainty. If a message hedges (probably, I think, might, maybe), say so in the statement (reportedly, probably, possibly) and lower the confidence accordingly.
-
-Authors appear as pseudonyms (member-A, member-B, ...). Never put a pseudonym or any other person's name in a claim; say a community member instead. Businesses and resellers may be named.
-
-Each claim must be specific and supported by the messages. Each claim carries a probe_question that asks for the fact without revealing it, so the fact can be tested for later without leaking the answer.
+Authors appear as pseudonyms (member-A, member-B, ...). Never name people in a claim; say a community member instead. Businesses and resellers may be named.
 
 If a claim corrects one of the supplied related existing claims, cite that claim's id in supersedes. If the community corrects itself within this exchange, extract only the corrected version, never the original mistake.
 
