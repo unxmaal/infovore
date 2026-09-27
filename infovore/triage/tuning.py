@@ -25,11 +25,20 @@ import hashlib
 import json
 import re
 import sqlite3
-from collections.abc import Mapping, Sequence
+from collections import Counter
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, fields
 
+from infovore.db.batch import BATCH_SIZE
 from infovore.rows import Label, LabelSource
-from infovore.triage.bayes import auc, candidate_thresholds, evaluate, recommend_threshold
+from infovore.triage.bayes import (
+    TOKEN,
+    TRAILING_PUNCTUATION,
+    auc,
+    candidate_thresholds,
+    evaluate,
+    recommend_threshold,
+)
 from infovore.triage.bayes import token_probability as bayes_token_probability
 from infovore.triage.logistic import LogisticModel, predict_proba, train_logistic
 from infovore.triage.rules import TriageRules
@@ -85,6 +94,15 @@ MIN_TOKEN_LENGTH = 3
 STRONG_LORE_PROBABILITY = 0.75
 WEAK_LORE_PROBABILITY = 0.4
 MAX_SUGGESTIONS = 30
+
+# Default `--max-corpus-df` (issue #105): a candidate is dropped if it appears
+# in more than 1% of *all* exchanges, labeled or not. Ordinary English words
+# are common everywhere regardless of label -- the label-only strong-evidence
+# check above can't tell "genuinely rare jargon" from "a common word that
+# happens to appear in most of a handful of long lore exchanges and none of
+# the short noise ones" -- but jargon really is rare corpus-wide, so this
+# catches what the label-only check can't.
+MAX_CORPUS_DF = 0.01
 
 # Common English function words and the exact "ordinary word" clues issue #95
 # calls out (that's, works, running, since): tokens that pass this list still
@@ -412,6 +430,7 @@ class TermCandidate:
     lore_count: int
     noise_count: int
     probability: float
+    corpus_df: float
 
 
 @dataclass(frozen=True)
@@ -426,7 +445,14 @@ _VIRTUAL_TOKEN_PREFIXES = ("SIG_", "CHAN_", "LEN_")
 
 
 def _is_domain_ish(token: str) -> bool:
-    if len(token) < MIN_TOKEN_LENGTH:
+    # Contractions/possessives (didn't, can't, doesn't, ...) are ordinary
+    # English, never domain jargon -- excluded regardless of digits or length.
+    if "'" in token:
+        return False
+    # A short *pure-alphabetic* token is almost always noise (a, an, ok, ...);
+    # a short token that also contains a digit (r4, o2) can be a genuine
+    # domain term, so length alone no longer disqualifies it.
+    if token.isalpha() and len(token) < MIN_TOKEN_LENGTH:
         return False
     has_digit = any(character.isdigit() for character in token)
     return has_digit or token not in STOPWORDS
@@ -437,33 +463,122 @@ def _toml_string(value: str) -> str:
     return f'"{escaped}"'
 
 
-def _domain_terms_snippet(terms: Sequence[str]) -> str:
-    lines = ["domain_terms = ["]
-    lines.extend(f"    {_toml_string(term)}," for term in terms)
-    lines.append("]")
-    return "\n".join(lines)
+def _domain_terms_snippet(candidates: Sequence["TermCandidate"]) -> str:
+    """TOML lines for `candidates` alone, meant to be pasted *inside* the
+    existing `domain_terms = [...]` list in `rules.toml` -- never a full
+    replacement list, so a bad paste can't clobber the current terms (issue
+    #105). Each line carries the candidate's corpus document frequency as a
+    trailing comment, alongside the lore/noise counts printed next to it."""
+    if not candidates:
+        return "# (no candidate additions)"
+    return "\n".join(
+        f"    {_toml_string(candidate.token)},  # corpus_df={candidate.corpus_df:.4f}"
+        for candidate in candidates
+    )
+
+
+def corpus_document_frequencies(
+    conn: sqlite3.Connection,
+    progress: Callable[[int, int], None] | None = None,
+    progress_every: int = BATCH_SIZE,
+) -> tuple[Counter[str], int]:
+    """Corpus-wide document frequency for every token the tokenizer
+    (`infovore.triage.bayes.TOKEN`/`TRAILING_PUNCTUATION`, the same one
+    `infovore.triage.bayes.features` uses) produces: for each token, how
+    many *exchanges* -- every exchange in the database, labeled or not --
+    contain it at least once (issue #105). Ordinary English words are
+    common everywhere regardless of label; jargon is rare corpus-wide, so
+    this is what tells the two apart when a labeled-only count can't (a
+    word that happens to appear in most of a handful of long lore exchanges
+    and none of the short noise ones looks like strong lore evidence by
+    label alone, even though it's common in the corpus as a whole).
+
+    A single streaming pass over `exchange_messages` joined to `messages`,
+    ordered by `exchange_id`: one exchange's messages are tokenized and
+    folded into a rolling per-exchange token set, which is then folded into
+    a running `Counter` once the next exchange starts. Memory scales with
+    the vocabulary size plus one exchange's tokens at a time, never the
+    whole corpus -- on the real DB (~204k exchanges / ~1.4M messages) this
+    is one sequential table scan. `progress`, if given, is called with
+    `(exchanges_scanned, total_exchanges)` every `progress_every` exchanges
+    and once more after the last one, so a caller can print progress on a
+    pass over the real DB that can take a while.
+    """
+    total_exchanges = int(conn.execute("SELECT COUNT(*) FROM exchanges").fetchone()[0])
+    document_frequency: Counter[str] = Counter()
+    current_exchange_id: int | None = None
+    current_tokens: set[str] = set()
+    scanned = 0
+
+    rows = conn.execute(
+        "SELECT em.exchange_id AS exchange_id, m.content AS content"
+        " FROM exchange_messages em JOIN messages m ON m.id = em.message_id"
+        " ORDER BY em.exchange_id"
+    )
+    for row in rows:
+        exchange_id = row["exchange_id"]
+        if current_exchange_id is None:
+            current_exchange_id = exchange_id
+        elif exchange_id != current_exchange_id:
+            document_frequency.update(current_tokens)
+            scanned += 1
+            if progress is not None and scanned % progress_every == 0:
+                progress(scanned, total_exchanges)
+            current_tokens = set()
+            current_exchange_id = exchange_id
+        for token in TOKEN.findall(row["content"].lower()):
+            current_tokens.add(token.rstrip(TRAILING_PUNCTUATION))
+
+    if current_exchange_id is not None:
+        document_frequency.update(current_tokens)
+        scanned += 1
+
+    if progress is not None:
+        progress(scanned, total_exchanges)
+
+    return document_frequency, total_exchanges
 
 
 def suggest_terms(
-    conn: sqlite3.Connection, rules: TriageRules, min_support: int = MIN_SIGNAL_SUPPORT
+    conn: sqlite3.Connection,
+    rules: TriageRules,
+    min_support: int = MIN_SIGNAL_SUPPORT,
+    max_corpus_df: float = MAX_CORPUS_DF,
+    progress: Callable[[int, int], None] | None = None,
 ) -> SuggestTermsResult:
     """Candidate `domain_terms` additions (strong lore evidence in the
-    trained Bayes model's per-token counts, domain-ish looking, and not
-    already matched by a current `domain_terms` rule) and drop candidates
-    (a current *literal* domain term whose own token counts don't actually
-    predict lore), plus a ready-to-paste `domain_terms = [...]` TOML
-    snippet with the additions appended.
+    trained Bayes model's per-token counts, domain-ish looking, rare enough
+    corpus-wide, and not already matched by a current `domain_terms` rule)
+    and drop candidates (a current *literal* domain term whose own token
+    counts don't actually predict lore), plus a snippet of just the
+    candidate-addition TOML lines to paste inside the existing
+    `domain_terms = [...]` list.
 
-    Reuses the already-trained Bayes model's `triage_tokens` counts rather
-    than rescanning raw messages: those counts already are "tokens with
-    lore evidence", exactly what this is looking for. Raises
-    `NoTrainedModelError` if no model has been trained yet.
+    Reuses the already-trained Bayes model's `triage_tokens` counts for the
+    label-conditional counts and probability (no rescanning of raw messages
+    for those) rather than rescanning raw messages: those counts already
+    are "tokens with lore evidence", exactly what this is looking for. On
+    top of that, a candidate is dropped if it appears in more than
+    `max_corpus_df` of *all* exchanges (`corpus_document_frequencies`, a
+    single streaming pass over every exchange's messages, labeled or not,
+    reported through `progress` if given) -- ordinary English words are
+    common everywhere regardless of label, so the label-only evidence above
+    can't tell them apart from genuine jargon on its own (issue #105).
+    Raises `NoTrainedModelError` if no model has been trained yet.
     """
     loaded = load_latest_model(conn)
     if loaded is None:
         raise NoTrainedModelError
     _, model = loaded
     domain_pattern = re.compile(rf"\b(?:{'|'.join(rules.domain_terms)})\b", re.IGNORECASE)
+    document_frequency, total_exchanges = corpus_document_frequencies(conn, progress=progress)
+
+    def corpus_df_of(token: str) -> float:
+        if (
+            not total_exchanges
+        ):  # pragma: no cover - unreachable: a trained model implies >=1 exchange
+            return 0.0
+        return document_frequency.get(token, 0) / total_exchanges
 
     additions: list[TermCandidate] = []
     for token, (lore_count, noise_count) in model.counts.items():
@@ -476,10 +591,13 @@ def suggest_terms(
             continue
         if domain_pattern.search(token):
             continue
+        corpus_df = corpus_df_of(token)
+        if corpus_df > max_corpus_df:
+            continue
         probability = bayes_token_probability(model, token)
         if probability < STRONG_LORE_PROBABILITY:
             continue
-        additions.append(TermCandidate(token, lore_count, noise_count, probability))
+        additions.append(TermCandidate(token, lore_count, noise_count, probability, corpus_df))
     additions.sort(key=lambda candidate: candidate.probability, reverse=True)
     additions = additions[:MAX_SUGGESTIONS]
 
@@ -497,11 +615,11 @@ def suggest_terms(
         probability = bayes_token_probability(model, term)
         if probability > WEAK_LORE_PROBABILITY:
             continue
-        drops.append(TermCandidate(term, lore_count, noise_count, probability))
+        drops.append(TermCandidate(term, lore_count, noise_count, probability, corpus_df_of(term)))
     drops.sort(key=lambda candidate: candidate.probability)
     drops = drops[:MAX_SUGGESTIONS]
 
-    snippet = _domain_terms_snippet((*rules.domain_terms, *(c.token for c in additions)))
+    snippet = _domain_terms_snippet(additions)
     return SuggestTermsResult(additions=tuple(additions), drops=tuple(drops), snippet=snippet)
 
 
@@ -890,6 +1008,7 @@ def compute_report_card(
 __all__ = [
     "BAYES_BINS",
     "CLASS_IMBALANCE_WARNING_THRESHOLD",
+    "MAX_CORPUS_DF",
     "MAX_SUGGESTIONS",
     "MIN_RECALL_FOR_REPORT_CARD",
     "MIN_SIGNAL_SUPPORT",
@@ -908,6 +1027,7 @@ __all__ = [
     "WeightChange",
     "bayes_bin",
     "compute_report_card",
+    "corpus_document_frequencies",
     "fit_weights",
     "render_rules_toml",
     "sampling_bias_warning",

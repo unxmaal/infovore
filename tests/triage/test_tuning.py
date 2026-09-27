@@ -14,7 +14,6 @@ from infovore.triage.rules import DEFAULT_RULES, parse_rules
 from infovore.triage.runner import triage_pending
 from infovore.triage.train import NoTrainedModelError, load_latest_model, score_all, train_and_store
 from infovore.triage.tuning import (
-    MAX_CORPUS_DF,
     UNCERTAIN_SAMPLING_WARNING_THRESHOLD,
     NoLabelsError,
     _is_domain_ish,
@@ -666,7 +665,9 @@ def test_corpus_document_frequencies_reports_progress(tmp_path: Path) -> None:
         seed_exchange(conn, i + 1, channel_id=1, content=f"filler{i}")
 
     calls: list[tuple[int, int]] = []
-    corpus_document_frequencies(conn, progress=calls.append, progress_every=2)
+    corpus_document_frequencies(
+        conn, progress=lambda scanned, total: calls.append((scanned, total)), progress_every=2
+    )
 
     assert (1, 5) not in calls  # not a multiple of progress_every=2
     assert (2, 5) in calls
@@ -699,7 +700,9 @@ def test_corpus_document_frequencies_calls_progress_once_for_an_empty_database(
     conn = db(tmp_path)
 
     calls: list[tuple[int, int]] = []
-    corpus_document_frequencies(conn, progress=calls.append)
+    corpus_document_frequencies(
+        conn, progress=lambda scanned, total: calls.append((scanned, total))
+    )
 
     assert calls == [(0, 0)]
 
@@ -725,26 +728,38 @@ REAL_FAILURE_JARGON = "gcc wouldn't ok"
 REAL_FAILURE_NOISE = "lol gg nothing here"
 REAL_FAILURE_BACKGROUND = "just chatting about random stuff here, nothing to report"
 
-REAL_FAILURE_BACKGROUND_COUNT = 574
-REAL_FAILURE_TOTAL_EXCHANGES = 20 + 6 + REAL_FAILURE_BACKGROUND_COUNT  # == 600
+REAL_FAILURE_LORE_COUNT = 20
+REAL_FAILURE_NOISE_COUNT = 10  # >= train.MIN_LABELS_PER_CLASS
+# How many of the lore exchanges carry the jargon tokens (gcc/wouldn't/ok).
+# `--train` holds out about a fifth of labels (infovore.triage.bayes.in_holdout,
+# hashed by exchange id) from the counts `suggest_terms` reads, so this is
+# picked (and pinned down by a debug run against this exact fixture, since the
+# holdout split is a deterministic hash of the exchange id) high enough that
+# >= MIN_SIGNAL_SUPPORT of them still survive into the trained model's counts.
+REAL_FAILURE_JARGON_COUNT = 6
+REAL_FAILURE_BACKGROUND_COUNT = 700
+REAL_FAILURE_TOTAL_EXCHANGES = (
+    REAL_FAILURE_LORE_COUNT + REAL_FAILURE_NOISE_COUNT + REAL_FAILURE_BACKGROUND_COUNT
+)  # == 730
 
 
 def seed_real_failure_fixture(conn: sqlite3.Connection) -> None:
     """20 long lore exchanges (common English words in all of them, plus
-    `gcc`/`wouldn't`/`ok` in the first 5), 6 short noise exchanges, and 574
-    unlabeled background exchanges -- 600 exchanges total, so a token
-    present in all 20 lore exchanges has corpus_df = 20/600 ~= 0.033 (over
-    the 1% default `--max-corpus-df`), while one present in only 5 has
-    corpus_df = 5/600 ~= 0.0083 (under it). Mirrors issue #105's real
-    failure: long lore exchanges full of common words, short noise
-    exchanges, and exactly one rare piece of real jargon (`gcc`)."""
-    for i in range(20):
+    `gcc`/`wouldn't`/`ok` in the first `REAL_FAILURE_JARGON_COUNT`), 10 short
+    noise exchanges, and 700 unlabeled background exchanges -- 730 exchanges
+    total, so a token present in all 20 lore exchanges has corpus_df =
+    20/730 ~= 0.027 (over the 1% default `--max-corpus-df`), while the
+    jargon tokens' surviving (post-holdout) support of 5 gives corpus_df =
+    5/730 ~= 0.0068 (under it). Mirrors issue #105's real failure: long lore
+    exchanges full of common words, short noise exchanges, and exactly one
+    rare piece of real jargon (`gcc`)."""
+    for i in range(REAL_FAILURE_LORE_COUNT):
         content = REAL_FAILURE_LORE_COMMON
-        if i < 5:
+        if i < REAL_FAILURE_JARGON_COUNT:
             content += " " + REAL_FAILURE_JARGON
         exchange_id = seed_exchange(conn, i + 1, channel_id=1, content=content)
         set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
-    for i in range(6):
+    for i in range(REAL_FAILURE_NOISE_COUNT):
         exchange_id = seed_exchange(conn, 100 + i, channel_id=2, content=REAL_FAILURE_NOISE)
         set_label(conn, exchange_id, Label.NOISE, LabelSource.HUMAN, None, NOW)
     for i in range(REAL_FAILURE_BACKGROUND_COUNT):
@@ -777,8 +792,12 @@ def test_suggest_terms_filters_common_words_by_corpus_df_and_keeps_rare_jargon(
     assert "wouldn't" not in added
     assert "ok" not in added
 
+    # corpus_df counts every exchange containing the token, train/holdout split
+    # aside -- gcc appears in exactly REAL_FAILURE_JARGON_COUNT exchanges.
     gcc_candidate = next(candidate for candidate in result.additions if candidate.token == "gcc")
-    assert gcc_candidate.corpus_df == pytest.approx(5 / REAL_FAILURE_TOTAL_EXCHANGES)
+    assert gcc_candidate.corpus_df == pytest.approx(
+        REAL_FAILURE_JARGON_COUNT / REAL_FAILURE_TOTAL_EXCHANGES
+    )
 
 
 # --- bayes_bin --------------------------------------------------------------

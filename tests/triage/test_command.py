@@ -571,7 +571,7 @@ def test_triage_suggest_terms_prints_additions_drops_and_a_snippet(tmp_path: Pat
     assert code == ExitCode.OK
     assert "candidate additions" in out
     assert "drop candidates" in out
-    assert "domain_terms = [" not in out  # never a full replacement list (issue #105)
+    assert '"sgi",' not in out  # never a full replacement list carrying existing terms (issue #105)
     assert "octane2000" in out
     assert "corpus_df=" in out
 
