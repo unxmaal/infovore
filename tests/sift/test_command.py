@@ -18,6 +18,7 @@ def environment(tmp_path: Path) -> dict[str, str]:
         "INFOVORE_GUILD_ID": "9",
         "INFOVORE_CHANNEL_IDS": "1,2",
         "INFOVORE_DB_PATH": str(tmp_path / "infovore.db"),
+        "INFOVORE_SCRATCH_DIR": str(tmp_path / "scratch"),
     }
 
 
@@ -185,3 +186,93 @@ def test_sift_export_mixed_without_a_trained_model_falls_back_to_random(tmp_path
     manifest = json.loads((out_dir / "manifest.json").read_text())
     assert len(manifest["message_ids"]) == 2
     assert "wrote 2" in out
+
+
+def test_sift_import_records_labels_and_prints_counts(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    export_code, _, _ = run(
+        ["sift", "export", "--size", "6", "--out", str(out_dir)], env
+    )
+    assert export_code == ExitCode.OK
+    (out_dir / "kept.csv").write_text("msg\n4\n5\n6\n")
+
+    code, out, _ = run(["sift", "import", str(out_dir)], env)
+
+    assert code == ExitCode.OK
+    assert "keep=3" in out
+    assert "trash=3" in out
+    assert "#general: keep=0 trash=3" in out
+    assert "#food: keep=3 trash=0" in out
+
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    rows = conn.execute(
+        "SELECT message_id, label FROM message_labels WHERE source = 'human' ORDER BY message_id"
+    ).fetchall()
+    assert [(r["message_id"], r["label"]) for r in rows] == [
+        (1, "trash"),
+        (2, "trash"),
+        (3, "trash"),
+        (4, "keep"),
+        (5, "keep"),
+        (6, "keep"),
+    ]
+
+
+def test_sift_import_missing_manifest_exits_config(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
+
+    code, _, err = run(["sift", "import", str(empty_dir)], env)
+
+    assert code == ExitCode.CONFIG
+    assert "manifest.json" in err
+
+
+def test_sift_import_with_no_result_files_exits_config_with_lnav_help(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "6", "--out", str(out_dir)], env)
+
+    code, _, err = run(["sift", "import", str(out_dir)], env)
+
+    assert code == ExitCode.CONFIG
+    assert "kept.csv" in err
+    assert "trash-regexes.csv" in err
+    assert "write-csv-to" in err
+
+
+def test_sift_import_save_rules_requires_a_regex_file(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "6", "--out", str(out_dir)], env)
+    (out_dir / "kept.csv").write_text("msg\n4\n5\n6\n")
+
+    code, _, err = run(
+        ["sift", "import", str(out_dir), "--save-rules", "food-chatter"], env
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "--save-rules" in err
+
+
+def test_sift_import_save_rules_writes_a_file(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "6", "--out", str(out_dir)], env)
+    (out_dir / "trash-regexes.csv").write_text("pattern\ngeneral chatter\n")
+
+    code, out, _ = run(
+        ["sift", "import", str(out_dir), "--save-rules", "food-chatter"], env
+    )
+
+    assert code == ExitCode.OK
+    assert "food-chatter" in out
+    saved = tmp_path / "scratch" / "sift_trash_rules" / "food-chatter.json"
+    assert saved.exists()
