@@ -707,6 +707,51 @@ def test_corpus_document_frequencies_calls_progress_once_for_an_empty_database(
     assert calls == [(0, 0)]
 
 
+# --- issue #113: parallel document-frequency scan ---------------------------
+
+
+def test_corpus_document_frequencies_workers_two_matches_workers_one(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    for i in range(25):
+        seed_exchange(conn, i + 1, channel_id=i % 3, content=f"gcc build {i} again octane")
+
+    serial, serial_total = corpus_document_frequencies(conn, workers=1)
+    parallel, parallel_total = corpus_document_frequencies(conn, workers=2)
+
+    assert serial_total == parallel_total == 25
+    assert dict(serial) == dict(parallel)
+
+
+def test_corpus_document_frequencies_workers_two_reports_progress_per_batch(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    for i in range(9):
+        seed_exchange(conn, i + 1, channel_id=1, content=f"filler{i}")
+
+    calls: list[tuple[int, int]] = []
+    corpus_document_frequencies(
+        conn,
+        progress=lambda scanned, total: calls.append((scanned, total)),
+        progress_every=3,
+        workers=2,
+    )
+
+    assert calls[-1] == (9, 9)
+    assert (3, 9) in calls
+    assert (6, 9) in calls
+
+
+def test_corpus_document_frequencies_defaults_to_one_worker(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, 1, channel_id=1, content="hello world")
+
+    document_frequency, total_exchanges = corpus_document_frequencies(conn)
+
+    assert total_exchanges == 1
+    assert document_frequency["hello"] == 1
+
+
 # --- regression: issue #105 (ordinary words suggested via length bias) -------
 
 REAL_FAILURE_COMMON_WORDS = (

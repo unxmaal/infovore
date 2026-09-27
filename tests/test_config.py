@@ -1,3 +1,4 @@
+import os
 from importlib import resources
 from pathlib import Path
 
@@ -569,3 +570,33 @@ def test_load_settings_triage_rules_error_combines_with_other_errors(tmp_path: P
     message = str(excinfo.value)
     assert "INFOVORE_TRIAGE_RULES" in message
     assert "INFOVORE_GUILD_ID" in message
+
+
+# --- issue #113: INFOVORE_WORKERS ------------------------------------------
+
+
+def test_load_settings_workers_defaults_to_cpu_count() -> None:
+    settings = load_settings(REQUIRED_ENV)
+    assert settings.workers == (os.cpu_count() or 1)
+
+
+def test_load_settings_workers_from_env() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_WORKERS": "4"}
+    assert load_settings(env).workers == 4
+
+
+def test_load_settings_workers_accepts_one() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_WORKERS": "1"}
+    assert load_settings(env).workers == 1
+
+
+def test_load_settings_workers_non_positive_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_WORKERS": "0"}
+    with pytest.raises(ConfigError, match="INFOVORE_WORKERS"):
+        load_settings(env)
+
+
+def test_load_settings_workers_non_integer_reported() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_WORKERS": "nope"}
+    with pytest.raises(ConfigError, match="INFOVORE_WORKERS"):
+        load_settings(env)

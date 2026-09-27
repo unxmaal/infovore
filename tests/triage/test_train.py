@@ -261,6 +261,72 @@ def test_score_stale_only_rescopes_exchanges_behind_the_latest_model(tmp_path: P
     assert third_pass == 1
 
 
+# --- issue #113: parallel scoring across workers ----------------------------
+
+
+def _fresh_db(path: Path) -> sqlite3.Connection:
+    conn = open_database(path)
+    migrate(conn)
+    return conn
+
+
+def test_score_all_workers_two_matches_workers_one(tmp_path: Path) -> None:
+    conn_serial = _fresh_db(tmp_path / "serial.db")
+    seed_labeled_exchanges(conn_serial, 20, 20)
+    train_and_store(conn_serial, FixedClock(NOW))
+    version_serial, model_serial = load_latest_model(conn_serial)  # type: ignore[misc]
+
+    conn_parallel = _fresh_db(tmp_path / "parallel.db")
+    seed_labeled_exchanges(conn_parallel, 20, 20)
+    train_and_store(conn_parallel, FixedClock(NOW))
+    version_parallel, model_parallel = load_latest_model(conn_parallel)  # type: ignore[misc]
+
+    scored_serial = score_all(conn_serial, model_serial, version_serial, workers=1)
+    scored_parallel = score_all(conn_parallel, model_parallel, version_parallel, workers=2)
+
+    assert scored_serial == scored_parallel == 40
+    serial_rows = conn_serial.execute(
+        "SELECT id, p_lore, p_lore_model FROM exchanges ORDER BY id"
+    ).fetchall()
+    parallel_rows = conn_parallel.execute(
+        "SELECT id, p_lore, p_lore_model FROM exchanges ORDER BY id"
+    ).fetchall()
+    assert [(row["id"], row["p_lore"], row["p_lore_model"]) for row in serial_rows] == [
+        (row["id"], row["p_lore"], row["p_lore_model"]) for row in parallel_rows
+    ]
+
+
+def test_score_stale_workers_two_matches_workers_one(tmp_path: Path) -> None:
+    conn_serial = _fresh_db(tmp_path / "serial.db")
+    seed_labeled_exchanges(conn_serial, 20, 20)
+    train_and_store(conn_serial, FixedClock(NOW))
+    version_serial, model_serial = load_latest_model(conn_serial)  # type: ignore[misc]
+
+    conn_parallel = _fresh_db(tmp_path / "parallel.db")
+    seed_labeled_exchanges(conn_parallel, 20, 20)
+    train_and_store(conn_parallel, FixedClock(NOW))
+    version_parallel, model_parallel = load_latest_model(conn_parallel)  # type: ignore[misc]
+
+    scored_serial = score_stale(conn_serial, model_serial, version_serial, workers=1)
+    scored_parallel = score_stale(conn_parallel, model_parallel, version_parallel, workers=2)
+
+    assert scored_serial == scored_parallel == 40
+    serial_rows = conn_serial.execute("SELECT id, p_lore FROM exchanges ORDER BY id").fetchall()
+    parallel_rows = conn_parallel.execute("SELECT id, p_lore FROM exchanges ORDER BY id").fetchall()
+    assert [row["p_lore"] for row in serial_rows] == [row["p_lore"] for row in parallel_rows]
+
+
+def test_score_all_defaults_to_one_worker(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+
+    scored = score_all(conn, model, version)
+
+    assert scored == 40
+
+
 def test_recommend_raises_without_a_trained_model(tmp_path: Path) -> None:
     conn = db(tmp_path)
     with pytest.raises(NoTrainedModelError):

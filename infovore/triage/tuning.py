@@ -29,7 +29,7 @@ from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, fields
 
-from infovore.db.batch import BATCH_SIZE
+from infovore.db.batch import BATCH_SIZE, SQLITE_MAX_VARIABLES
 from infovore.rows import Label, LabelSource
 from infovore.triage.bayes import (
     TOKEN,
@@ -41,6 +41,7 @@ from infovore.triage.bayes import (
 )
 from infovore.triage.bayes import token_probability as bayes_token_probability
 from infovore.triage.logistic import LogisticModel, predict_proba, train_logistic
+from infovore.triage.parallel import ChunkPool
 from infovore.triage.rules import TriageRules
 from infovore.triage.train import (
     Example,
@@ -477,10 +478,52 @@ def _domain_terms_snippet(candidates: Sequence["TermCandidate"]) -> str:
     )
 
 
+def _tokenize_worker_chunk(items: list[list[str]]) -> Counter[str]:
+    """`items`: for each exchange in this chunk, the list of its messages'
+    content strings (tokenizing needs no model or rules, so unlike the other
+    two workers in this issue, this one needs no `ChunkPool` initializer).
+    Returns document-frequency counts local to this chunk alone -- each
+    exchange contributes each of its tokens at most once, exactly like the
+    single-process version's per-exchange token set did."""
+    counter: Counter[str] = Counter()
+    for contents in items:
+        tokens: set[str] = set()
+        for content in contents:
+            for token in TOKEN.findall(content.lower()):
+                tokens.add(token.rstrip(TRAILING_PUNCTUATION))
+        counter.update(tokens)
+    return counter
+
+
+def _chunked_ids(ids: Sequence[int], size: int = SQLITE_MAX_VARIABLES) -> list[Sequence[int]]:
+    return [ids[start : start + size] for start in range(0, len(ids), size)]
+
+
+def _contents_by_exchange(
+    conn: sqlite3.Connection, exchange_ids: Sequence[int]
+) -> dict[int, list[str]]:
+    """`{exchange_id: [message content, ...]}` for each of `exchange_ids`
+    (assumed to have no duplicates), chunking the `IN (...)` list to stay
+    under SQLite's bound-parameter limit like `infovore.db.batch` does."""
+    contents: dict[int, list[str]] = {exchange_id: [] for exchange_id in exchange_ids}
+    for chunk in _chunked_ids(exchange_ids):
+        placeholders = ",".join("?" for _ in chunk)
+        rows = conn.execute(
+            "SELECT em.exchange_id AS exchange_id, m.content AS content"
+            " FROM exchange_messages em JOIN messages m ON m.id = em.message_id"
+            f" WHERE em.exchange_id IN ({placeholders}) ORDER BY em.exchange_id",
+            chunk,
+        )
+        for row in rows:
+            contents[row["exchange_id"]].append(row["content"])
+    return contents
+
+
 def corpus_document_frequencies(
     conn: sqlite3.Connection,
     progress: Callable[[int, int], None] | None = None,
     progress_every: int = BATCH_SIZE,
+    workers: int = 1,
 ) -> tuple[Counter[str], int]:
     """Corpus-wide document frequency for every token the tokenizer
     (`infovore.triage.bayes.TOKEN`/`TRAILING_PUNCTUATION`, the same one
@@ -493,45 +536,37 @@ def corpus_document_frequencies(
     and none of the short noise ones looks like strong lore evidence by
     label alone, even though it's common in the corpus as a whole).
 
-    A single streaming pass over `exchange_messages` joined to `messages`,
-    ordered by `exchange_id`: one exchange's messages are tokenized and
-    folded into a rolling per-exchange token set, which is then folded into
-    a running `Counter` once the next exchange starts. Memory scales with
-    the vocabulary size plus one exchange's tokens at a time, never the
-    whole corpus -- on the real DB (~204k exchanges / ~1.4M messages) this
-    is one sequential table scan. `progress`, if given, is called with
+    A batched pass, `progress_every` exchanges at a time (in `exchanges.id`
+    order): each batch's messages are loaded in the main process
+    (`_contents_by_exchange`, one set-based query per
+    `SQLITE_MAX_VARIABLES`-sized sub-chunk of ids) and handed to
+    `ChunkPool` as plain content strings -- tokenizing (issue #113's
+    CPU-bound part of this scan) runs in `workers` worker processes when
+    `workers > 1`, or directly in-process when it's `1` (the default).
+    Memory scales with one `progress_every`-sized batch's messages at a
+    time plus the running vocabulary, never the whole corpus -- on the real
+    DB (~204k exchanges / ~1.4M messages) this is a handful of sequential,
+    chunked table scans rather than one row-at-a-time cursor, but the same
+    total amount of work. `progress`, if given, is called with
     `(exchanges_scanned, total_exchanges)` every `progress_every` exchanges
     and once more after the last one, so a caller can print progress on a
     pass over the real DB that can take a while.
     """
     total_exchanges = int(conn.execute("SELECT COUNT(*) FROM exchanges").fetchone()[0])
+    exchange_ids = [row[0] for row in conn.execute("SELECT id FROM exchanges ORDER BY id")]
     document_frequency: Counter[str] = Counter()
-    current_exchange_id: int | None = None
-    current_tokens: set[str] = set()
     scanned = 0
 
-    rows = conn.execute(
-        "SELECT em.exchange_id AS exchange_id, m.content AS content"
-        " FROM exchange_messages em JOIN messages m ON m.id = em.message_id"
-        " ORDER BY em.exchange_id"
-    )
-    for row in rows:
-        exchange_id = row["exchange_id"]
-        if current_exchange_id is None:
-            current_exchange_id = exchange_id
-        elif exchange_id != current_exchange_id:
-            document_frequency.update(current_tokens)
-            scanned += 1
+    with ChunkPool(_tokenize_worker_chunk, workers) as pool:
+        for start in range(0, len(exchange_ids), progress_every):
+            batch_ids = exchange_ids[start : start + progress_every]
+            contents = _contents_by_exchange(conn, batch_ids)
+            items = [contents[exchange_id] for exchange_id in batch_ids]
+            for counter in pool.map_chunks(items):
+                document_frequency.update(counter)
+            scanned += len(batch_ids)
             if progress is not None and scanned % progress_every == 0:
                 progress(scanned, total_exchanges)
-            current_tokens = set()
-            current_exchange_id = exchange_id
-        for token in TOKEN.findall(row["content"].lower()):
-            current_tokens.add(token.rstrip(TRAILING_PUNCTUATION))
-
-    if current_exchange_id is not None:
-        document_frequency.update(current_tokens)
-        scanned += 1
 
     if progress is not None:
         progress(scanned, total_exchanges)
@@ -545,6 +580,7 @@ def suggest_terms(
     min_support: int = MIN_SIGNAL_SUPPORT,
     max_corpus_df: float = MAX_CORPUS_DF,
     progress: Callable[[int, int], None] | None = None,
+    workers: int = 1,
 ) -> SuggestTermsResult:
     """Candidate `domain_terms` additions (strong lore evidence in the
     trained Bayes model's per-token counts, domain-ish looking, rare enough
@@ -571,7 +607,9 @@ def suggest_terms(
         raise NoTrainedModelError
     _, model = loaded
     domain_pattern = re.compile(rf"\b(?:{'|'.join(rules.domain_terms)})\b", re.IGNORECASE)
-    document_frequency, total_exchanges = corpus_document_frequencies(conn, progress=progress)
+    document_frequency, total_exchanges = corpus_document_frequencies(
+        conn, progress=progress, workers=workers
+    )
 
     def corpus_df_of(token: str) -> float:
         if (

@@ -97,7 +97,7 @@ async def _run_cycle(
         include_bots=settings.include_bot_messages,
     )
     progress(CycleStepStarted(step="triage"))
-    triage_pending(conn, rules=settings.triage_rules)
+    triage_pending(conn, rules=settings.triage_rules, workers=settings.workers)
     extract_stage = settings.stages[Stage.EXTRACT]
     progress(CycleStepStarted(step="extract"))
     try:

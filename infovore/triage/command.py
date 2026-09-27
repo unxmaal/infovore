@@ -301,6 +301,7 @@ class TriageCommand:
             context.conn,
             progress=lambda event: _say(context.stdout, _describe_triage_event(event)),
             rules=context.settings.triage_rules,
+            workers=context.settings.workers,
         )
         context.stdout.write(
             f"scored={report.scored} channels_adjusted={report.channels_adjusted}\n"
@@ -344,7 +345,13 @@ class TriageCommand:
         loaded = load_latest_model(context.conn)
         assert loaded is not None
         version, model = loaded
-        scored = score_all(context.conn, model, version, rules=context.settings.triage_rules)
+        scored = score_all(
+            context.conn,
+            model,
+            version,
+            rules=context.settings.triage_rules,
+            workers=context.settings.workers,
+        )
         context.stdout.write(f"scored {scored} exchanges with p_lore\n")
         return ExitCode.OK
 
@@ -409,6 +416,7 @@ class TriageCommand:
                 progress=lambda scanned, total: _say(
                     context.stdout, f"corpus df: scanned {scanned}/{total} exchanges"
                 ),
+                workers=context.settings.workers,
             )
         except NoTrainedModelError as error:
             raise ConfigError("no trained model; run `infovore triage --train` first") from error
