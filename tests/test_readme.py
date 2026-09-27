@@ -104,6 +104,44 @@ def test_running_section_documents_the_shared_run_selector() -> None:
         assert needle in running, needle
 
 
+def test_tuning_loop_runbook_exists_and_covers_the_full_cycle() -> None:
+    triage = section("Triage")
+    parts = triage.split("### Tuning loop", 1)
+    assert len(parts) == 2, "README 'Triage' needs a '### Tuning loop' subsection"
+    body = parts[1]
+    for needle in (
+        "infovore extract --mode trial",
+        "infovore probe",
+        "infovore label --from-runs",
+        "infovore triage --train",
+        "infovore triage --signal-report",
+        "infovore triage --suggest-terms",
+        "INFOVORE_TRIAGE_RULES",
+        "infovore triage --report",
+        "human",
+    ):
+        assert needle in body, needle
+
+
+def test_triage_section_documents_the_tuning_flags() -> None:
+    triage = section("Triage")
+    for needle in (
+        "--signal-report",
+        "--suggest-terms",
+        "--min-support",
+        "--fit-weights",
+        "--out",
+        "--force",
+        "infovore/triage/logistic.py",
+        "infovore.triage.tuning",
+        "useless",
+        "harmful",
+        "class_imbalance",
+        "BAYES_00",
+    ):
+        assert needle in triage, needle
+
+
 def test_triage_section_documents_every_signal_and_the_version() -> None:
     import inspect
 
