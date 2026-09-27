@@ -227,6 +227,121 @@ def seed_labeled(db_path: str, lore_count: int, noise_count: int) -> None:
     conn.close()
 
 
+def _insert_llm_labeled_exchange(
+    conn: sqlite3.Connection,
+    message_id: int,
+    channel_id: int,
+    content: str,
+    label: str,
+    sampled_by: str | None,
+) -> None:
+    """Like `_insert_labeled_exchange`, but the label is `llm`-sourced from a
+    trial extraction run carrying a recorded sampling origin, so the
+    uncertain-sampling-share warning (issue #107) can trace it."""
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (?, ?, 9, 1, 'a', '2026-01-01T00:00:00+00:00', ?,"
+        " '2026-01-01T00:00:00+00:00', '{}')",
+        (message_id, channel_id, content),
+    )
+    content_hash = f"h{message_id}"
+    conn.execute(
+        "INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,"
+        " ended_at, message_count, grouping_rule, content_hash, extraction_status)"
+        " VALUES (?, ?, ?, '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00', 1,"
+        " 'quiet_gap', ?, 'pending')",
+        (channel_id, message_id, message_id, content_hash),
+    )
+    exchange_id = conn.execute(
+        "SELECT id FROM exchanges WHERE content_hash = ?", (content_hash,)
+    ).fetchone()["id"]
+    conn.execute(
+        "INSERT OR IGNORE INTO prompt_versions (version, text_sha256, created_at)"
+        " VALUES ('v1', 'sha', '2026-01-01T00:00:00+00:00')"
+    )
+    cursor = conn.execute(
+        "INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at, mode,"
+        " outcome, sampled_by) VALUES (?, 'm', 'v1', '2026-01-01T00:00:00+00:00', 'trial',"
+        " 'ok', ?)",
+        (exchange_id, sampled_by),
+    )
+    run_id = cursor.lastrowid
+    conn.execute(
+        "INSERT INTO exchange_labels (exchange_id, label, source, source_ref, labeled_at)"
+        " VALUES (?, ?, 'llm', ?, '2026-01-01T00:00:00+00:00')",
+        (exchange_id, label, f"run:{run_id} model:m"),
+    )
+
+
+def seed_llm_labeled(db_path: str, origins: list[tuple[str, str]]) -> None:
+    """`origins`: one `(label, sampled_by)` pair per labeled exchange."""
+    conn = open_database(db_path)
+    migrate(conn)
+    for message_id, (label, sampled_by) in enumerate(origins, start=1):
+        content = LORE_CONTENT if label == "lore" else NOISE_CONTENT
+        channel_id = 1 if label == "lore" else 2
+        _insert_llm_labeled_exchange(conn, message_id, channel_id, content, label, sampled_by)
+    conn.close()
+
+
+_MAJORITY_UNCERTAIN_ORIGINS: list[tuple[str, str]] = (
+    [("lore", "uncertain")] * 3
+    + [("lore", "random")]
+    + [("noise", "uncertain")] * 3
+    + [("noise", "random")]
+)
+
+
+def test_triage_signal_report_warns_on_uncertain_sampling_share(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_llm_labeled(env["INFOVORE_DB_PATH"], _MAJORITY_UNCERTAIN_ORIGINS)
+
+    code, out, _ = run(["triage", "--signal-report"], env)
+
+    assert code == ExitCode.OK
+    assert "uncertain" in out
+    assert "warning" in out
+
+
+def test_triage_signal_report_does_not_warn_when_sampling_is_balanced(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    origins = [("lore", "random")] * 4 + [("noise", "random")] * 4
+    seed_llm_labeled(env["INFOVORE_DB_PATH"], origins)
+
+    code, out, _ = run(["triage", "--signal-report"], env)
+
+    assert code == ExitCode.OK
+    assert "warning" not in out
+
+
+def test_triage_signal_report_warns_on_class_imbalance_when_provenance_unknown(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 18, 2)
+
+    code, out, _ = run(["triage", "--signal-report"], env)
+
+    assert code == ExitCode.OK
+    assert "warning" in out
+    assert "class imbalance" in out
+
+
+def test_triage_fit_weights_warns_on_uncertain_sampling_share_not_class_imbalance(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_llm_labeled(env["INFOVORE_DB_PATH"], _MAJORITY_UNCERTAIN_ORIGINS)
+    out_path = tmp_path / "fitted.toml"
+
+    code, out, _ = run(["triage", "--fit-weights", "--out", str(out_path)], env)
+
+    assert code == ExitCode.OK
+    assert "uncertain" in out
+    assert "warning" in out
+
+
 def test_triage_train_refuses_with_insufficient_labels(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed_labeled(env["INFOVORE_DB_PATH"], 3, 3)

@@ -38,6 +38,7 @@ from infovore.triage.tuning import (
     TermCandidate,
     compute_report_card,
     fit_weights,
+    sampling_bias_warning,
     signal_report,
     suggest_terms,
 )
@@ -181,18 +182,48 @@ def _render_suggest_terms(result: SuggestTermsResult) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _render_sampling_bias_warning(
+    class_imbalance_warning: bool,
+    uncertain_sampling_share: float | None,
+    uncertain_sampling_warning: bool,
+) -> str | None:
+    """One warning line (or `None`) for `--fit-weights`/`--signal-report`
+    (issue #107): prefer the recorded-sampling-origin check when any labeled
+    exchange's provenance is known, falling back to the class-imbalance
+    check (issue #95) when it isn't — hand labels, or labels from before
+    `extraction_runs.sampled_by` existed."""
+    if uncertain_sampling_share is not None:
+        if not uncertain_sampling_warning:
+            return None
+        return (
+            f"warning: {uncertain_sampling_share:.3f} of labeled exchanges' sampling origin is"
+            " `uncertain` (over 70%); a label set built mostly from `--strategy uncertain`"
+            " rounds isn't representative. Mix in `--strategy random` rounds, or use"
+            " `--strategy mixed`, so labels stay representative — see the README's Tuning loop"
+            " section."
+        )
+    if class_imbalance_warning:
+        return (
+            "warning: over 70% of labels are one class; a rules edit fit from this data may not"
+            " generalize. No sampling origin is recorded for these labels (hand labels, or labels"
+            " from before `extraction_runs.sampled_by` existed), so this checks class imbalance"
+            " instead — see the README's Tuning loop section."
+        )
+    return None
+
+
 def _render_fit_weights(result: FitWeightsResult, out_path: Path) -> str:
     lines = [f"wrote fitted rules to {out_path}", "signal weights (before -> after):"]
     for change in result.changes:
         lines.append(f"  {change.name} ({change.field}): {change.before:.4f} -> {change.after:.4f}")
     lines.append(f"label class imbalance: {result.class_imbalance:.3f}")
-    if result.class_imbalance_warning:
-        lines.append(
-            "warning: over 70% of labels are one class; a rules edit fit from this data may not"
-            " generalize. The sampling strategy (--strategy uncertain vs random/stratified) isn't"
-            " recorded in the database, so this checks class imbalance instead — see the README's"
-            " Tuning loop section."
-        )
+    warning = _render_sampling_bias_warning(
+        result.class_imbalance_warning,
+        result.uncertain_sampling_share,
+        result.uncertain_sampling_warning,
+    )
+    if warning is not None:
+        lines.append(warning)
     return "\n".join(lines) + "\n"
 
 
@@ -343,11 +374,19 @@ class TriageCommand:
 
         try:
             stats = signal_report(context.conn, context.settings.triage_rules)
+            bias = sampling_bias_warning(context.conn, context.settings.triage_rules)
         except NoLabelsError as error:
             raise ConfigError(
                 "no labeled exchanges; run `infovore label` first (see the README's Tuning loop)"
             ) from error
         context.stdout.write(_render_signal_report(stats))
+        warning = _render_sampling_bias_warning(
+            bias.class_imbalance_warning,
+            bias.uncertain_sampling_share,
+            bias.uncertain_sampling_warning,
+        )
+        if warning is not None:
+            context.stdout.write(warning + "\n")
         return ExitCode.OK
 
     def _suggest_terms(self, context: "AppContext", args: argparse.Namespace) -> int:

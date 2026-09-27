@@ -1,7 +1,7 @@
 import asyncio
 import random
 import sqlite3
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -44,6 +44,10 @@ class TrialSampleStrategy(StrEnum):
     STRATIFIED = "stratified"
     RANDOM = "random"
     UNCERTAIN = "uncertain"
+    MIXED = "mixed"
+
+
+DEFAULT_MIX_FRACTION_UNCERTAIN = 0.5
 
 
 @dataclass(frozen=True)
@@ -156,6 +160,7 @@ class _RunContext:
     total: int | None
     canonical_model: _CanonicalModel
     batch_id: str | None
+    sampled_by: Mapping[int, str]
 
 
 def _size_bucket(message_count: int) -> str:
@@ -184,14 +189,9 @@ def _select_random(rows: Sequence[sqlite3.Row], n: int, seed: int) -> list[int]:
     return sorted(rng.sample(ids, n))
 
 
-def select_trial_sample(
-    conn: sqlite3.Connection,
-    n: int,
-    seed: int,
-    min_score: float | None = None,
-    max_score: float | None = None,
-    strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
-) -> list[int]:
+def _sample_pool(
+    conn: sqlite3.Connection, min_score: float | None, max_score: float | None
+) -> list[sqlite3.Row]:
     conditions: list[str] = []
     params: list[object] = []
     if min_score is not None:
@@ -201,9 +201,26 @@ def select_trial_sample(
         conditions.append("triage_score <= ?")
         params.append(max_score)
     where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
-    rows = conn.execute(
+    return conn.execute(
         f"SELECT id, channel_id, message_count, p_lore FROM exchanges{where} ORDER BY id", params
     ).fetchall()
+
+
+def select_trial_sample(
+    conn: sqlite3.Connection,
+    n: int,
+    seed: int,
+    min_score: float | None = None,
+    max_score: float | None = None,
+    strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
+) -> list[int]:
+    if strategy is TrialSampleStrategy.MIXED:
+        origins = select_trial_sample_origins(
+            conn, n, seed, min_score=min_score, max_score=max_score, strategy=strategy
+        )
+        return sorted(origins)
+
+    rows = _sample_pool(conn, min_score, max_score)
 
     if strategy is TrialSampleStrategy.UNCERTAIN:
         return _select_uncertain(rows, n)
@@ -234,6 +251,60 @@ def select_trial_sample(
     for key in keys:
         selected.extend(rng.sample(strata[key], allocation[key]))
     return sorted(selected)
+
+
+def select_trial_sample_origins(
+    conn: sqlite3.Connection,
+    n: int,
+    seed: int,
+    min_score: float | None = None,
+    max_score: float | None = None,
+    strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
+    mix: float = DEFAULT_MIX_FRACTION_UNCERTAIN,
+) -> dict[int, str]:
+    """Every exchange id `select_trial_sample` would pick for this call,
+    mapped to the sampling strategy that picked it — `extraction_runs
+    .sampled_by`'s source (issue #107), so a mixed batch can attribute each
+    exchange to `random` vs `uncertain` and the tuning warning can compute
+    the share of labels that trace back to `uncertain` sampling.
+
+    For every strategy but `mixed` this is just `strategy.value` for each id
+    `select_trial_sample` returns. `mixed` splits `n` between `uncertain` and
+    `random`: `mix` (default 50/50) is the fraction assigned to `uncertain`,
+    deterministic under `seed`, and no id is chosen by both halves. It falls
+    back to an all-`random` split when no exchange has a `p_lore` yet — a
+    `mixed` round shouldn't have to wait on a trained model the way
+    `--strategy uncertain` alone does (which raises `NoScoredExchangesError`
+    in that case, unchanged by this function)."""
+    if strategy is not TrialSampleStrategy.MIXED:
+        selected = select_trial_sample(conn, n, seed, min_score, max_score, strategy)
+        return {exchange_id: strategy.value for exchange_id in selected}
+
+    rows = _sample_pool(conn, min_score, max_score)
+    if n >= len(rows):
+        return {
+            row["id"]: (
+                TrialSampleStrategy.UNCERTAIN.value
+                if row["p_lore"] is not None
+                else TrialSampleStrategy.RANDOM.value
+            )
+            for row in rows
+        }
+
+    scored_rows = [row for row in rows if row["p_lore"] is not None]
+    if not scored_rows:
+        random_ids = _select_random(rows, n, seed)
+        return {exchange_id: TrialSampleStrategy.RANDOM.value for exchange_id in random_ids}
+
+    n_uncertain = max(0, min(round(n * mix), len(scored_rows), n))
+    uncertain_ids = _select_uncertain(scored_rows, n_uncertain)
+    uncertain_id_set = set(uncertain_ids)
+    remaining_rows = [row for row in rows if row["id"] not in uncertain_id_set]
+    random_ids = _select_random(remaining_rows, n - len(uncertain_ids), seed)
+
+    origins = {exchange_id: TrialSampleStrategy.UNCERTAIN.value for exchange_id in uncertain_ids}
+    origins.update({exchange_id: TrialSampleStrategy.RANDOM.value for exchange_id in random_ids})
+    return origins
 
 
 def _previous_live_claim_ids(conn: sqlite3.Connection, exchange_id: int) -> list[int]:
@@ -286,6 +357,7 @@ def _finish_success(
         outcome=RunOutcome.OK,
         error=None,
         batch_id=context.batch_id,
+        sampled_by=context.sampled_by.get(exchange.id),
     )
 
     previous_claim_ids: list[int] = []
@@ -325,6 +397,7 @@ def _finish_failure(
         outcome=RunOutcome.FAILED,
         error=failure.message,
         batch_id=context.batch_id,
+        sampled_by=context.sampled_by.get(exchange.id),
     )
     recorded = record_run(context.conn, run_row, [])
     context.accumulator.run_ids.append(recorded.run_id)
@@ -434,6 +507,7 @@ async def run_extraction(
     progress: Progress = _ignore_progress,
     batch_id: str | None = None,
     rules: TriageRules = DEFAULT_RULES,
+    sampled_by: Mapping[int, str] | None = None,
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
@@ -465,6 +539,7 @@ async def run_extraction(
         total=total,
         canonical_model=_CanonicalModel(),
         batch_id=batch_id,
+        sampled_by=sampled_by or {},
     )
     progress(ExtractionStarted(mode=mode, total=total))
 

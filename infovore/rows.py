@@ -151,6 +151,7 @@ class ExtractionRunRow:
     outcome: RunOutcome
     error: str | None
     batch_id: str | None = None
+    sampled_by: str | None = None
 
 
 @dataclass(frozen=True)
