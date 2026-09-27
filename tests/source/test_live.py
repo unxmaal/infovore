@@ -11,6 +11,7 @@ from infovore.source.live import DiscordPySource, build_client, to_source_channe
 from infovore.source.protocol import (
     SourceForbiddenError,
     SourceMessage,
+    SourceNotFoundError,
     SourceRateLimitedError,
     SourceUnavailableError,
 )
@@ -312,12 +313,20 @@ class FakeGuild:
 class FakeClient:
     guilds: dict[int, FakeGuild] = field(default_factory=dict)
     channels: dict[int, FakeFetchableChannel] = field(default_factory=dict)
+    fetch_channel_result: FakeFetchableChannel | None = None
+    fetch_channel_error: Exception | None = None
 
     def get_guild(self, guild_id: int) -> FakeGuild | None:
         return self.guilds.get(guild_id)
 
     def get_channel(self, channel_id: int) -> FakeFetchableChannel | None:
         return self.channels.get(channel_id)
+
+    async def fetch_channel(self, channel_id: int) -> FakeFetchableChannel:
+        if self.fetch_channel_error is not None:
+            raise self.fetch_channel_error
+        assert self.fetch_channel_result is not None
+        return self.fetch_channel_result
 
 
 async def collect_history(
@@ -427,8 +436,52 @@ async def test_history_respects_after_id_cursor() -> None:
     assert [msg.id for page in pages for msg in page] == [2, 3]
 
 
-async def test_history_unknown_channel_raises_unavailable() -> None:
-    client = FakeClient()
+async def test_history_falls_back_to_fetch_channel_when_not_cached() -> None:
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", messages=[make_message(id=i) for i in range(1, 3)]
+    )
+    client = FakeClient(fetch_channel_result=channel)
+    source = DiscordPySource(client)
+    pages = await collect_history(source, 10, None, 10)
+    assert [msg.id for page in pages for msg in page] == [1, 2]
+
+
+async def test_history_fetch_channel_not_found_raises_source_not_found_error() -> None:
+    client = FakeClient(fetch_channel_error=make_http_exception(404, cls=discord.NotFound))
+    source = DiscordPySource(client)
+    try:
+        await collect_history(source, 999, None, 10)
+        raise AssertionError("expected SourceNotFoundError")
+    except SourceNotFoundError as error:
+        assert isinstance(error, SourceUnavailableError)
+
+
+async def test_history_fetch_channel_forbidden_raises_source_forbidden_error() -> None:
+    client = FakeClient(fetch_channel_error=make_http_exception(403, cls=discord.Forbidden))
+    source = DiscordPySource(client)
+    try:
+        await collect_history(source, 999, None, 10)
+        raise AssertionError("expected SourceForbiddenError")
+    except SourceForbiddenError as error:
+        assert isinstance(error, SourceUnavailableError)
+
+
+async def test_history_fetch_channel_other_http_error_raises_unavailable() -> None:
+    client = FakeClient(fetch_channel_error=make_http_exception(500))
+    source = DiscordPySource(client)
+    try:
+        await collect_history(source, 999, None, 10)
+        raise AssertionError("expected SourceUnavailableError")
+    except SourceForbiddenError:
+        raise AssertionError("did not expect SourceForbiddenError") from None
+    except SourceNotFoundError:
+        raise AssertionError("did not expect SourceNotFoundError") from None
+    except SourceUnavailableError:
+        pass
+
+
+async def test_history_fetch_channel_connection_error_raises_unavailable() -> None:
+    client = FakeClient(fetch_channel_error=OSError("no route"))
     source = DiscordPySource(client)
     try:
         await collect_history(source, 999, None, 10)
@@ -546,12 +599,26 @@ async def test_events_on_raw_message_edit_dropped_when_message_gone() -> None:
 
 
 async def test_events_on_raw_message_edit_unknown_channel_is_dropped() -> None:
-    client = FakeClient()
+    client = FakeClient(fetch_channel_error=make_http_exception(404, cls=discord.NotFound))
     source = DiscordPySource(client)
     await client.on_raw_message_edit(FakeRawMessageRef(999, 1))  # type: ignore[attr-defined]
     source.close()
     events = await collect_events(source)
     assert events == []
+
+
+async def test_events_on_raw_message_edit_fetches_channel_when_not_cached() -> None:
+    edited_message = make_message(content="edited")
+    channel = FakeFetchableChannel(
+        10, FakeGuildRef(100), "general", fetch_message_result=edited_message
+    )
+    client = FakeClient(fetch_channel_result=channel)
+    source = DiscordPySource(client)
+    await client.on_raw_message_edit(FakeRawMessageRef(10, 1))  # type: ignore[attr-defined]
+    source.close()
+    events = await collect_events(source)
+    assert len(events) == 1
+    assert events[0].message.content == "edited"  # type: ignore[attr-defined]
 
 
 async def test_events_on_raw_message_delete_relays() -> None:

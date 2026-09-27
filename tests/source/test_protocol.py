@@ -9,6 +9,7 @@ from infovore.source.protocol import (
     SourceAttachment,
     SourceChannel,
     SourceMessage,
+    SourceNotFoundError,
     SourceRateLimitedError,
     SourceReaction,
     SourceUnavailableError,
@@ -52,3 +53,7 @@ def test_errors_carry_details() -> None:
     assert limited.retry_after == 1.5
     assert "1.5" in str(limited)
     assert isinstance(SourceUnavailableError("down"), Exception)
+
+
+def test_source_not_found_error_is_a_source_unavailable_error() -> None:
+    assert isinstance(SourceNotFoundError("missing"), SourceUnavailableError)
