@@ -24,6 +24,7 @@ __all__ = [
     "Label",
     "Metrics",
     "Model",
+    "auc",
     "candidate_thresholds",
     "chi2q",
     "evaluate",
@@ -166,6 +167,41 @@ def evaluate(scored: Sequence[tuple[float, Label]], thresholds: Sequence[float])
         tn = sum(1 for p, label in scored if p < threshold and label is Label.NOISE)
         table.append(Metrics(threshold, tp=tp, fp=fp, fn=fn, tn=tn))
     return table
+
+
+def auc(scored: Sequence[tuple[float, Label]]) -> float | None:
+    """Area under the ROC curve for `scored`, computed rank-based (the
+    Mann-Whitney U statistic) rather than by integrating `evaluate` over a
+    threshold grid: exact regardless of how scores cluster or saturate, and
+    ties (equal scores across the two classes) are handled by giving each
+    member of a tied block the block's average rank, the standard tie
+    correction (a tie contributes exactly 0.5 per pair, as it should — a
+    threshold can't tell them apart).
+
+    Returns `None` when either class is empty in `scored` (issue #95's
+    report card: AUC is undefined with no labels of one class, distinct from
+    a real 0.0 or 1.0)."""
+    positive_count = sum(1 for _, label in scored if label is Label.LORE)
+    negative_count = len(scored) - positive_count
+    if positive_count == 0 or negative_count == 0:
+        return None
+    ranked = sorted(scored, key=lambda pair: pair[0])
+    total = len(ranked)
+    positive_rank_sum = 0.0
+    index = 0
+    while index < total:
+        end = index
+        while end + 1 < total and ranked[end + 1][0] == ranked[index][0]:
+            end += 1
+        # 1-based ranks index+1..end+1, averaged over the tied block.
+        average_rank = (index + 1 + end + 1) / 2.0
+        for tied in range(index, end + 1):
+            if ranked[tied][1] is Label.LORE:
+                positive_rank_sum += average_rank
+        index = end + 1
+    return (positive_rank_sum - positive_count * (positive_count + 1) / 2.0) / (
+        positive_count * negative_count
+    )
 
 
 def recommend_threshold(table: Sequence[Metrics], min_recall: float) -> Metrics | None:
