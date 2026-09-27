@@ -27,6 +27,7 @@ from infovore.triage.train import (
     train_and_store,
 )
 from infovore.triage.tuning import (
+    MAX_CORPUS_DF,
     MIN_RECALL_FOR_REPORT_CARD,
     MIN_SIGNAL_SUPPORT,
     FitWeightsResult,
@@ -163,20 +164,23 @@ def _render_term_candidates(header: str, candidates: Sequence[TermCandidate]) ->
         lines.append(
             f"  {candidate.token}: p={candidate.probability:.3f}"
             f" lore={candidate.lore_count} noise={candidate.noise_count}"
+            f" corpus_df={candidate.corpus_df:.4f}"
         )
     return lines
 
 
 def _render_suggest_terms(result: SuggestTermsResult) -> str:
     lines = _render_term_candidates(
-        "candidate additions (strong lore evidence, no current rule matches):", result.additions
+        "candidate additions (strong lore evidence, rare corpus-wide, no current rule matches):",
+        result.additions,
     )
     lines += _render_term_candidates(
         "drop candidates (current domain term, doesn't predict lore):", result.drops
     )
     lines.append(
-        "paste into rules.toml (candidate additions appended;"
-        " review drop candidates above before removing them):"
+        "insert these lines into the existing domain_terms = [...] list in rules.toml"
+        " (never paste as a full replacement; review drop candidates above before"
+        " removing them by hand):"
     )
     lines.append(result.snippet)
     return "\n".join(lines) + "\n"
@@ -271,6 +275,9 @@ class TriageCommand:
         parser.add_argument("--suggest-terms", action="store_true", dest="suggest_terms")
         parser.add_argument(
             "--min-support", type=int, default=MIN_SIGNAL_SUPPORT, dest="min_support"
+        )
+        parser.add_argument(
+            "--max-corpus-df", type=float, default=MAX_CORPUS_DF, dest="max_corpus_df"
         )
         parser.add_argument("--fit-weights", action="store_true", dest="fit_weights")
         parser.add_argument("--out", type=str, default=None, dest="out")
@@ -391,11 +398,17 @@ class TriageCommand:
         return ExitCode.OK
 
     def _suggest_terms(self, context: "AppContext", args: argparse.Namespace) -> int:
-        from infovore.cli import ExitCode
+        from infovore.cli import ExitCode, _say
 
         try:
             result = suggest_terms(
-                context.conn, context.settings.triage_rules, min_support=args.min_support
+                context.conn,
+                context.settings.triage_rules,
+                min_support=args.min_support,
+                max_corpus_df=args.max_corpus_df,
+                progress=lambda scanned, total: _say(
+                    context.stdout, f"corpus df: scanned {scanned}/{total} exchanges"
+                ),
             )
         except NoTrainedModelError as error:
             raise ConfigError("no trained model; run `infovore triage --train` first") from error

@@ -16,8 +16,10 @@ from infovore.triage.train import NoTrainedModelError, load_latest_model, score_
 from infovore.triage.tuning import (
     UNCERTAIN_SAMPLING_WARNING_THRESHOLD,
     NoLabelsError,
+    _is_domain_ish,
     bayes_bin,
     compute_report_card,
+    corpus_document_frequencies,
     fit_weights,
     render_rules_toml,
     sampling_bias_warning,
@@ -540,17 +542,19 @@ def test_suggest_terms_finds_domain_ish_additions_and_excludes_the_rest(tmp_path
     seed_suggest_fixture(conn)
     train_and_store(conn, FixedClock(NOW))
 
-    result = suggest_terms(conn, DEFAULT_RULES, min_support=5)
+    # max_corpus_df=1.0 (never trips) here: this test is about the domain-ish
+    # / support / rule-match filters, not the corpus-DF filter (covered below).
+    result = suggest_terms(conn, DEFAULT_RULES, min_support=5, max_corpus_df=1.0)
 
     added = {candidate.token for candidate in result.additions}
     assert "octane2000" in added  # domain-ish (has a digit), strong lore evidence, no rule matches
     assert "sgi" not in added  # already matched by the domain_terms rule
     assert "since" not in added  # ordinary stopword, no digit
-    assert "r4" not in added  # too short (MIN_TOKEN_LENGTH)
+    assert "r4" not in added  # equally common in lore and noise here, not "strong" evidence
     assert "onlyonce123" not in added  # not enough support
     assert "model99" not in added  # mixed evidence, not "strong"
     assert '"octane2000",' in result.snippet
-    assert result.snippet.startswith("domain_terms = [")
+    assert "domain_terms = [" not in result.snippet  # never a full replacement list (issue #105)
 
 
 def test_suggest_terms_finds_drop_candidates_for_weak_domain_terms(tmp_path: Path) -> None:
@@ -558,7 +562,7 @@ def test_suggest_terms_finds_drop_candidates_for_weak_domain_terms(tmp_path: Pat
     seed_suggest_fixture(conn)
     train_and_store(conn, FixedClock(NOW))
 
-    result = suggest_terms(conn, DEFAULT_RULES, min_support=5)
+    result = suggest_terms(conn, DEFAULT_RULES, min_support=5, max_corpus_df=1.0)
 
     dropped = {candidate.token for candidate in result.drops}
     assert "gio" in dropped  # existing literal domain term, only ever seen in noise here
@@ -571,10 +575,229 @@ def test_suggest_terms_respects_min_support(tmp_path: Path) -> None:
     seed_suggest_fixture(conn)
     train_and_store(conn, FixedClock(NOW))
 
-    lenient = suggest_terms(conn, DEFAULT_RULES, min_support=1)
+    lenient = suggest_terms(conn, DEFAULT_RULES, min_support=1, max_corpus_df=1.0)
 
     added = {candidate.token for candidate in lenient.additions}
     assert "onlyonce123" in added
+
+
+def test_suggest_terms_snippet_says_no_candidates_when_empty(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_suggest_fixture(conn)
+    train_and_store(conn, FixedClock(NOW))
+
+    # A vanishingly small max_corpus_df drops every candidate.
+    result = suggest_terms(conn, DEFAULT_RULES, min_support=5, max_corpus_df=0.0)
+
+    assert result.additions == ()
+    assert result.snippet == "# (no candidate additions)"
+
+
+# --- _is_domain_ish -----------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("token", "expected"),
+    [
+        ("gcc", True),  # domain-ish: not a stopword, len >= 3
+        ("since", False),  # ordinary stopword, no digit
+        ("didn't", False),  # contraction/apostrophe token, excluded regardless of length/digits
+        ("can't", False),
+        ("that's", False),  # apostrophe token that's also a stopword -- still excluded
+        ("ok", False),  # pure alphabetic, shorter than 3 chars
+        ("a", False),  # pure alphabetic, shorter than 3 chars (and a stopword)
+        ("r4", True),  # short, but contains a digit -- no longer disqualified by length alone
+        ("o2", True),
+    ],
+)
+def test_is_domain_ish(token: str, expected: bool) -> None:
+    assert _is_domain_ish(token) is expected
+
+
+# --- corpus_document_frequencies ----------------------------------------------
+
+
+def test_corpus_document_frequencies_counts_each_token_once_per_exchange(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " author_is_bot, created_at, content, ingested_at, raw_json)"
+        " VALUES (1, 1, 9, 1, 'a', 0, ?, 'gcc build gcc again', ?, '{}')",
+        (NOW.isoformat(), NOW.isoformat()),
+    )
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " author_is_bot, created_at, content, ingested_at, raw_json)"
+        " VALUES (2, 1, 9, 1, 'a', 0, ?, 'gcc again please', ?, '{}')",
+        (NOW.isoformat(), NOW.isoformat()),
+    )
+    row = ExchangeRow(
+        id=None,
+        channel_id=1,
+        thread_id=None,
+        first_message_id=1,
+        last_message_id=2,
+        started_at=NOW,
+        ended_at=NOW,
+        message_count=2,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash="multi-message",
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    insert_exchange(conn, row, [1, 2])
+    seed_exchange(conn, 3, channel_id=1, content="lol nothing here")  # no "gcc"
+
+    document_frequency, total_exchanges = corpus_document_frequencies(conn)
+
+    assert total_exchanges == 2
+    assert document_frequency["gcc"] == 1  # once per exchange, not per occurrence
+    assert document_frequency["again"] == 1
+    assert "lol" in document_frequency
+    assert "gcc" not in {"lol", "nothing", "here"}  # sanity: exchange 2 has no overlap
+
+
+def test_corpus_document_frequencies_reports_progress(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    for i in range(5):
+        seed_exchange(conn, i + 1, channel_id=1, content=f"filler{i}")
+
+    calls: list[tuple[int, int]] = []
+    corpus_document_frequencies(
+        conn, progress=lambda scanned, total: calls.append((scanned, total)), progress_every=2
+    )
+
+    assert (1, 5) not in calls  # not a multiple of progress_every=2
+    assert (2, 5) in calls
+    assert (4, 5) in calls
+    assert calls[-1] == (5, 5)  # final call, unconditional, even off the progress_every cadence
+
+
+def test_corpus_document_frequencies_without_progress_callback(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, 1, channel_id=1, content="hello world")
+
+    document_frequency, total_exchanges = corpus_document_frequencies(conn)
+
+    assert total_exchanges == 1
+    assert document_frequency["hello"] == 1
+
+
+def test_corpus_document_frequencies_handles_an_empty_database(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+
+    document_frequency, total_exchanges = corpus_document_frequencies(conn)
+
+    assert total_exchanges == 0
+    assert dict(document_frequency) == {}
+
+
+def test_corpus_document_frequencies_calls_progress_once_for_an_empty_database(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+
+    calls: list[tuple[int, int]] = []
+    corpus_document_frequencies(
+        conn, progress=lambda scanned, total: calls.append((scanned, total))
+    )
+
+    assert calls == [(0, 0)]
+
+
+# --- regression: issue #105 (ordinary words suggested via length bias) -------
+
+REAL_FAILURE_COMMON_WORDS = (
+    "later",
+    "maybe",
+    "stuff",
+    "trying",
+    "unfortunately",
+    "system",
+    "install",
+)
+REAL_FAILURE_LORE_COMMON = (
+    "we tried building it later and maybe it needs a system update, stuff kept"
+    " failing, trying again unfortunately the install broke"
+)
+# gcc: real jargon, rare corpus-wide. wouldn't/ok: same rare corpus-wide evidence
+# as gcc, but must still be excluded (contraction / short pure-alphabetic token).
+REAL_FAILURE_JARGON = "gcc wouldn't ok"
+REAL_FAILURE_NOISE = "lol gg nothing here"
+REAL_FAILURE_BACKGROUND = "just chatting about random stuff here, nothing to report"
+
+REAL_FAILURE_LORE_COUNT = 20
+REAL_FAILURE_NOISE_COUNT = 10  # >= train.MIN_LABELS_PER_CLASS
+# How many of the lore exchanges carry the jargon tokens (gcc/wouldn't/ok).
+# `--train` holds out about a fifth of labels (infovore.triage.bayes.in_holdout,
+# hashed by exchange id) from the counts `suggest_terms` reads, so this is
+# picked (and pinned down by a debug run against this exact fixture, since the
+# holdout split is a deterministic hash of the exchange id) high enough that
+# >= MIN_SIGNAL_SUPPORT of them still survive into the trained model's counts.
+REAL_FAILURE_JARGON_COUNT = 6
+REAL_FAILURE_BACKGROUND_COUNT = 700
+REAL_FAILURE_TOTAL_EXCHANGES = (
+    REAL_FAILURE_LORE_COUNT + REAL_FAILURE_NOISE_COUNT + REAL_FAILURE_BACKGROUND_COUNT
+)  # == 730
+
+
+def seed_real_failure_fixture(conn: sqlite3.Connection) -> None:
+    """20 long lore exchanges (common English words in all of them, plus
+    `gcc`/`wouldn't`/`ok` in the first `REAL_FAILURE_JARGON_COUNT`), 10 short
+    noise exchanges, and 700 unlabeled background exchanges -- 730 exchanges
+    total, so a token present in all 20 lore exchanges has corpus_df =
+    20/730 ~= 0.027 (over the 1% default `--max-corpus-df`), while the
+    jargon tokens' surviving (post-holdout) support of 5 gives corpus_df =
+    5/730 ~= 0.0068 (under it). Mirrors issue #105's real failure: long lore
+    exchanges full of common words, short noise exchanges, and exactly one
+    rare piece of real jargon (`gcc`)."""
+    for i in range(REAL_FAILURE_LORE_COUNT):
+        content = REAL_FAILURE_LORE_COMMON
+        if i < REAL_FAILURE_JARGON_COUNT:
+            content += " " + REAL_FAILURE_JARGON
+        exchange_id = seed_exchange(conn, i + 1, channel_id=1, content=content)
+        set_label(conn, exchange_id, Label.LORE, LabelSource.HUMAN, None, NOW)
+    for i in range(REAL_FAILURE_NOISE_COUNT):
+        exchange_id = seed_exchange(conn, 100 + i, channel_id=2, content=REAL_FAILURE_NOISE)
+        set_label(conn, exchange_id, Label.NOISE, LabelSource.HUMAN, None, NOW)
+    for i in range(REAL_FAILURE_BACKGROUND_COUNT):
+        seed_exchange(conn, 1000 + i, channel_id=3, content=REAL_FAILURE_BACKGROUND)
+
+
+def test_suggest_terms_filters_common_words_by_corpus_df_and_keeps_rare_jargon(
+    tmp_path: Path,
+) -> None:
+    """Regression test for issue #105's real failure: on real data, ordinary
+    words (later, maybe, didn't, stuff, trying, unfortunately, system,
+    install) were suggested as domain terms because lore exchanges are
+    longer than noise ones, so any common word is more likely to appear in
+    one -- the same length bias the Bayes model itself has. The only real
+    jargon was `gcc`. With the default `max_corpus_df`, the ordinary words
+    (common corpus-wide, not just in lore) are filtered out; `gcc` (rare
+    corpus-wide) is still suggested; `wouldn't`/`ok` have exactly the same
+    rare corpus-wide evidence as `gcc` but are excluded anyway (a
+    contraction, and a short pure-alphabetic token)."""
+    conn = db(tmp_path)
+    seed_real_failure_fixture(conn)
+    train_and_store(conn, FixedClock(NOW))
+
+    result = suggest_terms(conn, DEFAULT_RULES)  # default min_support and max_corpus_df
+
+    added = {candidate.token for candidate in result.additions}
+    assert "gcc" in added
+    for word in REAL_FAILURE_COMMON_WORDS:
+        assert word not in added
+    assert "wouldn't" not in added
+    assert "ok" not in added
+
+    # corpus_df counts every exchange containing the token, train/holdout split
+    # aside -- gcc appears in exactly REAL_FAILURE_JARGON_COUNT exchanges.
+    gcc_candidate = next(candidate for candidate in result.additions if candidate.token == "gcc")
+    assert gcc_candidate.corpus_df == pytest.approx(
+        REAL_FAILURE_JARGON_COUNT / REAL_FAILURE_TOTAL_EXCHANGES
+    )
 
 
 # --- bayes_bin --------------------------------------------------------------
