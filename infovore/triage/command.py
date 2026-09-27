@@ -362,8 +362,9 @@ class TriageCommand:
             assert main_row.formatted_threshold is not None
             metric = main_row.metric
             context.stdout.write(
-                f"recommended INFOVORE_TRIAGE_MIN_P_LORE={main_row.formatted_threshold}"
-                f" (recall={metric.recall:.3f} precision={metric.precision:.3f})\n"
+                f"recommended threshold (recall={metric.recall:.3f}"
+                f" precision={metric.precision:.3f}); add this line to your environment:\n"
+                f"INFOVORE_TRIAGE_MIN_P_LORE={main_row.formatted_threshold}\n"
                 f"expected share of exchanges sent to the LLM: {main_row.share:.3f}\n"
             )
         context.stdout.write(_render_recall_table(table_rows))
