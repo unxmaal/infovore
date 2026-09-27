@@ -1,4 +1,5 @@
 import io
+import re
 import sqlite3
 from datetime import UTC, datetime
 from importlib import resources
@@ -391,6 +392,21 @@ def test_triage_recommend_threshold_prints_recommendation(tmp_path: Path) -> Non
     assert code == ExitCode.OK
     assert "INFOVORE_TRIAGE_MIN_P_LORE=" in out
     assert "expected share" in out
+
+
+def test_triage_recommend_threshold_prints_a_paste_safe_assignment_line(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage", "--recommend-threshold", "--min-recall", "0.5"], env)
+
+    assert code == ExitCode.OK
+    assignments = [line for line in out.splitlines() if "INFOVORE_TRIAGE_MIN_P_LORE=" in line]
+    assert len(assignments) == 1
+    assert re.fullmatch(r"INFOVORE_TRIAGE_MIN_P_LORE=[0-9.eE+-]+", assignments[0])
+    assert "recall=" in out
+    assert "precision=" in out
 
 
 def test_triage_recommend_threshold_with_unreachable_recall_reports_none(tmp_path: Path) -> None:
