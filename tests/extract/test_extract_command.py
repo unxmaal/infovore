@@ -25,7 +25,7 @@ VALID_EXTRACTION_OUT = {
             "kind": "fact",
             "confidence": 0.9,
             "probe_question": "what does the octane2 need on its board?",
-            "source_message_ids": [1],
+            "sources": ["m1"],
             "supersedes": None,
         }
     ]

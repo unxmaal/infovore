@@ -125,8 +125,8 @@ def test_permalink_formats_discord_url() -> None:
     assert permalink(1, 2, 3) == "https://discord.com/channels/1/2/3"
 
 
-def test_prompt_version_is_v1() -> None:
-    assert PROMPT_VERSION == "v1"
+def test_prompt_version_is_v2() -> None:
+    assert PROMPT_VERSION == "v2"
 
 
 def test_prompt_sha256_matches_system_prompt() -> None:
@@ -155,7 +155,8 @@ def test_render_prompt_includes_context_section_when_context_present() -> None:
     rendered = render_prompt(a_request(context_messages=context))
     assert "CONTEXT" in rendered.prompt
     assert "earlier message" in rendered.prompt
-    assert "[50]" in rendered.prompt
+    assert "[c1]" in rendered.prompt
+    assert "[50]" not in rendered.prompt
 
 
 def test_render_prompt_related_claims_section_shows_none_when_empty() -> None:
@@ -191,13 +192,13 @@ def test_render_prompt_includes_reactions_and_attachments() -> None:
     assert "photo.png" in rendered.prompt
 
 
-def test_render_prompt_redacts_opted_out_authors_but_keeps_message_id() -> None:
+def test_render_prompt_redacts_opted_out_authors_but_keeps_message_ref() -> None:
     messages = (
         a_message(1, author_id=1, author_name="alice", content="normal"),
         a_message(2, author_id=2, author_name="bob", content="secret"),
     )
     rendered = render_prompt(a_request(messages=messages, opted_out_user_ids=frozenset({2})))
-    assert "[2]" in rendered.prompt
+    assert "[m2]" in rendered.prompt
     assert "bob" not in rendered.prompt
     assert "secret" not in rendered.prompt
     assert "[redacted]" in rendered.prompt
@@ -253,23 +254,23 @@ def test_render_prompt_snapshot() -> None:
     )
     rendered = render_prompt(request)
     assert rendered.system == SYSTEM_PROMPT
-    assert rendered.version == "v1"
+    assert rendered.version == "v2"
     assert rendered.prompt == (
         "CHANNEL: hardware\n"
         "\n"
         "PERMALINK: https://discord.com/channels/100/10/1\n"
         "\n"
         "CONTEXT (do not cite):\n"
-        "[50] alice @ 2026-01-01T00:00:00+00:00:\n"
+        "[c1] alice @ 2026-01-01T00:00:00+00:00:\n"
         "earlier context\n"
         "\n"
         "EXCHANGE:\n"
-        "[1] alice @ 2026-01-01T00:00:00+00:00:\n"
+        "[m1] alice @ 2026-01-01T00:00:00+00:00:\n"
         "What PROM does an Octane2 need?\n"
         "Reactions: \U0001f44d\u00d72\n"
         "Attachments: jumpers.png\n"
         "\n"
-        "[2] bob @ 2026-01-01T00:00:00+00:00:\n"
+        "[m2] bob @ 2026-01-01T00:00:00+00:00:\n"
         "6.5 works fine.\n"
         "\n"
         "RELATED EXISTING CLAIMS:\n"
@@ -281,3 +282,18 @@ def test_render_prompt_snapshot() -> None:
 def test_readme_contains_system_prompt_verbatim() -> None:
     readme = Path(__file__).resolve().parents[2] / "README.md"
     assert SYSTEM_PROMPT in readme.read_text()
+
+
+def test_render_prompt_maps_exchange_refs_to_message_ids() -> None:
+    messages = (a_message(706732704137478123), a_message(706733682781847611))
+    rendered = render_prompt(a_request(messages=messages))
+    assert rendered.refs == {"m1": 706732704137478123, "m2": 706733682781847611}
+    assert "[m1]" in rendered.prompt
+    assert "[m2]" in rendered.prompt
+    assert "[706733682781847611]" not in rendered.prompt
+
+
+def test_render_prompt_context_refs_are_not_citable() -> None:
+    context = (a_message(50, content="earlier message"),)
+    rendered = render_prompt(a_request(context_messages=context))
+    assert rendered.refs == {"m1": 1, "m2": 2}
