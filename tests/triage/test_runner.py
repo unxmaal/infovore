@@ -503,3 +503,74 @@ def test_triage_pending_channel_priors_skip_rows_whose_adjusted_value_is_unchang
     assert priors  # sanity: we did compute real per-channel priors
     assert not any(s.strip().upper() == "COMMIT" for s in statements)
     assert not any("UPDATE" in s.upper() for s in statements)
+
+
+# --- issue #113: parallel scoring across workers ----------------------------
+
+
+def _seed_varied_exchanges(conn: sqlite3.Connection, n: int) -> None:
+    # +2 spacing: `full_exchange` alone consumes two message ids (message_id,
+    # message_id + 1), so a flat +1 stride across mixed exchange kinds would
+    # collide.
+    for i in range(n):
+        channel_id = i % 4
+        message_id = i * 2 + 1
+        if i % 3 == 0:
+            full_exchange(conn, message_id, channel_id)
+        elif i % 3 == 1:
+            half_exchange(conn, message_id, channel_id)
+        else:
+            zero_exchange(conn, message_id, channel_id)
+
+
+def test_triage_pending_workers_two_matches_workers_one(tmp_path: Path) -> None:
+    serial_dir = tmp_path / "serial"
+    serial_dir.mkdir()
+    conn_serial = db(serial_dir)
+    _seed_varied_exchanges(conn_serial, 30)
+    version = _insert_stub_model(conn_serial)
+
+    parallel_dir = tmp_path / "parallel"
+    parallel_dir.mkdir()
+    conn_parallel = db(parallel_dir)
+    _seed_varied_exchanges(conn_parallel, 30)
+    _insert_stub_model(conn_parallel)
+
+    report_serial = triage_pending(conn_serial, workers=1)
+    report_parallel = triage_pending(conn_parallel, workers=2)
+
+    assert report_serial.scored == report_parallel.scored
+    assert report_serial.channel_means == report_parallel.channel_means
+    assert report_serial.channel_priors == report_parallel.channel_priors
+
+    serial_rows = conn_serial.execute(
+        "SELECT id, triage_score, triage_reasons, triage_version, p_lore FROM exchanges"
+        " ORDER BY id"
+    ).fetchall()
+    parallel_rows = conn_parallel.execute(
+        "SELECT id, triage_score, triage_reasons, triage_version, p_lore FROM exchanges"
+        " ORDER BY id"
+    ).fetchall()
+    assert [
+        (row["id"], row["triage_score"], row["triage_reasons"], row["triage_version"])
+        for row in serial_rows
+    ] == [
+        (row["id"], row["triage_score"], row["triage_reasons"], row["triage_version"])
+        for row in parallel_rows
+    ]
+    assert version is not None
+
+
+def test_triage_pending_streams_progress_events_with_multiple_workers(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    _seed_varied_exchanges(conn, 6)
+    events: list[object] = []
+
+    triage_pending(conn, progress=events.append, workers=2)
+
+    scored_events = [event for event in events if isinstance(event, TriageExchangeScored)]
+    assert len(scored_events) == 6
+    assert [event.index for event in scored_events] == list(range(1, 7))
+    assert {event.exchange_id for event in scored_events} == {row["id"] for row in conn.execute(
+        "SELECT id FROM exchanges"
+    )}
