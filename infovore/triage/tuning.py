@@ -15,12 +15,10 @@ Two logistic fits are used, for different purposes:
   a trained Bayes model exists, and a `CHAN_<id>` channel feature. It
   follows the issue's SpamAssassin-inspired addendum: weight every source
   of evidence together rather than picking rule score or Bayes. Its
-  `SIG_<name>` coefficients (after joint fitting with `p_lore` and channel)
-  are what actually get written by `--fit-weights` — jointly fitting first
-  keeps a rule's fitted weight from double-counting evidence the Bayes
-  model already explains — while its full predictions (including the
-  `BAYES_`/`CHAN_` features) are what the `--report` report card
-  cross-validates as "the fitted combination".
+  predictions are what the `--report` report card cross-validates as "the
+  fitted combination". Its coefficients are NOT written by `--fit-weights`:
+  the written file drives the stand-alone rule score, which never sees
+  `p_lore` or channel features, so its weights come from the signal-only fit.
 """
 
 import hashlib
@@ -575,24 +573,24 @@ def render_rules_toml(rules: TriageRules, overrides: Mapping[str, float]) -> str
 
 
 def fit_weights(conn: sqlite3.Connection, rules: TriageRules) -> FitWeightsResult:
-    """Fit a combined (rule signals + binned `p_lore`, when a model exists,
-    + channel) logistic model on every labeled exchange, and write out a
-    rules TOML with its `SIG_<name>` coefficients substituted for the
-    matching weight/penalty fields (scaled so the largest fitted signal
-    weight matches `TARGET_MAX_WEIGHT`, keeping the additive score on
-    roughly today's 0-1ish scale — ranking, which is what the gate
-    threshold is re-derived from, is invariant to that positive rescaling).
-    Fitting jointly with `p_lore` first (when available) keeps a rule's
-    fitted weight from re-claiming credit the Bayes model already explains
-    for the same exchanges.
+    """Fit a logistic model on the rule signals alone (`SIG_<name>` indicators,
+    no `p_lore` bins or channel features) over every labeled exchange, and
+    write out a rules TOML with those coefficients substituted for the
+    matching weight/penalty fields. The written file drives the stand-alone
+    rule score, so its weights must not be conditioned on features the rule
+    score never sees. Coefficients are scaled so the largest magnitude equals
+    `TARGET_MAX_WEIGHT`, keeping the additive score near today's scale. That
+    rescaling preserves the fitted model's ranking only approximately: the
+    rule score is clamped to [0, 1] and `domain_terms` is weighted per
+    distinct term up to `domain_term_cap`, so compare `--report` before and
+    after adopting a fitted file.
 
     Raises `NoLabelsError` if no exchange has an effective label yet.
     """
     examples = build_examples(conn, rules)
     if not examples:
         raise NoLabelsError
-    p_lore_by_exchange = _labeled_p_lore(conn, examples) if load_latest_model(conn) else None
-    fitted = _fit_combined_weights(examples, p_lore_by_exchange)
+    fitted = _fit_signal_weights(examples)
     scaled = _scale_signal_weights(fitted)
 
     changes = tuple(
