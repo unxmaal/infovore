@@ -129,6 +129,7 @@ def test_triage_section_documents_the_tuning_flags() -> None:
         "--signal-report",
         "--suggest-terms",
         "--min-support",
+        "--max-corpus-df",
         "--fit-weights",
         "--out",
         "--force",

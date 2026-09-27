@@ -562,13 +562,18 @@ def test_triage_suggest_terms_prints_additions_drops_and_a_snippet(tmp_path: Pat
     seed_suggest_terms_fixture(env["INFOVORE_DB_PATH"])
     run(["triage", "--train"], env)
 
-    code, out, _ = run(["triage", "--suggest-terms"], env)
+    # This fixture is only 30 exchanges total, so "octane2000" (present in
+    # half of them) would fail the default 1% max-corpus-df filter -- pass a
+    # lenient override since this test is about the printed shape, not that
+    # filter (covered by test_triage_suggest_terms_default_max_corpus_df_filters_common_tokens).
+    code, out, _ = run(["triage", "--suggest-terms", "--max-corpus-df", "1"], env)
 
     assert code == ExitCode.OK
     assert "candidate additions" in out
     assert "drop candidates" in out
-    assert "domain_terms = [" in out
+    assert "domain_terms = [" not in out  # never a full replacement list (issue #105)
     assert "octane2000" in out
+    assert "corpus_df=" in out
 
 
 def test_triage_suggest_terms_accepts_min_support(tmp_path: Path) -> None:
@@ -576,10 +581,38 @@ def test_triage_suggest_terms_accepts_min_support(tmp_path: Path) -> None:
     seed_suggest_terms_fixture(env["INFOVORE_DB_PATH"])
     run(["triage", "--train"], env)
 
-    code, out, _ = run(["triage", "--suggest-terms", "--min-support", "1"], env)
+    code, out, _ = run(
+        ["triage", "--suggest-terms", "--min-support", "1", "--max-corpus-df", "1"], env
+    )
 
     assert code == ExitCode.OK
     assert "candidate additions" in out
+
+
+def test_triage_suggest_terms_default_max_corpus_df_filters_common_tokens(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_suggest_terms_fixture(env["INFOVORE_DB_PATH"])
+    run(["triage", "--train"], env)
+
+    # No --max-corpus-df override: "octane2000" is present in half of this
+    # 30-exchange corpus, well over the default 1% cap, so it's filtered out.
+    code, out, _ = run(["triage", "--suggest-terms"], env)
+
+    assert code == ExitCode.OK
+    assert "octane2000" not in out
+
+
+def test_triage_suggest_terms_reports_corpus_df_scan_progress(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_suggest_terms_fixture(env["INFOVORE_DB_PATH"])
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage", "--suggest-terms"], env)
+
+    assert code == ExitCode.OK
+    assert "corpus df: scanned 30/30 exchanges" in out
 
 
 def test_triage_fit_weights_without_out_is_a_config_error(tmp_path: Path) -> None:
