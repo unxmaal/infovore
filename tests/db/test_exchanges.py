@@ -9,8 +9,8 @@ import pytest
 from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import (
-    ExchangeOrder,
     DuplicateExchangeError,
+    ExchangeOrder,
     MessageAlreadyGroupedError,
     claimable_exchanges,
     exchange_for_message,
