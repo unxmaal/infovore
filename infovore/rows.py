@@ -57,6 +57,17 @@ class LabelSource(StrEnum):
     HUMAN = "human"
 
 
+class MessageLabel(StrEnum):
+    TRASH = "trash"
+    KEEP = "keep"
+
+
+class MessageLabelSource(StrEnum):
+    HUMAN = "human"
+    CITATION = "citation"
+    RULE = "rule"
+
+
 @dataclass(frozen=True)
 class ChannelRow:
     id: int

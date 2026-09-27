@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 
 from infovore.db.connection import migrate, open_database
-from infovore.rows import MessageLabel, MessageLabelSource
 from infovore.db.message_labels import set_message_label
+from infovore.rows import MessageLabel, MessageLabelSource
 from infovore.sift.sampling import (
     NoScoredMessagesError,
     SiftStrategy,
@@ -173,6 +173,27 @@ def test_select_mixed_with_mix_one_behaves_like_uncertain(tmp_path: Path) -> Non
     _message_with_exchange(conn, 2, 1, p_trash=0.99)
     selected = select_sift_sample(conn, 1, seed=0, strategy=SiftStrategy.MIXED, mix=1.0)
     assert selected == [1]
+
+
+def test_select_mixed_consumes_the_whole_scored_pool_via_uncertain(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _message_with_exchange(conn, 1, 1, p_trash=0.5)
+    _message_with_exchange(conn, 2, 1, p_trash=0.99)
+    selected = select_sift_sample(conn, 2, seed=0, strategy=SiftStrategy.MIXED, mix=1.0)
+    assert sorted(selected) == [1, 2]
+
+
+def test_allocate_round_robin_skips_an_exhausted_channel(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1)
+    for i in range(2, 7):
+        _message_with_exchange(conn, i, 2)
+    selected = select_sift_sample(conn, 3, seed=0, strategy=SiftStrategy.RANDOM)
+    assert len(selected) == 3
+    assert 1 in selected
 
 
 def test_select_mixed_with_mix_zero_behaves_like_random(tmp_path: Path) -> None:

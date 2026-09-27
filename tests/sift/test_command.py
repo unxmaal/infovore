@@ -90,9 +90,7 @@ def test_sift_export_writes_batch_files(tmp_path: Path) -> None:
     seed(env["INFOVORE_DB_PATH"])
     out_dir = tmp_path / "batch1"
 
-    code, out, _ = run(
-        ["sift", "export", "--size", "4", "--seed", "1", "--out", str(out_dir)], env
-    )
+    code, out, _ = run(["sift", "export", "--size", "4", "--seed", "1", "--out", str(out_dir)], env)
 
     assert code == ExitCode.OK
     assert (out_dir / "batch.log").exists()
@@ -130,7 +128,12 @@ def test_sift_export_excludes_already_human_labeled_messages(tmp_path: Path) -> 
     seed(db_path)
     conn = open_database(db_path)
     set_message_label(
-        conn, 1, MessageLabel.TRASH, MessageLabelSource.HUMAN, None, datetime(2026, 1, 1, tzinfo=UTC)
+        conn,
+        1,
+        MessageLabel.TRASH,
+        MessageLabelSource.HUMAN,
+        None,
+        datetime(2026, 1, 1, tzinfo=UTC),
     )
     conn.close()
 
@@ -140,6 +143,17 @@ def test_sift_export_excludes_already_human_labeled_messages(tmp_path: Path) -> 
     assert code == ExitCode.OK
     manifest = json.loads((out_dir / "manifest.json").read_text())
     assert 1 not in manifest["message_ids"]
+
+
+def test_sift_export_rejects_mix_outside_zero_one(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    code, _, err = run(
+        ["sift", "export", "--size", "2", "--mix", "1.5", "--out", str(out_dir)], env
+    )
+    assert code == ExitCode.CONFIG
+    assert "--mix" in err
 
 
 def test_sift_export_uncertain_without_a_trained_model_exits_config(tmp_path: Path) -> None:
