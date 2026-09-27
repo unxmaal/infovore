@@ -228,6 +228,24 @@ def test_load_settings_triage_min_p_lore_non_numeric_reported() -> None:
         load_settings(env)
 
 
+def test_load_settings_triage_min_p_lore_round_trips_a_formatted_high_precision_threshold() -> None:
+    from infovore.rows import Label
+    from infovore.triage.bayes import candidate_thresholds, format_threshold
+
+    scored = [
+        (0.9999999999646519, Label.LORE),
+        (0.9994, Label.LORE),
+        (0.0011281727425668242, Label.NOISE),
+    ]
+    threshold = candidate_thresholds(scored)[-1]
+    formatted = format_threshold(threshold, scored)
+
+    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": formatted}
+    parsed = load_settings(env).triage_min_p_lore
+
+    assert [p >= parsed for p, _ in scored] == [p >= threshold for p, _ in scored]
+
+
 def test_load_settings_per_stage_backend_model_concurrency_timeout() -> None:
     env = {
         **REQUIRED_ENV,

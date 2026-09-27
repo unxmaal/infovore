@@ -16,13 +16,18 @@ TOKEN = re.compile(r"[\w/][\w'./+-]*")
 TRAILING_PUNCTUATION = ".,!?;:)'\"-"
 MAX_TOKEN_LENGTH = 40
 
+FORMAT_MIN_DIGITS = 6
+FORMAT_MAX_DIGITS = 17
+
 __all__ = [
     "Label",
     "Metrics",
     "Model",
+    "candidate_thresholds",
     "chi2q",
     "evaluate",
     "features",
+    "format_threshold",
     "in_holdout",
     "p_lore",
     "recommend_threshold",
@@ -164,3 +169,36 @@ def evaluate(scored: Sequence[tuple[float, Label]], thresholds: Sequence[float])
 def recommend_threshold(table: Sequence[Metrics], min_recall: float) -> Metrics | None:
     qualifying = [row for row in table if row.recall >= min_recall]
     return max(qualifying, key=lambda row: row.threshold) if qualifying else None
+
+
+def candidate_thresholds(scored: Sequence[tuple[float, Label]]) -> list[float]:
+    """Distinct p_lore scores present in ``scored``, sorted ascending.
+
+    Fisher-combined p_lore saturates near 0.0 and 1.0, so a fixed grid (e.g.
+    0.1..0.9) can't express the cutoffs a well-trained model needs (holdout
+    recall of 90% might require a threshold like 0.9994). Evaluating exactly
+    the holdout's own scores as candidate thresholds lets `recommend_threshold`
+    pick the highest one that still meets a recall target, using the same
+    ``>=`` semantics as the live gate (`infovore.triage.gate.passes_gate`), so
+    ties at the same score are handled consistently.
+    """
+    return sorted({p for p, _ in scored})
+
+
+def format_threshold(threshold: float, scored: Sequence[tuple[float, Label]]) -> str:
+    """Format ``threshold`` with the fewest significant digits (starting at
+    `FORMAT_MIN_DIGITS`) that keep every entry of ``scored`` on the same side
+    of the ``>=`` gate as the raw float.
+
+    A naive fixed-precision format (e.g. ``.6g``) can round a saturated score
+    like 0.9999999999646519 straight to "1", silently discarding the cutoff.
+    Increasing precision until the formatted-and-reparsed value reproduces the
+    exact same holdout gate outcomes guarantees the printed string is safe to
+    paste into INFOVORE_TRIAGE_MIN_P_LORE.
+    """
+    baseline = [p >= threshold for p, _ in scored]
+    for digits in range(FORMAT_MIN_DIGITS, FORMAT_MAX_DIGITS + 1):
+        candidate = f"{threshold:.{digits}g}"
+        if [p >= float(candidate) for p, _ in scored] == baseline:
+            return candidate
+    return repr(threshold)  # pragma: no cover - 17 significant digits always round-trips

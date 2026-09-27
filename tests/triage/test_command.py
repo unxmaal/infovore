@@ -234,3 +234,50 @@ def test_triage_recommend_threshold_with_unreachable_recall_reports_none(tmp_pat
 
     assert code == ExitCode.OK
     assert "no threshold meets recall" in out
+
+
+def test_triage_recommend_threshold_uses_precision_beyond_the_fixed_grid(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage", "--recommend-threshold", "--min-recall", "1.0"], env)
+
+    assert code == ExitCode.OK
+    line = next(line for line in out.splitlines() if line.startswith("recommended"))
+    value_str = line.split("=", 1)[1].split(" ", 1)[0]
+    assert float(value_str) > 0.9
+    assert value_str not in {f"{i / 10:.1f}" for i in range(1, 10)}
+
+
+def test_triage_recommend_threshold_prints_a_recall_target_table(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled(env["INFOVORE_DB_PATH"], 20, 20)
+    run(["triage", "--train"], env)
+
+    code, out, _ = run(["triage", "--recommend-threshold", "--min-recall", "0.6"], env)
+
+    assert code == ExitCode.OK
+    for target in ("0.95", "0.90", "0.80", "0.70", "0.50"):
+        assert target in out
+
+
+def test_render_recall_table_marks_unreachable_targets_plainly() -> None:
+    from infovore.triage.bayes import Metrics
+    from infovore.triage.command import _render_recall_table
+    from infovore.triage.train import RecommendationRow
+
+    rows = [
+        RecommendationRow(min_recall=0.95, metric=None, share=None, formatted_threshold=None),
+        RecommendationRow(
+            min_recall=0.5,
+            metric=Metrics(0.9, tp=2, fp=0, fn=0, tn=2),
+            share=0.5,
+            formatted_threshold="0.9",
+        ),
+    ]
+
+    rendered = _render_recall_table(rows)
+
+    assert "0.95  unreachable" in rendered
+    assert "0.50  threshold=0.9 share=0.500" in rendered

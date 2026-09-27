@@ -27,6 +27,7 @@ from infovore.source.protocol import (
     SourceChannel,
     SourceForbiddenError,
     SourceMessage,
+    SourceNotFoundError,
     SourceRateLimitedError,
     SourceReaction,
     SourceUnavailableError,
@@ -655,6 +656,29 @@ async def test_forbidden_channel_fails_immediately_without_retrying(tmp_path: Pa
     )
     assert [failure.channel_id for failure in report.failed] == [1]
     assert report.failed[0].reason.startswith("forbidden:")
+    assert sleeper.slept == []
+    assert report.channels[2].inserted == 1
+
+
+async def test_not_found_channel_fails_immediately_without_retrying(tmp_path: Path) -> None:
+    conn = make_conn(tmp_path)
+    source = FakeDiscordSource(
+        channels=[make_channel(1), make_channel(2)],
+        messages=[make_message(1, channel_id=1), make_message(101, channel_id=2)],
+    )
+    source.fail_next_history_call(SourceNotFoundError("channel 1 not found"), channel_id=1)
+    sleeper = RecordingSleeper()
+    report = await backfill(
+        conn,
+        source,
+        GUILD_ID,
+        [1, 2],
+        clock=FixedClock(NOW),
+        sleeper=sleeper,
+        include_bots=False,
+    )
+    assert [failure.channel_id for failure in report.failed] == [1]
+    assert report.failed[0].reason.startswith("not found:")
     assert sleeper.slept == []
     assert report.channels[2].inserted == 1
 

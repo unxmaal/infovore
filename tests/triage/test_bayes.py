@@ -9,9 +9,11 @@ from infovore.triage.bayes import (
     Label,
     Metrics,
     Model,
+    candidate_thresholds,
     chi2q,
     evaluate,
     features,
+    format_threshold,
     in_holdout,
     p_lore,
     recommend_threshold,
@@ -158,3 +160,100 @@ def test_evaluate_and_recommend_threshold() -> None:
 def test_metrics_with_no_positives_are_zero_not_errors() -> None:
     empty = Metrics(0.5, tp=0, fp=0, fn=0, tn=3)
     assert (empty.precision, empty.recall, empty.f1) == (0.0, 0.0, 0.0)
+
+
+def test_candidate_thresholds_returns_sorted_distinct_holdout_scores() -> None:
+    scored = [
+        (0.6, Label.LORE),
+        (0.2, Label.NOISE),
+        (0.6, Label.NOISE),
+        (0.9999, Label.LORE),
+    ]
+    assert candidate_thresholds(scored) == [0.2, 0.6, 0.9999]
+
+
+def test_candidate_thresholds_collapses_ties_at_saturation() -> None:
+    scored = [
+        (1.0, Label.LORE),
+        (1.0, Label.LORE),
+        (1.0, Label.NOISE),
+        (0.5, Label.NOISE),
+    ]
+    assert candidate_thresholds(scored) == [0.5, 1.0]
+
+
+def test_recommend_threshold_reaches_thresholds_beyond_a_fixed_grid() -> None:
+    # Fisher-combined p_lore saturates near 1.0; a fixed 0.1..0.9 grid can
+    # never recommend a threshold above 0.9 even though the model's own
+    # holdout scores support a much finer, higher cutoff.
+    scored = [
+        (1.0, Label.LORE),
+        (1.0, Label.LORE),
+        (0.99993, Label.LORE),
+        (0.9994, Label.LORE),
+        (0.6, Label.LORE),
+        (0.5, Label.NOISE),
+        (0.4, Label.NOISE),
+    ]
+    thresholds = candidate_thresholds(scored)
+    table = evaluate(scored, thresholds)
+
+    metric = recommend_threshold(table, min_recall=0.8)
+
+    assert metric is not None
+    assert metric.threshold == pytest.approx(0.9994)
+    assert metric.recall == pytest.approx(0.8)
+    assert metric.threshold > 0.9
+
+
+def test_candidate_thresholds_and_recommend_handle_ties_with_gte_semantics() -> None:
+    scored = [
+        (1.0, Label.LORE),
+        (1.0, Label.LORE),
+        (1.0, Label.NOISE),
+        (0.5, Label.NOISE),
+    ]
+    thresholds = candidate_thresholds(scored)
+    table = evaluate(scored, thresholds)
+
+    metric = recommend_threshold(table, min_recall=1.0)
+
+    assert metric is not None
+    assert metric.threshold == 1.0
+    assert metric.tp == 2
+    assert metric.fp == 1  # the tied noise example is included by >= semantics
+
+
+def test_format_threshold_prints_enough_precision_not_rounded_to_one() -> None:
+    scored = [(0.99993, Label.LORE), (0.5, Label.NOISE)]
+
+    formatted = format_threshold(0.99993, scored)
+
+    assert formatted != "1"
+    assert formatted == "0.99993"
+
+
+def test_format_threshold_naive_six_significant_digits_would_round_to_one() -> None:
+    # Demonstrates why format_threshold can't just always use a fixed .6g:
+    # some real (saturated) p_lore values round straight to 1 at 6 digits.
+    saturated = 0.9999999999646519
+    assert f"{saturated:.6g}" == "1"
+
+
+def test_format_threshold_round_trips_gate_outcome_for_adjacent_floats() -> None:
+    low = 0.5
+    high = math.nextafter(low, 1.0)
+    scored = [(high, Label.LORE), (low, Label.NOISE)]
+    # At the naive precision the two adjacent floats are indistinguishable.
+    assert float(f"{high:.6g}") == float(f"{low:.6g}")
+
+    formatted = format_threshold(high, scored)
+    parsed = float(formatted)
+
+    assert [p >= parsed for p, _ in scored] == [p >= high for p, _ in scored]
+
+
+def test_format_threshold_is_pasteable_into_settings_as_a_plain_float() -> None:
+    scored = [(0.9999999999646519, Label.LORE), (0.0011281727425668242, Label.NOISE)]
+    formatted = format_threshold(0.9999999999646519, scored)
+    assert 0.0 < float(formatted) <= 1.0

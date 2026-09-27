@@ -12,12 +12,14 @@ from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule, Label, La
 from infovore.timing import FixedClock
 from infovore.triage.bayes import Model, token_probability
 from infovore.triage.train import (
+    RECALL_TARGETS,
     InsufficientLabelsError,
     NoTrainedModelError,
     TrainReport,
     build_examples,
     load_latest_model,
     recommend,
+    recommend_table,
     score_all,
     score_stale,
     train_and_store,
@@ -243,3 +245,97 @@ def test_recommend_returns_none_when_no_threshold_meets_recall(tmp_path: Path) -
     train_and_store(conn, FixedClock(NOW))
 
     assert recommend(conn, min_recall=1.01) is None
+
+
+def test_recommend_evaluates_holdout_scores_not_a_fixed_grid(tmp_path: Path) -> None:
+    # With identical content per class, Fisher-combined p_lore saturates the
+    # holdout scores near 0 and 1 (well outside a fixed 0.1..0.9 grid).
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, version)
+
+    result = recommend(conn, min_recall=1.0)
+
+    assert result is not None
+    metric, share = result
+    assert metric.recall == pytest.approx(1.0)
+    assert metric.threshold > 0.9
+    assert f"{metric.threshold:.1f}" not in {f"{i / 10:.1f}" for i in range(1, 10)}
+    assert 0.0 <= share <= 1.0
+
+
+def test_recommend_share_is_zero_when_no_exchange_has_been_p_lore_scored(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    # Deliberately skip score_all: no exchange has p_lore yet.
+
+    result = recommend(conn, min_recall=0.5)
+
+    assert result is not None
+    _, share = result
+    assert share == 0.0
+
+
+def test_recommend_table_raises_without_a_trained_model(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    with pytest.raises(NoTrainedModelError):
+        recommend_table(conn)
+
+
+def test_recommend_table_covers_the_standard_recall_targets_with_monotonic_thresholds(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, version)
+
+    rows = recommend_table(conn)
+
+    assert [row.min_recall for row in rows] == list(RECALL_TARGETS)
+    thresholds = [row.metric.threshold for row in rows if row.metric is not None]
+    assert thresholds == sorted(thresholds)
+    for row in rows:
+        if row.metric is None:
+            assert row.share is None
+            assert row.formatted_threshold is None
+        else:
+            assert row.metric.recall >= row.min_recall
+            assert row.share is not None
+            assert 0.0 <= row.share <= 1.0
+            assert row.formatted_threshold is not None
+            assert 0.0 < float(row.formatted_threshold) <= 1.0
+
+
+def test_recommend_table_accepts_custom_recall_targets(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, version)
+
+    rows = recommend_table(conn, min_recalls=(0.5,))
+
+    assert [row.min_recall for row in rows] == [0.5]
+
+
+def test_recommend_table_share_is_measured_at_the_printed_threshold(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn = db(tmp_path)
+    seed_labeled_exchanges(conn, 20, 20)
+    train_and_store(conn, FixedClock(NOW))
+    version, model = load_latest_model(conn)  # type: ignore[misc]
+    score_all(conn, model, version)
+    raw_share = recommend_table(conn, min_recalls=(0.5,))[0].share
+    assert raw_share is not None and raw_share < 1.0
+
+    monkeypatch.setattr("infovore.triage.train.format_threshold", lambda threshold, scored: "0")
+    row = recommend_table(conn, min_recalls=(0.5,))[0]
+
+    assert row.formatted_threshold == "0"
+    assert row.share == 1.0
