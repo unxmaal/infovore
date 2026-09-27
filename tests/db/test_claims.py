@@ -1,4 +1,5 @@
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -698,3 +699,14 @@ def test_related_claims_matches_non_ascii_words(tmp_path: Path) -> None:
     )
     results = related_claims(conn, "Was ist die Größe?", limit=10)
     assert len(results) == 1
+
+
+def test_record_run_persists_batch_id(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    setup_basic(conn)
+    run = replace(a_run(exchange_id=1), batch_id="batch-7")
+    recorded = record_run(conn, run, [a_claim(exchange_id=1)])
+    row = conn.execute(
+        "SELECT batch_id FROM extraction_runs WHERE id = ?", (recorded.run_id,)
+    ).fetchone()
+    assert row["batch_id"] == "batch-7"

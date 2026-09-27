@@ -1414,3 +1414,43 @@ def test_live_only_claims_exchanges_at_or_above_min_score(tmp_path: Path) -> Non
     assert updated_low is not None
     assert updated_low.extraction_status is ExtractionStatus.PENDING
     assert updated_low.retry_count == 0
+
+
+class CrashOnSecondCallExtractor:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
+        self.calls += 1
+        if self.calls > 1:
+            raise RuntimeError("interrupted mid-run")
+        return ExtractionOutcome(
+            claims=(), model="canonical", input_tokens=None, output_tokens=None, failure=None
+        )
+
+
+def test_runs_are_stamped_with_batch_id_as_they_are_recorded(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1, content="first")])
+    seed_exchange(conn, [a_message(2, content="second")])
+
+    async def go() -> None:
+        await run_extraction(
+            conn,
+            CrashOnSecondCallExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.TRIAL,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+            exchange_ids=None,
+            batch_id="batch-1",
+        )
+
+    with pytest.raises(RuntimeError):
+        asyncio.run(go())
+
+    rows = conn.execute("SELECT batch_id FROM extraction_runs").fetchall()
+    assert [row["batch_id"] for row in rows] == ["batch-1"]
