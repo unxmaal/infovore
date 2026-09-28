@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>infovore sift</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #111318;
+    --muted: #5b6270;
+    --border: #d9dce2;
+    --focus-bg: #eef2ff;
+    --accent: #1d4ed8;
+    --keep: #15803d;
+    --trash: #b91c1c;
+    --pill-bg: #f1f2f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --fg: #eef0f4;
+      --muted: #a2a9b8;
+      --border: #2c303a;
+      --focus-bg: #1b2440;
+      --accent: #7aa2ff;
+      --keep: #4ade80;
+      --trash: #f87171;
+      --pill-bg: #1c1f26;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 20px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.4;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    z-index: 5;
+  }
+  header h1 { font-size: 1.1rem; margin: 0; }
+  #progress-text { color: var(--muted); font-size: 0.95rem; }
+  #progress-bar {
+    flex-basis: 100%;
+    height: 0.4rem;
+    background: var(--pill-bg);
+    border-radius: 0.2rem;
+    overflow: hidden;
+  }
+  #progress-bar-fill { height: 100%; background: var(--accent); width: 0%; }
+  main { max-width: 60rem; margin: 0 auto; padding: 1rem; padding-bottom: 8rem; }
+  .exchange-divider { border-top: 1px dashed var(--border); margin: 1.25rem 0; }
+  .message {
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    border: 1px solid transparent;
+    margin-bottom: 0.4rem;
+    cursor: pointer;
+  }
+  .message.focused { border-color: var(--accent); background: var(--focus-bg); }
+  .message.labeled-keep { opacity: 0.6; }
+  .message.labeled-trash { opacity: 0.4; text-decoration: line-through; }
+  .meta { display: flex; gap: 0.6rem; flex-wrap: wrap; color: var(--muted); font-size: 0.85rem; }
+  .channel { font-weight: 600; color: var(--accent); }
+  .author { font-weight: 600; }
+  .pill {
+    padding: 0.05rem 0.5rem;
+    border-radius: 1rem;
+    background: var(--pill-bg);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+  .pill-keep { color: var(--keep); }
+  .pill-trash { color: var(--trash); }
+  .content { margin-top: 0.25rem; white-space: pre-wrap; word-break: break-word; }
+  .content.collapsed {
+    max-height: 4.6em;
+    overflow: hidden;
+    position: relative;
+  }
+  .content.collapsed::after {
+    content: "expand \2193";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: var(--bg);
+    color: var(--accent);
+    font-size: 0.8rem;
+    padding-left: 0.5rem;
+  }
+  .actions { margin-top: 0.4rem; display: flex; gap: 0.5rem; }
+  button {
+    font: inherit;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+    cursor: pointer;
+  }
+  button.primary { border-color: var(--accent); color: var(--accent); }
+  .keep { border-color: var(--keep); color: var(--keep); }
+  .trash { border-color: var(--trash); color: var(--trash); }
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 10;
+  }
+  .overlay[hidden] { display: none; }
+  .panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    max-width: 32rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+  }
+  .panel h2 { margin-top: 0; }
+  .panel label { display: block; margin-top: 0.75rem; font-size: 0.9rem; color: var(--muted); }
+  .panel input, .panel select {
+    font: inherit;
+    width: 100%;
+    padding: 0.4rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+  }
+  .panel .row { display: flex; gap: 0.75rem; margin-top: 1rem; }
+  #bulk-result { margin-top: 0.75rem; color: var(--muted); font-size: 0.9rem; }
+  kbd {
+    border: 1px solid var(--border);
+    border-radius: 0.3rem;
+    padding: 0 0.35rem;
+    font-family: monospace;
+  }
+  #help ul { padding-left: 1.2rem; }
+  footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>infovore sift</h1>
+  <span id="progress-text">loading...</span>
+  <div id="progress-bar"><div id="progress-bar-fill"></div></div>
+</header>
+<main>
+  <div id="messages"></div>
+  <p id="empty-state" hidden>Nothing left to sift in this batch. Run <code>infovore sift train</code>
+    next, or start another batch with <code>infovore sift serve --new --out DIR</code>.</p>
+</main>
+<footer>
+  <span>local, no-auth tool for the maintainer's LAN/tailnet only &mdash; never expose this publicly</span>
+  <span>press <kbd>?</kbd> for keys</span>
+</footer>
+
+<div class="overlay" id="help" hidden>
+  <div class="panel">
+    <h2>Keys</h2>
+    <ul>
+      <li><kbd>j</kbd> / <kbd>k</kbd> &mdash; next / previous message</li>
+      <li><kbd>x</kbd> &mdash; trash the focused message</li>
+      <li><kbd>space</kbd> &mdash; keep the focused message</li>
+      <li><kbd>u</kbd> &mdash; undo the last action</li>
+      <li><kbd>X</kbd> &mdash; trash the rest of this channel in this batch</li>
+      <li><kbd>h</kbd> &mdash; bulk-hide panel (select text first to prefill "contains")</li>
+      <li><kbd>?</kbd> &mdash; toggle this help</li>
+    </ul>
+    <div class="row"><button class="primary" id="help-close">close</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="bulk" hidden>
+  <div class="panel">
+    <h2>Hide everything like this</h2>
+    <label for="bulk-type">Rule type</label>
+    <select id="bulk-type">
+      <option value="contains">contains phrase (case-insensitive)</option>
+      <option value="exact">exact whole message</option>
+      <option value="author">by author</option>
+      <option value="channel">by channel</option>
+      <option value="shorter_than">shorter than N characters</option>
+      <option value="regex">advanced regex</option>
+    </select>
+    <div id="bulk-value-row">
+      <label for="bulk-value">Value</label>
+      <input id="bulk-value" type="text">
+    </div>
+    <div id="bulk-length-row" hidden>
+      <label for="bulk-length">Maximum length</label>
+      <input id="bulk-length" type="number" min="1" value="10">
+    </div>
+    <label for="bulk-name">Save rule as</label>
+    <input id="bulk-name" type="text" placeholder="e.g. lol-chatter">
+    <div class="row">
+      <button id="bulk-preview">preview</button>
+      <button class="primary" id="bulk-apply">trash all matches</button>
+      <button id="bulk-close">cancel</button>
+    </div>
+    <div id="bulk-result"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var state = null;
+  var focusIndex = 0;
+
+  function esc(text) {
+    var div = document.createElement("div");
+    div.textContent = text == null ? "" : String(text);
+    return div.innerHTML;
+  }
+
+  function api(path, payload) {
+    var options = payload === undefined
+      ? undefined
+      : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) };
+    return fetch(path, options).then(function (response) {
+      return response.json().then(function (data) {
+        return { ok: response.ok, data: data };
+      });
+    });
+  }
+
+  function loadState() {
+    return api("/api/state").then(function (result) {
+      state = result.data;
+      focusIndex = firstUnlabeledIndex();
+      render();
+    });
+  }
+
+  function firstUnlabeledIndex() {
+    if (!state) return 0;
+    for (var i = 0; i < state.messages.length; i++) {
+      if (!state.messages[i].label) return i;
+    }
+    return 0;
+  }
+
+  function advanceFocus() {
+    if (!state) return;
+    for (var i = focusIndex + 1; i < state.messages.length; i++) {
+      if (!state.messages[i].label) { focusIndex = i; return; }
+    }
+  }
+
+  function renderProgress() {
+    var p = state.progress;
+    document.getElementById("progress-text").textContent =
+      "labeled " + p.labeled + "/" + p.total + " · keep " + p.keep + " · trash " + p.trash;
+    var pct = p.total ? Math.round((p.labeled / p.total) * 100) : 0;
+    document.getElementById("progress-bar-fill").style.width = pct + "%";
+    document.getElementById("empty-state").hidden = p.total === 0 || p.labeled < p.total;
+  }
+
+  function render() {
+    var container = document.getElementById("messages");
+    container.innerHTML = "";
+    var lastExchange = null;
+    state.messages.forEach(function (message, index) {
+      if (lastExchange !== null && message.exchange_id !== lastExchange) {
+        var divider = document.createElement("div");
+        divider.className = "exchange-divider";
+        container.appendChild(divider);
+      }
+      lastExchange = message.exchange_id;
+
+      var row = document.createElement("div");
+      row.className = "message" + (index === focusIndex ? " focused" : "")
+        + (message.label ? " labeled-" + message.label : "");
+      row.dataset.index = String(index);
+
+      var long = message.content.length > 320;
+      var pill = message.label
+        ? '<span class="pill pill-' + message.label + '">' + message.label + "</span>"
+        : "";
+      row.innerHTML =
+        '<div class="meta"><span class="channel">#' + esc(message.channel) + '</span>'
+        + '<span class="author">' + esc(message.author) + "</span>"
+        + '<span class="time">' + esc(message.created_at) + "</span>" + pill + "</div>"
+        + '<div class="content' + (long ? " collapsed" : "") + '">' + esc(message.content) + "</div>"
+        + '<div class="actions"><button class="keep">keep (space)</button>'
+        + '<button class="trash">trash (x)</button></div>';
+
+      row.addEventListener("click", function (event) {
+        if (event.target.classList.contains("content")) {
+          event.target.classList.toggle("collapsed");
+          return;
+        }
+        if (event.target.classList.contains("keep")) {
+          focusIndex = index;
+          label("keep");
+          return;
+        }
+        if (event.target.classList.contains("trash")) {
+          focusIndex = index;
+          label("trash");
+          return;
+        }
+        focusIndex = index;
+        render();
+      });
+      container.appendChild(row);
+    });
+    renderProgress();
+    var focused = container.querySelector(".message.focused");
+    if (focused) focused.scrollIntoView({ block: "center", behavior: "instant" });
+  }
+
+  function label(value) {
+    var message = state.messages[focusIndex];
+    if (!message) return;
+    api("/api/label", { message_id: message.id, label: value }).then(function (result) {
+      if (!result.ok) return;
+      state = result.data.state;
+      advanceFocus();
+      render();
+    });
+  }
+
+  function undo() {
+    api("/api/undo", {}).then(function (result) {
+      if (!result.ok) return;
+      state = result.data.state;
+      render();
+    });
+  }
+
+  function trashChannel() {
+    var message = state.messages[focusIndex];
+    if (!message) return;
+    api("/api/trash_channel", { channel: message.channel }).then(function (result) {
+      if (!result.ok) return;
+      state = result.data.state;
+      render();
+    });
+  }
+
+  function toggleHelp() {
+    var help = document.getElementById("help");
+    help.hidden = !help.hidden;
+  }
+
+  function updateBulkFields() {
+    var type = document.getElementById("bulk-type").value;
+    document.getElementById("bulk-value-row").hidden = type === "shorter_than";
+    document.getElementById("bulk-length-row").hidden = type !== "shorter_than";
+  }
+
+  function bulkPayload() {
+    var type = document.getElementById("bulk-type").value;
+    var payload = { type: type };
+    if (type === "shorter_than") {
+      payload.max_length = parseInt(document.getElementById("bulk-length").value, 10);
+    } else {
+      payload.value = document.getElementById("bulk-value").value;
+    }
+    return payload;
+  }
+
+  function openBulk() {
+    var selection = window.getSelection ? window.getSelection().toString() : "";
+    if (selection) {
+      document.getElementById("bulk-type").value = "contains";
+      document.getElementById("bulk-value").value = selection;
+    }
+    updateBulkFields();
+    document.getElementById("bulk-result").textContent = "";
+    document.getElementById("bulk").hidden = false;
+  }
+
+  function closeBulk() {
+    document.getElementById("bulk").hidden = true;
+  }
+
+  function previewBulk() {
+    api("/api/rules/preview", bulkPayload()).then(function (result) {
+      var out = document.getElementById("bulk-result");
+      if (!result.ok) {
+        out.textContent = "error: " + result.data.error;
+        return;
+      }
+      out.textContent = "would trash " + result.data.matched + " message(s) ("
+        + result.data.conflicts + " already kept)";
+    });
+  }
+
+  function applyBulk() {
+    var payload = bulkPayload();
+    payload.name = document.getElementById("bulk-name").value;
+    api("/api/rules/apply", payload).then(function (result) {
+      var out = document.getElementById("bulk-result");
+      if (!result.ok) {
+        out.textContent = "error: " + result.data.error;
+        return;
+      }
+      state = result.data.state;
+      out.textContent = "trashed " + result.data.applied + "; saved rule to " + result.data.saved_to;
+      render();
+    });
+  }
+
+  document.getElementById("bulk-type").addEventListener("change", updateBulkFields);
+  document.getElementById("bulk-preview").addEventListener("click", previewBulk);
+  document.getElementById("bulk-apply").addEventListener("click", applyBulk);
+  document.getElementById("bulk-close").addEventListener("click", closeBulk);
+  document.getElementById("help-close").addEventListener("click", toggleHelp);
+
+  document.addEventListener("keydown", function (event) {
+    if (!document.getElementById("bulk").hidden) {
+      if (event.key === "Escape") closeBulk();
+      return;
+    }
+    if (!document.getElementById("help").hidden) {
+      if (event.key === "Escape" || event.key === "?") toggleHelp();
+      return;
+    }
+    if (!state) return;
+    switch (event.key) {
+      case "j":
+        focusIndex = Math.min(focusIndex + 1, state.messages.length - 1);
+        render();
+        break;
+      case "k":
+        focusIndex = Math.max(focusIndex - 1, 0);
+        render();
+        break;
+      case "x":
+        event.preventDefault();
+        label("trash");
+        break;
+      case " ":
+        event.preventDefault();
+        label("keep");
+        break;
+      case "u":
+        undo();
+        break;
+      case "X":
+        trashChannel();
+        break;
+      case "h":
+        event.preventDefault();
+        openBulk();
+        break;
+      case "?":
+        toggleHelp();
+        break;
+      default:
+        break;
+    }
+  });
+
+  loadState();
+})();
+</script>
+</body>
+</html>

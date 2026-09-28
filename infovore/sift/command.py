@@ -1,11 +1,14 @@
 import argparse
+import threading
 from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
+from infovore.sift.addresses import default_hosts
 from infovore.sift.citations import derive_citation_labels
 from infovore.sift.export import export_batch
+from infovore.sift.httpd import block_until_interrupted, listening_url, shutdown_all, start_all
 from infovore.sift.importer import (
     ChannelCounts,
     MissingManifestError,
@@ -18,6 +21,7 @@ from infovore.sift.sampling import (
     NoScoredMessagesError,
     SiftStrategy,
 )
+from infovore.sift.serve import build_serve_app
 from infovore.sift.train import (
     DEFAULT_CONFUSION_THRESHOLD,
     DEFAULT_HUMAN_WEIGHT,
@@ -34,6 +38,7 @@ if TYPE_CHECKING:
     from infovore.cli import AppContext
 
 DEFAULT_SIFT_SIZE = 1000
+DEFAULT_SIFT_SERVE_PORT = 8765
 
 _NO_SIFT_RESULTS_MESSAGE = (
     "no kept.csv or trash-regexes.csv in DIR; in lnav, after filtering, run either"
@@ -151,6 +156,24 @@ class SiftCommand:
         train_parser.add_argument(
             "--human-weight", type=int, default=DEFAULT_HUMAN_WEIGHT, dest="human_weight"
         )
+        serve_parser = subparsers.add_parser(
+            "serve", help="serve a keyboard-driven browser UI for sifting a batch"
+        )
+        serve_parser.add_argument("dir", type=str, nargs="?", default=None)
+        serve_parser.add_argument("--new", action="store_true")
+        serve_parser.add_argument("--size", type=int, default=DEFAULT_SIFT_SIZE)
+        serve_parser.add_argument(
+            "--strategy",
+            choices=[strategy.value for strategy in SiftStrategy],
+            default=SiftStrategy.RANDOM.value,
+        )
+        serve_parser.add_argument("--seed", type=int, default=0)
+        serve_parser.add_argument(
+            "--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix"
+        )
+        serve_parser.add_argument("--out", type=str, default=None, dest="out")
+        serve_parser.add_argument("--host", action="append", default=None, dest="hosts")
+        serve_parser.add_argument("--port", type=int, default=DEFAULT_SIFT_SERVE_PORT)
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.sift_command == "import":
@@ -159,6 +182,8 @@ class SiftCommand:
             return self._citations(context, args)
         if args.sift_command == "train":
             return self._train(context, args)
+        if args.sift_command == "serve":
+            return self._serve(context, args)
         return self._export(context, args)
 
     def _citations(self, context: "AppContext", args: argparse.Namespace) -> int:
@@ -268,4 +293,57 @@ class SiftCommand:
             f" trash={report.trash} (source_ref={report.source_ref})\n"
             f"{_render_channel_counts(report.by_channel)}"
         )
+        return ExitCode.OK
+
+    def _serve(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        if bool(args.dir) == bool(args.new):
+            raise ConfigError("`sift serve` requires exactly one of DIR or --new")
+        if args.new and not args.out:
+            raise ConfigError("`sift serve --new` requires --out DIR")
+        if not 0.0 <= args.mix <= 1.0:
+            raise ConfigError("--mix must be between 0 and 1")
+
+        strategy = SiftStrategy(args.strategy)
+        try:
+            app = build_serve_app(
+                context.conn,
+                dir_=Path(args.dir) if args.dir else None,
+                new=args.new,
+                size=args.size,
+                strategy=strategy,
+                seed=args.seed,
+                mix=args.mix,
+                out_dir=Path(args.out) if args.out else None,
+                scratch_dir=context.settings.scratch_dir,
+                clock=context.clock,
+            )
+        except NoScoredMessagesError as error:
+            raise ConfigError(
+                "--strategy uncertain requires messages already scored with p_trash;"
+                " run `infovore sift train` first once it exists"
+            ) from error
+        except MissingManifestError as error:
+            raise ConfigError(
+                f"no manifest.json in {error}; run `infovore sift export` first"
+            ) from error
+
+        hosts = args.hosts if args.hosts else default_hosts()
+        try:
+            servers = start_all(hosts, args.port, app)
+        except OSError as error:
+            raise ConfigError(f"could not bind port {args.port}: {error}") from error
+
+        for server in servers:
+            context.stdout.write(f"listening on {listening_url(server)}\n")
+        context.stdout.write(
+            f"serving batch {app.batch_name!r}: {len(app.messages())} messages"
+            " (Ctrl-C to stop; run `infovore sift train` once everything is labeled)\n"
+        )
+        context.stdout.flush()
+        try:
+            block_until_interrupted(threading.Event())
+        finally:
+            shutdown_all(servers)
         return ExitCode.OK

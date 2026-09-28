@@ -1,9 +1,13 @@
 import io
 import json
 import sqlite3
+import threading
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
+import infovore.sift.command as sift_command
 from infovore.cli import ExitCode, builtin_commands, main
 from infovore.db.connection import migrate, open_database
 from infovore.db.message_labels import set_message_label
@@ -433,3 +437,121 @@ def test_sift_export_strategy_uncertain_works_after_train(tmp_path: Path) -> Non
     )
 
     assert code == ExitCode.OK
+
+
+def _no_block(event: threading.Event) -> None:
+    return None
+
+
+def test_sift_serve_requires_dir_or_new(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    code, _, err = run(["sift", "serve"], env)
+    assert code == ExitCode.CONFIG
+    assert "DIR or --new" in err
+
+
+def test_sift_serve_rejects_dir_and_new_together(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "2", "--out", str(out_dir)], env)
+    code, _, err = run(["sift", "serve", str(out_dir), "--new", "--out", str(out_dir)], env)
+    assert code == ExitCode.CONFIG
+    assert "DIR or --new" in err
+
+
+def test_sift_serve_new_requires_out(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    code, _, err = run(["sift", "serve", "--new"], env)
+    assert code == ExitCode.CONFIG
+    assert "--out" in err
+
+
+def test_sift_serve_rejects_mix_outside_zero_one(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    code, _, err = run(["sift", "serve", "--new", "--out", str(out_dir), "--mix", "1.5"], env)
+    assert code == ExitCode.CONFIG
+    assert "--mix" in err
+
+
+def test_sift_serve_missing_manifest_exits_config(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
+    code, _, err = run(["sift", "serve", str(empty_dir)], env)
+    assert code == ExitCode.CONFIG
+    assert "manifest.json" in err
+
+
+def test_sift_serve_uncertain_without_a_trained_model_exits_config(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    code, _, err = run(
+        ["sift", "serve", "--new", "--strategy", "uncertain", "--out", str(out_dir)], env
+    )
+    assert code == ExitCode.CONFIG
+    assert "p_trash" in err
+
+
+def test_sift_serve_starts_and_prints_listening_urls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sift_command, "block_until_interrupted", _no_block)
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "3", "--out", str(out_dir)], env)
+
+    code, out, _ = run(["sift", "serve", str(out_dir), "--host", "127.0.0.1", "--port", "0"], env)
+
+    assert code == ExitCode.OK
+    assert "listening on http://127.0.0.1:" in out
+    assert "serving batch" in out
+
+
+def test_sift_serve_new_starts_with_default_hosts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sift_command, "block_until_interrupted", _no_block)
+    monkeypatch.setattr(sift_command, "default_hosts", lambda: ["127.0.0.1"])
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, out, _ = run(
+        ["sift", "serve", "--new", "--size", "2", "--out", str(out_dir), "--port", "0"], env
+    )
+
+    assert code == ExitCode.OK
+    assert "listening on http://127.0.0.1:" in out
+
+
+def test_sift_serve_reports_a_port_already_in_use_as_a_config_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import socket
+
+    monkeypatch.setattr(sift_command, "block_until_interrupted", _no_block)
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "2", "--out", str(out_dir)], env)
+
+    blocker = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    blocker.bind(("127.0.0.1", 0))
+    blocker.listen(1)
+    port = blocker.getsockname()[1]
+    try:
+        code, _, err = run(
+            ["sift", "serve", str(out_dir), "--host", "127.0.0.1", "--port", str(port)], env
+        )
+        assert code == ExitCode.CONFIG
+        assert "could not bind" in err
+    finally:
+        blocker.close()
