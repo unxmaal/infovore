@@ -17,14 +17,33 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
 from typing import Any
+from urllib.parse import parse_qs, urlsplit
 
 from infovore.rows import MessageLabel
 from infovore.sift.rules import InvalidRuleError, parse_bulk_rule
-from infovore.sift.serve import ServeApp, UnknownMessageError
+from infovore.sift.serve import (
+    DEFAULT_CONTEXT_AFTER,
+    DEFAULT_CONTEXT_BEFORE,
+    ServeApp,
+    UnknownMessageError,
+)
 
 
 def load_page() -> str:
     return (resources.files(__package__) / "templates" / "serve.html").read_text(encoding="utf-8")
+
+
+def _parse_window_param(raw: str | None, default: int) -> int:
+    """`before=`/`after=` on `GET /api/context` (issue #137): missing means
+    the caller wants the default; present but not a non-negative integer is
+    a 400 (`ServeApp.context` still re-clamps whatever comes through to
+    `MAX_CONTEXT_WINDOW`, so an oversized-but-valid value is never an
+    error, only a numeric-looking one that isn't a valid count is)."""
+    if raw is None:
+        return default
+    if not raw.isdigit():
+        raise ValueError("before/after must be non-negative integers")
+    return int(raw)
 
 
 class _Server(ThreadingHTTPServer):
@@ -70,13 +89,21 @@ class _Handler(BaseHTTPRequestHandler):
         return parsed
 
     def do_GET(self) -> None:
-        if self.path == "/":
+        split = urlsplit(self.path)
+        if split.path == "/":
             self._send_html(self.server.page)
             return
-        if self.path == "/api/state":
+        if split.path == "/api/state":
             self._send_json(HTTPStatus.OK, self.server.app.state())
             return
-        self._send_json(HTTPStatus.NOT_FOUND, {"error": f"not found: {self.path}"})
+        if split.path == "/api/context":
+            query = {key: values[-1] for key, values in parse_qs(split.query).items()}
+            try:
+                self._handle_context(self.server.app, query)
+            except (UnknownMessageError, ValueError) as error:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
+            return
+        self._send_json(HTTPStatus.NOT_FOUND, {"error": f"not found: {split.path}"})
 
     def do_POST(self) -> None:
         app = self.server.app
@@ -101,6 +128,17 @@ class _Handler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": f"not found: {self.path}"})
         except (InvalidRuleError, UnknownMessageError, KeyError, ValueError) as error:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
+
+    def _handle_context(self, app: ServeApp, query: dict[str, str]) -> None:
+        raw_id = query.get("message_id")
+        if raw_id is None or not raw_id.isdigit():
+            raise ValueError(
+                "message_id must be a numeric string id: Discord ids exceed"
+                " JavaScript's safe integer range"
+            )
+        before = _parse_window_param(query.get("before"), DEFAULT_CONTEXT_BEFORE)
+        after = _parse_window_param(query.get("after"), DEFAULT_CONTEXT_AFTER)
+        self._send_json(HTTPStatus.OK, app.context(int(raw_id), before=before, after=after))
 
     def _handle_label(self, app: ServeApp, body: dict[str, Any]) -> None:
         raw_id = body["message_id"]

@@ -561,7 +561,9 @@ def test_context_window_is_clamped_at_the_start_of_the_exchange(tmp_path: Path) 
 
     result = app.context(1, before=4, after=0)
 
-    assert [m["id"] for m in result["messages"]] == ["1"]
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["1"]
 
 
 def test_context_uses_defaults_when_before_after_not_given(tmp_path: Path) -> None:
@@ -583,7 +585,9 @@ def test_context_caps_an_oversized_window_request(tmp_path: Path) -> None:
     assert result["before"] == MAX_CONTEXT_WINDOW
     assert result["after"] == MAX_CONTEXT_WINDOW
     # the exchange only has 5 messages, so the cap doesn't manufacture any
-    assert [m["id"] for m in result["messages"]] == ["1", "2", "3", "4", "5"]
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["1", "2", "3", "4", "5"]
 
 
 def test_context_rejects_a_negative_window(tmp_path: Path) -> None:
@@ -594,7 +598,9 @@ def test_context_rejects_a_negative_window(tmp_path: Path) -> None:
 
     assert result["before"] == 0
     assert result["after"] == 0
-    assert [m["id"] for m in result["messages"]] == ["3"]
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["3"]
 
 
 def test_context_redacts_opted_out_authors_content_and_author(tmp_path: Path) -> None:
@@ -604,7 +610,9 @@ def test_context_redacts_opted_out_authors_content_and_author(tmp_path: Path) ->
 
     result = app.context(3, before=4, after=4)
 
-    by_id = {m["id"]: m for m in result["messages"]}
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    by_id = {m["id"]: m for m in messages}
     assert by_id["2"]["author"] == "[redacted]"
     assert by_id["2"]["content"] == "[redacted]"
     assert by_id["4"]["author"] == "[redacted]"
