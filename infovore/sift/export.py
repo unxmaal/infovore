@@ -102,6 +102,8 @@ def export_batch(
     mix: float,
     out_dir: Path,
     now: datetime,
+    exclude_channels: frozenset[str] = frozenset(),
+    include_channels: frozenset[str] = frozenset(),
 ) -> ExportReport:
     """Write one sift batch (issue #128) to `out_dir`: `batch.log` (the
     lnav-friendly log), `infovore-sift.json` (the lnav format file — a copy
@@ -110,8 +112,18 @@ def export_batch(
     `manifest.json` (message ids in batch order, strategy, seed,
     `created_at`). Raises `infovore.sift.sampling.NoScoredMessagesError`
     (propagated, uncaught) before writing anything if `strategy` is
-    `uncertain` and no message has a `p_trash` yet."""
-    message_ids = select_sift_sample(conn, size, seed, strategy, mix=mix)
+    `uncertain` and no message has a `p_trash` yet. `exclude_channels` (the
+    denylist, issue #138) and `include_channels` (`--channels`) narrow the
+    sampling pool by channel name; the denylist always wins."""
+    message_ids = select_sift_sample(
+        conn,
+        size,
+        seed,
+        strategy,
+        mix=mix,
+        exclude_channels=exclude_channels,
+        include_channels=include_channels,
+    )
     batch = fetch_batch_messages(conn, message_ids)
 
     out_dir.mkdir(parents=True, exist_ok=True)

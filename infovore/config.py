@@ -79,6 +79,7 @@ class Settings:
     triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE
     triage_rules: TriageRules = DEFAULT_RULES
     workers: int = DEFAULT_WORKERS
+    exclude_channels: frozenset[str] = field(default_factory=frozenset)
 
 
 def _parse_int(raw: str) -> int | None:
@@ -187,6 +188,25 @@ def _parse_channel_ids(raw: str | None, errors: list[str]) -> tuple[int, ...]:
         errors.append("INFOVORE_CHANNEL_IDS must be a comma-separated list of positive integers")
         return ()
     return tuple(ids)
+
+
+def normalize_channel_names(raw: str | None) -> frozenset[str]:
+    """Comma-separated channel names -> a lowercased, `#`-stripped set
+    (issue #138): shared between `INFOVORE_EXCLUDE_CHANNELS` and `sift
+    export`/`sift serve --new`'s `--channels`, so the same string normalizes
+    the same way whether it names a denylist or an include filter. Any
+    non-empty name is accepted here; unknown-channel validation (against
+    `infovore.db.channel_filter.known_channel_names`) is the caller's job,
+    since only some callers have a database connection to validate against."""
+    text = raw or ""
+    names: set[str] = set()
+    for part in text.split(","):
+        name = part.strip()
+        if name.startswith("#"):
+            name = name[1:].strip()
+        if name:
+            names.add(name.lower())
+    return frozenset(names)
 
 
 def _optional_guild_id(raw: str | None, errors: list[str]) -> int | None:
@@ -322,6 +342,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
     workers = _optional_positive_int(
         env.get("INFOVORE_WORKERS"), DEFAULT_WORKERS, "INFOVORE_WORKERS", errors
     )
+    exclude_channels = normalize_channel_names(env.get("INFOVORE_EXCLUDE_CHANNELS"))
 
     if errors:
         raise ConfigError("; ".join(errors))
@@ -345,6 +366,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         triage_min_p_lore=triage_min_p_lore,
         triage_rules=triage_rules,
         workers=workers,
+        exclude_channels=exclude_channels,
     )
 
 

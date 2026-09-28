@@ -4,6 +4,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 
+from infovore.db.channel_filter import exclude_channels_clause, include_channels_clause
+
 DEFAULT_MIX_FRACTION_UNCERTAIN = 0.5
 
 
@@ -25,13 +27,23 @@ class SiftCandidate:
     p_trash: float | None
 
 
-def eligible_message_pool(conn: sqlite3.Connection) -> list[SiftCandidate]:
+def eligible_message_pool(
+    conn: sqlite3.Connection,
+    exclude_channels: frozenset[str] = frozenset(),
+    include_channels: frozenset[str] = frozenset(),
+) -> list[SiftCandidate]:
     """Every message a sift batch is allowed to offer (issue #128): it must
     belong to an exchange (`exchange_messages` — a message never grouped
     isn't part of the corpus this loop is triaging), its author must not be
     opted out (their history is never surfaced, redacted or not), and it
     must not already carry a `human` label (a batch never re-offers a
-    message the maintainer already sifted)."""
+    message the maintainer already sifted). `exclude_channels` (the
+    denylist, issue #138) and `include_channels` (`--channels`) further
+    restrict the pool by channel name, resolving a thread to its parent
+    channel's name; the denylist always wins when a channel is named in
+    both."""
+    excl_clause, excl_params = exclude_channels_clause("m.channel_id", exclude_channels)
+    incl_clause, incl_params = include_channels_clause("m.channel_id", include_channels)
     rows = conn.execute(
         "SELECT m.id AS id, m.channel_id AS channel_id, em.exchange_id AS exchange_id,"
         " m.p_trash AS p_trash"
@@ -41,8 +53,9 @@ def eligible_message_pool(conn: sqlite3.Connection) -> list[SiftCandidate]:
         " AND NOT EXISTS ("
         "   SELECT 1 FROM message_labels ml"
         "   WHERE ml.message_id = m.id AND ml.source = 'human'"
-        " )"
-        " ORDER BY m.id"
+        f" ){excl_clause}{incl_clause}"
+        " ORDER BY m.id",
+        (*excl_params, *incl_params),
     ).fetchall()
     return [
         SiftCandidate(
@@ -121,6 +134,8 @@ def select_sift_sample(
     seed: int,
     strategy: SiftStrategy,
     mix: float = DEFAULT_MIX_FRACTION_UNCERTAIN,
+    exclude_channels: frozenset[str] = frozenset(),
+    include_channels: frozenset[str] = frozenset(),
 ) -> list[int]:
     """Pick `n` message ids from `eligible_message_pool`, channel-stratified
     (issue #128): `random` draws uniformly within each channel's
@@ -132,7 +147,7 @@ def select_sift_sample(
     two (`mix`, default 50/50) but — unlike plain `uncertain` — falls back
     to an all-`random` split when nothing anywhere has a `p_trash` yet, so a
     mixed round never has to wait on a trained classifier."""
-    rows = eligible_message_pool(conn)
+    rows = eligible_message_pool(conn, exclude_channels, include_channels)
     if strategy is SiftStrategy.RANDOM:
         return sorted(_select_random_stratified(rows, n, seed))
     if strategy is SiftStrategy.UNCERTAIN:

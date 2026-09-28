@@ -109,6 +109,7 @@ class ExtractCommand:
                         max_score=args.max_score,
                         strategy=TrialSampleStrategy(args.strategy),
                         mix=args.mix,
+                        exclude_channels=context.settings.exclude_channels,
                     )
                 except NoScoredExchangesError as error:
                     raise ConfigError(
@@ -142,6 +143,7 @@ class ExtractCommand:
                 batch_id=batch_id,
                 rules=context.settings.triage_rules,
                 sampled_by=sampled_origins,
+                exclude_channels=context.settings.exclude_channels,
             )
         except PromptNotPromotedError as error:
             raise ConfigError(

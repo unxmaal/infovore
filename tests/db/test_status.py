@@ -170,9 +170,7 @@ def test_excluded_by_denylist_counts_gate_passing_exchanges_in_denylisted_channe
                  (2, 3, 3, '{NOW}', '{NOW}', 1, 'quiet_gap', 'c', 0.0, '{TRIAGE_VERSION}');
         """
     )
-    report = collect_status(
-        conn, triage_min_score=0.3, exclude_channels=frozenset({"food"})
-    )
+    report = collect_status(conn, triage_min_score=0.3, exclude_channels=frozenset({"food"}))
     assert report.passing_gate == 2
     assert report.excluded_by_denylist == 1
 

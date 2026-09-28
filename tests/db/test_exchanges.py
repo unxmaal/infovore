@@ -278,23 +278,29 @@ def test_claimable_exchanges_excludes_denylisted_channel_by_name(
     kept_id = insert_exchange(
         conn, make_exchange(message_count=1, content_hash="kept", channel_id=1), [1]
     )
-    insert_exchange(
-        conn, make_exchange(message_count=1, content_hash="trashed", channel_id=2), [2]
-    )
+    insert_exchange(conn, make_exchange(message_count=1, content_hash="trashed", channel_id=2), [2])
 
-    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"}))
+    result = claimable_exchanges(
+        conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"})
+    )
 
     assert [row.id for row in result] == [kept_id]
 
 
-def test_claimable_exchanges_denylist_is_case_insensitive_and_hash_tolerant(
+def test_claimable_exchanges_denylist_matches_channel_name_case_insensitively(
     conn: sqlite3.Connection,
 ) -> None:
+    """`exclude_channels` is expected already normalized (lowercase, no `#`
+    — `infovore.config.normalize_channel_names`'s job); `claimable_exchanges`
+    itself only needs to match a differently-cased stored channel name
+    case-insensitively."""
     insert_channel(conn, 1, "Food")
     insert_messages(conn, [1])
     insert_exchange(conn, make_exchange(message_count=1, content_hash="a", channel_id=1), [1])
 
-    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"#FOOD"}))
+    result = claimable_exchanges(
+        conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"})
+    )
 
     assert result == []
 
@@ -307,7 +313,9 @@ def test_claimable_exchanges_excludes_thread_whose_parent_is_denylisted(
     insert_messages(conn, [1])
     insert_exchange(conn, make_exchange(message_count=1, content_hash="a", channel_id=11), [1])
 
-    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"}))
+    result = claimable_exchanges(
+        conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"})
+    )
 
     assert result == []
 
@@ -322,7 +330,9 @@ def test_claimable_exchanges_keeps_thread_whose_parent_is_not_denylisted(
         conn, make_exchange(message_count=1, content_hash="a", channel_id=11), [1]
     )
 
-    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"}))
+    result = claimable_exchanges(
+        conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"})
+    )
 
     assert [row.id for row in result] == [exchange_id]
 

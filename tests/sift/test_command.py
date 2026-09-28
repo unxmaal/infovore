@@ -723,9 +723,7 @@ def test_sift_serve_new_unknown_channel_exits_config(tmp_path: Path) -> None:
     seed(env["INFOVORE_DB_PATH"])
     out_dir = tmp_path / "batch"
 
-    code, _, err = run(
-        ["sift", "serve", "--new", "--channels", "nope", "--out", str(out_dir)], env
-    )
+    code, _, err = run(["sift", "serve", "--new", "--channels", "nope", "--out", str(out_dir)], env)
 
     assert code == ExitCode.CONFIG
     assert "nope" in err
@@ -741,7 +739,7 @@ def test_sift_serve_new_denylist_wins_over_channels(
     seed(env["INFOVORE_DB_PATH"])
     out_dir = tmp_path / "batch"
 
-    code, out, _ = run(
+    code, _out, _ = run(
         [
             "sift",
             "serve",

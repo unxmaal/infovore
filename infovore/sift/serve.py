@@ -101,6 +101,8 @@ def resolve_batch(
     mix: float,
     out_dir: Path | None,
     now: datetime,
+    exclude_channels: frozenset[str] = frozenset(),
+    include_channels: frozenset[str] = frozenset(),
 ) -> BatchSource:
     """Which batch `sift serve` shows (issue #131): either an existing
     export dir (`dir_`, read as-is), or a freshly sampled one (`new=True`,
@@ -114,7 +116,15 @@ def resolve_batch(
     if new:
         assert out_dir is not None
         export_batch(
-            conn, size=size, strategy=strategy, seed=seed, mix=mix, out_dir=out_dir, now=now
+            conn,
+            size=size,
+            strategy=strategy,
+            seed=seed,
+            mix=mix,
+            out_dir=out_dir,
+            now=now,
+            exclude_channels=exclude_channels,
+            include_channels=include_channels,
         )
         target_dir = out_dir
     else:
@@ -369,6 +379,8 @@ def build_serve_app(
     out_dir: Path | None,
     scratch_dir: Path,
     clock: Clock,
+    exclude_channels: frozenset[str] = frozenset(),
+    include_channels: frozenset[str] = frozenset(),
 ) -> ServeApp:
     batch = resolve_batch(
         conn,
@@ -380,6 +392,8 @@ def build_serve_app(
         mix=mix,
         out_dir=out_dir,
         now=clock.now(),
+        exclude_channels=exclude_channels,
+        include_channels=include_channels,
     )
     messages = load_batch_messages(conn, batch.message_ids)
     return ServeApp(conn, messages, batch.dir.name, scratch_dir, clock)
