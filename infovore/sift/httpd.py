@@ -103,7 +103,12 @@ class _Handler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
 
     def _handle_label(self, app: ServeApp, body: dict[str, Any]) -> None:
-        message_id = int(body["message_id"])
+        raw_id = body["message_id"]
+        if not isinstance(raw_id, str):
+            raise ValueError(
+                "message_id must be a string: Discord ids exceed JavaScript's safe integer range"
+            )
+        message_id = int(raw_id)
         label = MessageLabel(body["label"])
         app.label(message_id, label)
         self._send_json(HTTPStatus.OK, {"state": app.state()})

@@ -129,13 +129,13 @@ def test_post_label_then_undo_round_trip(base_url: str) -> None:
     status, data = _post(base_url + "/api/label", {"message_id": "1", "label": "trash"})
     assert status == 200
     labels = {m["id"]: m["label"] for m in data["state"]["messages"]}
-    assert labels[1] == "trash"
+    assert labels["1"] == "trash"
 
     status, data = _post(base_url + "/api/undo", {})
     assert status == 200
     assert data["undone"] is True
     labels = {m["id"]: m["label"] for m in data["state"]["messages"]}
-    assert labels[1] is None
+    assert labels["1"] is None
 
 
 def test_post_trash_channel(base_url: str) -> None:

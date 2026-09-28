@@ -125,6 +125,8 @@
     z-index: 10;
   }
   .overlay[hidden] { display: none; }
+  .error-banner { position: sticky; top: 0; z-index: 20; padding: 0.75rem 1rem; font-size: 1.1rem; background: #b00020; color: #fff; }
+  .error-banner[hidden] { display: none; }
   .panel {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -173,6 +175,7 @@
 </style>
 </head>
 <body>
+<div id="error" class="error-banner" role="alert" hidden></div>
 <header>
   <h1>infovore sift</h1>
   <span id="progress-text">loading...</span>
@@ -247,6 +250,16 @@
     return div.innerHTML;
   }
 
+  function showError(message) {
+    var banner = document.getElementById("error");
+    banner.textContent = "Not saved: " + (message || "the server rejected the request");
+    banner.hidden = false;
+  }
+
+  function clearError() {
+    document.getElementById("error").hidden = true;
+  }
+
   function api(path, payload) {
     var options = payload === undefined
       ? undefined
@@ -255,6 +268,8 @@
       return response.json().then(function (data) {
         return { ok: response.ok, data: data };
       });
+    }).catch(function (error) {
+      return { ok: false, data: { error: "cannot reach the server (" + error + ")" } };
     });
   }
 
@@ -348,7 +363,8 @@
     var message = state.messages[focusIndex];
     if (!message) return;
     api("/api/label", { message_id: message.id, label: value }).then(function (result) {
-      if (!result.ok) return;
+      if (!result.ok) { showError(result.data && result.data.error); return; }
+      clearError();
       state = result.data.state;
       advanceFocus();
       render();
@@ -357,7 +373,8 @@
 
   function undo() {
     api("/api/undo", {}).then(function (result) {
-      if (!result.ok) return;
+      if (!result.ok) { showError(result.data && result.data.error); return; }
+      clearError();
       state = result.data.state;
       render();
     });
@@ -367,7 +384,8 @@
     var message = state.messages[focusIndex];
     if (!message) return;
     api("/api/trash_channel", { channel: message.channel }).then(function (result) {
-      if (!result.ok) return;
+      if (!result.ok) { showError(result.data && result.data.error); return; }
+      clearError();
       state = result.data.state;
       render();
     });
