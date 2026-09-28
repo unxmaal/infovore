@@ -121,12 +121,12 @@ def test_get_state_returns_the_batch(base_url: str) -> None:
     assert "application/json" in content_type
     data = json.loads(body)
     assert data["batch"] == "batch1"
-    assert [m["id"] for m in data["messages"]] == [1, 2]
+    assert [m["id"] for m in data["messages"]] == ["1", "2"]
     assert all(m["label"] is None for m in data["messages"])
 
 
 def test_post_label_then_undo_round_trip(base_url: str) -> None:
-    status, data = _post(base_url + "/api/label", {"message_id": 1, "label": "trash"})
+    status, data = _post(base_url + "/api/label", {"message_id": "1", "label": "trash"})
     assert status == 200
     labels = {m["id"]: m["label"] for m in data["state"]["messages"]}
     assert labels[1] == "trash"
@@ -160,7 +160,7 @@ def test_post_rules_preview_and_apply(base_url: str) -> None:
 
 
 def test_post_label_with_unknown_message_is_400(base_url: str) -> None:
-    status, data = _post(base_url + "/api/label", {"message_id": 999, "label": "trash"})
+    status, data = _post(base_url + "/api/label", {"message_id": "999", "label": "trash"})
     assert status == 400
     assert "error" in data
 
@@ -235,3 +235,46 @@ def test_block_until_interrupted_swallows_keyboard_interrupt() -> None:
             raise KeyboardInterrupt
 
     block_until_interrupted(_RaisingEvent())  # type: ignore[arg-type]
+
+
+SNOWFLAKE = 527504908467830833
+
+
+@pytest.fixture
+def snowflake_url(tmp_path: Path) -> Iterator[str]:
+    conn = open_database(tmp_path / "s.db")
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _message_with_exchange(conn, SNOWFLAKE, 1, "a real discord-sized id")
+    messages = load_batch_messages(conn, [SNOWFLAKE])
+    app = ServeApp(conn, messages, "batch1", tmp_path / "scratch", FixedClock(NOW))
+    servers = start_all(["127.0.0.1"], 0, app)
+    try:
+        yield listening_url(servers[0]).rstrip("/")
+    finally:
+        shutdown_all(servers)
+
+
+def test_state_sends_message_ids_as_exact_strings(snowflake_url: str) -> None:
+    _, body, _ = _get(snowflake_url + "/api/state")
+    assert json.loads(body)["messages"][0]["id"] == str(SNOWFLAKE)
+
+
+def test_label_accepts_a_snowflake_id_sent_as_a_string(snowflake_url: str) -> None:
+    status, data = _post(
+        snowflake_url + "/api/label", {"message_id": str(SNOWFLAKE), "label": "trash"}
+    )
+    assert status == 200
+    assert data["state"]["messages"][0]["label"] == "trash"
+
+
+def test_label_rejects_a_numeric_message_id(snowflake_url: str) -> None:
+    status, data = _post(snowflake_url + "/api/label", {"message_id": SNOWFLAKE, "label": "trash"})
+    assert status == 400
+    assert "string" in data["error"]
+
+
+def test_page_reports_api_errors_instead_of_ignoring_them() -> None:
+    page = load_page()
+    assert 'id="error"' in page
+    assert "showError" in page
