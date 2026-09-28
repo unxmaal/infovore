@@ -7,16 +7,25 @@ zero, examples visited in the given order every iteration — no randomness
 anywhere, so the same examples in the same order always produce the exact
 same model.
 
-Examples are sparse binary feature vectors: each is the frozenset of
-*active* feature names for that example (every other known feature is
-implicitly 0), the same representation `infovore.triage.bayes.features`
-already uses for the Bayes classifier. A training pass is therefore
-O(iterations * total active features across all examples), not
-O(iterations * examples * vocabulary size).
+Examples are sparse feature vectors, in either of two equivalent shapes:
+
+- a `frozenset[str]`/other `Iterable[str]` of *active* feature names, every
+  other known feature implicitly 0 and every active one implicitly 1 -- the
+  representation `infovore.triage.bayes.features` and `infovore.triage.tuning`
+  already use for the exchange-level Bayes/rule classifiers; or
+- a `Mapping[str, float]` of feature name to a continuous value (issue #135:
+  the message classifier's combiner fits real-valued inputs like
+  `logit(p_citation)`, not indicator features), which the first form is a
+  special case of (`{name: 1.0 for name in features}`) -- a caller passing
+  binary features gets exactly the same fit either way, since a weight of
+  1.0 multiplies a coefficient unchanged.
+
+A training pass is therefore O(iterations * total active feature-value pairs
+across all examples), not O(iterations * examples * vocabulary size).
 """
 
 import math
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 
 DEFAULT_ITERATIONS = 200
@@ -27,11 +36,16 @@ __all__ = [
     "DEFAULT_ITERATIONS",
     "DEFAULT_L2",
     "DEFAULT_LEARNING_RATE",
+    "FeatureValues",
     "LogisticModel",
     "predict_proba",
     "sigmoid",
     "train_logistic",
 ]
+
+# Either a set of active binary feature names, or a mapping of feature name
+# to its continuous value -- see the module docstring.
+FeatureValues = Mapping[str, float] | Iterable[str]
 
 
 @dataclass(frozen=True)
@@ -54,22 +68,38 @@ def sigmoid(x: float) -> float:
     return numerator / (1.0 + numerator)
 
 
-def _logit(intercept: float, weights: Mapping[str, float], features: Iterable[str]) -> float:
-    total = intercept
+def _feature_items(features: FeatureValues) -> Iterator[tuple[str, float]]:
+    """Normalize either shape `FeatureValues` can take to `(name, value)`
+    pairs: a `Mapping` yields its own `(name, value)` items unchanged; any
+    other iterable of names is treated as binary, each active name paired
+    with an implicit value of `1.0`."""
+    if isinstance(features, Mapping):
+        yield from features.items()
+        return
     for name in features:
-        total += weights.get(name, 0.0)
+        yield (name, 1.0)
+
+
+def _logit(
+    intercept: float, weights: Mapping[str, float], items: Iterable[tuple[str, float]]
+) -> float:
+    total = intercept
+    for name, value in items:
+        total += weights.get(name, 0.0) * value
     return total
 
 
-def predict_proba(model: LogisticModel, features: Iterable[str]) -> float:
-    """P(positive class) for an example whose active features are `features`
-    (any iterable of feature names; a `frozenset[str]` from
-    `infovore.triage.bayes.features` works directly)."""
-    return sigmoid(_logit(model.intercept, model.weights, features))
+def predict_proba(model: LogisticModel, features: FeatureValues) -> float:
+    """P(positive class) for an example described by `features` -- either a
+    binary active-feature set (any iterable of feature names; a
+    `frozenset[str]` from `infovore.triage.bayes.features` works directly)
+    or a `Mapping[str, float]` of feature name to continuous value (issue
+    #135's combiner)."""
+    return sigmoid(_logit(model.intercept, model.weights, _feature_items(features)))
 
 
 def train_logistic(
-    examples: Sequence[tuple[frozenset[str], bool]],
+    examples: Sequence[tuple[FeatureValues, bool]],
     iterations: int = DEFAULT_ITERATIONS,
     learning_rate: float = DEFAULT_LEARNING_RATE,
     l2: float = DEFAULT_L2,
@@ -81,10 +111,11 @@ def train_logistic(
     "how much to shrink" knob, and keeps gradient steps stable across widely
     different `l2` values at one fixed `learning_rate`.
 
-    `examples` pairs a sparse active-feature set with a bool label (`True`
-    for the positive class, e.g. lore). The intercept is never regularized
-    (only `weights` are), the standard convention: it exists to fit the
-    overall class balance, not to be shrunk toward it.
+    `examples` pairs a sparse feature set (binary or continuous -- see
+    `FeatureValues`) with a bool label (`True` for the positive class, e.g.
+    lore). The intercept is never regularized (only `weights` are), the
+    standard convention: it exists to fit the overall class balance, not to
+    be shrunk toward it.
 
     With no examples, returns a model with a zero intercept and no weights
     (`predict_proba` on it is always 0.5), so callers don't need a special
@@ -94,21 +125,25 @@ def train_logistic(
     if total == 0:
         return LogisticModel(intercept=0.0, weights={})
 
+    materialized: list[tuple[list[tuple[str, float]], bool]] = [
+        (list(_feature_items(features)), label) for features, label in examples
+    ]
+
     weights: dict[str, float] = {}
-    for features, _ in examples:
-        for name in features:
+    for items, _ in materialized:
+        for name, _value in items:
             weights.setdefault(name, 0.0)
 
     intercept = 0.0
     for _ in range(iterations):
         errors = [
-            predict_proba(LogisticModel(intercept, weights), features) - (1.0 if label else 0.0)
-            for features, label in examples
+            sigmoid(_logit(intercept, weights, items)) - (1.0 if label else 0.0)
+            for items, label in materialized
         ]
         gradient_weights = dict.fromkeys(weights, 0.0)
-        for (features, _), error in zip(examples, errors, strict=True):
-            for name in features:
-                gradient_weights[name] += error
+        for (items, _), error in zip(materialized, errors, strict=True):
+            for name, value in items:
+                gradient_weights[name] += error * value
         for name, summed_error in gradient_weights.items():
             gradient_weights[name] = summed_error / total + (l2 / total) * weights[name]
         gradient_intercept = sum(errors) / total

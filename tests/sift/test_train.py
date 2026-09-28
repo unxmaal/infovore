@@ -176,9 +176,7 @@ def test_train_and_store_citation_gate_ignores_messages_that_also_have_a_human_l
     not count toward the citation model's minimum either."""
     conn = db(tmp_path)
     seed_channels(conn)
-    ids = seed_labeled(
-        conn, 20, MessageLabel.KEEP, MessageLabelSource.CITATION, 1, 1, KEEP_CONTENT
-    )
+    ids = seed_labeled(conn, 20, MessageLabel.KEEP, MessageLabelSource.CITATION, 1, 1, KEEP_CONTENT)
     seed_labeled(conn, 20, MessageLabel.TRASH, MessageLabelSource.CITATION, 1, 100, TRASH_CONTENT)
     # Relabel every "citation keep" message with a human label too, leaving
     # zero citation-only keep examples.
@@ -246,6 +244,32 @@ def test_min_human_labels_per_class_is_configurable(tmp_path: Path) -> None:
     assert report.min_human_labels_per_class == 1000
 
 
+def test_min_human_labels_per_class_zero_fits_a_combiner_with_no_human_labels_at_all(
+    tmp_path: Path,
+) -> None:
+    """An edge case of the configurable minimum: `--min-human-labels 0` means
+    even zero human labels of a class clears the bar, so the non-fallback
+    path runs with an empty human example set -- every human-only figure
+    (AUC, discard pile shares) comes back `None` rather than a division by
+    zero or a crash."""
+    conn = db(tmp_path)
+    seed_citation_only_corpus(conn)
+
+    report = train_and_store(conn, FixedClock(NOW), min_human_labels_per_class=0)
+
+    assert report.fallback is False
+    assert report.human_labels_used == 0
+    assert report.human_auc is None
+    assert report.combined_auc is None
+    assert all(row.keep_lost is None and row.trash_caught is None for row in report.discard_pile)
+
+    loaded = load_latest_message_model(conn)
+    assert loaded is not None
+    assert loaded.fallback is False
+    assert loaded.human_model is not None
+    assert loaded.combiner is not None
+
+
 # --- train_and_store: full ensemble ---------------------------------------------
 
 
@@ -286,7 +310,8 @@ def test_train_and_store_builds_a_report_and_persists_both_models_and_the_combin
     assert combiner_row["human_model_version"] is not None
 
     citation_model_row = conn.execute(
-        "SELECT kind FROM message_model WHERE version = ?", (combiner_row["citation_model_version"],)
+        "SELECT kind FROM message_model WHERE version = ?",
+        (combiner_row["citation_model_version"],),
     ).fetchone()
     assert citation_model_row["kind"] == "citation"
     human_model_row = conn.execute(
@@ -401,12 +426,23 @@ def test_a_single_human_trashed_message_does_not_dominate_the_citation_model(
     counts and a fitted combiner, one human example is just one example."""
     conn = db(tmp_path)
     seed_channels(conn)
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, name, kind) VALUES (3, 1, 'off-topic', 'text')"
+    )
 
     # Plenty of ordinary citation-labeled keep/trash so the citation model is
     # well-formed and the human minimum-per-class gate is met independently.
-    seed_labeled(conn, GROUP_SIZE, MessageLabel.KEEP, MessageLabelSource.CITATION, 1, 2000, KEEP_CONTENT)
+    # Channels 2/3 (never used by a human-labeled message below) keep the
+    # citation model's CHAN_<id> tokens from confounding with channel 1,
+    # where every human example lives -- otherwise CHAN_1 alone would look
+    # like strong citation evidence for every human example regardless of
+    # its true label, just because human labeling happened to be scoped to
+    # one channel, which has nothing to do with this fixture's actual bug.
     seed_labeled(
-        conn, GROUP_SIZE, MessageLabel.TRASH, MessageLabelSource.CITATION, 2, 3000, TRASH_CONTENT
+        conn, GROUP_SIZE, MessageLabel.KEEP, MessageLabelSource.CITATION, 2, 2000, KEEP_CONTENT
+    )
+    seed_labeled(
+        conn, GROUP_SIZE, MessageLabel.TRASH, MessageLabelSource.CITATION, 3, 3000, TRASH_CONTENT
     )
     seed_labeled(
         conn,
@@ -466,7 +502,7 @@ def test_a_single_human_trashed_message_does_not_dominate_the_citation_model(
     assert "diesel" in tokens
 
     p_trash = p_trash_for_tokens(loaded, tokens)
-    assert p_trash < 0.9
+    assert p_trash < 0.5
 
 
 # --- scoring -----------------------------------------------------------------

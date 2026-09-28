@@ -338,6 +338,21 @@ def seed_labeled_corpus(db_path: str) -> None:
             None,
             datetime(2026, 1, 1, tzinfo=UTC),
         )
+    # A citation-labeled `keep` class too -- issue #135's citation model
+    # needs both classes among citation-only examples (this fixture's human
+    # labels are all `keep`, none `trash`, so it stays below the human
+    # minimum and falls back to citation-only; see the tests below).
+    for i in range(15):
+        message_id = 200 + i
+        _message_with_exchange(conn, message_id, 2, content=f"PROM 6.5.22 manual detail {i}")
+        set_message_label(
+            conn,
+            message_id,
+            MessageLabel.KEEP,
+            MessageLabelSource.CITATION,
+            None,
+            datetime(2026, 1, 1, tzinfo=UTC),
+        )
     conn.close()
 
 
@@ -360,7 +375,9 @@ def seed_full_ensemble_corpus(db_path: str) -> None:
     for i in range(35):
         message_id = 1000 + i
         _message_with_exchange(conn, message_id, 1, content=f"lol gg no cap {i}")
-        set_message_label(conn, message_id, MessageLabel.TRASH, MessageLabelSource.HUMAN, None, when)
+        set_message_label(
+            conn, message_id, MessageLabel.TRASH, MessageLabelSource.HUMAN, None, when
+        )
     for i in range(40):
         message_id = 2000 + i
         _message_with_exchange(conn, message_id, 2, content=f"PROM 6.5.22 manual detail {i}")
@@ -449,7 +466,7 @@ def test_sift_train_trains_and_scores_messages(tmp_path: Path) -> None:
 
     conn = open_database(env["INFOVORE_DB_PATH"])
     rows = conn.execute("SELECT p_trash FROM messages WHERE p_trash IS NOT NULL").fetchall()
-    assert len(rows) == 40
+    assert len(rows) == 55
 
 
 def test_sift_train_reports_citation_human_and_combined_auc_when_not_fallback(
