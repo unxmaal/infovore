@@ -53,6 +53,7 @@ version (see `infovore.sift.train.FeatureSetMismatchError`).
 import re
 import sqlite3
 from collections.abc import Mapping, Sequence
+from enum import StrEnum
 
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.raw import messages_by_ids
@@ -73,6 +74,44 @@ _PATH_RE = re.compile(r"(?:/[\w.-]+){2,}|[A-Za-z]:\\[\w\\.-]+")
 # version 2 adds them. `infovore.sift.train` stores this with the trained
 # ensemble and refuses to score with a mismatched version.
 FEATURE_SET_VERSION = 2
+
+
+class FeatureSet(StrEnum):
+    """The three selectable message feature sets (issue #144, following
+    #141's own ablation: on the real corpus -- 1,184 human labels, ~238k
+    citation labels -- conversation-context features measured *worse* than
+    no context at all: combined out-of-fold AUC vs human labels 0.805 with
+    context vs 0.854 without, `keep_lost@0.7` 13.9% vs 8.4%,
+    `trash_caught@0.9` 19% vs 28%):
+
+    - `PLAIN` -- the pre-#141 message features only: a message's own word
+      tokens, structural signals (`SIG_*`), a `CHAN_<channel_id>` token,
+      and a length bucket (`MLEN_*`). No conversation context at all --
+      the default (`DEFAULT_FEATURE_SET`), since it's what measured best
+      against real human labels.
+    - `STRUCTURAL` -- `PLAIN` plus only the *shape* of the surrounding
+      conversation: position/size buckets (`POS_*`, `EXSIZE_*`), the
+      `CTX_*` flags, and a neighbour's fact-shape tokens (`*_FACT_*`) --
+      but never a neighbour's own word tokens (no `PREV_`/`NEXT_`/
+      `REPLYTO_<word>`), which is exactly what #141's ablation found hurts
+      naive Bayes (a long, wordy neighbour swamps the model -- a
+      length-bias-like failure).
+    - `CONTEXT` -- everything `build_context_tokens`/`exchange_context_tokens`
+      produce, unfiltered: #141's original, always-on-until-now behaviour.
+
+    `infovore sift train --features` selects one; `infovore.sift.train`
+    persists the chosen name alongside `FEATURE_SET_VERSION`
+    (`message_combiner.feature_set_name`/`.feature_set_version`), and
+    scoring builds exactly that set (`context_tokens_for_feature_set`)."""
+
+    PLAIN = "plain"
+    STRUCTURAL = "structural"
+    CONTEXT = "context"
+
+
+# `infovore sift train --features`'s default when unset: the pre-#141
+# shape, which measured best against real human labels (see `FeatureSet`).
+DEFAULT_FEATURE_SET = FeatureSet.PLAIN
 
 # How many distinct neighbour word tokens (`PREV_`/`NEXT_`/`REPLYTO_`) a
 # single message contributes, to limit length bias -- a long neighbour
@@ -250,6 +289,41 @@ def exchange_context_tokens(
             continue
         result.update(build_context_tokens(exchange.messages, opted_out, reply_targets))
     return result
+
+
+def structural_context_tokens(tokens: frozenset[str]) -> frozenset[str]:
+    """Filters a full context-token set (`build_context_tokens`/
+    `exchange_context_tokens`'s output for one message) down to the
+    `FeatureSet.STRUCTURAL` subset (issue #144): position/size buckets and
+    reply-shape flags (`POS_`, `EXSIZE_`, `CTX_`) and a neighbour's
+    fact-shape tokens (`*_FACT_*`), dropping every neighbour *word* token
+    (`PREV_`/`NEXT_`/`REPLYTO_` followed by a plain lowercase word). A word
+    token never contains the literal `_FACT_` marker itself -- word tokens
+    are always lower-cased (`_word_tokens`), `_FACT_` is not -- so
+    `"_FACT_" in token` unambiguously picks out only the fact-shape
+    tokens, never a neighbour's own vocabulary."""
+    return frozenset(
+        token
+        for token in tokens
+        if token.startswith(("POS_", "EXSIZE_", "CTX_")) or "_FACT_" in token
+    )
+
+
+def context_tokens_for_feature_set(
+    feature_set: FeatureSet, full_context: frozenset[str]
+) -> frozenset[str]:
+    """`full_context` (one message's unfiltered `build_context_tokens`/
+    `exchange_context_tokens` output) narrowed to what `feature_set`
+    actually uses -- the single choke point both training
+    (`infovore.sift.train.build_message_examples`) and scoring
+    (`infovore.sift.train._score_rows`) go through, so `structural`/
+    `context` scoring can never drift from how they were trained. `PLAIN`
+    always returns no context at all, regardless of `full_context`."""
+    if feature_set is FeatureSet.PLAIN:
+        return frozenset()
+    if feature_set is FeatureSet.STRUCTURAL:
+        return structural_context_tokens(full_context)
+    return full_context
 
 
 def message_features(

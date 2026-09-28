@@ -9,11 +9,12 @@ import pytest
 from infovore.db.connection import migrate, open_database
 from infovore.db.message_labels import set_message_label
 from infovore.rows import MessageLabel, MessageLabelSource
-from infovore.sift.features import FEATURE_SET_VERSION
+from infovore.sift.features import DEFAULT_FEATURE_SET, FEATURE_SET_VERSION, FeatureSet
 from infovore.sift.train import (
     DEFAULT_MIN_HUMAN_LABELS_PER_CLASS,
     DISCARD_THRESHOLDS,
     Ensemble,
+    FeatureSetAblation,
     FeatureSetMismatchError,
     InsufficientLabelsError,
     MessageTrainReport,
@@ -143,7 +144,9 @@ def test_build_message_examples_returns_tokens_label_and_source(tmp_path: Path) 
     assert keep_example.label is MessageLabel.KEEP
     assert keep_example.source is MessageLabelSource.HUMAN
     assert keep_example.channel_id == 1
-    assert "prom" in keep_example.tokens
+    assert "prom" in keep_example.context_tokens
+    assert "prom" in keep_example.plain_tokens
+    assert "prom" in keep_example.structural_tokens
 
     citation_example = next(e for e in examples if e.message_id == 2000)
     assert citation_example.source is MessageLabelSource.CITATION
@@ -648,7 +651,7 @@ def seed_exchange(
         )
 
 
-def test_build_message_examples_tokens_include_context_but_base_tokens_do_not(
+def test_build_message_examples_tokens_include_context_but_plain_tokens_do_not(
     tmp_path: Path,
 ) -> None:
     conn = db(tmp_path)
@@ -661,10 +664,36 @@ def test_build_message_examples_tokens_include_context_but_base_tokens_do_not(
     examples = build_message_examples(conn)
     focus = next(e for e in examples if e.message_id == 500)
 
-    assert "PREV_run" in focus.tokens
-    assert "PREV_run" not in focus.base_tokens
-    assert "that" in focus.tokens
-    assert "that" in focus.base_tokens
+    assert "PREV_run" in focus.context_tokens
+    assert "PREV_run" not in focus.plain_tokens
+    assert "PREV_run" not in focus.structural_tokens
+    assert "that" in focus.context_tokens
+    assert "that" in focus.plain_tokens
+    assert "that" in focus.structural_tokens
+
+
+def test_build_message_examples_structural_tokens_keep_shape_but_not_neighbour_words(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_channels(conn)
+    seed_message(conn, 400, 1, 1, "see the manual at /etc/config/app.conf")
+    seed_message(conn, 500, 1, 2, "that works")
+    seed_exchange(conn, 600, 1, [400, 500])
+    set_message_label(conn, 500, MessageLabel.KEEP, MessageLabelSource.CITATION, None, NOW)
+
+    examples = build_message_examples(conn)
+    focus = next(e for e in examples if e.message_id == 500)
+
+    assert "PREV_FACT_path" in focus.structural_tokens
+    assert "POS_last" in focus.structural_tokens
+    assert "EXSIZE_1-2" in focus.structural_tokens
+    assert not any(
+        token.startswith("PREV_") and "_FACT_" not in token for token in focus.structural_tokens
+    )
+    assert "PREV_FACT_path" in focus.context_tokens
+    assert "PREV_manual" in focus.context_tokens
+    assert "PREV_manual" not in focus.structural_tokens
 
 
 def test_build_message_examples_context_excludes_opted_out_neighbour(tmp_path: Path) -> None:
@@ -679,7 +708,7 @@ def test_build_message_examples_context_excludes_opted_out_neighbour(tmp_path: P
     examples = build_message_examples(conn)
     focus = next(e for e in examples if e.message_id == 500)
 
-    assert not any(token.startswith("PREV_") for token in focus.tokens)
+    assert not any(token.startswith("PREV_") for token in focus.context_tokens)
 
 
 def test_train_and_store_persists_the_current_feature_set_version(tmp_path: Path) -> None:
@@ -688,33 +717,75 @@ def test_train_and_store_persists_the_current_feature_set_version(tmp_path: Path
 
     train_and_store(conn, FixedClock(NOW))
 
-    row = conn.execute("SELECT feature_set_version FROM message_combiner").fetchone()
+    row = conn.execute(
+        "SELECT feature_set_version, feature_set_name FROM message_combiner"
+    ).fetchone()
     assert row["feature_set_version"] == FEATURE_SET_VERSION
+    assert row["feature_set_name"] == FeatureSet.PLAIN.value
 
     loaded = load_latest_message_model(conn)
     assert loaded is not None
     assert loaded.feature_set_version == FEATURE_SET_VERSION
+    assert loaded.feature_set is FeatureSet.PLAIN
 
 
-def test_train_and_store_report_includes_a_baseline_ablation(tmp_path: Path) -> None:
+def test_train_and_store_default_feature_set_is_plain(tmp_path: Path) -> None:
     conn = db(tmp_path)
     seed_full_corpus(conn)
 
     report = train_and_store(conn, FixedClock(NOW))
 
-    assert report.baseline_citation_auc is not None
-    assert report.baseline_human_auc is not None
-    assert report.baseline_combined_auc is not None
-    assert 0.0 <= report.baseline_citation_auc <= 1.0
-    assert 0.0 <= report.baseline_human_auc <= 1.0
-    assert 0.0 <= report.baseline_combined_auc <= 1.0
-    assert len(report.baseline_discard_pile) == len(DISCARD_THRESHOLDS)
-    for row in report.baseline_discard_pile:
-        assert row.keep_lost is not None
-        assert row.trash_caught is not None
+    assert report.feature_set is FeatureSet.PLAIN
+    assert DEFAULT_FEATURE_SET is FeatureSet.PLAIN
 
 
-def test_train_and_store_ablation_falls_back_the_same_way_as_the_primary_fit(
+def test_train_and_store_persists_an_explicitly_chosen_feature_set(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_full_corpus(conn)
+
+    report = train_and_store(conn, FixedClock(NOW), feature_set=FeatureSet.STRUCTURAL)
+
+    assert report.feature_set is FeatureSet.STRUCTURAL
+    row = conn.execute("SELECT feature_set_name FROM message_combiner").fetchone()
+    assert row["feature_set_name"] == "structural"
+    loaded = load_latest_message_model(conn)
+    assert loaded is not None
+    assert loaded.feature_set is FeatureSet.STRUCTURAL
+
+
+def test_train_and_store_report_includes_ablations_for_all_three_feature_sets(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_full_corpus(conn)
+
+    report = train_and_store(conn, FixedClock(NOW))
+
+    assert len(report.ablations) == 3
+    assert {a.feature_set for a in report.ablations} == {
+        FeatureSet.PLAIN,
+        FeatureSet.STRUCTURAL,
+        FeatureSet.CONTEXT,
+    }
+    for ablation in report.ablations:
+        assert isinstance(ablation, FeatureSetAblation)
+        assert ablation.combined_auc is not None
+        assert 0.0 <= ablation.combined_auc <= 1.0
+        assert len(ablation.discard_pile) == len(DISCARD_THRESHOLDS)
+        for row in ablation.discard_pile:
+            assert row.keep_lost is not None
+            assert row.trash_caught is not None
+
+    # The persisted (default: plain) row's own figures match the chosen
+    # ablation entry exactly -- same fit, not a re-derived approximation.
+    plain_row = next(a for a in report.ablations if a.feature_set is FeatureSet.PLAIN)
+    assert report.combined_auc == plain_row.combined_auc
+    assert report.citation_auc == plain_row.citation_auc
+    assert report.human_auc == plain_row.human_auc
+    assert report.discard_pile == plain_row.discard_pile
+
+
+def test_train_and_store_ablations_fall_back_the_same_way_as_the_primary_fit(
     tmp_path: Path,
 ) -> None:
     conn = db(tmp_path)
@@ -723,11 +794,13 @@ def test_train_and_store_ablation_falls_back_the_same_way_as_the_primary_fit(
     report = train_and_store(conn, FixedClock(NOW))
 
     assert report.fallback is True
-    assert report.baseline_human_auc is None
-    assert report.baseline_combined_auc is None
-    assert all(
-        row.keep_lost is None and row.trash_caught is None for row in report.baseline_discard_pile
-    )
+    assert len(report.ablations) == 3
+    for ablation in report.ablations:
+        assert ablation.human_auc is None
+        assert ablation.combined_auc is None
+        assert all(
+            row.keep_lost is None and row.trash_caught is None for row in ablation.discard_pile
+        )
 
 
 def seed_decisive_context_pair(
@@ -779,21 +852,35 @@ def seed_decisive_context_corpus(conn: sqlite3.Connection) -> None:
         )
 
 
-def test_ablation_report_separates_the_decisive_that_works_fixture(tmp_path: Path) -> None:
+def test_ablation_compares_all_three_feature_sets_on_the_decisive_fixture(
+    tmp_path: Path,
+) -> None:
     conn = db(tmp_path)
     seed_decisive_context_corpus(conn)
 
-    report = train_and_store(conn, FixedClock(NOW))
+    report = train_and_store(conn, FixedClock(NOW))  # default persisted: plain
 
     assert report.fallback is False
-    assert report.combined_auc is not None
-    assert report.baseline_combined_auc is not None
-    # Without context, every "that works" message has identical own-message
-    # tokens regardless of label, so the baseline is close to chance.
-    assert report.baseline_combined_auc < 0.65
-    # With context, the previous message's words separate them cleanly.
-    assert report.combined_auc > 0.9
-    assert report.combined_auc - report.baseline_combined_auc > 0.3
+    by_set = {a.feature_set: a for a in report.ablations}
+    plain_auc = by_set[FeatureSet.PLAIN].combined_auc
+    structural_auc = by_set[FeatureSet.STRUCTURAL].combined_auc
+    context_auc = by_set[FeatureSet.CONTEXT].combined_auc
+    assert plain_auc is not None
+    assert structural_auc is not None
+    assert context_auc is not None
+    # Without any neighbour word tokens, every "that works" message has
+    # identical own-message tokens regardless of label (plain), and no
+    # differing fact-shape/position signal either (structural) -- both are
+    # close to chance.
+    assert plain_auc < 0.65
+    assert structural_auc < 0.7
+    # With full context, the previous message's own words separate them
+    # cleanly.
+    assert context_auc > 0.9
+    assert context_auc - plain_auc > 0.3
+    # The persisted model (default: plain) matches the plain ablation row.
+    assert report.feature_set is FeatureSet.PLAIN
+    assert report.combined_auc == plain_auc
 
 
 def test_score_all_raises_when_the_stored_feature_set_version_is_stale(tmp_path: Path) -> None:
@@ -818,3 +905,124 @@ def test_score_stale_raises_when_the_stored_feature_set_version_is_stale(tmp_pat
 
     with pytest.raises(FeatureSetMismatchError):
         score_stale(conn, stale)
+
+
+# --- issue #144: scoring builds exactly the persisted feature set -------------
+
+
+def _seed_context_sensitive_pair(conn: sqlite3.Connection) -> None:
+    """Two unlabeled, never-trained-on messages -- own tokens ("that
+    works") identical in both -- whose previous message differs (how-to vs
+    chatter), each in its own exchange, so `p_trash` differs between them
+    only if scoring actually consults conversation context."""
+    seed_message(conn, 90000, 1, 1, "run pip install widget then restart")
+    seed_message(conn, 90001, 1, 2, "that works")
+    seed_exchange(conn, 90100, 1, [90000, 90001])
+    seed_message(conn, 90002, 1, 1, "lol remember that time we did the thing")
+    seed_message(conn, 90003, 1, 2, "that works")
+    seed_exchange(conn, 90101, 1, [90002, 90003])
+
+
+def test_score_all_builds_context_tokens_when_the_persisted_feature_set_is_context(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_decisive_context_corpus(conn)
+    train_and_store(conn, FixedClock(NOW), feature_set=FeatureSet.CONTEXT)
+    ensemble = load_latest_message_model(conn)
+    assert ensemble is not None
+    assert ensemble.feature_set is FeatureSet.CONTEXT
+
+    _seed_context_sensitive_pair(conn)
+    score_all(conn, ensemble)
+
+    keep_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90001").fetchone()["p_trash"]
+    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()["p_trash"]
+    assert keep_like != trash_like
+
+
+def test_score_all_builds_only_plain_tokens_when_the_persisted_feature_set_is_plain(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_decisive_context_corpus(conn)
+    train_and_store(conn, FixedClock(NOW))  # default: plain
+    ensemble = load_latest_message_model(conn)
+    assert ensemble is not None
+    assert ensemble.feature_set is FeatureSet.PLAIN
+
+    _seed_context_sensitive_pair(conn)
+    score_all(conn, ensemble)
+
+    keep_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90001").fetchone()["p_trash"]
+    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()["p_trash"]
+    assert keep_like == trash_like
+
+
+def test_score_all_builds_only_structural_tokens_when_the_persisted_feature_set_is_structural(
+    tmp_path: Path,
+) -> None:
+    """Structural sees the surrounding conversation's *shape* but never a
+    neighbour's own words, so two messages whose neighbours differ only in
+    wording (no differing fact-shape/position signal) still score
+    identically."""
+    conn = db(tmp_path)
+    seed_decisive_context_corpus(conn)
+    train_and_store(conn, FixedClock(NOW), feature_set=FeatureSet.STRUCTURAL)
+    ensemble = load_latest_message_model(conn)
+    assert ensemble is not None
+    assert ensemble.feature_set is FeatureSet.STRUCTURAL
+
+    _seed_context_sensitive_pair(conn)
+    score_all(conn, ensemble)
+
+    keep_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90001").fetchone()["p_trash"]
+    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()["p_trash"]
+    assert keep_like == trash_like
+
+
+# --- issue #144: backward compatibility with a pre-#144 stored model ----------
+
+
+def _insert_legacy_message_combiner_row(conn: sqlite3.Connection, feature_set_version: int) -> None:
+    """Simulates a `message_combiner` row written before issue #144 --
+    before the `feature_set_name` column existed, only `feature_set_version`
+    was ever recorded (issue #141's migration 0013)."""
+    conn.execute(
+        "INSERT INTO message_model (trained_at, labels_used, holdout_size, params_json, kind)"
+        " VALUES (?, 1, 0, '{\"trash_documents\": 1, \"keep_documents\": 1}', 'citation')",
+        (NOW_TEXT,),
+    )
+    citation_version = conn.execute("SELECT version FROM message_model").fetchone()["version"]
+    conn.execute(
+        "INSERT INTO message_combiner (trained_at, citation_model_version, human_model_version,"
+        " fallback, params_json, feature_set_version)"
+        " VALUES (?, ?, NULL, 1, '{}', ?)",
+        (NOW_TEXT, citation_version, feature_set_version),
+    )
+
+
+def test_load_latest_message_model_resolves_a_legacy_version_2_row_to_context(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    _insert_legacy_message_combiner_row(conn, feature_set_version=2)
+
+    loaded = load_latest_message_model(conn)
+
+    assert loaded is not None
+    assert loaded.feature_set_version == 2
+    assert loaded.feature_set is FeatureSet.CONTEXT
+
+
+def test_load_latest_message_model_resolves_a_legacy_version_1_row_to_plain(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    _insert_legacy_message_combiner_row(conn, feature_set_version=1)
+
+    loaded = load_latest_message_model(conn)
+
+    assert loaded is not None
+    assert loaded.feature_set_version == 1
+    assert loaded.feature_set is FeatureSet.PLAIN
