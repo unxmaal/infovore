@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 
 from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
+from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
 from infovore.db.claims import live_prompt_version as db_live_prompt_version
 from infovore.db.claims import retract_claim as db_retract_claim
@@ -191,7 +192,10 @@ def _select_random(rows: Sequence[sqlite3.Row], n: int, seed: int) -> list[int]:
 
 
 def _sample_pool(
-    conn: sqlite3.Connection, min_score: float | None, max_score: float | None
+    conn: sqlite3.Connection,
+    min_score: float | None,
+    max_score: float | None,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> list[sqlite3.Row]:
     conditions: list[str] = []
     params: list[object] = []
@@ -201,6 +205,10 @@ def _sample_pool(
     if max_score is not None:
         conditions.append("triage_score <= ?")
         params.append(max_score)
+    excl_clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
+    if excl_clause:
+        conditions.append(excl_clause.removeprefix(" AND "))
+        params.extend(excl_params)
     where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
     return conn.execute(
         f"SELECT id, channel_id, message_count, p_lore FROM exchanges{where} ORDER BY id", params
@@ -214,14 +222,21 @@ def select_trial_sample(
     min_score: float | None = None,
     max_score: float | None = None,
     strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> list[int]:
     if strategy is TrialSampleStrategy.MIXED:
         origins = select_trial_sample_origins(
-            conn, n, seed, min_score=min_score, max_score=max_score, strategy=strategy
+            conn,
+            n,
+            seed,
+            min_score=min_score,
+            max_score=max_score,
+            strategy=strategy,
+            exclude_channels=exclude_channels,
         )
         return sorted(origins)
 
-    rows = _sample_pool(conn, min_score, max_score)
+    rows = _sample_pool(conn, min_score, max_score, exclude_channels)
 
     if strategy is TrialSampleStrategy.UNCERTAIN:
         return _select_uncertain(rows, n)
@@ -262,6 +277,7 @@ def select_trial_sample_origins(
     max_score: float | None = None,
     strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
     mix: float = DEFAULT_MIX_FRACTION_UNCERTAIN,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> dict[int, str]:
     """Every exchange id `select_trial_sample` would pick for this call,
     mapped to the sampling strategy that picked it — `extraction_runs
@@ -278,10 +294,12 @@ def select_trial_sample_origins(
     `--strategy uncertain` alone does (which raises `NoScoredExchangesError`
     in that case, unchanged by this function)."""
     if strategy is not TrialSampleStrategy.MIXED:
-        selected = select_trial_sample(conn, n, seed, min_score, max_score, strategy)
+        selected = select_trial_sample(
+            conn, n, seed, min_score, max_score, strategy, exclude_channels=exclude_channels
+        )
         return {exchange_id: strategy.value for exchange_id in selected}
 
-    rows = _sample_pool(conn, min_score, max_score)
+    rows = _sample_pool(conn, min_score, max_score, exclude_channels)
     if n >= len(rows):
         return {
             row["id"]: (
@@ -510,6 +528,7 @@ async def run_extraction(
     order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
     rules: TriageRules = DEFAULT_RULES,
     sampled_by: Mapping[int, str] | None = None,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
@@ -554,6 +573,7 @@ async def run_extraction(
                 min_score=min_score,
                 min_p_lore=min_p_lore,
                 order=order,
+                exclude_channels=exclude_channels,
             )
             if not batch:
                 break

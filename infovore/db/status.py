@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE, DEFAULT_TRIAGE_MIN_SCORE
+from infovore.db.channel_filter import include_channels_clause
 from infovore.db.codec import from_db_time
 from infovore.db.labels import label_counts
 from infovore.triage.gate import gate_sql
@@ -29,6 +30,7 @@ class StatusReport:
     latest_model_labels_used: int | None
     p_lore_scored: int
     passing_gate: int
+    excluded_by_denylist: int
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
@@ -65,11 +67,30 @@ def _latest_model(conn: sqlite3.Connection) -> tuple[int | None, int | None]:
     return int(row["version"]), int(row["labels_used"])
 
 
+def _excluded_by_denylist(
+    conn: sqlite3.Connection,
+    gate_clause: str,
+    gate_params: tuple[float, float],
+    exclude_channels: frozenset[str],
+) -> int:
+    if not exclude_channels:
+        return 0
+    denylist_clause, denylist_params = include_channels_clause(
+        "exchanges.channel_id", exclude_channels
+    )
+    return _count_params(
+        conn,
+        f"SELECT COUNT(*) FROM exchanges WHERE {gate_clause}{denylist_clause}",
+        (*gate_params, *denylist_params),
+    )
+
+
 def collect_status(
     conn: sqlite3.Connection,
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE,
     triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     rules: TriageRules = DEFAULT_RULES,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> StatusReport:
     counts = label_counts(conn)
     latest_model_version, latest_model_labels_used = _latest_model(conn)
@@ -107,5 +128,8 @@ def collect_status(
         p_lore_scored=_count(conn, "SELECT COUNT(*) FROM exchanges WHERE p_lore IS NOT NULL"),
         passing_gate=_count_params(
             conn, f"SELECT COUNT(*) FROM exchanges WHERE {gate_clause}", gate_params
+        ),
+        excluded_by_denylist=_excluded_by_denylist(
+            conn, gate_clause, gate_params, exclude_channels
         ),
     )

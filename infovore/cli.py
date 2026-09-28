@@ -101,6 +101,7 @@ class StatusCommand:
             context.settings.triage_min_score,
             context.settings.triage_min_p_lore,
             rules=context.settings.triage_rules,
+            exclude_channels=context.settings.exclude_channels,
         )
         lines = [
             f"channels: {report.channels}",
@@ -124,6 +125,7 @@ class StatusCommand:
             ),
             f"p_lore scored: {report.p_lore_scored}",
             f"passing gate: {report.passing_gate}",
+            f"excluded by denylist: {report.excluded_by_denylist}",
             *(
                 f"{stage.value}: {stage_settings.backend} / {stage_settings.model}"
                 for stage, stage_settings in context.settings.stages.items()

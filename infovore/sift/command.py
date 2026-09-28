@@ -4,7 +4,8 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from infovore.config import ConfigError
+from infovore.config import ConfigError, normalize_channel_names
+from infovore.db.channel_filter import known_channel_names
 from infovore.sift.addresses import default_hosts
 from infovore.sift.citations import derive_citation_labels
 from infovore.sift.export import export_batch
@@ -112,6 +113,24 @@ def _render_message_top_tokens(label: str, tokens: Sequence[MessageTokenInfo]) -
     return "\n".join(lines)
 
 
+def _resolve_include_channels(context: "AppContext", raw: str | None) -> frozenset[str]:
+    """`--channels` -> a validated, normalized include set (issue #138):
+    empty/unset means no restriction. An unknown channel name exits `2`
+    listing every known channel name, so a typo doesn't silently sample
+    nothing."""
+    include_channels = normalize_channel_names(raw) if raw else frozenset()
+    if not include_channels:
+        return include_channels
+    known = known_channel_names(context.conn)
+    unknown = sorted(include_channels - known)
+    if unknown:
+        raise ConfigError(
+            f"unknown channel(s) in --channels: {', '.join(unknown)};"
+            f" known channels: {', '.join(sorted(known)) or 'none'}"
+        )
+    return include_channels
+
+
 class SiftCommand:
     name = "sift"
     help = "message-level trash sifting in lnav: export a batch, import human labels"
@@ -134,6 +153,14 @@ class SiftCommand:
             "--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix"
         )
         export_parser.add_argument("--out", type=str, default=None, dest="out")
+        export_parser.add_argument(
+            "--channels",
+            type=str,
+            default=None,
+            dest="channels",
+            help="comma-separated channel names to restrict sampling to (and their threads);"
+            " the channel denylist (INFOVORE_EXCLUDE_CHANNELS) always wins",
+        )
 
         import_parser = subparsers.add_parser(
             "import", help="record human labels from a sifted lnav batch"
@@ -184,6 +211,14 @@ class SiftCommand:
         serve_parser.add_argument("--out", type=str, default=None, dest="out")
         serve_parser.add_argument("--host", action="append", default=None, dest="hosts")
         serve_parser.add_argument("--port", type=int, default=DEFAULT_SIFT_SERVE_PORT)
+        serve_parser.add_argument(
+            "--channels",
+            type=str,
+            default=None,
+            dest="channels",
+            help="comma-separated channel names to restrict sampling to (and their threads,"
+            " --new only); the channel denylist (INFOVORE_EXCLUDE_CHANNELS) always wins",
+        )
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.sift_command == "import":
@@ -275,6 +310,7 @@ class SiftCommand:
 
         out_dir = Path(args.out)
         strategy = SiftStrategy(args.strategy)
+        include_channels = _resolve_include_channels(context, args.channels)
         try:
             report = export_batch(
                 context.conn,
@@ -284,6 +320,8 @@ class SiftCommand:
                 mix=args.mix,
                 out_dir=out_dir,
                 now=context.clock.now(),
+                exclude_channels=context.settings.exclude_channels,
+                include_channels=include_channels,
             )
         except NoScoredMessagesError as error:
             raise ConfigError(
@@ -343,6 +381,7 @@ class SiftCommand:
             raise ConfigError("--mix must be between 0 and 1")
 
         strategy = SiftStrategy(args.strategy)
+        include_channels = _resolve_include_channels(context, args.channels)
         try:
             app = build_serve_app(
                 context.conn,
@@ -355,6 +394,8 @@ class SiftCommand:
                 out_dir=Path(args.out) if args.out else None,
                 scratch_dir=context.settings.scratch_dir,
                 clock=context.clock,
+                exclude_channels=context.settings.exclude_channels,
+                include_channels=include_channels,
             )
         except NoScoredMessagesError as error:
             raise ConfigError(

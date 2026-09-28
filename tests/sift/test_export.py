@@ -213,6 +213,54 @@ def test_export_batch_creates_out_dir(tmp_path: Path) -> None:
     assert out_dir.is_dir()
 
 
+def test_export_batch_respects_exclude_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1, content="general message")
+    _message_with_exchange(conn, 2, 2, content="food message")
+
+    out_dir = tmp_path / "out"
+    report = export_batch(
+        conn,
+        size=10,
+        strategy=SiftStrategy.RANDOM,
+        seed=0,
+        mix=0.5,
+        out_dir=out_dir,
+        now=datetime(2026, 1, 2, tzinfo=UTC),
+        exclude_channels=frozenset({"food"}),
+    )
+
+    assert report.count == 1
+    manifest = json.loads(report.manifest_path.read_text())
+    assert manifest["message_ids"] == [1]
+
+
+def test_export_batch_respects_include_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1, content="general message")
+    _message_with_exchange(conn, 2, 2, content="food message")
+
+    out_dir = tmp_path / "out"
+    report = export_batch(
+        conn,
+        size=10,
+        strategy=SiftStrategy.RANDOM,
+        seed=0,
+        mix=0.5,
+        out_dir=out_dir,
+        now=datetime(2026, 1, 2, tzinfo=UTC),
+        include_channels=frozenset({"general"}),
+    )
+
+    assert report.count == 1
+    manifest = json.loads(report.manifest_path.read_text())
+    assert manifest["message_ids"] == [1]
+
+
 def test_lnav_format_json_is_valid_and_matches_the_batch_log_pattern() -> None:
     parsed = json.loads(LNAV_FORMAT_JSON)
     fmt = parsed["infovore_sift"]

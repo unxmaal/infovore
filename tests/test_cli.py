@@ -66,7 +66,37 @@ def test_status_on_a_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert "triage model: none" in out
     assert "p_lore scored: 0" in out
     assert "passing gate: 0" in out
+    assert "excluded by denylist: 0" in out
     assert (tmp_path / "nested" / "dir" / "infovore.db").exists()
+
+
+def test_status_shows_excluded_by_denylist_count(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_TRIAGE_MIN_SCORE"] = "0.3"
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+    assert run(["status"], env)[0] == ExitCode.OK
+    from infovore.db.connection import open_database
+
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    now = "2026-01-01T00:00:00+00:00"
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES
+          (1, 9, 'general', 'text'), (2, 9, 'food', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{now}', 'x', '{now}', '{{}}'),
+                 (2, 2, 9, 1, 'a', '{now}', 'y', '{now}', '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
+          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}'),
+                 (2, 2, 2, '{now}', '{now}', 1, 'quiet_gap', 'b', 0.9, '{TRIAGE_VERSION}');
+        """
+    )
+    code, out, _ = run(["status"], env)
+    assert code == ExitCode.OK
+    assert "passing gate: 2" in out
+    assert "excluded by denylist: 1" in out
 
 
 def test_status_lists_non_empty_counts(tmp_path: Path) -> None:

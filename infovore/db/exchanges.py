@@ -4,6 +4,7 @@ from enum import StrEnum
 from typing import cast
 
 from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
+from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
@@ -148,6 +149,7 @@ def claimable_exchanges(
     min_score: float | None = None,
     min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> list[ExchangeRow]:
     condition = "extraction_status IN (?, ?) AND retry_count < ?"
     params: list[object] = [
@@ -159,6 +161,9 @@ def claimable_exchanges(
         clause, gate_params = gate_sql(min_score, min_p_lore)
         condition += f" AND {clause}"
         params.extend(gate_params)
+    excl_clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
+    condition += excl_clause
+    params.extend(excl_params)
     rows = conn.execute(
         f"SELECT * FROM exchanges WHERE {condition} ORDER BY {_ORDER_BY[order]} LIMIT ?",
         (*params, limit),

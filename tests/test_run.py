@@ -16,11 +16,13 @@ from infovore.cli import AppContext, ExitCode, builtin_commands, main
 from infovore.config import Settings, Stage, StageSettings
 from infovore.db.claims import promote_prompt_version, register_prompt_version
 from infovore.db.connection import migrate, open_database
+from infovore.db.exchanges import get_exchange, insert_exchange
 from infovore.extract.fake import MarkerExtractor, MarkerProbe
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.fake import FakeBackend
 from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import Registry, default_registry
+from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
 from infovore.run import (
     CycleStepStarted,
     RunCommand,
@@ -48,7 +50,7 @@ def db(tmp_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def make_settings(tmp_path: Path) -> Settings:
+def make_settings(tmp_path: Path, exclude_channels: frozenset[str] = frozenset()) -> Settings:
     stage = StageSettings(backend="fake", model="m", concurrency=2, timeout_seconds=60.0)
     return Settings(
         discord_token="t",
@@ -58,6 +60,7 @@ def make_settings(tmp_path: Path) -> Settings:
         scratch_dir=tmp_path / "scratch",
         stages={Stage.EXTRACT: stage, Stage.PROBE: stage, Stage.JUDGE: stage},
         triage_min_score=0.0,
+        exclude_channels=exclude_channels,
     )
 
 
@@ -391,6 +394,72 @@ async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path)
         CycleStepStarted(step="extract"),
         CycleStepStarted(step="probe"),
     ]
+
+
+def _seed_pending_exchange_in_channel(
+    conn: sqlite3.Connection, channel_id: int, channel_name: str, message_id: int
+) -> int:
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, name, kind) VALUES (?, 9, ?, 'text')",
+        (channel_id, channel_name),
+    )
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (?, ?, 9, 1, 'alice', ?, 'hi', ?, '{}')",
+        (message_id, channel_id, NOW.isoformat(), NOW.isoformat()),
+    )
+    row = ExchangeRow(
+        id=None,
+        channel_id=channel_id,
+        thread_id=None,
+        first_message_id=message_id,
+        last_message_id=message_id,
+        started_at=NOW,
+        ended_at=NOW,
+        message_count=1,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash=f"hash-{message_id}",
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    exchange_id = insert_exchange(conn, row, [message_id])
+    conn.execute(
+        "UPDATE exchanges SET triage_score = 1.0, triage_reasons = '[]', triage_version = ?"
+        " WHERE id = ?",
+        ("t1", exchange_id),
+    )
+    return exchange_id
+
+
+async def test_run_once_extraction_never_claims_a_denylisted_channel(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
+    promote_prompt_version(conn, PROMPT_VERSION, NOW)
+    kept_id = _seed_pending_exchange_in_channel(conn, 1, "general", 1)
+    excluded_id = _seed_pending_exchange_in_channel(conn, 2, "food", 2)
+    settings = make_settings(tmp_path, exclude_channels=frozenset({"food"}))
+    source = FakeDiscordSource()
+
+    report = await run_once(
+        conn,
+        source,
+        MarkerExtractor(),
+        MarkerProbe(),
+        FixedClock(NOW),
+        RecordingSleeper(),
+        settings,
+    )
+
+    assert report.cycles_completed == 1
+    kept = get_exchange(conn, kept_id)
+    excluded = get_exchange(conn, excluded_id)
+    assert kept is not None
+    assert excluded is not None
+    assert kept.extraction_status is ExtractionStatus.DONE
+    assert excluded.extraction_status is ExtractionStatus.PENDING
 
 
 async def test_run_once_progress_defaults_to_noop(tmp_path: Path) -> None:

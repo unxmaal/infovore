@@ -217,6 +217,46 @@ def test_resolve_batch_new_samples_and_writes_a_manifest(tmp_path: Path) -> None
     assert (out_dir / MANIFEST_NAME).exists()
 
 
+def test_resolve_batch_new_respects_exclude_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    out_dir = tmp_path / "fresh"
+
+    batch = resolve_batch(
+        conn,
+        dir_=None,
+        new=True,
+        size=10,
+        strategy=SiftStrategy.RANDOM,
+        seed=0,
+        mix=0.5,
+        out_dir=out_dir,
+        now=NOW,
+        exclude_channels=frozenset({"food"}),
+    )
+
+    assert batch.message_ids == [1, 2, 3]
+
+
+def test_resolve_batch_new_respects_include_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    out_dir = tmp_path / "fresh"
+
+    batch = resolve_batch(
+        conn,
+        dir_=None,
+        new=True,
+        size=10,
+        strategy=SiftStrategy.RANDOM,
+        seed=0,
+        mix=0.5,
+        out_dir=out_dir,
+        now=NOW,
+        include_channels=frozenset({"food"}),
+    )
+
+    assert batch.message_ids == [4, 5, 6]
+
+
 def test_resolve_batch_new_propagates_no_scored_messages_error(tmp_path: Path) -> None:
     conn = seeded(tmp_path)
     out_dir = tmp_path / "fresh"
@@ -259,6 +299,27 @@ def test_build_serve_app_from_existing_dir(tmp_path: Path) -> None:
 
     assert app.batch_name == "batch1"
     assert len(app.messages()) == 6
+
+
+def test_build_serve_app_new_respects_exclude_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    out_dir = tmp_path / "fresh"
+
+    app = build_serve_app(
+        conn,
+        dir_=None,
+        new=True,
+        size=10,
+        strategy=SiftStrategy.RANDOM,
+        seed=0,
+        mix=0.5,
+        out_dir=out_dir,
+        scratch_dir=tmp_path / "scratch",
+        clock=FixedClock(NOW),
+        exclude_channels=frozenset({"food"}),
+    )
+
+    assert {message.channel_name for message in app.messages()} == {"general"}
 
 
 # --- ServeApp: state / progress ----------------------------------------------

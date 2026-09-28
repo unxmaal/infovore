@@ -85,6 +85,14 @@ def test_configuration_documents_export_source() -> None:
         assert needle in configuration, needle
 
 
+def test_configuration_documents_the_channel_denylist() -> None:
+    configuration = section("Configuration")
+    running = section("Running")
+    for needle in ("INFOVORE_EXCLUDE_CHANNELS", "claimable_exchanges"):
+        assert needle in configuration, needle
+    assert "INFOVORE_EXCLUDE_CHANNELS" in running
+
+
 def test_configuration_documents_the_shared_channel_allowlist() -> None:
     configuration = section("Configuration")
     running = section("Running")
@@ -178,6 +186,13 @@ def test_sifting_section_documents_citations_train_and_report() -> None:
         "AUC",
     ):
         assert needle in body, needle
+
+
+def test_sifting_section_documents_the_channels_filter() -> None:
+    running = section("Running")
+    sifting = running.split("### Sifting", 1)[1]
+    for needle in ("--channels", "INFOVORE_EXCLUDE_CHANNELS"):
+        assert needle in sifting, needle
 
 
 def test_tuning_loop_recommends_mixed_rounds() -> None:

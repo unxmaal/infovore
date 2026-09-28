@@ -11,6 +11,7 @@ from infovore.config import (
     Stage,
     StageSettings,
     load_settings,
+    normalize_channel_names,
     read_dotenv,
     resolve_guild_id,
     settings_from_environment,
@@ -70,6 +71,25 @@ def test_settings_defaults() -> None:
     assert settings.exchange_max_messages == 50
     assert settings.opt_out_role_name == "no-archive"
     assert settings.include_bot_messages is False
+    assert settings.exclude_channels == frozenset()
+
+
+def test_normalize_channel_names_lowercases_and_strips_hash() -> None:
+    assert normalize_channel_names("Food,#Motor-Vehicles") == {"food", "motor-vehicles"}
+
+
+def test_normalize_channel_names_strips_whitespace_and_drops_empties() -> None:
+    assert normalize_channel_names(" food , , #music-geeks ,") == {"food", "music-geeks"}
+
+
+def test_normalize_channel_names_none_or_blank_is_empty() -> None:
+    assert normalize_channel_names(None) == frozenset()
+    assert normalize_channel_names("") == frozenset()
+    assert normalize_channel_names("   ") == frozenset()
+
+
+def test_normalize_channel_names_dedupes_case_insensitively() -> None:
+    assert normalize_channel_names("Food,food,FOOD") == {"food"}
 
 
 def test_settings_token_hidden_from_repr() -> None:
@@ -296,6 +316,17 @@ def test_load_settings_discord_source_channel_ids_blank_means_all() -> None:
     env = {**REQUIRED_ENV, "INFOVORE_CHANNEL_IDS": " , , "}
     settings = load_settings(env)
     assert settings.channel_ids == ()
+
+
+def test_load_settings_exclude_channels_unset_means_none() -> None:
+    settings = load_settings(REQUIRED_ENV)
+    assert settings.exclude_channels == frozenset()
+
+
+def test_load_settings_exclude_channels_parses_and_normalizes() -> None:
+    env = {**REQUIRED_ENV, "INFOVORE_EXCLUDE_CHANNELS": "Food,#Motor-Vehicles,music-geeks"}
+    settings = load_settings(env)
+    assert settings.exclude_channels == {"food", "motor-vehicles", "music-geeks"}
 
 
 def test_load_settings_bad_int_reported() -> None:

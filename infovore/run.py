@@ -114,6 +114,7 @@ async def _run_cycle(
             min_score=settings.triage_min_score,
             min_p_lore=settings.triage_min_p_lore,
             rules=settings.triage_rules,
+            exclude_channels=settings.exclude_channels,
         )
     except PromptNotPromotedError as error:
         logger.warning(
