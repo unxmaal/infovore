@@ -536,6 +536,7 @@ def test_sift_train_trains_and_scores_messages(tmp_path: Path) -> None:
     # labels -- well below the default per-class minimum, so this falls back
     # to the citation-only model (issue #135 design point 4).
     assert "fallback" in out
+    assert "ablation" in out
 
     conn = open_database(env["INFOVORE_DB_PATH"])
     rows = conn.execute("SELECT p_trash FROM messages WHERE p_trash IS NOT NULL").fetchall()
@@ -557,6 +558,9 @@ def test_sift_train_reports_citation_human_and_combined_auc_when_not_fallback(
     assert "combined: auc=" in out
     assert "discard pile" in out
     assert "citation-holdout" in out
+    assert "ablation" in out
+    assert "with context features" in out
+    assert "without context features" in out
 
 
 def test_sift_train_human_weight_flag_is_a_documented_removal_error(tmp_path: Path) -> None:

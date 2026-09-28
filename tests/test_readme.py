@@ -188,6 +188,25 @@ def test_sifting_section_documents_citations_train_and_report() -> None:
         assert needle in body, needle
 
 
+def test_sifting_section_documents_context_features_and_ablation() -> None:
+    running = section("Running")
+    sifting = running.split("### Sifting", 1)[1]
+    for needle in (
+        "conversation context",
+        "PREV_",
+        "NEXT_",
+        "REPLYTO_",
+        "FEATURE_SET_VERSION",
+        "feature_set_version",
+        "FeatureSetMismatchError",
+        "ablation",
+        "with context features",
+        "without context features",
+        "exchange_context_tokens",
+    ):
+        assert needle in sifting, needle
+
+
 def test_sifting_section_documents_the_channels_filter() -> None:
     running = section("Running")
     sifting = running.split("### Sifting", 1)[1]

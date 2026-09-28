@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -8,10 +9,12 @@ import pytest
 from infovore.db.connection import migrate, open_database
 from infovore.db.message_labels import set_message_label
 from infovore.rows import MessageLabel, MessageLabelSource
+from infovore.sift.features import FEATURE_SET_VERSION
 from infovore.sift.train import (
     DEFAULT_MIN_HUMAN_LABELS_PER_CLASS,
     DISCARD_THRESHOLDS,
     Ensemble,
+    FeatureSetMismatchError,
     InsufficientLabelsError,
     MessageTrainReport,
     build_message_examples,
@@ -604,3 +607,214 @@ def test_score_all_workers_two_matches_workers_one(tmp_path: Path) -> None:
     assert [(r["id"], r["p_trash"]) for r in serial_rows] == [
         (r["id"], r["p_trash"]) for r in parallel_rows
     ]
+
+
+# --- issue #141: conversation-context features --------------------------------
+
+
+def seed_message(
+    conn: sqlite3.Connection, message_id: int, channel_id: int, author_id: int, content: str
+) -> None:
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json)"
+        " VALUES (?, ?, 1, ?, 'someone', ?, ?, ?, '{}')",
+        (message_id, channel_id, author_id, NOW_TEXT, content, NOW_TEXT),
+    )
+
+
+def seed_exchange(
+    conn: sqlite3.Connection, exchange_id: int, channel_id: int, message_ids: list[int]
+) -> None:
+    conn.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
+        " started_at, ended_at, message_count, grouping_rule, content_hash)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, 'quiet_gap', ?)",
+        (
+            exchange_id,
+            channel_id,
+            message_ids[0],
+            message_ids[-1],
+            NOW_TEXT,
+            NOW_TEXT,
+            len(message_ids),
+            f"h{exchange_id}",
+        ),
+    )
+    for position, message_id in enumerate(message_ids):
+        conn.execute(
+            "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, ?)",
+            (exchange_id, message_id, position),
+        )
+
+
+def test_build_message_examples_tokens_include_context_but_base_tokens_do_not(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_channels(conn)
+    seed_message(conn, 400, 1, 1, "run pip install widget")
+    seed_message(conn, 500, 1, 2, "that works")
+    seed_exchange(conn, 600, 1, [400, 500])
+    set_message_label(conn, 500, MessageLabel.KEEP, MessageLabelSource.CITATION, None, NOW)
+
+    examples = build_message_examples(conn)
+    focus = next(e for e in examples if e.message_id == 500)
+
+    assert "PREV_run" in focus.tokens
+    assert "PREV_run" not in focus.base_tokens
+    assert "that" in focus.tokens
+    assert "that" in focus.base_tokens
+
+
+def test_build_message_examples_context_excludes_opted_out_neighbour(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_channels(conn)
+    seed_message(conn, 400, 1, 42, "secret private words")
+    seed_message(conn, 500, 1, 2, "that works")
+    seed_exchange(conn, 600, 1, [400, 500])
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (42, ?)", (NOW_TEXT,))
+    set_message_label(conn, 500, MessageLabel.KEEP, MessageLabelSource.CITATION, None, NOW)
+
+    examples = build_message_examples(conn)
+    focus = next(e for e in examples if e.message_id == 500)
+
+    assert not any(token.startswith("PREV_") for token in focus.tokens)
+
+
+def test_train_and_store_persists_the_current_feature_set_version(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_full_corpus(conn)
+
+    train_and_store(conn, FixedClock(NOW))
+
+    row = conn.execute("SELECT feature_set_version FROM message_combiner").fetchone()
+    assert row["feature_set_version"] == FEATURE_SET_VERSION
+
+    loaded = load_latest_message_model(conn)
+    assert loaded is not None
+    assert loaded.feature_set_version == FEATURE_SET_VERSION
+
+
+def test_train_and_store_report_includes_a_baseline_ablation(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_full_corpus(conn)
+
+    report = train_and_store(conn, FixedClock(NOW))
+
+    assert report.baseline_citation_auc is not None
+    assert report.baseline_human_auc is not None
+    assert report.baseline_combined_auc is not None
+    assert 0.0 <= report.baseline_citation_auc <= 1.0
+    assert 0.0 <= report.baseline_human_auc <= 1.0
+    assert 0.0 <= report.baseline_combined_auc <= 1.0
+    assert len(report.baseline_discard_pile) == len(DISCARD_THRESHOLDS)
+    for row in report.baseline_discard_pile:
+        assert row.keep_lost is not None
+        assert row.trash_caught is not None
+
+
+def test_train_and_store_ablation_falls_back_the_same_way_as_the_primary_fit(
+    tmp_path: Path,
+) -> None:
+    conn = db(tmp_path)
+    seed_citation_only_corpus(conn)
+
+    report = train_and_store(conn, FixedClock(NOW))
+
+    assert report.fallback is True
+    assert report.baseline_human_auc is None
+    assert report.baseline_combined_auc is None
+    assert all(
+        row.keep_lost is None and row.trash_caught is None for row in report.baseline_discard_pile
+    )
+
+
+def seed_decisive_context_pair(
+    conn: sqlite3.Connection,
+    exchange_id: int,
+    prev_id: int,
+    focus_id: int,
+    prev_content: str,
+    label: MessageLabel,
+) -> None:
+    seed_message(conn, prev_id, 1, 1, prev_content)
+    seed_message(conn, focus_id, 1, 2, "that works")
+    seed_exchange(conn, exchange_id, 1, [prev_id, focus_id])
+    set_message_label(conn, focus_id, label, MessageLabelSource.HUMAN, None, NOW)
+
+
+def seed_decisive_context_corpus(conn: sqlite3.Connection) -> None:
+    """The issue's own motivating fixture: "that works" is identical junk
+    or a meaningful confirmation depending on what came before it. Every
+    `keep` example is literally the message "that works" after a how-to;
+    every `trash` example is the identical message after unrelated chatter
+    -- so a model without conversation-context features cannot possibly
+    separate them (their own tokens are identical), while a model with
+    context features can, via the previous message's words."""
+    seed_channels(conn)
+    seed_labeled(
+        conn, GROUP_SIZE, MessageLabel.KEEP, MessageLabelSource.CITATION, 2, 2000, KEEP_CONTENT
+    )
+    seed_labeled(
+        conn, GROUP_SIZE, MessageLabel.TRASH, MessageLabelSource.CITATION, 2, 3000, TRASH_CONTENT
+    )
+    for i in range(HUMAN_GROUP_SIZE):
+        seed_decisive_context_pair(
+            conn,
+            exchange_id=40000 + i,
+            prev_id=41000 + i,
+            focus_id=42000 + i,
+            prev_content=f"run pip install widget{i} then restart the service",
+            label=MessageLabel.KEEP,
+        )
+    for i in range(HUMAN_GROUP_SIZE):
+        seed_decisive_context_pair(
+            conn,
+            exchange_id=50000 + i,
+            prev_id=51000 + i,
+            focus_id=52000 + i,
+            prev_content=f"lol remember that time we did the thing haha {i}",
+            label=MessageLabel.TRASH,
+        )
+
+
+def test_ablation_report_separates_the_decisive_that_works_fixture(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_decisive_context_corpus(conn)
+
+    report = train_and_store(conn, FixedClock(NOW))
+
+    assert report.fallback is False
+    assert report.combined_auc is not None
+    assert report.baseline_combined_auc is not None
+    # Without context, every "that works" message has identical own-message
+    # tokens regardless of label, so the baseline is close to chance.
+    assert report.baseline_combined_auc < 0.65
+    # With context, the previous message's words separate them cleanly.
+    assert report.combined_auc > 0.9
+    assert report.combined_auc - report.baseline_combined_auc > 0.3
+
+
+def test_score_all_raises_when_the_stored_feature_set_version_is_stale(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_citation_only_corpus(conn)
+    train_and_store(conn, FixedClock(NOW))
+    ensemble = load_latest_message_model(conn)
+    assert ensemble is not None
+    stale = replace(ensemble, feature_set_version=ensemble.feature_set_version - 1)
+
+    with pytest.raises(FeatureSetMismatchError, match="infovore sift train"):
+        score_all(conn, stale)
+
+
+def test_score_stale_raises_when_the_stored_feature_set_version_is_stale(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_citation_only_corpus(conn)
+    train_and_store(conn, FixedClock(NOW))
+    ensemble = load_latest_message_model(conn)
+    assert ensemble is not None
+    stale = replace(ensemble, feature_set_version=ensemble.feature_set_version - 1)
+
+    with pytest.raises(FeatureSetMismatchError):
+        score_stale(conn, stale)
