@@ -278,3 +278,187 @@ def test_page_reports_api_errors_instead_of_ignoring_them() -> None:
     page = load_page()
     assert 'id="error"' in page
     assert "showError" in page
+
+
+# --- /api/context (issue #137) ------------------------------------------------
+
+_CONVERSATION = [
+    (1, 1, "alice", "one", "2026-01-01T00:00:00+00:00"),
+    (2, 2, "bob", "two", "2026-01-01T00:01:00+00:00"),
+    (3, 1, "alice", "three", "2026-01-01T00:02:00+00:00"),
+    (4, 2, "bob", "four", "2026-01-01T00:03:00+00:00"),
+    (5, 1, "alice", "five", "2026-01-01T00:04:00+00:00"),
+]
+
+
+def _exchange_with_messages(
+    conn: sqlite3.Connection,
+    exchange_id: int,
+    channel_id: int,
+    message_specs: list[tuple[int, int, str, str, str]],
+) -> None:
+    first_id, last_id = message_specs[0][0], message_specs[-1][0]
+    first_created, last_created = message_specs[0][4], message_specs[-1][4]
+    conn.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
+        " started_at, ended_at, message_count, grouping_rule, content_hash)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, 'quiet_gap', ?)",
+        (
+            exchange_id,
+            channel_id,
+            first_id,
+            last_id,
+            first_created,
+            last_created,
+            len(message_specs),
+            f"hx{exchange_id}",
+        ),
+    )
+    for position, (message_id, author_id, author_name, content, created_at) in enumerate(
+        message_specs, start=1
+    ):
+        conn.execute(
+            "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+            " created_at, content, ingested_at, raw_json)"
+            " VALUES (?, ?, 1, ?, ?, ?, ?, ?, '{}')",
+            (message_id, channel_id, author_id, author_name, created_at, content, NOW.isoformat()),
+        )
+        conn.execute(
+            "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, ?)",
+            (exchange_id, message_id, position),
+        )
+
+
+@pytest.fixture
+def context_url(tmp_path: Path) -> Iterator[str]:
+    conn = open_database(tmp_path / "ctx.db")
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _exchange_with_messages(conn, 100, 1, _CONVERSATION)
+    messages = load_batch_messages(conn, [3])
+    app = ServeApp(conn, messages, "batch1", tmp_path / "scratch", FixedClock(NOW))
+    servers = start_all(["127.0.0.1"], 0, app)
+    try:
+        yield listening_url(servers[0]).rstrip("/")
+    finally:
+        shutdown_all(servers)
+
+
+def test_get_context_returns_the_window_in_position_order(context_url: str) -> None:
+    status, body, content_type = _get(context_url + "/api/context?message_id=3&before=1&after=1")
+    assert status == 200
+    assert "application/json" in content_type
+    data = json.loads(body)
+    assert data["message_id"] == "3"
+    assert [m["id"] for m in data["messages"]] == ["2", "3", "4"]
+    assert [m["focused"] for m in data["messages"]] == [False, True, False]
+
+
+def test_get_context_uses_defaults_when_before_after_omitted(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context?message_id=3")
+    assert status == 200
+    data = json.loads(body)
+    assert [m["id"] for m in data["messages"]] == ["1", "2", "3", "4", "5"]
+
+
+def test_get_context_caps_an_oversized_window(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context?message_id=3&before=999&after=999")
+    assert status == 200
+    data = json.loads(body)
+    assert data["before"] == 20
+    assert data["after"] == 20
+
+
+def test_get_context_redacts_opted_out_authors(tmp_path: Path) -> None:
+    conn = open_database(tmp_path / "ctx-redact.db")
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _exchange_with_messages(conn, 100, 1, _CONVERSATION)
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (2, ?)", (NOW.isoformat(),))
+    messages = load_batch_messages(conn, [3])
+    app = ServeApp(conn, messages, "batch1", tmp_path / "scratch", FixedClock(NOW))
+    servers = start_all(["127.0.0.1"], 0, app)
+    try:
+        url = listening_url(servers[0]).rstrip("/")
+        status, body, _ = _get(url + "/api/context?message_id=3&before=4&after=4")
+    finally:
+        shutdown_all(servers)
+    assert status == 200
+    by_id = {m["id"]: m for m in json.loads(body)["messages"]}
+    assert by_id["2"]["author"] == "[redacted]"
+    assert by_id["2"]["content"] == "[redacted]"
+
+
+def test_get_context_missing_message_id_is_400(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context")
+    assert status == 400
+    assert "error" in json.loads(body)
+
+
+def test_get_context_non_numeric_message_id_is_400(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context?message_id=not-a-number")
+    assert status == 400
+    assert "error" in json.loads(body)
+
+
+def test_get_context_unknown_message_id_is_400(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context?message_id=999999")
+    assert status == 400
+    assert "error" in json.loads(body)
+
+
+def test_get_context_invalid_before_is_400(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context?message_id=3&before=nope")
+    assert status == 400
+    assert "error" in json.loads(body)
+
+
+def test_get_context_invalid_after_is_400(context_url: str) -> None:
+    status, body, _ = _get(context_url + "/api/context?message_id=3&after=nope")
+    assert status == 400
+    assert "error" in json.loads(body)
+
+
+def test_get_context_sends_a_real_size_snowflake_id_as_an_exact_string(
+    tmp_path: Path,
+) -> None:
+    conn = open_database(tmp_path / "ctx-snowflake.db")
+    migrate(conn)
+    _channel(conn, 1, "general")
+    snowflake_conversation = [
+        (SNOWFLAKE, 1, "alice", "one", "2026-01-01T00:00:00+00:00"),
+        (SNOWFLAKE + 1, 2, "bob", "two", "2026-01-01T00:01:00+00:00"),
+        (SNOWFLAKE + 2, 1, "alice", "three", "2026-01-01T00:02:00+00:00"),
+    ]
+    _exchange_with_messages(conn, 100, 1, snowflake_conversation)
+    messages = load_batch_messages(conn, [SNOWFLAKE + 1])
+    app = ServeApp(conn, messages, "batch1", tmp_path / "scratch", FixedClock(NOW))
+    servers = start_all(["127.0.0.1"], 0, app)
+    try:
+        url = listening_url(servers[0]).rstrip("/")
+        status, body, _ = _get(url + f"/api/context?message_id={SNOWFLAKE + 1}")
+    finally:
+        shutdown_all(servers)
+    assert status == 200
+    data = json.loads(body)
+    assert data["message_id"] == str(SNOWFLAKE + 1)
+    assert {m["id"] for m in data["messages"]} == {
+        str(SNOWFLAKE),
+        str(SNOWFLAKE + 1),
+        str(SNOWFLAKE + 2),
+    }
+
+
+def test_page_has_a_context_container_and_c_key_toggle() -> None:
+    page = load_page()
+    assert "context-row" in page
+    assert 'case "c":' in page
+    assert 'case "+":' in page
+    assert 'case "-":' in page
+    assert "contextEnabled" in page
+    assert "/api/context" in page
+
+
+def test_page_help_mentions_the_context_keys() -> None:
+    page = load_page()
+    assert "context" in page.lower()
