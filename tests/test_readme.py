@@ -165,11 +165,16 @@ def test_sifting_section_documents_citations_train_and_report() -> None:
         "infovore sift train",
         "message_model",
         "message_tokens",
-        "human_weight",
+        "message_combiner",
         "--human-weight",
+        "citation model",
+        "human model",
+        "combiner",
+        "fallback",
+        "out-of-fold",
         "p_trash",
         "discard",
-        "per channel",
+        "channel name",
         "AUC",
     ):
         assert needle in body, needle

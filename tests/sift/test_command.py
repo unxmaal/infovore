@@ -341,6 +341,41 @@ def seed_labeled_corpus(db_path: str) -> None:
     conn.close()
 
 
+def seed_full_ensemble_corpus(db_path: str) -> None:
+    """Enough citation *and* human labels of both classes (>= the default
+    30/class minimum) to exercise the full two-model ensemble rather than
+    the citation-only fallback -- issue #135."""
+    from infovore.db.message_labels import set_message_label
+    from infovore.rows import MessageLabel, MessageLabelSource
+
+    conn = open_database(db_path)
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    when = datetime(2026, 1, 1, tzinfo=UTC)
+    for i in range(35):
+        message_id = 1 + i
+        _message_with_exchange(conn, message_id, 1, content=f"PROM 6.5.22 manual detail {i}")
+        set_message_label(conn, message_id, MessageLabel.KEEP, MessageLabelSource.HUMAN, None, when)
+    for i in range(35):
+        message_id = 1000 + i
+        _message_with_exchange(conn, message_id, 1, content=f"lol gg no cap {i}")
+        set_message_label(conn, message_id, MessageLabel.TRASH, MessageLabelSource.HUMAN, None, when)
+    for i in range(40):
+        message_id = 2000 + i
+        _message_with_exchange(conn, message_id, 2, content=f"PROM 6.5.22 manual detail {i}")
+        set_message_label(
+            conn, message_id, MessageLabel.KEEP, MessageLabelSource.CITATION, None, when
+        )
+    for i in range(40):
+        message_id = 3000 + i
+        _message_with_exchange(conn, message_id, 2, content=f"lol gg no cap {i}")
+        set_message_label(
+            conn, message_id, MessageLabel.TRASH, MessageLabelSource.CITATION, None, when
+        )
+    conn.close()
+
+
 def test_sift_citations_reports_keep_and_trash_counts(tmp_path: Path) -> None:
     from infovore.db.claims import NewClaim, record_run
     from infovore.rows import ClaimKind, ExtractionRunRow, RunMode, RunOutcome
@@ -399,8 +434,6 @@ def test_sift_train_requires_minimum_labels(tmp_path: Path) -> None:
 
 
 def test_sift_train_trains_and_scores_messages(tmp_path: Path) -> None:
-    from infovore.sift.train import DEFAULT_HUMAN_WEIGHT
-
     env = environment(tmp_path)
     seed_labeled_corpus(env["INFOVORE_DB_PATH"])
 
@@ -409,21 +442,52 @@ def test_sift_train_trains_and_scores_messages(tmp_path: Path) -> None:
     assert code == ExitCode.OK
     assert "trained message model" in out
     assert "scored" in out
-    assert f"human_weight={DEFAULT_HUMAN_WEIGHT}" in out
+    # seed_labeled_corpus has only 20 human `keep` labels and 0 human `trash`
+    # labels -- well below the default per-class minimum, so this falls back
+    # to the citation-only model (issue #135 design point 4).
+    assert "fallback" in out
 
     conn = open_database(env["INFOVORE_DB_PATH"])
     rows = conn.execute("SELECT p_trash FROM messages WHERE p_trash IS NOT NULL").fetchall()
     assert len(rows) == 40
 
 
-def test_sift_train_accepts_a_human_weight_flag(tmp_path: Path) -> None:
+def test_sift_train_reports_citation_human_and_combined_auc_when_not_fallback(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train"], env)
+
+    assert code == ExitCode.OK
+    assert "fallback" not in out
+    assert "citation-only: auc=" in out
+    assert "human-only: auc=" in out
+    assert "combined: auc=" in out
+    assert "discard pile" in out
+    assert "citation-holdout" in out
+
+
+def test_sift_train_human_weight_flag_is_a_documented_removal_error(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed_labeled_corpus(env["INFOVORE_DB_PATH"])
 
-    code, out, _ = run(["sift", "train", "--human-weight", "3"], env)
+    code, _, err = run(["sift", "train", "--human-weight", "3"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "--human-weight" in err
+    assert "#135" in err
+
+
+def test_sift_train_accepts_a_min_human_labels_flag(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train", "--min-human-labels", "1000"], env)
 
     assert code == ExitCode.OK
-    assert "human_weight=3" in out
+    assert "fallback" in out
 
 
 def test_sift_export_strategy_uncertain_works_after_train(tmp_path: Path) -> None:
