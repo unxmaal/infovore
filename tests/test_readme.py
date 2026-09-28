@@ -200,9 +200,20 @@ def test_sifting_section_documents_context_features_and_ablation() -> None:
         "feature_set_version",
         "FeatureSetMismatchError",
         "ablation",
-        "with context features",
-        "without context features",
         "exchange_context_tokens",
+    ):
+        assert needle in sifting, needle
+
+
+def test_sifting_section_documents_the_three_feature_sets() -> None:
+    running = section("Running")
+    sifting = running.split("### Sifting", 1)[1]
+    for needle in (
+        "--features",
+        "feature_set_name",
+        "DEFAULT_FEATURE_SET",
+        "structural",
+        "FeatureSet",
     ):
         assert needle in sifting, needle
 

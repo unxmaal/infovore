@@ -559,8 +559,55 @@ def test_sift_train_reports_citation_human_and_combined_auc_when_not_fallback(
     assert "discard pile" in out
     assert "citation-holdout" in out
     assert "ablation" in out
-    assert "with context features" in out
-    assert "without context features" in out
+    assert "plain" in out
+    assert "structural" in out
+    assert "context" in out
+
+
+def test_sift_train_default_feature_set_is_plain(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train"], env)
+
+    assert code == ExitCode.OK
+    assert "features=plain" in out
+
+
+def test_sift_train_accepts_a_features_flag(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train", "--features", "context"], env)
+
+    assert code == ExitCode.OK
+    assert "features=context" in out
+
+
+def test_sift_train_rejects_an_unknown_features_value(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
+
+    code, _, err = run(["sift", "train", "--features", "bogus"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "--features" in err
+
+
+def test_sift_train_ablation_table_lists_all_three_feature_sets_and_marks_persisted(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train", "--features", "structural"], env)
+
+    assert code == ExitCode.OK
+    assert "features=structural" in out
+    ablation = out.split("ablation", 1)[1]
+    assert "plain" in ablation
+    assert "structural" in ablation
+    assert "context" in ablation
 
 
 def test_sift_train_human_weight_flag_is_a_documented_removal_error(tmp_path: Path) -> None:

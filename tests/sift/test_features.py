@@ -6,13 +6,17 @@ from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.connection import migrate, open_database
 from infovore.rows import MessageRow
 from infovore.sift.features import (
+    DEFAULT_FEATURE_SET,
     FEATURE_SET_VERSION,
     NEIGHBOUR_TOKEN_CAP,
+    FeatureSet,
     build_context_tokens,
+    context_tokens_for_feature_set,
     exchange_context_tokens,
     exchange_size_bucket,
     message_features,
     position_bucket,
+    structural_context_tokens,
 )
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -463,3 +467,77 @@ def test_exchange_context_tokens_uses_exchange_inputs_for_ids_ordering(tmp_path:
 
     assert [m.id for m in inputs[100].messages] == [1, 2]
     assert set(tokens) == {1, 2}
+
+
+# --- issue #144: named feature sets (plain/structural/context) ---------------
+
+
+def test_default_feature_set_is_plain() -> None:
+    assert DEFAULT_FEATURE_SET is FeatureSet.PLAIN
+
+
+def test_feature_set_has_exactly_three_named_members() -> None:
+    assert {member.value for member in FeatureSet} == {"plain", "structural", "context"}
+    assert tuple(FeatureSet) == (FeatureSet.PLAIN, FeatureSet.STRUCTURAL, FeatureSet.CONTEXT)
+
+
+def test_structural_context_tokens_drops_neighbour_word_tokens() -> None:
+    prev = _message("run pip install widget", id=1, author_id=1)
+    focus = _message("that works", id=2, author_id=2)
+    following = _message("great thanks", id=3, author_id=1)
+    full = build_context_tokens([prev, focus, following], opted_out=frozenset())[2]
+    assert "PREV_run" in full and "NEXT_great" in full  # sanity: full context has words
+
+    structural = structural_context_tokens(full)
+
+    assert not any(token.startswith(("PREV_", "NEXT_", "REPLYTO_")) for token in structural if "_FACT_" not in token)
+    assert "PREV_run" not in structural
+    assert "NEXT_great" not in structural
+
+
+def test_structural_context_tokens_keeps_position_size_and_ctx_flags() -> None:
+    prev = _message("hi", id=1, author_id=9)
+    focus = _message("that works", id=2, author_id=9)
+    full = build_context_tokens([prev, focus], opted_out=frozenset())[2]
+
+    structural = structural_context_tokens(full)
+
+    assert "POS_last" in structural
+    assert "EXSIZE_1-2" in structural
+    assert "CTX_same_author_prev" in structural
+
+
+def test_structural_context_tokens_keeps_neighbour_fact_shape_tokens() -> None:
+    prev = _message("see the manual at /etc/config/app.conf", id=1)
+    focus = _message("that works", id=2, author_id=2)
+    full = build_context_tokens([prev, focus], opted_out=frozenset())[2]
+
+    structural = structural_context_tokens(full)
+
+    assert "PREV_FACT_path" in structural
+
+
+def test_context_tokens_for_feature_set_plain_is_always_empty() -> None:
+    prev = _message("run pip install widget", id=1, author_id=1)
+    focus = _message("that works", id=2, author_id=2)
+    full = build_context_tokens([prev, focus], opted_out=frozenset())[2]
+
+    assert context_tokens_for_feature_set(FeatureSet.PLAIN, full) == frozenset()
+
+
+def test_context_tokens_for_feature_set_structural_matches_the_filter_helper() -> None:
+    prev = _message("see the manual at /etc/config/app.conf", id=1)
+    focus = _message("that works", id=2, author_id=2)
+    full = build_context_tokens([prev, focus], opted_out=frozenset())[2]
+
+    assert context_tokens_for_feature_set(FeatureSet.STRUCTURAL, full) == structural_context_tokens(
+        full
+    )
+
+
+def test_context_tokens_for_feature_set_context_passes_through_unfiltered() -> None:
+    prev = _message("run pip install widget", id=1, author_id=1)
+    focus = _message("that works", id=2, author_id=2)
+    full = build_context_tokens([prev, focus], opted_out=frozenset())[2]
+
+    assert context_tokens_for_feature_set(FeatureSet.CONTEXT, full) == full
