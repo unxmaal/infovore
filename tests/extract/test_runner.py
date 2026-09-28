@@ -1669,3 +1669,124 @@ def test_trial_runs_are_stamped_with_their_sampled_by_origin(tmp_path: Path) -> 
     assert rows[succeeding_id] == "uncertain"
     assert rows[failing_id] == "random"
     assert rows[unsampled_id] is None
+
+
+# --- channel denylist (issue #138) -------------------------------------------
+
+
+def insert_channel(
+    conn: sqlite3.Connection,
+    channel_id: int,
+    name: str,
+    parent_id: int | None = None,
+    kind: str = "text",
+) -> None:
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind) VALUES (?, ?, ?, ?, ?)",
+        (channel_id, GUILD_ID, parent_id, name, kind),
+    )
+
+
+def test_select_trial_sample_excludes_denylisted_channel(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_channel(conn, 1, "general")
+    insert_channel(conn, 2, "food")
+    kept = seed_exchange(conn, [a_message(1, channel_id=1)])
+    seed_exchange(conn, [a_message(2, channel_id=2)])
+    assert kept.id is not None
+
+    sample = select_trial_sample(conn, 10, seed=0, exclude_channels=frozenset({"food"}))
+
+    assert sample == [kept.id]
+
+
+def test_select_trial_sample_excludes_thread_whose_parent_is_denylisted(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_channel(conn, 10, "food")
+    insert_channel(conn, 11, "food-thread-1", parent_id=10, kind="thread")
+    insert_channel(conn, 20, "general")
+    kept = seed_exchange(conn, [a_message(1, channel_id=20)])
+    seed_exchange(conn, [a_message(2, channel_id=11)])
+    assert kept.id is not None
+
+    sample = select_trial_sample(conn, 10, seed=0, exclude_channels=frozenset({"food"}))
+
+    assert sample == [kept.id]
+
+
+def test_select_trial_sample_mixed_strategy_respects_exclude_channels(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_channel(conn, 1, "general")
+    insert_channel(conn, 2, "food")
+    kept = seed_exchange(conn, [a_message(1, channel_id=1)])
+    seed_exchange(conn, [a_message(2, channel_id=2)])
+    assert kept.id is not None
+
+    sample = select_trial_sample(
+        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, exclude_channels=frozenset({"food"})
+    )
+
+    assert sample == [kept.id]
+
+
+def test_select_trial_sample_origins_excludes_denylisted_channel(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_channel(conn, 1, "general")
+    insert_channel(conn, 2, "food")
+    kept = seed_exchange(conn, [a_message(1, channel_id=1)])
+    seed_exchange(conn, [a_message(2, channel_id=2)])
+    assert kept.id is not None
+
+    origins = select_trial_sample_origins(conn, 10, seed=0, exclude_channels=frozenset({"food"}))
+
+    assert origins == {kept.id: "stratified"}
+
+
+def test_select_trial_sample_origins_mixed_respects_exclude_channels(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_channel(conn, 1, "general")
+    insert_channel(conn, 2, "food")
+    kept = seed_exchange(conn, [a_message(1, channel_id=1)])
+    seed_exchange(conn, [a_message(2, channel_id=2)])
+    assert kept.id is not None
+
+    origins = select_trial_sample_origins(
+        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, exclude_channels=frozenset({"food"})
+    )
+
+    assert list(origins) == [kept.id]
+
+
+def test_run_extraction_live_never_claims_a_denylisted_channel(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    insert_channel(conn, 1, "general")
+    insert_channel(conn, 2, "food")
+    kept = seed_exchange(conn, [a_message(1, channel_id=1, content="hi")])
+    trashed = seed_exchange(conn, [a_message(2, channel_id=2, content="hi")])
+    assert kept.id is not None
+    assert trashed.id is not None
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            MarkerExtractor(),
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=2,
+            exclude_channels=frozenset({"food"}),
+        )
+
+    report = asyncio.run(go())
+
+    assert report.processed == 1
+    kept_after = get_exchange(conn, kept.id)
+    trashed_after = get_exchange(conn, trashed.id)
+    assert kept_after is not None
+    assert trashed_after is not None
+    assert kept_after.extraction_status is ExtractionStatus.DONE
+    assert trashed_after.extraction_status is ExtractionStatus.PENDING

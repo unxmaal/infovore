@@ -150,6 +150,79 @@ def test_sift_export_excludes_already_human_labeled_messages(tmp_path: Path) -> 
     assert 1 not in manifest["message_ids"]
 
 
+def test_sift_export_channels_restricts_the_pool(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, _, _ = run(
+        ["sift", "export", "--size", "10", "--channels", "general", "--out", str(out_dir)], env
+    )
+
+    assert code == ExitCode.OK
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert sorted(manifest["message_ids"]) == [1, 2, 3]
+
+
+def test_sift_export_channels_accepts_hash_prefix_and_mixed_case(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, _, _ = run(
+        ["sift", "export", "--size", "10", "--channels", "#General", "--out", str(out_dir)], env
+    )
+
+    assert code == ExitCode.OK
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert sorted(manifest["message_ids"]) == [1, 2, 3]
+
+
+def test_sift_export_unknown_channel_exits_config_listing_known_channels(
+    tmp_path: Path,
+) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, _, err = run(
+        ["sift", "export", "--size", "10", "--channels", "nope", "--out", str(out_dir)], env
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "nope" in err
+    assert "general" in err
+    assert "food" in err
+
+
+def test_sift_export_denylist_wins_over_channels(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "general"
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, _, _ = run(
+        ["sift", "export", "--size", "10", "--channels", "general", "--out", str(out_dir)], env
+    )
+
+    assert code == ExitCode.OK
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert manifest["message_ids"] == []
+
+
+def test_sift_export_denylist_excludes_a_channel_without_channels_flag(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, _, _ = run(["sift", "export", "--size", "10", "--out", str(out_dir)], env)
+
+    assert code == ExitCode.OK
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert sorted(manifest["message_ids"]) == [1, 2, 3]
+
+
 def test_sift_export_rejects_mix_outside_zero_one(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
@@ -611,6 +684,83 @@ def test_sift_serve_new_starts_with_default_hosts(
 
     assert code == ExitCode.OK
     assert "listening on http://127.0.0.1:" in out
+
+
+def test_sift_serve_new_channels_restricts_the_pool(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sift_command, "block_until_interrupted", _no_block)
+    monkeypatch.setattr(sift_command, "default_hosts", lambda: ["127.0.0.1"])
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, out, _ = run(
+        [
+            "sift",
+            "serve",
+            "--new",
+            "--size",
+            "10",
+            "--channels",
+            "general",
+            "--out",
+            str(out_dir),
+            "--port",
+            "0",
+        ],
+        env,
+    )
+
+    assert code == ExitCode.OK
+    assert "serving batch" in out
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert sorted(manifest["message_ids"]) == [1, 2, 3]
+
+
+def test_sift_serve_new_unknown_channel_exits_config(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, _, err = run(
+        ["sift", "serve", "--new", "--channels", "nope", "--out", str(out_dir)], env
+    )
+
+    assert code == ExitCode.CONFIG
+    assert "nope" in err
+
+
+def test_sift_serve_new_denylist_wins_over_channels(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sift_command, "block_until_interrupted", _no_block)
+    monkeypatch.setattr(sift_command, "default_hosts", lambda: ["127.0.0.1"])
+    env = environment(tmp_path)
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "general"
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+
+    code, out, _ = run(
+        [
+            "sift",
+            "serve",
+            "--new",
+            "--size",
+            "10",
+            "--channels",
+            "general",
+            "--out",
+            str(out_dir),
+            "--port",
+            "0",
+        ],
+        env,
+    )
+
+    assert code == ExitCode.OK
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert manifest["message_ids"] == []
 
 
 def test_sift_serve_reports_a_port_already_in_use_as_a_config_error(

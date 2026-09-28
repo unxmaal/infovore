@@ -17,10 +17,13 @@ from infovore.sift.sampling import (
 NOW = datetime(2026, 1, 1, tzinfo=UTC).isoformat()
 
 
-def _channel(conn: sqlite3.Connection, channel_id: int, name: str) -> None:
+def _channel(
+    conn: sqlite3.Connection, channel_id: int, name: str, parent_id: int | None = None
+) -> None:
+    kind = "thread" if parent_id is not None else "text"
     conn.execute(
-        "INSERT INTO channels (id, guild_id, name, kind) VALUES (?, 1, ?, 'text')",
-        (channel_id, name),
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind) VALUES (?, 1, ?, ?, ?)",
+        (channel_id, parent_id, name, kind),
     )
 
 
@@ -203,3 +206,85 @@ def test_select_mixed_with_mix_zero_behaves_like_random(tmp_path: Path) -> None:
     _message_with_exchange(conn, 2, 1, p_trash=0.99)
     selected = select_sift_sample(conn, 2, seed=0, strategy=SiftStrategy.MIXED, mix=0.0)
     assert sorted(selected) == [1, 2]
+
+
+# --- channel denylist / include filter (issue #138) --------------------------
+
+
+def test_eligible_message_pool_excludes_denylisted_channel(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1)
+    _message_with_exchange(conn, 2, 2)
+    pool = eligible_message_pool(conn, exclude_channels=frozenset({"food"}))
+    assert {row.id for row in pool} == {1}
+
+
+def test_eligible_message_pool_excludes_thread_whose_parent_is_denylisted(
+    tmp_path: Path,
+) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 10, "food")
+    _channel(conn, 11, "food-thread-1", parent_id=10)
+    _message_with_exchange(conn, 1, 1)
+    _message_with_exchange(conn, 2, 11)
+    pool = eligible_message_pool(conn, exclude_channels=frozenset({"food"}))
+    assert {row.id for row in pool} == {1}
+
+
+def test_eligible_message_pool_include_channels_restricts_the_pool(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1)
+    _message_with_exchange(conn, 2, 2)
+    pool = eligible_message_pool(conn, include_channels=frozenset({"general"}))
+    assert {row.id for row in pool} == {1}
+
+
+def test_eligible_message_pool_include_channels_covers_threads_of_the_named_channel(
+    tmp_path: Path,
+) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "general-thread-1", parent_id=1)
+    _message_with_exchange(conn, 1, 1)
+    _message_with_exchange(conn, 2, 2)
+    pool = eligible_message_pool(conn, include_channels=frozenset({"general"}))
+    assert {row.id for row in pool} == {1, 2}
+
+
+def test_eligible_message_pool_denylist_wins_over_include_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "food")
+    _message_with_exchange(conn, 1, 1)
+    pool = eligible_message_pool(
+        conn, exclude_channels=frozenset({"food"}), include_channels=frozenset({"food"})
+    )
+    assert pool == []
+
+
+def test_select_sift_sample_respects_exclude_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1)
+    _message_with_exchange(conn, 2, 2)
+    selected = select_sift_sample(
+        conn, 10, seed=0, strategy=SiftStrategy.RANDOM, exclude_channels=frozenset({"food"})
+    )
+    assert selected == [1]
+
+
+def test_select_sift_sample_respects_include_channels(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    _message_with_exchange(conn, 1, 1)
+    _message_with_exchange(conn, 2, 2)
+    selected = select_sift_sample(
+        conn, 10, seed=0, strategy=SiftStrategy.RANDOM, include_channels=frozenset({"general"})
+    )
+    assert selected == [1]

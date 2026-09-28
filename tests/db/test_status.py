@@ -38,6 +38,7 @@ def test_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert report.latest_model_labels_used is None
     assert report.p_lore_scored == 0
     assert report.passing_gate == 0
+    assert report.excluded_by_denylist == 0
 
 
 def test_triaged_and_above_threshold_counts(tmp_path: Path) -> None:
@@ -147,3 +148,47 @@ def test_reports_latest_model_p_lore_scored_and_passing_gate(tmp_path: Path) -> 
     assert report.latest_model_labels_used == 40
     assert report.p_lore_scored == 1
     assert report.passing_gate == 2
+
+
+def test_excluded_by_denylist_counts_gate_passing_exchanges_in_denylisted_channels(
+    tmp_path: Path,
+) -> None:
+    conn = fresh(tmp_path)
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES
+          (1, 9, 'general', 'text'), (2, 9, 'food', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}'),
+                 (2, 2, 9, 1, 'a', '{NOW}', 'y', '{NOW}', '{{}}'),
+                 (3, 2, 9, 1, 'a', '{NOW}', 'z', '{NOW}', '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}'),
+                 (2, 2, 2, '{NOW}', '{NOW}', 1, 'quiet_gap', 'b', 0.9, '{TRIAGE_VERSION}'),
+                 (2, 3, 3, '{NOW}', '{NOW}', 1, 'quiet_gap', 'c', 0.0, '{TRIAGE_VERSION}');
+        """
+    )
+    report = collect_status(
+        conn, triage_min_score=0.3, exclude_channels=frozenset({"food"})
+    )
+    assert report.passing_gate == 2
+    assert report.excluded_by_denylist == 1
+
+
+def test_excluded_by_denylist_is_zero_without_a_denylist(tmp_path: Path) -> None:
+    conn = fresh(tmp_path)
+    conn.executescript(
+        f"""
+        INSERT INTO channels (id, guild_id, name, kind) VALUES (1, 9, 'general', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json)
+          VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}');
+        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}');
+        """
+    )
+    report = collect_status(conn, triage_min_score=0.3)
+    assert report.excluded_by_denylist == 0

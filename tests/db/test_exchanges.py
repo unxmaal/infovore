@@ -49,6 +49,19 @@ def insert_messages(conn: sqlite3.Connection, message_ids: Sequence[int]) -> Non
         insert_message(conn, message_id)
 
 
+def insert_channel(
+    conn: sqlite3.Connection,
+    channel_id: int,
+    name: str,
+    parent_id: int | None = None,
+    kind: str = "text",
+) -> None:
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind) VALUES (?, 1, ?, ?, ?)",
+        (channel_id, parent_id, name, kind),
+    )
+
+
 def make_exchange(
     message_count: int = 2,
     content_hash: str = "hash-1",
@@ -56,10 +69,11 @@ def make_exchange(
     retry_count: int = 0,
     parent_exchange_id: int | None = None,
     started_at: datetime = NOW,
+    channel_id: int = 1,
 ) -> ExchangeRow:
     return ExchangeRow(
         id=None,
-        channel_id=1,
+        channel_id=channel_id,
         thread_id=None,
         first_message_id=1,
         last_message_id=message_count,
@@ -251,6 +265,73 @@ def test_claimable_exchanges_without_min_score_ignores_triage(conn: sqlite3.Conn
     exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="any"), [1])
 
     result = claimable_exchanges(conn, limit=10, max_retries=3)
+
+    assert [row.id for row in result] == [exchange_id]
+
+
+def test_claimable_exchanges_excludes_denylisted_channel_by_name(
+    conn: sqlite3.Connection,
+) -> None:
+    insert_channel(conn, 1, "general")
+    insert_channel(conn, 2, "food")
+    insert_messages(conn, [1, 2])
+    kept_id = insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="kept", channel_id=1), [1]
+    )
+    insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="trashed", channel_id=2), [2]
+    )
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"}))
+
+    assert [row.id for row in result] == [kept_id]
+
+
+def test_claimable_exchanges_denylist_is_case_insensitive_and_hash_tolerant(
+    conn: sqlite3.Connection,
+) -> None:
+    insert_channel(conn, 1, "Food")
+    insert_messages(conn, [1])
+    insert_exchange(conn, make_exchange(message_count=1, content_hash="a", channel_id=1), [1])
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"#FOOD"}))
+
+    assert result == []
+
+
+def test_claimable_exchanges_excludes_thread_whose_parent_is_denylisted(
+    conn: sqlite3.Connection,
+) -> None:
+    insert_channel(conn, 10, "food")
+    insert_channel(conn, 11, "food-thread-1", parent_id=10, kind="thread")
+    insert_messages(conn, [1])
+    insert_exchange(conn, make_exchange(message_count=1, content_hash="a", channel_id=11), [1])
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"}))
+
+    assert result == []
+
+
+def test_claimable_exchanges_keeps_thread_whose_parent_is_not_denylisted(
+    conn: sqlite3.Connection,
+) -> None:
+    insert_channel(conn, 10, "general")
+    insert_channel(conn, 11, "general-thread-1", parent_id=10, kind="thread")
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(
+        conn, make_exchange(message_count=1, content_hash="a", channel_id=11), [1]
+    )
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset({"food"}))
+
+    assert [row.id for row in result] == [exchange_id]
+
+
+def test_claimable_exchanges_without_denylist_ignores_channels(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1])
+    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="a"), [1])
+
+    result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset())
 
     assert [row.id for row in result] == [exchange_id]
 

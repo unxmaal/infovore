@@ -726,3 +726,100 @@ def test_extract_rejects_unknown_order(tmp_path: Path) -> None:
 
     assert code == ExitCode.CONFIG
     assert "--order" in err
+
+
+# --- INFOVORE_EXCLUDE_CHANNELS (issue #138) ----------------------------------
+
+
+def seed_two_channel_exchanges(db_path: str) -> tuple[int, int]:
+    """One exchange in `#general` (channel 1) and one in `#food` (channel 2),
+    both pending and triaged, both promoted."""
+    conn = open_database(db_path)
+    migrate(conn)
+    conn.executescript(
+        """
+        INSERT INTO channels (id, guild_id, name, kind) VALUES
+          (1, 9, 'general', 'text'), (2, 9, 'food', 'text');
+        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
+          created_at, content, ingested_at, raw_json) VALUES
+          (1, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',
+           '2026-01-01T00:00:00+00:00', '{}'),
+          (2, 2, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',
+           '2026-01-01T00:00:00+00:00', '{}');
+        """
+    )
+    kept = ExchangeRow(
+        id=None,
+        channel_id=1,
+        thread_id=None,
+        first_message_id=1,
+        last_message_id=1,
+        started_at=NOW,
+        ended_at=NOW,
+        message_count=1,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash="kept",
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    excluded = ExchangeRow(
+        id=None,
+        channel_id=2,
+        thread_id=None,
+        first_message_id=2,
+        last_message_id=2,
+        started_at=NOW,
+        ended_at=NOW,
+        message_count=1,
+        grouping_rule=GroupingRule.QUIET_GAP,
+        content_hash="excluded",
+        parent_exchange_id=None,
+        extraction_status=ExtractionStatus.PENDING,
+        retry_count=0,
+        last_error=None,
+    )
+    kept_id = insert_exchange(conn, kept, [1])
+    excluded_id = insert_exchange(conn, excluded, [2])
+    mark_triaged(conn, kept_id, 1.0)
+    mark_triaged(conn, excluded_id, 1.0)
+    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
+    promote_prompt_version(conn, PROMPT_VERSION, NOW)
+    conn.close()
+    return kept_id, excluded_id
+
+
+def test_extract_live_mode_never_claims_a_denylisted_channel(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+    kept_id, excluded_id = seed_two_channel_exchanges(env["INFOVORE_DB_PATH"])
+    registry = registry_with(success_results())
+
+    code, out, _ = run(["extract"], env, registry)
+
+    assert code == ExitCode.OK
+    assert "succeeded=1" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    kept = get_exchange(conn, kept_id)
+    excluded = get_exchange(conn, excluded_id)
+    assert kept is not None
+    assert excluded is not None
+    assert kept.extraction_status is ExtractionStatus.DONE
+    assert excluded.extraction_status is ExtractionStatus.PENDING
+    conn.close()
+
+
+def test_extract_trial_mode_sample_excludes_denylisted_channel(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+    kept_id, _ = seed_two_channel_exchanges(env["INFOVORE_DB_PATH"])
+    registry = registry_with(success_results())
+
+    code, out, _ = run(
+        ["extract", "--mode", "trial", "--sample", "10", "--seed", "0"], env, registry
+    )
+
+    assert code == ExitCode.OK
+    assert "processed=1" in out
+    assert f"exchange {kept_id}:" in out
