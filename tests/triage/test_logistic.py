@@ -85,3 +85,57 @@ def test_intercept_reflects_class_balance_when_there_are_no_features() -> None:
     # With no features at all, the fitted intercept should recover close to
     # the empirical log-odds of the class balance: logit(0.8) = ln(0.8/0.2).
     assert model.intercept == pytest.approx(math.log(0.8 / 0.2), abs=0.05)
+
+
+# --- continuous (weighted) features, issue #135's combiner -------------------
+
+
+def test_predict_proba_accepts_a_mapping_of_continuous_feature_values() -> None:
+    model = LogisticModel(intercept=0.0, weights={"x": 2.0, "y": -0.5})
+    assert predict_proba(model, {"x": 3.0}) == pytest.approx(sigmoid(6.0))
+    assert predict_proba(model, {"x": 1.0, "y": 2.0}) == pytest.approx(sigmoid(1.0))
+    assert predict_proba(model, {}) == pytest.approx(sigmoid(0.0))
+
+
+def test_predict_proba_mapping_with_value_one_matches_the_binary_form() -> None:
+    model = LogisticModel(intercept=0.5, weights={"x": 2.0})
+    assert predict_proba(model, {"x": 1.0}) == predict_proba(model, frozenset({"x"}))
+
+
+def test_predict_proba_mapping_ignores_unknown_features() -> None:
+    model = LogisticModel(intercept=0.0, weights={"x": 5.0})
+    assert predict_proba(model, {"never-seen": 3.0}) == pytest.approx(sigmoid(0.0))
+
+
+SEPARABLE_CONTINUOUS_EXAMPLES: list[tuple[dict[str, float], bool]] = [
+    ({"x": 3.0}, True),
+    ({"x": 2.0}, True),
+    ({"x": 2.5}, True),
+    ({"x": -3.0}, False),
+    ({"x": -2.0}, False),
+    ({"x": -2.5}, False),
+]
+
+
+def test_train_logistic_fits_a_continuous_feature() -> None:
+    model = train_logistic(SEPARABLE_CONTINUOUS_EXAMPLES, l2=0.01)
+
+    assert model.weights["x"] > 0
+    assert predict_proba(model, {"x": 3.0}) > 0.5
+    assert predict_proba(model, {"x": -3.0}) < 0.5
+
+
+def test_train_logistic_on_binary_features_is_unaffected_by_mapping_support() -> None:
+    # A frozenset input is exactly the mapping {name: 1.0 for name in features}
+    # -- the same fit either way, bit for bit.
+    binary = train_logistic(SEPARABLE_EXAMPLES, l2=0.01)
+    mapped = train_logistic(
+        [(dict.fromkeys(features, 1.0), label) for features, label in SEPARABLE_EXAMPLES], l2=0.01
+    )
+    assert dict(binary.weights) == dict(mapped.weights)
+    assert binary.intercept == mapped.intercept
+
+
+def test_train_logistic_on_no_mapping_examples_returns_a_neutral_model() -> None:
+    model = train_logistic([])
+    assert predict_proba(model, {"x": 3.0}) == 0.5

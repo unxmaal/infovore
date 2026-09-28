@@ -24,7 +24,7 @@ from infovore.sift.sampling import (
 from infovore.sift.serve import build_serve_app
 from infovore.sift.train import (
     DEFAULT_CONFUSION_THRESHOLD,
-    DEFAULT_HUMAN_WEIGHT,
+    DEFAULT_MIN_HUMAN_LABELS_PER_CLASS,
     DiscardRow,
     InsufficientLabelsError,
     MessageTokenInfo,
@@ -79,34 +79,31 @@ def _render_message_auc(label: str, value: float | None) -> str:
     return f"  {label}: auc={text}"
 
 
-def _render_channel_stats(channel_stats: dict[int, Metrics]) -> str:
-    lines = ["per channel (at the confusion threshold):"]
-    for channel_id in sorted(channel_stats):
-        metric = channel_stats[channel_id]
+def _render_channel_stats(channel_stats: dict[str, Metrics]) -> str:
+    lines = ["citation-holdout per channel (by name, at the confusion threshold):"]
+    for channel_name in sorted(channel_stats):
+        metric = channel_stats[channel_name]
         lines.append(
-            f"  channel {channel_id}: precision={metric.precision:.3f} recall={metric.recall:.3f}"
+            f"  #{channel_name}: precision={metric.precision:.3f} recall={metric.recall:.3f}"
             f" (tp={metric.tp} fp={metric.fp} fn={metric.fn} tn={metric.tn})"
         )
     return "\n".join(lines)
 
 
 def _render_discard_pile(rows: Sequence[DiscardRow]) -> str:
-    lines = ["discard pile (share of held-out keep messages that would be discarded):"]
+    lines = ["discard pile (combined score, out-of-fold, against human labels only):"]
     for row in rows:
-        human = f"{row.human_keep_discarded:.3f}" if row.human_keep_discarded is not None else "n/a"
-        citation = (
-            f"{row.citation_keep_discarded:.3f}"
-            if row.citation_keep_discarded is not None
-            else "n/a"
-        )
+        keep_lost = f"{row.keep_lost:.3f}" if row.keep_lost is not None else "n/a"
+        trash_caught = f"{row.trash_caught:.3f}" if row.trash_caught is not None else "n/a"
         lines.append(
-            f"  p_trash>={row.threshold:.2f}: human_keep_lost={human} citation_keep_lost={citation}"
+            f"  p_trash>={row.threshold:.2f}: human_keep_lost={keep_lost}"
+            f" human_trash_caught={trash_caught}"
         )
     return "\n".join(lines)
 
 
-def _render_message_top_tokens(tokens: Sequence[MessageTokenInfo]) -> str:
-    lines = ["top tokens:"]
+def _render_message_top_tokens(label: str, tokens: Sequence[MessageTokenInfo]) -> str:
+    lines = [f"top tokens ({label} model):"]
     for token in tokens:
         lines.append(
             f"  {token.token}: p_trash={token.probability:.3f}"
@@ -154,7 +151,20 @@ class SiftCommand:
             "train", help="train the message-level trash classifier and score p_trash"
         )
         train_parser.add_argument(
-            "--human-weight", type=int, default=DEFAULT_HUMAN_WEIGHT, dest="human_weight"
+            "--human-weight",
+            type=int,
+            default=None,
+            dest="human_weight",
+            help="removed in #135 (message-level classes are now combined by a fitted"
+            " logistic combiner, not by weighted duplication); passing this is an error",
+        )
+        train_parser.add_argument(
+            "--min-human-labels",
+            type=int,
+            default=DEFAULT_MIN_HUMAN_LABELS_PER_CLASS,
+            dest="min_human_labels",
+            help="minimum human labels of each class needed to fit the combiner;"
+            " below it, sift train falls back to the citation model alone",
         )
         serve_parser = subparsers.add_parser(
             "serve", help="serve a keyboard-driven browser UI for sifting a batch"
@@ -199,32 +209,59 @@ class SiftCommand:
     def _train(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
 
+        if args.human_weight is not None:
+            raise ConfigError(
+                "--human-weight was removed in #135: the message classifier now trains a"
+                " citation model and a human model separately and combines them with a"
+                " fitted logistic regression, so there is no manual weight to set. Just"
+                " run `infovore sift train` (optionally with --min-human-labels)."
+            )
+
         try:
-            report = train_and_store(context.conn, context.clock, human_weight=args.human_weight)
+            report = train_and_store(
+                context.conn,
+                context.clock,
+                min_human_labels_per_class=args.min_human_labels,
+            )
         except InsufficientLabelsError as error:
             raise ConfigError(str(error)) from error
 
-        context.stdout.write(
-            f"trained message model v{report.version}: labels_used={report.labels_used}"
-            f" holdout_size={report.holdout_size} human_weight={report.human_weight}\n"
+        fallback_note = (
+            f" (fallback: citation-only, need >={report.min_human_labels_per_class} human"
+            " labels per class to fit a combiner)"
+            if report.fallback
+            else ""
         )
-        context.stdout.write(_render_message_metrics_table(report.overall_metrics) + "\n")
         context.stdout.write(
-            _render_message_confusion(report.confusion, DEFAULT_CONFUSION_THRESHOLD) + "\n"
+            f"trained message model v{report.version}: citation_labels="
+            f"{report.citation_labels_used} human_labels={report.human_labels_used}"
+            f"{fallback_note}\n"
         )
-        context.stdout.write(_render_message_auc("overall", report.overall_auc) + "\n")
-        context.stdout.write(_render_message_auc("human-labeled holdout", report.human_auc) + "\n")
+        context.stdout.write("out-of-fold evaluation against human labels:\n")
+        context.stdout.write(_render_message_auc("citation-only", report.citation_auc) + "\n")
+        context.stdout.write(_render_message_auc("human-only", report.human_auc) + "\n")
+        context.stdout.write(_render_message_auc("combined", report.combined_auc) + "\n")
+        context.stdout.write(_render_discard_pile(report.discard_pile) + "\n")
+        context.stdout.write("citation-holdout metrics (secondary):\n")
+        context.stdout.write(_render_message_metrics_table(report.citation_holdout_metrics) + "\n")
         context.stdout.write(
-            _render_message_auc("citation-labeled holdout", report.citation_auc) + "\n"
+            _render_message_confusion(
+                report.citation_holdout_confusion, DEFAULT_CONFUSION_THRESHOLD
+            )
+            + "\n"
+        )
+        context.stdout.write(
+            _render_message_auc("citation-holdout", report.citation_holdout_auc) + "\n"
         )
         context.stdout.write(_render_channel_stats(report.channel_stats) + "\n")
-        context.stdout.write(_render_discard_pile(report.discard_pile) + "\n")
-        context.stdout.write(_render_message_top_tokens(report.top_tokens) + "\n")
+        context.stdout.write(
+            _render_message_top_tokens("citation", report.citation_top_tokens) + "\n"
+        )
+        context.stdout.write(_render_message_top_tokens("human", report.human_top_tokens) + "\n")
 
         loaded = load_latest_message_model(context.conn)
         assert loaded is not None
-        version, model = loaded
-        scored = score_all(context.conn, model, version, workers=context.settings.workers)
+        scored = score_all(context.conn, loaded, workers=context.settings.workers)
         context.stdout.write(f"scored {scored} messages with p_trash\n")
         return ExitCode.OK
 

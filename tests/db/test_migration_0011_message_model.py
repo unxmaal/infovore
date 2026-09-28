@@ -12,7 +12,16 @@ def test_message_model_and_tokens_tables_exist(tmp_path: Path) -> None:
     assert {"message_model", "message_tokens"} <= names
 
     model_columns = {row["name"] for row in conn.execute("PRAGMA table_info(message_model)")}
-    assert model_columns == {"version", "trained_at", "labels_used", "holdout_size", "params_json"}
+    # `kind` added by migration 0012 (issue #135): 'citation', 'human', or
+    # 'legacy' for pre-#135 rows trained by the single-model classifier.
+    assert model_columns == {
+        "version",
+        "trained_at",
+        "labels_used",
+        "holdout_size",
+        "params_json",
+        "kind",
+    }
 
     token_columns = {row["name"] for row in conn.execute("PRAGMA table_info(message_tokens)")}
     assert token_columns == {"model_version", "token", "trash_count", "keep_count"}
