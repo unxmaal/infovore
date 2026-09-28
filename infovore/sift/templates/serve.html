@@ -86,6 +86,22 @@
   .pill-keep { color: var(--keep); }
   .pill-trash { color: var(--trash); }
   .content { margin-top: 0.25rem; white-space: pre-wrap; word-break: break-word; }
+  .context-note {
+    color: var(--muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0.4rem 0 0.15rem 0.85rem;
+  }
+  .context-row {
+    padding: 0.4rem 0.85rem;
+    margin: 0.15rem 0 0.15rem 0.6rem;
+    border-left: 2px solid var(--border);
+    opacity: 0.6;
+    font-size: 0.85rem;
+    cursor: default;
+  }
+  .context-row .content { margin-top: 0.15rem; white-space: pre-wrap; word-break: break-word; }
   .content.collapsed {
     max-height: 4.6em;
     overflow: hidden;
@@ -201,6 +217,8 @@
       <li><kbd>u</kbd> &mdash; undo the last action</li>
       <li><kbd>X</kbd> &mdash; trash the rest of this channel in this batch</li>
       <li><kbd>h</kbd> &mdash; bulk-hide panel (select text first to prefill "contains")</li>
+      <li><kbd>c</kbd> &mdash; toggle conversation context around the focused message (on by default)</li>
+      <li><kbd>+</kbd> / <kbd>-</kbd> &mdash; grow / shrink the context window</li>
       <li><kbd>?</kbd> &mdash; toggle this help</li>
     </ul>
     <div class="row"><button class="primary" id="help-close">close</button></div>
@@ -243,6 +261,21 @@
   "use strict";
   var state = null;
   var focusIndex = 0;
+
+  // Conversation context (issue #137): "would anything be lost if this
+  // message vanished from the conversation?" needs the surrounding
+  // conversation, not just the sampled line. On by default; `c` toggles
+  // it, `+`/`-` grow/shrink the window. Fetched debounced and cached per
+  // "message id + window size" key so navigating quickly doesn't spam the
+  // server, and a stale response never overwrites a since-changed focus.
+  var contextEnabled = true;
+  var CONTEXT_DEFAULT = 4;
+  var CONTEXT_STEP = 2;
+  var CONTEXT_MAX = 20;
+  var contextBefore = CONTEXT_DEFAULT;
+  var contextAfter = CONTEXT_DEFAULT;
+  var contextCache = {};
+  var contextTimer = null;
 
   function esc(text) {
     var div = document.createElement("div");
@@ -305,6 +338,56 @@
     document.getElementById("empty-state").hidden = p.total === 0 || p.labeled < p.total;
   }
 
+  function contextKey(messageId, before, after) {
+    return messageId + ":" + before + ":" + after;
+  }
+
+  function splitContext(payload) {
+    var entries = payload.messages;
+    var focusedIndex = -1;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].focused) { focusedIndex = i; break; }
+    }
+    if (focusedIndex === -1) return { before: entries, after: [] };
+    return { before: entries.slice(0, focusedIndex), after: entries.slice(focusedIndex + 1) };
+  }
+
+  function buildContextRow(entry) {
+    var row = document.createElement("div");
+    row.className = "context-row";
+    row.innerHTML =
+      '<div class="meta"><span class="author">' + esc(entry.author) + "</span>"
+      + '<span class="time">' + esc(entry.created_at) + "</span></div>"
+      + '<div class="content">' + esc(entry.content) + "</div>";
+    return row;
+  }
+
+  // Only ever fetches for the currently-focused message's exact
+  // (id, before, after) key; a cache hit resolves synchronously (no
+  // request), and a miss debounces 150ms before asking the server, so
+  // holding `j`/`k` down doesn't fire one request per row. If the focus
+  // has moved on by the time the response arrives, the result is still
+  // cached (a future re-focus reuses it) but does not force a render.
+  function scheduleContextFetch(messageId) {
+    var key = contextKey(messageId, contextBefore, contextAfter);
+    if (contextCache[key]) return;
+    if (contextTimer) clearTimeout(contextTimer);
+    contextTimer = setTimeout(function () {
+      contextTimer = null;
+      var url = "/api/context?message_id=" + encodeURIComponent(messageId)
+        + "&before=" + contextBefore + "&after=" + contextAfter;
+      api(url).then(function (result) {
+        if (!result.ok) { showError(result.data && result.data.error); return; }
+        clearError();
+        contextCache[key] = result.data;
+        var current = state && state.messages[focusIndex];
+        if (current && contextKey(current.id, contextBefore, contextAfter) === key) {
+          render();
+        }
+      });
+    }, 150);
+  }
+
   function render() {
     var container = document.getElementById("messages");
     container.innerHTML = "";
@@ -352,7 +435,34 @@
         focusIndex = index;
         render();
       });
+
+      var contextForFocus = null;
+      if (index === focusIndex && contextEnabled) {
+        var cached = contextCache[contextKey(message.id, contextBefore, contextAfter)];
+        if (cached) {
+          contextForFocus = splitContext(cached);
+        } else {
+          scheduleContextFetch(message.id);
+        }
+      }
+
+      if (contextForFocus && (contextForFocus.before.length || contextForFocus.after.length)) {
+        var note = document.createElement("div");
+        note.className = "context-note";
+        note.textContent = "context — view only";
+        container.appendChild(note);
+      }
+      if (contextForFocus) {
+        contextForFocus.before.forEach(function (entry) {
+          container.appendChild(buildContextRow(entry));
+        });
+      }
       container.appendChild(row);
+      if (contextForFocus) {
+        contextForFocus.after.forEach(function (entry) {
+          container.appendChild(buildContextRow(entry));
+        });
+      }
     });
     renderProgress();
     var focused = container.querySelector(".message.focused");
@@ -497,6 +607,22 @@
       case "h":
         event.preventDefault();
         openBulk();
+        break;
+      case "c":
+        contextEnabled = !contextEnabled;
+        render();
+        break;
+      case "+":
+        event.preventDefault();
+        contextBefore = Math.min(contextBefore + CONTEXT_STEP, CONTEXT_MAX);
+        contextAfter = Math.min(contextAfter + CONTEXT_STEP, CONTEXT_MAX);
+        render();
+        break;
+      case "-":
+        event.preventDefault();
+        contextBefore = Math.max(contextBefore - CONTEXT_STEP, 0);
+        contextAfter = Math.max(contextAfter - CONTEXT_STEP, 0);
+        render();
         break;
       case "?":
         toggleHelp();
