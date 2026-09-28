@@ -37,7 +37,15 @@ def _message_with_exchange(
         "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
         " started_at, ended_at, message_count, grouping_rule, content_hash)"
         " VALUES (?, ?, ?, ?, ?, ?, 1, 'quiet_gap', ?)",
-        (message_id, channel_id, message_id, message_id, NOW.isoformat(), NOW.isoformat(), f"h{message_id}"),
+        (
+            message_id,
+            channel_id,
+            message_id,
+            message_id,
+            NOW.isoformat(),
+            NOW.isoformat(),
+            f"h{message_id}",
+        ),
     )
     conn.execute(
         "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, 1)",
@@ -170,7 +178,7 @@ def test_post_rules_apply_without_a_name_is_400(base_url: str) -> None:
 
 
 def test_post_unknown_path_is_404(base_url: str) -> None:
-    status, data = _post(base_url + "/nope", {})
+    status, _ = _post(base_url + "/nope", {})
     assert status == 404
 
 
@@ -186,3 +194,44 @@ def test_get_bad_body_on_post_is_400(base_url: str) -> None:
         raise AssertionError("expected an HTTPError")
     except urllib.error.HTTPError as error:
         assert error.code == 400
+
+
+def test_post_body_that_is_not_a_json_object_is_400(base_url: str) -> None:
+    request = urllib.request.Request(
+        base_url + "/api/label",
+        data=b"[1, 2, 3]",
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(request)
+        raise AssertionError("expected an HTTPError")
+    except urllib.error.HTTPError as error:
+        assert error.code == 400
+
+
+def test_block_until_interrupted_returns_once_the_event_is_set() -> None:
+    import threading
+    import time
+
+    from infovore.sift.httpd import block_until_interrupted
+
+    event = threading.Event()
+
+    def _set_soon() -> None:
+        time.sleep(0.02)
+        event.set()
+
+    threading.Thread(target=_set_soon, daemon=True).start()
+    block_until_interrupted(event)
+    assert event.is_set()
+
+
+def test_block_until_interrupted_swallows_keyboard_interrupt() -> None:
+    from infovore.sift.httpd import block_until_interrupted
+
+    class _RaisingEvent:
+        def wait(self) -> None:
+            raise KeyboardInterrupt
+
+    block_until_interrupted(_RaisingEvent())  # type: ignore[arg-type]

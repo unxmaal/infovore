@@ -77,6 +77,11 @@ def test_parse_bulk_rule_rejects_unknown_type() -> None:
         parse_bulk_rule({"type": "bogus", "value": "x"})
 
 
+def test_parse_bulk_rule_rejects_non_string_type() -> None:
+    with pytest.raises(InvalidRuleError, match="unknown rule type"):
+        parse_bulk_rule({"type": 5, "value": "x"})
+
+
 def test_parse_bulk_rule_rejects_missing_value() -> None:
     with pytest.raises(InvalidRuleError, match="non-empty value"):
         parse_bulk_rule({"type": "contains"})

@@ -87,10 +87,16 @@ def test_load_batch_messages_returns_rows_in_order(tmp_path: Path) -> None:
 
 
 def test_load_batch_messages_excludes_opted_out_authors_defensively(tmp_path: Path) -> None:
-    conn = seeded(tmp_path)
+    conn = open_database(tmp_path / "x.db")
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _message_with_exchange(conn, 1, 1, author_id=1, content="from a")
+    _message_with_exchange(conn, 2, 1, author_id=2, content="from b")
     conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (1, ?)", (NOW.isoformat(),))
-    messages = load_batch_messages(conn, [1, 2, 3, 4])
-    assert [m.id for m in messages] == [4]
+
+    messages = load_batch_messages(conn, [1, 2])
+
+    assert [m.id for m in messages] == [2]
 
 
 def test_load_batch_messages_empty(tmp_path: Path) -> None:
@@ -277,7 +283,9 @@ def test_reloading_resumes_already_labeled_messages(tmp_path: Path) -> None:
 
     reloaded = _app(conn, tmp_path, [1, 2])
     state = reloaded.state()
-    messages = {m["id"]: m["label"] for m in state["messages"]}
+    state_messages = state["messages"]
+    assert isinstance(state_messages, list)
+    messages = {m["id"]: m["label"] for m in state_messages}
     assert messages[1] == "keep"
     assert messages[2] is None
     assert reloaded.progress().labeled == 1
@@ -435,3 +443,15 @@ def test_apply_rule_with_no_matches_does_not_record_an_undo_action(tmp_path: Pat
 
     assert preview.matched_count == 0
     assert app.undo() is False
+
+
+def test_progress_and_state_with_an_empty_batch(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    app = ServeApp(conn, [], "empty-batch", tmp_path / "scratch", FixedClock(NOW))
+
+    progress = app.progress()
+
+    assert progress.total == 0
+    assert progress.labeled == 0
+    assert progress.remaining_by_channel == {}
+    assert app.state()["messages"] == []

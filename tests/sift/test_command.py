@@ -310,9 +310,7 @@ def test_sift_serve_rejects_mix_outside_zero_one(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
     out_dir = tmp_path / "batch"
-    code, _, err = run(
-        ["sift", "serve", "--new", "--out", str(out_dir), "--mix", "1.5"], env
-    )
+    code, _, err = run(["sift", "serve", "--new", "--out", str(out_dir), "--mix", "1.5"], env)
     assert code == ExitCode.CONFIG
     assert "--mix" in err
 
@@ -347,9 +345,7 @@ def test_sift_serve_starts_and_prints_listening_urls(
     out_dir = tmp_path / "batch"
     run(["sift", "export", "--size", "3", "--out", str(out_dir)], env)
 
-    code, out, _ = run(
-        ["sift", "serve", str(out_dir), "--host", "127.0.0.1", "--port", "0"], env
-    )
+    code, out, _ = run(["sift", "serve", str(out_dir), "--host", "127.0.0.1", "--port", "0"], env)
 
     assert code == ExitCode.OK
     assert "listening on http://127.0.0.1:" in out
@@ -371,3 +367,28 @@ def test_sift_serve_new_starts_with_default_hosts(
 
     assert code == ExitCode.OK
     assert "listening on http://127.0.0.1:" in out
+
+
+def test_sift_serve_reports_a_port_already_in_use_as_a_config_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import socket
+
+    monkeypatch.setattr(sift_command, "block_until_interrupted", _no_block)
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+    out_dir = tmp_path / "batch"
+    run(["sift", "export", "--size", "2", "--out", str(out_dir)], env)
+
+    blocker = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    blocker.bind(("127.0.0.1", 0))
+    blocker.listen(1)
+    port = blocker.getsockname()[1]
+    try:
+        code, _, err = run(
+            ["sift", "serve", str(out_dir), "--host", "127.0.0.1", "--port", str(port)], env
+        )
+        assert code == ExitCode.CONFIG
+        assert "could not bind" in err
+    finally:
+        blocker.close()
