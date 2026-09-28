@@ -8,8 +8,6 @@ import pytest
 from infovore.db.connection import migrate, open_database
 from infovore.db.message_labels import set_message_label
 from infovore.rows import MessageLabel, MessageLabelSource
-from infovore.timing import FixedClock
-from infovore.triage.bayes import Model, in_holdout, token_probability
 from infovore.sift.train import (
     DEFAULT_HUMAN_WEIGHT,
     DISCARD_THRESHOLDS,
@@ -21,6 +19,8 @@ from infovore.sift.train import (
     score_stale,
     train_and_store,
 )
+from infovore.timing import FixedClock
+from infovore.triage.bayes import Model, in_holdout, token_probability
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 NOW_TEXT = NOW.isoformat()
@@ -247,7 +247,9 @@ def test_human_weight_lets_one_human_example_outweigh_many_citation_examples(
     citation_trash_ids = non_holdout_ids(7000, 20)
     for message_id in citation_trash_ids:
         seed_message_with_exchange(conn, message_id, 1, "distinctiveword trash chatter")
-        set_message_label(conn, message_id, MessageLabel.TRASH, MessageLabelSource.CITATION, None, NOW)
+        set_message_label(
+            conn, message_id, MessageLabel.TRASH, MessageLabelSource.CITATION, None, NOW
+        )
 
     human_keep_id = non_holdout_ids(8000, 1)[0]
     seed_message_with_exchange(conn, human_keep_id, 1, "distinctiveword keep content")

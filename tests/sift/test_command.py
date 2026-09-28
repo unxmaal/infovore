@@ -278,7 +278,8 @@ def seed_exchange_with_messages(
     for message_id in message_ids:
         conn.execute(
             "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
-            " created_at, content, ingested_at, raw_json) VALUES (?, ?, 1, 1, 'alice', ?, 'x', ?, '{}')",
+            " created_at, content, ingested_at, raw_json)"
+            " VALUES (?, ?, 1, 1, 'alice', ?, 'x', ?, '{}')",
             (message_id, channel_id, NOW, NOW),
         )
     conn.execute(

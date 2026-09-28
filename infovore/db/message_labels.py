@@ -51,6 +51,29 @@ def effective_message_labels(conn: sqlite3.Connection) -> dict[int, MessageLabel
     return result
 
 
+def effective_message_labels_with_source(
+    conn: sqlite3.Connection,
+) -> dict[int, tuple[MessageLabel, MessageLabelSource]]:
+    """Like `effective_message_labels`, but also reports which source won.
+    `infovore.sift.train` (issue #128 PR 3) needs this to weight a human
+    example more heavily than a citation one when training, and to report
+    holdout precision/recall/AUC separately per source (citation labels are
+    noisy -- uncited does not mean trash -- while human labels are the
+    ground truth that matters)."""
+    result: dict[int, tuple[MessageLabel, MessageLabelSource]] = {}
+    weak: dict[int, tuple[MessageLabel, MessageLabelSource]] = {}
+    for row in conn.execute("SELECT message_id, label, source FROM message_labels"):
+        source = MessageLabelSource(row["source"])
+        pair = (MessageLabel(row["label"]), source)
+        if source is MessageLabelSource.HUMAN:
+            result[row["message_id"]] = pair
+        else:
+            weak[row["message_id"]] = pair
+    for message_id, pair in weak.items():
+        result.setdefault(message_id, pair)
+    return result
+
+
 def human_labeled_message_ids(conn: sqlite3.Connection) -> frozenset[int]:
     """Every message with a `human` label — a sift batch never re-offers a
     message the maintainer has already hand-labeled."""
