@@ -862,24 +862,25 @@ def test_ablation_compares_all_three_feature_sets_on_the_decisive_fixture(
 
     assert report.fallback is False
     by_set = {a.feature_set: a for a in report.ablations}
-    assert by_set[FeatureSet.PLAIN].combined_auc is not None
-    assert by_set[FeatureSet.STRUCTURAL].combined_auc is not None
-    assert by_set[FeatureSet.CONTEXT].combined_auc is not None
+    plain_auc = by_set[FeatureSet.PLAIN].combined_auc
+    structural_auc = by_set[FeatureSet.STRUCTURAL].combined_auc
+    context_auc = by_set[FeatureSet.CONTEXT].combined_auc
+    assert plain_auc is not None
+    assert structural_auc is not None
+    assert context_auc is not None
     # Without any neighbour word tokens, every "that works" message has
     # identical own-message tokens regardless of label (plain), and no
     # differing fact-shape/position signal either (structural) -- both are
     # close to chance.
-    assert by_set[FeatureSet.PLAIN].combined_auc < 0.65
-    assert by_set[FeatureSet.STRUCTURAL].combined_auc < 0.7
+    assert plain_auc < 0.65
+    assert structural_auc < 0.7
     # With full context, the previous message's own words separate them
     # cleanly.
-    assert by_set[FeatureSet.CONTEXT].combined_auc > 0.9
-    assert (
-        by_set[FeatureSet.CONTEXT].combined_auc - by_set[FeatureSet.PLAIN].combined_auc > 0.3
-    )
+    assert context_auc > 0.9
+    assert context_auc - plain_auc > 0.3
     # The persisted model (default: plain) matches the plain ablation row.
     assert report.feature_set is FeatureSet.PLAIN
-    assert report.combined_auc == by_set[FeatureSet.PLAIN].combined_auc
+    assert report.combined_auc == plain_auc
 
 
 def test_score_all_raises_when_the_stored_feature_set_version_is_stale(tmp_path: Path) -> None:
@@ -936,9 +937,7 @@ def test_score_all_builds_context_tokens_when_the_persisted_feature_set_is_conte
     score_all(conn, ensemble)
 
     keep_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90001").fetchone()["p_trash"]
-    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()[
-        "p_trash"
-    ]
+    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()["p_trash"]
     assert keep_like != trash_like
 
 
@@ -956,9 +955,7 @@ def test_score_all_builds_only_plain_tokens_when_the_persisted_feature_set_is_pl
     score_all(conn, ensemble)
 
     keep_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90001").fetchone()["p_trash"]
-    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()[
-        "p_trash"
-    ]
+    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()["p_trash"]
     assert keep_like == trash_like
 
 
@@ -980,18 +977,14 @@ def test_score_all_builds_only_structural_tokens_when_the_persisted_feature_set_
     score_all(conn, ensemble)
 
     keep_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90001").fetchone()["p_trash"]
-    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()[
-        "p_trash"
-    ]
+    trash_like = conn.execute("SELECT p_trash FROM messages WHERE id = 90003").fetchone()["p_trash"]
     assert keep_like == trash_like
 
 
 # --- issue #144: backward compatibility with a pre-#144 stored model ----------
 
 
-def _insert_legacy_message_combiner_row(
-    conn: sqlite3.Connection, feature_set_version: int
-) -> None:
+def _insert_legacy_message_combiner_row(conn: sqlite3.Connection, feature_set_version: int) -> None:
     """Simulates a `message_combiner` row written before issue #144 --
     before the `feature_set_name` column existed, only `feature_set_version`
     was ever recorded (issue #141's migration 0013)."""

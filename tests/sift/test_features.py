@@ -490,7 +490,11 @@ def test_structural_context_tokens_drops_neighbour_word_tokens() -> None:
 
     structural = structural_context_tokens(full)
 
-    assert not any(token.startswith(("PREV_", "NEXT_", "REPLYTO_")) for token in structural if "_FACT_" not in token)
+    assert not any(
+        token.startswith(("PREV_", "NEXT_", "REPLYTO_"))
+        for token in structural
+        if "_FACT_" not in token
+    )
     assert "PREV_run" not in structural
     assert "NEXT_great" not in structural
 

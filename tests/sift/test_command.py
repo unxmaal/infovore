@@ -585,13 +585,19 @@ def test_sift_train_accepts_a_features_flag(tmp_path: Path) -> None:
 
 
 def test_sift_train_rejects_an_unknown_features_value(tmp_path: Path) -> None:
+    """`--features` is validated by argparse `choices` -- same as
+    `--strategy` elsewhere in this command -- which reports an invalid
+    value straight to `argparse.ArgumentParser.error` (`SystemExit(2)`) for
+    a sub-subcommand parser (`sift train`'s own parser isn't the
+    `_UsageError`-raising one `infovore.cli._build_parser` installs at the
+    top level, so this never reaches `main`'s own exit-code translation)."""
     env = environment(tmp_path)
     seed_full_ensemble_corpus(env["INFOVORE_DB_PATH"])
 
-    code, _, err = run(["sift", "train", "--features", "bogus"], env)
+    with pytest.raises(SystemExit) as exit_info:
+        run(["sift", "train", "--features", "bogus"], env)
 
-    assert code == ExitCode.CONFIG
-    assert "--features" in err
+    assert exit_info.value.code == 2
 
 
 def test_sift_train_ablation_table_lists_all_three_feature_sets_and_marks_persisted(

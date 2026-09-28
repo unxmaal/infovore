@@ -9,6 +9,7 @@ from infovore.db.channel_filter import known_channel_names
 from infovore.sift.addresses import default_hosts
 from infovore.sift.citations import derive_citation_labels
 from infovore.sift.export import export_batch
+from infovore.sift.features import DEFAULT_FEATURE_SET, FeatureSet
 from infovore.sift.httpd import block_until_interrupted, listening_url, shutdown_all, start_all
 from infovore.sift.importer import (
     ChannelCounts,
@@ -27,6 +28,7 @@ from infovore.sift.train import (
     DEFAULT_CONFUSION_THRESHOLD,
     DEFAULT_MIN_HUMAN_LABELS_PER_CLASS,
     DiscardRow,
+    FeatureSetAblation,
     InsufficientLabelsError,
     MessageTokenInfo,
     load_latest_message_model,
@@ -103,39 +105,31 @@ def _render_discard_pile(rows: Sequence[DiscardRow]) -> str:
     return "\n".join(lines)
 
 
-def _render_ablation(
-    context_auc: float | None,
-    baseline_auc: float | None,
-    context_discard: Sequence[DiscardRow],
-    baseline_discard: Sequence[DiscardRow],
+def _render_feature_set_ablation(
+    ablations: Sequence[FeatureSetAblation], persisted: FeatureSet
 ) -> str:
-    """Side-by-side ablation (issue #141): the combined model's out-of-fold
-    AUC and discard pile with and without conversation-context features,
-    evaluated on the exact same folds -- so the gain context brings is
-    measured, not assumed. The shipped/stored model always uses context
-    features (the numbers already printed above this); this table repeats
-    the combined AUC for convenience and lines the discard piles up."""
-    context_text = f"{context_auc:.3f}" if context_auc is not None else "n/a"
-    baseline_text = f"{baseline_auc:.3f}" if baseline_auc is not None else "n/a"
+    """The issue #144 three-way ablation: the combined model's out-of-fold
+    AUC and discard pile for `plain`/`structural`/`context`, fit on the
+    exact same folds -- so the gain or loss any one set brings over the
+    others is measured, not assumed, on every run. The persisted/scored
+    set (`--features`, default `plain`) is marked with `*`; its row's
+    figures are exactly the ones already printed above this table."""
     lines = [
         "ablation (combined model, out-of-fold against human labels, same folds):",
-        f"  with context features:    auc={context_text}",
-        f"  without context features: auc={baseline_text}",
-        "  discard pile (with context -- without context):",
+        "  feature set  combined_auc  discard pile (p_trash>=thresh: keep_lost/trash_caught)",
     ]
-    for with_row, without_row in zip(context_discard, baseline_discard, strict=True):
-        with_keep = f"{with_row.keep_lost:.3f}" if with_row.keep_lost is not None else "n/a"
-        with_trash = f"{with_row.trash_caught:.3f}" if with_row.trash_caught is not None else "n/a"
-        without_keep = (
-            f"{without_row.keep_lost:.3f}" if without_row.keep_lost is not None else "n/a"
-        )
-        without_trash = (
-            f"{without_row.trash_caught:.3f}" if without_row.trash_caught is not None else "n/a"
-        )
-        lines.append(
-            f"    p_trash>={with_row.threshold:.2f}: keep_lost={with_keep} -- {without_keep}"
-            f"  trash_caught={with_trash} -- {without_trash}"
-        )
+    for row in ablations:
+        marker = "*" if row.feature_set is persisted else " "
+        auc_text = f"{row.combined_auc:.3f}" if row.combined_auc is not None else "n/a"
+        cells = []
+        for discard in row.discard_pile:
+            keep_lost = f"{discard.keep_lost:.3f}" if discard.keep_lost is not None else "n/a"
+            trash_caught = (
+                f"{discard.trash_caught:.3f}" if discard.trash_caught is not None else "n/a"
+            )
+            cells.append(f"{discard.threshold:.1f}:{keep_lost}/{trash_caught}")
+        lines.append(f"  {row.feature_set.value:<11}{marker} {auc_text:>10}    " + "  ".join(cells))
+    lines.append("  (* = persisted/scored this run)")
     return "\n".join(lines)
 
 
@@ -229,6 +223,17 @@ class SiftCommand:
             help="minimum human labels of each class needed to fit the combiner;"
             " below it, sift train falls back to the citation model alone",
         )
+        train_parser.add_argument(
+            "--features",
+            choices=[fs.value for fs in FeatureSet],
+            default=DEFAULT_FEATURE_SET.value,
+            dest="features",
+            help="which named feature set (issue #144) the persisted/scored model actually"
+            f" uses (default: {DEFAULT_FEATURE_SET.value}); `structural` adds only the context"
+            " signals (POS_/EXSIZE_/CTX_/*_FACT_*, never a neighbour's own word tokens),"
+            " `context` adds everything including PREV_/NEXT_/REPLYTO_ word tokens; the"
+            " report's ablation compares all three on the same folds regardless of this flag",
+        )
         serve_parser = subparsers.add_parser(
             "serve", help="serve a keyboard-driven browser UI for sifting a batch"
         )
@@ -293,6 +298,7 @@ class SiftCommand:
                 context.conn,
                 context.clock,
                 min_human_labels_per_class=args.min_human_labels,
+                feature_set=FeatureSet(args.features),
             )
         except InsufficientLabelsError as error:
             raise ConfigError(str(error)) from error
@@ -304,9 +310,9 @@ class SiftCommand:
             else ""
         )
         context.stdout.write(
-            f"trained message model v{report.version}: citation_labels="
-            f"{report.citation_labels_used} human_labels={report.human_labels_used}"
-            f"{fallback_note}\n"
+            f"trained message model v{report.version} (features={report.feature_set.value}):"
+            f" citation_labels={report.citation_labels_used}"
+            f" human_labels={report.human_labels_used}{fallback_note}\n"
         )
         context.stdout.write("out-of-fold evaluation against human labels:\n")
         context.stdout.write(_render_message_auc("citation-only", report.citation_auc) + "\n")
@@ -330,13 +336,7 @@ class SiftCommand:
         )
         context.stdout.write(_render_message_top_tokens("human", report.human_top_tokens) + "\n")
         context.stdout.write(
-            _render_ablation(
-                report.combined_auc,
-                report.baseline_combined_auc,
-                report.discard_pile,
-                report.baseline_discard_pile,
-            )
-            + "\n"
+            _render_feature_set_ablation(report.ablations, report.feature_set) + "\n"
         )
 
         loaded = load_latest_message_model(context.conn)
