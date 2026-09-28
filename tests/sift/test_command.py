@@ -270,3 +270,166 @@ def test_sift_import_save_rules_writes_a_file(tmp_path: Path) -> None:
     assert "food-chatter" in out
     saved = tmp_path / "scratch" / "sift_trash_rules" / "food-chatter.json"
     assert saved.exists()
+
+
+def seed_exchange_with_messages(
+    conn: sqlite3.Connection, exchange_id: int, channel_id: int, message_ids: list[int]
+) -> None:
+    for message_id in message_ids:
+        conn.execute(
+            "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+            " created_at, content, ingested_at, raw_json)"
+            " VALUES (?, ?, 1, 1, 'alice', ?, 'x', ?, '{}')",
+            (message_id, channel_id, NOW, NOW),
+        )
+    conn.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
+        " started_at, ended_at, message_count, grouping_rule, content_hash)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, 'quiet_gap', ?)",
+        (
+            exchange_id,
+            channel_id,
+            message_ids[0],
+            message_ids[-1],
+            NOW,
+            NOW,
+            len(message_ids),
+            f"h{exchange_id}",
+        ),
+    )
+    for position, message_id in enumerate(message_ids, start=1):
+        conn.execute(
+            "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, ?)",
+            (exchange_id, message_id, position),
+        )
+
+
+def seed_labeled_corpus(db_path: str) -> None:
+    from infovore.db.message_labels import set_message_label
+    from infovore.rows import MessageLabel, MessageLabelSource
+
+    conn = open_database(db_path)
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _channel(conn, 2, "food")
+    for i in range(20):
+        message_id = 1 + i
+        _message_with_exchange(conn, message_id, 1, content=f"PROM 6.5.22 manual detail {i}")
+        set_message_label(
+            conn,
+            message_id,
+            MessageLabel.KEEP,
+            MessageLabelSource.HUMAN,
+            None,
+            datetime(2026, 1, 1, tzinfo=UTC),
+        )
+    for i in range(20):
+        message_id = 100 + i
+        _message_with_exchange(conn, message_id, 2, content=f"lol gg no cap {i}")
+        set_message_label(
+            conn,
+            message_id,
+            MessageLabel.TRASH,
+            MessageLabelSource.CITATION,
+            None,
+            datetime(2026, 1, 1, tzinfo=UTC),
+        )
+    conn.close()
+
+
+def test_sift_citations_reports_keep_and_trash_counts(tmp_path: Path) -> None:
+    from infovore.db.claims import NewClaim, record_run
+    from infovore.rows import ClaimKind, ExtractionRunRow, RunMode, RunOutcome
+
+    env = environment(tmp_path)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    migrate(conn)
+    _channel(conn, 1, "general")
+    seed_exchange_with_messages(conn, 1, 1, [1, 2])
+    conn.execute(
+        "INSERT INTO prompt_versions (version, text_sha256, created_at) VALUES ('v1', 'sha', ?)",
+        (NOW,),
+    )
+    run_row = ExtractionRunRow(
+        id=None,
+        exchange_id=1,
+        model="claude",
+        prompt_version="v1",
+        started_at=datetime(2026, 1, 1, tzinfo=UTC),
+        finished_at=datetime(2026, 1, 1, tzinfo=UTC),
+        input_tokens=1,
+        output_tokens=1,
+        mode=RunMode.LIVE,
+        outcome=RunOutcome.OK,
+        error=None,
+    )
+    claim = NewClaim(
+        exchange_id=1,
+        statement="s",
+        subject="subj",
+        kind=ClaimKind.FACT,
+        confidence=0.9,
+        probe_question="q?",
+        permalink="https://x",
+        supersedes_claim_id=None,
+        source_message_ids=(1,),
+    )
+    record_run(conn, run_row, [claim])
+    conn.close()
+
+    code, out, _ = run(["sift", "citations"], env)
+
+    assert code == ExitCode.OK
+    assert "keep=1" in out
+    assert "trash=1" in out
+
+
+def test_sift_train_requires_minimum_labels(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+
+    code, _, err = run(["sift", "train"], env)
+
+    assert code == ExitCode.CONFIG
+    assert "10" in err
+
+
+def test_sift_train_trains_and_scores_messages(tmp_path: Path) -> None:
+    from infovore.sift.train import DEFAULT_HUMAN_WEIGHT
+
+    env = environment(tmp_path)
+    seed_labeled_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train"], env)
+
+    assert code == ExitCode.OK
+    assert "trained message model" in out
+    assert "scored" in out
+    assert f"human_weight={DEFAULT_HUMAN_WEIGHT}" in out
+
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    rows = conn.execute("SELECT p_trash FROM messages WHERE p_trash IS NOT NULL").fetchall()
+    assert len(rows) == 40
+
+
+def test_sift_train_accepts_a_human_weight_flag(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled_corpus(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(["sift", "train", "--human-weight", "3"], env)
+
+    assert code == ExitCode.OK
+    assert "human_weight=3" in out
+
+
+def test_sift_export_strategy_uncertain_works_after_train(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_labeled_corpus(env["INFOVORE_DB_PATH"])
+    run(["sift", "train"], env)
+    out_dir = tmp_path / "batch2"
+
+    code, _, _ = run(
+        ["sift", "export", "--size", "5", "--strategy", "uncertain", "--out", str(out_dir)], env
+    )
+
+    assert code == ExitCode.OK

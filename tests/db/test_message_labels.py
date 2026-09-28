@@ -9,6 +9,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.message_labels import (
     MessageLabelCounts,
     effective_message_labels,
+    effective_message_labels_with_source,
     human_labeled_message_ids,
     message_label_counts,
     set_message_label,
@@ -136,3 +137,36 @@ def test_message_label_counts_by_source_and_effective(tmp_path: Path) -> None:
         "human": {"trash": 1, "keep": 1},
     }
     assert counts.effective == {"keep": 1, "trash": 2}
+
+
+def test_effective_message_labels_with_source_is_empty_on_a_fresh_database(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    assert effective_message_labels_with_source(conn) == {}
+
+
+def test_effective_message_labels_with_source_reports_the_weak_source_alone(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    set_message_label(conn, 1, MessageLabel.TRASH, MessageLabelSource.CITATION, None, NOW)
+    assert effective_message_labels_with_source(conn) == {
+        1: (MessageLabel.TRASH, MessageLabelSource.CITATION)
+    }
+
+
+def test_effective_message_labels_with_source_prefers_human_over_citation(tmp_path: Path) -> None:
+    conn = seeded(tmp_path)
+    set_message_label(conn, 1, MessageLabel.TRASH, MessageLabelSource.CITATION, None, NOW)
+    set_message_label(conn, 1, MessageLabel.KEEP, MessageLabelSource.HUMAN, None, LATER)
+    assert effective_message_labels_with_source(conn) == {
+        1: (MessageLabel.KEEP, MessageLabelSource.HUMAN)
+    }
+
+
+def test_effective_message_labels_with_source_prefers_human_regardless_of_insert_order(
+    tmp_path: Path,
+) -> None:
+    conn = seeded(tmp_path)
+    set_message_label(conn, 1, MessageLabel.KEEP, MessageLabelSource.HUMAN, None, NOW)
+    set_message_label(conn, 1, MessageLabel.TRASH, MessageLabelSource.CITATION, None, LATER)
+    assert effective_message_labels_with_source(conn) == {
+        1: (MessageLabel.KEEP, MessageLabelSource.HUMAN)
+    }

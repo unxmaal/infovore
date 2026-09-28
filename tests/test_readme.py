@@ -155,6 +155,26 @@ def test_triage_section_documents_the_uncertain_sampling_warning() -> None:
         assert needle in triage, needle
 
 
+def test_sifting_section_documents_citations_train_and_report() -> None:
+    running = section("Running")
+    sifting = running.split("### Sifting", 1)
+    assert len(sifting) == 2, "README 'Running' needs a '### Sifting' subsection"
+    body = sifting[1]
+    for needle in (
+        "infovore sift citations",
+        "infovore sift train",
+        "message_model",
+        "message_tokens",
+        "human_weight",
+        "--human-weight",
+        "p_trash",
+        "discard",
+        "per channel",
+        "AUC",
+    ):
+        assert needle in body, needle
+
+
 def test_tuning_loop_recommends_mixed_rounds() -> None:
     triage = section("Triage")
     body = triage.split("### Tuning loop", 1)[1]
