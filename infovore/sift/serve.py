@@ -30,8 +30,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from infovore.db.codec import from_db_time
 from infovore.db.connection import transaction
 from infovore.db.message_labels import set_message_label
+from infovore.extract.prompt import REDACTED
 from infovore.rows import MessageLabel, MessageLabelSource
 from infovore.sift.export import MANIFEST_NAME, SiftBatchMessage, export_batch, fetch_batch_messages
 from infovore.sift.importer import MissingManifestError
@@ -40,6 +42,17 @@ from infovore.sift.sampling import SiftStrategy
 from infovore.timing import Clock
 
 _LabelRow = tuple[str, "str | None", str]
+
+# Conversation context (issue #137): "would anything be lost if this
+# message vanished from the conversation?" is hard to judge from one
+# sampled line, so `GET /api/context` (infovore.sift.httpd) hands back a
+# window of neighbouring messages around the focused one. Defaults and cap
+# live here (not in httpd.py) so they apply regardless of caller — the
+# HTTP layer parses whatever a client sent, but `ServeApp.context` always
+# re-clamps it itself.
+DEFAULT_CONTEXT_BEFORE = 4
+DEFAULT_CONTEXT_AFTER = 4
+MAX_CONTEXT_WINDOW = 20
 
 
 class UnknownMessageError(Exception):
@@ -365,6 +378,99 @@ class ServeApp:
                 self._actions.append(_BulkAction(priors))
             saved_path = save_bulk_rule(self._scratch_dir, name, rule, self._clock.now())
             return preview, saved_path
+
+    def context(
+        self,
+        message_id: int,
+        *,
+        before: int = DEFAULT_CONTEXT_BEFORE,
+        after: int = DEFAULT_CONTEXT_AFTER,
+    ) -> dict[str, object]:
+        """The conversation around `message_id` (issue #137): up to
+        `before`/`after` neighbouring messages in the same exchange, each
+        with a string id, author, `created_at`, content, and whether it is
+        the focused message itself. `message_id` must be one of this
+        batch's own messages (the only ones a maintainer can ever have
+        focused) — anything else raises `UnknownMessageError`, same as
+        `label()`.
+
+        **Ordering: `exchange_messages.position`, not raw channel
+        `created_at`.** `position` already encodes the conversation order
+        the chunker reconstructed (thread / reply_chain / quiet_gap — see
+        README "Grouping rules"), which survives a busy channel
+        interleaving unrelated exchanges around the same wall-clock time;
+        a message's context should be its conversation, not everything
+        else posted nearby. `position` is a total order within one
+        exchange (unique per `(exchange_id, position)`), so no secondary
+        sort key is needed.
+
+        **Windowing.** `before`/`after` are clamped to `[0,
+        MAX_CONTEXT_WINDOW]` here, regardless of what a caller (e.g. the
+        HTTP layer) already validated — this method is the one source of
+        truth for the cap. A window that reaches past either end of the
+        exchange is simply shorter than requested; it is never padded or
+        an error.
+
+        **Redaction.** An opted-out author's messages appear with author
+        and content both replaced by `infovore.extract.prompt.REDACTED`
+        ("[redacted]"), the same convention the extraction prompt uses —
+        never their real text. The opt-out set is re-read from `opt_outs`
+        on every call (not trusted from whatever the batch or the stored
+        row already show), matching the defense-in-depth re-check
+        `load_batch_messages` already does for the batch itself: a message
+        can be redacted at rest already (`infovore.privacy.optout.
+        redact_stored`), but a context window spans messages the batch
+        never touched, so this is the only place some of them get
+        re-checked at all.
+
+        **Parent-exchange context is intentionally out of scope.** An
+        exchange's `parent_exchange_id` (set when a group is a size-cap
+        split continuation, a late reply, or a thread revival — see
+        README) can carry real background for a message near the start of
+        its exchange. It is not pulled in here: the common case (a reply a
+        few messages into an ordinary exchange) already gets full context
+        from this window, and mixing in a second exchange's messages would
+        blur the "view-only, never labeled" contract this window keeps
+        (would a parent's messages count toward `before`? get their own
+        redaction pass and cap?) for a maintainer tool where the batch's
+        `batch.log` export already exists for deeper digging. Left as a
+        follow-up if the in-exchange window still isn't enough context in
+        practice.
+        """
+        if message_id not in self._by_id:
+            raise UnknownMessageError(message_id)
+        before = max(0, min(before, MAX_CONTEXT_WINDOW))
+        after = max(0, min(after, MAX_CONTEXT_WINDOW))
+        exchange_id = self._by_id[message_id].exchange_id
+        position = self._conn.execute(
+            "SELECT position FROM exchange_messages WHERE exchange_id = ? AND message_id = ?",
+            (exchange_id, message_id),
+        ).fetchone()["position"]
+        rows = self._conn.execute(
+            "SELECT m.id AS id, m.author_id AS author_id,"
+            " m.author_name_at_time AS author_name, m.created_at AS created_at,"
+            " m.content AS content"
+            " FROM exchange_messages em JOIN messages m ON m.id = em.message_id"
+            " WHERE em.exchange_id = ? AND em.position BETWEEN ? AND ?"
+            " ORDER BY em.position",
+            (exchange_id, position - before, position + after),
+        ).fetchall()
+        opted_out = _opted_out_ids(self._conn, [row["id"] for row in rows])
+        return {
+            "message_id": str(message_id),
+            "before": before,
+            "after": after,
+            "messages": [
+                {
+                    "id": str(row["id"]),
+                    "author": REDACTED if row["id"] in opted_out else row["author_name"],
+                    "created_at": from_db_time(row["created_at"]).isoformat(),
+                    "content": REDACTED if row["id"] in opted_out else row["content"],
+                    "focused": row["id"] == message_id,
+                }
+                for row in rows
+            ],
+        }
 
 
 def build_serve_app(

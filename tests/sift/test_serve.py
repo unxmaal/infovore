@@ -12,6 +12,9 @@ from infovore.sift.importer import MissingManifestError
 from infovore.sift.rules import BulkRule, RuleType
 from infovore.sift.sampling import NoScoredMessagesError, SiftStrategy
 from infovore.sift.serve import (
+    DEFAULT_CONTEXT_AFTER,
+    DEFAULT_CONTEXT_BEFORE,
+    MAX_CONTEXT_WINDOW,
     ServeApp,
     UnknownMessageError,
     build_serve_app,
@@ -63,6 +66,50 @@ def _message_with_exchange(
         "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, 1)",
         (message_id, message_id),
     )
+
+
+def _exchange_with_messages(
+    conn: sqlite3.Connection,
+    exchange_id: int,
+    channel_id: int,
+    message_specs: list[tuple[int, int, str, str, str]],
+) -> None:
+    """One exchange with several messages, in position order (positions
+    1..N matching `message_specs`'s order) — unlike `_message_with_exchange`
+    above (one message per exchange), this is what conversation-context
+    tests need: several messages sharing one exchange so a window can be
+    taken around one of them. `message_specs` entries are
+    `(message_id, author_id, author_name, content, created_at)`."""
+    first_id, last_id = message_specs[0][0], message_specs[-1][0]
+    first_created, last_created = message_specs[0][4], message_specs[-1][4]
+    conn.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
+        " started_at, ended_at, message_count, grouping_rule, content_hash)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, 'quiet_gap', ?)",
+        (
+            exchange_id,
+            channel_id,
+            first_id,
+            last_id,
+            first_created,
+            last_created,
+            len(message_specs),
+            f"hx{exchange_id}",
+        ),
+    )
+    for position, (message_id, author_id, author_name, content, created_at) in enumerate(
+        message_specs, start=1
+    ):
+        conn.execute(
+            "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+            " created_at, content, ingested_at, raw_json)"
+            " VALUES (?, ?, 1, ?, ?, ?, ?, ?, '{}')",
+            (message_id, channel_id, author_id, author_name, created_at, content, NOW.isoformat()),
+        )
+        conn.execute(
+            "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, ?)",
+            (exchange_id, message_id, position),
+        )
 
 
 def seeded(tmp_path: Path, name: str = "x.db") -> sqlite3.Connection:
@@ -516,3 +563,128 @@ def test_progress_and_state_with_an_empty_batch(tmp_path: Path) -> None:
     assert progress.labeled == 0
     assert progress.remaining_by_channel == {}
     assert app.state()["messages"] == []
+
+
+# --- ServeApp: context (issue #137) -------------------------------------------
+
+_CONVERSATION = [
+    (1, 1, "alice", "one", "2026-01-01T00:00:00+00:00"),
+    (2, 2, "bob", "two", "2026-01-01T00:01:00+00:00"),
+    (3, 1, "alice", "three", "2026-01-01T00:02:00+00:00"),
+    (4, 2, "bob", "four", "2026-01-01T00:03:00+00:00"),
+    (5, 1, "alice", "five", "2026-01-01T00:04:00+00:00"),
+]
+
+
+def _conversation(tmp_path: Path, name: str = "ctx.db") -> sqlite3.Connection:
+    conn = open_database(tmp_path / name)
+    migrate(conn)
+    _channel(conn, 1, "general")
+    _exchange_with_messages(conn, 100, 1, _CONVERSATION)
+    return conn
+
+
+def test_context_orders_by_exchange_position_and_marks_the_focused_message(
+    tmp_path: Path,
+) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [3])
+
+    result = app.context(3, before=4, after=4)
+
+    assert result["message_id"] == "3"
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["1", "2", "3", "4", "5"]
+    assert [m["focused"] for m in messages] == [False, False, True, False, False]
+    focused = messages[2]
+    assert focused["author"] == "alice"
+    assert focused["content"] == "three"
+    assert focused["created_at"] == "2026-01-01T00:02:00+00:00"
+
+
+def test_context_windows_before_and_after_independently(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [3])
+
+    result = app.context(3, before=1, after=2)
+
+    assert result["before"] == 1
+    assert result["after"] == 2
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["2", "3", "4", "5"]
+
+
+def test_context_window_is_clamped_at_the_start_of_the_exchange(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [1])
+
+    result = app.context(1, before=4, after=0)
+
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["1"]
+
+
+def test_context_uses_defaults_when_before_after_not_given(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [3])
+
+    result = app.context(3)
+
+    assert result["before"] == DEFAULT_CONTEXT_BEFORE
+    assert result["after"] == DEFAULT_CONTEXT_AFTER
+
+
+def test_context_caps_an_oversized_window_request(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [3])
+
+    result = app.context(3, before=10_000, after=10_000)
+
+    assert result["before"] == MAX_CONTEXT_WINDOW
+    assert result["after"] == MAX_CONTEXT_WINDOW
+    # the exchange only has 5 messages, so the cap doesn't manufacture any
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["1", "2", "3", "4", "5"]
+
+
+def test_context_rejects_a_negative_window(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [3])
+
+    result = app.context(3, before=-5, after=-5)
+
+    assert result["before"] == 0
+    assert result["after"] == 0
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    assert [m["id"] for m in messages] == ["3"]
+
+
+def test_context_redacts_opted_out_authors_content_and_author(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    conn.execute("INSERT INTO opt_outs (user_id, since) VALUES (2, ?)", (NOW.isoformat(),))
+    app = _app(conn, tmp_path, [3])
+
+    result = app.context(3, before=4, after=4)
+
+    messages = result["messages"]
+    assert isinstance(messages, list)
+    by_id = {m["id"]: m for m in messages}
+    assert by_id["2"]["author"] == "[redacted]"
+    assert by_id["2"]["content"] == "[redacted]"
+    assert by_id["4"]["author"] == "[redacted]"
+    assert by_id["4"]["content"] == "[redacted]"
+    # bob's opt-out never leaks alice's messages
+    assert by_id["1"]["author"] == "alice"
+    assert by_id["1"]["content"] == "one"
+
+
+def test_context_raises_for_a_message_not_in_the_served_batch(tmp_path: Path) -> None:
+    conn = _conversation(tmp_path)
+    app = _app(conn, tmp_path, [3])
+    with pytest.raises(UnknownMessageError):
+        app.context(999)
