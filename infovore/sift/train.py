@@ -38,7 +38,7 @@ import hashlib
 import json
 import math
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from infovore.db.batch import BATCH_SIZE, SQLITE_MAX_VARIABLES
@@ -46,8 +46,9 @@ from infovore.db.codec import to_db_time
 from infovore.db.connection import transaction
 from infovore.db.message_labels import effective_message_labels_with_source
 from infovore.db.raw import messages_by_ids
+from infovore.privacy.optout import opted_out_user_ids
 from infovore.rows import MessageLabel, MessageLabelSource
-from infovore.sift.features import message_features
+from infovore.sift.features import FEATURE_SET_VERSION, exchange_context_tokens, message_features
 from infovore.timing import Clock
 from infovore.triage.bayes import (
     Label,
@@ -106,6 +107,7 @@ __all__ = [
     "MIN_LABELS_PER_CLASS",
     "DiscardRow",
     "Ensemble",
+    "FeatureSetMismatchError",
     "InsufficientLabelsError",
     "MessageExample",
     "MessageTokenInfo",
@@ -130,11 +132,31 @@ class InsufficientLabelsError(Exception):
         self.trash_count = trash_count
 
 
+class FeatureSetMismatchError(Exception):
+    """Raised when scoring is attempted with an ensemble trained under a
+    different `infovore.sift.features.FEATURE_SET_VERSION` (issue #141): the
+    stored model's token counts assume a feature set that no longer matches
+    what `message_features`/`exchange_context_tokens` build today, so
+    scoring it would silently mix incompatible tokens rather than fail
+    loudly. Retraining (`infovore sift train`) always stores the current
+    version, so this only ever fires against a stale, pre-retrain model."""
+
+    def __init__(self, stored_version: int, current_version: int) -> None:
+        super().__init__(
+            f"stored model was trained with feature set version {stored_version}, but the"
+            f" current feature set is version {current_version}; run `infovore sift train`"
+            " to retrain before scoring"
+        )
+        self.stored_version = stored_version
+        self.current_version = current_version
+
+
 @dataclass(frozen=True)
 class MessageExample:
     message_id: int
     channel_id: int
     tokens: frozenset[str]
+    base_tokens: frozenset[str]
     label: MessageLabel
     source: MessageLabelSource
 
@@ -158,8 +180,11 @@ class DiscardRow:
 class Ensemble:
     """The full, persisted classifier state `load_latest_message_model`
     reconstructs: the citation model (always present), the human model and
-    combiner (present unless `fallback`), and the combiner's own version
-    (what `messages.p_trash_model` records)."""
+    combiner (present unless `fallback`), the combiner's own version (what
+    `messages.p_trash_model` records), and the feature set version it was
+    trained under (issue #141 -- `_score_rows` refuses to score with this
+    when it no longer matches `infovore.sift.features.FEATURE_SET_VERSION`,
+    see `FeatureSetMismatchError`)."""
 
     citation_version: int
     citation_model: Model
@@ -168,6 +193,7 @@ class Ensemble:
     combiner_version: int
     combiner: LogisticModel | None
     fallback: bool
+    feature_set_version: int
 
 
 @dataclass(frozen=True)
@@ -189,22 +215,64 @@ class MessageTrainReport:
     citation_holdout_confusion: Metrics
     citation_holdout_auc: float | None
     channel_stats: dict[str, Metrics]
+    # Ablation (issue #141): the same out-of-fold AUC and discard pile as
+    # above, but fit and evaluated on the *same folds* without any
+    # conversation-context tokens -- so the gain context features bring is
+    # measured, not assumed. The stored/shipped model always uses context
+    # features (the fields above); these are report-only.
+    baseline_citation_auc: float | None
+    baseline_human_auc: float | None
+    baseline_combined_auc: float | None
+    baseline_discard_pile: tuple[DiscardRow, ...]
 
 
 def _bayes_label(label: MessageLabel) -> Label:
     return Label.LORE if label is MessageLabel.TRASH else Label.NOISE
 
 
+def _exchange_ids_for_messages(
+    conn: sqlite3.Connection, message_ids: Sequence[int]
+) -> dict[int, int]:
+    result: dict[int, int] = {}
+    for start in range(0, len(message_ids), SQLITE_MAX_VARIABLES):
+        chunk = message_ids[start : start + SQLITE_MAX_VARIABLES]
+        placeholders = ",".join("?" for _ in chunk)
+        for row in conn.execute(
+            f"SELECT message_id, exchange_id FROM exchange_messages"
+            f" WHERE message_id IN ({placeholders})",
+            chunk,
+        ):
+            result[row["message_id"]] = row["exchange_id"]
+    return result
+
+
 def build_message_examples(conn: sqlite3.Connection) -> list[MessageExample]:
+    """Every labeled message's training example: its own tokens (no
+    conversation context) plus, separately, the context-enhanced tokens the
+    shipped ensemble actually trains on (issue #141). Each labeled message's
+    exchange is loaded once, in position order, via
+    `infovore.sift.features.exchange_context_tokens` (itself batched across
+    every exchange these messages belong to, not one query per exchange)."""
     labeled = effective_message_labels_with_source(conn)
     ids = sorted(labeled)
+    if not ids:
+        return []
+    opted_out = opted_out_user_ids(conn)
+    exchange_id_by_message = _exchange_ids_for_messages(conn, ids)
+    exchange_ids = sorted(set(exchange_id_by_message.values()))
+    context_by_message = exchange_context_tokens(conn, exchange_ids, opted_out)
+
     examples: list[MessageExample] = []
     for start in range(0, len(ids), SQLITE_MAX_VARIABLES):
         chunk = ids[start : start + SQLITE_MAX_VARIABLES]
         for message in messages_by_ids(conn, chunk):
             label, source = labeled[message.id]
-            tokens = message_features(message, message.channel_id)
-            examples.append(MessageExample(message.id, message.channel_id, tokens, label, source))
+            context = context_by_message.get(message.id, frozenset())
+            tokens = message_features(message, message.channel_id, context)
+            base_tokens = message_features(message, message.channel_id)
+            examples.append(
+                MessageExample(message.id, message.channel_id, tokens, base_tokens, label, source)
+            )
     return examples
 
 
@@ -270,6 +338,129 @@ def p_trash_for_tokens(ensemble: Ensemble, tokens: frozenset[str]) -> float:
     return predict_proba(ensemble.combiner, features)
 
 
+@dataclass(frozen=True)
+class _AblationFit:
+    """One side of the issue #141 ablation: a citation model, human model
+    and combiner fit purely from a `token_selector` over `MessageExample`
+    (`lambda e: e.tokens` for the shipped, context-aware side; `lambda e:
+    e.base_tokens` for the without-context baseline), plus the out-of-fold
+    AUCs and discard pile that fitting produces. Both sides share the exact
+    same fold split (`_fold_of`, keyed by message id) and the exact same
+    fallback decision (human label counts alone, independent of tokens), so
+    the two are a true apples-to-apples comparison."""
+
+    citation_model: Model
+    human_model: Model | None
+    combiner: LogisticModel | None
+    citation_auc: float | None
+    human_auc: float | None
+    combined_auc: float | None
+    discard_pile: tuple[DiscardRow, ...]
+
+
+def _fit_ablation(
+    citation_examples: Sequence[MessageExample],
+    human_examples: Sequence[MessageExample],
+    fallback: bool,
+    token_selector: Callable[[MessageExample], frozenset[str]],
+) -> _AblationFit:
+    citation_train_pairs = [
+        (token_selector(e), _bayes_label(e.label))
+        for e in citation_examples
+        if not in_holdout(e.message_id)
+    ]
+    citation_model = train(citation_train_pairs)
+
+    if fallback:
+        citation_pairs_vs_human = [
+            (p_lore(citation_model, token_selector(e)), _bayes_label(e.label))
+            for e in human_examples
+        ]
+        citation_auc = auc(citation_pairs_vs_human)
+        discard_pile = tuple(
+            DiscardRow(threshold=threshold, keep_lost=None, trash_caught=None)
+            for threshold in DISCARD_THRESHOLDS
+        )
+        return _AblationFit(citation_model, None, None, citation_auc, None, None, discard_pile)
+
+    folds_of_human = {e.message_id: _fold_of(e.message_id) for e in human_examples}
+    p_human_oof: dict[int, float] = {}
+    for fold in range(FOLDS):
+        sub_train_pairs = [
+            (token_selector(e), _bayes_label(e.label))
+            for e in human_examples
+            if folds_of_human[e.message_id] != fold
+        ]
+        sub_model = train(sub_train_pairs)
+        for e in human_examples:
+            if folds_of_human[e.message_id] == fold:
+                p_human_oof[e.message_id] = p_lore(sub_model, token_selector(e))
+
+    p_citation_for_human = {
+        e.message_id: p_lore(citation_model, token_selector(e)) for e in human_examples
+    }
+
+    def _features_for(message_id: int) -> dict[str, float]:
+        p_human = p_human_oof[message_id]
+        return _combiner_features(
+            p_citation_for_human[message_id], p_human, human_seen=p_human != 0.5
+        )
+
+    combiner_examples: list[tuple[FeatureValues, bool]] = [
+        (_features_for(e.message_id), e.label is MessageLabel.TRASH) for e in human_examples
+    ]
+    combiner = train_logistic(combiner_examples)
+
+    # Nested cross-validation, fold-excluding the combiner itself too
+    # (cheap: it fits three already-computed features, no NB retraining),
+    # so the reported "combined" AUC is honestly out-of-fold rather than
+    # scored by a combiner that saw these exact rows during its own fit.
+    combined_oof: dict[int, float] = {}
+    for fold in range(FOLDS):
+        fold_train_examples: list[tuple[FeatureValues, bool]] = [
+            (_features_for(e.message_id), e.label is MessageLabel.TRASH)
+            for e in human_examples
+            if folds_of_human[e.message_id] != fold
+        ]
+        fold_combiner = train_logistic(fold_train_examples)
+        for e in human_examples:
+            if folds_of_human[e.message_id] == fold:
+                combined_oof[e.message_id] = predict_proba(
+                    fold_combiner, _features_for(e.message_id)
+                )
+
+    human_pairs = [(p_human_oof[e.message_id], _bayes_label(e.label)) for e in human_examples]
+    citation_pairs = [
+        (p_citation_for_human[e.message_id], _bayes_label(e.label)) for e in human_examples
+    ]
+    combined_pairs = [(combined_oof[e.message_id], _bayes_label(e.label)) for e in human_examples]
+    human_auc = auc(human_pairs)
+    citation_auc = auc(citation_pairs)
+    combined_auc = auc(combined_pairs)
+
+    keep_scores = [
+        combined_oof[e.message_id] for e in human_examples if e.label is MessageLabel.KEEP
+    ]
+    trash_scores = [
+        combined_oof[e.message_id] for e in human_examples if e.label is MessageLabel.TRASH
+    ]
+    discard_pile = tuple(
+        DiscardRow(
+            threshold=threshold,
+            keep_lost=_share_at_or_above(keep_scores, threshold),
+            trash_caught=_share_at_or_above(trash_scores, threshold),
+        )
+        for threshold in DISCARD_THRESHOLDS
+    )
+
+    # Final human model: retrained on *all* human labels -- the fold split
+    # above only ever generated the combiner's training inputs.
+    human_model = train([(token_selector(e), _bayes_label(e.label)) for e in human_examples])
+    return _AblationFit(
+        citation_model, human_model, combiner, citation_auc, human_auc, combined_auc, discard_pile
+    )
+
+
 def train_and_store(
     conn: sqlite3.Connection,
     clock: Clock,
@@ -290,13 +481,24 @@ def train_and_store(
     if citation_keep < MIN_LABELS_PER_CLASS or citation_trash < MIN_LABELS_PER_CLASS:
         raise InsufficientLabelsError(citation_keep, citation_trash)
 
+    human_keep = sum(1 for e in human_examples if e.label is MessageLabel.KEEP)
+    human_trash = sum(1 for e in human_examples if e.label is MessageLabel.TRASH)
+    fallback = human_keep < min_human_labels_per_class or human_trash < min_human_labels_per_class
+
+    # The shipped/stored ensemble: context-aware tokens (issue #141).
+    context_fit = _fit_ablation(citation_examples, human_examples, fallback, lambda e: e.tokens)
+    # Report-only ablation: the same folds and the same fallback decision,
+    # but without any conversation-context tokens at all -- never persisted.
+    baseline_fit = _fit_ablation(
+        citation_examples, human_examples, fallback, lambda e: e.base_tokens
+    )
+
+    citation_model = context_fit.citation_model
+    human_model = context_fit.human_model
+    combiner = context_fit.combiner
+
     # --- citation model, with its own internal holdout for the secondary section ---
     citation_holdout = [e for e in citation_examples if in_holdout(e.message_id)]
-    citation_train_pairs = [
-        (e.tokens, _bayes_label(e.label)) for e in citation_examples if not in_holdout(e.message_id)
-    ]
-    citation_model = train(citation_train_pairs)
-
     citation_holdout_scored = [(p_lore(citation_model, e.tokens), e) for e in citation_holdout]
     citation_secondary_pairs = [
         (score, _bayes_label(e.label)) for score, e in citation_holdout_scored
@@ -320,103 +522,7 @@ def train_and_store(
     }
 
     citation_top_tokens = _top_message_tokens(citation_model)
-
-    human_keep = sum(1 for e in human_examples if e.label is MessageLabel.KEEP)
-    human_trash = sum(1 for e in human_examples if e.label is MessageLabel.TRASH)
-    fallback = human_keep < min_human_labels_per_class or human_trash < min_human_labels_per_class
-
-    human_model: Model | None = None
-    human_top_tokens: tuple[MessageTokenInfo, ...] = ()
-    combiner: LogisticModel | None = None
-    human_auc: float | None = None
-    combined_auc: float | None = None
-
-    if fallback:
-        citation_pairs_vs_human = [
-            (p_lore(citation_model, e.tokens), _bayes_label(e.label)) for e in human_examples
-        ]
-        citation_auc = auc(citation_pairs_vs_human)
-        discard_pile = tuple(
-            DiscardRow(threshold=threshold, keep_lost=None, trash_caught=None)
-            for threshold in DISCARD_THRESHOLDS
-        )
-    else:
-        folds_of_human = {e.message_id: _fold_of(e.message_id) for e in human_examples}
-        p_human_oof: dict[int, float] = {}
-        for fold in range(FOLDS):
-            sub_train_pairs = [
-                (e.tokens, _bayes_label(e.label))
-                for e in human_examples
-                if folds_of_human[e.message_id] != fold
-            ]
-            sub_model = train(sub_train_pairs)
-            for e in human_examples:
-                if folds_of_human[e.message_id] == fold:
-                    p_human_oof[e.message_id] = p_lore(sub_model, e.tokens)
-
-        p_citation_for_human = {
-            e.message_id: p_lore(citation_model, e.tokens) for e in human_examples
-        }
-
-        def _features_for(message_id: int) -> dict[str, float]:
-            p_human = p_human_oof[message_id]
-            return _combiner_features(
-                p_citation_for_human[message_id], p_human, human_seen=p_human != 0.5
-            )
-
-        combiner_examples: list[tuple[FeatureValues, bool]] = [
-            (_features_for(e.message_id), e.label is MessageLabel.TRASH) for e in human_examples
-        ]
-        combiner = train_logistic(combiner_examples)
-
-        # Nested cross-validation, fold-excluding the combiner itself too
-        # (cheap: it fits three already-computed features, no NB retraining),
-        # so the reported "combined" AUC is honestly out-of-fold rather than
-        # scored by a combiner that saw these exact rows during its own fit.
-        combined_oof: dict[int, float] = {}
-        for fold in range(FOLDS):
-            fold_train_examples: list[tuple[FeatureValues, bool]] = [
-                (_features_for(e.message_id), e.label is MessageLabel.TRASH)
-                for e in human_examples
-                if folds_of_human[e.message_id] != fold
-            ]
-            fold_combiner = train_logistic(fold_train_examples)
-            for e in human_examples:
-                if folds_of_human[e.message_id] == fold:
-                    combined_oof[e.message_id] = predict_proba(
-                        fold_combiner, _features_for(e.message_id)
-                    )
-
-        human_pairs = [(p_human_oof[e.message_id], _bayes_label(e.label)) for e in human_examples]
-        citation_pairs = [
-            (p_citation_for_human[e.message_id], _bayes_label(e.label)) for e in human_examples
-        ]
-        combined_pairs = [
-            (combined_oof[e.message_id], _bayes_label(e.label)) for e in human_examples
-        ]
-        human_auc = auc(human_pairs)
-        citation_auc = auc(citation_pairs)
-        combined_auc = auc(combined_pairs)
-
-        keep_scores = [
-            combined_oof[e.message_id] for e in human_examples if e.label is MessageLabel.KEEP
-        ]
-        trash_scores = [
-            combined_oof[e.message_id] for e in human_examples if e.label is MessageLabel.TRASH
-        ]
-        discard_pile = tuple(
-            DiscardRow(
-                threshold=threshold,
-                keep_lost=_share_at_or_above(keep_scores, threshold),
-                trash_caught=_share_at_or_above(trash_scores, threshold),
-            )
-            for threshold in DISCARD_THRESHOLDS
-        )
-
-        # Final human model: retrained on *all* human labels -- the fold
-        # split above only ever generated the combiner's training inputs.
-        human_model = train([(e.tokens, _bayes_label(e.label)) for e in human_examples])
-        human_top_tokens = _top_message_tokens(human_model)
+    human_top_tokens = _top_message_tokens(human_model) if human_model is not None else ()
 
     now_text = to_db_time(clock.now())
     with transaction(conn):
@@ -481,8 +587,16 @@ def train_and_store(
         }
         cursor = conn.execute(
             "INSERT INTO message_combiner (trained_at, citation_model_version,"
-            " human_model_version, fallback, params_json) VALUES (?, ?, ?, ?, ?)",
-            (now_text, citation_version, human_version, int(fallback), json.dumps(combiner_params)),
+            " human_model_version, fallback, params_json, feature_set_version)"
+            " VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                now_text,
+                citation_version,
+                human_version,
+                int(fallback),
+                json.dumps(combiner_params),
+                FEATURE_SET_VERSION,
+            ),
         )
         combiner_version = int(cursor.lastrowid or 0)
 
@@ -492,16 +606,20 @@ def train_and_store(
         human_labels_used=len(human_examples),
         fallback=fallback,
         min_human_labels_per_class=min_human_labels_per_class,
-        citation_auc=citation_auc,
-        human_auc=human_auc,
-        combined_auc=combined_auc,
-        discard_pile=discard_pile,
+        citation_auc=context_fit.citation_auc,
+        human_auc=context_fit.human_auc,
+        combined_auc=context_fit.combined_auc,
+        discard_pile=context_fit.discard_pile,
         citation_top_tokens=citation_top_tokens,
         human_top_tokens=human_top_tokens,
         citation_holdout_metrics=citation_holdout_metrics,
         citation_holdout_confusion=citation_holdout_confusion,
         citation_holdout_auc=citation_holdout_auc,
         channel_stats=channel_stats,
+        baseline_citation_auc=baseline_fit.citation_auc,
+        baseline_human_auc=baseline_fit.human_auc,
+        baseline_combined_auc=baseline_fit.combined_auc,
+        baseline_discard_pile=baseline_fit.discard_pile,
     )
 
 
@@ -525,8 +643,8 @@ def _load_model(conn: sqlite3.Connection, version: int) -> Model:
 
 def load_latest_message_model(conn: sqlite3.Connection) -> Ensemble | None:
     row = conn.execute(
-        "SELECT version, citation_model_version, human_model_version, fallback, params_json"
-        " FROM message_combiner ORDER BY version DESC LIMIT 1"
+        "SELECT version, citation_model_version, human_model_version, fallback, params_json,"
+        " feature_set_version FROM message_combiner ORDER BY version DESC LIMIT 1"
     ).fetchone()
     if row is None:
         return None
@@ -553,6 +671,7 @@ def load_latest_message_model(conn: sqlite3.Connection) -> Ensemble | None:
         combiner_version=int(row["version"]),
         combiner=combiner,
         fallback=fallback,
+        feature_set_version=int(row["feature_set_version"]),
     )
 
 
@@ -580,14 +699,38 @@ def _score_rows(
     rows: list[sqlite3.Row],
     workers: int = 1,
 ) -> int:
+    """Score `rows` (message id + channel id), `BATCH_SIZE` at a time: each
+    batch's exchange context is loaded and built once, batched, in this
+    (main) process (issue #141 -- `infovore.sift.features.
+    exchange_context_tokens`), before the pure-Python `p_trash` scoring
+    itself is handed to `ChunkPool`'s workers, exactly as `message_features`
+    without context was before. Refuses up front if `ensemble` was trained
+    under a feature set that no longer matches
+    `infovore.sift.features.FEATURE_SET_VERSION` (`FeatureSetMismatchError`)
+    -- scoring even one row with mismatched tokens would be silently wrong,
+    not just imprecise."""
+    if ensemble.feature_set_version != FEATURE_SET_VERSION:
+        raise FeatureSetMismatchError(ensemble.feature_set_version, FEATURE_SET_VERSION)
+    opted_out = opted_out_user_ids(conn)
     count = 0
     with ChunkPool(_p_trash_worker_chunk, workers, _init_p_trash_worker, (ensemble,)) as pool:
         for start in range(0, len(rows), BATCH_SIZE):
             batch = rows[start : start + BATCH_SIZE]
-            message_rows = messages_by_ids(conn, [row["id"] for row in batch])
+            message_ids = [row["id"] for row in batch]
+            message_rows = messages_by_ids(conn, message_ids)
             by_id = {message.id: message for message in message_rows}
+            exchange_id_by_message = _exchange_ids_for_messages(conn, message_ids)
+            exchange_ids = sorted(set(exchange_id_by_message.values()))
+            context_by_message = exchange_context_tokens(conn, exchange_ids, opted_out)
             items = [
-                (row["id"], message_features(by_id[row["id"]], row["channel_id"]))
+                (
+                    row["id"],
+                    message_features(
+                        by_id[row["id"]],
+                        row["channel_id"],
+                        context_by_message.get(row["id"], frozenset()),
+                    ),
+                )
                 for row in batch
                 if row["id"] in by_id
             ]

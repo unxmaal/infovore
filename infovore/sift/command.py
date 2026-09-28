@@ -103,6 +103,42 @@ def _render_discard_pile(rows: Sequence[DiscardRow]) -> str:
     return "\n".join(lines)
 
 
+def _render_ablation(
+    context_auc: float | None,
+    baseline_auc: float | None,
+    context_discard: Sequence[DiscardRow],
+    baseline_discard: Sequence[DiscardRow],
+) -> str:
+    """Side-by-side ablation (issue #141): the combined model's out-of-fold
+    AUC and discard pile with and without conversation-context features,
+    evaluated on the exact same folds -- so the gain context brings is
+    measured, not assumed. The shipped/stored model always uses context
+    features (the numbers already printed above this); this table repeats
+    the combined AUC for convenience and lines the discard piles up."""
+    context_text = f"{context_auc:.3f}" if context_auc is not None else "n/a"
+    baseline_text = f"{baseline_auc:.3f}" if baseline_auc is not None else "n/a"
+    lines = [
+        "ablation (combined model, out-of-fold against human labels, same folds):",
+        f"  with context features:    auc={context_text}",
+        f"  without context features: auc={baseline_text}",
+        "  discard pile (with context -- without context):",
+    ]
+    for with_row, without_row in zip(context_discard, baseline_discard, strict=True):
+        with_keep = f"{with_row.keep_lost:.3f}" if with_row.keep_lost is not None else "n/a"
+        with_trash = f"{with_row.trash_caught:.3f}" if with_row.trash_caught is not None else "n/a"
+        without_keep = (
+            f"{without_row.keep_lost:.3f}" if without_row.keep_lost is not None else "n/a"
+        )
+        without_trash = (
+            f"{without_row.trash_caught:.3f}" if without_row.trash_caught is not None else "n/a"
+        )
+        lines.append(
+            f"    p_trash>={with_row.threshold:.2f}: keep_lost={with_keep} -- {without_keep}"
+            f"  trash_caught={with_trash} -- {without_trash}"
+        )
+    return "\n".join(lines)
+
+
 def _render_message_top_tokens(label: str, tokens: Sequence[MessageTokenInfo]) -> str:
     lines = [f"top tokens ({label} model):"]
     for token in tokens:
@@ -293,9 +329,23 @@ class SiftCommand:
             _render_message_top_tokens("citation", report.citation_top_tokens) + "\n"
         )
         context.stdout.write(_render_message_top_tokens("human", report.human_top_tokens) + "\n")
+        context.stdout.write(
+            _render_ablation(
+                report.combined_auc,
+                report.baseline_combined_auc,
+                report.discard_pile,
+                report.baseline_discard_pile,
+            )
+            + "\n"
+        )
 
         loaded = load_latest_message_model(context.conn)
         assert loaded is not None
+        # `train_and_store` above always stores the current feature set
+        # version and `loaded` is that same freshly trained ensemble, so
+        # `FeatureSetMismatchError` (infovore.sift.train) can't fire here --
+        # it guards a caller that scores a *stale* ensemble without
+        # retraining first, which this command never does.
         scored = score_all(context.conn, loaded, workers=context.settings.workers)
         context.stdout.write(f"scored {scored} messages with p_trash\n")
         return ExitCode.OK
