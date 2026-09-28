@@ -45,6 +45,9 @@ def test_message_combiner_table_exists_with_expected_columns(tmp_path: Path) -> 
         "human_model_version",
         "fallback",
         "params_json",
+        # `feature_set_version` (default 1) is added by migration 0013
+        # (issue #141), additive to this one.
+        "feature_set_version",
     }
 
 

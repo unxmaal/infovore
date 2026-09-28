@@ -208,8 +208,7 @@ def test_build_context_tokens_flags_same_author_as_prev() -> None:
 
     assert "CTX_same_author_prev" in build_context_tokens([prev, same_author], frozenset())[2]
     assert (
-        "CTX_same_author_prev"
-        not in build_context_tokens([prev, different_author], frozenset())[2]
+        "CTX_same_author_prev" not in build_context_tokens([prev, different_author], frozenset())[2]
     )
 
 
@@ -219,9 +218,7 @@ def test_build_context_tokens_flags_prev_ends_with_question() -> None:
     focus = _message("that works", id=2, author_id=2)
 
     assert "CTX_prev_ends_question" in build_context_tokens([question, focus], frozenset())[2]
-    assert (
-        "CTX_prev_ends_question" not in build_context_tokens([statement, focus], frozenset())[2]
-    )
+    assert "CTX_prev_ends_question" not in build_context_tokens([statement, focus], frozenset())[2]
 
 
 def test_build_context_tokens_caps_distinct_neighbour_tokens() -> None:
