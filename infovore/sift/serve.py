@@ -263,7 +263,7 @@ class ServeApp:
             "batch": self.batch_name,
             "messages": [
                 {
-                    "id": message.id,
+                    "id": str(message.id),
                     "exchange_id": message.exchange_id,
                     "channel": message.channel_name,
                     "author": message.author_name,

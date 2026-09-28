@@ -240,7 +240,7 @@ def test_state_reports_null_label_before_any_action(tmp_path: Path) -> None:
     assert state["batch"] == "batch1"
     messages = state["messages"]
     assert isinstance(messages, list)
-    assert messages[0]["id"] == 1
+    assert messages[0]["id"] == "1"
     assert messages[0]["label"] is None
 
 
@@ -286,8 +286,8 @@ def test_reloading_resumes_already_labeled_messages(tmp_path: Path) -> None:
     state_messages = state["messages"]
     assert isinstance(state_messages, list)
     messages = {m["id"]: m["label"] for m in state_messages}
-    assert messages[1] == "keep"
-    assert messages[2] is None
+    assert messages["1"] == "keep"
+    assert messages["2"] is None
     assert reloaded.progress().labeled == 1
 
 
