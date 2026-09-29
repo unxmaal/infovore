@@ -681,6 +681,16 @@ A `launchd` user agent runs a periodic `backfill` + `chunk` pair. Save as `~/Lib
 
 `WorkingDirectory` is where `infovore` looks for `.env`; put every `INFOVORE_*` and backend credential variable there instead of in the plist so secrets never end up in `launchctl list` output.
 
+### macOS tmux runner (unattended, over SSH)
+
+`deploy/run-unattended.sh` is the runner used for the first long unattended run on a Mac mini. Copy it to `~/infovore/run-unattended.sh` on the host. `start` rescores triage, promotes the prompt version (`INFOVORE_PROMPT_VERSION`, default `v5`), and opens a tmux session `infovore` with two windows, each under `caffeinate` so the Mac can't sleep:
+- `extract`: `extract --mode live --order best`, restarting after crashes;
+- `probe`: a probe pass every 10 minutes.
+
+`stop` kills the session; work in progress is kept and everything resumes on the next `start`. Logs go to `~/infovore/logs/`.
+
+Over SSH or tmux on macOS the login keychain is locked, so `claude -p` must authenticate with `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`) exported in `~/.infovore.env`, which should be mode `600`.
+
 ### Linux systemd
 
 A oneshot service plus a timer, run as the unprivileged user that owns the database:
