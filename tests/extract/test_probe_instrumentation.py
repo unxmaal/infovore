@@ -38,9 +38,7 @@ class UsageProbe:
         if self._batch_failure is not None:
             return BatchProbeOutcome(None, self._batch_failure, self._usage)
         return BatchProbeOutcome(
-            outcomes=tuple(
-                ProbeOutcome(Novelty.KNOWN, "batch-model", "a", None) for _ in claims
-            ),
+            outcomes=tuple(ProbeOutcome(Novelty.KNOWN, "batch-model", "a", None) for _ in claims),
             failure=None,
             usage=self._usage,
         )
