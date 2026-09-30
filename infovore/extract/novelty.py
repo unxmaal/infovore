@@ -21,7 +21,13 @@ from infovore.db.run_selection import (
     NoTrialBatchError,
     resolve_run_selector,
 )
+from infovore.extract.compare import (
+    DEFAULT_COMPARE_LIMIT,
+    ComparisonReport,
+    run_comparison,
+)
 from infovore.extract.llm_extractor import BatchedLLMNoveltyProbe
+from infovore.extract.probe_runs import probe_run_row
 from infovore.extract.protocol import (
     BatchNoveltyProbe,
     Failure,
@@ -30,7 +36,7 @@ from infovore.extract.protocol import (
     ProbeOutcome,
     ProbeUsage,
 )
-from infovore.rows import ClaimRow, Novelty, ProbeRunRow, RunOutcome
+from infovore.rows import ClaimRow, Novelty
 from infovore.timing import Clock, Sleeper
 
 if TYPE_CHECKING:
@@ -122,33 +128,6 @@ def _batches(claims: Sequence[ClaimRow], size: int) -> list[list[ClaimRow]]:
     return [ordered[start : start + size] for start in range(0, len(ordered), size)]
 
 
-def _probe_run_row(
-    usage: ProbeUsage,
-    *,
-    started_at: datetime,
-    finished_at: datetime,
-    claim_count: int,
-    batched: bool,
-    error: str | None,
-) -> ProbeRunRow:
-    return ProbeRunRow(
-        id=None,
-        probe_model=usage.probe_model,
-        judge_model=usage.judge_model,
-        started_at=started_at,
-        finished_at=finished_at,
-        claim_count=claim_count,
-        batched=batched,
-        recall_input_tokens=usage.recall_input_tokens,
-        recall_output_tokens=usage.recall_output_tokens,
-        judge_input_tokens=usage.judge_input_tokens,
-        judge_output_tokens=usage.judge_output_tokens,
-        cost_usd=usage.cost_usd,
-        outcome=RunOutcome.FAILED if error is not None else RunOutcome.OK,
-        error=error,
-    )
-
-
 def _retry_after(failure: Failure) -> float:
     if failure.retry_after is None:
         return DEFAULT_USAGE_LIMIT_RETRY_SECONDS
@@ -204,7 +183,7 @@ async def run_probe(
     ) -> int:
         return record_probe_run(
             conn,
-            _probe_run_row(
+            probe_run_row(
                 usage,
                 started_at=started_at,
                 finished_at=clock.now(),
@@ -318,6 +297,31 @@ def _describe_probe_event(event: ProbeEvent) -> str:
             return f"claim {event.claim_id}: paused"
 
 
+def _render_comparison(report: "ComparisonReport") -> str:
+    lines = [
+        f"compared: {report.compared} (failed {report.failed})",
+        f"agreement: {_format_ratio(report.agreement_rate)} ({report.agreed}/{report.compared})",
+        f"known -> unknown: {report.known_to_unknown}",
+        f"calls: {report.calls} cost: {_format_usd(report.cost_usd)}",
+    ]
+    if report.confusion:
+        lines.append("was -> now:")
+        for (was, now), count in sorted(
+            report.confusion.items(), key=lambda item: (-item[1], item[0][0].value)
+        ):
+            marker = "  " if was is now else " *"
+            lines.append(f"{marker} {was.value} -> {now.value}: {count}")
+    return "\n".join(lines) + "\n"
+
+
+def _format_ratio(value: float | None) -> str:
+    return "n/a" if value is None else f"{value:.1%}"
+
+
+def _format_usd(value: float | None) -> str:
+    return "unreported" if value is None else f"${value:.4f}"
+
+
 class ProbeCommand:
     name = "probe"
     help = "closed-book novelty probe over unprobed claims"
@@ -329,6 +333,13 @@ class ProbeCommand:
         parser.add_argument("--limit", type=int, default=None)
         parser.add_argument("--probe-model", type=str, default=None)
         parser.add_argument("--retry-failed", action="store_true")
+        parser.add_argument(
+            "--compare",
+            action="store_true",
+            help="re-probe already-probed claims and diff against their stored verdicts,"
+            " without overwriting them",
+        )
+        parser.add_argument("--compare-limit", type=int, default=DEFAULT_COMPARE_LIMIT)
         parser.add_argument(
             "--batch-size",
             type=int,
@@ -354,6 +365,18 @@ class ProbeCommand:
                 ) from error
             except InvalidRunSelectorError as error:
                 raise ConfigError(str(error)) from error
+
+        if args.compare:
+            comparison = await run_comparison(
+                context.conn,
+                probe,
+                context.clock,
+                limit=args.compare_limit,
+                batch_size=args.batch_size,
+                concurrency=concurrency,
+            )
+            context.stdout.write(_render_comparison(comparison))
+            return ExitCode.OK
 
         report = await run_probe(
             context.conn,
