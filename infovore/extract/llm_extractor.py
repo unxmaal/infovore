@@ -1,7 +1,9 @@
 import json
+from collections.abc import Sequence
 
 from infovore.extract.prompt import render_prompt
 from infovore.extract.protocol import (
+    BatchProbeOutcome,
     ExtractionOutcome,
     ExtractionRequest,
     Failure,
@@ -9,12 +11,16 @@ from infovore.extract.protocol import (
     ProbeOutcome,
 )
 from infovore.extract.schema import (
+    BatchJudgeOut,
+    BatchRecallOut,
     ExtractionOut,
     InvalidExtractionError,
     JudgeOut,
     RecallOut,
     first_json_object,
     json_schema_for,
+    parse_batch_judge,
+    parse_batch_recall,
     parse_extraction,
     parse_judge,
     parse_recall,
@@ -46,6 +52,45 @@ JUDGE_SYSTEM_PROMPT = (
 
 RECALL_MAX_OUTPUT_TOKENS = 2000
 JUDGE_MAX_OUTPUT_TOKENS = 2000
+
+BATCH_RECALL_SYSTEM_PROMPT = (
+    "Answer each numbered question below using only your own knowledge, with "
+    "no other context.\n"
+    "\n"
+    "The questions are unrelated to each other. Never use one question, or "
+    "your answer to it, as a hint for another: answer each as though it were "
+    "the only question you had been asked.\n"
+    "\n"
+    "Be brief. If you are not sure of an answer, respond with exactly "
+    '"I don\'t know" for that question.\n'
+    "\n"
+    "Return one entry per question, each carrying that question's own index. "
+    "Output ONLY a JSON object matching the given schema. No other text."
+)
+
+BATCH_JUDGE_SYSTEM_PROMPT = (
+    "You are comparing closed-book recall answers against claims, to judge "
+    "how much the answering model already knew. Each numbered item is "
+    "independent; judge it only against its own claim and answer.\n"
+    "\n"
+    "Return unknown if the answer says it does not know, or is unrelated "
+    "to the claim.\n"
+    "Return partial if the answer gives some but not all of the claim's "
+    "specifics.\n"
+    "Return contradicts if the answer confidently asserts something "
+    "incompatible with the claim.\n"
+    "Return known if the answer is substantively the same fact as the "
+    "claim.\n"
+    "\n"
+    "Return one entry per item, each carrying that item's own index. "
+    "Output ONLY a JSON object matching the given schema. No other text."
+)
+
+# Output caps scale with the batch: the per-claim caps were sized for one
+# answer, and reusing them for N would truncate the response into a parse
+# failure and a pointless fallback.
+BATCH_RECALL_MAX_OUTPUT_TOKENS_PER_CLAIM = 400
+BATCH_JUDGE_MAX_OUTPUT_TOKENS_PER_CLAIM = 400
 
 REPAIR_PREVIOUS_OUTPUT_HEADER = "--- PREVIOUS OUTPUT (invalid) ---"
 REPAIR_VALIDATION_ERROR_HEADER = "--- VALIDATION ERROR ---"
@@ -238,3 +283,89 @@ class LLMNoveltyProbe:
             )
 
         return ProbeOutcome(verdict=verdict, model=recall_result.model, answer=answer, failure=None)
+
+
+def _batch_recall_prompt(claims: Sequence[ClaimRow]) -> str:
+    return "\n".join(f"[{index}] {claim.probe_question}" for index, claim in enumerate(claims))
+
+
+def _batch_judge_prompt(claims: Sequence[ClaimRow], answers: Sequence[str]) -> str:
+    return "\n\n".join(
+        f"[{index}]\n{_judge_prompt(claim, answer)}"
+        for index, (claim, answer) in enumerate(zip(claims, answers, strict=True))
+    )
+
+
+class BatchedLLMNoveltyProbe:
+    """Probes several claims per pair of LLM calls, falling back to one-at-a-time.
+
+    The per-claim path is kept as `probe`, both to satisfy `NoveltyProbe` and
+    because it is what a batch falls back to when the response cannot be
+    mapped onto the claims.
+    """
+
+    def __init__(self, probe_backend: LLMBackend, judge_backend: LLMBackend) -> None:
+        self._probe_backend = probe_backend
+        self._judge_backend = judge_backend
+        self._single = LLMNoveltyProbe(probe_backend, judge_backend)
+
+    async def probe(self, claim: ClaimRow) -> ProbeOutcome:
+        return await self._single.probe(claim)
+
+    async def probe_batch(self, claims: Sequence[ClaimRow]) -> BatchProbeOutcome:
+        if not claims:
+            return BatchProbeOutcome(outcomes=(), failure=None)
+        count = len(claims)
+
+        recall_request = LLMRequest(
+            system=BATCH_RECALL_SYSTEM_PROMPT,
+            prompt=_batch_recall_prompt(claims),
+            json_schema=json_schema_for(BatchRecallOut),
+            max_output_tokens=BATCH_RECALL_MAX_OUTPUT_TOKENS_PER_CLAIM * count,
+        )
+        recall_result = await self._probe_backend.complete(recall_request)
+        if recall_result.error is not None:
+            return BatchProbeOutcome(None, _failure_from_error(recall_result.error))
+
+        try:
+            answers = parse_batch_recall(
+                _payload_from_result(
+                    recall_result, self._probe_backend.capabilities().native_json_schema
+                ),
+                count,
+            )
+        except InvalidExtractionError as exc:
+            return BatchProbeOutcome(None, Failure(FailureKind.INVALID_OUTPUT, str(exc), None))
+
+        judge_request = LLMRequest(
+            system=BATCH_JUDGE_SYSTEM_PROMPT,
+            prompt=_batch_judge_prompt(claims, answers),
+            json_schema=json_schema_for(BatchJudgeOut),
+            max_output_tokens=BATCH_JUDGE_MAX_OUTPUT_TOKENS_PER_CLAIM * count,
+        )
+        judge_result = await self._judge_backend.complete(judge_request)
+        if judge_result.error is not None:
+            return BatchProbeOutcome(None, _failure_from_error(judge_result.error))
+
+        try:
+            verdicts = parse_batch_judge(
+                _payload_from_result(
+                    judge_result, self._judge_backend.capabilities().native_json_schema
+                ),
+                count,
+            )
+        except InvalidExtractionError as exc:
+            return BatchProbeOutcome(None, Failure(FailureKind.INVALID_OUTPUT, str(exc), None))
+
+        return BatchProbeOutcome(
+            outcomes=tuple(
+                ProbeOutcome(
+                    verdict=verdict,
+                    model=recall_result.model,
+                    answer=answer,
+                    failure=None,
+                )
+                for verdict, answer in zip(verdicts, answers, strict=True)
+            ),
+            failure=None,
+        )

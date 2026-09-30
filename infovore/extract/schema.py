@@ -64,6 +64,33 @@ class RecallOut(BaseModel):
     answer: str
 
 
+class BatchRecallItem(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    index: int = Field(ge=0)
+    answer: str
+
+
+class BatchRecallOut(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    answers: list[BatchRecallItem]
+
+
+class BatchJudgeItem(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    index: int = Field(ge=0)
+    verdict: Literal["unknown", "partial", "contradicts", "known"]
+    reason: str
+
+
+class BatchJudgeOut(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    verdicts: list[BatchJudgeItem]
+
+
 def json_schema_for(model: type[BaseModel]) -> dict[str, object]:
     return model.model_json_schema()
 
@@ -163,3 +190,43 @@ def parse_recall(payload: object) -> str:
     except ValidationError as exc:
         raise InvalidExtractionError(str(exc)) from exc
     return parsed.answer
+
+
+def _indexed(items: list[tuple[int, object]], expected: int) -> dict[int, object]:
+    """Map a batch response's items onto 0..expected-1 by their own `index`.
+
+    Never falls back to positional order: a batch whose indices do not cover
+    exactly the expected set is rejected, so a misaligned response can never
+    write one claim's verdict onto another claim.
+    """
+    seen: dict[int, object] = {}
+    for index, value in items:
+        if index >= expected:
+            raise InvalidExtractionError(f"index {index} out of range for batch of {expected}")
+        if index in seen:
+            raise InvalidExtractionError(f"duplicate index {index} in batch response")
+        seen[index] = value
+    missing = sorted(set(range(expected)) - seen.keys())
+    if missing:
+        raise InvalidExtractionError(f"batch response missing indices {missing}")
+    return seen
+
+
+def parse_batch_recall(payload: object, expected: int) -> list[str]:
+    data = _coerce_payload(payload)
+    try:
+        parsed = BatchRecallOut.model_validate(data)
+    except ValidationError as exc:
+        raise InvalidExtractionError(str(exc)) from exc
+    answers = _indexed([(item.index, item.answer) for item in parsed.answers], expected)
+    return [str(answers[index]) for index in range(expected)]
+
+
+def parse_batch_judge(payload: object, expected: int) -> list[Novelty]:
+    data = _coerce_payload(payload)
+    try:
+        parsed = BatchJudgeOut.model_validate(data)
+    except ValidationError as exc:
+        raise InvalidExtractionError(str(exc)) from exc
+    verdicts = _indexed([(item.index, item.verdict) for item in parsed.verdicts], expected)
+    return [Novelty(str(verdicts[index])) for index in range(expected)]
