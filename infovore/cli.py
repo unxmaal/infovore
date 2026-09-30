@@ -84,6 +84,24 @@ def _format_nested_counts(nested: Mapping[str, Mapping[str, int]]) -> str:
     )
 
 
+def _format_rate(rate: float | None) -> str:
+    return "n/a" if rate is None else f"{rate:.1f}"
+
+
+def _format_eta(hours: float | None) -> str:
+    if hours is None:
+        return "unknown (no recent runs)"
+    if hours == 0.0:
+        return "queue empty"
+    if hours < 48:
+        return f"{hours:.1f}h"
+    return f"{hours / 24:.1f}d"
+
+
+def _format_cost(cost: float | None) -> str:
+    return "cost unreported" if cost is None else f"${cost:.2f}"
+
+
 def _format_time(value: datetime | None) -> str:
     return value.isoformat() if value is not None else "never"
 
@@ -102,11 +120,15 @@ class StatusCommand:
             context.settings.triage_min_p_lore,
             rules=context.settings.triage_rules,
             exclude_channels=context.settings.exclude_channels,
+            now=context.clock.now(),
+            max_retries=context.settings.max_retries,
         )
         lines = [
             f"channels: {report.channels}",
             f"messages: {report.messages} (deleted {report.deleted_messages})",
             f"exchanges: {_format_counts(report.exchanges_by_status)}",
+            f"queue: {report.pending_gated} gated"
+            f" (of {report.pending_exchanges} claimable before the gate)",
             f"claims: {_format_counts(report.claims_by_novelty)}"
             f" (retracted {report.retracted_claims})",
             f"runs: {_format_counts(report.runs_by_outcome)}",
@@ -126,6 +148,17 @@ class StatusCommand:
             f"p_lore scored: {report.p_lore_scored}",
             f"passing gate: {report.passing_gate}",
             f"excluded by denylist: {report.excluded_by_denylist}",
+            f"throughput (last {report.throughput_window_hours}h):"
+            f" extract {_format_rate(report.extraction_per_hour)}/h,"
+            f" probe {_format_rate(report.probe_per_hour)}/h",
+            f"extract eta: {_format_eta(report.extraction_eta_hours)}",
+            f"extract spend: {report.extraction_input_tokens} in /"
+            f" {report.extraction_output_tokens} out"
+            f" / {_format_cost(report.extraction_cost_usd)}",
+            f"probe spend: {report.probe_input_tokens} in /"
+            f" {report.probe_output_tokens} out"
+            f" / {_format_cost(report.probe_cost_usd)}"
+            f" over {report.probe_claims} claims",
             *(
                 f"{stage.value}: {stage_settings.backend} / {stage_settings.model}"
                 for stage, stage_settings in context.settings.stages.items()

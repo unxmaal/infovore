@@ -13,6 +13,9 @@ from infovore.cli import (
     Command,
     ExitCode,
     SourceFactory,
+    _format_cost,
+    _format_eta,
+    _format_rate,
     main,
 )
 from infovore.config import Settings
@@ -369,3 +372,28 @@ def test_sync_optouts_writes_opening_line_before_connecting_to_source(tmp_path: 
     )
     assert code == ExitCode.OK
     assert seen_before_connect == [True]
+
+
+def test_eta_is_rendered_in_the_unit_a_reader_can_act_on() -> None:
+    assert _format_eta(None) == "unknown (no recent runs)"
+    assert _format_eta(0.0) == "queue empty"
+    assert _format_eta(3.25) == "3.2h"
+    assert _format_eta(240.0) == "10.0d"
+
+
+def test_a_missing_rate_or_cost_says_so_rather_than_showing_zero() -> None:
+    assert _format_rate(None) == "n/a"
+    assert _format_rate(0.5) == "0.5"
+    assert _format_cost(None) == "cost unreported"
+    assert _format_cost(1.5) == "$1.50"
+
+
+def test_status_reports_the_gated_queue_and_spend(tmp_path: Path) -> None:
+    code, out, _ = run(["status"], environment(tmp_path))
+
+    assert code == ExitCode.OK
+    assert "queue: 0 gated (of 0 claimable before the gate)" in out
+    assert "throughput (last 6h): extract n/a/h, probe n/a/h" in out
+    assert "extract eta: queue empty" in out
+    assert "extract spend: 0 in / 0 out / cost unreported" in out
+    assert "probe spend: 0 in / 0 out / cost unreported over 0 claims" in out
