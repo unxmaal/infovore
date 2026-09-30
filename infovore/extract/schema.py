@@ -1,5 +1,5 @@
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
@@ -49,6 +49,19 @@ class ExtractionOut(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     claims: list[ClaimOut]
+
+
+class BatchExtractionItem(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    index: int = Field(ge=0)
+    claims: list[ClaimOut]
+
+
+class BatchExtractionOut(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    items: list[BatchExtractionItem]
 
 
 class JudgeOut(BaseModel):
@@ -137,6 +150,37 @@ def _coerce_payload(payload: object) -> object:
     return payload
 
 
+def _claims_from(
+    claims: list[ClaimOut],
+    citable_refs: Mapping[str, int],
+    related_claim_ids: set[int],
+    label: str,
+) -> tuple[ExtractedClaim, ...]:
+    problems: list[str] = []
+    for position, claim in enumerate(claims):
+        uncitable = [ref for ref in claim.sources if ref not in citable_refs]
+        if uncitable:
+            problems.append(f"{label}claim {position}: uncitable sources {uncitable}")
+        if claim.supersedes is not None and claim.supersedes not in related_claim_ids:
+            problems.append(
+                f"{label}claim {position}: supersedes {claim.supersedes} is not a related claim id"
+            )
+    if problems:
+        raise InvalidExtractionError("; ".join(problems))
+    return tuple(
+        ExtractedClaim(
+            statement=claim.statement,
+            subject=claim.subject,
+            kind=claim.kind,
+            confidence=claim.confidence,
+            probe_question=claim.probe_question,
+            source_message_ids=tuple(citable_refs[ref] for ref in claim.sources),
+            supersedes_claim_id=claim.supersedes,
+        )
+        for claim in claims
+    )
+
+
 def parse_extraction(
     payload: object,
     citable_refs: Mapping[str, int],
@@ -148,30 +192,36 @@ def parse_extraction(
     except ValidationError as exc:
         raise InvalidExtractionError(str(exc)) from exc
 
-    problems: list[str] = []
-    for position, claim in enumerate(parsed.claims):
-        uncitable = [ref for ref in claim.sources if ref not in citable_refs]
-        if uncitable:
-            problems.append(f"claim {position}: uncitable sources {uncitable}")
-        if claim.supersedes is not None and claim.supersedes not in related_claim_ids:
-            problems.append(
-                f"claim {position}: supersedes {claim.supersedes} is not a related claim id"
-            )
-    if problems:
-        raise InvalidExtractionError("; ".join(problems))
+    return _claims_from(parsed.claims, citable_refs, related_claim_ids, "")
 
-    return tuple(
-        ExtractedClaim(
-            statement=claim.statement,
-            subject=claim.subject,
-            kind=claim.kind,
-            confidence=claim.confidence,
-            probe_question=claim.probe_question,
-            source_message_ids=tuple(citable_refs[ref] for ref in claim.sources),
-            supersedes_claim_id=claim.supersedes,
+
+def parse_batch_extraction(
+    payload: object,
+    refs_by_index: Sequence[Mapping[str, int]],
+    related_by_index: Sequence[set[int]],
+) -> list[tuple[ExtractedClaim, ...]]:
+    """Map a batched extraction onto its exchanges.
+
+    Each item's claims are validated against ONLY that exchange's refs, so a
+    claim the model attached to the wrong conversation is rejected rather
+    than silently stored with another exchange's sources and permalink.
+    """
+    data = _coerce_payload(payload)
+    try:
+        parsed = BatchExtractionOut.model_validate(data)
+    except ValidationError as exc:
+        raise InvalidExtractionError(str(exc)) from exc
+    expected = len(refs_by_index)
+    items = _indexed([(item.index, item.claims) for item in parsed.items], expected)
+    return [
+        _claims_from(
+            items[index],
+            refs_by_index[index],
+            related_by_index[index],
+            f"item {index}: ",
         )
-        for claim in parsed.claims
-    )
+        for index in range(expected)
+    ]
 
 
 def parse_judge(payload: object) -> Novelty:
@@ -192,14 +242,14 @@ def parse_recall(payload: object) -> str:
     return parsed.answer
 
 
-def _indexed(items: list[tuple[int, object]], expected: int) -> dict[int, object]:
+def _indexed[T](items: list[tuple[int, T]], expected: int) -> dict[int, T]:
     """Map a batch response's items onto 0..expected-1 by their own `index`.
 
     Never falls back to positional order: a batch whose indices do not cover
     exactly the expected set is rejected, so a misaligned response can never
     write one claim's verdict onto another claim.
     """
-    seen: dict[int, object] = {}
+    seen: dict[int, T] = {}
     for index, value in items:
         if index >= expected:
             raise InvalidExtractionError(f"index {index} out of range for batch of {expected}")
@@ -219,7 +269,7 @@ def parse_batch_recall(payload: object, expected: int) -> list[str]:
     except ValidationError as exc:
         raise InvalidExtractionError(str(exc)) from exc
     answers = _indexed([(item.index, item.answer) for item in parsed.answers], expected)
-    return [str(answers[index]) for index in range(expected)]
+    return [answers[index] for index in range(expected)]
 
 
 def parse_batch_judge(payload: object, expected: int) -> list[Novelty]:
@@ -229,4 +279,4 @@ def parse_batch_judge(payload: object, expected: int) -> list[Novelty]:
     except ValidationError as exc:
         raise InvalidExtractionError(str(exc)) from exc
     verdicts = _indexed([(item.index, item.verdict) for item in parsed.verdicts], expected)
-    return [Novelty(str(verdicts[index])) for index in range(expected)]
+    return [Novelty(verdicts[index]) for index in range(expected)]

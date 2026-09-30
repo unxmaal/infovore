@@ -1,6 +1,7 @@
 import hashlib
 import math
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from infovore.extract.protocol import ExtractionRequest
@@ -152,7 +153,7 @@ def _render_related_claims(request: ExtractionRequest) -> str:
     )
 
 
-def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
+def render_prompt(request: ExtractionRequest, ref_prefix: str = "") -> RenderedPrompt:
     guild_id = request.messages[0].guild_id
     link = permalink(guild_id, request.exchange.channel_id, request.exchange.first_message_id)
     sections = [
@@ -162,11 +163,14 @@ def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
     names = _pseudonyms(request)
     if request.context_messages:
         rendered_context = "\n\n".join(
-            _render_message(f"c{index}", message, request.opted_out_user_ids, names)
+            _render_message(f"{ref_prefix}c{index}", message, request.opted_out_user_ids, names)
             for index, message in enumerate(request.context_messages, start=1)
         )
         sections.append(f"CONTEXT (do not cite):\n{rendered_context}")
-    refs = {f"m{index}": message.id for index, message in enumerate(request.messages, start=1)}
+    refs = {
+        f"{ref_prefix}m{index}": message.id
+        for index, message in enumerate(request.messages, start=1)
+    }
     rendered_exchange = "\n\n".join(
         _render_message(
             ref,
@@ -188,4 +192,56 @@ def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
         version=PROMPT_VERSION,
         token_estimate=token_estimate,
         refs=refs,
+    )
+
+
+BATCH_SYSTEM_PROMPT = SYSTEM_PROMPT.replace(
+    "You are reading an archived exchange from a hobbyist SGI/IRIX community.",
+    "You are reading several unrelated archived exchanges from a hobbyist "
+    "SGI/IRIX community. Each is numbered and independent: never let one "
+    "exchange inform a claim about another, and never cite a ref belonging "
+    "to a different exchange.",
+).replace(
+    "Every claim must list in sources the refs (m1, m2, ...) of the "
+    "messages in this exchange that support it. Never cite a message from "
+    "the CONTEXT section (refs c1, c2, ...): those messages are read-only "
+    "background from a prior exchange and cannot be cited.",
+    "Every claim must list in sources the refs (eNm1, eNm2, ...) of the "
+    "messages in ITS OWN exchange that support it, where N is that "
+    "exchange's number. Never cite a message from a CONTEXT section (refs "
+    "eNc1, eNc2, ...): those are read-only background and cannot be cited. "
+    "Never cite a ref from another exchange.",
+) + (
+    "\n\nReturn one entry per exchange, each carrying that exchange's own "
+    "index, including exchanges that yield zero claims."
+)
+
+
+@dataclass(frozen=True)
+class RenderedBatchPrompt:
+    system: str
+    prompt: str
+    version: str
+    token_estimate: int
+    refs_by_index: list[dict[str, int]]
+    related_by_index: list[set[int]]
+
+
+def render_batch_prompt(requests: Sequence[ExtractionRequest]) -> RenderedBatchPrompt:
+    """Render several exchanges into one prompt, each with its own ref
+    namespace so a claim can be tied back to exactly one of them."""
+    rendered = [render_prompt(request, f"e{index}") for index, request in enumerate(requests)]
+    body = "\n\n".join(
+        f"=== EXCHANGE {index} ===\n{item.prompt}" for index, item in enumerate(rendered)
+    )
+    return RenderedBatchPrompt(
+        system=BATCH_SYSTEM_PROMPT,
+        prompt=body,
+        version=PROMPT_VERSION,
+        token_estimate=math.ceil(len(BATCH_SYSTEM_PROMPT + body) / 4),
+        refs_by_index=[item.refs for item in rendered],
+        related_by_index=[
+            {claim.id for claim in request.related_claims if claim.id is not None}
+            for request in requests
+        ],
     )

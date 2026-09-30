@@ -92,6 +92,23 @@ class ProbeOutcome:
 
 
 @dataclass(frozen=True)
+class BatchExtractionOutcome:
+    """Result of extracting several exchanges in one LLM call.
+
+    Exactly one of `outcomes` and `failure` is set; a `failure` is
+    batch-level, meaning the call errored or its response could not be
+    mapped safely onto the exchanges.
+    """
+
+    outcomes: tuple[ExtractionOutcome, ...] | None
+    failure: Failure | None
+
+    @property
+    def succeeded(self) -> bool:
+        return self.failure is None
+
+
+@dataclass(frozen=True)
 class BatchProbeOutcome:
     """Result of probing several claims in one pair of LLM calls.
 
@@ -111,6 +128,13 @@ class BatchProbeOutcome:
 
 class ClaimExtractor(Protocol):
     async def extract(self, request: ExtractionRequest) -> ExtractionOutcome: ...
+
+
+@runtime_checkable
+class BatchClaimExtractor(ClaimExtractor, Protocol):
+    async def extract_batch(
+        self, requests: Sequence[ExtractionRequest]
+    ) -> BatchExtractionOutcome: ...
 
 
 class NoveltyProbe(Protocol):

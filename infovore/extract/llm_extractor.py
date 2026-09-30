@@ -1,8 +1,9 @@
 import json
 from collections.abc import Sequence
 
-from infovore.extract.prompt import render_prompt
+from infovore.extract.prompt import render_batch_prompt, render_prompt
 from infovore.extract.protocol import (
+    BatchExtractionOutcome,
     BatchProbeOutcome,
     ExtractionOutcome,
     ExtractionRequest,
@@ -12,6 +13,7 @@ from infovore.extract.protocol import (
     ProbeUsage,
 )
 from infovore.extract.schema import (
+    BatchExtractionOut,
     BatchJudgeOut,
     BatchRecallOut,
     ExtractionOut,
@@ -20,6 +22,7 @@ from infovore.extract.schema import (
     RecallOut,
     first_json_object,
     json_schema_for,
+    parse_batch_extraction,
     parse_batch_judge,
     parse_batch_recall,
     parse_extraction,
@@ -435,4 +438,102 @@ class BatchedLLMNoveltyProbe:
             ),
             failure=None,
             usage=_probe_usage(recall_result, judge_result),
+        )
+
+
+DEFAULT_MAX_OUTPUT_TOKENS_PER_EXCHANGE = 4000
+
+
+def _split_tokens(total: int | None, weights: Sequence[int]) -> list[int | None]:
+    """Divide one call's tokens across the items that shared it.
+
+    The parts sum to the total exactly, so summing the column still gives
+    what the call actually billed. Zero total weight splits evenly.
+    """
+    if total is None:
+        return [None] * len(weights)
+    count = len(weights)
+    if count == 0:
+        return []
+    total_weight = sum(weights)
+    if total_weight == 0:
+        weights = [1] * count
+        total_weight = count
+    parts = [total * weight // total_weight for weight in weights]
+    parts[0] += total - sum(parts)
+    return list(parts)
+
+
+def _split_cost(total: float | None, weights: Sequence[int]) -> list[float | None]:
+    if total is None:
+        return [None] * len(weights)
+    count = len(weights)
+    total_weight = sum(weights) or count
+    normalized = weights if sum(weights) else [1] * count
+    parts = [total * weight / total_weight for weight in normalized]
+    parts[0] += total - sum(parts)
+    return list(parts)
+
+
+class BatchedLLMClaimExtractor:
+    """Extracts several exchanges per LLM call, falling back to one at a time.
+
+    The per-exchange path is kept as `extract`, both to satisfy
+    `ClaimExtractor` and because it is what a batch falls back to.
+    """
+
+    def __init__(
+        self,
+        backend: LLMBackend,
+        max_output_tokens: int = 8000,
+        max_output_tokens_per_exchange: int = DEFAULT_MAX_OUTPUT_TOKENS_PER_EXCHANGE,
+    ) -> None:
+        self._backend = backend
+        self._per_exchange = max_output_tokens_per_exchange
+        self._single = LLMClaimExtractor(backend, max_output_tokens)
+
+    async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
+        return await self._single.extract(request)
+
+    async def extract_batch(self, requests: Sequence[ExtractionRequest]) -> BatchExtractionOutcome:
+        if not requests:
+            return BatchExtractionOutcome(outcomes=(), failure=None)
+        rendered = render_batch_prompt(requests)
+        result = await self._backend.complete(
+            LLMRequest(
+                system=rendered.system,
+                prompt=rendered.prompt,
+                json_schema=json_schema_for(BatchExtractionOut),
+                max_output_tokens=self._per_exchange * len(requests),
+            )
+        )
+        if result.error is not None:
+            return BatchExtractionOutcome(None, _failure_from_error(result.error))
+        try:
+            per_exchange = parse_batch_extraction(
+                _payload_from_result(result, self._backend.capabilities().native_json_schema),
+                rendered.refs_by_index,
+                rendered.related_by_index,
+            )
+        except InvalidExtractionError as exc:
+            return BatchExtractionOutcome(None, Failure(FailureKind.INVALID_OUTPUT, str(exc), None))
+
+        claim_counts = [len(claims) for claims in per_exchange]
+        even = [1] * len(requests)
+        inputs = _split_tokens(result.usage.input_tokens, even)
+        outputs = _split_tokens(result.usage.output_tokens, claim_counts)
+        costs = _split_cost(result.usage.cost_usd, even)
+        return BatchExtractionOutcome(
+            outcomes=tuple(
+                ExtractionOutcome(
+                    claims=claims,
+                    model=result.model,
+                    input_tokens=inputs[index],
+                    output_tokens=outputs[index],
+                    failure=None,
+                    cost_usd=costs[index],
+                )
+                for index, claims in enumerate(per_exchange)
+            ),
+            failure=None,
         )

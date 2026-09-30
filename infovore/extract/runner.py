@@ -20,7 +20,15 @@ from infovore.db.exchanges import (
 )
 from infovore.db.exchanges import record_failure as db_record_failure
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION, permalink
-from infovore.extract.protocol import ClaimExtractor, ExtractedClaim, Failure, FailureKind
+from infovore.extract.protocol import (
+    BatchClaimExtractor,
+    ClaimExtractor,
+    ExtractedClaim,
+    ExtractionOutcome,
+    ExtractionRequest,
+    Failure,
+    FailureKind,
+)
 from infovore.extract.request import build_request
 from infovore.rows import ExchangeRow, ExtractionRunRow, ExtractionStatus, RunMode, RunOutcome
 from infovore.timing import Clock, Sleeper
@@ -433,100 +441,181 @@ def _finish_failure(
         db_record_failure(context.conn, exchange.id, failure.message, context.max_retries)
 
 
-async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
-    async with context.semaphore:
-        request = build_request(context.conn, exchange)
-        context.accumulator.processed += 1
-        assert exchange.id is not None
-        exchange_id = exchange.id
+def _prepare(context: _RunContext, exchange: ExchangeRow) -> ExtractionRequest | None:
+    """Build the request, or None when the exchange is wholly opted out."""
+    request = build_request(context.conn, exchange)
+    context.accumulator.processed += 1
+    assert exchange.id is not None
+    exchange_id = exchange.id
+    if all(message.author_id in request.opted_out_user_ids for message in request.messages):
+        if context.mode is RunMode.LIVE:
+            set_status(context.conn, exchange_id, ExtractionStatus.SKIPPED)
+        context.accumulator.skipped += 1
+        context.accumulator.outcomes += 1
+        context.progress(
+            ExchangeSkipped(
+                exchange_id=exchange_id,
+                index=context.accumulator.outcomes,
+                total=context.total,
+            )
+        )
+        return None
+    return request
 
-        if all(message.author_id in request.opted_out_user_ids for message in request.messages):
-            if context.mode is RunMode.LIVE:
-                set_status(context.conn, exchange_id, ExtractionStatus.SKIPPED)
-            context.accumulator.skipped += 1
-            context.accumulator.outcomes += 1
+
+def _record_success(
+    context: _RunContext,
+    exchange: ExchangeRow,
+    request: ExtractionRequest,
+    outcome: ExtractionOutcome,
+    started_at: datetime,
+) -> None:
+    assert exchange.id is not None
+    claims_before = context.accumulator.claims_recorded
+    _finish_success(
+        context,
+        exchange,
+        request.messages[0].guild_id,
+        outcome.model,
+        outcome.input_tokens,
+        outcome.output_tokens,
+        outcome.cost_usd,
+        outcome.claims,
+        started_at,
+    )
+    context.accumulator.outcomes += 1
+    context.progress(
+        ExchangeClaimed(
+            exchange_id=exchange.id,
+            claims=context.accumulator.claims_recorded - claims_before,
+            index=context.accumulator.outcomes,
+            total=context.total,
+        )
+    )
+
+
+async def _extract_one(
+    context: _RunContext, exchange: ExchangeRow, request: ExtractionRequest
+) -> None:
+    assert exchange.id is not None
+    exchange_id = exchange.id
+    while True:
+        started_at = context.clock.now()
+        outcome = await context.extractor.extract(request)
+        if outcome.succeeded:
+            _record_success(context, exchange, request, outcome, started_at)
+            return
+        failure = outcome.failure
+        assert failure is not None
+        if failure.kind is FailureKind.USAGE_LIMIT:
+            context.accumulator.pauses += 1
+            retry_after = (
+                DEFAULT_USAGE_LIMIT_RETRY_AFTER
+                if failure.retry_after is None
+                else failure.retry_after
+            )
             context.progress(
-                ExchangeSkipped(
+                ExchangePaused(
                     exchange_id=exchange_id,
+                    retry_after=retry_after,
                     index=context.accumulator.outcomes,
                     total=context.total,
                 )
             )
+            await context.sleeper.sleep(retry_after)
+            continue
+        _finish_failure(
+            context,
+            exchange,
+            failure,
+            outcome.input_tokens,
+            outcome.output_tokens,
+            outcome.cost_usd,
+            started_at,
+        )
+        context.accumulator.outcomes += 1
+        context.progress(
+            ExchangeFailed(
+                exchange_id=exchange_id,
+                kind=failure.kind.value,
+                index=context.accumulator.outcomes,
+                total=context.total,
+            )
+        )
+        return
+
+
+async def _extract_group(
+    context: _RunContext, prepared: Sequence[tuple[ExchangeRow, ExtractionRequest]]
+) -> None:
+    extractor = context.extractor
+    assert isinstance(extractor, BatchClaimExtractor)
+    requests = [request for _, request in prepared]
+    while True:
+        started_at = context.clock.now()
+        result = await extractor.extract_batch(requests)
+        if result.succeeded:
+            assert result.outcomes is not None
+            for (exchange, request), outcome in zip(prepared, result.outcomes, strict=True):
+                _record_success(context, exchange, request, outcome, started_at)
             return
-
-        guild_id = request.messages[0].guild_id
-        while True:
-            # Per attempt, not per exchange: a usage-limit pause loops, and
-            # folding the sleep into the duration would make it meaningless.
-            started_at = context.clock.now()
-            outcome = await context.extractor.extract(request)
-            if outcome.succeeded:
-                claims_before = context.accumulator.claims_recorded
-                _finish_success(
-                    context,
-                    exchange,
-                    guild_id,
-                    outcome.model,
-                    outcome.input_tokens,
-                    outcome.output_tokens,
-                    outcome.cost_usd,
-                    outcome.claims,
-                    started_at,
-                )
-                context.accumulator.outcomes += 1
-                context.progress(
-                    ExchangeClaimed(
-                        exchange_id=exchange_id,
-                        claims=context.accumulator.claims_recorded - claims_before,
-                        index=context.accumulator.outcomes,
-                        total=context.total,
-                    )
-                )
-                return
-
-            failure = outcome.failure
-            assert failure is not None
-            if failure.kind is FailureKind.USAGE_LIMIT:
-                context.accumulator.pauses += 1
-                retry_after = (
-                    DEFAULT_USAGE_LIMIT_RETRY_AFTER
-                    if failure.retry_after is None
-                    else failure.retry_after
-                )
+        failure = result.failure
+        assert failure is not None
+        if failure.kind is FailureKind.USAGE_LIMIT:
+            context.accumulator.pauses += 1
+            retry_after = (
+                DEFAULT_USAGE_LIMIT_RETRY_AFTER
+                if failure.retry_after is None
+                else failure.retry_after
+            )
+            for exchange, _ in prepared:
+                assert exchange.id is not None
                 context.progress(
                     ExchangePaused(
-                        exchange_id=exchange_id,
+                        exchange_id=exchange.id,
                         retry_after=retry_after,
                         index=context.accumulator.outcomes,
                         total=context.total,
                     )
                 )
-                await context.sleeper.sleep(retry_after)
-                continue
+            await context.sleeper.sleep(retry_after)
+            continue
+        # The batch could not be mapped onto its exchanges. Re-extract singly
+        # so each gets its own claims or its own recorded error, rather than
+        # one call's failure being charged to all of them.
+        for exchange, request in prepared:
+            await _extract_one(context, exchange, request)
+        return
 
-            _finish_failure(
-                context,
-                exchange,
-                failure,
-                outcome.input_tokens,
-                outcome.output_tokens,
-                outcome.cost_usd,
-                started_at,
-            )
-            context.accumulator.outcomes += 1
-            context.progress(
-                ExchangeFailed(
-                    exchange_id=exchange_id,
-                    kind=failure.kind.value,
-                    index=context.accumulator.outcomes,
-                    total=context.total,
-                )
-            )
+
+async def _handle_group(context: _RunContext, exchanges: Sequence[ExchangeRow]) -> None:
+    async with context.semaphore:
+        prepared = [
+            (exchange, request)
+            for exchange in exchanges
+            if (request := _prepare(context, exchange)) is not None
+        ]
+        if not prepared:
             return
+        if len(prepared) > 1 and isinstance(context.extractor, BatchClaimExtractor):
+            await _extract_group(context, prepared)
+            return
+        for exchange, request in prepared:
+            await _extract_one(context, exchange, request)
 
 
-async def _process_batch(context: _RunContext, batch: Sequence[ExchangeRow]) -> None:
-    await asyncio.gather(*(_handle_exchange(context, exchange) for exchange in batch))
+def _groups(batch: Sequence[ExchangeRow], size: int) -> list[Sequence[ExchangeRow]]:
+    if size <= 1:
+        return [[exchange] for exchange in batch]
+    return [batch[start : start + size] for start in range(0, len(batch), size)]
+
+
+async def _process_batch(
+    context: _RunContext, batch: Sequence[ExchangeRow], extract_batch_size: int = 1
+) -> None:
+    await asyncio.gather(
+        *(_handle_group(context, group) for group in _groups(batch, extract_batch_size))
+    )
 
 
 async def run_extraction(
@@ -549,6 +638,7 @@ async def run_extraction(
     rules: TriageRules = DEFAULT_RULES,
     sampled_by: Mapping[int, str] | None = None,
     exclude_channels: frozenset[str] = frozenset(),
+    extract_batch_size: int = 1,
 ) -> ExtractionReport:
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, clock.now())
     if mode is RunMode.LIVE and db_live_prompt_version(conn) != PROMPT_VERSION:
@@ -597,9 +687,9 @@ async def run_extraction(
             )
             if not batch:
                 break
-            await _process_batch(context, batch)
+            await _process_batch(context, batch, extract_batch_size)
     else:
         assert trial_batch is not None
-        await _process_batch(context, trial_batch)
+        await _process_batch(context, trial_batch, extract_batch_size)
 
     return context.accumulator.to_report()

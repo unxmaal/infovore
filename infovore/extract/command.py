@@ -1,11 +1,11 @@
 import argparse
 from typing import TYPE_CHECKING
 
-from infovore.config import ConfigError, Stage
+from infovore.config import DEFAULT_EXTRACT_BATCH_SIZE, ConfigError, Stage
 from infovore.db.batches import record_extraction_batch
 from infovore.db.codec import to_db_time
 from infovore.db.exchanges import ExchangeOrder
-from infovore.extract.llm_extractor import LLMClaimExtractor
+from infovore.extract.llm_extractor import BatchedLLMClaimExtractor
 from infovore.extract.runner import (
     DEFAULT_MIX_FRACTION_UNCERTAIN,
     ExchangeClaimed,
@@ -60,6 +60,12 @@ class ExtractCommand:
         parser.add_argument("--exchange-id", type=int, action="append", default=[])
         parser.add_argument("--min-score", type=float, default=None)
         parser.add_argument("--max-score", type=float, default=None)
+        parser.add_argument(
+            "--extract-batch-size",
+            type=int,
+            default=DEFAULT_EXTRACT_BATCH_SIZE,
+            help="exchanges per LLM call; 1 extracts one exchange at a time",
+        )
         parser.add_argument(
             "--strategy",
             choices=[strategy.value for strategy in TrialSampleStrategy],
@@ -122,7 +128,7 @@ class ExtractCommand:
 
         stage_settings = context.settings.stages[Stage.EXTRACT]
         backend = await stage_backend(context, Stage.EXTRACT)
-        extractor = LLMClaimExtractor(backend)
+        extractor = BatchedLLMClaimExtractor(backend)
 
         try:
             report = await run_extraction(
@@ -141,6 +147,7 @@ class ExtractCommand:
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
                 batch_id=batch_id,
+                extract_batch_size=args.extract_batch_size,
                 rules=context.settings.triage_rules,
                 sampled_by=sampled_origins,
                 exclude_channels=context.settings.exclude_channels,
