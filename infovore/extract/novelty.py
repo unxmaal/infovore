@@ -3,6 +3,7 @@ import asyncio
 import sqlite3
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from infovore.cli import ExitCode, _say, stage_backend
@@ -10,6 +11,7 @@ from infovore.config import DEFAULT_PROBE_BATCH_SIZE, ConfigError, Stage
 from infovore.db.claims import (
     claims_for_runs_needing_probe,
     claims_needing_probe,
+    record_probe_run,
     set_novelty,
     set_probe_error,
     unprobed_claims,
@@ -26,8 +28,9 @@ from infovore.extract.protocol import (
     FailureKind,
     NoveltyProbe,
     ProbeOutcome,
+    ProbeUsage,
 )
-from infovore.rows import ClaimRow, Novelty
+from infovore.rows import ClaimRow, Novelty, ProbeRunRow, RunOutcome
 from infovore.timing import Clock, Sleeper
 
 if TYPE_CHECKING:
@@ -119,6 +122,33 @@ def _batches(claims: Sequence[ClaimRow], size: int) -> list[list[ClaimRow]]:
     return [ordered[start : start + size] for start in range(0, len(ordered), size)]
 
 
+def _probe_run_row(
+    usage: ProbeUsage,
+    *,
+    started_at: datetime,
+    finished_at: datetime,
+    claim_count: int,
+    batched: bool,
+    error: str | None,
+) -> ProbeRunRow:
+    return ProbeRunRow(
+        id=None,
+        probe_model=usage.probe_model,
+        judge_model=usage.judge_model,
+        started_at=started_at,
+        finished_at=finished_at,
+        claim_count=claim_count,
+        batched=batched,
+        recall_input_tokens=usage.recall_input_tokens,
+        recall_output_tokens=usage.recall_output_tokens,
+        judge_input_tokens=usage.judge_input_tokens,
+        judge_output_tokens=usage.judge_output_tokens,
+        cost_usd=usage.cost_usd,
+        outcome=RunOutcome.FAILED if error is not None else RunOutcome.OK,
+        error=error,
+    )
+
+
 def _retry_after(failure: Failure) -> float:
     if failure.retry_after is None:
         return DEFAULT_USAGE_LIMIT_RETRY_SECONDS
@@ -147,15 +177,42 @@ async def run_probe(
     semaphore = asyncio.Semaphore(concurrency)
     batching = batch_size > 1 and isinstance(probe, BatchNoveltyProbe)
 
-    def record_success(claim_id: int, outcome: ProbeOutcome) -> None:
+    def record_success(claim_id: int, outcome: ProbeOutcome, probe_run_id: int | None) -> None:
         nonlocal probed
         assert outcome.verdict is not None
         assert outcome.model is not None
         assert outcome.answer is not None
-        set_novelty(conn, claim_id, outcome.verdict, outcome.model, outcome.answer, clock.now())
+        set_novelty(
+            conn,
+            claim_id,
+            outcome.verdict,
+            outcome.model,
+            outcome.answer,
+            clock.now(),
+            probe_run_id,
+        )
         probed += 1
         by_verdict[outcome.verdict] = by_verdict.get(outcome.verdict, 0) + 1
         progress(ClaimProbed(claim_id=claim_id, verdict=outcome.verdict.value))
+
+    def record_probe_call(
+        usage: ProbeUsage,
+        started_at: datetime,
+        claim_count: int,
+        batched: bool,
+        error: str | None,
+    ) -> int:
+        return record_probe_run(
+            conn,
+            _probe_run_row(
+                usage,
+                started_at=started_at,
+                finished_at=clock.now(),
+                claim_count=claim_count,
+                batched=batched,
+                error=error,
+            ),
+        )
 
     def record_failure(claim_id: int, failure: Failure) -> None:
         nonlocal failed
@@ -169,17 +226,22 @@ async def run_probe(
         assert claim.id is not None
         claim_id = claim.id
         while True:
+            started_at = clock.now()
             outcome = await probe.probe(claim)
             if outcome.succeeded:
-                record_success(claim_id, outcome)
+                run_id = record_probe_call(outcome.usage, started_at, 1, False, None)
+                record_success(claim_id, outcome, run_id)
                 return
             failure = outcome.failure
             assert failure is not None
             if failure.kind is FailureKind.USAGE_LIMIT:
+                # A usage limit spent nothing worth recording, and the claim is
+                # retried, so it gets no probe_runs row of its own.
                 pauses += 1
                 progress(ClaimPaused(claim_id=claim_id))
                 await sleeper.sleep(_retry_after(failure))
                 continue
+            record_probe_call(outcome.usage, started_at, 1, False, failure.message)
             record_failure(claim_id, failure)
             return
 
@@ -187,12 +249,14 @@ async def run_probe(
         nonlocal pauses
         assert isinstance(probe, BatchNoveltyProbe)
         while True:
+            started_at = clock.now()
             result = await probe.probe_batch(batch)
             if result.succeeded:
                 assert result.outcomes is not None
+                run_id = record_probe_call(result.usage, started_at, len(batch), True, None)
                 for claim, outcome in zip(batch, result.outcomes, strict=True):
                     assert claim.id is not None
-                    record_success(claim.id, outcome)
+                    record_success(claim.id, outcome, run_id)
                 return
             failure = result.failure
             assert failure is not None
@@ -203,9 +267,11 @@ async def run_probe(
                     progress(ClaimPaused(claim_id=claim.id))
                 await sleeper.sleep(_retry_after(failure))
                 continue
-            # The batch as a whole could not be mapped onto its claims. Re-probe
-            # singly so each claim gets its own verdict or its own error, rather
-            # than charging one call's failure to all of them.
+            # The batch as a whole could not be mapped onto its claims. Record
+            # what the failed call spent, then re-probe singly so each claim
+            # gets its own verdict or its own error, rather than charging one
+            # call's failure to all of them.
+            record_probe_call(result.usage, started_at, len(batch), True, failure.message)
             for claim in batch:
                 await probe_one(claim)
             return

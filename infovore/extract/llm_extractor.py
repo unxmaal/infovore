@@ -9,6 +9,7 @@ from infovore.extract.protocol import (
     Failure,
     FailureKind,
     ProbeOutcome,
+    ProbeUsage,
 )
 from infovore.extract.schema import (
     BatchJudgeOut,
@@ -141,6 +142,32 @@ def _repair_prompt(original_prompt: str, previous_output: str, error: str) -> st
     )
 
 
+def _probe_usage(
+    recall: LLMResult | None,
+    judge: LLMResult | None,
+) -> ProbeUsage:
+    """Usage for one call pair. A pair that failed part-way still cost what it
+    already spent, so whichever call completed is recorded."""
+    return ProbeUsage(
+        probe_model=recall.model if recall is not None else None,
+        judge_model=judge.model if judge is not None else None,
+        recall_input_tokens=recall.usage.input_tokens if recall is not None else None,
+        recall_output_tokens=recall.usage.output_tokens if recall is not None else None,
+        judge_input_tokens=judge.usage.input_tokens if judge is not None else None,
+        judge_output_tokens=judge.usage.output_tokens if judge is not None else None,
+        cost_usd=_sum_optional_float(
+            recall.usage.cost_usd if recall is not None else None,
+            judge.usage.cost_usd if judge is not None else None,
+        ),
+    )
+
+
+def _sum_optional_float(first: float | None, second: float | None) -> float | None:
+    if first is None and second is None:
+        return None
+    return (first or 0.0) + (second or 0.0)
+
+
 def _judge_prompt(claim: ClaimRow, answer: str) -> str:
     return (
         f"CLAIM SUBJECT: {claim.subject}\n"
@@ -174,10 +201,12 @@ class LLMClaimExtractor:
                 input_tokens=initial_result.usage.input_tokens,
                 output_tokens=initial_result.usage.output_tokens,
                 failure=_failure_from_error(initial_result.error),
+                cost_usd=initial_result.usage.cost_usd,
             )
 
         input_tokens = initial_result.usage.input_tokens
         output_tokens = initial_result.usage.output_tokens
+        cost_usd = initial_result.usage.cost_usd
 
         try:
             payload = _payload_from_result(initial_result, native)
@@ -192,6 +221,7 @@ class LLMClaimExtractor:
             repair_result = await self._backend.complete(repair_request)
             input_tokens = _sum_optional(input_tokens, repair_result.usage.input_tokens)
             output_tokens = _sum_optional(output_tokens, repair_result.usage.output_tokens)
+            cost_usd = _sum_optional_float(cost_usd, repair_result.usage.cost_usd)
             if repair_result.error is not None:
                 return ExtractionOutcome(
                     claims=(),
@@ -199,6 +229,7 @@ class LLMClaimExtractor:
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
                     failure=_failure_from_error(repair_result.error),
+                    cost_usd=cost_usd,
                 )
             try:
                 repair_payload = _payload_from_result(repair_result, native)
@@ -210,6 +241,7 @@ class LLMClaimExtractor:
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
                     failure=Failure(FailureKind.INVALID_OUTPUT, str(repair_exc), None),
+                    cost_usd=cost_usd,
                 )
             return ExtractionOutcome(
                 claims=claims,
@@ -217,6 +249,7 @@ class LLMClaimExtractor:
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
                 failure=None,
+                cost_usd=cost_usd,
             )
 
         return ExtractionOutcome(
@@ -225,6 +258,7 @@ class LLMClaimExtractor:
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             failure=None,
+            cost_usd=cost_usd,
         )
 
 
@@ -242,7 +276,13 @@ class LLMNoveltyProbe:
         )
         recall_result = await self._probe_backend.complete(recall_request)
         if recall_result.error is not None:
-            return ProbeOutcome(None, None, None, _failure_from_error(recall_result.error))
+            return ProbeOutcome(
+                None,
+                None,
+                None,
+                _failure_from_error(recall_result.error),
+                _probe_usage(None, None),
+            )
 
         try:
             recall_payload = _payload_from_result(
@@ -255,6 +295,7 @@ class LLMNoveltyProbe:
                 recall_result.model,
                 None,
                 Failure(FailureKind.INVALID_OUTPUT, str(exc), None),
+                _probe_usage(recall_result, None),
             )
 
         judge_request = LLMRequest(
@@ -266,7 +307,11 @@ class LLMNoveltyProbe:
         judge_result = await self._judge_backend.complete(judge_request)
         if judge_result.error is not None:
             return ProbeOutcome(
-                None, recall_result.model, answer, _failure_from_error(judge_result.error)
+                None,
+                recall_result.model,
+                answer,
+                _failure_from_error(judge_result.error),
+                _probe_usage(recall_result, None),
             )
 
         try:
@@ -280,9 +325,16 @@ class LLMNoveltyProbe:
                 recall_result.model,
                 answer,
                 Failure(FailureKind.INVALID_OUTPUT, str(exc), None),
+                _probe_usage(recall_result, judge_result),
             )
 
-        return ProbeOutcome(verdict=verdict, model=recall_result.model, answer=answer, failure=None)
+        return ProbeOutcome(
+            verdict=verdict,
+            model=recall_result.model,
+            answer=answer,
+            failure=None,
+            usage=_probe_usage(recall_result, judge_result),
+        )
 
 
 def _batch_recall_prompt(claims: Sequence[ClaimRow]) -> str:
@@ -325,7 +377,9 @@ class BatchedLLMNoveltyProbe:
         )
         recall_result = await self._probe_backend.complete(recall_request)
         if recall_result.error is not None:
-            return BatchProbeOutcome(None, _failure_from_error(recall_result.error))
+            return BatchProbeOutcome(
+                None, _failure_from_error(recall_result.error), _probe_usage(None, None)
+            )
 
         try:
             answers = parse_batch_recall(
@@ -335,7 +389,11 @@ class BatchedLLMNoveltyProbe:
                 count,
             )
         except InvalidExtractionError as exc:
-            return BatchProbeOutcome(None, Failure(FailureKind.INVALID_OUTPUT, str(exc), None))
+            return BatchProbeOutcome(
+                None,
+                Failure(FailureKind.INVALID_OUTPUT, str(exc), None),
+                _probe_usage(recall_result, None),
+            )
 
         judge_request = LLMRequest(
             system=BATCH_JUDGE_SYSTEM_PROMPT,
@@ -345,7 +403,11 @@ class BatchedLLMNoveltyProbe:
         )
         judge_result = await self._judge_backend.complete(judge_request)
         if judge_result.error is not None:
-            return BatchProbeOutcome(None, _failure_from_error(judge_result.error))
+            return BatchProbeOutcome(
+                None,
+                _failure_from_error(judge_result.error),
+                _probe_usage(recall_result, None),
+            )
 
         try:
             verdicts = parse_batch_judge(
@@ -355,7 +417,11 @@ class BatchedLLMNoveltyProbe:
                 count,
             )
         except InvalidExtractionError as exc:
-            return BatchProbeOutcome(None, Failure(FailureKind.INVALID_OUTPUT, str(exc), None))
+            return BatchProbeOutcome(
+                None,
+                Failure(FailureKind.INVALID_OUTPUT, str(exc), None),
+                _probe_usage(recall_result, judge_result),
+            )
 
         return BatchProbeOutcome(
             outcomes=tuple(
@@ -368,4 +434,5 @@ class BatchedLLMNoveltyProbe:
                 for verdict, answer in zip(verdicts, answers, strict=True)
             ),
             failure=None,
+            usage=_probe_usage(recall_result, judge_result),
         )

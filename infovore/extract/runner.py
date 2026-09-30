@@ -3,6 +3,7 @@ import random
 import sqlite3
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import StrEnum
 
 from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
@@ -342,7 +343,9 @@ def _finish_success(
     outcome_model: str | None,
     input_tokens: int | None,
     output_tokens: int | None,
+    cost_usd: float | None,
     claims: Sequence[ExtractedClaim],
+    started_at: datetime,
 ) -> None:
     assert exchange.id is not None
     now = context.clock.now()
@@ -368,7 +371,7 @@ def _finish_success(
         exchange_id=exchange.id,
         model=outcome_model or context.model_label,
         prompt_version=PROMPT_VERSION,
-        started_at=now,
+        started_at=started_at,
         finished_at=now,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
@@ -377,6 +380,7 @@ def _finish_success(
         error=None,
         batch_id=context.batch_id,
         sampled_by=context.sampled_by.get(exchange.id),
+        cost_usd=cost_usd,
     )
 
     previous_claim_ids: list[int] = []
@@ -400,6 +404,8 @@ def _finish_failure(
     failure: Failure,
     input_tokens: int | None,
     output_tokens: int | None,
+    cost_usd: float | None,
+    started_at: datetime,
 ) -> None:
     assert exchange.id is not None
     now = context.clock.now()
@@ -408,7 +414,7 @@ def _finish_failure(
         exchange_id=exchange.id,
         model=context.canonical_model.value or context.model_label,
         prompt_version=PROMPT_VERSION,
-        started_at=now,
+        started_at=started_at,
         finished_at=now,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
@@ -417,6 +423,7 @@ def _finish_failure(
         error=failure.message,
         batch_id=context.batch_id,
         sampled_by=context.sampled_by.get(exchange.id),
+        cost_usd=cost_usd,
     )
     recorded = record_run(context.conn, run_row, [])
     context.accumulator.run_ids.append(recorded.run_id)
@@ -449,6 +456,9 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
 
         guild_id = request.messages[0].guild_id
         while True:
+            # Per attempt, not per exchange: a usage-limit pause loops, and
+            # folding the sleep into the duration would make it meaningless.
+            started_at = context.clock.now()
             outcome = await context.extractor.extract(request)
             if outcome.succeeded:
                 claims_before = context.accumulator.claims_recorded
@@ -459,7 +469,9 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
                     outcome.model,
                     outcome.input_tokens,
                     outcome.output_tokens,
+                    outcome.cost_usd,
                     outcome.claims,
+                    started_at,
                 )
                 context.accumulator.outcomes += 1
                 context.progress(
@@ -492,7 +504,15 @@ async def _handle_exchange(context: _RunContext, exchange: ExchangeRow) -> None:
                 await context.sleeper.sleep(retry_after)
                 continue
 
-            _finish_failure(context, exchange, failure, outcome.input_tokens, outcome.output_tokens)
+            _finish_failure(
+                context,
+                exchange,
+                failure,
+                outcome.input_tokens,
+                outcome.output_tokens,
+                outcome.cost_usd,
+                started_at,
+            )
             context.accumulator.outcomes += 1
             context.progress(
                 ExchangeFailed(

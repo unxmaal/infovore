@@ -6,7 +6,15 @@ from datetime import datetime
 
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
-from infovore.rows import ClaimKind, ClaimRow, ExtractionRunRow, Novelty, RunMode, RunOutcome
+from infovore.rows import (
+    ClaimKind,
+    ClaimRow,
+    ExtractionRunRow,
+    Novelty,
+    ProbeRunRow,
+    RunMode,
+    RunOutcome,
+)
 
 _WORD_RE = re.compile(r"[\w\-./]+")
 
@@ -84,8 +92,8 @@ def record_run(
         cursor = conn.execute(
             "INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at,"
             " finished_at, input_tokens, output_tokens, mode, outcome, error, batch_id,"
-            " sampled_by)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            " sampled_by, cost_usd)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 run.exchange_id,
                 run.model,
@@ -99,6 +107,7 @@ def record_run(
                 run.error,
                 run.batch_id,
                 run.sampled_by,
+                run.cost_usd,
             ),
         )
         run_id = cursor.lastrowid
@@ -161,6 +170,7 @@ def _row_to_claim(row: sqlite3.Row) -> ClaimRow:
         probe_error=row["probe_error"],
         retracted_at=from_db_time(row["retracted_at"]),
         retraction_reason=row["retraction_reason"],
+        probe_run_id=row["probe_run_id"],
     )
 
 
@@ -182,6 +192,9 @@ def _row_to_run(row: sqlite3.Row) -> ExtractionRunRow:
         mode=RunMode(row["mode"]),
         outcome=RunOutcome(row["outcome"]),
         error=row["error"],
+        batch_id=row["batch_id"],
+        sampled_by=row["sampled_by"],
+        cost_usd=row["cost_usd"],
     )
 
 
@@ -278,12 +291,64 @@ def set_novelty(
     probe_model: str,
     probe_answer: str,
     at: datetime,
+    probe_run_id: int | None = None,
 ) -> None:
     conn.execute(
         "UPDATE claims SET novelty = ?, probe_model = ?, probe_answer = ?, probed_at = ?,"
-        " probe_error = NULL WHERE id = ?",
-        (verdict.value, probe_model, probe_answer, to_db_time(at), claim_id),
+        " probe_error = NULL, probe_run_id = ? WHERE id = ?",
+        (verdict.value, probe_model, probe_answer, to_db_time(at), probe_run_id, claim_id),
     )
+
+
+def record_probe_run(conn: sqlite3.Connection, run: ProbeRunRow) -> int:
+    cursor = conn.execute(
+        "INSERT INTO probe_runs (probe_model, judge_model, started_at, finished_at, claim_count,"
+        " batched, recall_input_tokens, recall_output_tokens, judge_input_tokens,"
+        " judge_output_tokens, cost_usd, outcome, error)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            run.probe_model,
+            run.judge_model,
+            to_db_time(run.started_at),
+            to_db_time(run.finished_at),
+            run.claim_count,
+            int(run.batched),
+            run.recall_input_tokens,
+            run.recall_output_tokens,
+            run.judge_input_tokens,
+            run.judge_output_tokens,
+            run.cost_usd,
+            run.outcome.value,
+            run.error,
+        ),
+    )
+    run_id = cursor.lastrowid
+    assert run_id is not None
+    return run_id
+
+
+def _row_to_probe_run(row: sqlite3.Row) -> ProbeRunRow:
+    return ProbeRunRow(
+        id=row["id"],
+        probe_model=row["probe_model"],
+        judge_model=row["judge_model"],
+        started_at=from_db_time(row["started_at"]),
+        finished_at=from_db_time(row["finished_at"]),
+        claim_count=row["claim_count"],
+        batched=bool(row["batched"]),
+        recall_input_tokens=row["recall_input_tokens"],
+        recall_output_tokens=row["recall_output_tokens"],
+        judge_input_tokens=row["judge_input_tokens"],
+        judge_output_tokens=row["judge_output_tokens"],
+        cost_usd=row["cost_usd"],
+        outcome=RunOutcome(row["outcome"]),
+        error=row["error"],
+    )
+
+
+def get_probe_run(conn: sqlite3.Connection, run_id: int) -> ProbeRunRow | None:
+    row = conn.execute("SELECT * FROM probe_runs WHERE id = ?", (run_id,)).fetchone()
+    return _row_to_probe_run(row) if row is not None else None
 
 
 def set_probe_error(conn: sqlite3.Connection, claim_id: int, error: str) -> None:
