@@ -233,7 +233,10 @@ class ServeApp:
     never loses the labels themselves (those are in `message_labels`,
     which is what makes reloading the page, or resuming after a restart,
     show already-labeled messages correctly: `state`/`progress` always
-    re-read the database rather than trusting any cached label)."""
+    re-read the database rather than trusting any cached label). Those
+    reads are scoped to THIS batch's `source_ref`, so a message carrying
+    a label from an earlier round counts as unjudged here -- that is what
+    makes `--repeat` work (issue #166)."""
 
     def __init__(
         self,
@@ -265,8 +268,12 @@ class ServeApp:
         placeholders = ", ".join("?" * len(self._messages))
         rows = self._conn.execute(
             f"SELECT message_id, label FROM message_labels"
-            f" WHERE source = ? AND message_id IN ({placeholders})",
-            (MessageLabelSource.HUMAN.value, *(message.id for message in self._messages)),
+            f" WHERE source = ? AND source_ref = ? AND message_id IN ({placeholders})",
+            (
+                MessageLabelSource.HUMAN.value,
+                self.source_ref,
+                *(message.id for message in self._messages),
+            ),
         ).fetchall()
         return {row["message_id"]: MessageLabel(row["label"]) for row in rows}
 
