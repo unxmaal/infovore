@@ -21,6 +21,7 @@ from infovore.sift.importer import (
 from infovore.sift.sampling import (
     DEFAULT_MIX_FRACTION_UNCERTAIN,
     NoScoredMessagesError,
+    SiftAllocation,
     SiftStrategy,
 )
 from infovore.sift.serve import build_serve_app
@@ -181,6 +182,11 @@ class SiftCommand:
         export_parser.add_argument("--seed", type=int, default=0)
         export_parser.add_argument("--repeat", type=int, default=0)
         export_parser.add_argument(
+            "--allocation",
+            choices=[mode.value for mode in SiftAllocation],
+            default=SiftAllocation.ROUND_ROBIN.value,
+        )
+        export_parser.add_argument(
             "--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix"
         )
         export_parser.add_argument("--out", type=str, default=None, dest="out")
@@ -248,6 +254,11 @@ class SiftCommand:
         )
         serve_parser.add_argument("--seed", type=int, default=0)
         serve_parser.add_argument("--repeat", type=int, default=0)
+        serve_parser.add_argument(
+            "--allocation",
+            choices=[mode.value for mode in SiftAllocation],
+            default=SiftAllocation.ROUND_ROBIN.value,
+        )
         serve_parser.add_argument(
             "--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix"
         )
@@ -375,6 +386,7 @@ class SiftCommand:
                 exclude_channels=context.settings.exclude_channels,
                 include_channels=include_channels,
                 repeat=args.repeat,
+                allocation=SiftAllocation(args.allocation),
             )
         except NoScoredMessagesError as error:
             raise ConfigError(
@@ -450,6 +462,7 @@ class SiftCommand:
                 exclude_channels=context.settings.exclude_channels,
                 include_channels=include_channels,
                 repeat=args.repeat,
+                allocation=SiftAllocation(args.allocation),
             )
         except NoScoredMessagesError as error:
             raise ConfigError(

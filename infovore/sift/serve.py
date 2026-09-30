@@ -39,7 +39,7 @@ from infovore.rows import MessageLabel, MessageLabelSource
 from infovore.sift.export import MANIFEST_NAME, SiftBatchMessage, export_batch, fetch_batch_messages
 from infovore.sift.importer import MissingManifestError
 from infovore.sift.rules import BulkRule, RulePreview, preview_rule, save_bulk_rule
-from infovore.sift.sampling import SiftStrategy
+from infovore.sift.sampling import SiftAllocation, SiftStrategy
 from infovore.timing import Clock
 
 _LabelRow = tuple[str, "str | None", str]
@@ -118,6 +118,7 @@ def resolve_batch(
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
     repeat: int = 0,
+    allocation: SiftAllocation = SiftAllocation.ROUND_ROBIN,
 ) -> BatchSource:
     """Which batch `sift serve` shows (issue #131): either an existing
     export dir (`dir_`, read as-is), or a freshly sampled one (`new=True`,
@@ -141,6 +142,7 @@ def resolve_batch(
             exclude_channels=exclude_channels,
             include_channels=include_channels,
             repeat=repeat,
+            allocation=allocation,
         )
         target_dir = out_dir
     else:
@@ -492,6 +494,7 @@ def build_serve_app(
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
     repeat: int = 0,
+    allocation: SiftAllocation = SiftAllocation.ROUND_ROBIN,
 ) -> ServeApp:
     batch = resolve_batch(
         conn,
@@ -506,6 +509,7 @@ def build_serve_app(
         exclude_channels=exclude_channels,
         include_channels=include_channels,
         repeat=repeat,
+        allocation=allocation,
     )
     messages = load_batch_messages(conn, batch.message_ids)
     return ServeApp(conn, messages, batch.dir.name, scratch_dir, clock)
