@@ -9,6 +9,11 @@ from infovore.db.channel_filter import exclude_channels_clause, include_channels
 DEFAULT_MIX_FRACTION_UNCERTAIN = 0.5
 
 
+class SiftAllocation(StrEnum):
+    ROUND_ROBIN = "round-robin"
+    PROPORTIONAL = "proportional"
+
+
 class SiftStrategy(StrEnum):
     RANDOM = "random"
     UNCERTAIN = "uncertain"
@@ -131,11 +136,49 @@ def _allocate_round_robin(strata: Mapping[int, Sequence[SiftCandidate]], n: int)
     return allocation
 
 
-def _select_random_stratified(rows: Sequence[SiftCandidate], n: int, seed: int) -> list[int]:
+def _allocate_proportional(strata: Mapping[int, Sequence[SiftCandidate]], n: int) -> dict[int, int]:
+    """Split `n` across channel strata in proportion to each channel's share
+    of the pool, so a raw rate over the batch estimates the same rate over
+    the corpus without reweighting (issue #166). Round-robin deliberately
+    does the opposite: it spans channels for coverage, which makes #general
+    13x under-represented here and leaves any corpus-level estimate resting
+    on a handful of its messages."""
+    keys = sorted(strata)
+    sizes = {key: len(strata[key]) for key in keys}
+    total = sum(sizes.values())
+    if n >= total:
+        return dict(sizes)
+
+    exact = {key: n * sizes[key] / total for key in keys}
+    allocation = {key: min(int(exact[key]), sizes[key]) for key in keys}
+    # Largest remainder: truncation alone loses up to len(keys) - 1 slots.
+    while sum(allocation.values()) < n:
+        candidates = [key for key in keys if allocation[key] < sizes[key]]
+        key = max(candidates, key=lambda k: (exact[k] - allocation[k], sizes[k], -k))
+        allocation[key] += 1
+    return allocation
+
+
+def allocate(
+    strata: Mapping[int, Sequence[SiftCandidate]],
+    n: int,
+    allocation: SiftAllocation = SiftAllocation.ROUND_ROBIN,
+) -> dict[int, int]:
+    if allocation is SiftAllocation.PROPORTIONAL:
+        return _allocate_proportional(strata, n)
+    return _allocate_round_robin(strata, n)
+
+
+def _select_random_stratified(
+    rows: Sequence[SiftCandidate],
+    n: int,
+    seed: int,
+    allocation_mode: SiftAllocation = SiftAllocation.ROUND_ROBIN,
+) -> list[int]:
     if not rows:
         return []
     strata = _by_channel(rows)
-    allocation = _allocate_round_robin(strata, n)
+    allocation = allocate(strata, n, allocation_mode)
     rng = random.Random(seed)
     selected: list[int] = []
     for channel_id, count in allocation.items():
@@ -150,7 +193,11 @@ def _uncertainty(row: SiftCandidate) -> tuple[float, int]:
     return (abs(row.p_trash - 0.5), row.id)
 
 
-def _select_uncertain_stratified(rows: Sequence[SiftCandidate], n: int) -> list[int]:
+def _select_uncertain_stratified(
+    rows: Sequence[SiftCandidate],
+    n: int,
+    allocation_mode: SiftAllocation = SiftAllocation.ROUND_ROBIN,
+) -> list[int]:
     scored = [row for row in rows if row.p_trash is not None]
     if not scored:
         raise NoScoredMessagesError
@@ -172,6 +219,7 @@ def select_sift_sample(
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
     repeat: int = 0,
+    allocation: SiftAllocation = SiftAllocation.ROUND_ROBIN,
 ) -> list[int]:
     """Pick `n` message ids from `eligible_message_pool`, channel-stratified
     (issue #128): `random` draws uniformly within each channel's
@@ -183,23 +231,25 @@ def select_sift_sample(
     two (`mix`, default 50/50) but — unlike plain `uncertain` — falls back
     to an all-`random` split when nothing anywhere has a `p_trash` yet, so a
     mixed round never has to wait on a trained classifier."""
-    repeats = _select_repeats(conn, repeat, n, seed, exclude_channels, include_channels)
+    repeats = _select_repeats(conn, repeat, n, seed, exclude_channels, include_channels, allocation)
     n -= len(repeats)
     rows = eligible_message_pool(conn, exclude_channels, include_channels)
     if strategy is SiftStrategy.RANDOM:
-        return sorted(repeats | set(_select_random_stratified(rows, n, seed)))
+        return sorted(repeats | set(_select_random_stratified(rows, n, seed, allocation)))
     if strategy is SiftStrategy.UNCERTAIN:
-        return sorted(repeats | set(_select_uncertain_stratified(rows, n)))
+        return sorted(repeats | set(_select_uncertain_stratified(rows, n, allocation)))
 
     scored = [row for row in rows if row.p_trash is not None]
     if not scored:
-        return sorted(repeats | set(_select_random_stratified(rows, n, seed)))
+        return sorted(repeats | set(_select_random_stratified(rows, n, seed, allocation)))
 
     n_uncertain = max(0, min(round(n * mix), len(scored), n))
-    uncertain_ids = _select_uncertain_stratified(rows, n_uncertain) if n_uncertain else []
+    uncertain_ids = (
+        _select_uncertain_stratified(rows, n_uncertain, allocation) if n_uncertain else []
+    )
     uncertain_id_set = set(uncertain_ids)
     remaining_rows = [row for row in rows if row.id not in uncertain_id_set]
-    random_ids = _select_random_stratified(remaining_rows, n - len(uncertain_ids), seed)
+    random_ids = _select_random_stratified(remaining_rows, n - len(uncertain_ids), seed, allocation)
     return sorted(repeats | uncertain_id_set | set(random_ids))
 
 
@@ -210,9 +260,10 @@ def _select_repeats(
     seed: int,
     exclude_channels: frozenset[str],
     include_channels: frozenset[str],
+    allocation: SiftAllocation = SiftAllocation.ROUND_ROBIN,
 ) -> set[int]:
     wanted = min(repeat, n)
     if wanted <= 0:
         return set()
     pool = repeat_message_pool(conn, exclude_channels, include_channels)
-    return set(_select_random_stratified(pool, wanted, seed))
+    return set(_select_random_stratified(pool, wanted, seed, allocation))

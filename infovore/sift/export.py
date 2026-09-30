@@ -7,7 +7,7 @@ from pathlib import Path
 
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.sift.lnav_format import LNAV_FORMAT_JSON
-from infovore.sift.sampling import SiftStrategy, select_sift_sample
+from infovore.sift.sampling import SiftAllocation, SiftStrategy, select_sift_sample
 
 BATCH_TEXT_LIMIT = 300
 BATCH_LOG_NAME = "batch.log"
@@ -105,6 +105,7 @@ def export_batch(
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
     repeat: int = 0,
+    allocation: SiftAllocation = SiftAllocation.ROUND_ROBIN,
 ) -> ExportReport:
     """Write one sift batch (issue #128) to `out_dir`: `batch.log` (the
     lnav-friendly log), `infovore-sift.json` (the lnav format file — a copy
@@ -125,6 +126,7 @@ def export_batch(
         exclude_channels=exclude_channels,
         include_channels=include_channels,
         repeat=repeat,
+        allocation=allocation,
     )
     batch = fetch_batch_messages(conn, message_ids)
 
