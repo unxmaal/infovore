@@ -1,12 +1,4 @@
-"""Gate evaluation from realised yield rather than from labels.
-
-`triage --report` measures the classifier against labels, which says how it
-ranks across the whole score range. It cannot say whether the gate is buying
-anything AT ITS OPERATING POINT, because above a saturated threshold every
-exchange scores alike. This asks the outcome question instead: of the
-exchanges extraction actually ran on, how many produced nothing, and what did
-that cost.
-"""
+"""Gate evaluation from realised yield rather than labels (see README)."""
 
 import sqlite3
 from dataclasses import dataclass
