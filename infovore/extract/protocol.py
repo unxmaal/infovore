@@ -58,10 +58,24 @@ class ExtractionOutcome:
     input_tokens: int | None
     output_tokens: int | None
     failure: Failure | None
+    cost_usd: float | None = None
 
     @property
     def succeeded(self) -> bool:
         return self.failure is None
+
+
+@dataclass(frozen=True)
+class ProbeUsage:
+    """What one recall+judge call pair cost, and how many claims shared it."""
+
+    probe_model: str | None = None
+    judge_model: str | None = None
+    recall_input_tokens: int | None = None
+    recall_output_tokens: int | None = None
+    judge_input_tokens: int | None = None
+    judge_output_tokens: int | None = None
+    cost_usd: float | None = None
 
 
 @dataclass(frozen=True)
@@ -70,6 +84,7 @@ class ProbeOutcome:
     model: str | None
     answer: str | None
     failure: Failure | None
+    usage: ProbeUsage = ProbeUsage()
 
     @property
     def succeeded(self) -> bool:
@@ -87,6 +102,7 @@ class BatchProbeOutcome:
 
     outcomes: tuple[ProbeOutcome, ...] | None
     failure: Failure | None
+    usage: ProbeUsage = ProbeUsage()
 
     @property
     def succeeded(self) -> bool:

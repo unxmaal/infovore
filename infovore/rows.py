@@ -163,6 +163,27 @@ class ExtractionRunRow:
     error: str | None
     batch_id: str | None = None
     sampled_by: str | None = None
+    cost_usd: float | None = None
+
+
+@dataclass(frozen=True)
+class ProbeRunRow:
+    """One recall+judge call pair, covering `claim_count` claims."""
+
+    id: int | None
+    probe_model: str | None
+    judge_model: str | None
+    started_at: datetime
+    finished_at: datetime
+    claim_count: int
+    batched: bool
+    recall_input_tokens: int | None
+    recall_output_tokens: int | None
+    judge_input_tokens: int | None
+    judge_output_tokens: int | None
+    cost_usd: float | None
+    outcome: RunOutcome
+    error: str | None
 
 
 @dataclass(frozen=True)
@@ -192,6 +213,7 @@ class ClaimRow:
     probe_error: str | None
     retracted_at: datetime | None
     retraction_reason: str | None
+    probe_run_id: int | None = None
 
 
 @dataclass(frozen=True)

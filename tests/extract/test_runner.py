@@ -1,7 +1,7 @@
 import asyncio
 import sqlite3
 from dataclasses import replace
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -53,7 +53,7 @@ from infovore.rows import (
     RunMode,
     RunOutcome,
 )
-from infovore.timing import FixedClock, RecordingSleeper
+from infovore.timing import Clock, FixedClock, RecordingSleeper
 from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.score import TRIAGE_VERSION
 
@@ -1790,3 +1790,145 @@ def test_run_extraction_live_never_claims_a_denylisted_channel(tmp_path: Path) -
     assert trashed_after is not None
     assert kept_after.extraction_status is ExtractionStatus.DONE
     assert trashed_after.extraction_status is ExtractionStatus.PENDING
+
+
+class TickingClock(Clock):
+    """Advances one second per read, so a start and a finish differ."""
+
+    def __init__(self) -> None:
+        self._ticks = 0
+
+    def now(self) -> datetime:
+        self._ticks += 1
+        return NOW + timedelta(seconds=self._ticks)
+
+
+def test_a_run_brackets_its_own_attempt_and_records_cost(tmp_path: Path) -> None:
+    # Before issue #149 started_at and finished_at were both written as the
+    # finish instant, so every row read as zero duration.
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)])
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model="model-y",
+                input_tokens=7,
+                output_tokens=3,
+                failure=None,
+                cost_usd=0.0125,
+            )
+        ]
+    )
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            extractor,
+            TickingClock(),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+        )
+
+    asyncio.run(go())
+
+    row = conn.execute(
+        "SELECT started_at, finished_at, cost_usd FROM extraction_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    assert row["started_at"] < row["finished_at"]
+    assert row["cost_usd"] == 0.0125
+
+
+def test_a_paused_run_times_the_attempt_that_succeeded_not_the_sleep(tmp_path: Path) -> None:
+    # The retry loop re-reads the clock, so a usage-limit sleep is not folded
+    # into the recorded duration.
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)])
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=None,
+                output_tokens=None,
+                failure=Failure(FailureKind.USAGE_LIMIT, "slow down", 45.0),
+            ),
+            ExtractionOutcome(
+                claims=(),
+                model="model-y",
+                input_tokens=1,
+                output_tokens=1,
+                failure=None,
+                cost_usd=0.5,
+            ),
+        ]
+    )
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            extractor,
+            TickingClock(),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+        )
+
+    report = asyncio.run(go())
+
+    assert report.pauses == 1
+    row = conn.execute(
+        "SELECT started_at, finished_at FROM extraction_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    started = datetime.fromisoformat(row["started_at"])
+    finished = datetime.fromisoformat(row["finished_at"])
+    # one clock tick apart: the second attempt only, not the whole loop
+    assert (finished - started) == timedelta(seconds=1)
+
+
+def test_a_failed_run_records_its_cost(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    seed_exchange(conn, [a_message(1)])
+    extractor = SequencedExtractor(
+        [
+            ExtractionOutcome(
+                claims=(),
+                model=None,
+                input_tokens=5,
+                output_tokens=0,
+                failure=Failure(FailureKind.FATAL, "nope", None),
+                cost_usd=0.002,
+            )
+        ]
+    )
+
+    async def go() -> ExtractionReport:
+        await promote(conn)
+        return await run_extraction(
+            conn,
+            extractor,
+            FixedClock(NOW),
+            RecordingSleeper(),
+            mode=RunMode.LIVE,
+            model_label="model-x",
+            batch_size=10,
+            max_retries=3,
+            concurrency=1,
+        )
+
+    asyncio.run(go())
+
+    row = conn.execute(
+        "SELECT outcome, cost_usd FROM extraction_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    assert row["outcome"] == "failed"
+    assert row["cost_usd"] == 0.002
