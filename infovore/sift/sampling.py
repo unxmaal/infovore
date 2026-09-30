@@ -68,6 +68,41 @@ def eligible_message_pool(
     ]
 
 
+def repeat_message_pool(
+    conn: sqlite3.Connection,
+    exclude_channels: frozenset[str] = frozenset(),
+    include_channels: frozenset[str] = frozenset(),
+) -> list[SiftCandidate]:
+    """The mirror of `eligible_message_pool`: messages that ALREADY carry a
+    human label, so a round can re-offer a handful of them unannounced and
+    measure the maintainer's agreement with his own earlier judgment. That
+    rate is the ceiling no technique can beat (issue #166)."""
+    excl_clause, excl_params = exclude_channels_clause("m.channel_id", exclude_channels)
+    incl_clause, incl_params = include_channels_clause("m.channel_id", include_channels)
+    rows = conn.execute(
+        "SELECT m.id AS id, m.channel_id AS channel_id, em.exchange_id AS exchange_id,"
+        " m.p_trash AS p_trash"
+        " FROM messages m"
+        " JOIN exchange_messages em ON em.message_id = m.id"
+        " WHERE m.author_id NOT IN (SELECT user_id FROM opt_outs)"
+        " AND EXISTS ("
+        "   SELECT 1 FROM message_labels ml"
+        "   WHERE ml.message_id = m.id AND ml.source = 'human'"
+        f" ){excl_clause}{incl_clause}"
+        " ORDER BY m.id",
+        (*excl_params, *incl_params),
+    ).fetchall()
+    return [
+        SiftCandidate(
+            id=row["id"],
+            channel_id=row["channel_id"],
+            exchange_id=row["exchange_id"],
+            p_trash=row["p_trash"],
+        )
+        for row in rows
+    ]
+
+
 def _by_channel(rows: Sequence[SiftCandidate]) -> dict[int, list[SiftCandidate]]:
     strata: dict[int, list[SiftCandidate]] = {}
     for row in rows:
@@ -136,6 +171,7 @@ def select_sift_sample(
     mix: float = DEFAULT_MIX_FRACTION_UNCERTAIN,
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
+    repeat: int = 0,
 ) -> list[int]:
     """Pick `n` message ids from `eligible_message_pool`, channel-stratified
     (issue #128): `random` draws uniformly within each channel's
@@ -147,19 +183,36 @@ def select_sift_sample(
     two (`mix`, default 50/50) but — unlike plain `uncertain` — falls back
     to an all-`random` split when nothing anywhere has a `p_trash` yet, so a
     mixed round never has to wait on a trained classifier."""
+    repeats = _select_repeats(conn, repeat, n, seed, exclude_channels, include_channels)
+    n -= len(repeats)
     rows = eligible_message_pool(conn, exclude_channels, include_channels)
     if strategy is SiftStrategy.RANDOM:
-        return sorted(_select_random_stratified(rows, n, seed))
+        return sorted(repeats | set(_select_random_stratified(rows, n, seed)))
     if strategy is SiftStrategy.UNCERTAIN:
-        return sorted(_select_uncertain_stratified(rows, n))
+        return sorted(repeats | set(_select_uncertain_stratified(rows, n)))
 
     scored = [row for row in rows if row.p_trash is not None]
     if not scored:
-        return sorted(_select_random_stratified(rows, n, seed))
+        return sorted(repeats | set(_select_random_stratified(rows, n, seed)))
 
     n_uncertain = max(0, min(round(n * mix), len(scored), n))
     uncertain_ids = _select_uncertain_stratified(rows, n_uncertain) if n_uncertain else []
     uncertain_id_set = set(uncertain_ids)
     remaining_rows = [row for row in rows if row.id not in uncertain_id_set]
     random_ids = _select_random_stratified(remaining_rows, n - len(uncertain_ids), seed)
-    return sorted(uncertain_id_set | set(random_ids))
+    return sorted(repeats | uncertain_id_set | set(random_ids))
+
+
+def _select_repeats(
+    conn: sqlite3.Connection,
+    repeat: int,
+    n: int,
+    seed: int,
+    exclude_channels: frozenset[str],
+    include_channels: frozenset[str],
+) -> set[int]:
+    wanted = min(repeat, n)
+    if wanted <= 0:
+        return set()
+    pool = repeat_message_pool(conn, exclude_channels, include_channels)
+    return set(_select_random_stratified(pool, wanted, seed))

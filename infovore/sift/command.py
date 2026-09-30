@@ -179,6 +179,7 @@ class SiftCommand:
             default=SiftStrategy.RANDOM.value,
         )
         export_parser.add_argument("--seed", type=int, default=0)
+        export_parser.add_argument("--repeat", type=int, default=0)
         export_parser.add_argument(
             "--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix"
         )
@@ -246,6 +247,7 @@ class SiftCommand:
             default=SiftStrategy.RANDOM.value,
         )
         serve_parser.add_argument("--seed", type=int, default=0)
+        serve_parser.add_argument("--repeat", type=int, default=0)
         serve_parser.add_argument(
             "--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix"
         )
@@ -372,6 +374,7 @@ class SiftCommand:
                 now=context.clock.now(),
                 exclude_channels=context.settings.exclude_channels,
                 include_channels=include_channels,
+                repeat=args.repeat,
             )
         except NoScoredMessagesError as error:
             raise ConfigError(
@@ -446,6 +449,7 @@ class SiftCommand:
                 clock=context.clock,
                 exclude_channels=context.settings.exclude_channels,
                 include_channels=include_channels,
+                repeat=args.repeat,
             )
         except NoScoredMessagesError as error:
             raise ConfigError(

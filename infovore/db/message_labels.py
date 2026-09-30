@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.db.codec import to_db_time
+from infovore.db.label_events import record_label_event
 from infovore.rows import MessageLabel, MessageLabelSource
 
 
@@ -33,6 +34,8 @@ def set_message_label(
         " labeled_at = excluded.labeled_at",
         (message_id, label.value, source.value, source_ref, to_db_time(at)),
     )
+    if source is MessageLabelSource.HUMAN:
+        record_label_event(conn, message_id, label, source_ref, at)
 
 
 def effective_message_labels(conn: sqlite3.Connection) -> dict[int, MessageLabel]:

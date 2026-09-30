@@ -32,6 +32,7 @@ from pathlib import Path
 
 from infovore.db.codec import from_db_time
 from infovore.db.connection import transaction
+from infovore.db.label_events import drop_last_label_event
 from infovore.db.message_labels import set_message_label
 from infovore.extract.prompt import REDACTED
 from infovore.rows import MessageLabel, MessageLabelSource
@@ -116,6 +117,7 @@ def resolve_batch(
     now: datetime,
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
+    repeat: int = 0,
 ) -> BatchSource:
     """Which batch `sift serve` shows (issue #131): either an existing
     export dir (`dir_`, read as-is), or a freshly sampled one (`new=True`,
@@ -138,6 +140,7 @@ def resolve_batch(
             now=now,
             exclude_channels=exclude_channels,
             include_channels=include_channels,
+            repeat=repeat,
         )
         target_dir = out_dir
     else:
@@ -192,6 +195,7 @@ def _restore_label_row(conn: sqlite3.Connection, message_id: int, prior: _LabelR
     if there wasn't one, or restoring the previous label/source_ref/
     labeled_at verbatim if there was (so undoing a re-label doesn't just
     clear it, it restores the earlier human call)."""
+    drop_last_label_event(conn, message_id)
     if prior is None:
         conn.execute(
             "DELETE FROM message_labels WHERE message_id = ? AND source = ?",
@@ -487,6 +491,7 @@ def build_serve_app(
     clock: Clock,
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
+    repeat: int = 0,
 ) -> ServeApp:
     batch = resolve_batch(
         conn,
@@ -500,6 +505,7 @@ def build_serve_app(
         now=clock.now(),
         exclude_channels=exclude_channels,
         include_channels=include_channels,
+        repeat=repeat,
     )
     messages = load_batch_messages(conn, batch.message_ids)
     return ServeApp(conn, messages, batch.dir.name, scratch_dir, clock)

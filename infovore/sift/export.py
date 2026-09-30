@@ -104,6 +104,7 @@ def export_batch(
     now: datetime,
     exclude_channels: frozenset[str] = frozenset(),
     include_channels: frozenset[str] = frozenset(),
+    repeat: int = 0,
 ) -> ExportReport:
     """Write one sift batch (issue #128) to `out_dir`: `batch.log` (the
     lnav-friendly log), `infovore-sift.json` (the lnav format file — a copy
@@ -123,6 +124,7 @@ def export_batch(
         mix=mix,
         exclude_channels=exclude_channels,
         include_channels=include_channels,
+        repeat=repeat,
     )
     batch = fetch_batch_messages(conn, message_ids)
 
