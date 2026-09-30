@@ -451,3 +451,65 @@ def test_probe_command_run_id_rejects_an_invalid_selector_token(tmp_path: Path) 
 
     assert code == ExitCode.CONFIG
     assert "abc" in err
+
+
+def set_verdict(db_path: str, claim_id: int, verdict: str) -> None:
+    conn = open_database(db_path)
+    conn.execute(
+        "UPDATE claims SET novelty = ?, probe_model = 'old', probe_answer = 'a', probed_at = ?"
+        " WHERE id = ?",
+        (verdict, NOW_TEXT, claim_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def test_compare_diffs_against_the_stored_verdicts(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    claim_id, _ = seed(env["INFOVORE_DB_PATH"])
+    set_verdict(env["INFOVORE_DB_PATH"], claim_id, "known")
+
+    code, out, _ = run(
+        ["probe", "--compare", "--batch-size", "1"],
+        env,
+        registry_with(ScriptedLLMFactory(verdict="unknown")),
+    )
+
+    assert code == ExitCode.OK
+    assert "compared: 1" in out
+    assert "agreement: 0.0%" in out
+    assert "known -> unknown: 1" in out
+    assert "* known -> unknown: 1" in out
+
+    claim = get_claim(open_database(env["INFOVORE_DB_PATH"]), claim_id)
+    assert claim is not None
+    assert claim.novelty is Novelty.KNOWN  # the reference survives
+
+
+def test_compare_reports_agreement_when_the_verdict_holds(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    claim_id, _ = seed(env["INFOVORE_DB_PATH"])
+    set_verdict(env["INFOVORE_DB_PATH"], claim_id, "known")
+
+    code, out, _ = run(
+        ["probe", "--compare"], env, registry_with(ScriptedLLMFactory(verdict="known"))
+    )
+
+    assert code == ExitCode.OK
+    assert "agreement: 100.0%" in out
+    assert "known -> unknown: 0" in out
+    assert "  known -> known: 1" in out
+    assert "cost: unreported" in out
+
+
+def test_compare_with_nothing_probed_says_so(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed(env["INFOVORE_DB_PATH"])
+
+    code, out, _ = run(
+        ["probe", "--compare"], env, registry_with(ScriptedLLMFactory(verdict="known"))
+    )
+
+    assert code == ExitCode.OK
+    assert "compared: 0" in out
+    assert "agreement: n/a" in out
