@@ -15,7 +15,10 @@ DEFAULT_OPT_OUT_ROLE_NAME = "no-archive"
 DEFAULT_INCLUDE_BOT_MESSAGES = False
 DEFAULT_SCRATCH_DIR = "scratch"
 DEFAULT_STAGE_CONCURRENCY = 2
-DEFAULT_PROBE_BATCH_SIZE = 10
+# Off by default: measured on 30 claims, batching drifts verdicts toward
+# `unknown` monotonically with batch size, inflating the novelty rate
+# the pipeline exists to report. See issue #160.
+DEFAULT_PROBE_BATCH_SIZE = 1
 DEFAULT_STAGE_TIMEOUT_SECONDS = 60.0
 DEFAULT_TRIAGE_MIN_SCORE = 0.3
 DEFAULT_TRIAGE_MIN_P_LORE = 0.5
