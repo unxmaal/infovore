@@ -1,6 +1,7 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from infovore.rows import (
     AttachmentRow,
@@ -75,9 +76,31 @@ class ProbeOutcome:
         return self.failure is None
 
 
+@dataclass(frozen=True)
+class BatchProbeOutcome:
+    """Result of probing several claims in one pair of LLM calls.
+
+    Exactly one of `outcomes` and `failure` is set. A `failure` is a
+    batch-level one: the call errored, or the response could not be mapped
+    onto the claims safely. Per-claim failures live inside `outcomes`.
+    """
+
+    outcomes: tuple[ProbeOutcome, ...] | None
+    failure: Failure | None
+
+    @property
+    def succeeded(self) -> bool:
+        return self.failure is None
+
+
 class ClaimExtractor(Protocol):
     async def extract(self, request: ExtractionRequest) -> ExtractionOutcome: ...
 
 
 class NoveltyProbe(Protocol):
     async def probe(self, claim: ClaimRow) -> ProbeOutcome: ...
+
+
+@runtime_checkable
+class BatchNoveltyProbe(NoveltyProbe, Protocol):
+    async def probe_batch(self, claims: Sequence[ClaimRow]) -> BatchProbeOutcome: ...
