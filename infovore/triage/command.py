@@ -43,6 +43,7 @@ from infovore.triage.tuning import (
     signal_report,
     suggest_terms,
 )
+from infovore.triage.yield_report import YieldBand, compute_yield_by_band
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -57,6 +58,35 @@ def _describe_triage_event(event: TriageEvent) -> str:
         case _:
             assert isinstance(event, TriagePriorsApplied)
             return f"channel priors applied: {event.channels} channels"
+
+
+def _band_name(band: YieldBand) -> str:
+    if band.lower is None:
+        return "unscored"
+    if band.upper is None:
+        return f">={band.lower:g}"
+    return f"{band.lower:g}-{band.upper:g}"
+
+
+def _optional(value: float | None, spec: str) -> str:
+    return "n/a" if value is None else format(value, spec)
+
+
+def _render_yield(bands: list[YieldBand]) -> str:
+    lines = [
+        "",
+        "realised yield by p_lore band (live runs only):",
+        f"  {'band':<12} {'runs':>7} {'barren':>7} {'barren%':>8}"
+        f" {'claims':>8} {'per run':>8} {'cost/claim':>11}",
+    ]
+    for band in bands:
+        lines.append(
+            f"  {_band_name(band):<12} {band.exchanges:>7} {band.barren:>7}"
+            f" {_optional(band.barren_rate, '.1%'):>8}"
+            f" {band.claims:>8} {_optional(band.claims_per_exchange, '.2f'):>8}"
+            f" {_optional(band.cost_per_claim, '.4f'):>11}"
+        )
+    return "\n".join(lines) + "\n"
 
 
 def _render_report(stats: TriageStats) -> str:
@@ -317,6 +347,7 @@ class TriageCommand:
             card = compute_report_card(context.conn, context.settings.triage_rules)
             if card is not None:
                 context.stdout.write(_render_report_card(card, MIN_RECALL_FOR_REPORT_CARD))
+            context.stdout.write(_render_yield(compute_yield_by_band(context.conn)))
         return ExitCode.OK
 
     def _train(self, context: "AppContext") -> int:
