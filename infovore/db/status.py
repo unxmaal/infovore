@@ -1,10 +1,15 @@
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE, DEFAULT_TRIAGE_MIN_SCORE
+from infovore.config import (
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_TRIAGE_MIN_P_LORE,
+    DEFAULT_TRIAGE_MIN_SCORE,
+)
 from infovore.db.channel_filter import include_channels_clause
-from infovore.db.codec import from_db_time
+from infovore.db.codec import from_db_time, to_db_time
+from infovore.db.exchanges import claimable_condition
 from infovore.db.labels import label_counts
 from infovore.triage.gate import gate_sql
 from infovore.triage.rules import DEFAULT_RULES, TriageRules
@@ -31,6 +36,19 @@ class StatusReport:
     p_lore_scored: int
     passing_gate: int
     excluded_by_denylist: int
+    pending_exchanges: int
+    pending_gated: int
+    extraction_per_hour: float | None
+    probe_per_hour: float | None
+    extraction_eta_hours: float | None
+    extraction_input_tokens: int
+    extraction_output_tokens: int
+    extraction_cost_usd: float | None
+    probe_input_tokens: int
+    probe_output_tokens: int
+    probe_cost_usd: float | None
+    probe_claims: int
+    throughput_window_hours: int
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
@@ -85,16 +103,79 @@ def _excluded_by_denylist(
     )
 
 
+DEFAULT_THROUGHPUT_WINDOW_HOURS = 6
+
+
+def _sum(conn: sqlite3.Connection, sql: str, params: tuple[object, ...] = ()) -> int:
+    value = conn.execute(sql, params).fetchone()[0]
+    return int(value) if value is not None else 0
+
+
+def _sum_optional(
+    conn: sqlite3.Connection, sql: str, params: tuple[object, ...] = ()
+) -> float | None:
+    value = conn.execute(sql, params).fetchone()[0]
+    return float(value) if value is not None else None
+
+
+def _rate_per_hour(count: int, window_hours: int) -> float | None:
+    if count == 0:
+        return None
+    return count / window_hours
+
+
+def _eta_hours(pending: int, rate: float | None) -> float | None:
+    if pending == 0:
+        return 0.0
+    if rate is None or rate <= 0:
+        return None
+    return pending / rate
+
+
 def collect_status(
     conn: sqlite3.Connection,
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE,
     triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     rules: TriageRules = DEFAULT_RULES,
     exclude_channels: frozenset[str] = frozenset(),
+    *,
+    now: datetime | None = None,
+    max_retries: int = DEFAULT_MAX_RETRIES,
+    throughput_window_hours: int = DEFAULT_THROUGHPUT_WINDOW_HOURS,
 ) -> StatusReport:
     counts = label_counts(conn)
     latest_model_version, latest_model_labels_used = _latest_model(conn)
     gate_clause, gate_params = gate_sql(triage_min_score, triage_min_p_lore)
+
+    pending_clause, pending_params = claimable_condition(max_retries)
+    gated_clause, gated_params = claimable_condition(
+        max_retries, triage_min_score, triage_min_p_lore, exclude_channels
+    )
+    pending_gated = _count_params(
+        conn, f"SELECT COUNT(*) FROM exchanges WHERE {gated_clause}", tuple(gated_params)
+    )
+
+    since = to_db_time(now - timedelta(hours=throughput_window_hours)) if now else None
+    recent_runs = (
+        _count_params(
+            conn,
+            "SELECT COUNT(*) FROM extraction_runs WHERE started_at >= ?",
+            (since,),
+        )
+        if since is not None
+        else 0
+    )
+    recent_probe_claims = (
+        _sum(
+            conn,
+            "SELECT SUM(claim_count) FROM probe_runs WHERE started_at >= ?",
+            (since,),
+        )
+        if since is not None
+        else 0
+    )
+    extraction_per_hour = _rate_per_hour(recent_runs, throughput_window_hours)
+
     return StatusReport(
         channels=_count(conn, "SELECT COUNT(*) FROM channels"),
         messages=_count(conn, "SELECT COUNT(*) FROM messages"),
@@ -132,4 +213,27 @@ def collect_status(
         excluded_by_denylist=_excluded_by_denylist(
             conn, gate_clause, gate_params, exclude_channels
         ),
+        pending_exchanges=_count_params(
+            conn, f"SELECT COUNT(*) FROM exchanges WHERE {pending_clause}", tuple(pending_params)
+        ),
+        pending_gated=pending_gated,
+        extraction_per_hour=extraction_per_hour,
+        probe_per_hour=_rate_per_hour(recent_probe_claims, throughput_window_hours),
+        extraction_eta_hours=_eta_hours(pending_gated, extraction_per_hour),
+        extraction_input_tokens=_sum(conn, "SELECT SUM(input_tokens) FROM extraction_runs"),
+        extraction_output_tokens=_sum(conn, "SELECT SUM(output_tokens) FROM extraction_runs"),
+        extraction_cost_usd=_sum_optional(conn, "SELECT SUM(cost_usd) FROM extraction_runs"),
+        probe_input_tokens=_sum(
+            conn,
+            "SELECT COALESCE(SUM(recall_input_tokens), 0) + COALESCE(SUM(judge_input_tokens), 0)"
+            " FROM probe_runs",
+        ),
+        probe_output_tokens=_sum(
+            conn,
+            "SELECT COALESCE(SUM(recall_output_tokens), 0) + COALESCE(SUM(judge_output_tokens), 0)"
+            " FROM probe_runs",
+        ),
+        probe_cost_usd=_sum_optional(conn, "SELECT SUM(cost_usd) FROM probe_runs"),
+        probe_claims=_sum(conn, "SELECT SUM(claim_count) FROM probe_runs"),
+        throughput_window_hours=throughput_window_hours,
     )

@@ -142,15 +142,17 @@ _ORDER_BY: dict[ExchangeOrder, str] = {
 }
 
 
-def claimable_exchanges(
-    conn: sqlite3.Connection,
-    limit: int,
+def claimable_condition(
     max_retries: int,
     min_score: float | None = None,
     min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
-    order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
     exclude_channels: frozenset[str] = frozenset(),
-) -> list[ExchangeRow]:
+) -> tuple[str, list[object]]:
+    """The predicate for "extract would work on this exchange next".
+
+    Shared by the queue and by anything that counts it, so a reported backlog
+    cannot drift from the rows the queue will actually return.
+    """
     condition = "extraction_status IN (?, ?) AND retry_count < ?"
     params: list[object] = [
         ExtractionStatus.PENDING.value,
@@ -164,6 +166,19 @@ def claimable_exchanges(
     excl_clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     condition += excl_clause
     params.extend(excl_params)
+    return condition, params
+
+
+def claimable_exchanges(
+    conn: sqlite3.Connection,
+    limit: int,
+    max_retries: int,
+    min_score: float | None = None,
+    min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
+    order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
+    exclude_channels: frozenset[str] = frozenset(),
+) -> list[ExchangeRow]:
+    condition, params = claimable_condition(max_retries, min_score, min_p_lore, exclude_channels)
     rows = conn.execute(
         f"SELECT * FROM exchanges WHERE {condition} ORDER BY {_ORDER_BY[order]} LIMIT ?",
         (*params, limit),
