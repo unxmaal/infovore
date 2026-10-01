@@ -146,6 +146,7 @@ class ExchangeRow:
     extraction_status: ExtractionStatus
     retry_count: int
     last_error: str | None
+    chunk_recipe: int | None = None
     triage_score: float | None = None
     triage_reasons: str | None = None
     triage_version: str | None = None
