@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.db.codec import to_db_time
-from infovore.rows import MessageLabel
+from infovore.rows import LabelRegime, MessageLabel
 
 
 @dataclass(frozen=True)
@@ -34,10 +34,12 @@ def record_label_event(
     label: MessageLabel,
     source_ref: str | None,
     at: datetime,
+    regime: LabelRegime,
 ) -> None:
     conn.execute(
-        "INSERT INTO label_events (message_id, label, source_ref, labeled_at) VALUES (?, ?, ?, ?)",
-        (message_id, label.value, source_ref, to_db_time(at)),
+        "INSERT INTO label_events (message_id, label, source_ref, labeled_at, regime)"
+        " VALUES (?, ?, ?, ?, ?)",
+        (message_id, label.value, source_ref, to_db_time(at), regime.value),
     )
 
 

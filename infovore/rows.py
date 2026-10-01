@@ -62,6 +62,11 @@ class MessageLabel(StrEnum):
     KEEP = "keep"
 
 
+class LabelRegime(StrEnum):
+    ISOLATED = "isolated"
+    CONTEXT = "context"
+
+
 class MessageLabelSource(StrEnum):
     HUMAN = "human"
     CITATION = "citation"

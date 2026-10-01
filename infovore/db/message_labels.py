@@ -4,7 +4,8 @@ from datetime import datetime
 
 from infovore.db.codec import to_db_time
 from infovore.db.label_events import record_label_event
-from infovore.rows import MessageLabel, MessageLabelSource
+from infovore.db.label_regime import regime_for_source_ref
+from infovore.rows import LabelRegime, MessageLabel, MessageLabelSource
 
 
 @dataclass(frozen=True)
@@ -20,22 +21,24 @@ def set_message_label(
     source: MessageLabelSource,
     source_ref: str | None,
     at: datetime,
+    regime: LabelRegime | None = None,
 ) -> None:
     """Record one `message_labels` row (issue #128), one per `(message_id,
     source)`: `human` (this PR), `citation`/`rule` (PR 3, the message
     classifier). Re-labeling the same message from the same source replaces
     the earlier row rather than accumulating duplicates, mirroring
     `infovore.db.labels.set_label` for `exchange_labels`."""
+    effective = regime if regime is not None else regime_for_source_ref(source_ref)
     conn.execute(
-        "INSERT INTO message_labels (message_id, label, source, source_ref, labeled_at)"
-        " VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO message_labels (message_id, label, source, source_ref, labeled_at, regime)"
+        " VALUES (?, ?, ?, ?, ?, ?)"
         " ON CONFLICT (message_id, source) DO UPDATE SET"
         " label = excluded.label, source_ref = excluded.source_ref,"
-        " labeled_at = excluded.labeled_at",
-        (message_id, label.value, source.value, source_ref, to_db_time(at)),
+        " labeled_at = excluded.labeled_at, regime = excluded.regime",
+        (message_id, label.value, source.value, source_ref, to_db_time(at), effective.value),
     )
     if source is MessageLabelSource.HUMAN:
-        record_label_event(conn, message_id, label, source_ref, at)
+        record_label_event(conn, message_id, label, source_ref, at, effective)
 
 
 def effective_message_labels(conn: sqlite3.Connection) -> dict[int, MessageLabel]:
@@ -56,6 +59,7 @@ def effective_message_labels(conn: sqlite3.Connection) -> dict[int, MessageLabel
 
 def effective_message_labels_with_source(
     conn: sqlite3.Connection,
+    regimes: frozenset[LabelRegime] = frozenset({LabelRegime.CONTEXT}),
 ) -> dict[int, tuple[MessageLabel, MessageLabelSource]]:
     """Like `effective_message_labels`, but also reports which source won.
     `infovore.sift.train` (issue #128 PR 3) needs this to weight a human
@@ -65,10 +69,13 @@ def effective_message_labels_with_source(
     ground truth that matters)."""
     result: dict[int, tuple[MessageLabel, MessageLabelSource]] = {}
     weak: dict[int, tuple[MessageLabel, MessageLabelSource]] = {}
-    for row in conn.execute("SELECT message_id, label, source FROM message_labels"):
+    wanted = {regime.value for regime in regimes}
+    for row in conn.execute("SELECT message_id, label, source, regime FROM message_labels"):
         source = MessageLabelSource(row["source"])
         pair = (MessageLabel(row["label"]), source)
         if source is MessageLabelSource.HUMAN:
+            if row["regime"] not in wanted:
+                continue
             result[row["message_id"]] = pair
         else:
             weak[row["message_id"]] = pair
