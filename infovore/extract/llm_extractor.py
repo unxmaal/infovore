@@ -1,7 +1,7 @@
 import json
 from collections.abc import Sequence
 
-from infovore.extract.prompt import render_prompt
+from infovore.extract.prompt import LIVE_PROMPT_VERSION, render_prompt
 from infovore.extract.protocol import (
     BatchProbeOutcome,
     ExtractionOutcome,
@@ -177,12 +177,18 @@ def _judge_prompt(claim: ClaimRow, answer: str) -> str:
 
 
 class LLMClaimExtractor:
-    def __init__(self, backend: LLMBackend, max_output_tokens: int = 8000) -> None:
+    def __init__(
+        self,
+        backend: LLMBackend,
+        max_output_tokens: int = 8000,
+        prompt_version: str = LIVE_PROMPT_VERSION,
+    ) -> None:
         self._backend = backend
         self._max_output_tokens = max_output_tokens
+        self._prompt_version = prompt_version
 
     async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
-        rendered = render_prompt(request)
+        rendered = render_prompt(request, self._prompt_version)
         related_claim_ids = {claim.id for claim in request.related_claims if claim.id is not None}
         schema = json_schema_for(ExtractionOut)
         native = self._backend.capabilities().native_json_schema

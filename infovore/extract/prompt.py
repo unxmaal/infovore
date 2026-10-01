@@ -51,6 +51,78 @@ SYSTEM_PROMPT = (
     "Output ONLY a JSON object matching the given schema. No other text."
 )
 
+SYSTEM_PROMPT_V6 = (
+    "You are reading an archived exchange from a hobbyist SGI/IRIX community.\n"
+    "\n"
+    "Record durable technical facts: statements that stay true and useful to "
+    "someone who never reads this conversation. Part numbers, jumper and "
+    "switch settings, PROM/firmware versions, IRIX quirks and the workarounds "
+    "for them, repair and installation procedures, compatibility between "
+    "specific parts, where software and manuals can be obtained, and what a "
+    "model sold for and when. Generic computing knowledge is not wanted.\n"
+    "\n"
+    "Every claim is about a THING. Its grammatical subject must be the "
+    "hardware, the software, the part or the procedure, never a person and "
+    "never an unnamed someone. Write 'The SGI O2 power supply can be "
+    "substituted with a Meanwell modular unit', not 'a member found that it "
+    "can'. Who said it is recorded in sources and the permalink; it does not "
+    "belong in the sentence. Authors appear as pseudonyms (member-A, "
+    "member-B, ...) and must never be named. Businesses and resellers may be "
+    "named, and a price needs its date.\n"
+    "\n"
+    "An occasion is not a fact. One person's purchase, one machine's "
+    "behaviour on one afternoon, what somebody intends to try next, an "
+    "unanswered question, and an opinion are all occasions and yield nothing, "
+    "however specific they are. Ask of each claim whether it would still be "
+    "worth reading in ten years by someone holding the same hardware.\n"
+    "\n"
+    "Record only what the messages establish. If the exchange supports only a "
+    "hedged or disputed statement, leave it out rather than hedging it in "
+    "words. Never add specifics from your own knowledge.\n"
+    "\n"
+    "Most exchanges yield nothing, and zero claims is the correct and common "
+    "answer for ordinary conversation. Never return more than five claims "
+    "from one exchange; if more seem available, keep the most durable.\n"
+    "\n"
+    "Each claim carries a probe_question that asks for the fact without "
+    "revealing it, so the fact can be tested for later without leaking the "
+    "answer.\n"
+    "\n"
+    "If a claim corrects one of the supplied related existing claims, cite "
+    "that claim's id in supersedes. If the community corrects itself within "
+    "this exchange, record only the corrected version, never the original "
+    "mistake.\n"
+    "\n"
+    "Every claim must list in sources the refs (m1, m2, ...) of the "
+    "messages in this exchange that support it. Never cite a message from "
+    "the CONTEXT section (refs c1, c2, ...): those messages are read-only "
+    "background from a prior exchange and cannot be cited.\n"
+    "\n"
+    "Reactions are provided as a weak signal of community agreement, not "
+    "proof.\n"
+    "\n"
+    "Output ONLY a JSON object matching the given schema. No other text."
+)
+
+PROMPTS = {"v5": SYSTEM_PROMPT, "v6": SYSTEM_PROMPT_V6}
+
+# Bumping this halts live extraction until the new version is promoted
+# (`runner.PromptNotPromotedError`), so a candidate prompt ships selectable
+# and unpromoted, and only this constant decides what production sends.
+LIVE_PROMPT_VERSION = PROMPT_VERSION
+
+
+class UnknownPromptVersionError(KeyError):
+    pass
+
+
+def system_prompt(version: str = LIVE_PROMPT_VERSION) -> str:
+    try:
+        return PROMPTS[version]
+    except KeyError as error:
+        raise UnknownPromptVersionError(version) from error
+
+
 PROMPT_SHA256 = hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()
 
 
@@ -152,7 +224,7 @@ def _render_related_claims(request: ExtractionRequest) -> str:
     )
 
 
-def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
+def render_prompt(request: ExtractionRequest, version: str = LIVE_PROMPT_VERSION) -> RenderedPrompt:
     guild_id = request.messages[0].guild_id
     link = permalink(guild_id, request.exchange.channel_id, request.exchange.first_message_id)
     sections = [
@@ -181,11 +253,12 @@ def render_prompt(request: ExtractionRequest) -> RenderedPrompt:
     sections.append(f"EXCHANGE:\n{rendered_exchange}")
     sections.append(f"RELATED EXISTING CLAIMS:\n{_render_related_claims(request)}")
     prompt = "\n\n".join(sections)
-    token_estimate = math.ceil(len(SYSTEM_PROMPT + prompt) / 4)
+    system = system_prompt(version)
+    token_estimate = math.ceil(len(system + prompt) / 4)
     return RenderedPrompt(
-        system=SYSTEM_PROMPT,
+        system=system,
         prompt=prompt,
-        version=PROMPT_VERSION,
+        version=version,
         token_estimate=token_estimate,
         refs=refs,
     )
