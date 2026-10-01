@@ -144,3 +144,36 @@ def test_repeats_work_with_the_uncertain_strategy(tmp_path: Path) -> None:
     judged = {message_id for message_id in picked if message_id >= 100}
     assert len(judged) == 2
     assert len(picked) == 6
+
+
+def _judged_isolated(conn: sqlite3.Connection, message_id: int) -> None:
+    set_message_label(
+        conn,
+        message_id,
+        MessageLabel.KEEP,
+        MessageLabelSource.HUMAN,
+        "sift-serve:batch-002",
+        NOW,
+    )
+
+
+def test_repeat_pool_excludes_the_retired_isolated_regime(tmp_path: Path) -> None:
+    conn = _corpus(tmp_path, fresh=3, judged=2)
+    _message(conn, 200)
+    _judged_isolated(conn, 200)
+
+    pool = repeat_message_pool(conn)
+
+    assert {row.id for row in pool} == {100, 101}
+
+
+def test_repeats_are_never_drawn_from_a_retired_regime(tmp_path: Path) -> None:
+    conn = _corpus(tmp_path, fresh=10, judged=0)
+    for message_id in range(200, 210):
+        _message(conn, message_id)
+        _judged_isolated(conn, message_id)
+
+    picked = select_sift_sample(conn, n=6, seed=1, strategy=SiftStrategy.RANDOM, repeat=3)
+
+    assert not set(picked) & set(range(200, 210))
+    assert len(picked) == 6

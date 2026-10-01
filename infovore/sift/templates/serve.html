@@ -83,6 +83,12 @@
     font-size: 0.75rem;
     text-transform: uppercase;
   }
+  #criterion {
+    grid-column: 1 / -1;
+    margin: 0.4rem 0 0;
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
   .pill-keep { color: var(--keep); }
   .pill-trash { color: var(--trash); }
   .content { margin-top: 0.25rem; white-space: pre-wrap; word-break: break-word; }
@@ -196,6 +202,9 @@
   <h1>infovore sift</h1>
   <span id="progress-text">loading...</span>
   <div id="progress-bar"><div id="progress-bar-fill"></div></div>
+  <p id="criterion"><strong>keep</strong> if, read inside its thread, it contributes to the
+    contextual flow of the conversation &mdash; press <kbd>c</kbd> for the thread before
+    judging a short message</p>
 </header>
 <main>
   <div id="messages"></div>

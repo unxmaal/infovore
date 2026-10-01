@@ -81,7 +81,10 @@ def repeat_message_pool(
     """The mirror of `eligible_message_pool`: messages that ALREADY carry a
     human label, so a round can re-offer a handful of them unannounced and
     measure the maintainer's agreement with his own earlier judgment. That
-    rate is the ceiling no technique can beat (issue #166)."""
+    rate is the ceiling no technique can beat (issue #166). Restricted to the
+    `context` regime: a repeat drawn from the retired isolated-message rounds
+    measures a UI change rather than his consistency, which is exactly the
+    mistake issue #170 records."""
     excl_clause, excl_params = exclude_channels_clause("m.channel_id", exclude_channels)
     incl_clause, incl_params = include_channels_clause("m.channel_id", include_channels)
     rows = conn.execute(
@@ -93,6 +96,7 @@ def repeat_message_pool(
         " AND EXISTS ("
         "   SELECT 1 FROM message_labels ml"
         "   WHERE ml.message_id = m.id AND ml.source = 'human'"
+        "   AND ml.regime = 'context'"
         f" ){excl_clause}{incl_clause}"
         " ORDER BY m.id",
         (*excl_params, *incl_params),
