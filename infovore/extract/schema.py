@@ -68,7 +68,11 @@ class ExtractionOutV6(BaseModel):
 
 ExtractionModel = type[ExtractionOut] | type[ExtractionOutV6]
 
-OUTPUT_MODELS: dict[str, ExtractionModel] = {"v5": ExtractionOut, "v6": ExtractionOutV6}
+OUTPUT_MODELS: dict[str, ExtractionModel] = {
+    "v5": ExtractionOut,
+    "v6": ExtractionOutV6,
+    "v7": ExtractionOutV6,
+}
 
 
 def output_model_for(version: str) -> ExtractionModel:

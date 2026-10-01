@@ -100,7 +100,25 @@ SYSTEM_PROMPT_V6 = (
     "Output ONLY a JSON object matching the given schema. No other text."
 )
 
-PROMPTS = {"v5": SYSTEM_PROMPT, "v6": SYSTEM_PROMPT_V6}
+SYSTEM_PROMPT_V7 = SYSTEM_PROMPT_V6.replace(
+    # v6 refused anything hedged, which in an archive where almost every real
+    # fact arrives attributed and tentative also refused the facts: measured
+    # 26.5% recovery of v5's cited sources against v5's own 83% ceiling, and
+    # nothing at all on 20 of 40 exchanges (issue #165).
+    "Record only what the messages establish. If the exchange supports only a "
+    "hedged or disputed statement, leave it out rather than hedging it in "
+    "words. Never add specifics from your own knowledge.",
+    "Record only what the messages establish, and never add specifics from "
+    "your own knowledge. A fact stated tentatively is still a fact: "
+    "'the ucontext struct reportedly holds no program counter' is worth "
+    "recording, written as a statement about the struct, with the "
+    "uncertainty carried in confidence rather than in the words. What "
+    "yields nothing is a GUESS about what might be true, a plan, a "
+    "question, or a statement the exchange itself disputes and never "
+    "settles.",
+)
+
+PROMPTS = {"v5": SYSTEM_PROMPT, "v6": SYSTEM_PROMPT_V6, "v7": SYSTEM_PROMPT_V7}
 
 # Bumping this halts live extraction until the new version is promoted
 # (`runner.PromptNotPromotedError`), so a candidate prompt ships selectable

@@ -13,8 +13,8 @@ from infovore.extract.prompt import (
 PROMOTED_V5_SHA256 = "89d0fe56b602aa96adc6124ce3e37219123c9a75080b1e1ad228cdf98f475a4a"
 
 
-def test_both_versions_are_available() -> None:
-    assert set(PROMPTS) == {"v5", "v6"}
+def test_every_version_is_available() -> None:
+    assert set(PROMPTS) == {"v5", "v6", "v7"}
 
 
 def test_the_live_version_is_still_v5() -> None:
@@ -85,3 +85,45 @@ def test_v6_does_not_ask_for_a_probe_question() -> None:
     recorded runs must stay reproducible."""
     assert "probe_question" not in PROMPTS["v6"]
     assert "probe_question" in PROMPTS["v5"]
+
+
+def test_v7_is_v6_with_only_the_hedging_rule_changed() -> None:
+    """v6 measured 26.5% recovery of v5's cited sources against v5's own 83%
+    ceiling, and produced nothing on 20 of 40 exchanges, because refusing
+    anything hedged also refuses facts: in this archive almost every real
+    fact arrives attributed and tentative. v7 changes that paragraph and
+    nothing else, so the next comparison attributes any difference to it."""
+    v6, v7 = PROMPTS["v6"], PROMPTS["v7"]
+    unchanged = [
+        "Every claim is about a THING",
+        "An occasion is not a fact",
+        "Never return more than five claims",
+        "sources",
+        "CONTEXT",
+        "supersedes",
+    ]
+
+    for fragment in unchanged:
+        assert fragment in v6
+        assert fragment in v7
+    assert "leave it out rather than hedging it in words" in v6
+    assert "leave it out rather than hedging it in words" not in v7
+
+
+def test_v7_keeps_a_tentatively_stated_fact_and_refuses_a_guess() -> None:
+    v7 = PROMPTS["v7"]
+
+    assert "A fact stated tentatively is still a fact" in v7
+    assert "GUESS about what might be true" in v7
+    assert "confidence rather than in the words" in v7
+
+
+def test_v6_is_unchanged_because_its_results_are_published() -> None:
+    """Editing a measured prompt in place makes the published figure describe
+    a text that no longer exists, which is why v5 carries a pinned digest."""
+    assert "probe_question" not in PROMPTS["v6"]
+    assert len(PROMPTS["v6"]) == 2372
+
+
+def test_v7_does_not_ask_for_a_probe_question_either() -> None:
+    assert "probe_question" not in PROMPTS["v7"]
