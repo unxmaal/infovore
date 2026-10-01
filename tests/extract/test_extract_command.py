@@ -861,9 +861,24 @@ def test_compare_prompt_reports_both_arms(tmp_path: Path) -> None:
     assert code == int(ExitCode.OK)
     claims_before = _claim_count(env["INFOVORE_DB_PATH"])
 
-    code, out, _ = run(["extract", "--compare-prompt", "v6", "--compare-limit", "1"], env, registry)
+    dump = tmp_path / "arms"
+    code, out, _ = run(
+        [
+            "extract",
+            "--compare-prompt",
+            "v6",
+            "--compare-limit",
+            "1",
+            "--compare-dump",
+            str(dump),
+        ],
+        env,
+        registry,
+    )
 
     assert code == int(ExitCode.OK)
+    assert (dump / "v5.jsonl").exists()
+    assert (dump / "v6.jsonl").exists()
     assert "prompt comparison over 1 already-extracted exchanges" in out
     assert "v5" in out
     assert "v6" in out
@@ -874,3 +889,16 @@ def _claim_count(db_path: str) -> int:
     conn = open_database(db_path)
     migrate(conn)
     return int(conn.execute("SELECT COUNT(*) AS n FROM claims").fetchone()["n"])
+
+
+def test_compare_prompt_runs_without_a_dump_directory(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = Registry()
+    registry.register(ScriptedFactory([HEALTH_OK] + [success_results()[1]] * 8))
+
+    assert run(["extract", "--mode", "live"], env, registry)[0] == int(ExitCode.OK)
+    code, out, _ = run(["extract", "--compare-prompt", "v6", "--compare-limit", "1"], env, registry)
+
+    assert code == int(ExitCode.OK)
+    assert "prompt comparison" in out

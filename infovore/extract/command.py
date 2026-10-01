@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError, Stage
@@ -71,6 +72,13 @@ class ExtractCommand:
             help="re-extract done exchanges under the live prompt and this one; writes nothing",
         )
         parser.add_argument("--compare-limit", type=int, default=DEFAULT_COMPARE_LIMIT)
+        parser.add_argument(
+            "--compare-dump",
+            type=str,
+            default=None,
+            dest="compare_dump",
+            help="directory to write each arm's claims as JSONL; the aggregate is not the evidence",
+        )
         parser.add_argument("--sample", type=int, default=None)
         parser.add_argument("--seed", type=int, default=0)
         parser.add_argument("--exchange-id", type=int, action="append", default=[])
@@ -100,10 +108,21 @@ class ExtractCommand:
             raise ConfigError("no already-extracted exchanges to compare against")
 
         backend = await stage_backend(context, Stage.EXTRACT)
+        dump_dir = Path(args.compare_dump) if args.compare_dump else None
+        if dump_dir is not None:
+            dump_dir.mkdir(parents=True, exist_ok=True)
         arms = []
         for version in (LIVE_PROMPT_VERSION, candidate):
             extractor = LLMClaimExtractor(backend, prompt_version=version)
-            arms.append(await run_arm(context.conn, extractor, version, exchange_ids))
+            arms.append(
+                await run_arm(
+                    context.conn,
+                    extractor,
+                    version,
+                    exchange_ids,
+                    dump=dump_dir / f"{version}.jsonl" if dump_dir else None,
+                )
+            )
         comparison = PromptComparison(exchange_ids=tuple(exchange_ids), arms=tuple(arms))
         for line in format_comparison(comparison):
             context.stdout.write(f"{line}\n")

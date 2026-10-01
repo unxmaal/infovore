@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
@@ -381,3 +382,42 @@ def test_the_two_size_bucketings_in_this_repo_are_known_to_differ() -> None:
         "21+",
     ]
     assert SIZE_BUCKETS == ((1, 2), (3, 5), (6, 15), (16, 49), (50, 10**9))
+
+
+@pytest.mark.asyncio
+async def test_an_arm_keeps_the_claims_it_measured(
+    tmp_path: Path, conn: sqlite3.Connection
+) -> None:
+    """The aggregate is not the evidence. Discarding the claims makes every
+    follow-up question cost another full run: the coverage check on v6 was
+    identified as decisive BEFORE the comparison ran and was still lost."""
+    out = tmp_path / "arm.jsonl"
+
+    await run_arm(conn, _Stub([_claim("The O2 PSU is 150W.")]), "v6", [1, 2], dump=out)
+
+    records = [json.loads(line) for line in out.read_text().splitlines()]
+    assert [record["exchange_id"] for record in records] == [1, 2]
+    assert records[0]["version"] == "v6"
+    assert records[0]["claims"][0]["statement"] == "The O2 PSU is 150W."
+    assert records[0]["claims"][0]["sources"] == [1]
+
+
+@pytest.mark.asyncio
+async def test_a_dump_records_an_exchange_that_yielded_nothing(
+    tmp_path: Path, conn: sqlite3.Connection
+) -> None:
+    """A zero-claim exchange is a result, not an absence: without the row,
+    coverage cannot tell 'nothing found' from 'never attempted'."""
+    out = tmp_path / "arm.jsonl"
+
+    await run_arm(conn, _Stub([]), "v6", [1], dump=out)
+
+    records = [json.loads(line) for line in out.read_text().splitlines()]
+    assert records == [{"exchange_id": 1, "version": "v6", "claims": []}]
+
+
+@pytest.mark.asyncio
+async def test_no_dump_is_written_when_none_is_asked_for(conn: sqlite3.Connection) -> None:
+    arm = await run_arm(conn, _Stub([_claim("x" * 20)]), "v6", [1])
+
+    assert arm.claims == 1

@@ -1,6 +1,8 @@
+import json
 import random
 import sqlite3
 from dataclasses import dataclass
+from pathlib import Path
 
 from infovore.db.exchanges import get_exchange
 from infovore.extract.claim_shape import shape_counts
@@ -115,10 +117,15 @@ async def run_arm(
     extractor: ClaimExtractor,
     version: str,
     exchange_ids: list[int],
+    dump: Path | None = None,
 ) -> ArmResult:
     """Extract the same exchanges under one prompt version. Writes nothing: a
     comparison that mutates `claims` destroys the baseline it is measured
-    against and cannot be run twice.
+    against and cannot be run twice. `dump` writes one JSONL record per
+    exchange, including the ones that yielded nothing, because the aggregate
+    is not the evidence: without the claims themselves every follow-up
+    question costs another full run, which is how the coverage check on v6
+    was lost after being identified as the decisive one.
 
     The label is checked against the extractor's own prompt version. An
     experiment whose arms are labelled by hand can report two differently
@@ -129,6 +136,7 @@ async def run_arm(
         raise ArmLabelMismatchError(f"arm labelled {version} but the extractor renders {actual}")
     failures = claims = input_tokens = output_tokens = 0
     claim_chars = source_chars = person_subject = 0
+    records: list[dict[str, object]] = []
     for exchange_id in exchange_ids:
         exchange = get_exchange(conn, exchange_id)
         if exchange is None:  # pragma: no cover - ids come from the same table
@@ -148,6 +156,24 @@ async def run_arm(
             for claim in outcome.claims
         )
         person_subject += shape_counts(statements).person_subject
+        records.append(
+            {
+                "exchange_id": exchange_id,
+                "version": version,
+                "claims": [
+                    {
+                        "statement": claim.statement,
+                        "subject": claim.subject,
+                        "kind": claim.kind.value,
+                        "confidence": claim.confidence,
+                        "sources": list(claim.source_message_ids),
+                    }
+                    for claim in outcome.claims
+                ],
+            }
+        )
+    if dump is not None:
+        dump.write_text("".join(f"{json.dumps(record)}\n" for record in records))
     return ArmResult(
         version=version,
         exchanges=len(exchange_ids),
