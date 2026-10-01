@@ -118,7 +118,33 @@ SYSTEM_PROMPT_V7 = SYSTEM_PROMPT_V6.replace(
     "settles.",
 )
 
-PROMPTS = {"v5": SYSTEM_PROMPT, "v6": SYSTEM_PROMPT_V6, "v7": SYSTEM_PROMPT_V7}
+SYSTEM_PROMPT_V8 = SYSTEM_PROMPT_V7.replace(
+    # v7 still refused "one machine's behaviour on one afternoon", which is
+    # how a fault and its symptoms arrive in a chat archive. Measured: v7
+    # dropped "faulty IR pipe on an Onyx: irsaudit fails and X11 crashes
+    # soon after login", which is the most useful shape of fact here
+    # (issue #165). An occasion can be EVIDENCE for a fact about the class.
+    "An occasion is not a fact. One person's purchase, one machine's "
+    "behaviour on one afternoon, what somebody intends to try next, an "
+    "unanswered question, and an opinion are all occasions and yield nothing, "
+    "however specific they are.",
+    "An occasion is not a fact, but an occasion can be the evidence for "
+    "one. The event itself is never the claim: one person's purchase, a "
+    "dispute with a seller, what somebody intends to try next, an "
+    "unanswered question and an opinion all yield nothing. But when one "
+    "machine's behaviour tells you something about that model or part, "
+    "record it: a fault and the symptoms it produces, a part that turned "
+    "out to fit, a command that did or did not work, a limit someone ran "
+    "into. Write it as a statement about the hardware or software rather "
+    "than about the occasion.",
+)
+
+PROMPTS = {
+    "v5": SYSTEM_PROMPT,
+    "v6": SYSTEM_PROMPT_V6,
+    "v7": SYSTEM_PROMPT_V7,
+    "v8": SYSTEM_PROMPT_V8,
+}
 
 # Bumping this halts live extraction until the new version is promoted
 # (`runner.PromptNotPromotedError`), so a candidate prompt ships selectable

@@ -14,7 +14,7 @@ PROMOTED_V5_SHA256 = "89d0fe56b602aa96adc6124ce3e37219123c9a75080b1e1ad228cdf98f
 
 
 def test_every_version_is_available() -> None:
-    assert set(PROMPTS) == {"v5", "v6", "v7"}
+    assert set(PROMPTS) == {"v5", "v6", "v7", "v8"}
 
 
 def test_the_live_version_is_still_v5() -> None:
@@ -127,3 +127,41 @@ def test_v6_is_unchanged_because_its_results_are_published() -> None:
 
 def test_v7_does_not_ask_for_a_probe_question_either() -> None:
     assert "probe_question" not in PROMPTS["v7"]
+
+
+def test_v8_is_v7_with_only_the_occasion_rule_changed() -> None:
+    """v7 still refused "one machine's behaviour on one afternoon", which is
+    how a fault and its symptoms arrive in a chat archive. It dropped "faulty
+    IR pipe on an Onyx: irsaudit fails and X11 crashes soon after login",
+    the most useful shape of fact in this corpus. v8 changes that paragraph
+    and nothing else, so the next comparison attributes the difference to it."""
+    v7, v8 = PROMPTS["v7"], PROMPTS["v8"]
+    unchanged = [
+        "Every claim is about a THING",
+        "A fact stated tentatively is still a fact",
+        "Never return more than five claims",
+        "worth reading in ten years",
+        "sources",
+        "CONTEXT",
+    ]
+
+    for fragment in unchanged:
+        assert fragment in v7
+        assert fragment in v8
+    assert "one machine's behaviour on one afternoon" in v7
+    assert "one machine's behaviour on one afternoon" not in v8
+
+
+def test_v8_promotes_generalisable_behaviour_to_a_fact() -> None:
+    v8 = PROMPTS["v8"]
+
+    assert "an occasion can be the evidence for one" in v8
+    assert "a fault and the symptoms it produces" in v8
+    assert "The event itself is never the claim" in v8
+
+
+def test_the_measured_versions_are_left_byte_identical() -> None:
+    """v6 and v7 both have published figures. Editing a measured prompt makes
+    the published number describe a text that no longer exists."""
+    assert len(PROMPTS["v6"]) == 2372
+    assert len(PROMPTS["v7"]) == 2639

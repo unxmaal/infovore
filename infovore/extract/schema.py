@@ -72,6 +72,7 @@ OUTPUT_MODELS: dict[str, ExtractionModel] = {
     "v5": ExtractionOut,
     "v6": ExtractionOutV6,
     "v7": ExtractionOutV6,
+    "v8": ExtractionOutV6,
 }
 
 
