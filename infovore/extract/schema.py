@@ -12,18 +12,17 @@ class InvalidExtractionError(ValueError):
     pass
 
 
-class ClaimOut(BaseModel):
+class _ClaimBase(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     statement: str
     subject: str
     kind: ClaimKind
     confidence: float = Field(ge=0.0, le=1.0)
-    probe_question: str
     sources: list[str] = Field(min_length=1)
     supersedes: int | None
 
-    @field_validator("statement", "subject", "probe_question")
+    @field_validator("statement", "subject", "probe_question", check_fields=False)
     @classmethod
     def _strip_and_require(cls, value: str) -> str:
         stripped = value.strip()
@@ -38,6 +37,10 @@ class ClaimOut(BaseModel):
             raise ValueError("sources must not contain duplicates")
         return value
 
+
+class ClaimOut(_ClaimBase):
+    probe_question: str
+
     @model_validator(mode="after")
     def _probe_question_must_not_leak(self) -> "ClaimOut":
         if self.statement.lower() in self.probe_question.lower():
@@ -49,6 +52,30 @@ class ExtractionOut(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     claims: list[ClaimOut]
+
+
+class ClaimOutV6(_ClaimBase):
+    """v6 drops `probe_question`. It existed only to feed the closed-book
+    novelty probe, and once novelty means CORPUS novelty the field is 34.8%
+    of the claim payload bought for nothing (issue #165)."""
+
+
+class ExtractionOutV6(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    claims: list[ClaimOutV6]
+
+
+ExtractionModel = type[ExtractionOut] | type[ExtractionOutV6]
+
+OUTPUT_MODELS: dict[str, ExtractionModel] = {"v5": ExtractionOut, "v6": ExtractionOutV6}
+
+
+def output_model_for(version: str) -> ExtractionModel:
+    try:
+        return OUTPUT_MODELS[version]
+    except KeyError as error:
+        raise InvalidExtractionError(f"no output schema for prompt version {version}") from error
 
 
 class JudgeOut(BaseModel):
@@ -141,10 +168,12 @@ def parse_extraction(
     payload: object,
     citable_refs: Mapping[str, int],
     related_claim_ids: set[int],
+    version: str = "v5",
 ) -> tuple[ExtractedClaim, ...]:
     data = _coerce_payload(payload)
+    model = output_model_for(version)
     try:
-        parsed = ExtractionOut.model_validate(data)
+        parsed = model.model_validate(data)
     except ValidationError as exc:
         raise InvalidExtractionError(str(exc)) from exc
 
@@ -166,7 +195,7 @@ def parse_extraction(
             subject=claim.subject,
             kind=claim.kind,
             confidence=claim.confidence,
-            probe_question=claim.probe_question,
+            probe_question=getattr(claim, "probe_question", ""),
             source_message_ids=tuple(citable_refs[ref] for ref in claim.sources),
             supersedes_claim_id=claim.supersedes,
         )

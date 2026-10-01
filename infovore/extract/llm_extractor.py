@@ -14,12 +14,12 @@ from infovore.extract.protocol import (
 from infovore.extract.schema import (
     BatchJudgeOut,
     BatchRecallOut,
-    ExtractionOut,
     InvalidExtractionError,
     JudgeOut,
     RecallOut,
     first_json_object,
     json_schema_for,
+    output_model_for,
     parse_batch_judge,
     parse_batch_recall,
     parse_extraction,
@@ -190,7 +190,7 @@ class LLMClaimExtractor:
     async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
         rendered = render_prompt(request, self._prompt_version)
         related_claim_ids = {claim.id for claim in request.related_claims if claim.id is not None}
-        schema = json_schema_for(ExtractionOut)
+        schema = json_schema_for(output_model_for(self._prompt_version))
         native = self._backend.capabilities().native_json_schema
 
         initial_request = LLMRequest(
@@ -216,7 +216,9 @@ class LLMClaimExtractor:
 
         try:
             payload = _payload_from_result(initial_result, native)
-            claims = parse_extraction(payload, rendered.refs, related_claim_ids)
+            claims = parse_extraction(
+                payload, rendered.refs, related_claim_ids, self._prompt_version
+            )
         except InvalidExtractionError as exc:
             repair_request = LLMRequest(
                 system=rendered.system,
@@ -239,7 +241,9 @@ class LLMClaimExtractor:
                 )
             try:
                 repair_payload = _payload_from_result(repair_result, native)
-                claims = parse_extraction(repair_payload, rendered.refs, related_claim_ids)
+                claims = parse_extraction(
+                    repair_payload, rendered.refs, related_claim_ids, self._prompt_version
+                )
             except InvalidExtractionError as repair_exc:
                 return ExtractionOutcome(
                     claims=(),

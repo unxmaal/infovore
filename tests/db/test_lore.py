@@ -51,10 +51,21 @@ def seeded(path: Path) -> sqlite3.Connection:
     return conn
 
 
-def test_lore_contains_exactly_current_live_net_new_claims(tmp_path: Path) -> None:
+def test_lore_contains_exactly_current_live_claims_not_known(tmp_path: Path) -> None:
+    """Since migration 0019 the rule is `novelty != 'known'`, so claim 5
+    ('not yet probed') publishes. Novelty means CORPUS novelty: whether a
+    frontier model recalled a fact on a given day is not an inclusion
+    criterion (issue #165). Claim 4 ('already known') stays suppressed, so
+    the verdicts already paid for keep working."""
     conn = seeded(tmp_path / "x.db")
     ids = [row["claim_id"] for row in conn.execute("SELECT claim_id FROM lore ORDER BY claim_id")]
-    assert ids == [1, 2, 3, 9, 10, 12]
+    assert ids == [1, 2, 3, 5, 9, 10, 12]
+
+
+def test_lore_still_suppresses_a_known_claim(tmp_path: Path) -> None:
+    conn = seeded(tmp_path / "x.db")
+    ids = [row["claim_id"] for row in conn.execute("SELECT claim_id FROM lore")]
+    assert 4 not in ids
 
 
 def test_lore_columns(tmp_path: Path) -> None:

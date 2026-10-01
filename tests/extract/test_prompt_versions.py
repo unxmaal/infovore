@@ -74,6 +74,14 @@ def test_v6_keeps_the_structural_rules_the_schema_depends_on() -> None:
 
     assert "sources" in v6
     assert "CONTEXT" in v6
-    assert "probe_question" in v6
     assert "supersedes" in v6
     assert "JSON" in v6
+
+
+def test_v6_does_not_ask_for_a_probe_question() -> None:
+    """The field fed the closed-book probe only. With novelty redefined as
+    corpus novelty, asking for it buys 34.8% of the claim payload for
+    nothing (issue #165). v5 still asks, because v5 is promoted and its
+    recorded runs must stay reproducible."""
+    assert "probe_question" not in PROMPTS["v6"]
+    assert "probe_question" in PROMPTS["v5"]
