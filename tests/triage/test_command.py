@@ -769,3 +769,13 @@ def test_triage_report_omits_the_report_card_without_labels(tmp_path: Path) -> N
 
     assert code == ExitCode.OK
     assert "report card" not in out
+
+
+def test_triage_gain_curve_reports_the_gate_against_its_controls(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+
+    code, out, _ = run(["triage", "--gain-curve", "trial"], env)
+
+    assert code == ExitCode.OK
+    assert "gain curve, trial runs" in out
+    assert "nothing to rank" in out
