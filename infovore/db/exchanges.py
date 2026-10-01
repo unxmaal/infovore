@@ -44,6 +44,7 @@ def _row_to_exchange(row: sqlite3.Row) -> ExchangeRow:
         triage_version=row["triage_version"],
         p_lore=row["p_lore"],
         p_lore_model=row["p_lore_model"],
+        chunk_recipe=row["chunk_recipe"],
     )
 
 
@@ -75,7 +76,7 @@ def insert_exchange(
             "INSERT INTO exchanges (channel_id, thread_id, first_message_id,"
             " last_message_id, started_at, ended_at, message_count, grouping_rule,"
             " content_hash, parent_exchange_id, extraction_status, retry_count,"
-            " last_error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            " last_error, chunk_recipe) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 exchange.channel_id,
                 exchange.thread_id,
@@ -90,6 +91,7 @@ def insert_exchange(
                 exchange.extraction_status.value,
                 exchange.retry_count,
                 exchange.last_error,
+                exchange.chunk_recipe,
             ),
         )
         exchange_id = cast(int, cursor.lastrowid)
