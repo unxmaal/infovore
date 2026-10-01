@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
 from infovore.triage.bayes import Metrics
+from infovore.triage.gain_curve import compute_gain_curve, format_gain_report
 from infovore.triage.report import TriageStats, compute_triage_stats
 from infovore.triage.runner import (
     TriageEvent,
@@ -302,6 +303,12 @@ class TriageCommand:
         )
         parser.add_argument("--min-recall", type=float, default=0.9, dest="min_recall")
         parser.add_argument("--signal-report", action="store_true", dest="signal_report")
+        parser.add_argument(
+            "--gain-curve",
+            choices=["trial", "live"],
+            default=None,
+            dest="gain_curve",
+        )
         parser.add_argument("--suggest-terms", action="store_true", dest="suggest_terms")
         parser.add_argument(
             "--min-support", type=int, default=MIN_SIGNAL_SUPPORT, dest="min_support"
@@ -322,6 +329,8 @@ class TriageCommand:
             return self._train(context)
         if args.signal_report:
             return self._signal_report(context)
+        if args.gain_curve:
+            return self._gain_curve(context, args.gain_curve)
         if args.suggest_terms:
             return self._suggest_terms(context, args)
         if args.fit_weights:
@@ -414,6 +423,14 @@ class TriageCommand:
             )
         context.stdout.write(_render_recall_table(table_rows))
         return ExitCode.OK
+
+    def _gain_curve(self, context: "AppContext", mode: str) -> int:
+        from infovore.cli import ExitCode
+
+        report = compute_gain_curve(context.conn, mode=mode)
+        for line in format_gain_report(report):
+            context.stdout.write(f"{line}\n")
+        return int(ExitCode.OK)
 
     def _signal_report(self, context: "AppContext") -> int:
         from infovore.cli import ExitCode

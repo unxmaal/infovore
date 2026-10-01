@@ -823,3 +823,82 @@ def test_extract_trial_mode_sample_excludes_denylisted_channel(tmp_path: Path) -
     assert code == ExitCode.OK
     assert "processed=1" in out
     assert f"exchange {kept_id}:" in out
+
+
+def test_compare_prompt_rejects_an_unknown_version(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    registry = Registry()
+    registry.register(ScriptedFactory(success_results()))
+
+    code, _, err = run(["extract", "--compare-prompt", "v99"], env, registry)
+
+    assert code == int(ExitCode.CONFIG)
+    assert "unknown prompt version v99" in err
+
+
+def test_compare_prompt_refuses_with_no_baseline_to_compare_against(tmp_path: Path) -> None:
+    """The comparison re-extracts ALREADY-extracted exchanges, so with none
+    present there is no baseline and it must say so rather than report zeroes."""
+    env = environment(tmp_path)
+    registry = Registry()
+    registry.register(ScriptedFactory(success_results()))
+
+    code, _, err = run(["extract", "--compare-prompt", "v6"], env, registry)
+
+    assert code == int(ExitCode.CONFIG)
+    assert "no already-extracted exchanges" in err
+
+
+def test_compare_prompt_reports_both_arms(tmp_path: Path) -> None:
+    """Both arms see the same exchanges, and nothing is written: the baseline
+    a comparison measures against must survive being measured."""
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = Registry()
+    registry.register(ScriptedFactory([HEALTH_OK] + [success_results()[1]] * 8))
+
+    code, out, _ = run(["extract", "--mode", "live"], env, registry)
+    assert code == int(ExitCode.OK)
+    claims_before = _claim_count(env["INFOVORE_DB_PATH"])
+
+    dump = tmp_path / "arms"
+    code, out, _ = run(
+        [
+            "extract",
+            "--compare-prompt",
+            "v6",
+            "--compare-limit",
+            "1",
+            "--compare-dump",
+            str(dump),
+        ],
+        env,
+        registry,
+    )
+
+    assert code == int(ExitCode.OK)
+    assert (dump / "v5.jsonl").exists()
+    assert (dump / "v6.jsonl").exists()
+    assert "prompt comparison over 1 already-extracted exchanges" in out
+    assert "v5" in out
+    assert "v6" in out
+    assert _claim_count(env["INFOVORE_DB_PATH"]) == claims_before
+
+
+def _claim_count(db_path: str) -> int:
+    conn = open_database(db_path)
+    migrate(conn)
+    return int(conn.execute("SELECT COUNT(*) AS n FROM claims").fetchone()["n"])
+
+
+def test_compare_prompt_runs_without_a_dump_directory(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"])
+    registry = Registry()
+    registry.register(ScriptedFactory([HEALTH_OK] + [success_results()[1]] * 8))
+
+    assert run(["extract", "--mode", "live"], env, registry)[0] == int(ExitCode.OK)
+    code, out, _ = run(["extract", "--compare-prompt", "v6", "--compare-limit", "1"], env, registry)
+
+    assert code == int(ExitCode.OK)
+    assert "prompt comparison" in out
