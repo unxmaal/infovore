@@ -187,6 +187,10 @@ class LLMClaimExtractor:
         self._max_output_tokens = max_output_tokens
         self._prompt_version = prompt_version
 
+    @property
+    def prompt_version(self) -> str:
+        return self._prompt_version
+
     async def extract(self, request: ExtractionRequest) -> ExtractionOutcome:
         rendered = render_prompt(request, self._prompt_version)
         related_claim_ids = {claim.id for claim in request.related_claims if claim.id is not None}
