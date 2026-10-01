@@ -1,7 +1,17 @@
+import math
 import random
 import sqlite3
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+
+from infovore.extract.prompt import system_prompt
+
+# A call cannot be billed less input than the system prompt alone occupies,
+# before any exchange text or harness overhead. Prompt v1/v2-era trial runs
+# recorded as little as 2 input tokens; at 2 tokens a run is FREE, so it
+# sorts to the front of any claims-per-token ordering and distorts every arm.
+# Derived from the prompt rather than hard-coded, so it cannot rot.
+MIN_PLAUSIBLE_INPUT_TOKENS = math.ceil(len(system_prompt("v5")) / 4)
 
 ORACLE = "oracle (true claims/token)"
 RANDOM = "random order (control)"
@@ -31,6 +41,8 @@ class GainReport:
     total_tokens: int
     total_claims: int
     points: tuple[GainPoint, ...]
+    excluded_implausible: int = 0
+    min_input_tokens: int = MIN_PLAUSIBLE_INPUT_TOKENS
 
 
 def _claims_at_budget(
@@ -100,17 +112,24 @@ def gain_points(candidates: Sequence[Candidate], seed: int) -> tuple[GainPoint, 
     )
 
 
-def compute_gain_curve(conn: sqlite3.Connection, mode: str, seed: int = 0) -> GainReport:
+def compute_gain_curve(
+    conn: sqlite3.Connection,
+    mode: str,
+    seed: int = 0,
+    min_input_tokens: int = MIN_PLAUSIBLE_INPUT_TOKENS,
+) -> GainReport:
     rows = conn.execute(
         "SELECT e.id AS exchange_id, e.p_lore AS p_lore,"
         " r.input_tokens + r.output_tokens AS tokens,"
         " (SELECT COUNT(*) FROM claims c WHERE c.extraction_run_id = r.id) AS claims"
+        ", r.input_tokens AS input_tokens"
         " FROM extraction_runs r JOIN exchanges e ON e.id = r.exchange_id"
         " WHERE r.outcome = 'ok' AND r.mode = ?"
         "   AND r.input_tokens IS NOT NULL AND r.output_tokens IS NOT NULL"
         "   AND e.p_lore IS NOT NULL",
         (mode,),
     ).fetchall()
+    credible = [row for row in rows if row["input_tokens"] >= min_input_tokens]
     candidates = [
         Candidate(
             exchange_id=row["exchange_id"],
@@ -118,7 +137,7 @@ def compute_gain_curve(conn: sqlite3.Connection, mode: str, seed: int = 0) -> Ga
             claims=row["claims"],
             p_lore=row["p_lore"],
         )
-        for row in rows
+        for row in credible
     ]
     return GainReport(
         mode=mode,
@@ -126,6 +145,8 @@ def compute_gain_curve(conn: sqlite3.Connection, mode: str, seed: int = 0) -> Ga
         total_tokens=sum(candidate.tokens for candidate in candidates),
         total_claims=sum(candidate.claims for candidate in candidates),
         points=gain_points(candidates, seed),
+        excluded_implausible=len(rows) - len(credible),
+        min_input_tokens=min_input_tokens,
     )
 
 
@@ -135,9 +156,15 @@ def format_gain_report(report: GainReport) -> list[str]:
             f"gain curve, {report.mode} runs: no scored runs with recorded tokens yet,"
             " so there is nothing to rank"
         ]
+    excluded = (
+        f", {report.excluded_implausible} excluded as billed under"
+        f" {report.min_input_tokens} input tokens"
+        if report.excluded_implausible
+        else ""
+    )
     lines = [
         f"gain curve, {report.mode} runs: {report.exchanges} exchanges,"
-        f" {report.total_claims} claims, {report.total_tokens} tokens",
+        f" {report.total_claims} claims, {report.total_tokens} tokens{excluded}",
         f"  {'ordering':<30} {'@10%':>7} {'@25%':>7} {'for 90%':>9} {'for 95%':>9}",
     ]
     for point in report.points:

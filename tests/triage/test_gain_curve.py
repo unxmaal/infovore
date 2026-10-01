@@ -6,6 +6,7 @@ import pytest
 
 from infovore.db.connection import migrate, open_database
 from infovore.triage.gain_curve import (
+    MIN_PLAUSIBLE_INPUT_TOKENS,
     ORACLE,
     RANDOM,
     Candidate,
@@ -140,8 +141,8 @@ def _run(
 
 
 def test_compute_reads_only_the_requested_mode(conn: sqlite3.Connection) -> None:
-    _run(conn, 1, "trial", 100, 3, 0.9)
-    _run(conn, 2, "live", 100, 3, 1.0)
+    _run(conn, 1, "trial", 20_000, 3, 0.9)
+    _run(conn, 2, "live", 20_000, 3, 1.0)
 
     report = compute_gain_curve(conn, mode="trial", seed=0)
 
@@ -152,8 +153,8 @@ def test_compute_reads_only_the_requested_mode(conn: sqlite3.Connection) -> None
 def test_compute_skips_exchanges_with_no_score(conn: sqlite3.Connection) -> None:
     """An unscored exchange cannot be ranked by the gate, so including it
     would silently credit the gate with a random placement."""
-    _run(conn, 1, "trial", 100, 3, 0.9)
-    _run(conn, 2, "trial", 100, 3, None)
+    _run(conn, 1, "trial", 20_000, 3, 0.9)
+    _run(conn, 2, "trial", 20_000, 3, None)
 
     report = compute_gain_curve(conn, mode="trial", seed=0)
 
@@ -162,7 +163,7 @@ def test_compute_skips_exchanges_with_no_score(conn: sqlite3.Connection) -> None
 
 def test_compute_reports_the_controls_alongside_the_gate(conn: sqlite3.Connection) -> None:
     for index in range(1, 11):
-        _run(conn, index, "trial", 100, index % 3, index / 10)
+        _run(conn, index, "trial", 20_000, index % 3, index / 10)
 
     report = compute_gain_curve(conn, mode="trial", seed=0)
 
@@ -207,3 +208,55 @@ def test_an_empty_report_says_so_rather_than_printing_a_bare_table() -> None:
         "gain curve, trial runs: no scored runs with recorded tokens yet,"
         " so there is nothing to rank"
     ]
+
+
+def test_a_run_too_cheap_to_be_real_is_excluded(conn: sqlite3.Connection) -> None:
+    """Prompt v1/v2-era trial runs recorded 2 input tokens. A run billed less
+    than the system prompt provably occupies cannot have real accounting, and
+    at 2 tokens it is FREE, so it sorts to the front of any claims-per-token
+    ordering and distorts every arm of the curve."""
+    _run(conn, 1, "trial", 20_000, 3, 0.9)
+    _run(conn, 2, "trial", 2, 5, 0.1)
+
+    report = compute_gain_curve(conn, mode="trial", seed=0)
+
+    assert report.exchanges == 1
+    assert report.excluded_implausible == 1
+
+
+def test_the_exclusion_count_is_reported_not_hidden(conn: sqlite3.Connection) -> None:
+    _run(conn, 1, "trial", 20_000, 3, 0.9)
+    _run(conn, 2, "trial", 2, 5, 0.1)
+
+    lines = format_gain_report(compute_gain_curve(conn, mode="trial", seed=0))
+
+    assert any("1 excluded" in line for line in lines)
+
+
+def test_nothing_is_said_about_exclusions_when_there_are_none(conn: sqlite3.Connection) -> None:
+    _run(conn, 1, "trial", 20_000, 3, 0.9)
+
+    lines = format_gain_report(compute_gain_curve(conn, mode="trial", seed=0))
+
+    assert not any("excluded" in line for line in lines)
+
+
+def test_the_floor_is_derived_from_the_prompt_not_guessed() -> None:
+    """A hard-coded number would rot the moment the prompt changed."""
+    from infovore.extract.prompt import system_prompt
+
+    assert len(system_prompt("v5")) // 8 <= MIN_PLAUSIBLE_INPUT_TOKENS
+    assert len(system_prompt("v5")) >= MIN_PLAUSIBLE_INPUT_TOKENS
+
+
+def test_a_stricter_floor_can_be_requested(conn: sqlite3.Connection) -> None:
+    """The v2-era runs average 997 input tokens, above the provable floor but
+    still far below the ~9,500 a real v3+ call costs, so a caller measuring
+    that era needs to say so."""
+    _run(conn, 1, "trial", 20_000, 3, 0.9)
+    _run(conn, 2, "trial", 1_000, 5, 0.1)
+
+    report = compute_gain_curve(conn, mode="trial", seed=0, min_input_tokens=3_000)
+
+    assert report.exchanges == 1
+    assert report.excluded_implausible == 1
