@@ -14,7 +14,9 @@ from urllib.parse import parse_qs, urlsplit
 
 from infovore.eval.judge import (
     JUDGE_INTERFACE_VERSION,
+    InvalidLabelError,
     NotInExchangeError,
+    QueueBuilder,
     UnknownQueueItemError,
     exchange_view,
     first_unjudged,
@@ -41,7 +43,9 @@ class JudgeServer(ThreadingHTTPServer):
         lock: threading.Lock,
         clock: Clock,
         page: str,
+        build_queue: QueueBuilder,
     ) -> None:
+        self.build_queue = build_queue
         self.conn = conn
         self.lock = lock
         self.clock = clock
@@ -50,10 +54,10 @@ class JudgeServer(ThreadingHTTPServer):
 
 
 def _view_payload(server: JudgeServer, index: int) -> dict[str, Any]:
-    view = exchange_view(server.conn, index)
-    done, total = progress(server.conn)
+    queue = server.build_queue(server.conn)
+    view = exchange_view(server.conn, queue, index)
+    done, total = progress(server.conn, queue)
     payload = asdict(view)
-    payload["marked"] = sorted(view.marked)
     payload["progress"] = {"done": done, "total": total}
     payload["interface_version"] = JUDGE_INTERFACE_VERSION
     return payload
@@ -85,8 +89,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if url.path == "/api/next":
             with self.server.lock:
-                index = first_unjudged(self.server.conn)
-                done, total = progress(self.server.conn)
+                queue = self.server.build_queue(self.server.conn)
+                index = first_unjudged(self.server.conn, queue)
+                done, total = progress(self.server.conn, queue)
             self._send_json(
                 HTTPStatus.OK, {"index": index, "progress": {"done": done, "total": total}}
             )
@@ -114,33 +119,39 @@ class _Handler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length") or 0)
             body = json.loads(self.rfile.read(length) or b"{}")
             index = int(body["index"])
-            facts = [int(i) for i in body.get("facts", [])]
+            exchange_id = int(body["exchange_id"])
+            label = str(body["label"])
         except (ValueError, KeyError, TypeError):
-            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "expected {index, facts: [ids]}"})
+            self._send_json(
+                HTTPStatus.BAD_REQUEST, {"error": "expected {index, exchange_id, label}"}
+            )
             return
         try:
             with self.server.lock:
-                written = submit(self.server.conn, index, facts, self.server.clock.now())
-                done, total = progress(self.server.conn)
+                queue = self.server.build_queue(self.server.conn)
+                submit(self.server.conn, queue, index, exchange_id, label, self.server.clock.now())
+                done, total = progress(self.server.conn, queue)
         except UnknownQueueItemError as error:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": str(error)})
             return
-        except NotInExchangeError as error:
+        except (NotInExchangeError, InvalidLabelError) as error:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
             return
-        self._send_json(
-            HTTPStatus.OK, {"written": written, "progress": {"done": done, "total": total}}
-        )
+        self._send_json(HTTPStatus.OK, {"progress": {"done": done, "total": total}})
 
 
 def start_all(
-    hosts: list[str], port: int, conn: sqlite3.Connection, clock: Clock
+    hosts: list[str],
+    port: int,
+    conn: sqlite3.Connection,
+    clock: Clock,
+    build_queue: QueueBuilder,
 ) -> list[JudgeServer]:
     page = load_page()
     lock = threading.Lock()
     servers = []
     for host in hosts:
-        server = JudgeServer((host, port), conn, lock, clock, page)
+        server = JudgeServer((host, port), conn, lock, clock, page, build_queue)
         threading.Thread(target=server.serve_forever, daemon=True, name=f"judge-{host}").start()
         servers.append(server)
     return servers

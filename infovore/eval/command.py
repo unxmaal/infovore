@@ -3,7 +3,19 @@ import threading
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
-from infovore.eval.judge import fact_counts, progress, self_agreement
+from infovore.eval.judge import (
+    LABELS,
+    RELEVANCE_TARGET,
+    UNCERTAIN,
+    QueueBuilder,
+    frozen_queue,
+    label_counts,
+    labels_needed,
+    self_agreement,
+    slice_progress,
+    uncertain_judged,
+    uncertain_queue,
+)
 from infovore.eval.judge_httpd import DEFAULT_JUDGE_PORT, listening_url, shutdown_all, start_all
 from infovore.eval.slices import (
     SliceExistsError,
@@ -73,7 +85,7 @@ class SliceCommand:
 
 class JudgeCommand:
     name = "judge"
-    help = "Eric's fact-marking page over the gold set, and its report (#190)"
+    help = "Eric's exchange-judging page and its report (#190)"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         sub = parser.add_subparsers(
@@ -82,31 +94,40 @@ class JudgeCommand:
         serve = sub.add_parser("serve", help="serve the judging page until Ctrl-C")
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_JUDGE_PORT)
-        sub.add_parser("report", help="progress, facts marked, and self-agreement")
+        serve.add_argument("--queue", choices=["frozen", UNCERTAIN], default="frozen")
+        sub.add_parser("report", help="labels, slice progress, self-agreement, labels still needed")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
         from infovore.sift.httpd import block_until_interrupted
 
         if args.judge_action == "report":
-            done, total = progress(context.conn)
-            facts, no_facts = fact_counts(context.conn)
+            counts = label_counts(context.conn)
+            for label in LABELS:
+                context.stdout.write(f"{label}: {counts[label]}\n")
+            for entry in slice_progress(context.conn):
+                context.stdout.write(f"slice {entry.name}: {entry.done} of {entry.total} judged\n")
+            context.stdout.write(f"uncertain: {uncertain_judged(context.conn)} judged\n")
             agreement = self_agreement(context.conn)
-            context.stdout.write(f"judged: {done} of {total} queue items\n")
-            context.stdout.write(
-                f"first pass: {facts} fact messages, {no_facts} no-fact messages\n"
-            )
             rate = "n/a" if agreement.rate is None else f"{agreement.rate:.1%}"
             context.stdout.write(
-                f"self-agreement: {rate} ({agreement.agreed} of {agreement.messages} messages"
-                f" across {agreement.exchanges} repeated exchanges)\n"
+                f"self-agreement: {rate} ({agreement.agreed} of {agreement.exchanges}"
+                " repeated exchanges)\n"
             )
+            for label, need in labels_needed(counts).items():
+                context.stdout.write(f"needed: {need} more {label} to reach {RELEVANCE_TARGET}\n")
             return int(ExitCode.OK)
 
-        if progress(context.conn)[1] == 0:
+        build_queue: QueueBuilder = frozen_queue
+        if args.queue == UNCERTAIN:
+            settings = context.settings
+            build_queue = uncertain_queue(
+                settings.max_retries, settings.triage_min_p_lore, settings.exclude_channels
+            )
+        elif not frozen_queue(context.conn):
             raise ConfigError("no gold set frozen yet; run `infovore slice freeze` first")
         hosts = args.hosts or ["127.0.0.1"]
-        servers = start_all(hosts, args.port, context.conn, context.clock)
+        servers = start_all(hosts, args.port, context.conn, context.clock, build_queue)
         try:
             for server in servers:
                 context.stdout.write(f"listening on {listening_url(server)}\n")

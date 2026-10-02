@@ -6,21 +6,28 @@ import pytest
 
 from infovore.db.connection import migrate, open_database
 from infovore.eval.judge import (
-    FACT,
+    BAD_GROUPING,
+    IRRELEVANT,
     JUDGE_INTERFACE_VERSION,
     JUDGE_SCORER,
-    NO_FACT,
+    RELEVANT,
+    InvalidLabelError,
     NotInExchangeError,
     QueueItem,
     UnknownQueueItemError,
     exchange_view,
-    fact_counts,
-    judging_queue,
+    first_unjudged,
+    frozen_queue,
+    label_counts,
+    labels_needed,
     progress,
     self_agreement,
+    slice_progress,
     submit,
+    uncertain_judged,
+    uncertain_queue,
 )
-from infovore.eval.slices import GOLD, GOLD_REPEATS
+from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS
 
 AT = datetime(2026, 10, 2, tzinfo=UTC)
 
@@ -81,85 +88,99 @@ def conn(tmp_path: Path) -> sqlite3.Connection:
     _exchange(connection, 1, [11, 12, 13])
     _exchange(connection, 2, [21, 22], parent=1)
     _exchange(connection, 3, [31])
+    _exchange(connection, 4, [41])
+    _exchange(connection, 5, [51])
     _slice(connection, GOLD, [1, 2, 3])
     _slice(connection, GOLD_REPEATS, [1])
+    _slice(connection, BUILD, [3, 4, 5])
     return connection
 
 
-def test_the_queue_is_the_gold_set_then_the_repeats(conn: sqlite3.Connection) -> None:
-    assert judging_queue(conn) == [
-        QueueItem(1, 1),
-        QueueItem(2, 1),
-        QueueItem(3, 1),
-        QueueItem(1, 2),
+def _ids(queue: list[QueueItem]) -> list[tuple[str, int, int]]:
+    return [(i.slice_name, i.position, i.exchange_id) for i in queue]
+
+
+def _label(conn: sqlite3.Connection, queue: list[QueueItem], index: int, label: str) -> None:
+    submit(conn, queue, index, queue[index].exchange_id, label, AT)
+
+
+def test_the_queue_is_gold_then_repeats_then_the_rest_of_s1(conn: sqlite3.Connection) -> None:
+    assert _ids(frozen_queue(conn)) == [
+        (GOLD, 1, 1),
+        (GOLD, 2, 2),
+        (GOLD, 3, 3),
+        (GOLD_REPEATS, 1, 1),
+        (BUILD, 1, 4),
+        (BUILD, 2, 5),
     ]
 
 
-def test_a_repeat_is_judged_independently_of_its_first_pass(conn: sqlite3.Connection) -> None:
-    """The second showing must not arrive pre-marked, or it measures memory
-    of the page rather than the judgment."""
-    submit(conn, 0, [12], AT)
+def test_a_repeat_arrives_unmarked(conn: sqlite3.Connection) -> None:
+    """The second showing must not be pre-labelled, or it measures memory of
+    the page rather than the judgment."""
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
 
-    assert exchange_view(conn, 0).marked == {12}
-    assert exchange_view(conn, 3).marked == frozenset()
-    assert not exchange_view(conn, 3).done
-
-
-def test_submitting_records_every_message_explicitly(conn: sqlite3.Connection) -> None:
-    written = submit(conn, 0, [12], AT)
-
-    rows = conn.execute(
-        "SELECT subject_id, label, scorer_version, reproducibility FROM annotations"
-        " WHERE scorer = ? ORDER BY subject_id",
-        (JUDGE_SCORER,),
-    ).fetchall()
-    assert written == 3
-    assert [(r["subject_id"], r["label"]) for r in rows] == [
-        (11, NO_FACT),
-        (12, FACT),
-        (13, NO_FACT),
-    ]
-    assert {r["scorer_version"] for r in rows} == {JUDGE_INTERFACE_VERSION}
-    assert {r["reproducibility"] for r in rows} == {"recorded"}
+    assert exchange_view(conn, queue, 0).label == RELEVANT
+    assert exchange_view(conn, queue, 3).label is None
 
 
-def test_an_unopened_exchange_stays_unjudged(conn: sqlite3.Connection) -> None:
-    """The sift import defect: a message nobody considered became 'trash' by
-    default. Here nothing is recorded until the exchange is submitted."""
-    submit(conn, 0, [12], AT)
+def test_submitting_records_one_exchange_annotation(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 1, BAD_GROUPING)
 
-    assert progress(conn) == (1, 4)
-    assert not exchange_view(conn, 1).done
-
-
-def test_changing_a_judgment_appends_and_the_newest_wins(conn: sqlite3.Connection) -> None:
-    submit(conn, 0, [12], AT)
-    submit(conn, 0, [11, 13], AT + timedelta(minutes=1))
-
-    assert exchange_view(conn, 0).marked == {11, 13}
-    assert (
-        conn.execute(
-            "SELECT COUNT(*) AS n FROM annotations WHERE scorer = ?", (JUDGE_SCORER,)
-        ).fetchone()["n"]
-        == 6
+    row = conn.execute("SELECT * FROM annotations").fetchone()
+    assert (row["subject_kind"], row["subject_id"], row["scorer"]) == ("exchange", 2, JUDGE_SCORER)
+    assert (row["label"], row["scorer_version"], row["reproducibility"]) == (
+        BAD_GROUPING,
+        JUDGE_INTERFACE_VERSION,
+        "recorded",
     )
+    assert row["source_ref"] == "judge:gold:2"
+    assert row["created_at"].startswith("2026-10-02")
 
 
-def test_a_message_outside_the_exchange_is_refused(conn: sqlite3.Connection) -> None:
-    with pytest.raises(NotInExchangeError):
-        submit(conn, 0, [21], AT)
-    assert progress(conn) == (0, 4)
+def test_an_unjudged_exchange_has_no_row(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+
+    assert progress(conn, queue) == (1, 6)
+    assert first_unjudged(conn, queue) == 1
+    assert exchange_view(conn, queue, 1).label is None
 
 
-def test_an_index_off_the_queue_is_refused(conn: sqlite3.Connection) -> None:
+def test_judging_again_appends_and_the_newest_shows(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, 0, IRRELEVANT)
+
+    assert exchange_view(conn, queue, 0).label == IRRELEVANT
+    assert conn.execute("SELECT COUNT(*) AS n FROM annotations").fetchone()["n"] == 2
+
+
+def test_nothing_left_means_no_resume_point(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    for index in range(len(queue)):
+        _label(conn, queue, index, IRRELEVANT)
+
+    assert first_unjudged(conn, queue) is None
+
+
+def test_bad_submissions_are_refused_and_write_nothing(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    with pytest.raises(InvalidLabelError):
+        submit(conn, queue, 0, 1, "fact", AT)
+    with pytest.raises(NotInExchangeError, match="not exchange"):
+        submit(conn, queue, 0, 2, RELEVANT, AT)
     with pytest.raises(UnknownQueueItemError):
-        exchange_view(conn, 4)
+        submit(conn, queue, -1, 1, RELEVANT, AT)
     with pytest.raises(UnknownQueueItemError):
-        submit(conn, -1, [], AT)
+        exchange_view(conn, queue, 6)
+    assert conn.execute("SELECT COUNT(*) AS n FROM annotations").fetchone()["n"] == 0
 
 
 def test_context_from_the_parent_is_shown_but_marked_as_context(conn: sqlite3.Connection) -> None:
-    view = exchange_view(conn, 1)
+    view = exchange_view(conn, frozen_queue(conn), 1)
 
     assert [(m.id, m.is_context) for m in view.messages] == [
         (11, True),
@@ -170,46 +191,80 @@ def test_context_from_the_parent_is_shown_but_marked_as_context(conn: sqlite3.Co
     ]
 
 
-def test_context_cannot_be_marked_as_a_fact(conn: sqlite3.Connection) -> None:
-    """Context belongs to another exchange; marking it here would credit
-    this exchange with a fact it does not contain."""
-    with pytest.raises(NotInExchangeError):
-        submit(conn, 1, [11], AT)
-
-
 def test_the_view_carries_channel_link_and_position(conn: sqlite3.Connection) -> None:
-    view = exchange_view(conn, 2)
+    view = exchange_view(conn, frozen_queue(conn), 2)
 
-    assert (view.index, view.total, view.exchange_id, view.channel) == (2, 4, 3, "hardware")
+    assert (view.index, view.total, view.exchange_id, view.channel) == (2, 6, 3, "hardware")
     assert view.messages[0].link == "https://discord.com/channels/9/1/31"
     assert view.messages[0].author == "hal"
 
 
-def test_self_agreement_compares_the_two_passes_per_message(conn: sqlite3.Connection) -> None:
-    submit(conn, 0, [12], AT)
-    submit(conn, 3, [12, 13], AT)
+def test_label_counts_use_the_newest_judgment_and_skip_repeats(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, 3, IRRELEVANT)
+    _label(conn, queue, 1, IRRELEVANT)
+    _label(conn, queue, 1, BAD_GROUPING)
 
-    agreement = self_agreement(conn)
-
-    assert (agreement.exchanges, agreement.messages, agreement.agreed) == (1, 3, 2)
-    assert agreement.rate == pytest.approx(2 / 3)
+    assert label_counts(conn) == {RELEVANT: 1, IRRELEVANT: 0, BAD_GROUPING: 1}
 
 
-def test_self_agreement_is_undefined_until_a_repeat_has_both_passes(
-    conn: sqlite3.Connection,
-) -> None:
-    submit(conn, 0, [12], AT)
+def test_labels_needed_counts_down_to_the_bayes_minimum() -> None:
+    assert labels_needed({RELEVANT: 150, IRRELEVANT: 260, BAD_GROUPING: 9}) == {
+        RELEVANT: 50,
+        IRRELEVANT: 0,
+    }
 
+
+def test_slice_progress_counts_judged_per_slice(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, 4, RELEVANT)
+
+    assert [(p.name, p.done, p.total) for p in slice_progress(conn)] == [
+        (GOLD, 1, 3),
+        (GOLD_REPEATS, 0, 1),
+        (BUILD, 1, 2),
+    ]
+
+
+def test_self_agreement_compares_the_two_showings(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
     assert self_agreement(conn).rate is None
 
+    _label(conn, queue, 3, RELEVANT)
+    assert (self_agreement(conn).exchanges, self_agreement(conn).rate) == (1, 1.0)
 
-def test_fact_counts_use_the_first_pass_only(conn: sqlite3.Connection) -> None:
-    """Repeats measure consistency; counting them would double-weight the
-    repeated exchanges."""
-    submit(conn, 0, [12], AT)
-    submit(conn, 3, [11, 12, 13], AT)
+    _label(conn, queue, 3, IRRELEVANT)
+    assert self_agreement(conn).rate == 0.0
 
-    assert fact_counts(conn) == (1, 2)
+
+def _gate(conn: sqlite3.Connection, scores: dict[int, float | None]) -> None:
+    for exchange_id, p_lore in scores.items():
+        conn.execute("UPDATE exchanges SET p_lore = ? WHERE id = ?", (p_lore, exchange_id))
+
+
+def test_the_uncertain_queue_is_closest_to_a_coin_flip_first(conn: sqlite3.Connection) -> None:
+    _gate(conn, {1: 0.9, 2: 0.45, 3: 0.52, 4: None, 5: 0.1})
+    queue = uncertain_queue(3, 0.0, frozenset())(conn)
+
+    assert [i.exchange_id for i in queue] == [3, 2, 1, 5]
+    assert [i.position for i in queue] == [1, 2, 3, 4]
+
+
+def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
+    build = uncertain_queue(3, 0.0, frozenset())
+    first = build(conn)
+    submit(conn, first, 0, first[0].exchange_id, RELEVANT, AT)
+    conn.execute("UPDATE exchanges SET extraction_status = 'done' WHERE id = 3")
+
+    assert [i.exchange_id for i in build(conn)] == [2]
+    assert uncertain_judged(conn) == 1
+    assert uncertain_queue(3, 0.0, frozenset({"hardware"}))(conn) == []
 
 
 def test_a_missing_channel_falls_back_to_its_id(tmp_path: Path) -> None:
@@ -219,12 +274,10 @@ def test_a_missing_channel_falls_back_to_its_id(tmp_path: Path) -> None:
     _exchange(connection, 1, [11])
     _slice(connection, GOLD, [1])
 
-    assert exchange_view(connection, 0).channel == "1"
+    assert exchange_view(connection, frozen_queue(connection), 0).channel == "1"
 
 
-def test_an_exchange_with_no_messages_is_refused_not_silently_skipped(tmp_path: Path) -> None:
-    """Writing nothing would leave the item undone forever, so the page would
-    keep offering it."""
+def test_an_exchange_with_no_messages_is_refused(tmp_path: Path) -> None:
     connection = open_database(tmp_path / "z.db")
     migrate(connection)
     connection.execute("PRAGMA foreign_keys = OFF")
@@ -237,4 +290,4 @@ def test_an_exchange_with_no_messages_is_refused_not_silently_skipped(tmp_path: 
     _slice(connection, GOLD, [1])
 
     with pytest.raises(NotInExchangeError, match="no messages"):
-        submit(connection, 0, [], AT)
+        submit(connection, frozen_queue(connection), 0, 1, RELEVANT, AT)

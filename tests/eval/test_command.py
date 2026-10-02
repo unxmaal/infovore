@@ -94,30 +94,37 @@ def test_report_before_any_judging(tmp_path: Path) -> None:
     code, out = run(["judge", "report"], tmp_path)
 
     assert code == ExitCode.OK
-    assert "judged: 0 of 55 queue items" in out
+    assert "relevant: 0" in out
+    assert "bad_grouping: 0" in out
+    assert "slice gold: 0 of 50 judged" in out
+    assert "slice gold-repeats: 0 of 5 judged" in out
+    assert "uncertain: 0 judged" in out
     assert "self-agreement: n/a" in out
+    assert "needed: 200 more relevant to reach 200" in out
+    assert "needed: 200 more irrelevant to reach 200" in out
 
 
-def test_report_shows_agreement_once_a_repeat_has_both_passes(tmp_path: Path) -> None:
+def test_report_shows_counts_and_agreement_once_a_repeat_has_both_passes(tmp_path: Path) -> None:
     from datetime import UTC, datetime
 
-    from infovore.eval.judge import judging_queue, submit
+    from infovore.eval.judge import frozen_queue, submit
 
     _seed(tmp_path)
     run(["slice", "freeze"], tmp_path)
     conn = open_database(tmp_path / "infovore.db")
-    queue = judging_queue(conn)
-    repeat = queue[-1]
-    first = next(i for i, item in enumerate(queue) if item.exchange_id == repeat.exchange_id)
+    queue = frozen_queue(conn)
     at = datetime(2026, 10, 2, tzinfo=UTC)
-    submit(conn, first, [], at)
-    submit(conn, len(queue) - 1, [], at)
+    repeat = next(i for i, item in enumerate(queue) if item.slice_name == "gold-repeats")
+    first = next(i for i, item in enumerate(queue) if item.exchange_id == queue[repeat].exchange_id)
+    for index in (first, repeat):
+        submit(conn, queue, index, queue[index].exchange_id, "relevant", at)
     conn.close()
 
     _, out = run(["judge", "report"], tmp_path)
 
-    assert "self-agreement: " in out
-    assert "n/a" not in out
+    assert "relevant: 1" in out
+    assert "self-agreement: 100.0% (1 of 1 repeated exchanges)" in out
+    assert "needed: 199 more relevant" in out
 
 
 def test_serve_refuses_without_a_gold_set(tmp_path: Path) -> None:
@@ -137,6 +144,19 @@ def test_serve_listens_then_returns_when_interrupted(
     run(["slice", "freeze"], tmp_path)
 
     code, out = run(["judge", "serve", "--port", "0"], tmp_path)
+
+    assert code == ExitCode.OK
+    assert "listening on http://127.0.0.1:" in out
+
+
+def test_serve_uncertain_needs_no_frozen_slices(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import infovore.sift.httpd
+
+    monkeypatch.setattr(infovore.sift.httpd, "block_until_interrupted", lambda event: None)
+
+    code, out = run(["judge", "serve", "--port", "0", "--queue", "uncertain"], tmp_path)
 
     assert code == ExitCode.OK
     assert "listening on http://127.0.0.1:" in out

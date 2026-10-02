@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from infovore.db.connection import migrate, open_database
+from infovore.eval.judge import frozen_queue
 from infovore.eval.judge_httpd import JudgeServer, listening_url, shutdown_all, start_all
 from infovore.eval.slices import GOLD, GOLD_REPEATS
 from infovore.timing import FixedClock
@@ -62,7 +63,7 @@ def _db(tmp_path: Path) -> sqlite3.Connection:
 
 @pytest.fixture
 def server(tmp_path: Path) -> Iterator[JudgeServer]:
-    servers = start_all(["127.0.0.1"], 0, _db(tmp_path), FixedClock(AT))
+    servers = start_all(["127.0.0.1"], 0, _db(tmp_path), FixedClock(AT), frozen_queue)
     yield servers[0]
     shutdown_all(servers)
 
@@ -95,7 +96,7 @@ def test_the_page_is_served(server: JudgeServer) -> None:
     status, body = _get(server, "/")
 
     assert status == 200
-    assert "states or confirms a durable technical fact" in str(body)
+    assert "bad grouping" in str(body)
 
 
 def test_next_points_at_the_first_unjudged_item(server: JudgeServer) -> None:
@@ -110,21 +111,26 @@ def test_an_exchange_comes_back_with_its_messages_and_interface_version(
     assert status == 200
     assert isinstance(body, dict)
     assert [m["id"] for m in body["messages"]] == [11, 12]
-    assert body["marked"] == []
-    assert body["interface_version"] == 1
+    assert body["label"] is None
+    assert body["interface_version"] == 2
+
+
+def _submit(server: JudgeServer, index: int, exchange_id: int, label: str) -> tuple[int, object]:
+    payload = {"index": index, "exchange_id": exchange_id, "label": label}
+    return _post(server, "/api/submit", json.dumps(payload).encode())
 
 
 def test_a_submission_is_saved_and_moves_the_resume_point(server: JudgeServer) -> None:
-    status, body = _post(server, "/api/submit", json.dumps({"index": 0, "facts": [12]}).encode())
+    status, body = _submit(server, 0, 1, "relevant")
 
-    assert (status, body) == (200, {"written": 2, "progress": {"done": 1, "total": 3}})
+    assert (status, body) == (200, {"progress": {"done": 1, "total": 3}})
     assert _get(server, "/api/next")[1] == {"index": 1, "progress": {"done": 1, "total": 3}}
-    assert _get(server, "/api/exchange?index=0")[1]["marked"] == [12]  # type: ignore[index]
+    assert _get(server, "/api/exchange?index=0")[1]["label"] == "relevant"  # type: ignore[index]
 
 
 def test_every_item_judged_leaves_no_resume_point(server: JudgeServer) -> None:
-    for index in range(3):
-        _post(server, "/api/submit", json.dumps({"index": index, "facts": []}).encode())
+    for index, exchange_id in enumerate([1, 2, 1]):
+        _submit(server, index, exchange_id, "irrelevant")
 
     assert _get(server, "/api/next")[1] == {"index": None, "progress": {"done": 3, "total": 3}}
 
@@ -141,9 +147,18 @@ def test_bad_reads_are_refused(server: JudgeServer, path: str, status: int) -> N
     ("path", "payload", "status"),
     [
         ("/api/submit", b"not json", 400),
-        ("/api/submit", json.dumps({"facts": [1]}).encode(), 400),
-        ("/api/submit", json.dumps({"index": 9, "facts": []}).encode(), 404),
-        ("/api/submit", json.dumps({"index": 0, "facts": [21]}).encode(), 400),
+        ("/api/submit", json.dumps({"index": 0, "label": "relevant"}).encode(), 400),
+        (
+            "/api/submit",
+            json.dumps({"index": 9, "exchange_id": 1, "label": "relevant"}).encode(),
+            404,
+        ),
+        (
+            "/api/submit",
+            json.dumps({"index": 0, "exchange_id": 2, "label": "relevant"}).encode(),
+            400,
+        ),
+        ("/api/submit", json.dumps({"index": 0, "exchange_id": 1, "label": "fact"}).encode(), 400),
         ("/api/other", b"{}", 404),
     ],
 )
