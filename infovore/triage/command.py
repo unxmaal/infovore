@@ -309,6 +309,16 @@ class TriageCommand:
             default=None,
             dest="gain_curve",
         )
+        parser.add_argument(
+            "--compare-scorers",
+            default=None,
+            dest="compare_scorers",
+            metavar="V1,V2",
+            help="rank one population by several p_lore model versions",
+        )
+        parser.add_argument(
+            "--compare-mode", choices=["trial", "live"], default="trial", dest="compare_mode"
+        )
         parser.add_argument("--suggest-terms", action="store_true", dest="suggest_terms")
         parser.add_argument(
             "--min-support", type=int, default=MIN_SIGNAL_SUPPORT, dest="min_support"
@@ -331,6 +341,8 @@ class TriageCommand:
             return self._signal_report(context)
         if args.gain_curve:
             return self._gain_curve(context, args.gain_curve)
+        if args.compare_scorers:
+            return self._compare_scorers(context, args.compare_scorers, args.compare_mode)
         if args.suggest_terms:
             return self._suggest_terms(context, args)
         if args.fit_weights:
@@ -430,6 +442,45 @@ class TriageCommand:
         report = compute_gain_curve(context.conn, mode=mode)
         for line in format_gain_report(report):
             context.stdout.write(f"{line}\n")
+        return int(ExitCode.OK)
+
+    def _compare_scorers(self, context: "AppContext", versions: str, mode: str) -> int:
+        """Rank one population by several scorer versions, reading each from
+        `annotations`. Needs no labels and makes no LLM calls: the ground
+        truth is the recorded extraction outcome."""
+        from infovore.cli import ExitCode
+        from infovore.triage.scorer_compare import (
+            bootstrap_difference,
+            candidates_for,
+            compare_scorers,
+            format_comparison,
+            scores_from_annotations,
+        )
+
+        try:
+            wanted = [int(part) for part in versions.split(",") if part.strip()]
+        except ValueError:
+            raise ConfigError(f"--compare-scorers wants versions, got {versions!r}") from None
+        if not wanted:
+            raise ConfigError("--compare-scorers needs at least one version")
+
+        for line in format_comparison(compare_scorers(context.conn, mode, wanted)):
+            context.stdout.write(f"{line}\n")
+
+        # The curve alone cannot say whether a gap is real. A paired bootstrap
+        # against the last version named gives each gap an interval.
+        baseline = f"p_lore v{wanted[-1]}"
+        arms = {f"p_lore v{v}": scores_from_annotations(context.conn, "p_lore", v) for v in wanted}
+        candidates = candidates_for(context.conn, mode)
+        context.stdout.write(f"\npaired against {baseline}, 95% CI over 2000 resamples\n")
+        for fraction in (0.10, 0.25):
+            context.stdout.write(f"  at {int(fraction * 100)}% of budget\n")
+            for interval in bootstrap_difference(candidates, arms, baseline, fraction=fraction):
+                verdict = "SEPARABLE" if interval.separable_from_zero else "not separable"
+                context.stdout.write(
+                    f"    {interval.label:<28} {interval.point:+6.2f} pts"
+                    f"  [{interval.low:+6.2f}, {interval.high:+6.2f}]  {verdict}\n"
+                )
         return int(ExitCode.OK)
 
     def _signal_report(self, context: "AppContext") -> int:

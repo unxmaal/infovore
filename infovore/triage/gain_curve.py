@@ -1,7 +1,7 @@
 import math
 import random
 import sqlite3
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 from infovore.extract.prompt import system_prompt
@@ -88,11 +88,20 @@ def _point(label: str, ordered: Sequence[Candidate], totals: tuple[int, int]) ->
     )
 
 
-def gain_points(candidates: Sequence[Candidate], seed: int) -> tuple[GainPoint, ...]:
+def gain_points(
+    candidates: Sequence[Candidate],
+    seed: int,
+    arms: Mapping[str, Mapping[int, float]] | None = None,
+) -> tuple[GainPoint, ...]:
     """What a ranking buys per token spent, which is what AUC cannot see: AUC
     is unweighted and unpriced, so a gate can score 0.963 while moving almost
     no value forward (issue #151). The random control is returned
-    unconditionally, because the gate's number is uninterpretable without it."""
+    unconditionally, because the gate's number is uninterpretable without it.
+
+    `arms` ranks by externally supplied scores, one arm per label, so two
+    scorer versions can be compared on one population without refitting
+    either. A candidate an arm did not score sorts last rather than being
+    dropped, so every arm is measured over the same denominator."""
     if not candidates:
         return ()
     totals = (
@@ -101,11 +110,19 @@ def gain_points(candidates: Sequence[Candidate], seed: int) -> tuple[GainPoint, 
     )
     shuffled = list(candidates)
     random.Random(seed).shuffle(shuffled)
-    orderings: tuple[tuple[str, Callable[[Candidate], float] | None], ...] = (
-        ("p_lore", lambda candidate: -candidate.p_lore),
-        (ORACLE, lambda candidate: -candidate.claims / max(candidate.tokens, 1)),
-        (RANDOM, None),
+    # The default arm reads the attribute directly rather than a map keyed by
+    # exchange_id: one exchange can have several extraction runs, so such a map
+    # collapses candidates that must be ranked separately.
+    orderings: list[tuple[str, Callable[[Candidate], float] | None]] = (
+        [("p_lore", lambda candidate: -candidate.p_lore)]
+        if arms is None
+        else [
+            (label, lambda candidate, s=scores: -s.get(candidate.exchange_id, -math.inf))  # type: ignore[misc]
+            for label, scores in arms.items()
+        ]
     )
+    orderings.append((ORACLE, lambda candidate: -candidate.claims / max(candidate.tokens, 1)))
+    orderings.append((RANDOM, None))
     return tuple(
         _point(label, shuffled if key is None else sorted(candidates, key=key), totals)
         for label, key in orderings
