@@ -1,3 +1,5 @@
+import os
+import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -169,6 +171,28 @@ async def test_scratch_dir_is_created_when_missing(tmp_path: Path) -> None:
     await backend.complete(text_request())
     assert scratch.is_dir()
     assert list(scratch.iterdir()) == []
+
+
+async def test_stale_empty_tmp_dirs_are_swept_but_other_entries_survive(tmp_path: Path) -> None:
+    old = time.time() - 3600
+    stale_empty = tmp_path / "tmpold"
+    stale_full = tmp_path / "tmpfull"
+    fresh = tmp_path / "tmpfresh"
+    other = tmp_path / "sift_trash_rules"
+    stale_file = tmp_path / "tmpfile"
+    for directory in (stale_empty, stale_full, fresh, other):
+        directory.mkdir()
+    (stale_full / "x").write_text("keep")
+    stale_file.write_text("keep")
+    for entry in (stale_empty, stale_full, other, stale_file):
+        os.utime(entry, (old, old))
+    backend = make_backend(FakeProcessRunner(ok(result="hi")), tmp_path)
+    await backend.complete(text_request())
+    assert not stale_empty.exists()
+    assert stale_full.exists()
+    assert fresh.exists()
+    assert other.exists()
+    assert stale_file.exists()
 
 
 async def test_text_success_reads_result_field(tmp_path: Path) -> None:

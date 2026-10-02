@@ -1,8 +1,10 @@
 import asyncio
+import contextlib
 import json
 import re
 import subprocess
 import tempfile
+import time
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,6 +15,7 @@ from infovore.llm.protocol import Capabilities, ErrorKind, LLMBackend, LLMReques
 
 DEFAULT_BINARY = "claude"
 DEFAULT_RETRY_AFTER = 300.0
+STALE_TMP_SECONDS = 600.0
 
 _USAGE_LIMIT_RE = re.compile(r"usage limit|rate limit|limit reached", re.IGNORECASE)
 _AUTH_RE = re.compile(r"not logged in|authentication", re.IGNORECASE)
@@ -23,6 +26,14 @@ _NETWORK_RE = re.compile(
 )
 _ISO_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?")
 _EPOCH_RE = re.compile(r"\b(1\d{9})\b")
+
+
+def _sweep_stale_tmp_dirs(scratch_dir: Path) -> None:
+    cutoff = time.time() - STALE_TMP_SECONDS
+    for entry in scratch_dir.glob("tmp*"):
+        if entry.is_dir() and entry.stat().st_mtime < cutoff:
+            with contextlib.suppress(OSError):
+                entry.rmdir()
 
 
 def _looks_like_network_error(text: str) -> bool:
@@ -96,6 +107,7 @@ class ClaudeCliBackend:
     async def complete(self, request: LLMRequest) -> LLMResult:
         argv = self._build_argv(request)
         self._scratch_dir.mkdir(parents=True, exist_ok=True)
+        _sweep_stale_tmp_dirs(self._scratch_dir)
         with tempfile.TemporaryDirectory(dir=str(self._scratch_dir)) as cwd:
             result = await self._runner.run(argv, request.prompt, cwd, self._timeout)
         return self._map_result(result, request)
