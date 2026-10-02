@@ -228,6 +228,10 @@ def unprobed_claims(
     query = (
         "SELECT c.* FROM claims c JOIN extraction_runs r ON r.id = c.extraction_run_id"
         " WHERE c.novelty = ? AND c.retracted_at IS NULL"
+        # The recall prompt IS the probe_question and v6+ claims have none, so
+        # probing one sends an empty prompt and risks a junk 'known' verdict
+        # that drops the claim from `lore` (#188).
+        " AND c.probe_question != ''"
     )
     params: list[object] = [Novelty.UNPROBED.value]
     if not include_failed:

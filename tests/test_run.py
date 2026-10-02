@@ -17,7 +17,7 @@ from infovore.config import Settings, Stage, StageSettings
 from infovore.db.claims import promote_prompt_version, register_prompt_version
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
-from infovore.extract.fake import MarkerExtractor, MarkerProbe
+from infovore.extract.fake import MarkerExtractor
 from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.fake import FakeBackend
 from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
@@ -146,7 +146,7 @@ class BlockingSleeper:
         await asyncio.sleep(100000)
 
 
-async def test_run_forever_ingests_groups_extracts_and_probes_then_stops(tmp_path: Path) -> None:
+async def test_run_forever_ingests_groups_and_extracts_then_stops(tmp_path: Path) -> None:
     conn = db(tmp_path)
     register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
     promote_prompt_version(conn, PROMPT_VERSION, NOW)
@@ -163,7 +163,6 @@ async def test_run_forever_ingests_groups_extracts_and_probes_then_stops(tmp_pat
             conn,
             source,
             MarkerExtractor(),
-            MarkerProbe(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -182,10 +181,14 @@ async def test_run_forever_ingests_groups_extracts_and_probes_then_stops(tmp_pat
     exchange = conn.execute("SELECT extraction_status FROM exchanges").fetchone()
     assert exchange is not None
     assert exchange["extraction_status"] == "done"
+    # The closed-book probe was retired under #165 and novelty is corpus
+    # novelty (migration 0019). The loop used to probe every claim anyway, and
+    # a v8 claim has an empty probe_question, so that was an LLM call with an
+    # empty prompt whose verdict could drop the claim from `lore` (#188).
     claim = conn.execute("SELECT novelty, probe_model FROM claims").fetchone()
     assert claim is not None
-    assert claim["novelty"] == "unknown"
-    assert claim["probe_model"] == "fake-probe"
+    assert claim["novelty"] == "unprobed"
+    assert claim["probe_model"] is None
 
 
 async def test_run_forever_skips_extraction_when_prompt_not_promoted_but_still_groups(
@@ -206,7 +209,6 @@ async def test_run_forever_skips_extraction_when_prompt_not_promoted_but_still_g
                 conn,
                 source,
                 MarkerExtractor(),
-                MarkerProbe(),
                 FixedClock(NOW),
                 RecordingSleeper(),
                 settings,
@@ -240,7 +242,6 @@ async def test_run_forever_counts_a_failing_event_and_continues(tmp_path: Path) 
             conn,
             source,
             MarkerExtractor(),
-            MarkerProbe(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -270,7 +271,6 @@ async def test_run_forever_counts_an_ignored_event_and_continues(tmp_path: Path)
             conn,
             source,
             MarkerExtractor(),
-            MarkerProbe(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -298,7 +298,6 @@ async def test_run_forever_counts_a_failing_cycle_step_and_continues(tmp_path: P
             conn,
             source,
             MarkerExtractor(),
-            MarkerProbe(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -323,7 +322,6 @@ async def test_run_forever_multiple_cycles_then_stop_between_intervals(tmp_path:
             conn,
             source,
             MarkerExtractor(),
-            MarkerProbe(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -349,7 +347,6 @@ async def test_stop_during_interval_wait_returns_promptly(tmp_path: Path) -> Non
             conn,
             source,
             MarkerExtractor(),
-            MarkerProbe(),
             FixedClock(NOW),
             sleeper,
             settings,
@@ -379,7 +376,6 @@ async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path)
         conn,
         source,
         MarkerExtractor(),
-        MarkerProbe(),
         FixedClock(NOW),
         RecordingSleeper(),
         settings,
@@ -392,7 +388,6 @@ async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path)
         CycleStepStarted(step="chunk"),
         CycleStepStarted(step="triage"),
         CycleStepStarted(step="extract"),
-        CycleStepStarted(step="probe"),
     ]
 
 
@@ -447,7 +442,6 @@ async def test_run_once_extraction_never_claims_a_denylisted_channel(tmp_path: P
         conn,
         source,
         MarkerExtractor(),
-        MarkerProbe(),
         FixedClock(NOW),
         RecordingSleeper(),
         settings,
@@ -471,7 +465,6 @@ async def test_run_once_progress_defaults_to_noop(tmp_path: Path) -> None:
         conn,
         source,
         MarkerExtractor(),
-        MarkerProbe(),
         FixedClock(NOW),
         RecordingSleeper(),
         settings,
@@ -655,15 +648,13 @@ def test_run_command_once_flag_streams_flushed_progress_lines(tmp_path: Path) ->
     assert code == ExitCode.OK
     lines = out.getvalue().splitlines()
     assert lines[0] == "checking extract backend (fake / sonnet)..."
-    assert lines[1] == "checking probe backend (fake / sonnet)..."
-    assert lines[2] == "checking judge backend (fake / haiku)..."
-    assert lines[3] == "opening discord source..."
-    assert lines[4] == "cycle: sync-optouts"
-    assert lines[5] == "cycle: chunk"
-    assert lines[6] == "cycle: triage"
-    assert lines[7] == "cycle: extract"
-    assert lines[8] == "cycle: probe"
-    assert out.flushes_at[:9] == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert lines[1] == "opening discord source..."
+    assert lines[2] == "cycle: sync-optouts"
+    assert lines[3] == "cycle: chunk"
+    assert lines[4] == "cycle: triage"
+    assert lines[5] == "cycle: extract"
+    assert "cycle: probe" not in lines
+    assert out.flushes_at[:6] == [1, 2, 3, 4, 5, 6]
 
 
 def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: Path) -> None:
@@ -732,5 +723,7 @@ def test_run_command_prints_checking_backend_lines_before_each_stage_health_chec
 
     assert code == ExitCode.OK
     assert "checking extract backend (spy / sonnet)..." in snapshots[0]
-    assert "checking probe backend (spy / sonnet)..." in snapshots[1]
-    assert "checking judge backend (spy / haiku)..." in snapshots[2]
+    # `run` no longer builds the probe or judge backends, so a misconfigured
+    # probe stage cannot stop the extraction loop from starting.
+    assert "checking probe backend" not in out.getvalue()
+    assert "checking judge backend" not in out.getvalue()
