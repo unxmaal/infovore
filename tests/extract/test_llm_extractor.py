@@ -10,13 +10,19 @@ from infovore.extract.llm_extractor import (
     LLMClaimExtractor,
     LLMNoveltyProbe,
 )
+from infovore.extract.prompt import PROMPT_VERSION
 from infovore.extract.protocol import (
     ClaimExtractor,
     ExtractionRequest,
     FailureKind,
     NoveltyProbe,
 )
-from infovore.extract.schema import ExtractionOut, JudgeOut, RecallOut, json_schema_for
+from infovore.extract.schema import (
+    JudgeOut,
+    RecallOut,
+    json_schema_for,
+    output_model_for,
+)
 from infovore.llm.fake import FakeBackend
 from infovore.llm.protocol import Capabilities, ErrorKind, LLMResult, Usage
 from infovore.rows import (
@@ -116,7 +122,6 @@ def _claim_payload(**overrides: object) -> dict[str, object]:
         "subject": "IRIX 6.5.30",
         "kind": "fact",
         "confidence": 0.9,
-        "probe_question": "What overlay version does IRIX 6.5.30 require?",
         "sources": ["m1"],
         "supersedes": None,
     }
@@ -142,7 +147,9 @@ async def test_extract_uses_native_structured_output() -> None:
     assert outcome.claims[0].statement == "IRIX 6.5.30 requires the November 2006 overlay"
     assert outcome.model == "claude-sonnet-4-5-20250929"
     assert len(backend.requests) == 1
-    assert backend.requests[0].json_schema == json_schema_for(ExtractionOut)
+    # Derived from the live version, so promoting a prompt cannot leave this
+    # asserting a schema the extractor no longer sends.
+    assert backend.requests[0].json_schema == json_schema_for(output_model_for(PROMPT_VERSION))
 
 
 async def test_extract_text_json_path_when_not_native() -> None:

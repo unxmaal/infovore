@@ -1,3 +1,5 @@
+import hashlib
+
 import pytest
 
 from infovore.extract.prompt import (
@@ -17,23 +19,30 @@ def test_every_version_is_available() -> None:
     assert set(PROMPTS) == {"v5", "v6", "v7", "v8"}
 
 
-def test_the_live_version_is_still_v5() -> None:
-    """Bumping this constant halts live extraction until the new version is
-    promoted (`runner.py` raises `PromptNotPromotedError`). v6 ships
-    selectable and unpromoted so it can be measured without stopping
-    anything."""
-    assert PROMPT_VERSION == "v5"
-    assert LIVE_PROMPT_VERSION == "v5"
+def test_the_live_version_is_v8() -> None:
+    """This constant and the version promoted in the database must move
+    together: `runner.py` raises `PromptNotPromotedError` when they disagree,
+    which halts live extraction rather than running the wrong prompt."""
+    assert PROMPT_VERSION == "v8"
+    assert LIVE_PROMPT_VERSION == "v8"
 
 
-def test_the_live_prompt_text_is_unchanged() -> None:
-    """v5 is promoted in the live database against this digest. Editing it
-    silently would make every historical run's `prompt_version` a lie."""
-    assert PROMPT_SHA256 == PROMOTED_V5_SHA256
+def test_v5s_text_stays_frozen_even_though_it_is_no_longer_live() -> None:
+    """77,184 stored claims record `prompt_version = v5`. Editing that text
+    would make every one of those rows a lie about what produced it, so the
+    digest is pinned independently of which version is currently live."""
+    assert hashlib.sha256(PROMPTS["v5"].encode("utf-8")).hexdigest() == PROMOTED_V5_SHA256
+
+
+def test_the_live_digest_describes_the_live_prompt() -> None:
+    """`PROMPT_SHA256` is what `register_prompt_version` writes, so a digest
+    computed from a version other than the live one would record a promotion
+    that never happened."""
+    assert hashlib.sha256(PROMPTS[PROMPT_VERSION].encode("utf-8")).hexdigest() == PROMPT_SHA256
 
 
 def test_system_prompt_defaults_to_the_live_version() -> None:
-    assert system_prompt() == PROMPTS["v5"]
+    assert system_prompt() == PROMPTS[PROMPT_VERSION]
 
 
 def test_system_prompt_selects_by_version() -> None:

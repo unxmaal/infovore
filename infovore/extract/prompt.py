@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from infovore.extract.protocol import ExtractionRequest
 from infovore.rows import AttachmentRow, MessageRow, ReactionRow
 
-PROMPT_VERSION = "v5"
+PROMPT_VERSION = "v8"
 
 SYSTEM_PROMPT = (
     "You are reading an archived exchange from a hobbyist SGI/IRIX community.\n"
@@ -163,7 +163,7 @@ def system_prompt(version: str = LIVE_PROMPT_VERSION) -> str:
         raise UnknownPromptVersionError(version) from error
 
 
-PROMPT_SHA256 = hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()
+PROMPT_SHA256 = hashlib.sha256(PROMPTS[PROMPT_VERSION].encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)

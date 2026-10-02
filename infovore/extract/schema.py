@@ -4,6 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from infovore.extract.prompt import LIVE_PROMPT_VERSION
 from infovore.extract.protocol import ExtractedClaim
 from infovore.rows import ClaimKind, Novelty
 
@@ -173,7 +174,7 @@ def parse_extraction(
     payload: object,
     citable_refs: Mapping[str, int],
     related_claim_ids: set[int],
-    version: str = "v5",
+    version: str = LIVE_PROMPT_VERSION,
 ) -> tuple[ExtractedClaim, ...]:
     data = _coerce_payload(payload)
     model = output_model_for(version)

@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from infovore.extract.protocol import ExtractedClaim
 from infovore.extract.schema import (
+    OUTPUT_MODELS,
     ClaimOut,
     ExtractionOut,
     InvalidExtractionError,
@@ -262,7 +263,9 @@ def test_first_json_object_never_raises_anything_but_invalid_extraction_error(
 
 def test_parse_extraction_returns_extracted_claims() -> None:
     payload = {"claims": [_claim()]}
-    result = parse_extraction(payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set())
+    result = parse_extraction(
+        payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set(), version="v5"
+    )
     assert result == (
         ExtractedClaim(
             statement="IRIX 6.5.30 requires the November 2006 overlay",
@@ -278,40 +281,50 @@ def test_parse_extraction_returns_extracted_claims() -> None:
 
 def test_parse_extraction_accepts_json_string_payload() -> None:
     payload = json.dumps({"claims": [_claim()]})
-    result = parse_extraction(payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set())
+    result = parse_extraction(
+        payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set(), version="v5"
+    )
     assert len(result) == 1
 
 
 def test_parse_extraction_rejects_non_json_string() -> None:
     with pytest.raises(InvalidExtractionError):
-        parse_extraction("not json {{{", citable_refs={}, related_claim_ids=set())
+        parse_extraction("not json {{{", citable_refs={}, related_claim_ids=set(), version="v5")
 
 
 def test_parse_extraction_rejects_structurally_invalid_payload() -> None:
     with pytest.raises(InvalidExtractionError):
-        parse_extraction({"bogus": True}, citable_refs={}, related_claim_ids=set())
+        parse_extraction({"bogus": True}, citable_refs={}, related_claim_ids=set(), version="v5")
 
 
 def test_parse_extraction_returns_empty_tuple_for_no_claims() -> None:
-    result = parse_extraction({"claims": []}, citable_refs={}, related_claim_ids=set())
+    result = parse_extraction(
+        {"claims": []}, citable_refs={}, related_claim_ids=set(), version="v5"
+    )
     assert result == ()
 
 
 def test_parse_extraction_rejects_uncitable_source_id() -> None:
     payload = {"claims": [_claim(sources=["m1", "m3"])]}
     with pytest.raises(InvalidExtractionError, match="m3"):
-        parse_extraction(payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set())
+        parse_extraction(
+            payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set(), version="v5"
+        )
 
 
 def test_parse_extraction_rejects_unrelated_supersedes() -> None:
     payload = {"claims": [_claim(supersedes=5)]}
     with pytest.raises(InvalidExtractionError, match="5"):
-        parse_extraction(payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set())
+        parse_extraction(
+            payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set(), version="v5"
+        )
 
 
 def test_parse_extraction_accepts_related_supersedes() -> None:
     payload = {"claims": [_claim(supersedes=5)]}
-    result = parse_extraction(payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids={5})
+    result = parse_extraction(
+        payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids={5}, version="v5"
+    )
     assert result[0].supersedes_claim_id == 5
 
 
@@ -323,7 +336,9 @@ def test_parse_extraction_reports_all_problems_across_claims() -> None:
         ]
     }
     with pytest.raises(InvalidExtractionError) as excinfo:
-        parse_extraction(payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set())
+        parse_extraction(
+            payload, citable_refs={"m1": 1, "m2": 2}, related_claim_ids=set(), version="v5"
+        )
     message = str(excinfo.value)
     assert "claim 0" in message
     assert "claim 1" in message
@@ -382,17 +397,42 @@ def test_claim_out_sources_are_strings_in_json_schema() -> None:
 def test_parse_extraction_maps_refs_to_snowflake_ids_exactly() -> None:
     snowflakes = {"m1": 706732704137478123, "m2": 706733682781847611}
     payload = json.loads(json.dumps({"claims": [_claim(sources=["m2", "m1"])]}))
-    result = parse_extraction(payload, citable_refs=snowflakes, related_claim_ids=set())
+    result = parse_extraction(
+        payload, citable_refs=snowflakes, related_claim_ids=set(), version="v5"
+    )
     assert result[0].source_message_ids == (706733682781847611, 706732704137478123)
 
 
 def test_parse_extraction_rejects_context_ref() -> None:
     payload = {"claims": [_claim(sources=["c1"])]}
     with pytest.raises(InvalidExtractionError, match="c1"):
-        parse_extraction(payload, citable_refs={"m1": 1}, related_claim_ids=set())
+        parse_extraction(payload, citable_refs={"m1": 1}, related_claim_ids=set(), version="v5")
 
 
 def test_parse_extraction_rejects_raw_message_id_as_ref() -> None:
     payload = {"claims": [_claim(sources=["1"])]}
     with pytest.raises(InvalidExtractionError, match="uncitable"):
-        parse_extraction(payload, citable_refs={"m1": 1}, related_claim_ids=set())
+        parse_extraction(payload, citable_refs={"m1": 1}, related_claim_ids=set(), version="v5")
+
+
+@pytest.mark.parametrize("version", sorted(OUTPUT_MODELS))
+def test_every_version_enforces_the_source_rules(version: str) -> None:
+    """The citation rules are not v5 trivia: `claim_sources` is how a claim
+    points back at its evidence. Pinning the parse tests above to v5 would
+    have quietly dropped this coverage for whichever version is live, so it
+    runs against all of them (issue #184)."""
+    claim = {
+        "statement": "IRIX 6.5.30 requires the November 2006 overlay",
+        "subject": "IRIX 6.5.30",
+        "kind": "fact",
+        "confidence": 0.9,
+        "sources": ["m9"],
+        "supersedes": None,
+    }
+    if version == "v5":
+        claim["probe_question"] = "What overlay does it require?"
+
+    with pytest.raises(InvalidExtractionError):
+        parse_extraction(
+            {"claims": [claim]}, citable_refs={"m1": 1}, related_claim_ids=set(), version=version
+        )

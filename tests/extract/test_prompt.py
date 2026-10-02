@@ -6,6 +6,7 @@ from pathlib import Path
 from infovore.extract.prompt import (
     PROMPT_SHA256,
     PROMPT_VERSION,
+    PROMPTS,
     SYSTEM_PROMPT,
     permalink,
     render_prompt,
@@ -100,6 +101,9 @@ def a_claim(claim_id: int = 5) -> ClaimRow:
     )
 
 
+LIVE_PROMPT = PROMPTS[PROMPT_VERSION]
+
+
 def a_request(
     messages: tuple[MessageRow, ...] | None = None,
     context_messages: tuple[MessageRow, ...] = (),
@@ -125,17 +129,17 @@ def test_permalink_formats_discord_url() -> None:
     assert permalink(1, 2, 3) == "https://discord.com/channels/1/2/3"
 
 
-def test_prompt_version_is_v3() -> None:
-    assert PROMPT_VERSION == "v5"
+def test_prompt_version_is_the_live_version() -> None:
+    assert PROMPT_VERSION == "v8"
 
 
-def test_prompt_sha256_matches_system_prompt() -> None:
-    assert hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest() == PROMPT_SHA256
+def test_prompt_sha256_matches_the_live_prompt() -> None:
+    assert hashlib.sha256(LIVE_PROMPT.encode("utf-8")).hexdigest() == PROMPT_SHA256
 
 
-def test_render_prompt_uses_system_prompt_and_version() -> None:
+def test_render_prompt_uses_the_live_prompt_and_version() -> None:
     rendered = render_prompt(a_request())
-    assert rendered.system == SYSTEM_PROMPT
+    assert rendered.system == LIVE_PROMPT
     assert rendered.version == PROMPT_VERSION
 
 
@@ -253,8 +257,8 @@ def test_render_prompt_snapshot() -> None:
         channel_name="hardware",
     )
     rendered = render_prompt(request)
-    assert rendered.system == SYSTEM_PROMPT
-    assert rendered.version == "v5"
+    assert rendered.system == LIVE_PROMPT
+    assert rendered.version == PROMPT_VERSION
     assert rendered.prompt == (
         "CHANNEL: hardware\n"
         "\n"
@@ -279,9 +283,11 @@ def test_render_prompt_snapshot() -> None:
     assert rendered.token_estimate == math.ceil(len(rendered.system + rendered.prompt) / 4)
 
 
-def test_readme_contains_system_prompt_verbatim() -> None:
+def test_readme_contains_the_live_prompt_verbatim() -> None:
+    """The README quotes the prompt that is actually running. Pinning v5's
+    text here would leave it documenting a prompt nothing uses."""
     readme = Path(__file__).resolve().parents[2] / "README.md"
-    assert SYSTEM_PROMPT in readme.read_text()
+    assert LIVE_PROMPT in readme.read_text(encoding="utf-8")
 
 
 def test_render_prompt_maps_exchange_refs_to_message_ids() -> None:
@@ -299,36 +305,50 @@ def test_render_prompt_context_refs_are_not_citable() -> None:
     assert rendered.refs == {"m1": 1, "m2": 2}
 
 
-def test_system_prompt_forbids_adding_specifics() -> None:
-    assert "Do not add specifics" in SYSTEM_PROMPT
-    assert "your own knowledge" in SYSTEM_PROMPT
+def test_the_live_prompt_forbids_adding_specifics() -> None:
+    assert "never add specifics" in LIVE_PROMPT
+    assert "your own knowledge" in LIVE_PROMPT
 
 
-def test_system_prompt_still_extracts_generously() -> None:
+def test_v5_extracted_generously_which_is_why_it_was_replaced() -> None:
+    """v5 delegated filtering to a probe that cost 73% of the budget to remove
+    7.8% of claims. Every version after it drops the instruction, so this
+    asserts v5's frozen text rather than the live prompt."""
     assert "Extract generously" in SYSTEM_PROMPT
+    assert "generously" not in LIVE_PROMPT.lower()
 
 
-def test_system_prompt_keeps_v2_framing_minimal() -> None:
-    assert SYSTEM_PROMPT.startswith(
+def test_the_live_prompt_keeps_the_framing_minimal() -> None:
+    assert LIVE_PROMPT.startswith(
         "You are reading an archived exchange from a hobbyist SGI/IRIX community."
     )
-    assert "general software" not in SYSTEM_PROMPT
+    assert "general software" not in LIVE_PROMPT
 
 
-def test_system_prompt_preserves_uncertainty() -> None:
-    assert "reportedly" in SYSTEM_PROMPT
-    assert "lower the confidence" in SYSTEM_PROMPT
+def test_the_live_prompt_preserves_uncertainty() -> None:
+    """v5 said "lower the confidence"; v7 rephrased it after v6 proved that
+    refusing anything hedged also refuses facts. The rule survives, the
+    wording does not."""
+    assert "reportedly" in LIVE_PROMPT
+    assert "uncertainty carried in confidence" in LIVE_PROMPT
 
 
-def test_system_prompt_protects_private_individuals() -> None:
-    assert "member-A" in SYSTEM_PROMPT
-    assert "a community member" in SYSTEM_PROMPT
-    assert "Businesses and resellers may be named" in SYSTEM_PROMPT
+def test_the_live_prompt_protects_private_individuals() -> None:
+    """v5's "say a community member instead" became a sentence template the
+    model used in 48.7% of statements (RULE #304), so the live prompt must
+    NOT carry that phrasing while still forbidding named individuals."""
+    assert "member-A" in LIVE_PROMPT
+    assert "must never be named" in LIVE_PROMPT
+    assert "a community member" not in LIVE_PROMPT
+    assert "Businesses and resellers may be named" in LIVE_PROMPT
 
 
-def test_system_prompt_keeps_market_history_in_scope() -> None:
-    assert "prices" in SYSTEM_PROMPT
-    assert "sales" in SYSTEM_PROMPT
+def test_the_live_prompt_keeps_market_history_in_scope() -> None:
+    """v5 listed "prices" and "sales"; v8 says "what a model sold for and
+    when" and "a price needs its date". Same scope, different words, which is
+    why asserting the literal fragments would have read as a scope loss."""
+    assert "what a model sold for and when" in LIVE_PROMPT
+    assert "a price needs its date" in LIVE_PROMPT
 
 
 def test_render_prompt_replaces_author_names_with_stable_pseudonyms() -> None:
