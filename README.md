@@ -179,6 +179,7 @@ uv run infovore triage [--report]
 uv run infovore triage --train
 uv run infovore triage --recommend-threshold [--min-recall R]
 uv run infovore triage --signal-report
+uv run infovore triage --compare-scorers V1,V2 [--compare-mode trial|live]
 uv run infovore triage --suggest-terms [--min-support N] [--max-corpus-df F]
 uv run infovore triage --fit-weights --out PATH [--force]
 uv run infovore extract [--mode trial|live] [--sample N] [--seed S] [--exchange-id ID ...] [--order chronological|best]
