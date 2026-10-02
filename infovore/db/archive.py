@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from infovore.db.channel_filter import exclude_channels_clause
+from infovore.db.exchange_search import SHAREABLE_MESSAGE
 from infovore.db.fts import TOKENIZE
-from infovore.privacy.optout import REDACTED_CONTENT
 from infovore.triage.gate import gate_sql
 
 _SCHEMA = f"""
@@ -96,10 +96,9 @@ def _write(
         " JOIN exchange_messages em ON em.exchange_id = e.id"
         " JOIN messages m ON m.id = em.message_id"
         f" WHERE {gate_clause}{excl_clause}"
-        "   AND m.author_id NOT IN (SELECT user_id FROM opt_outs)"
-        "   AND m.content != ? AND m.deleted_at IS NULL"
+        f"   AND {SHAREABLE_MESSAGE}"
         " ORDER BY em.exchange_id, em.position",
-        (*gate_params, *excl_params, REDACTED_CONTENT),
+        (*gate_params, *excl_params),
     ).fetchall()
     exchange_ids = sorted({row[1] for row in rows})
     for start in range(0, len(exchange_ids), 500):

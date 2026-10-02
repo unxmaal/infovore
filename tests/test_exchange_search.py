@@ -225,6 +225,23 @@ def test_export_keeps_only_gated_non_opted_out_content(tmp_path: Path) -> None:
     assert b"opted out words" not in blob and b"rejected exchange" not in blob
 
 
+def test_search_and_export_agree_on_which_messages_are_visible(tmp_path: Path) -> None:
+    a = Archive(tmp_path)
+    a.exchange([(1, "Octane keep me"), (1, "Octane deleted words"), (1, "[redacted]")])
+    a.conn.execute("UPDATE messages SET deleted_at = 'x' WHERE content = 'Octane deleted words'")
+    a.conn.commit()
+    dest = tmp_path / "agree.db"
+    run(["export-archive", str(dest)], environment(tmp_path))
+    exported = {r[0] for r in sqlite3.connect(dest).execute("SELECT content FROM messages")}
+
+    _, octane, _ = run(["search", "--exchanges", "Octane"], environment(tmp_path))
+    _, redacted, _ = run(["search", "--exchanges", "redacted"], environment(tmp_path))
+
+    assert exported == {"Octane keep me"}
+    assert "deleted words" not in octane and "keep me" in octane
+    assert "no exchanges" in redacted
+
+
 def test_export_refuses_to_overwrite_without_force(tmp_path: Path) -> None:
     a = Archive(tmp_path)
     a.exchange([(1, "Octane")])

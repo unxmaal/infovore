@@ -3,11 +3,15 @@ from dataclasses import dataclass
 
 from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.messages_fts import DEFAULT_SEARCH_LIMIT, as_fts_query
+from infovore.privacy.optout import REDACTED_CONTENT
 from infovore.triage.gate import gate_sql
 
 SNIPPETS_PER_EXCHANGE = 2
 SNIPPET_CHARS = 200
 _NOT_OPTED_OUT = "m.author_id NOT IN (SELECT user_id FROM opt_outs)"
+SHAREABLE_MESSAGE = (
+    f"{_NOT_OPTED_OUT} AND m.deleted_at IS NULL AND m.content != '{REDACTED_CONTENT}'"
+)
 
 
 @dataclass(frozen=True)
@@ -55,7 +59,7 @@ def search_exchanges(
         " JOIN messages m ON m.id = f.rowid"
         " JOIN exchange_messages em ON em.message_id = m.id"
         " JOIN exchanges e ON e.id = em.exchange_id"
-        f" WHERE {_NOT_OPTED_OUT}{excl_clause}"
+        f" WHERE {SHAREABLE_MESSAGE}{excl_clause}"
         " ORDER BY f.score, m.id",
         (*gate_params, match, *excl_params),
     ).fetchall()
