@@ -243,6 +243,10 @@ def test_cli_train_human_refuses_then_trains(tmp_path: Path) -> None:
 
     code, _, err = run(["triage", "--train-human"], env)
     assert code != 0
+    assert "--human-limit N or --all-exchanges" in err
+
+    code, _, err = run(["triage", "--train-human", "--all-exchanges"], env)
+    assert code != 0
     assert "need at least 200" in err
 
     code, out, _ = run(["triage", "--human-report", "--min-per-class", "30"], env)

@@ -311,6 +311,7 @@ class TriageCommand:
             "--min-per-class", type=int, default=MIN_PER_CLASS, dest="min_per_class"
         )
         parser.add_argument("--human-limit", type=int, default=None, dest="human_limit")
+        parser.add_argument("--all-exchanges", action="store_true", dest="all_exchanges")
         parser.add_argument(
             "--recommend-threshold", action="store_true", dest="recommend_threshold"
         )
@@ -425,6 +426,8 @@ class TriageCommand:
     def _human(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
 
+        if args.train_human and args.human_limit is None and not args.all_exchanges:
+            raise ConfigError("--train-human needs --human-limit N or --all-exchanges")
         try:
             fit = fit_human(context.conn, context.settings.triage_rules, args.min_per_class)
         except InsufficientHumanLabelsError as error:
