@@ -250,7 +250,7 @@ def test_the_uncertain_queue_is_closest_to_a_coin_flip_first(conn: sqlite3.Conne
     queue = uncertain_queue(3, 0.0, frozenset())(conn)
 
     assert [i.exchange_id for i in queue] == [3, 2, 1, 5]
-    assert [i.position for i in queue] == [1, 2, 3, 4]
+    assert [i.position for i in queue] == [3, 2, 1, 5]
 
 
 def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
@@ -265,6 +265,20 @@ def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
     assert [i.exchange_id for i in build(conn)] == [2]
     assert uncertain_judged(conn) == 1
     assert uncertain_queue(3, 0.0, frozenset({"hardware"}))(conn) == []
+
+
+def test_judging_in_the_uncertain_queue_never_marks_a_different_exchange_judged(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
+    build = uncertain_queue(3, 0.0, frozenset())
+    first = build(conn)
+    submit(conn, first, 0, first[0].exchange_id, RELEVANT, AT)
+
+    after = build(conn)
+    assert [i.exchange_id for i in after] == [2, 3]
+    assert progress(conn, after) == (0, 2)
+    assert first_unjudged(conn, after) == 0
 
 
 def test_a_missing_channel_falls_back_to_its_id(tmp_path: Path) -> None:

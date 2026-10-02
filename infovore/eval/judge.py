@@ -110,7 +110,8 @@ def uncertain_queue(
     max_retries: int, min_p_lore: float, exclude_channels: frozenset[str]
 ) -> QueueBuilder:
     """Unjudged exchanges extraction could still claim, the ones the scorer is
-    least sure about first (uncertainty sampling)."""
+    least sure about first (uncertainty sampling). The ref is the exchange id,
+    since a rank shifts as items are judged and would alias another exchange."""
 
     def build(conn: sqlite3.Connection) -> list[QueueItem]:
         condition, params = claimable_condition(max_retries, None, min_p_lore, exclude_channels)
@@ -121,7 +122,7 @@ def uncertain_queue(
             " ORDER BY ABS(p_lore - 0.5), id LIMIT ?",
             (*params, JUDGE_SCORER, UNCERTAIN_LIMIT),
         ).fetchall()
-        return [QueueItem(row["id"], UNCERTAIN, n) for n, row in enumerate(rows, start=1)]
+        return [QueueItem(row["id"], UNCERTAIN, row["id"]) for row in rows]
 
     return build
 
