@@ -176,7 +176,9 @@ def compare_scorers(
         for row in credible
     ]
     wanted = {candidate.exchange_id for candidate in candidates}
-    arms: dict[str, dict[int, float]] = {}
+    arms: dict[str, dict[int, float]] = {
+        LIVE_ORDER: live_order_scores(conn, sorted(wanted)),
+    }
     unscored: dict[int, int] = {}
     for version in versions:
         scores = scores_from_annotations(conn, scorer, version)
@@ -324,3 +326,36 @@ def candidates_for(
         for row in rows
         if row["input_tokens"] >= min_input_tokens
     ]
+
+
+LIVE_ORDER = "the live ORDER BY"
+
+
+def live_order_scores(conn: sqlite3.Connection, exchange_ids: Sequence[int]) -> dict[int, float]:
+    """The ordering `claimable_exchanges(order=BEST)` actually selects with,
+    expressed as scores so it can be ranked alongside a single scorer.
+
+    Ranking by `p_lore` alone does NOT measure the live gate and understates
+    it: the real key is `p_lore IS NULL, p_lore DESC, triage_score DESC,
+    started_at, id`, so ties in the saturated region are already broken by
+    `triage_score` and then chronologically. Measuring `p_lore` alone and
+    calling it the gate is the gauntlet's "the label is not the run"."""
+    ids = list(exchange_ids)
+    if not ids:
+        return {}
+    rows = conn.execute(
+        f"SELECT id, p_lore, triage_score, started_at FROM exchanges"
+        f" WHERE id IN ({','.join('?' * len(ids))})",
+        ids,
+    ).fetchall()
+    ordered = sorted(
+        rows,
+        key=lambda row: (
+            row["p_lore"] is None,
+            -(row["p_lore"] or 0.0),
+            -(row["triage_score"] or 0.0),
+            row["started_at"],
+            row["id"],
+        ),
+    )
+    return {row["id"]: float(len(ordered) - position) for position, row in enumerate(ordered)}
