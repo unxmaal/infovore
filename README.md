@@ -40,6 +40,8 @@ The product is a SQLite file (see "Consuming the database"). Nothing talks to in
 - **Import boundaries** (enforced by ruff `banned-api`): `discord` only in `source/live.py`; process spawning only in `llm/claude_cli.py`; `openai`/`httpx2` only in `llm/openai_compat.py`.
 - **One writer.** SQLite runs in WAL mode; the whole pipeline runs on the host that holds the file, and readers open it read-only. LLM backends may be remote.
 
+`infovore search` queries `messages_fts` over the raw corpus rather than over extracted claims, so a fact the extractor missed is findable and re-extractable instead of lost. `--context N` shows the N messages either side of a hit in its **channel**, not its exchange, because 54% of messages belong to no exchange the gate ever admitted and those are the ones the index exists to reach.
+
 ## Data model
 
 All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migrations in `infovore/db/migrations/` are applied in order and recorded in `schema_migrations`; `PRAGMA user_version` is the latest applied migration.
@@ -167,6 +169,7 @@ Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, e
 
 ```
 uv run infovore status
+uv run infovore search TERMS... [--limit N] [--context N]
 uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
 uv run infovore triage [--report]
