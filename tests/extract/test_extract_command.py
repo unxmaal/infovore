@@ -24,7 +24,6 @@ VALID_EXTRACTION_OUT = {
             "subject": "Octane2",
             "kind": "fact",
             "confidence": 0.9,
-            "probe_question": "what does the octane2 need on its board?",
             "sources": ["m1"],
             "supersedes": None,
         }
@@ -877,10 +876,11 @@ def test_compare_prompt_reports_both_arms(tmp_path: Path) -> None:
     )
 
     assert code == int(ExitCode.OK)
-    assert (dump / "v5.jsonl").exists()
+    # The baseline arm is whatever is live, not a fixed "v5".
+    assert (dump / f"{PROMPT_VERSION}.jsonl").exists()
     assert (dump / "v6.jsonl").exists()
     assert "prompt comparison over 1 already-extracted exchanges" in out
-    assert "v5" in out
+    assert PROMPT_VERSION in out
     assert "v6" in out
     assert _claim_count(env["INFOVORE_DB_PATH"]) == claims_before
 
