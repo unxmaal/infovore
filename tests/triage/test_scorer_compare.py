@@ -460,3 +460,67 @@ def test_at_the_full_budget_every_ordering_recovers_everything() -> None:
     )
 
     assert [iv.point for iv in intervals] == [0.0]
+
+
+def test_the_live_order_breaks_p_lore_ties_by_triage_score_then_time() -> None:
+    """Ranking by p_lore alone is NOT the live gate and understates it. The
+    real key is `p_lore IS NULL, p_lore DESC, triage_score DESC, started_at,
+    id`, so saturated ties are already broken (PR #186 measured p_lore alone
+    and drew the wrong conclusion from it)."""
+    import tempfile
+
+    from infovore.db.connection import migrate, open_database
+    from infovore.triage.scorer_compare import live_order_scores
+
+    with tempfile.TemporaryDirectory() as directory:
+        conn = open_database(Path(directory) / "x.db")
+        migrate(conn)
+        conn.execute(
+            "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+            " VALUES (1, 1, NULL, 'c', 'text')"
+        )
+        # Three exchanges tied on p_lore: the saturated case.
+        for exchange_id, triage_score, day in ((1, 0.1, "03"), (2, 0.9, "02"), (3, 0.1, "01")):
+            conn.execute(
+                "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
+                " started_at, ended_at, message_count, grouping_rule, content_hash, p_lore,"
+                " triage_score) VALUES (?, 1, 1, 1, ?, ?, 1, 'quiet_gap', ?, 1.0, ?)",
+                (
+                    exchange_id,
+                    f"2026-01-{day}T00:00:00+00:00",
+                    f"2026-01-{day}T00:00:00+00:00",
+                    f"h{exchange_id}",
+                    triage_score,
+                ),
+            )
+
+        scores = live_order_scores(conn, [1, 2, 3])
+
+    # 2 first on triage_score; then 3 before 1 because it is older.
+    assert sorted(scores, key=lambda i: -scores[i]) == [2, 3, 1]
+
+
+def test_an_empty_population_has_no_live_order() -> None:
+    import tempfile
+
+    from infovore.db.connection import migrate, open_database
+    from infovore.triage.scorer_compare import live_order_scores
+
+    with tempfile.TemporaryDirectory() as directory:
+        conn = open_database(Path(directory) / "x.db")
+        migrate(conn)
+        assert live_order_scores(conn, []) == {}
+
+
+def test_the_comparison_always_includes_the_live_order_arm(conn: sqlite3.Connection) -> None:
+    """Every comparison must show what production actually does, or an arm
+    gets judged against a gate that is not the one running."""
+    from infovore.triage.scorer_compare import LIVE_ORDER
+
+    _outcome(conn, 1, claims=5, tokens=1000)
+    _outcome(conn, 2, claims=0, tokens=1000)
+    shadow_score(conn, 3, DEFAULT_RULES, [1, 2], AT)
+
+    labels = [p.label for p in compare_scorers(conn, "trial", [3]).report.points]
+
+    assert LIVE_ORDER in labels
