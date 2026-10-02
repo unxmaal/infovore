@@ -188,6 +188,8 @@ uv run infovore triage --signal-report
 uv run infovore triage --compare-scorers V1,V2 [--compare-mode trial|live]
 uv run infovore triage --suggest-terms [--min-support N] [--max-corpus-df F]
 uv run infovore triage --fit-weights --out PATH [--force]
+uv run infovore triage --human-report [--min-per-class N]   # held-out precision/recall, or labels still needed
+uv run infovore triage --train-human [--min-per-class N] [--human-limit N]   # human_exchange labels only; writes derived p_relevant_human annotations, not activated
 uv run infovore extract [--mode trial|live] [--sample N] [--seed S] [--exchange-id ID ...] [--order chronological|best]
                         [--min-score F] [--max-score F]
                         [--strategy stratified|random|uncertain|mixed] [--mix FRACTION]

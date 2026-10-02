@@ -7,6 +7,13 @@ from typing import TYPE_CHECKING
 from infovore.config import ConfigError
 from infovore.triage.bayes import Metrics
 from infovore.triage.gain_curve import compute_gain_curve, format_gain_report
+from infovore.triage.human import (
+    MIN_PER_CLASS,
+    SCORER,
+    InsufficientHumanLabelsError,
+    fit_human,
+    score_human,
+)
 from infovore.triage.report import TriageStats, compute_triage_stats
 from infovore.triage.runner import (
     TriageEvent,
@@ -298,6 +305,12 @@ class TriageCommand:
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("--report", action="store_true")
         parser.add_argument("--train", action="store_true")
+        parser.add_argument("--human-report", action="store_true", dest="human_report")
+        parser.add_argument("--train-human", action="store_true", dest="train_human")
+        parser.add_argument(
+            "--min-per-class", type=int, default=MIN_PER_CLASS, dest="min_per_class"
+        )
+        parser.add_argument("--human-limit", type=int, default=None, dest="human_limit")
         parser.add_argument(
             "--recommend-threshold", action="store_true", dest="recommend_threshold"
         )
@@ -337,6 +350,8 @@ class TriageCommand:
             return self._recommend(context, args)
         if args.train:
             return self._train(context)
+        if args.human_report or args.train_human:
+            return self._human(context, args)
         if args.signal_report:
             return self._signal_report(context)
         if args.gain_curve:
@@ -405,6 +420,37 @@ class TriageCommand:
             workers=context.settings.workers,
         )
         context.stdout.write(f"scored {scored} exchanges with p_lore\n")
+        return ExitCode.OK
+
+    def _human(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        try:
+            fit = fit_human(context.conn, context.settings.triage_rules, args.min_per_class)
+        except InsufficientHumanLabelsError as error:
+            if args.train_human:
+                raise ConfigError(str(error)) from error
+            context.stdout.write(f"human model: {error}\n")
+            return ExitCode.OK
+        report = fit.report
+        auc_text = f"{report.auc:.3f}" if report.auc is not None else "n/a"
+        context.stdout.write(
+            f"human model: relevant={report.relevant} irrelevant={report.irrelevant}"
+            f" holdout_size={report.holdout_size} auc={auc_text}\n"
+        )
+        context.stdout.write(_render_metrics_table(report.metrics) + "\n")
+        if args.train_human:
+            version, written = score_human(
+                context.conn,
+                fit,
+                context.clock.now(),
+                context.settings.triage_rules,
+                args.human_limit,
+            )
+            context.stdout.write(
+                f"wrote {written} derived annotations as {SCORER} v{version}"
+                " (not activated; exchanges.p_lore unchanged)\n"
+            )
         return ExitCode.OK
 
     def _recommend(self, context: "AppContext", args: argparse.Namespace) -> int:

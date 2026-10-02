@@ -1,0 +1,38 @@
+# Deterministic SGI/IRIX gazetteer for the human-label model (infovore.triage.human).
+# [text]: a feature fires when any pattern matches the joined exchange text.
+# [message_share]: fires when over half the messages match. Case-insensitive.
+[text]
+models = [
+    '\b(?:indy|indigo2?|o2\+?|octane2?|origin(?:\s?\d{3,4})?|onyx[234]?|fuel|tezro|crimson|challenge|personal iris|4d(?:/\d+)?)\b',
+]
+irix_version = [
+    '\birix\s*[3-6]\.\d(?:\.\d+)?[mf]?\b',
+    '\b6\.5\.\d{1,2}[mf]?\b',
+]
+prom = [
+    '\b(?:prom|firmware|nvram|sash|ip\d{2}prom)\b',
+]
+part_number = [
+    '\b\d{3}-\d{4}-\d{3}\b',
+]
+error_shape = [
+    '\bcommand not found\b',
+    '\bno such file or directory\b',
+    '\bsegmentation fault\b|\bbus error\b|\bcore dumped\b|\bkernel panic\b',
+    '\bcannot (?:open|find|execute|load)\b',
+    '^\s*\w+: .*\b(?:error|failed|not found)\b',
+]
+tools = [
+    '\b(?:inst|swmgr|hinv|nekoware|mips|mipspro|gcc|gmake|fx|versions)\b',
+]
+
+[message_share]
+greeting = [
+    '^\W*(?:hi|hello|hey|yo|gm|sup|good (?:morning|night|evening)|welcome|thanks?|thx|ty)\W*$',
+]
+link_only = [
+    '^<?https?://\S+>?$',
+]
+meme = [
+    '^\W*(?:lol+|lmao+|kek+|based|cope|seethe|gg|poggers|this|same|mood|real)\W*$',
+]
