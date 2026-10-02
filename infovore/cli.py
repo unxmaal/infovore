@@ -315,12 +315,14 @@ def builtin_commands() -> list[Command]:
     from infovore.extract.novelty import ProbeCommand
     from infovore.extract.review import PromoteCommand, ReviewCommand
     from infovore.run import RunCommand
+    from infovore.search.command import SearchCommand
     from infovore.sift.command import SiftCommand
     from infovore.triage.command import TriageCommand
     from infovore.triage.label import LabelCommand
 
     return [
         StatusCommand(),
+        SearchCommand(),
         SyncOptOutsCommand(),
         ChunkCommand(),
         BackfillCommand(),
