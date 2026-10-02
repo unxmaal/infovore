@@ -733,3 +733,23 @@ def test_related_claims_can_exclude_one_exchanges_own_claims(tmp_path: Path) -> 
     assert set(everything) == {own.claim_ids[0], other.claim_ids[0]}
     excluded = [c.id for c in related_claims(conn, "Zeta widget", limit=10, exclude_exchange_id=1)]
     assert excluded == [other.claim_ids[0]]
+
+
+def test_unprobed_claims_skips_a_claim_with_no_probe_question(tmp_path: Path) -> None:
+    """v6+ claims have no probe_question, and the recall prompt IS the
+    probe_question, so selecting one sends an empty prompt to the model and
+    lets a junk verdict remove the claim from `lore` (#188). This guards the
+    manual `infovore probe` path now that the run loop no longer probes."""
+    from dataclasses import replace
+
+    conn = db(tmp_path)
+    setup_basic(conn)
+    with_question = record_run(conn, a_run(), [a_claim(statement="a", subject="s")])
+    without = record_run(
+        conn, a_run(), [replace(a_claim(statement="b", subject="s"), probe_question="")]
+    )
+
+    ids = {claim.id for claim in unprobed_claims(conn, limit=10)}
+
+    assert with_question.claim_ids[0] in ids
+    assert without.claim_ids[0] not in ids

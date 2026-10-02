@@ -11,9 +11,8 @@ from typing import TYPE_CHECKING
 
 from infovore.chunk.grouper import group_pending
 from infovore.config import Settings, Stage, resolve_guild_id
-from infovore.extract.llm_extractor import LLMClaimExtractor, LLMNoveltyProbe
-from infovore.extract.novelty import run_probe
-from infovore.extract.protocol import ClaimExtractor, NoveltyProbe
+from infovore.extract.llm_extractor import LLMClaimExtractor
+from infovore.extract.protocol import ClaimExtractor
 from infovore.extract.runner import PromptNotPromotedError, run_extraction
 from infovore.ingest.live import EventOutcome, handle_event
 from infovore.privacy.optout import sync_opt_outs
@@ -74,7 +73,6 @@ async def _run_cycle(
     conn: sqlite3.Connection,
     source: DiscordSource,
     extractor: ClaimExtractor,
-    probe: NoveltyProbe,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -121,17 +119,6 @@ async def _run_cycle(
             "live prompt version %s is not promoted; skipping extraction this cycle",
             error.version,
         )
-    probe_stage = settings.stages[Stage.PROBE]
-    progress(CycleStepStarted(step="probe"))
-    await run_probe(
-        conn,
-        probe,
-        clock,
-        sleeper,
-        probe_model=None,
-        limit=settings.batch_size,
-        concurrency=probe_stage.concurrency,
-    )
 
 
 async def _interruptible_wait(sleeper: Sleeper, seconds: float, stop: asyncio.Event) -> None:
@@ -150,7 +137,6 @@ async def _cycle_until_stop(
     conn: sqlite3.Connection,
     source: DiscordSource,
     extractor: ClaimExtractor,
-    probe: NoveltyProbe,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -161,7 +147,7 @@ async def _cycle_until_stop(
 ) -> None:
     while not stop.is_set():
         try:
-            await _run_cycle(conn, source, extractor, probe, clock, sleeper, settings, progress)
+            await _run_cycle(conn, source, extractor, clock, sleeper, settings, progress)
         except Exception:
             logger.exception("periodic cycle failed")
             report.cycles_failed += 1
@@ -176,7 +162,6 @@ async def run_once(
     conn: sqlite3.Connection,
     source: DiscordSource,
     extractor: ClaimExtractor,
-    probe: NoveltyProbe,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -184,7 +169,7 @@ async def run_once(
 ) -> RunReport:
     report = RunReport()
     try:
-        await _run_cycle(conn, source, extractor, probe, clock, sleeper, settings, progress)
+        await _run_cycle(conn, source, extractor, clock, sleeper, settings, progress)
     except Exception:
         logger.exception("periodic cycle failed")
         report.cycles_failed += 1
@@ -197,7 +182,6 @@ async def run_forever(
     conn: sqlite3.Connection,
     source: DiscordSource,
     extractor: ClaimExtractor,
-    probe: NoveltyProbe,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -217,7 +201,6 @@ async def run_forever(
             conn,
             source,
             extractor,
-            probe,
             clock,
             sleeper,
             settings,
@@ -252,7 +235,7 @@ def remove_stop_handlers(signals: Sequence[signal.Signals]) -> None:
 
 class RunCommand:
     name = "run"
-    help = "live ingest plus a periodic chunk/extract/probe loop, until SIGTERM/SIGINT"
+    help = "live ingest plus a periodic chunk/triage/extract loop, until SIGTERM/SIGINT"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("--interval", type=float, default=600.0)
@@ -261,11 +244,10 @@ class RunCommand:
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode, _say, stage_backend
 
+        # No probe in the loop: it was retired under #165, and v6+ claims carry
+        # no probe_question to probe with (#188).
         extract_backend = await stage_backend(context, Stage.EXTRACT)
-        probe_backend = await stage_backend(context, Stage.PROBE)
-        judge_backend = await stage_backend(context, Stage.JUDGE)
         extractor = LLMClaimExtractor(extract_backend)
-        probe = LLMNoveltyProbe(probe_backend, judge_backend)
 
         def report_progress(event: CycleStepStarted) -> None:
             _say(context.stdout, f"cycle: {event.step}")
@@ -280,7 +262,6 @@ class RunCommand:
                         context.conn,
                         source,
                         extractor,
-                        probe,
                         context.clock,
                         context.sleeper,
                         context.settings,
@@ -291,7 +272,6 @@ class RunCommand:
                         context.conn,
                         source,
                         extractor,
-                        probe,
                         context.clock,
                         context.sleeper,
                         context.settings,
