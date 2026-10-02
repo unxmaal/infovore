@@ -290,6 +290,7 @@ async def stage_backend(context: AppContext, stage: Stage) -> LLMBackend:
 
 class SnapshotCommand:
     name = "snapshot"
+    migrates = False
     help = "write a consistent copy of the database via the SQLite backup API"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
@@ -388,7 +389,9 @@ def main(
     settings.db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = open_database(settings.db_path)
     try:
-        migrate(conn)
+        command = next(command for command in available if command.name == args.command)
+        if getattr(command, "migrates", True):
+            migrate(conn)
         context = AppContext(
             settings,
             conn,
@@ -398,7 +401,6 @@ def main(
             stdout,
             source_factory if source_factory is not None else default_source_factory,
         )
-        command = next(command for command in available if command.name == args.command)
         return asyncio.run(command.run(context, args))
     except ConfigError as error:
         stderr.write(f"configuration error: {error}\n")
