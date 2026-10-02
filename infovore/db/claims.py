@@ -6,6 +6,7 @@ from datetime import datetime
 
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
+from infovore.db.fts import match_terms, quote
 from infovore.rows import (
     ClaimKind,
     ClaimRow,
@@ -409,17 +410,10 @@ def retract_claims_with_all_sources_opted_out(conn: sqlite3.Connection, at: date
 
 
 def _match_expression(text: str) -> str | None:
-    seen: set[str] = set()
-    tokens: list[str] = []
-    for raw in _WORD_RE.findall(text):
-        token = raw.rstrip("-./")
-        if not token or token in seen:
-            continue
-        seen.add(token)
-        tokens.append(token)
-    if not tokens:
+    terms = match_terms(_WORD_RE.findall(text))
+    if not terms:
         return None
-    return " OR ".join('"' + token.replace('"', '""') + '"' for token in tokens)
+    return " OR ".join(quote(term) for term in terms)
 
 
 def related_claims(

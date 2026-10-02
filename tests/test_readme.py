@@ -16,12 +16,22 @@ def section(title: str) -> str:
 def test_every_schema_object_is_documented_in_the_data_model_section(tmp_path: Path) -> None:
     conn = open_database(tmp_path / "x.db")
     migrate(conn)
+    # FTS5 creates four shadow tables per index (_data, _idx, _docsize,
+    # _config). Derive the prefixes from the virtual tables that exist rather
+    # than naming each index, or every new index needs this test edited.
+    fts_prefixes = tuple(
+        f"{row[0]}_"
+        for row in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND sql LIKE '%USING fts5%'"
+        )
+    )
     names = {
         row[0]
         for row in conn.execute(
             "SELECT name FROM sqlite_master WHERE type IN ('table', 'view')"
-            " AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'claims_fts_%'"
+            " AND name NOT LIKE 'sqlite_%'"
         )
+        if not row[0].startswith(fts_prefixes)
     }
     documented = section("Data model")
     missing = sorted(name for name in names if f"`{name}`" not in documented)
