@@ -197,7 +197,8 @@ def test_a_dynamic_queue_reports_judged_from_the_queue_after_it_shrinks(tmp_path
         "queue": LIKELY_IRRELEVANT,
         "judged": 1,
         "queued": 1,
-        "irrelevant_needed": 199,
+        "relevant_needed": 200,
+        "irrelevant_needed": 200,
         "target": 200,
     }
     assert status == 200

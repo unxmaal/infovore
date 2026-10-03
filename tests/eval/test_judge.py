@@ -430,7 +430,8 @@ def test_queue_stats_count_judged_from_the_queue_across_rebuilds(
         "queue": UNCERTAIN,
         "judged": 1,
         "queued": 2,
-        "irrelevant_needed": 199,
+        "relevant_needed": 200,
+        "irrelevant_needed": 200,
         "target": 200,
     }
     assert queue_stats(conn, "c1", after)["judged"] == 0

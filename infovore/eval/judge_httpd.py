@@ -47,7 +47,9 @@ class JudgeServer(ThreadingHTTPServer):
         page: str,
         build_queue: QueueBuilder,
         queue_name: str | None = None,
+        exclude_channels: frozenset[str] = frozenset(),
     ) -> None:
+        self.exclude_channels = exclude_channels
         self.build_queue = build_queue
         self.queue_name = queue_name
         self.conn = conn
@@ -61,7 +63,7 @@ def _progress(server: JudgeServer, queue: list[QueueItem]) -> dict[str, Any]:
     done, total = progress(server.conn, queue)
     out: dict[str, Any] = {"done": done, "total": total}
     if server.queue_name is not None:
-        out.update(queue_stats(server.conn, server.queue_name, queue))
+        out.update(queue_stats(server.conn, server.queue_name, queue, server.exclude_channels))
     return out
 
 
@@ -156,12 +158,15 @@ def start_all(
     clock: Clock,
     build_queue: QueueBuilder,
     queue_name: str | None = None,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> list[JudgeServer]:
     page = load_page()
     lock = threading.Lock()
     servers = []
     for host in hosts:
-        server = JudgeServer((host, port), conn, lock, clock, page, build_queue, queue_name)
+        server = JudgeServer(
+            (host, port), conn, lock, clock, page, build_queue, queue_name, exclude_channels
+        )
         threading.Thread(target=server.serve_forever, daemon=True, name=f"judge-{host}").start()
         servers.append(server)
     return servers
