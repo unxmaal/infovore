@@ -12,9 +12,11 @@ from infovore.triage.cascade import (
     PRECISION_TARGET,
     Outcome,
     decide_bayes,
+    decide_lexicon,
     stage_reports,
     tune_high,
 )
+from infovore.triage.lexicon import LexiconScore
 from tests.triage.test_command import environment, run
 from tests.triage.test_human import human, seed
 from tests.triage.test_lexicon import corpus
@@ -29,6 +31,12 @@ def test_tuning_takes_the_lowest_share_that_keeps_precision() -> None:
     assert tune_high([(0.2, False), (0.3, False)], 1.0) > 1.0
     assert tune_high([(0.0, True), (0.5, True)], 1.0) == 0.5
     assert PRECISION_TARGET > 0.9
+
+
+def test_the_lexicon_abstains_without_hits_and_decides_on_share() -> None:
+    assert decide_lexicon(LexiconScore(0.0, 0, 3), 0.3) is None
+    assert decide_lexicon(LexiconScore(0.2, 1, 5), 0.3) is None
+    assert decide_lexicon(LexiconScore(0.5, 2, 4), 0.3) == "relevant"
 
 
 def test_the_bayes_band_decides_only_far_from_a_coin_flip() -> None:
@@ -51,14 +59,15 @@ def test_stage_reports_count_decisions_confusion_and_residue() -> None:
         outcome(5, "residue", "residue"),
     ]
     labels = {1: Label.LORE, 2: Label.NOISE, 3: Label.LORE, 4: Label.NOISE}
-    lexicon, bayes, residue = stage_reports(outcomes, labels)
+    denylist, lexicon, bayes, residue = stage_reports(outcomes, labels)
 
     assert (lexicon.decided, lexicon.relevant, lexicon.irrelevant) == (4, 2, 2)
     assert (lexicon.tp, lexicon.fp, lexicon.fn, lexicon.tn) == (1, 1, 1, 1)
     assert (lexicon.labelled, lexicon.correct, lexicon.accuracy) == (4, 2, 0.5)
+    assert denylist.decided == 0 and denylist.accuracy is None
     assert bayes.decided == 0 and bayes.accuracy is None
     assert (residue.decided, residue.share) == (1, 0.2)
-    assert stage_reports([], {})[2].share == 0.0
+    assert stage_reports([], {})[3].share == 0.0
 
 
 def build(tmp_path: Path) -> tuple[dict[str, str], sqlite3.Connection]:
@@ -112,7 +121,8 @@ def test_the_cascade_reports_each_stage_per_slice(tmp_path: Path) -> None:
     assert "stage bayes: abstains on everything" in out
     assert "stage residue:" in out
     assert "accuracy=1.000" in out
-    assert "residue: n=1 share=0.200" in out
+    assert "irrelevant=0" in out
+    assert "residue: n=3 share=0.600" in out
     assert "lexicon v=lx-" in out
 
 
@@ -189,3 +199,60 @@ def test_mine_prints_candidates(tmp_path: Path) -> None:
         ["relevance", "mine", "--tech", "tech", "--off", "chat", "--min-count", "99"], env
     )
     assert "no candidates" in out
+
+
+def test_collisions_lists_lexicon_terms_common_off_topic(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    corpus(tmp_path / "infovore.db").close()
+
+    code, out, _ = run(
+        [
+            "relevance",
+            "collisions",
+            "--tech",
+            "tech",
+            "--off",
+            "chat",
+            "--max-off",
+            "1",
+            "--min-ratio",
+            "99",
+            "--terms",
+            "zorp,lunch",
+        ],
+        env,
+    )
+
+    assert code == ExitCode.OK
+    assert "zorp\t2\t1" in out
+    code, out, _ = run(
+        ["relevance", "collisions", "--tech", "tech", "--off", "chat", "--terms", "zorp"], env
+    )
+    assert "no collisions" in out
+    code, out, _ = run(["relevance", "collisions", "--tech", "tech", "--off", "chat"], env)
+    assert code == ExitCode.OK
+
+
+def test_the_denylist_decides_irrelevant_before_the_lexicon(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    for cid, name in ((1, "tech"), (2, "food")):
+        conn.execute(
+            "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+            " VALUES (?, 9, NULL, ?, 'text')",
+            (cid, name),
+        )
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id IN (2, 4)")
+    conn.commit()
+    conn.close()
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+
+    code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
+
+    assert code == ExitCode.OK
+    assert "stage denylist: decided=2 relevant=0 irrelevant=2 labelled=2" in out
+    assert "accuracy=0.500" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    row = annotation_history(conn, "exchange", 2, "relevance_denylist")[0]
+    assert (row["label"], row["reproducibility"]) == ("irrelevant", "derived")
+    assert annotation_history(conn, "exchange", 2, "relevance_lexicon") == []
+    assert annotation_history(conn, "exchange", 3, "relevance_denylist") == []

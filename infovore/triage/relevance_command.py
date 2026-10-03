@@ -16,10 +16,13 @@ from infovore.triage.cascade import (
 )
 from infovore.triage.human import held_out_ids, training_labels
 from infovore.triage.lexicon import (
+    MAX_OFF,
     MIN_COUNT,
+    MIN_RATIO,
     MINE_LIMIT,
     OFF_CHANNELS,
     TECH_CHANNELS,
+    collisions,
     load_lexicon,
     message_hits,
     mine_terms,
@@ -47,10 +50,18 @@ class RelevanceCommand:
         mine.add_argument("--off", default=",".join(OFF_CHANNELS))
         mine.add_argument("--min-count", type=int, default=MIN_COUNT, dest="min_count")
         mine.add_argument("--limit", type=int, default=MINE_LIMIT)
+        clash = sub.add_parser("collisions", help="lexicon terms common in off-topic channels")
+        clash.add_argument("--tech", default=",".join(TECH_CHANNELS))
+        clash.add_argument("--off", default=",".join(OFF_CHANNELS))
+        clash.add_argument("--max-off", type=int, default=MAX_OFF, dest="max_off")
+        clash.add_argument("--min-ratio", type=float, default=MIN_RATIO, dest="min_ratio")
+        clash.add_argument("--terms", default=None, help="comma-separated; default: the lexicon")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.relevance_action == "mine":
             return self._mine(context, args)
+        if args.relevance_action == "collisions":
+            return self._collisions(context, args)
         if args.explain is not None:
             return self._explain(context, args.explain)
         return self._cascade(context, args)
@@ -70,6 +81,24 @@ class RelevanceCommand:
             context.stdout.write("no candidates\n")
         for m in mined:
             context.stdout.write(f"{m.term}\t{m.tech}\t{m.off}\t{m.log_odds:.2f}\n")
+        return int(ExitCode.OK)
+
+    def _collisions(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        terms = args.terms.split(",") if args.terms else sorted(load_lexicon().terms)
+        found = collisions(
+            context.conn,
+            terms,
+            args.tech.split(","),
+            args.off.split(","),
+            args.max_off,
+            args.min_ratio,
+        )
+        if not found:
+            context.stdout.write("no collisions\n")
+        for c in found:
+            context.stdout.write(f"{c.term}\t{c.tech}\t{c.off}\n")
         return int(ExitCode.OK)
 
     def _explain(self, context: "AppContext", exchange_id: int) -> int:
@@ -101,8 +130,9 @@ class RelevanceCommand:
         if unknown:
             raise ConfigError(f"unknown slice(s): {', '.join(unknown)}")
         lexicon = load_lexicon()
-        t_high = tune_high(tuning_samples(conn, lexicon))
-        fit, why = try_fit(conn)
+        exclude = context.settings.exclude_channels
+        t_high = tune_high(tuning_samples(conn, lexicon, exclude))
+        fit, why = try_fit(conn, exclude)
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
         context.stdout.write(
@@ -115,14 +145,14 @@ class RelevanceCommand:
             if name == BUILD:
                 ids = [i for i in ids if i not in held]
             everything.update(ids)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, fit)
+            outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
             kind = "tuning, held-out excluded" if name == BUILD else "held-out"
             context.stdout.write(f"slice {name} ({kind}): n={len(ids)}\n")
             for report in stage_reports(outcomes, labels):
                 context.stdout.write(self._line(report, fit is None, why))
         if args.write:
             ids = sorted(everything)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, fit)
+            outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
             versions = write_outcomes(conn, outcomes, lexicon, t_high, fit, context.clock.now())
             written = ", ".join(f"{SCORERS[s]} v{v}" for s, v in versions.items())
             context.stdout.write(f"wrote {len(ids)} exchanges: {written}\n")

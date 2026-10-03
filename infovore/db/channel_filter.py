@@ -53,6 +53,17 @@ def include_channels_clause(
     return f" AND EXISTS ({inner})", params
 
 
+def excluded_exchange_ids(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str]
+) -> frozenset[int]:
+    """Ids of exchanges whose channel (or thread parent) is in `exclude_channels`."""
+    if not exclude_channels:
+        return frozenset()
+    clause, params = include_channels_clause("e.channel_id", exclude_channels)
+    rows = conn.execute("SELECT e.id FROM exchanges e WHERE 1 = 1" + clause, params)
+    return frozenset(row[0] for row in rows)
+
+
 def known_channel_names(conn: sqlite3.Connection) -> frozenset[str]:
     """Every distinct channel name (lowercased) in the `channels` table —
     what a `--channels`/`INFOVORE_EXCLUDE_CHANNELS` name is validated

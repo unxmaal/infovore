@@ -604,3 +604,26 @@ def test_claimable_exchanges_best_order_respects_limit(conn: sqlite3.Connection)
         conn, limit=2, max_retries=3, min_score=0.3, min_p_lore=0.5, order=ExchangeOrder.BEST
     )
     assert [row.id for row in result] == [late_best, mid_high]
+
+
+def test_excluded_exchange_ids_cover_threads_and_an_empty_set(tmp_path: Path) -> None:
+    from infovore.db.channel_filter import excluded_exchange_ids
+
+    conn = open_database(tmp_path / "x.db")
+    migrate(conn)
+    for cid, name, parent in ((1, "tech", None), (2, "food", None), (3, "recipes", 2)):
+        conn.execute(
+            "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+            " VALUES (?, 9, ?, ?, 'text')",
+            (cid, parent, name),
+        )
+    for eid, cid in ((1, 1), (2, 2), (3, 3)):
+        conn.execute(
+            "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
+            " ended_at, message_count, grouping_rule, content_hash)"
+            " VALUES (?, ?, 1, 1, 't', 't', 1, 'quiet_gap', ?)",
+            (eid, cid, f"h{eid}"),
+        )
+
+    assert excluded_exchange_ids(conn, frozenset({"food"})) == {2, 3}
+    assert excluded_exchange_ids(conn, frozenset()) == frozenset()

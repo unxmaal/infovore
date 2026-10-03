@@ -7,6 +7,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.triage.human import load_gazetteer
 from infovore.triage.lexicon import (
     LexiconError,
+    collisions,
     load_lexicon,
     message_hits,
     mine_terms,
@@ -96,3 +97,15 @@ def test_mining_ranks_terms_by_log_odds_between_the_channel_sets(tmp_path: Path)
     assert (mined[0].tech, mined[0].off) == (2, 1)
     assert mined[0].log_odds > 0
     assert len(mine_terms(corpus(tmp_path / "n.db"), ["tech"], ["chat"], min_count=1, limit=1)) == 1
+
+
+def test_collisions_flag_terms_common_off_topic_without_enrichment(tmp_path: Path) -> None:
+    conn = corpus(tmp_path / "c.db")
+    found = collisions(
+        conn, ["zorp", "lunch", "absent"], ["tech"], ["chat"], max_off=1, min_ratio=3.0
+    )
+
+    assert [(c.term, c.tech, c.off) for c in found] == [("lunch", 0, 2), ("zorp", 2, 1)]
+    assert collisions(conn, ["zorp"], ["tech"], ["chat"], max_off=2, min_ratio=1.0) == []
+    assert collisions(conn, ["zorp"], ["tech"], ["chat"], max_off=1, min_ratio=1.1) == []
+    assert collisions(conn, ["zorps"], ["tech"], ["chat"], max_off=1, min_ratio=1.0) == []

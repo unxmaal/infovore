@@ -39,6 +39,8 @@ OFF_CHANNELS: Final = (
 )
 MIN_COUNT: Final = 30
 MINE_LIMIT: Final = 400
+MAX_OFF: Final = 10
+MIN_RATIO: Final = 10.0
 _WORD: Final = re.compile(r"[a-z][a-z0-9+#-]{2,}")
 
 
@@ -150,6 +152,48 @@ def _document_frequency(
         total += 1
         counts.update(set(_WORD.findall(row["content"].lower())))
     return counts, total
+
+
+@dataclass(frozen=True)
+class Collision:
+    term: str
+    tech: int
+    off: int
+
+
+def _term_frequency(conn: sqlite3.Connection, channels: Sequence[str]) -> tuple[Counter[str], int]:
+    marks = ", ".join("?" for _ in channels)
+    counts: Counter[str] = Counter()
+    total = 0
+    for row in conn.execute(
+        f"SELECT m.content FROM messages m JOIN channels c ON c.id = m.channel_id"
+        f" WHERE c.name IN ({marks})",
+        tuple(channels),
+    ):
+        total += 1
+        found = words(row["content"])
+        counts.update(found | {t[:-1] for t in found if t.endswith("s")})
+    return counts, total
+
+
+def collisions(
+    conn: sqlite3.Connection,
+    terms: Sequence[str],
+    tech_channels: Sequence[str],
+    off_channels: Sequence[str],
+    max_off: int = MAX_OFF,
+    min_ratio: float = MIN_RATIO,
+) -> list[Collision]:
+    tech, tech_total = _term_frequency(conn, tech_channels)
+    off, off_total = _term_frequency(conn, off_channels)
+    found = []
+    for term in sorted(set(terms)):
+        if off[term] < max_off:
+            continue
+        ratio = (tech[term] / tech_total) / (off[term] / off_total)
+        if ratio < min_ratio:
+            found.append(Collision(term, tech[term], off[term]))
+    return found
 
 
 def mine_terms(

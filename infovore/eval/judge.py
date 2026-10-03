@@ -5,7 +5,7 @@ from datetime import datetime
 
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
-from infovore.db.channel_filter import exclude_channels_clause
+from infovore.db.channel_filter import exclude_channels_clause, excluded_exchange_ids
 from infovore.db.exchanges import claimable_condition, exchange_message_ids, get_exchange
 from infovore.db.raw import get_channel, messages_by_ids
 from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, HOLDOUT, REJECTED, slice_ids
@@ -348,20 +348,24 @@ def uncertain_judged(conn: sqlite3.Connection) -> int:
     return sum(1 for ref in _judged_refs(conn) if ref.startswith(f"{_REF}{UNCERTAIN}:"))
 
 
-def label_counts(conn: sqlite3.Connection) -> dict[str, int]:
+def label_counts(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+) -> dict[str, int]:
     """Exchanges per label, newest judgment wins, repeats excluded so the
     repeated exchanges are not double-weighted."""
     counts = dict.fromkeys(LABELS, 0)
     repeats = f"{_REF}{GOLD_REPEATS}:%"
+    denied = excluded_exchange_ids(conn, exclude_channels)
     for row in conn.execute(
-        "SELECT label, COUNT(*) AS n FROM annotations a WHERE scorer = ?"
+        "SELECT label, subject_id FROM annotations a WHERE scorer = ?"
         " AND subject_kind = 'exchange' AND source_ref NOT LIKE ?"
         " AND id = (SELECT MAX(id) FROM annotations WHERE scorer = a.scorer"
         " AND subject_kind = 'exchange' AND subject_id = a.subject_id"
-        " AND source_ref NOT LIKE ?) GROUP BY label",
+        " AND source_ref NOT LIKE ?)",
         (JUDGE_SCORER, repeats, repeats),
     ):
-        counts[row["label"]] = row["n"]
+        if row["subject_id"] not in denied:
+            counts[row["label"]] += 1
     return counts
 
 

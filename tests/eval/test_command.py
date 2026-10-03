@@ -100,6 +100,7 @@ def test_report_before_any_judging(tmp_path: Path) -> None:
     assert "slice gold-repeats: 0 of 5 judged" in out
     assert "uncertain: 0 judged" in out
     assert "self-agreement: n/a" in out
+    assert "usable relevant: 0" in out
     assert "needed: 200 more relevant to reach 200" in out
     assert "needed: 200 more irrelevant to reach 200" in out
 

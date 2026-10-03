@@ -401,6 +401,21 @@ def test_the_page_states_the_labelling_definition() -> None:
     assert JUDGE_INTERFACE_VERSION == 3
 
 
+def test_usable_label_counts_skip_excluded_channels(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (2, 9, NULL, 'food', 'text')"
+    )
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 4")
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, next(i for i, q in enumerate(queue) if q.exchange_id == 4), IRRELEVANT)
+
+    assert label_counts(conn)[IRRELEVANT] == 1
+    assert label_counts(conn, frozenset({"food"}))[IRRELEVANT] == 0
+    assert label_counts(conn, frozenset({"food"}))[RELEVANT] == 1
+
+
 def test_queue_stats_count_judged_from_the_queue_across_rebuilds(
     conn: sqlite3.Connection,
 ) -> None:

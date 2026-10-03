@@ -458,3 +458,28 @@ def test_cli_scorer_report_names_the_population_and_n(tmp_path: Path) -> None:
         ["triage", "--human-report", "--scorer", "local-model", "--include-training"], env
     )
     assert "population: all human labels (includes training) n=4" in out
+
+
+def _channels(conn: sqlite3.Connection) -> None:
+    for cid, name, parent in ((1, "tech", None), (2, "food", None), (3, "food-thread", 2)):
+        conn.execute(
+            "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+            " VALUES (?, 9, ?, ?, 'text')",
+            (cid, parent, name),
+        )
+
+
+def test_excluded_channel_labels_never_train_bayes(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    ids = seed_labeled(conn, 10, 10)
+    _channels(conn)
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id IN (?, ?, ?)", ids[10:13])
+    conn.execute("UPDATE exchanges SET channel_id = 3 WHERE id = ?", (ids[13],))
+
+    excluded = frozenset({"food"})
+    assert len(training_labels(conn)[0]) == 20
+    assert len(training_labels(conn, exclude_channels=excluded)[0]) == 16
+    fit = fit_human(conn, minimum=6, exclude_channels=excluded)
+    assert (fit.report.relevant, fit.report.irrelevant) == (10, 6)
+    with pytest.raises(InsufficientHumanLabelsError):
+        fit_human(conn, minimum=7, exclude_channels=excluded)
