@@ -285,7 +285,7 @@ def test_evaluate_scorer_scores_any_scorer_against_the_human_labels(tmp_path: Pa
     extra = seed(conn, 99, "unlabelled")
     derive(conn, "local-model", 3, {a: 0.9, b: 0.6, c: 0.7, d: 0.1, extra: 0.99})
 
-    result = evaluate_scorer(conn, "local-model")
+    result = evaluate_scorer(conn, "local-model", include_training=True)
 
     assert (result.scorer, result.version, result.evaluated) == ("local-model", 3, 4)
     assert (result.relevant, result.irrelevant) == (2, 2)
@@ -303,8 +303,8 @@ def test_evaluate_scorer_defaults_to_the_latest_version_and_honours_an_explicit_
     derive(conn, "local-model", 1, {a: 0.9, b: 0.9, c: 0.1, d: 0.1})
     derive(conn, "local-model", 2, {a: 0.1, b: 0.1, c: 0.9, d: 0.9})
 
-    assert evaluate_scorer(conn, "local-model").auc == 0.0
-    assert evaluate_scorer(conn, "local-model", 1).auc == 1.0
+    assert evaluate_scorer(conn, "local-model", include_training=True).auc == 0.0
+    assert evaluate_scorer(conn, "local-model", 1, include_training=True).auc == 1.0
 
 
 def test_evaluate_scorer_ignores_labels_the_scorer_did_not_score(tmp_path: Path) -> None:
@@ -312,7 +312,7 @@ def test_evaluate_scorer_ignores_labels_the_scorer_did_not_score(tmp_path: Path)
     a, _, c, _ = labeled_four(conn)
     derive(conn, "local-model", 1, {a: 0.9, c: 0.1})
 
-    result = evaluate_scorer(conn, "local-model")
+    result = evaluate_scorer(conn, "local-model", include_training=True)
 
     assert (result.evaluated, result.relevant, result.irrelevant) == (2, 1, 1)
 
@@ -323,11 +323,11 @@ def test_evaluate_scorer_ignores_other_scorers_and_non_derived_rows(tmp_path: Pa
     derive(conn, "other", 1, {a: 0.9, b: 0.9, c: 0.1, d: 0.1})
 
     with pytest.raises(NoScorerAnnotationsError):
-        evaluate_scorer(conn, "local-model")
+        evaluate_scorer(conn, "local-model", include_training=True)
     with pytest.raises(NoScorerAnnotationsError):
-        evaluate_scorer(conn, "other", 7)
+        evaluate_scorer(conn, "other", 7, include_training=True)
     with pytest.raises(NoScorerAnnotationsError):
-        evaluate_scorer(conn, HUMAN_SCORER)
+        evaluate_scorer(conn, HUMAN_SCORER, include_training=True)
 
 
 def test_cli_human_report_with_a_scorer_compares_it_head_to_head(tmp_path: Path) -> None:
@@ -339,13 +339,24 @@ def test_cli_human_report_with_a_scorer_compares_it_head_to_head(tmp_path: Path)
     conn.commit()
     conn.close()
 
-    code, out, _ = run(["triage", "--human-report", "--scorer", "local-model"], env)
+    code, out, _ = run(
+        ["triage", "--human-report", "--scorer", "local-model", "--include-training"], env
+    )
     assert code == 0
     assert "scorer local-model v2: evaluated=4 relevant=2 irrelevant=2 auc=0.750" in out
     assert "threshold  tp  fp  fn  tn  precision  recall  f1" in out
 
     code, out, _ = run(
-        ["triage", "--human-report", "--scorer", "local-model", "--scorer-version", "2"], env
+        [
+            "triage",
+            "--human-report",
+            "--scorer",
+            "local-model",
+            "--scorer-version",
+            "2",
+            "--include-training",
+        ],
+        env,
     )
     assert code == 0
     assert "local-model v2" in out
@@ -354,7 +365,7 @@ def test_cli_human_report_with_a_scorer_compares_it_head_to_head(tmp_path: Path)
 def test_cli_human_report_with_an_unknown_scorer_is_a_config_error(tmp_path: Path) -> None:
     env = environment(tmp_path)
 
-    code, _, err = run(["triage", "--human-report", "--scorer", "nope"], env)
+    code, _, err = run(["triage", "--human-report", "--scorer", "nope", "--include-training"], env)
 
     assert code != 0
     assert "no derived annotations for scorer 'nope'" in err
@@ -371,8 +382,79 @@ def test_cli_human_report_with_a_scorer_and_no_overlap_says_auc_is_undefined(
     conn.commit()
     conn.close()
 
-    code, out, _ = run(["triage", "--human-report", "--scorer", "local-model"], env)
+    code, out, _ = run(
+        ["triage", "--human-report", "--scorer", "local-model", "--include-training"], env
+    )
 
     assert code == 0
     assert "evaluated=0" in out
     assert "auc=n/a" in out
+
+
+def freeze(conn: sqlite3.Connection, name: str, ids: list[int]) -> None:
+    for position, exchange_id in enumerate(ids, start=1):
+        conn.execute(
+            "INSERT INTO eval_slices (name, exchange_id, position, population, seed, frozen_at)"
+            " VALUES (?, ?, ?, 'p', 1, ?)",
+            (name, exchange_id, position, NOW.isoformat()),
+        )
+    conn.commit()
+
+
+def test_evaluate_scorer_defaults_to_held_out_s2_and_gold(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    a, b, c, d = labeled_four(conn)
+    derive(conn, "local-model", 1, {a: 0.9, b: 0.2, c: 0.95, d: 0.1})
+    freeze(conn, "s2", [a, c])
+    freeze(conn, "gold", [d])
+    freeze(conn, "s1", [b])
+
+    held = evaluate_scorer(conn, "local-model")
+    everything = evaluate_scorer(conn, "local-model", include_training=True)
+
+    assert held.population == "held-out (s2, gold)"
+    assert (held.evaluated, held.relevant, held.irrelevant) == (3, 1, 2)
+    assert held.auc == 0.5
+    assert everything.population == "all human labels (includes training)"
+    assert everything.evaluated == 4
+
+
+def test_evaluate_scorer_held_out_is_empty_without_frozen_slices(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    a, b, c, d = labeled_four(conn)
+    derive(conn, "local-model", 1, {a: 0.9, b: 0.2, c: 0.8, d: 0.1})
+
+    assert evaluate_scorer(conn, "local-model").evaluated == 0
+
+
+def test_fit_human_never_trains_on_s2_or_gold_exchanges(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    ids = seed_labeled(conn, 40, 40)
+    freeze(conn, "s2", ids[:5] + ids[40:45])
+    freeze(conn, "gold", ids[5:8])
+    freeze(conn, "s1", ids[8:10])
+
+    fit = fit_human(conn, minimum=30)
+
+    assert (fit.report.relevant, fit.report.irrelevant) == (40 - 8, 40 - 5)
+    assert fit.recipe["excludes_slices"] == ["s2", "gold"]
+
+
+def test_cli_scorer_report_names_the_population_and_n(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    migrate(conn)
+    a, b, c, d = labeled_four(conn)
+    derive(conn, "local-model", 1, {a: 0.9, b: 0.6, c: 0.7, d: 0.1})
+    freeze(conn, "s2", [a, d])
+    conn.close()
+
+    code, out, _ = run(["triage", "--human-report", "--scorer", "local-model"], env)
+    assert code == 0
+    assert "population: held-out (s2, gold) n=2" in out
+    assert "evaluated=2" in out
+
+    code, out, _ = run(
+        ["triage", "--human-report", "--scorer", "local-model", "--include-training"], env
+    )
+    assert "population: all human labels (includes training) n=4" in out

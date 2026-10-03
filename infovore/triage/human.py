@@ -12,6 +12,7 @@ from typing import Final
 
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import BATCH_SIZE, exchange_inputs_for_ids
+from infovore.eval.slices import GOLD, HOLDOUT
 from infovore.rows import AttachmentRow, Label, MessageRow, ReactionRow
 from infovore.triage.bayes import (
     HOLDOUT_BUCKETS,
@@ -35,6 +36,9 @@ MIN_PER_CLASS: Final = 200
 EVAL_THRESHOLDS: Final = tuple(round(i / 10, 1) for i in range(1, 10))
 SHARE_THRESHOLD: Final = 0.5
 VERY_SHORT_CHARACTERS: Final = 30
+HELD_OUT_SLICES: Final = (HOLDOUT, GOLD)
+HELD_OUT_POPULATION: Final = f"held-out ({', '.join(HELD_OUT_SLICES)})"
+ALL_LABELS_POPULATION: Final = "all human labels (includes training)"
 _LABELS: Final = {"relevant": Label.LORE, "irrelevant": Label.NOISE}
 
 
@@ -169,6 +173,14 @@ def training_labels(
     return labels, last_id
 
 
+def held_out_ids(conn: sqlite3.Connection) -> frozenset[int]:
+    marks = ", ".join("?" for _ in HELD_OUT_SLICES)
+    rows = conn.execute(
+        f"SELECT DISTINCT exchange_id FROM eval_slices WHERE name IN ({marks})", HELD_OUT_SLICES
+    )
+    return frozenset(row["exchange_id"] for row in rows)
+
+
 @dataclass(frozen=True)
 class HumanReport:
     relevant: int
@@ -191,6 +203,8 @@ def fit_human(
     minimum: int = MIN_PER_CLASS,
 ) -> HumanFit:
     labels, last_id = training_labels(conn)
+    held = held_out_ids(conn)
+    labels = {eid: label for eid, label in labels.items() if eid not in held}
     relevant = sum(1 for label in labels.values() if label is Label.LORE)
     irrelevant = len(labels) - relevant
     if relevant < minimum or irrelevant < minimum:
@@ -206,13 +220,13 @@ def fit_human(
             tokens = human_features(one.messages, one.reactions, one.attachments, rules, gazetteer)
             examples.append((exchange_id, tokens, labels[exchange_id]))
     model = train((tokens, label) for eid, tokens, label in examples if not in_holdout(eid))
-    held = [(p_lore(model, tokens), label) for eid, tokens, label in examples if in_holdout(eid)]
+    scored = [(p_lore(model, tokens), label) for eid, tokens, label in examples if in_holdout(eid)]
     report = HumanReport(
         relevant=relevant,
         irrelevant=irrelevant,
-        holdout_size=len(held),
-        auc=auc(held),
-        metrics=tuple(evaluate(held, EVAL_THRESHOLDS)),
+        holdout_size=len(scored),
+        auc=auc(scored),
+        metrics=tuple(evaluate(scored, EVAL_THRESHOLDS)),
     )
     recipe: dict[str, object] = {
         "label_scorer": HUMAN_SCORER,
@@ -220,6 +234,7 @@ def fit_human(
         "holdout": f"sha256(exchange_id)[0] % {HOLDOUT_BUCKETS} == 0",
         "rules_version": rules.version,
         "gazetteer_version": gazetteer.version,
+        "excludes_slices": list(HELD_OUT_SLICES),
         "min_per_class": minimum,
         "features": "text tokens + __RULE_<name> rule hits",
     }
@@ -276,6 +291,7 @@ def score_human(
 class ScorerEvaluation:
     scorer: str
     version: int
+    population: str
     evaluated: int
     relevant: int
     irrelevant: int
@@ -284,10 +300,12 @@ class ScorerEvaluation:
 
 
 def evaluate_scorer(
-    conn: sqlite3.Connection, scorer: str, version: int | None = None
+    conn: sqlite3.Connection,
+    scorer: str,
+    version: int | None = None,
+    include_training: bool = False,
 ) -> ScorerEvaluation:
-    """Any scorer's derived exchange annotations against the latest human labels,
-    so an external model is compared head to head with Bayes by writing annotations."""
+    """Derived scorer annotations vs human labels; held-out slices unless include_training."""
     if version is None:
         row = conn.execute(
             "SELECT MAX(scorer_version) AS v FROM annotations WHERE scorer = ?"
@@ -310,6 +328,9 @@ def evaluate_scorer(
             + ("" if version is None else f" version {version}")
         )
     labels, _ = training_labels(conn)
+    if not include_training:
+        held = held_out_ids(conn)
+        labels = {eid: label for eid, label in labels.items() if eid in held}
     scored = [
         (scores[exchange_id], label)
         for exchange_id, label in labels.items()
@@ -319,6 +340,7 @@ def evaluate_scorer(
     return ScorerEvaluation(
         scorer=scorer,
         version=version,
+        population=ALL_LABELS_POPULATION if include_training else HELD_OUT_POPULATION,
         evaluated=len(scored),
         relevant=relevant,
         irrelevant=len(scored) - relevant,
