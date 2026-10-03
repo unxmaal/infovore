@@ -138,4 +138,4 @@ def test_a_new_exchange_records_the_recipe_that_produced_it(conn: sqlite3.Connec
     exchange_id = insert_exchange(conn, exchange, [7])
 
     row = conn.execute("SELECT chunk_recipe FROM exchanges WHERE id = ?", (exchange_id,)).fetchone()
-    assert row["chunk_recipe"] == 1
+    assert row["chunk_recipe"] == register_recipe(conn, current_recipe(), AT)

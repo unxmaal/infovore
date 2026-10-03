@@ -10,6 +10,10 @@ DEFAULT_QUIET_GAP = timedelta(minutes=30)
 DEFAULT_MAX_MESSAGES = 50
 DEFAULT_OVERLAP = 3
 ZERO = timedelta(0)
+DEFAULT_GAP_PERCENTILE = 95.0
+DEFAULT_GAP_CEILING = timedelta(hours=6)
+DEFAULT_FOLD_FACTOR = 4.0
+DEFAULT_FOLD_SIZE = 2
 
 
 @dataclass(frozen=True)

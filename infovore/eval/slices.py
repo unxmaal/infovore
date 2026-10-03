@@ -207,7 +207,7 @@ def slice_ids(conn: sqlite3.Connection, name: str) -> list[int]:
     return [
         row["exchange_id"]
         for row in conn.execute(
-            "SELECT exchange_id FROM eval_slices WHERE name = ? ORDER BY position", (name,)
+            "SELECT exchange_id FROM current_eval_slices WHERE name = ? ORDER BY position", (name,)
         )
     ]
 
@@ -215,7 +215,8 @@ def slice_ids(conn: sqlite3.Connection, name: str) -> list[int]:
 def slice_summary(conn: sqlite3.Connection, name: str) -> list[BucketSummary]:
     counts: dict[Bucket, list[int]] = {bucket: [0, 0] for bucket in SIZE_BUCKETS}
     for row in conn.execute(
-        "SELECT e.message_count AS n FROM eval_slices s JOIN exchanges e ON e.id = s.exchange_id"
+        "SELECT e.message_count AS n FROM current_eval_slices s"
+        " JOIN exchanges e ON e.id = s.exchange_id"
         " WHERE s.name = ?",
         (name,),
     ):
@@ -229,9 +230,10 @@ def slice_summary(conn: sqlite3.Connection, name: str) -> list[BucketSummary]:
 
 
 def slice_names(conn: sqlite3.Connection) -> list[str]:
-    return [
-        row["name"]
+    names = (
+        row["name"].split("@")[0]
         for row in conn.execute(
             "SELECT name, MIN(rowid) AS first FROM eval_slices GROUP BY name ORDER BY first"
         )
-    ]
+    )
+    return list(dict.fromkeys(names))

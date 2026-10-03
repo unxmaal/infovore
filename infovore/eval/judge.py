@@ -199,7 +199,7 @@ def _likely_irrelevant_items(
     clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     rows = conn.execute(
         f"SELECT id, p_lore FROM exchanges WHERE p_lore IS NOT NULL AND {_UNJUDGED}"
-        f" AND id NOT IN (SELECT exchange_id FROM eval_slices WHERE name IN (?, ?)){clause}"
+        f" AND id NOT IN (SELECT exchange_id FROM current_eval_slices WHERE name IN (?, ?)){clause}"
         f" AND {enough_text_clause('exchanges.id')} ORDER BY p_lore, id LIMIT ?",
         (JUDGE_SCORER, HOLDOUT, GOLD, *excl_params, MIN_TEXT_MESSAGES, LIKELY_IRRELEVANT_POOL),
     ).fetchall()

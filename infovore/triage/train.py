@@ -268,7 +268,9 @@ def score_all(
     rules: TriageRules = DEFAULT_RULES,
     workers: int = 1,
 ) -> int:
-    rows = conn.execute("SELECT id, channel_id FROM exchanges ORDER BY id").fetchall()
+    rows = conn.execute(
+        "SELECT id, channel_id FROM exchanges WHERE superseded_by_recipe IS NULL ORDER BY id"
+    ).fetchall()
     return _score_rows(conn, model, model_version, rows, rules, workers)
 
 
@@ -280,8 +282,8 @@ def score_stale(
     workers: int = 1,
 ) -> int:
     rows = conn.execute(
-        "SELECT id, channel_id FROM exchanges"
-        " WHERE p_lore_model IS NULL OR p_lore_model != ? ORDER BY id",
+        "SELECT id, channel_id FROM exchanges WHERE superseded_by_recipe IS NULL"
+        " AND (p_lore_model IS NULL OR p_lore_model != ?) ORDER BY id",
         (model_version,),
     ).fetchall()
     return _score_rows(conn, model, model_version, rows, rules, workers)

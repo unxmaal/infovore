@@ -53,7 +53,7 @@ def derive_citation_labels(conn: sqlite3.Connection, at: datetime) -> CitationLa
         placeholders = ",".join("?" for _ in chunk)
 
         member_rows = conn.execute(
-            f"SELECT exchange_id, message_id FROM exchange_messages"
+            f"SELECT exchange_id, message_id FROM all_exchange_messages"
             f" WHERE exchange_id IN ({placeholders})",
             chunk,
         ).fetchall()

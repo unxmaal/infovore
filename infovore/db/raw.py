@@ -345,9 +345,37 @@ def ungrouped_messages_for_channel(conn: sqlite3.Connection, channel_id: int) ->
     return [message_from_row(row) for row in rows]
 
 
+def light_channel_messages(conn: sqlite3.Connection, channel_id: int) -> list[MessageRow]:
+    rows = conn.execute(
+        "SELECT id, guild_id, author_id, author_is_bot, created_at, reply_to_id, thread_id,"
+        " deleted_at FROM messages WHERE channel_id = ? ORDER BY created_at, id",
+        (channel_id,),
+    )
+    return [
+        MessageRow(
+            id=row["id"],
+            channel_id=channel_id,
+            guild_id=row["guild_id"],
+            author_id=row["author_id"],
+            author_name_at_time="",
+            author_is_bot=bool(row["author_is_bot"]),
+            created_at=from_db_time(row["created_at"]),
+            edited_at=None,
+            content="",
+            reply_to_id=row["reply_to_id"],
+            thread_id=row["thread_id"],
+            deleted_at=from_db_time(row["deleted_at"]),
+            ingested_at=from_db_time(row["created_at"]),
+            raw_json="",
+        )
+        for row in rows
+    ]
+
+
 def latest_exchange_for_thread(conn: sqlite3.Connection, thread_id: int) -> int | None:
     row = conn.execute(
-        "SELECT id FROM exchanges WHERE thread_id = ? ORDER BY started_at DESC, id DESC LIMIT 1",
+        "SELECT id FROM exchanges WHERE thread_id = ? AND superseded_by_recipe IS NULL"
+        " ORDER BY started_at DESC, id DESC LIMIT 1",
         (thread_id,),
     ).fetchone()
     if row is None:

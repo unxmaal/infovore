@@ -164,7 +164,9 @@ def training_labels(
     last_id = 0
     rows = conn.execute(
         "SELECT id, subject_id, label FROM annotations WHERE scorer = ?"
-        " AND subject_kind = 'exchange' AND reproducibility = 'recorded' ORDER BY id",
+        " AND subject_kind = 'exchange' AND reproducibility = 'recorded'"
+        " AND subject_id NOT IN (SELECT id FROM exchanges WHERE superseded_by_recipe IS NOT NULL)"
+        " ORDER BY id",
         (HUMAN_SCORER,),
     )
     for row in rows:
@@ -181,7 +183,8 @@ def training_labels(
 def held_out_ids(conn: sqlite3.Connection) -> frozenset[int]:
     marks = ", ".join("?" for _ in HELD_OUT_SLICES)
     rows = conn.execute(
-        f"SELECT DISTINCT exchange_id FROM eval_slices WHERE name IN ({marks})", HELD_OUT_SLICES
+        f"SELECT DISTINCT exchange_id FROM current_eval_slices WHERE name IN ({marks})",
+        HELD_OUT_SLICES,
     )
     return frozenset(row["exchange_id"] for row in rows)
 
@@ -278,7 +281,11 @@ def score_human(
     gazetteer = load_gazetteer()
     cap = -1 if limit is None else limit
     ids = [
-        row["id"] for row in conn.execute("SELECT id FROM exchanges ORDER BY id LIMIT ?", (cap,))
+        row["id"]
+        for row in conn.execute(
+            "SELECT id FROM exchanges WHERE superseded_by_recipe IS NULL ORDER BY id LIMIT ?",
+            (cap,),
+        )
     ]
     written = 0
     for start in range(0, len(ids), BATCH_SIZE):
