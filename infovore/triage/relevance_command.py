@@ -130,8 +130,9 @@ class RelevanceCommand:
         if unknown:
             raise ConfigError(f"unknown slice(s): {', '.join(unknown)}")
         lexicon = load_lexicon()
-        t_high = tune_high(tuning_samples(conn, lexicon))
-        fit, why = try_fit(conn)
+        exclude = context.settings.exclude_channels
+        t_high = tune_high(tuning_samples(conn, lexicon, exclude))
+        fit, why = try_fit(conn, exclude)
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
         context.stdout.write(
@@ -144,14 +145,14 @@ class RelevanceCommand:
             if name == BUILD:
                 ids = [i for i in ids if i not in held]
             everything.update(ids)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, fit)
+            outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
             kind = "tuning, held-out excluded" if name == BUILD else "held-out"
             context.stdout.write(f"slice {name} ({kind}): n={len(ids)}\n")
             for report in stage_reports(outcomes, labels):
                 context.stdout.write(self._line(report, fit is None, why))
         if args.write:
             ids = sorted(everything)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, fit)
+            outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
             versions = write_outcomes(conn, outcomes, lexicon, t_high, fit, context.clock.now())
             written = ", ".join(f"{SCORERS[s]} v{v}" for s, v in versions.items())
             context.stdout.write(f"wrote {len(ids)} exchanges: {written}\n")

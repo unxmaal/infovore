@@ -7,6 +7,7 @@ from typing import Final
 
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
+from infovore.db.channel_filter import excluded_exchange_ids
 from infovore.eval.slices import BUILD
 from infovore.rows import Label
 from infovore.triage.bayes import p_lore
@@ -24,7 +25,7 @@ from infovore.triage.lexicon import Lexicon, LexiconScore, score_lexicon
 PRECISION_TARGET: Final = 0.97
 BAYES_HIGH: Final = 0.9
 BAYES_LOW: Final = 0.1
-STAGES: Final = ("lexicon", "bayes", "residue")
+STAGES: Final = ("denylist", "lexicon", "bayes", "residue")
 SCORERS: Final = {stage: f"relevance_{stage}" for stage in STAGES}
 RELEVANT: Final = "relevant"
 IRRELEVANT: Final = "irrelevant"
@@ -85,9 +86,11 @@ def decide_bayes(p: float | None) -> str | None:
     return IRRELEVANT if p <= BAYES_LOW else None
 
 
-def tuning_samples(conn: sqlite3.Connection, lexicon: Lexicon) -> list[tuple[float, bool]]:
+def tuning_samples(
+    conn: sqlite3.Connection, lexicon: Lexicon, exclude_channels: frozenset[str] = frozenset()
+) -> list[tuple[float, bool]]:
     held = held_out_ids(conn)
-    labels, _ = training_labels(conn)
+    labels, _ = training_labels(conn, exclude_channels=exclude_channels)
     build = {
         row["exchange_id"]
         for row in conn.execute("SELECT exchange_id FROM eval_slices WHERE name = ?", (BUILD,))
@@ -100,9 +103,11 @@ def tuning_samples(conn: sqlite3.Connection, lexicon: Lexicon) -> list[tuple[flo
     ]
 
 
-def try_fit(conn: sqlite3.Connection) -> tuple[HumanFit | None, str]:
+def try_fit(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+) -> tuple[HumanFit | None, str]:
     try:
-        return fit_human(conn, minimum=MIN_PER_CLASS), ""
+        return fit_human(conn, minimum=MIN_PER_CLASS, exclude_channels=exclude_channels), ""
     except InsufficientHumanLabelsError as error:
         return None, str(error)
 
@@ -113,10 +118,15 @@ def run_cascade(
     lexicon: Lexicon,
     t_high: float,
     fit: HumanFit | None,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> list[Outcome]:
-    inputs = exchange_inputs_for_ids(conn, ids)
+    denied = excluded_exchange_ids(conn, exclude_channels)
+    inputs = exchange_inputs_for_ids(conn, [eid for eid in ids if eid not in denied])
     outcomes = []
     for eid in ids:
+        if eid in denied:
+            outcomes.append(Outcome(eid, 0.0, 0, 0, None, "denylist", IRRELEVANT))
+            continue
         one = inputs[eid]
         score = score_lexicon(lexicon, one.messages)
         decision = decide_lexicon(score, t_high)
@@ -184,6 +194,20 @@ def write_outcomes(
         "bayes_band": [BAYES_LOW, BAYES_HIGH],
     }
     for o in outcomes:
+        if o.stage == "denylist":
+            denied = Annotation(
+                subject_kind="exchange",
+                subject_id=o.exchange_id,
+                scorer=SCORERS["denylist"],
+                scorer_version=versions["denylist"],
+                reproducibility="derived",
+                score=None,
+                label=IRRELEVANT,
+                recipe=json.loads(json.dumps(base)),
+                source_ref="relevance-cascade",
+            )
+            record_annotation(conn, denied, at)
+            continue
         rows: list[tuple[str, float | None, str | None, dict[str, object]]] = [
             (
                 "lexicon",

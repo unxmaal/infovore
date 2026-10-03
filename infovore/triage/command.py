@@ -436,7 +436,12 @@ class TriageCommand:
         if args.train_human and args.human_limit is None and not args.all_exchanges:
             raise ConfigError("--train-human needs --human-limit N or --all-exchanges")
         try:
-            fit = fit_human(context.conn, context.settings.triage_rules, args.min_per_class)
+            fit = fit_human(
+                context.conn,
+                context.settings.triage_rules,
+                args.min_per_class,
+                context.settings.exclude_channels,
+            )
         except InsufficientHumanLabelsError as error:
             if args.train_human:
                 raise ConfigError(str(error)) from error

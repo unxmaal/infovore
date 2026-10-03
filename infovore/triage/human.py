@@ -12,6 +12,7 @@ from typing import Final
 
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import BATCH_SIZE, exchange_inputs_for_ids
+from infovore.db.channel_filter import excluded_exchange_ids
 from infovore.eval.slices import GOLD, HOLDOUT
 from infovore.rows import AttachmentRow, Label, MessageRow, ReactionRow
 from infovore.triage.bayes import (
@@ -151,7 +152,9 @@ def human_features(
 
 
 def training_labels(
-    conn: sqlite3.Connection, source: str = HUMAN_SCORER
+    conn: sqlite3.Connection,
+    source: str = HUMAN_SCORER,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> tuple[dict[int, Label], int]:
     if source != HUMAN_SCORER:
         raise LlmLabelsNotTrainableError(
@@ -170,6 +173,8 @@ def training_labels(
             labels[row["subject_id"]] = _LABELS[row["label"]]
         else:
             labels.pop(row["subject_id"], None)
+    for eid in excluded_exchange_ids(conn, exclude_channels) & labels.keys():
+        del labels[eid]
     return labels, last_id
 
 
@@ -201,8 +206,9 @@ def fit_human(
     conn: sqlite3.Connection,
     rules: TriageRules = DEFAULT_RULES,
     minimum: int = MIN_PER_CLASS,
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> HumanFit:
-    labels, last_id = training_labels(conn)
+    labels, last_id = training_labels(conn, exclude_channels=exclude_channels)
     held = held_out_ids(conn)
     labels = {eid: label for eid, label in labels.items() if eid not in held}
     relevant = sum(1 for label in labels.values() if label is Label.LORE)

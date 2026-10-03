@@ -241,7 +241,7 @@ def test_the_denylist_decides_irrelevant_before_the_lexicon(tmp_path: Path) -> N
             " VALUES (?, 9, NULL, ?, 'text')",
             (cid, name),
         )
-    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id IN (1, 4)")
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id IN (2, 4)")
     conn.commit()
     conn.close()
     env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
@@ -252,7 +252,7 @@ def test_the_denylist_decides_irrelevant_before_the_lexicon(tmp_path: Path) -> N
     assert "stage denylist: decided=2 relevant=0 irrelevant=2 labelled=2" in out
     assert "accuracy=0.500" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
-    row = annotation_history(conn, "exchange", 1, "relevance_denylist")[0]
+    row = annotation_history(conn, "exchange", 2, "relevance_denylist")[0]
     assert (row["label"], row["reproducibility"]) == ("irrelevant", "derived")
-    assert annotation_history(conn, "exchange", 1, "relevance_lexicon") == []
-    assert annotation_history(conn, "exchange", 2, "relevance_denylist") == []
+    assert annotation_history(conn, "exchange", 2, "relevance_lexicon") == []
+    assert annotation_history(conn, "exchange", 3, "relevance_denylist") == []

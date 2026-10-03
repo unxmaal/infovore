@@ -4,9 +4,11 @@ from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
 from infovore.eval.judge import (
+    IRRELEVANT,
     LABELS,
     LIKELY_IRRELEVANT,
     RELEVANCE_TARGET,
+    RELEVANT,
     UNCERTAIN,
     QueueBuilder,
     c1_queue,
@@ -122,7 +124,10 @@ class JudgeCommand:
                 f"self-agreement: {rate} ({agreement.agreed} of {agreement.exchanges}"
                 " repeated exchanges)\n"
             )
-            for label, need in labels_needed(counts).items():
+            usable = label_counts(context.conn, context.settings.exclude_channels)
+            for label in (RELEVANT, IRRELEVANT):
+                context.stdout.write(f"usable {label}: {usable[label]}\n")
+            for label, need in labels_needed(usable).items():
                 context.stdout.write(f"needed: {need} more {label} to reach {RELEVANCE_TARGET}\n")
             return int(ExitCode.OK)
 

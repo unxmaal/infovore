@@ -407,7 +407,7 @@ def test_usable_label_counts_skip_excluded_channels(conn: sqlite3.Connection) ->
     conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 4")
     queue = frozen_queue(conn)
     _label(conn, queue, 0, RELEVANT)
-    _label(conn, queue, 3, IRRELEVANT)
+    _label(conn, queue, next(i for i, q in enumerate(queue) if q.exchange_id == 4), IRRELEVANT)
 
     assert label_counts(conn)[IRRELEVANT] == 1
     assert label_counts(conn, frozenset({"food"}))[IRRELEVANT] == 0
