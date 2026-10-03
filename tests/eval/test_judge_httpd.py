@@ -9,8 +9,14 @@ from pathlib import Path
 import pytest
 
 from infovore.db.connection import migrate, open_database
-from infovore.eval.judge import frozen_queue
-from infovore.eval.judge_httpd import JudgeServer, listening_url, shutdown_all, start_all
+from infovore.eval.judge import LIKELY_IRRELEVANT, QueueItem, frozen_queue
+from infovore.eval.judge_httpd import (
+    JudgeServer,
+    listening_url,
+    load_page,
+    shutdown_all,
+    start_all,
+)
 from infovore.eval.slices import GOLD, GOLD_REPEATS
 from infovore.timing import FixedClock
 
@@ -170,3 +176,42 @@ def test_bad_submissions_are_refused(
 
 def test_the_listening_url_names_host_and_port(server: JudgeServer) -> None:
     assert listening_url(server).startswith("http://127.0.0.1:")
+
+
+def test_a_dynamic_queue_reports_judged_from_the_queue_after_it_shrinks(tmp_path: Path) -> None:
+    conn = _db(tmp_path)
+
+    def build(db: sqlite3.Connection) -> list[QueueItem]:
+        done = {r[0] for r in db.execute("SELECT subject_id FROM annotations")}
+        return [QueueItem(i, LIKELY_IRRELEVANT, i) for i in (1, 2) if i not in done]
+
+    servers = start_all(["127.0.0.1"], 0, conn, FixedClock(AT), build, queue_name=LIKELY_IRRELEVANT)
+    try:
+        status, body = _submit(servers[0], 0, 1, "irrelevant")
+        nxt = _get(servers[0], "/api/next")[1]
+        view = _get(servers[0], "/api/exchange?index=0")[1]
+    finally:
+        shutdown_all(servers)
+
+    expected = {
+        "queue": LIKELY_IRRELEVANT,
+        "judged": 1,
+        "queued": 1,
+        "irrelevant_needed": 199,
+        "target": 200,
+    }
+    assert status == 200
+    assert isinstance(body, dict) and body["progress"] == {
+        "done": 1,
+        "total": 2,
+        **{**expected, "queued": 2},
+    }
+    assert isinstance(nxt, dict) and nxt["progress"] == {"done": 0, "total": 1, **expected}
+    assert isinstance(view, dict) and view["progress"]["judged"] == 1
+
+
+def test_the_page_header_shows_judged_from_the_queue() -> None:
+    page = load_page()
+
+    assert "judged from" in page
+    assert "more irrelevant needed" in page

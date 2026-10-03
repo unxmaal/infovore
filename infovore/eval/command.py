@@ -136,13 +136,20 @@ class JudgeCommand:
                 args.scorer,
             )
         elif args.queue == LIKELY_IRRELEVANT:
-            build_queue = likely_irrelevant_queue
+            build_queue = likely_irrelevant_queue(context.settings.exclude_channels)
         elif args.queue == "c1":
-            build_queue = c1_queue
+            build_queue = c1_queue(context.settings.exclude_channels)
         elif not frozen_queue(context.conn):
             raise ConfigError("no gold set frozen yet; run `infovore slice freeze` first")
         hosts = args.hosts or ["127.0.0.1"]
-        servers = start_all(hosts, args.port, context.conn, context.clock, build_queue)
+        servers = start_all(
+            hosts,
+            args.port,
+            context.conn,
+            context.clock,
+            build_queue,
+            None if args.queue == "frozen" else args.queue,
+        )
         try:
             for server in servers:
                 context.stdout.write(f"listening on {listening_url(server)}\n")
