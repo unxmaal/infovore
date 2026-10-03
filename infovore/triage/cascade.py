@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Final
@@ -109,10 +109,13 @@ def tuning_samples(
 
 
 def try_fit(
-    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+    conn: sqlite3.Connection,
+    exclude_channels: frozenset[str] = frozenset(),
+    minimum: int | None = None,
 ) -> tuple[HumanFit | None, str]:
     try:
-        return fit_human(conn, minimum=MIN_PER_CLASS, exclude_channels=exclude_channels), ""
+        floor = MIN_PER_CLASS if minimum is None else minimum
+        return fit_human(conn, minimum=floor, exclude_channels=exclude_channels), ""
     except InsufficientHumanLabelsError as error:
         return None, str(error)
 
@@ -149,6 +152,48 @@ def run_cascade(
             stage, decision = "residue", RESIDUE
         outcomes.append(Outcome(eid, score.share, score.hits, score.messages, p, stage, decision))
     return outcomes
+
+
+def current_exchange_ids(conn: sqlite3.Connection) -> list[int]:
+    return [row["id"] for row in conn.execute("SELECT id FROM current_exchanges ORDER BY id")]
+
+
+def run_cascade_batched(
+    conn: sqlite3.Connection,
+    ids: Sequence[int],
+    lexicon: Lexicon,
+    t_high: float,
+    fit: HumanFit | None,
+    exclude_channels: frozenset[str],
+    batch_size: int,
+    progress: Callable[[int, int], None],
+) -> list[Outcome]:
+    outcomes: list[Outcome] = []
+    for start in range(0, len(ids), batch_size):
+        chunk = ids[start : start + batch_size]
+        outcomes.extend(run_cascade(conn, chunk, lexicon, t_high, fit, exclude_channels))
+        progress(len(outcomes), len(ids))
+    return outcomes
+
+
+def residue_channels(
+    conn: sqlite3.Connection, outcomes: Sequence[Outcome], limit: int
+) -> list[tuple[str, int]]:
+    residue = [o.exchange_id for o in outcomes if o.stage == "residue"]
+    counts: dict[str, int] = {}
+    for start in range(0, len(residue), 500):
+        chunk = residue[start : start + 500]
+        marks = ",".join("?" * len(chunk))
+        rows = conn.execute(
+            f"SELECT COALESCE(c.name, CAST(e.channel_id AS TEXT)) AS name, COUNT(*) AS n"
+            f" FROM current_exchanges e LEFT JOIN channels c ON c.id = e.channel_id"
+            f" WHERE e.id IN ({marks}) GROUP BY name",
+            chunk,
+        )
+        for row in rows:
+            counts[row["name"]] = counts.get(row["name"], 0) + row["n"]
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    return ranked[:limit]
 
 
 def stage_reports(outcomes: Sequence[Outcome], labels: dict[int, Label]) -> list[StageReport]:
