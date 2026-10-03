@@ -59,14 +59,15 @@ def test_stage_reports_count_decisions_confusion_and_residue() -> None:
         outcome(5, "residue", "residue"),
     ]
     labels = {1: Label.LORE, 2: Label.NOISE, 3: Label.LORE, 4: Label.NOISE}
-    lexicon, bayes, residue = stage_reports(outcomes, labels)
+    denylist, lexicon, bayes, residue = stage_reports(outcomes, labels)
 
     assert (lexicon.decided, lexicon.relevant, lexicon.irrelevant) == (4, 2, 2)
     assert (lexicon.tp, lexicon.fp, lexicon.fn, lexicon.tn) == (1, 1, 1, 1)
     assert (lexicon.labelled, lexicon.correct, lexicon.accuracy) == (4, 2, 0.5)
+    assert denylist.decided == 0 and denylist.accuracy is None
     assert bayes.decided == 0 and bayes.accuracy is None
     assert (residue.decided, residue.share) == (1, 0.2)
-    assert stage_reports([], {})[2].share == 0.0
+    assert stage_reports([], {})[3].share == 0.0
 
 
 def build(tmp_path: Path) -> tuple[dict[str, str], sqlite3.Connection]:
@@ -230,3 +231,28 @@ def test_collisions_lists_lexicon_terms_common_off_topic(tmp_path: Path) -> None
     assert "no collisions" in out
     code, out, _ = run(["relevance", "collisions", "--tech", "tech", "--off", "chat"], env)
     assert code == ExitCode.OK
+
+
+def test_the_denylist_decides_irrelevant_before_the_lexicon(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    for cid, name in ((1, "tech"), (2, "food")):
+        conn.execute(
+            "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+            " VALUES (?, 9, NULL, ?, 'text')",
+            (cid, name),
+        )
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id IN (1, 4)")
+    conn.commit()
+    conn.close()
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+
+    code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
+
+    assert code == ExitCode.OK
+    assert "stage denylist: decided=2 relevant=0 irrelevant=2 labelled=2" in out
+    assert "accuracy=0.500" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    row = annotation_history(conn, "exchange", 1, "relevance_denylist")[0]
+    assert (row["label"], row["reproducibility"]) == ("irrelevant", "derived")
+    assert annotation_history(conn, "exchange", 1, "relevance_lexicon") == []
+    assert annotation_history(conn, "exchange", 2, "relevance_denylist") == []
