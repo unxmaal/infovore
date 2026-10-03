@@ -59,7 +59,7 @@ def test_stage_reports_count_decisions_confusion_and_residue() -> None:
         outcome(5, "residue", "residue"),
     ]
     labels = {1: Label.LORE, 2: Label.NOISE, 3: Label.LORE, 4: Label.NOISE}
-    denylist, lexicon, bayes, residue = stage_reports(outcomes, labels)
+    denylist, no_text, lexicon, bayes, residue = stage_reports(outcomes, labels)
 
     assert (lexicon.decided, lexicon.relevant, lexicon.irrelevant) == (4, 2, 2)
     assert (lexicon.tp, lexicon.fp, lexicon.fn, lexicon.tn) == (1, 1, 1, 1)
@@ -67,7 +67,8 @@ def test_stage_reports_count_decisions_confusion_and_residue() -> None:
     assert denylist.decided == 0 and denylist.accuracy is None
     assert bayes.decided == 0 and bayes.accuracy is None
     assert (residue.decided, residue.share) == (1, 0.2)
-    assert stage_reports([], {})[3].share == 0.0
+    assert no_text.decided == 0
+    assert stage_reports([], {})[4].share == 0.0
 
 
 def build(tmp_path: Path) -> tuple[dict[str, str], sqlite3.Connection]:
@@ -256,3 +257,41 @@ def test_the_denylist_decides_irrelevant_before_the_lexicon(tmp_path: Path) -> N
     assert (row["label"], row["reproducibility"]) == ("irrelevant", "derived")
     assert annotation_history(conn, "exchange", 2, "relevance_lexicon") == []
     assert annotation_history(conn, "exchange", 3, "relevance_denylist") == []
+
+
+def test_text_less_exchanges_are_set_aside_before_the_lexicon(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    conn.execute("UPDATE messages SET content = '  ' WHERE id = 2")
+    conn.execute("UPDATE messages SET content = '[redacted]' WHERE id = 4")
+    conn.execute("UPDATE messages SET deleted_at = ? WHERE id = 5", (NOW.isoformat(),))
+    conn.commit()
+    conn.close()
+
+    code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
+
+    assert code == ExitCode.OK
+    assert "stage no_text: n=3 share=0.600 (set aside, not scored)" in out
+    assert "stage lexicon: decided=2" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    row = annotation_history(conn, "exchange", 2, "relevance_no_text")[0]
+    assert (row["label"], row["reproducibility"]) == ("no_text", "derived")
+    assert annotation_history(conn, "exchange", 2, "relevance_lexicon") == []
+    assert annotation_history(conn, "exchange", 1, "relevance_no_text") == []
+
+
+def test_the_denylist_outranks_no_text(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind) VALUES (2, 9, NULL, 'food', 'text')"
+    )
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 2")
+    conn.execute("UPDATE messages SET content = '' WHERE id = 2")
+    conn.commit()
+    conn.close()
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+
+    code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
+
+    assert code == ExitCode.OK
+    assert "stage denylist: decided=1" in out
+    assert "stage no_text: n=0" in out
