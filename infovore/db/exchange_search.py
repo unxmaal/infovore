@@ -58,7 +58,7 @@ def search_exchanges(
         "        WHERE messages_fts MATCH ?) f"
         " JOIN messages m ON m.id = f.rowid"
         " JOIN exchange_messages em ON em.message_id = m.id"
-        " JOIN exchanges e ON e.id = em.exchange_id"
+        " JOIN current_exchanges e ON e.id = em.exchange_id"
         f" WHERE {SHAREABLE_MESSAGE}{excl_clause}"
         " ORDER BY f.score, m.id",
         (*gate_params, match, *excl_params),
@@ -99,7 +99,7 @@ def _describe(
         " (SELECT COUNT(DISTINCT m.author_id) FROM exchange_messages em"
         "   JOIN messages m ON m.id = em.message_id"
         f"  WHERE em.exchange_id = e.id AND {_NOT_OPTED_OUT}) AS participants"
-        " FROM exchanges e"
+        " FROM current_exchanges e"
         " JOIN messages fm ON fm.id = e.first_message_id"
         " JOIN channels c ON c.id = fm.channel_id"
         " WHERE e.id = ?",

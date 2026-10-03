@@ -66,6 +66,8 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `exchange_remap` | append-only map from an exchange to the exchange that holds the majority of its messages under a new recipe (migration 0024, `infovore chunk --rechunk --recipe N`): `kind` is `one_to_one`, `merged`, `split` or `ambiguous` (no majority, `new_exchange_id` NULL) |
 | `superseded_exchange_messages` | the membership of exchanges a rechunk replaced (migration 0024). `exchange_messages` keeps one row per message for the current exchanges only; superseded exchanges keep their rows, claims and annotations, are flagged `exchanges.superseded_by_recipe`, and are `skipped` unless extraction was already `done` |
 | `all_exchange_messages` | view: `exchange_messages` plus `superseded_exchange_messages`, for readers that must still reach a superseded exchange (citations, context windows, batch inputs) |
+| `current_exchanges` | view: `exchanges` without those superseded by a rechunk; every reader of exchanges counts, queues, searches and exports through it, and a test fails on a raw `FROM exchanges` elsewhere |
+| `current_slice_members` | view: `current_eval_slices` restricted to current exchanges; what slice resolution serves |
 | `current_eval_slices` | view: each slice at its latest recipe. A slice rebuilt for recipe N is stored in `eval_slices` as `name@N` with its members mapped by message membership; the frozen rows are never touched, and judge, cascade and `trainable_labels` read this view |
 | `exchange_messages` | ordered membership; a message belongs to at most one exchange |
 | `prompt_versions` | every extraction prompt version with its text hash; the most recently promoted one is live |

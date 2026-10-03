@@ -69,7 +69,8 @@ def _population(
 ) -> dict[Bucket, list[int]]:
     pools: dict[Bucket, list[int]] = {bucket: [] for bucket in SIZE_BUCKETS}
     for row in conn.execute(
-        f"SELECT id, message_count FROM exchanges WHERE {condition} ORDER BY id",
+        f"SELECT id, message_count FROM current_exchanges AS exchanges WHERE {condition} ORDER BY"
+        f" id",
         tuple(params),
     ):
         pools[bucket_of(row["message_count"])].append(row["id"])
@@ -207,7 +208,8 @@ def slice_ids(conn: sqlite3.Connection, name: str) -> list[int]:
     return [
         row["exchange_id"]
         for row in conn.execute(
-            "SELECT exchange_id FROM current_eval_slices WHERE name = ? ORDER BY position", (name,)
+            "SELECT exchange_id FROM current_slice_members WHERE name = ? ORDER BY position",
+            (name,),
         )
     ]
 
@@ -216,7 +218,7 @@ def slice_summary(conn: sqlite3.Connection, name: str) -> list[BucketSummary]:
     counts: dict[Bucket, list[int]] = {bucket: [0, 0] for bucket in SIZE_BUCKETS}
     for row in conn.execute(
         "SELECT e.message_count AS n FROM current_eval_slices s"
-        " JOIN exchanges e ON e.id = s.exchange_id"
+        " JOIN current_exchanges e ON e.id = s.exchange_id"
         " WHERE s.name = ?",
         (name,),
     ):

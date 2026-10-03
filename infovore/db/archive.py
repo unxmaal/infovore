@@ -92,7 +92,7 @@ def _write(
     rows = conn.execute(
         "SELECT m.id, em.exchange_id, em.position, m.guild_id, m.channel_id,"
         " m.author_name_at_time, m.created_at, m.content"
-        " FROM exchanges e"
+        " FROM current_exchanges e"
         " JOIN exchange_messages em ON em.exchange_id = e.id"
         " JOIN messages m ON m.id = em.message_id"
         f" WHERE {gate_clause}{excl_clause}"

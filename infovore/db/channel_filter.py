@@ -60,7 +60,7 @@ def excluded_exchange_ids(
     if not exclude_channels:
         return frozenset()
     clause, params = include_channels_clause("e.channel_id", exclude_channels)
-    rows = conn.execute("SELECT e.id FROM exchanges e WHERE 1 = 1" + clause, params)
+    rows = conn.execute("SELECT e.id FROM current_exchanges e WHERE 1 = 1" + clause, params)
     return frozenset(row[0] for row in rows)
 
 

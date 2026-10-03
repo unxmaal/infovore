@@ -122,7 +122,7 @@ def _score_batch(
 
 def _channel_means(conn: sqlite3.Connection, rules: TriageRules) -> tuple[dict[int, float], float]:
     rows = conn.execute(
-        "SELECT channel_id, triage_reasons FROM exchanges WHERE triage_version = ?",
+        "SELECT channel_id, triage_reasons FROM current_exchanges WHERE triage_version = ?",
         (rules.version,),
     ).fetchall()
     raw_by_channel: dict[int, list[float]] = {}
@@ -150,7 +150,7 @@ def _apply_channel_priors(
 ) -> dict[int, float]:
     priors: dict[int, float] = {}
     rows = conn.execute(
-        "SELECT id, channel_id, triage_score, triage_reasons FROM exchanges"
+        "SELECT id, channel_id, triage_score, triage_reasons FROM current_exchanges"
         " WHERE triage_version = ?",
         (rules.version,),
     ).fetchall()
@@ -187,7 +187,8 @@ def triage_pending(
     workers: int = 1,
 ) -> TriageReport:
     candidate_rows = conn.execute(
-        "SELECT id FROM exchanges WHERE triage_version IS NULL OR triage_version != ? ORDER BY id",
+        "SELECT id FROM current_exchanges WHERE triage_version IS NULL OR triage_version != ?"
+        " ORDER BY id",
         (rules.version,),
     ).fetchall()
     candidate_ids = [row["id"] for row in candidate_rows]

@@ -25,7 +25,8 @@ def compute_triage_stats(
     conn: sqlite3.Connection, min_score: float, rules: TriageRules = DEFAULT_RULES
 ) -> TriageStats:
     rows = conn.execute(
-        "SELECT channel_id, triage_score, triage_reasons FROM exchanges WHERE triage_version = ?",
+        "SELECT channel_id, triage_score, triage_reasons FROM current_exchanges WHERE"
+        " triage_version = ?",
         (rules.version,),
     ).fetchall()
     histogram: dict[str, int] = {}

@@ -30,7 +30,7 @@ def channel_report(
     info: dict[int, tuple[str, bool]] = {}
     rows = conn.execute(
         "SELECT c.name AS name, c.id AS cid, LOWER(c.name) AS lname, LOWER(p.name) AS pname,"
-        " e.id AS eid FROM exchanges e JOIN channels c ON c.id = e.channel_id"
+        " e.id AS eid FROM current_exchanges e JOIN channels c ON c.id = e.channel_id"
         " LEFT JOIN channels p ON p.id = c.parent_id"
     )
     for row in rows:

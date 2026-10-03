@@ -52,7 +52,7 @@ def compute_yield_by_band(
         " r.output_tokens AS output_tokens,"
         " r.cost_usd AS cost_usd,"
         " (SELECT COUNT(*) FROM claims c WHERE c.extraction_run_id = r.id) AS claims"
-        " FROM extraction_runs r JOIN exchanges e ON e.id = r.exchange_id"
+        " FROM extraction_runs r JOIN current_exchanges e ON e.id = r.exchange_id"
         " WHERE r.outcome = 'ok' AND r.mode = 'live'"
     ).fetchall()
 

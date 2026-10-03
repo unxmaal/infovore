@@ -268,9 +268,7 @@ def score_all(
     rules: TriageRules = DEFAULT_RULES,
     workers: int = 1,
 ) -> int:
-    rows = conn.execute(
-        "SELECT id, channel_id FROM exchanges WHERE superseded_by_recipe IS NULL ORDER BY id"
-    ).fetchall()
+    rows = conn.execute("SELECT id, channel_id FROM current_exchanges ORDER BY id").fetchall()
     return _score_rows(conn, model, model_version, rows, rules, workers)
 
 
@@ -282,7 +280,7 @@ def score_stale(
     workers: int = 1,
 ) -> int:
     rows = conn.execute(
-        "SELECT id, channel_id FROM exchanges WHERE superseded_by_recipe IS NULL"
+        "SELECT id, channel_id FROM current_exchanges WHERE 1 = 1"
         " AND (p_lore_model IS NULL OR p_lore_model != ?) ORDER BY id",
         (model_version,),
     ).fetchall()
@@ -319,12 +317,16 @@ def _holdout_scored_for_model(
 
 def _corpus_share(conn: sqlite3.Connection, threshold: float) -> float:
     total = int(
-        conn.execute("SELECT COUNT(*) FROM exchanges WHERE p_lore IS NOT NULL").fetchone()[0]
+        conn.execute("SELECT COUNT(*) FROM current_exchanges WHERE p_lore IS NOT NULL").fetchone()[
+            0
+        ]
     )
     if not total:
         return 0.0
     passing = int(
-        conn.execute("SELECT COUNT(*) FROM exchanges WHERE p_lore >= ?", (threshold,)).fetchone()[0]
+        conn.execute(
+            "SELECT COUNT(*) FROM current_exchanges WHERE p_lore >= ?", (threshold,)
+        ).fetchone()[0]
     )
     return passing / total
 

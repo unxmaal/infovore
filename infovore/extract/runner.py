@@ -212,7 +212,9 @@ def _sample_pool(
         params.extend(excl_params)
     where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
     return conn.execute(
-        f"SELECT id, channel_id, message_count, p_lore FROM exchanges{where} ORDER BY id", params
+        f"SELECT id, channel_id, message_count, p_lore FROM current_exchanges AS exchanges{where}"
+        f" ORDER BY id",
+        params,
     ).fetchall()
 
 

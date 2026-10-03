@@ -89,7 +89,8 @@ def shadow_score(
         channels = {
             row["id"]: row["channel_id"]
             for row in conn.execute(
-                f"SELECT id, channel_id FROM exchanges WHERE id IN ({','.join('?' * len(batch))})",
+                f"SELECT id, channel_id FROM current_exchanges WHERE id IN"
+                f" ({','.join('?' * len(batch))})",
                 batch,
             )
         }
@@ -160,7 +161,7 @@ def compare_scorers(
         " r.input_tokens + r.output_tokens AS tokens,"
         " (SELECT COUNT(*) FROM claims c WHERE c.extraction_run_id = r.id) AS claims,"
         " r.input_tokens AS input_tokens"
-        " FROM extraction_runs r JOIN exchanges e ON e.id = r.exchange_id"
+        " FROM extraction_runs r JOIN current_exchanges e ON e.id = r.exchange_id"
         " WHERE r.outcome = 'ok' AND r.mode = ?"
         "   AND r.input_tokens IS NOT NULL AND r.output_tokens IS NOT NULL",
         (mode,),
@@ -311,7 +312,7 @@ def candidates_for(
         " r.input_tokens + r.output_tokens AS tokens,"
         " (SELECT COUNT(*) FROM claims c WHERE c.extraction_run_id = r.id) AS claims,"
         " r.input_tokens AS input_tokens"
-        " FROM extraction_runs r JOIN exchanges e ON e.id = r.exchange_id"
+        " FROM extraction_runs r JOIN current_exchanges e ON e.id = r.exchange_id"
         " WHERE r.outcome = 'ok' AND r.mode = ?"
         "   AND r.input_tokens IS NOT NULL AND r.output_tokens IS NOT NULL",
         (mode,),
@@ -344,7 +345,7 @@ def live_order_scores(conn: sqlite3.Connection, exchange_ids: Sequence[int]) -> 
     if not ids:
         return {}
     rows = conn.execute(
-        f"SELECT id, p_lore, triage_score, started_at FROM exchanges"
+        f"SELECT id, p_lore, triage_score, started_at FROM current_exchanges"
         f" WHERE id IN ({','.join('?' * len(ids))})",
         ids,
     ).fetchall()

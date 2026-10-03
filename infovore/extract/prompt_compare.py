@@ -67,7 +67,7 @@ def queue_size_mix(conn: sqlite3.Connection) -> dict[tuple[int, int], int]:
     thing: 90% of those are 16-49 message exchanges, while 76% of the queue is
     15 messages or fewer."""
     rows = conn.execute(
-        "SELECT message_count FROM exchanges WHERE extraction_status = 'pending'"
+        "SELECT message_count FROM current_exchanges WHERE extraction_status = 'pending'"
     ).fetchall()
     mix: dict[tuple[int, int], int] = {bucket: 0 for bucket in SIZE_BUCKETS}
     for row in rows:
@@ -81,7 +81,7 @@ def sample_extracted_exchanges(conn: sqlite3.Connection, limit: int, seed: int =
     stable: a comparison whose sample moves cannot be re-run."""
     available: dict[tuple[int, int], list[int]] = {bucket: [] for bucket in SIZE_BUCKETS}
     for row in conn.execute(
-        "SELECT DISTINCT e.id AS id, e.message_count AS message_count FROM exchanges e"
+        "SELECT DISTINCT e.id AS id, e.message_count AS message_count FROM current_exchanges e"
         " JOIN extraction_runs r ON r.exchange_id = e.id"
         " WHERE r.mode = 'live' AND r.outcome = 'ok' AND e.extraction_status = 'done'"
         " ORDER BY e.id"
