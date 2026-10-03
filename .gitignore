@@ -14,3 +14,4 @@ dist/
 *.db-wal
 *.db-shm
 .claude/
+scratch/
