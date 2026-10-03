@@ -3,6 +3,7 @@ import threading
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
+from infovore.eval.channel_report import channel_report, format_channel_report
 from infovore.eval.judge import (
     LABELS,
     LIKELY_IRRELEVANT,
@@ -104,12 +105,23 @@ class JudgeCommand:
         serve.add_argument(
             "--scorer", default=None, help="uncertainty source for --queue uncertain"
         )
-        sub.add_parser("report", help="labels, slice progress, self-agreement, labels still needed")
+        report = sub.add_parser(
+            "report", help="labels, slice progress, self-agreement, labels still needed"
+        )
+        report.add_argument("--by-channel", action="store_true", help="per-channel label breakdown")
+        report.add_argument("--min-labels", type=int, default=1)
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
         from infovore.sift.httpd import block_until_interrupted
 
+        if args.judge_action == "report" and args.by_channel:
+            rows = channel_report(context.conn, context.settings.exclude_channels, args.min_labels)
+            if rows:
+                context.stdout.write(format_channel_report(rows))
+            else:
+                context.stdout.write(f"no channels with at least {args.min_labels} labels\n")
+            return int(ExitCode.OK)
         if args.judge_action == "report":
             counts = label_counts(context.conn)
             for label in LABELS:
