@@ -73,7 +73,7 @@ def build(tmp_path: Path) -> tuple[dict[str, str], sqlite3.Connection]:
         (NOW.isoformat(), NOW.isoformat()),
     )
     conn.execute("INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, 107, 2)", (ids[6],))
-    for eid, label in zip(ids, ["relevant"] * 3 + ["irrelevant"] * 2 + ["relevant"] * 2, strict=True):
+    for eid, label in zip(ids, ["relevant"] * 3 + ["irrelevant"] * 2 + ["relevant", "irrelevant"], strict=True):
         human(conn, eid, label)
     for name, members in (("s1", [*ids[:5], ids[6]]), ("gold", [ids[5], ids[0]])):
         for position, eid in enumerate(members, start=1):

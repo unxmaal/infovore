@@ -366,31 +366,26 @@ def _content(conn: sqlite3.Connection, exchange_id: int, text: str) -> None:
 
 
 def test_likely_irrelevant_ranks_by_lexicon_share_then_p_lore(conn: sqlite3.Connection) -> None:
-    _exchange(conn, 6, [61])
-    _exchange(conn, 7, [71])
-    _exchange(conn, 8, [81])
+    for eid in (6, 7, 8, 9):
+        _exchange(conn, eid, [eid * 10 + 1])
     _slice(conn, "s2", [8])
-    for eid, text, p in ((1, "scsi disk", 0.0), (3, "lol lunch", 0.5), (4, "great food", 0.2)):
+    texts = {4: "great food", 5: "kernel panic", 6: "nothing", 9: "scsi disk", 7: "x", 8: "y"}
+    for eid, text in texts.items():
         _content(conn, eid, text)
+    for eid, p in ((1, 0.0), (2, 0.0), (3, 0.0), (4, 0.2), (5, 0.1), (6, 0.0), (7, 0.0), (8, 0.0)):
         conn.execute("UPDATE exchanges SET p_lore = ? WHERE id = ?", (p, eid))
-    _content(conn, 5, "kernel panic")
-    conn.execute("UPDATE exchanges SET p_lore = 0.1 WHERE id = 5")
-    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id IN (6, 8)")
-    _content(conn, 6, "nothing")
+    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id = 9")
     _label_with(conn, 7)
-    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id = 7")
-    _label_with(conn, 2)
 
     queue = likely_irrelevant_queue(conn)
 
     assert [(i.slice_name, i.exchange_id) for i in queue] == [
         (LIKELY_IRRELEVANT, 6),
         (LIKELY_IRRELEVANT, 4),
-        (LIKELY_IRRELEVANT, 3),
+        (LIKELY_IRRELEVANT, 9),
         (LIKELY_IRRELEVANT, 5),
-        (LIKELY_IRRELEVANT, 1),
     ]
-    assert progress(conn, queue) == (0, 5)
+    assert progress(conn, queue) == (0, 4)
 
 
 def test_the_page_states_the_labelling_definition() -> None:
