@@ -215,6 +215,30 @@ def _likely_irrelevant_items(
     ]
 
 
+def cached_queue(build: QueueBuilder) -> QueueBuilder:
+    """Build a dynamic queue once, then per call only drop what has been judged;
+    rebuild (the next batch) only when nothing is left."""
+    items: list[QueueItem] = []
+
+    def cached(conn: sqlite3.Connection) -> list[QueueItem]:
+        nonlocal items
+        judged = {
+            row["subject_id"]
+            for row in conn.execute(
+                "SELECT DISTINCT subject_id FROM annotations"
+                " WHERE subject_kind = 'exchange' AND scorer = ?",
+                (JUDGE_SCORER,),
+            )
+        }
+        remaining = [item for item in items if item.exchange_id not in judged]
+        if not remaining:
+            remaining = build(conn)
+        items = remaining
+        return remaining
+
+    return cached
+
+
 def _item(queue: list[QueueItem], index: int) -> QueueItem:
     if not 0 <= index < len(queue):
         raise UnknownQueueItemError(f"no queue item {index}; the queue has {len(queue)}")

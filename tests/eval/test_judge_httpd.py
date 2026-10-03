@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from infovore.db.connection import migrate, open_database
-from infovore.eval.judge import LIKELY_IRRELEVANT, QueueItem, frozen_queue
+from infovore.eval.judge import LIKELY_IRRELEVANT, QueueItem, cached_queue, frozen_queue
 from infovore.eval.judge_httpd import (
     JudgeServer,
     listening_url,
@@ -216,3 +216,37 @@ def test_the_page_header_shows_judged_from_the_queue() -> None:
 
     assert "judged from" in page
     assert "more irrelevant needed" in page
+
+
+def test_a_cached_queue_is_built_once_across_requests_and_judged_items_drop_out(
+    tmp_path: Path,
+) -> None:
+    conn = _db(tmp_path)
+    calls: list[int] = []
+
+    def build(db: sqlite3.Connection) -> list[QueueItem]:
+        calls.append(1)
+        done = {r[0] for r in db.execute("SELECT subject_id FROM annotations")}
+        return [QueueItem(i, LIKELY_IRRELEVANT, i) for i in (1, 2) if i not in done]
+
+    servers = start_all(
+        ["127.0.0.1"], 0, conn, FixedClock(AT), cached_queue(build), queue_name=LIKELY_IRRELEVANT
+    )
+    try:
+        for _ in range(3):
+            _get(servers[0], "/api/next")
+            _get(servers[0], "/api/exchange?index=0")
+        built_before_submit = len(calls)
+        _submit(servers[0], 0, 1, "irrelevant")
+        nxt = _get(servers[0], "/api/next")[1]
+        view = _get(servers[0], "/api/exchange?index=0")[1]
+        _submit(servers[0], 0, 2, "relevant")
+        empty = _get(servers[0], "/api/next")[1]
+    finally:
+        shutdown_all(servers)
+
+    assert built_before_submit == 1
+    assert len(calls) == 2
+    assert isinstance(nxt, dict) and nxt["progress"]["queued"] == 1
+    assert isinstance(view, dict) and view["exchange_id"] == 2
+    assert isinstance(empty, dict) and empty["index"] is None

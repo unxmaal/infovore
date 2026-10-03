@@ -11,6 +11,7 @@ from infovore.eval.judge import (
     UNCERTAIN,
     QueueBuilder,
     c1_queue,
+    cached_queue,
     frozen_queue,
     label_counts,
     likely_irrelevant_queue,
@@ -158,6 +159,8 @@ class JudgeCommand:
             build_queue = c1_queue(context.settings.exclude_channels)
         elif not frozen_queue(context.conn):
             raise ConfigError("no gold set frozen yet; run `infovore slice freeze` first")
+        if args.queue != "frozen":
+            build_queue = cached_queue(build_queue)
         hosts = args.hosts or ["127.0.0.1"]
         servers = start_all(
             hosts,
