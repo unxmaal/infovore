@@ -106,21 +106,34 @@ def frozen_queue(conn: sqlite3.Connection) -> list[QueueItem]:
     ]
 
 
+_LATEST_SCORE = (
+    "(SELECT a.score FROM annotations a WHERE a.subject_kind = 'exchange'"
+    " AND a.subject_id = exchanges.id AND a.scorer = ? AND a.reproducibility = 'derived'"
+    " ORDER BY a.scorer_version DESC, a.id DESC LIMIT 1)"
+)
+
+
 def uncertain_queue(
-    max_retries: int, min_p_lore: float, exclude_channels: frozenset[str]
+    max_retries: int,
+    min_p_lore: float,
+    exclude_channels: frozenset[str],
+    scorer: str | None = None,
 ) -> QueueBuilder:
     """Unjudged exchanges extraction could still claim, the ones the scorer is
     least sure about first (uncertainty sampling). The ref is the exchange id,
-    since a rank shifts as items are judged and would alias another exchange."""
+    since a rank shifts as items are judged and would alias another exchange.
+    `scorer` reads that scorer's latest derived annotation; None reads p_lore."""
 
     def build(conn: sqlite3.Connection) -> list[QueueItem]:
         condition, params = claimable_condition(max_retries, None, min_p_lore, exclude_channels)
+        score, score_params = ("p_lore", []) if scorer is None else (_LATEST_SCORE, [scorer])
         rows = conn.execute(
-            f"SELECT id FROM exchanges WHERE {condition} AND p_lore IS NOT NULL"
+            f"SELECT id FROM (SELECT id, {score} AS s FROM exchanges WHERE {condition})"
+            " WHERE s IS NOT NULL"
             " AND id NOT IN (SELECT subject_id FROM annotations"
             " WHERE subject_kind = 'exchange' AND scorer = ?)"
-            " ORDER BY ABS(p_lore - 0.5), id LIMIT ?",
-            (*params, JUDGE_SCORER, UNCERTAIN_LIMIT),
+            " ORDER BY ABS(s - 0.5), id LIMIT ?",
+            (*score_params, *params, JUDGE_SCORER, UNCERTAIN_LIMIT),
         ).fetchall()
         return [QueueItem(row["id"], UNCERTAIN, row["id"]) for row in rows]
 

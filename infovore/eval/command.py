@@ -95,6 +95,9 @@ class JudgeCommand:
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_JUDGE_PORT)
         serve.add_argument("--queue", choices=["frozen", UNCERTAIN], default="frozen")
+        serve.add_argument(
+            "--scorer", default=None, help="uncertainty source for --queue uncertain"
+        )
         sub.add_parser("report", help="labels, slice progress, self-agreement, labels still needed")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
@@ -122,7 +125,10 @@ class JudgeCommand:
         if args.queue == UNCERTAIN:
             settings = context.settings
             build_queue = uncertain_queue(
-                settings.max_retries, settings.triage_min_p_lore, settings.exclude_channels
+                settings.max_retries,
+                settings.triage_min_p_lore,
+                settings.exclude_channels,
+                args.scorer,
             )
         elif not frozen_queue(context.conn):
             raise ConfigError("no gold set frozen yet; run `infovore slice freeze` first")

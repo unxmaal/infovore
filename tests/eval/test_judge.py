@@ -253,6 +253,35 @@ def test_the_uncertain_queue_is_closest_to_a_coin_flip_first(conn: sqlite3.Conne
     assert [i.position for i in queue] == [3, 2, 1, 5]
 
 
+def _derived(conn: sqlite3.Connection, scorer: str, version: int, scores: dict[int, float]) -> None:
+    for exchange_id, score in scores.items():
+        conn.execute(
+            "INSERT INTO annotations (subject_kind, subject_id, scorer, scorer_version,"
+            " reproducibility, score, recipe_json, created_at)"
+            " VALUES ('exchange', ?, ?, ?, 'derived', ?, '{}', ?)",
+            (exchange_id, scorer, version, score, AT.isoformat()),
+        )
+
+
+def test_the_uncertain_queue_ranks_by_the_named_scorers_latest_version(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.5, 3: 0.5, 4: 0.5, 5: 0.5})
+    _derived(conn, "local-model", 1, {1: 0.5, 2: 0.9, 3: 0.1})
+    _derived(conn, "local-model", 2, {1: 0.95, 2: 0.6, 3: 0.45})
+    _derived(conn, "other", 1, {4: 0.5})
+    queue = uncertain_queue(3, 0.0, frozenset(), "local-model")(conn)
+
+    assert [i.exchange_id for i in queue] == [3, 2, 1]
+
+
+def test_the_uncertain_queue_default_ignores_annotations(conn: sqlite3.Connection) -> None:
+    _gate(conn, {1: 0.9, 2: 0.5})
+    _derived(conn, "local-model", 1, {1: 0.5, 2: 0.9})
+
+    assert [i.exchange_id for i in uncertain_queue(3, 0.0, frozenset())(conn)] == [2, 1]
+
+
 def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
     conn: sqlite3.Connection,
 ) -> None:

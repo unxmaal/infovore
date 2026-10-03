@@ -162,6 +162,19 @@ def test_serve_uncertain_needs_no_frozen_slices(
     assert "listening on http://127.0.0.1:" in out
 
 
+def test_serve_uncertain_accepts_a_scorer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import infovore.sift.httpd
+
+    monkeypatch.setattr(infovore.sift.httpd, "block_until_interrupted", lambda event: None)
+
+    code, _ = run(
+        ["judge", "serve", "--port", "0", "--queue", "uncertain", "--scorer", "local-model"],
+        tmp_path,
+    )
+
+    assert code == ExitCode.OK
+
+
 def test_builtin_commands_include_slice_and_judge() -> None:
     from infovore.cli import builtin_commands
 
