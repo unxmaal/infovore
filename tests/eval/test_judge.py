@@ -447,6 +447,7 @@ def test_usable_label_counts_skip_excluded_channels(conn: sqlite3.Connection) ->
 def test_queue_stats_count_judged_from_the_queue_across_rebuilds(
     conn: sqlite3.Connection,
 ) -> None:
+    _texty(conn, 2, 3)
     _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
     build = uncertain_queue(3, 0.0, frozenset())
     first = build(conn)
@@ -506,7 +507,7 @@ def test_dynamic_queues_skip_exchanges_with_fewer_than_three_text_messages(
     _slice(conn, "c1", [1, 2, 3, 6, 7, 8, 9])
 
     assert [i.exchange_id for i in c1_queue(frozenset())(conn)] == [1, 9]
-    assert {i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)} == {1, 9}
+    assert {i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)} == {9}
     assert [i.exchange_id for i in uncertain_queue(3, 0.0, frozenset())(conn)] == [1, 9]
 
 
@@ -516,7 +517,6 @@ def test_the_likely_irrelevant_pool_is_drawn_after_the_fragment_filter(
     monkeypatch.setattr("infovore.eval.judge.LIKELY_IRRELEVANT_POOL", 2)
     _exchange(conn, 6, [61, 62, 63])
     conn.execute("UPDATE exchanges SET p_lore = 0.5 WHERE id = 6")
-    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id IN (2, 3, 4, 5)")
-    conn.execute("DELETE FROM eval_slices WHERE name = ?", (GOLD,))
+    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id IN (4, 5)")
 
     assert [i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)] == [6]

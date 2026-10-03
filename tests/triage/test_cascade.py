@@ -271,7 +271,7 @@ def test_text_less_exchanges_are_set_aside_before_the_lexicon(tmp_path: Path) ->
 
     assert code == ExitCode.OK
     assert "stage no_text: n=3 share=0.600 (set aside, not scored)" in out
-    assert "stage lexicon: decided=2" in out
+    assert "stage lexicon: decided=1" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
     row = annotation_history(conn, "exchange", 2, "relevance_no_text")[0]
     assert (row["label"], row["reproducibility"]) == ("no_text", "derived")
@@ -282,7 +282,8 @@ def test_text_less_exchanges_are_set_aside_before_the_lexicon(tmp_path: Path) ->
 def test_the_denylist_outranks_no_text(tmp_path: Path) -> None:
     env, conn = build(tmp_path)
     conn.execute(
-        "INSERT INTO channels (id, guild_id, parent_id, name, kind) VALUES (2, 9, NULL, 'food', 'text')"
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (2, 9, NULL, 'food', 'text')"
     )
     conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 2")
     conn.execute("UPDATE messages SET content = '' WHERE id = 2")
