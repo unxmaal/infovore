@@ -186,6 +186,22 @@ def held_out_ids(conn: sqlite3.Connection) -> frozenset[int]:
     return frozenset(row["exchange_id"] for row in rows)
 
 
+def trainable_labels(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+) -> tuple[dict[int, Label], int]:
+    labels, last_id = training_labels(conn, exclude_channels=exclude_channels)
+    held = held_out_ids(conn)
+    return {eid: label for eid, label in labels.items() if eid not in held}, last_id
+
+
+def trainable_counts(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+) -> tuple[int, int]:
+    labels, _ = trainable_labels(conn, exclude_channels)
+    relevant = sum(1 for label in labels.values() if label is Label.LORE)
+    return relevant, len(labels) - relevant
+
+
 @dataclass(frozen=True)
 class HumanReport:
     relevant: int
@@ -208,11 +224,8 @@ def fit_human(
     minimum: int = MIN_PER_CLASS,
     exclude_channels: frozenset[str] = frozenset(),
 ) -> HumanFit:
-    labels, last_id = training_labels(conn, exclude_channels=exclude_channels)
-    held = held_out_ids(conn)
-    labels = {eid: label for eid, label in labels.items() if eid not in held}
-    relevant = sum(1 for label in labels.values() if label is Label.LORE)
-    irrelevant = len(labels) - relevant
+    labels, last_id = trainable_labels(conn, exclude_channels)
+    relevant, irrelevant = trainable_counts(conn, exclude_channels)
     if relevant < minimum or irrelevant < minimum:
         raise InsufficientHumanLabelsError(relevant, irrelevant, minimum)
     gazetteer = load_gazetteer()

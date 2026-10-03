@@ -11,6 +11,7 @@ from infovore.db.raw import get_channel, messages_by_ids
 from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, HOLDOUT, REJECTED, slice_ids
 from infovore.extract.prompt import permalink
 from infovore.rows import MessageRow
+from infovore.triage.human import trainable_counts
 from infovore.triage.lexicon import load_lexicon, score_lexicon
 
 JUDGE_SCORER = "human_exchange"
@@ -308,7 +309,10 @@ def progress(conn: sqlite3.Connection, queue: list[QueueItem]) -> tuple[int, int
 
 
 def queue_stats(
-    conn: sqlite3.Connection, queue_name: str, queue: list[QueueItem]
+    conn: sqlite3.Connection,
+    queue_name: str,
+    queue: list[QueueItem],
+    exclude_channels: frozenset[str] = frozenset(),
 ) -> dict[str, int | str]:
     """Header numbers for a queue rebuilt after every submit, where a position
     within it means nothing: judged is counted from the labels themselves."""
@@ -317,11 +321,13 @@ def queue_stats(
         " WHERE scorer = ? AND subject_kind = 'exchange' AND source_ref LIKE ?",
         (JUDGE_SCORER, f"{_REF}{queue_name}:%"),
     ).fetchone()[0]
+    needed = trainable_needed(conn, exclude_channels)
     return {
         "queue": queue_name,
         "judged": judged,
         "queued": len(queue),
-        "irrelevant_needed": labels_needed(label_counts(conn))[IRRELEVANT],
+        "relevant_needed": needed[RELEVANT],
+        "irrelevant_needed": needed[IRRELEVANT],
         "target": RELEVANCE_TARGET,
     }
 
@@ -372,6 +378,13 @@ def label_counts(
 def labels_needed(counts: dict[str, int]) -> dict[str, int]:
     """How many more of each class reach SpamAssassin's Bayes minimum."""
     return {label: max(0, RELEVANCE_TARGET - counts[label]) for label in (RELEVANT, IRRELEVANT)}
+
+
+def trainable_needed(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+) -> dict[str, int]:
+    relevant, irrelevant = trainable_counts(conn, exclude_channels)
+    return labels_needed({RELEVANT: relevant, IRRELEVANT: irrelevant})
 
 
 def self_agreement(conn: sqlite3.Connection) -> Agreement:

@@ -4,20 +4,18 @@ from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
 from infovore.eval.judge import (
-    IRRELEVANT,
     LABELS,
     LIKELY_IRRELEVANT,
     RELEVANCE_TARGET,
-    RELEVANT,
     UNCERTAIN,
     QueueBuilder,
     c1_queue,
     frozen_queue,
     label_counts,
-    labels_needed,
     likely_irrelevant_queue,
     self_agreement,
     slice_progress,
+    trainable_needed,
     uncertain_judged,
     uncertain_queue,
 )
@@ -29,6 +27,7 @@ from infovore.eval.slices import (
     slice_names,
     slice_summary,
 )
+from infovore.triage.human import trainable_counts
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -124,10 +123,11 @@ class JudgeCommand:
                 f"self-agreement: {rate} ({agreement.agreed} of {agreement.exchanges}"
                 " repeated exchanges)\n"
             )
-            usable = label_counts(context.conn, context.settings.exclude_channels)
-            for label in (RELEVANT, IRRELEVANT):
-                context.stdout.write(f"usable {label}: {usable[label]}\n")
-            for label, need in labels_needed(usable).items():
+            excluded = context.settings.exclude_channels
+            relevant, irrelevant = trainable_counts(context.conn, excluded)
+            context.stdout.write(f"trainable relevant: {relevant}\n")
+            context.stdout.write(f"trainable irrelevant: {irrelevant}\n")
+            for label, need in trainable_needed(context.conn, excluded).items():
                 context.stdout.write(f"needed: {need} more {label} to reach {RELEVANCE_TARGET}\n")
             return int(ExitCode.OK)
 
@@ -154,6 +154,7 @@ class JudgeCommand:
             context.clock,
             build_queue,
             None if args.queue == "frozen" else args.queue,
+            context.settings.exclude_channels,
         )
         try:
             for server in servers:
