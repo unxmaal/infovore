@@ -339,7 +339,9 @@ def test_cli_human_report_with_a_scorer_compares_it_head_to_head(tmp_path: Path)
     conn.commit()
     conn.close()
 
-    code, out, _ = run(["triage", "--human-report", "--scorer", "local-model", "--include-training"], env)
+    code, out, _ = run(
+        ["triage", "--human-report", "--scorer", "local-model", "--include-training"], env
+    )
     assert code == 0
     assert "scorer local-model v2: evaluated=4 relevant=2 irrelevant=2 auc=0.750" in out
     assert "threshold  tp  fp  fn  tn  precision  recall  f1" in out
@@ -380,7 +382,9 @@ def test_cli_human_report_with_a_scorer_and_no_overlap_says_auc_is_undefined(
     conn.commit()
     conn.close()
 
-    code, out, _ = run(["triage", "--human-report", "--scorer", "local-model", "--include-training"], env)
+    code, out, _ = run(
+        ["triage", "--human-report", "--scorer", "local-model", "--include-training"], env
+    )
 
     assert code == 0
     assert "evaluated=0" in out
@@ -400,7 +404,7 @@ def freeze(conn: sqlite3.Connection, name: str, ids: list[int]) -> None:
 def test_evaluate_scorer_defaults_to_held_out_s2_and_gold(tmp_path: Path) -> None:
     conn = db(tmp_path)
     a, b, c, d = labeled_four(conn)
-    derive(conn, "local-model", 1, {a: 0.9, b: 0.2, c: 0.8, d: 0.1})
+    derive(conn, "local-model", 1, {a: 0.9, b: 0.2, c: 0.95, d: 0.1})
     freeze(conn, "s2", [a, c])
     freeze(conn, "gold", [d])
     freeze(conn, "s1", [b])

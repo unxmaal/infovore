@@ -313,6 +313,7 @@ class TriageCommand:
             "--min-per-class", type=int, default=MIN_PER_CLASS, dest="min_per_class"
         )
         parser.add_argument("--scorer", default=None)
+        parser.add_argument("--include-training", action="store_true", dest="include_training")
         parser.add_argument("--scorer-version", type=int, default=None, dest="scorer_version")
         parser.add_argument("--human-limit", type=int, default=None, dest="human_limit")
         parser.add_argument("--all-exchanges", action="store_true", dest="all_exchanges")
@@ -466,10 +467,13 @@ class TriageCommand:
         from infovore.cli import ExitCode
 
         try:
-            result = evaluate_scorer(context.conn, args.scorer, args.scorer_version)
+            result = evaluate_scorer(
+                context.conn, args.scorer, args.scorer_version, args.include_training
+            )
         except NoScorerAnnotationsError as error:
             raise ConfigError(str(error)) from error
         auc_text = f"{result.auc:.3f}" if result.auc is not None else "n/a"
+        context.stdout.write(f"population: {result.population} n={result.evaluated}\n")
         context.stdout.write(
             f"scorer {result.scorer} v{result.version}: evaluated={result.evaluated}"
             f" relevant={result.relevant} irrelevant={result.irrelevant} auc={auc_text}\n"
