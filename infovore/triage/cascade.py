@@ -186,7 +186,7 @@ def residue_channels(
         marks = ",".join("?" * len(chunk))
         rows = conn.execute(
             f"SELECT COALESCE(c.name, CAST(e.channel_id AS TEXT)) AS name, COUNT(*) AS n"
-            f" FROM exchanges e LEFT JOIN channels c ON c.id = e.channel_id"
+            f" FROM current_exchanges e LEFT JOIN channels c ON c.id = e.channel_id"
             f" WHERE e.id IN ({marks}) GROUP BY name",
             chunk,
         )

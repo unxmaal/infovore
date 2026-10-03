@@ -315,18 +315,16 @@ def test_all_runs_every_current_exchange_and_reports_share_and_residue_channels(
 
     assert code == ExitCode.OK
     assert "corpus: n=6" in out
-    assert "stage lexicon: decided=2 relevant=2 irrelevant=0 share=0.333" in out
+    assert "stage lexicon: decided=4 relevant=4 irrelevant=0 share=0.667" in out
     assert "stage bayes: abstains on everything" in out
-    assert "residue: n=4 share=0.667" in out
-    assert "residue channel general: 4" in out
+    assert "residue: n=2 share=0.333" in out
+    assert "residue channel general: 2" in out
     assert "labelled=" in out and "accuracy=" in out
     assert "progress 6/6" in capsys.readouterr().err
 
 
 def test_all_with_write_annotates_exchanges_outside_every_slice(tmp_path: Path) -> None:
     env, conn = build(tmp_path)
-    conn.execute("DELETE FROM eval_slices")
-    conn.commit()
     conn.close()
 
     code, out, _ = run(["relevance", "cascade", "--all", "--write"], env)
@@ -334,6 +332,7 @@ def test_all_with_write_annotates_exchanges_outside_every_slice(tmp_path: Path) 
     assert code == ExitCode.OK
     assert "wrote 7 exchanges" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
+    assert annotation_history(conn, "exchange", 6, "relevance_lexicon")
     assert annotation_history(conn, "exchange", 2, "relevance_lexicon")[0]["label"] == "relevant"
 
 
@@ -351,7 +350,7 @@ def test_min_per_class_lets_the_bayes_stage_fit(tmp_path: Path) -> None:
 def test_residue_channels_counts_by_channel_name_and_falls_back_to_the_id(
     tmp_path: Path,
 ) -> None:
-    env, conn = build(tmp_path)
+    _, conn = build(tmp_path)
     conn.execute(
         "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
         " VALUES (1, 9, NULL, 'general', 'text')"

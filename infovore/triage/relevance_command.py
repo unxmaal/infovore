@@ -3,9 +3,9 @@ import sys
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
-from infovore.rows import Label
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.eval.slices import BUILD, slice_ids, slice_names
+from infovore.rows import Label
 from infovore.triage.cascade import (
     SCORERS,
     Outcome,
@@ -28,6 +28,7 @@ from infovore.triage.lexicon import (
     MINE_LIMIT,
     OFF_CHANNELS,
     TECH_CHANNELS,
+    Lexicon,
     collisions,
     load_lexicon,
     message_hits,
@@ -166,7 +167,9 @@ class RelevanceCommand:
         everything_outcomes = None
         if args.all:
             everything = set(current_exchange_ids(conn))
-            everything_outcomes = self._all(context, sorted(everything), lexicon, t_high, fit, labels, why)
+            everything_outcomes = self._all(
+                context, sorted(everything), lexicon, t_high, fit, labels, why
+            )
         if args.write:
             ids = sorted(everything)
             outcomes = everything_outcomes or run_cascade(conn, ids, lexicon, t_high, fit, exclude)
