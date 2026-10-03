@@ -432,10 +432,11 @@ def test_c1_and_likely_irrelevant_queues_skip_excluded_channels(conn: sqlite3.Co
     )
     conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 4")
     conn.execute("UPDATE exchanges SET channel_id = 3 WHERE id = 5")
+    _exchange(conn, 6, [61])
     conn.execute("UPDATE exchanges SET p_lore = 0.1")
     _slice(conn, "c1", [2, 4, 5])
     excluded = frozenset({"food"})
 
     assert [i.exchange_id for i in c1_queue(excluded)(conn)] == [2]
-    assert {i.exchange_id for i in likely_irrelevant_queue(excluded)(conn)} == {1, 2, 3}
-    assert {i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)} == {1, 2, 3, 4, 5}
+    assert {i.exchange_id for i in likely_irrelevant_queue(excluded)(conn)} == {6}
+    assert {i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)} == {4, 5, 6}
