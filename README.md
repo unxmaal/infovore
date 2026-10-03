@@ -40,7 +40,7 @@ The product is a SQLite file (see "Consuming the database"). Nothing talks to in
 - **Import boundaries** (enforced by ruff `banned-api`): `discord` only in `source/live.py`; process spawning only in `llm/claude_cli.py`; `openai`/`httpx2` only in `llm/openai_compat.py`.
 - **One writer.** SQLite runs in WAL mode; the whole pipeline runs on the host that holds the file, and readers open it read-only. LLM backends may be remote.
 
-`infovore search` queries `messages_fts` over the raw corpus rather than over extracted claims, so a fact the extractor missed is findable and re-extractable instead of lost. `--context N` shows the N messages either side of a hit in its **channel**, not its exchange, because 54% of messages belong to no exchange the gate ever admitted and those are the ones the index exists to reach.
+`infovore search` queries `messages_fts` over the raw corpus rather than over extracted claims, so a fact the extractor missed is findable and re-extractable instead of lost. `--context N` shows the N messages either side of a hit in its **channel**, not its exchange, because 54% of messages belong to no exchange the gate ever admitted and those are the ones the index exists to reach. `--exchanges` instead ranks whole gate-passing conversations (`--all` adds rejected ones), and `export-archive` writes a shareable SQLite of those exchanges with opted-out content removed.
 
 ## Data model
 
@@ -173,11 +173,12 @@ Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, e
 
 ```
 uv run infovore status
-uv run infovore search TERMS... [--limit N] [--context N]
+uv run infovore search TERMS... [--limit N] [--context N] [--exchanges [--all]]
 uv run infovore slice freeze
 uv run infovore slice show [NAME]
-uv run infovore judge serve [--host HOST ...] [--port PORT] [--queue frozen|uncertain]
+uv run infovore judge serve [--host HOST ...] [--port PORT] [--queue frozen|uncertain] [--scorer NAME]
 uv run infovore judge report
+uv run infovore export-archive PATH [--force]
 uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
 uv run infovore triage [--report]
