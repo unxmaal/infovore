@@ -8,6 +8,7 @@ from typing import Final
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import excluded_exchange_ids
+from infovore.db.exchange_text import text_message_counts
 from infovore.eval.slices import BUILD
 from infovore.rows import Label
 from infovore.triage.bayes import p_lore
@@ -25,11 +26,13 @@ from infovore.triage.lexicon import Lexicon, LexiconScore, score_lexicon
 PRECISION_TARGET: Final = 0.97
 BAYES_HIGH: Final = 0.9
 BAYES_LOW: Final = 0.1
-STAGES: Final = ("denylist", "lexicon", "bayes", "residue")
+STAGES: Final = ("denylist", "no_text", "lexicon", "bayes", "residue")
 SCORERS: Final = {stage: f"relevance_{stage}" for stage in STAGES}
 RELEVANT: Final = "relevant"
 IRRELEVANT: Final = "irrelevant"
 RESIDUE: Final = "residue"
+NO_TEXT: Final = "no_text"
+UNSCORED: Final = (RESIDUE, NO_TEXT)
 
 
 @dataclass(frozen=True)
@@ -121,11 +124,16 @@ def run_cascade(
     exclude_channels: frozenset[str] = frozenset(),
 ) -> list[Outcome]:
     denied = excluded_exchange_ids(conn, exclude_channels)
-    inputs = exchange_inputs_for_ids(conn, [eid for eid in ids if eid not in denied])
+    live = [eid for eid in ids if eid not in denied]
+    text = text_message_counts(conn, live)
+    inputs = exchange_inputs_for_ids(conn, [eid for eid in live if text[eid]])
     outcomes = []
     for eid in ids:
         if eid in denied:
             outcomes.append(Outcome(eid, 0.0, 0, 0, None, "denylist", IRRELEVANT))
+            continue
+        if not text[eid]:
+            outcomes.append(Outcome(eid, 0.0, 0, 0, None, NO_TEXT, NO_TEXT))
             continue
         one = inputs[eid]
         score = score_lexicon(lexicon, one.messages)
@@ -161,12 +169,12 @@ def stage_reports(outcomes: Sequence[Outcome], labels: dict[int, Label]) -> list
                 decided=len(mine),
                 relevant=sum(1 for o in mine if o.decision == RELEVANT),
                 irrelevant=sum(1 for o in mine if o.decision == IRRELEVANT),
-                labelled=len(pairs),
-                correct=tp + tn if stage != "residue" else 0,
-                tp=tp if stage != "residue" else 0,
-                fp=fp if stage != "residue" else 0,
-                fn=fn if stage != "residue" else 0,
-                tn=tn if stage != "residue" else 0,
+                labelled=len(pairs) if stage not in UNSCORED else 0,
+                correct=tp + tn if stage not in UNSCORED else 0,
+                tp=tp if stage not in UNSCORED else 0,
+                fp=fp if stage not in UNSCORED else 0,
+                fn=fn if stage not in UNSCORED else 0,
+                tn=tn if stage not in UNSCORED else 0,
             )
         )
     return reports
@@ -194,15 +202,15 @@ def write_outcomes(
         "bayes_band": [BAYES_LOW, BAYES_HIGH],
     }
     for o in outcomes:
-        if o.stage == "denylist":
+        if o.stage in ("denylist", NO_TEXT):
             denied = Annotation(
                 subject_kind="exchange",
                 subject_id=o.exchange_id,
-                scorer=SCORERS["denylist"],
-                scorer_version=versions["denylist"],
+                scorer=SCORERS[o.stage],
+                scorer_version=versions[o.stage],
                 reproducibility="derived",
                 score=None,
-                label=IRRELEVANT,
+                label=o.decision,
                 recipe=json.loads(json.dumps(base)),
                 source_ref="relevance-cascade",
             )

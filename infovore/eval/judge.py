@@ -6,6 +6,7 @@ from datetime import datetime
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import exclude_channels_clause, excluded_exchange_ids
+from infovore.db.exchange_text import enough_text_clause
 from infovore.db.exchanges import claimable_condition, exchange_message_ids, get_exchange
 from infovore.db.raw import get_channel, messages_by_ids
 from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, HOLDOUT, REJECTED, slice_ids
@@ -26,6 +27,7 @@ LABELS = (RELEVANT, IRRELEVANT, BAD_GROUPING)
 UNCERTAIN = "uncertain"
 LIKELY_IRRELEVANT = "likely-irrelevant"
 LIKELY_IRRELEVANT_POOL = 2000
+MIN_TEXT_MESSAGES = 3
 UNCERTAIN_LIMIT = 200
 RELEVANCE_TARGET = 200
 CONTEXT_SIZE = 3
@@ -134,12 +136,13 @@ def uncertain_queue(
         condition, params = claimable_condition(max_retries, None, min_p_lore, exclude_channels)
         score, score_params = ("p_lore", []) if scorer is None else (_LATEST_SCORE, [scorer])
         rows = conn.execute(
-            f"SELECT id FROM (SELECT id, {score} AS s FROM exchanges WHERE {condition})"
+            f"SELECT id FROM (SELECT id, {score} AS s FROM exchanges WHERE {condition}"
+            f" AND {enough_text_clause('exchanges.id')})"
             " WHERE s IS NOT NULL"
             " AND id NOT IN (SELECT subject_id FROM annotations"
             " WHERE subject_kind = 'exchange' AND scorer = ?)"
             " ORDER BY ABS(s - 0.5), id LIMIT ?",
-            (*score_params, *params, JUDGE_SCORER, UNCERTAIN_LIMIT),
+            (*score_params, *params, MIN_TEXT_MESSAGES, JUDGE_SCORER, UNCERTAIN_LIMIT),
         ).fetchall()
         return [QueueItem(row["id"], UNCERTAIN, row["id"]) for row in rows]
 
@@ -161,7 +164,11 @@ def c1_queue(exclude_channels: frozenset[str]) -> QueueBuilder:
 def _c1_items(conn: sqlite3.Connection, exclude_channels: frozenset[str]) -> list[QueueItem]:
     clause, params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     allowed = {
-        row["id"] for row in conn.execute(f"SELECT id FROM exchanges WHERE 1 = 1{clause}", params)
+        row["id"]
+        for row in conn.execute(
+            f"SELECT id FROM exchanges WHERE {enough_text_clause('exchanges.id')}{clause}",
+            (MIN_TEXT_MESSAGES, *params),
+        )
     }
     judged = {
         row["subject_id"]
@@ -193,8 +200,8 @@ def _likely_irrelevant_items(
     rows = conn.execute(
         f"SELECT id, p_lore FROM exchanges WHERE p_lore IS NOT NULL AND {_UNJUDGED}"
         f" AND id NOT IN (SELECT exchange_id FROM eval_slices WHERE name IN (?, ?)){clause}"
-        " ORDER BY p_lore, id LIMIT ?",
-        (JUDGE_SCORER, HOLDOUT, GOLD, *excl_params, LIKELY_IRRELEVANT_POOL),
+        f" AND {enough_text_clause('exchanges.id')} ORDER BY p_lore, id LIMIT ?",
+        (JUDGE_SCORER, HOLDOUT, GOLD, *excl_params, MIN_TEXT_MESSAGES, LIKELY_IRRELEVANT_POOL),
     ).fetchall()
     lexicon = load_lexicon()
     inputs = exchange_inputs_for_ids(conn, [row["id"] for row in rows])

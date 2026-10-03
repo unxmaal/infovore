@@ -162,6 +162,11 @@ class RelevanceCommand:
     def _line(report: StageReport, no_bayes: bool, why: str) -> str:
         if report.stage == "residue":
             return f"stage residue: n={report.decided} share={report.share:.3f}\n"
+        if report.stage == "no_text":
+            return (
+                f"stage no_text: n={report.decided} share={report.share:.3f}"
+                " (set aside, not scored)\n"
+            )
         if report.stage == "bayes" and no_bayes:
             return f"stage bayes: abstains on everything ({why})\n"
         accuracy = "n/a" if report.accuracy is None else f"{report.accuracy:.3f}"
