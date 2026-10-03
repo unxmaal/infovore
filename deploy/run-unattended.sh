@@ -1,6 +1,6 @@
 #!/bin/zsh -l
 # Unattended infovore live extraction (best-first) in tmux, Mac kept awake. Resume-safe.
-#   INFOVORE_PROMPT_VERSION=vN ~/infovore/run-unattended.sh start --i-approved
+#   ~/infovore/run-unattended.sh start --i-approved
 #   ~/infovore/run-unattended.sh stop    # end it (work in progress is kept)
 set -u
 SELF=$HOME/infovore/run-unattended.sh
@@ -11,9 +11,14 @@ LOG=~/infovore/logs; mkdir -p $LOG
 case "${1:-start}" in
   start)
     [ "${2:-}" = "--i-approved" ] || { echo "refusing: start needs --i-approved (explicit approval)" >&2; exit 1; }
-    [ -n "${INFOVORE_PROMPT_VERSION:-}" ] || { echo "refusing: INFOVORE_PROMPT_VERSION is not set" >&2; exit 1; }
     uv run infovore triage 2>&1 | tail -n 5 | tee -a $LOG/setup.log
-    uv run infovore promote --prompt-version "$INFOVORE_PROMPT_VERSION" 2>&1 | tee -a $LOG/setup.log
+    code_version=$(uv run python -c 'from infovore.extract.prompt import PROMPT_VERSION; print(PROMPT_VERSION)')
+    live_version=$(uv run infovore status 2>/dev/null | awk '/^live prompt version:/ {print $NF}')
+    if [ "$code_version" != "$live_version" ]; then
+      echo "refusing to start: code prompt is $code_version, promoted is ${live_version:-none}." | tee -a $LOG/setup.log
+      echo "promote deliberately first: uv run infovore promote --prompt-version $code_version" | tee -a $LOG/setup.log
+      exit 1
+    fi
     tmux new-session -d -s infovore -n extract "caffeinate -dimsu $SELF extract"
     echo "started: tmux attach -t infovore  (logs in $LOG)"
     ;;
@@ -27,5 +32,9 @@ case "${1:-start}" in
       if [ $rc -eq 0 ]; then echo "$(date) extract queue drained" >>$LOG/extract.log; break; fi
       echo "$(date) extract exited $rc, restarting in 60s" >>$LOG/extract.log; sleep 60
     done
+    ;;
+  *)
+    echo "usage: $SELF start|stop" >&2
+    exit 2
     ;;
 esac
