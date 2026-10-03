@@ -136,7 +136,8 @@ def uncertain_queue(
         condition, params = claimable_condition(max_retries, None, min_p_lore, exclude_channels)
         score, score_params = ("p_lore", []) if scorer is None else (_LATEST_SCORE, [scorer])
         rows = conn.execute(
-            f"SELECT id FROM (SELECT id, {score} AS s FROM exchanges WHERE {condition}"
+            f"SELECT id FROM (SELECT id, {score} AS s FROM current_exchanges AS exchanges WHERE"
+            f" {condition}"
             f" AND {enough_text_clause('exchanges.id')})"
             " WHERE s IS NOT NULL"
             " AND id NOT IN (SELECT subject_id FROM annotations"
@@ -166,7 +167,8 @@ def _c1_items(conn: sqlite3.Connection, exclude_channels: frozenset[str]) -> lis
     allowed = {
         row["id"]
         for row in conn.execute(
-            f"SELECT id FROM exchanges WHERE {enough_text_clause('exchanges.id')}{clause}",
+            f"SELECT id FROM current_exchanges AS exchanges WHERE"
+            f" {enough_text_clause('exchanges.id')}{clause}",
             (MIN_TEXT_MESSAGES, *params),
         )
     }
@@ -198,7 +200,8 @@ def _likely_irrelevant_items(
     only the LIKELY_IRRELEVANT_POOL lowest p_lore are scored, so no whole-corpus pass."""
     clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     rows = conn.execute(
-        f"SELECT id, p_lore FROM exchanges WHERE p_lore IS NOT NULL AND {_UNJUDGED}"
+        f"SELECT id, p_lore FROM current_exchanges AS exchanges WHERE p_lore IS NOT NULL AND"
+        f" {_UNJUDGED}"
         f" AND id NOT IN (SELECT exchange_id FROM current_eval_slices WHERE name IN (?, ?)){clause}"
         f" AND {enough_text_clause('exchanges.id')} ORDER BY p_lore, id LIMIT ?",
         (JUDGE_SCORER, HOLDOUT, GOLD, *excl_params, MIN_TEXT_MESSAGES, LIKELY_IRRELEVANT_POOL),

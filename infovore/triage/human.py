@@ -165,7 +165,7 @@ def training_labels(
     rows = conn.execute(
         "SELECT id, subject_id, label FROM annotations WHERE scorer = ?"
         " AND subject_kind = 'exchange' AND reproducibility = 'recorded'"
-        " AND subject_id NOT IN (SELECT id FROM exchanges WHERE superseded_by_recipe IS NOT NULL)"
+        " AND subject_id IN (SELECT id FROM current_exchanges)"
         " ORDER BY id",
         (HUMAN_SCORER,),
     )
@@ -183,7 +183,7 @@ def training_labels(
 def held_out_ids(conn: sqlite3.Connection) -> frozenset[int]:
     marks = ", ".join("?" for _ in HELD_OUT_SLICES)
     rows = conn.execute(
-        f"SELECT DISTINCT exchange_id FROM current_eval_slices WHERE name IN ({marks})",
+        f"SELECT DISTINCT exchange_id FROM current_slice_members WHERE name IN ({marks})",
         HELD_OUT_SLICES,
     )
     return frozenset(row["exchange_id"] for row in rows)
@@ -283,7 +283,7 @@ def score_human(
     ids = [
         row["id"]
         for row in conn.execute(
-            "SELECT id FROM exchanges WHERE superseded_by_recipe IS NULL ORDER BY id LIMIT ?",
+            "SELECT id FROM current_exchanges ORDER BY id LIMIT ?",
             (cap,),
         )
     ]

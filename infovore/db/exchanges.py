@@ -182,7 +182,8 @@ def claimable_exchanges(
 ) -> list[ExchangeRow]:
     condition, params = claimable_condition(max_retries, min_score, min_p_lore, exclude_channels)
     rows = conn.execute(
-        f"SELECT * FROM exchanges WHERE {condition} ORDER BY {_ORDER_BY[order]} LIMIT ?",
+        f"SELECT * FROM current_exchanges AS exchanges WHERE {condition} ORDER BY"
+        f" {_ORDER_BY[order]} LIMIT ?",
         (*params, limit),
     ).fetchall()
     return [_row_to_exchange(row) for row in rows]
@@ -192,7 +193,7 @@ def has_untriaged_claimable(
     conn: sqlite3.Connection, current_version: str, max_retries: int
 ) -> bool:
     row = conn.execute(
-        "SELECT 1 FROM exchanges WHERE extraction_status IN (?, ?) AND retry_count < ?"
+        "SELECT 1 FROM current_exchanges WHERE extraction_status IN (?, ?) AND retry_count < ?"
         " AND (triage_version IS NULL OR triage_version != ?) LIMIT 1",
         (
             ExtractionStatus.PENDING.value,

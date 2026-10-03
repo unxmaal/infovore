@@ -331,7 +331,8 @@ def _labeled_p_lore(conn: sqlite3.Connection, examples: Sequence[Example]) -> di
     ids = [example.exchange_id for example in examples]
     placeholders = ",".join("?" * len(ids))
     rows = conn.execute(
-        f"SELECT id, p_lore FROM exchanges WHERE id IN ({placeholders}) AND p_lore IS NOT NULL",
+        f"SELECT id, p_lore FROM current_exchanges WHERE id IN ({placeholders}) AND p_lore IS NOT"
+        f" NULL",
         ids,
     ).fetchall()
     return {row["id"]: row["p_lore"] for row in rows}
@@ -552,8 +553,8 @@ def corpus_document_frequencies(
     and once more after the last one, so a caller can print progress on a
     pass over the real DB that can take a while.
     """
-    total_exchanges = int(conn.execute("SELECT COUNT(*) FROM exchanges").fetchone()[0])
-    exchange_ids = [row[0] for row in conn.execute("SELECT id FROM exchanges ORDER BY id")]
+    total_exchanges = int(conn.execute("SELECT COUNT(*) FROM current_exchanges").fetchone()[0])
+    exchange_ids = [row[0] for row in conn.execute("SELECT id FROM current_exchanges ORDER BY id")]
     document_frequency: Counter[str] = Counter()
     scanned = 0
 
@@ -906,13 +907,15 @@ def _corpus_share(conn: sqlite3.Connection, column: str, threshold: float) -> fl
     # `column` is always one of the two literals below, never user input.
     assert column in ("triage_score", "p_lore")
     total = int(
-        conn.execute(f"SELECT COUNT(*) FROM exchanges WHERE {column} IS NOT NULL").fetchone()[0]
+        conn.execute(
+            f"SELECT COUNT(*) FROM current_exchanges WHERE {column} IS NOT NULL"
+        ).fetchone()[0]
     )
     if not total:  # pragma: no cover - unreachable: `threshold` only exists when >=1 row scored it
         return 0.0
     passing = int(
         conn.execute(
-            f"SELECT COUNT(*) FROM exchanges WHERE {column} >= ?", (threshold,)
+            f"SELECT COUNT(*) FROM current_exchanges WHERE {column} >= ?", (threshold,)
         ).fetchone()[0]
     )
     return passing / total
@@ -927,7 +930,7 @@ def _labeled_column_scores(
         return []
     placeholders = ",".join("?" * len(exchange_ids))
     rows = conn.execute(
-        f"SELECT id, {column} AS value FROM exchanges"
+        f"SELECT id, {column} AS value FROM current_exchanges"
         f" WHERE id IN ({placeholders}) AND {column} IS NOT NULL",
         exchange_ids,
     ).fetchall()
@@ -1015,7 +1018,7 @@ def compute_report_card(
     if combination_card.threshold is not None:
         final_model = _fit_combined_weights(examples, p_lore_by_exchange)
         rows = conn.execute(
-            "SELECT triage_reasons, p_lore, channel_id FROM exchanges"
+            "SELECT triage_reasons, p_lore, channel_id FROM current_exchanges"
             " WHERE triage_reasons IS NOT NULL"
         ).fetchall()
         if rows:

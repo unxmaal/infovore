@@ -140,7 +140,7 @@ def compute_gain_curve(
         " r.input_tokens + r.output_tokens AS tokens,"
         " (SELECT COUNT(*) FROM claims c WHERE c.extraction_run_id = r.id) AS claims"
         ", r.input_tokens AS input_tokens"
-        " FROM extraction_runs r JOIN exchanges e ON e.id = r.exchange_id"
+        " FROM extraction_runs r JOIN current_exchanges e ON e.id = r.exchange_id"
         " WHERE r.outcome = 'ok' AND r.mode = ?"
         "   AND r.input_tokens IS NOT NULL AND r.output_tokens IS NOT NULL"
         "   AND e.p_lore IS NOT NULL",

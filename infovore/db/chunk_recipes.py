@@ -58,7 +58,5 @@ def recipe_for_version(conn: sqlite3.Connection, version: int) -> ChunkRecipe | 
 
 
 def current_recipe_version(conn: sqlite3.Connection) -> int:
-    row = conn.execute(
-        "SELECT MAX(chunk_recipe) AS version FROM exchanges WHERE superseded_by_recipe IS NULL"
-    ).fetchone()
+    row = conn.execute("SELECT MAX(chunk_recipe) AS version FROM current_exchanges").fetchone()
     return int(row["version"] or 1)

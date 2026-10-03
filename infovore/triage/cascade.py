@@ -97,7 +97,7 @@ def tuning_samples(
     build = {
         row["exchange_id"]
         for row in conn.execute(
-            "SELECT exchange_id FROM current_eval_slices WHERE name = ?", (BUILD,)
+            "SELECT exchange_id FROM current_slice_members WHERE name = ?", (BUILD,)
         )
     } - held
     ids = sorted(eid for eid in build if eid in labels)

@@ -98,7 +98,7 @@ def _excluded_by_denylist(
     )
     return _count_params(
         conn,
-        f"SELECT COUNT(*) FROM exchanges WHERE {gate_clause}{denylist_clause}",
+        f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {gate_clause}{denylist_clause}",
         (*gate_params, *denylist_params),
     )
 
@@ -152,7 +152,9 @@ def collect_status(
         max_retries, triage_min_score, triage_min_p_lore, exclude_channels
     )
     pending_gated = _count_params(
-        conn, f"SELECT COUNT(*) FROM exchanges WHERE {gated_clause}", tuple(gated_params)
+        conn,
+        f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {gated_clause}",
+        tuple(gated_params),
     )
 
     since = to_db_time(now - timedelta(hours=throughput_window_hours)) if now else None
@@ -181,7 +183,7 @@ def collect_status(
         messages=_count(conn, "SELECT COUNT(*) FROM messages"),
         deleted_messages=_count(conn, "SELECT COUNT(*) FROM messages WHERE deleted_at IS NOT NULL"),
         exchanges_by_status=_counts(
-            conn, "SELECT extraction_status, COUNT(*) FROM exchanges GROUP BY 1 ORDER BY 1"
+            conn, "SELECT extraction_status, COUNT(*) FROM current_exchanges GROUP BY 1 ORDER BY 1"
         ),
         claims_by_novelty=_counts(
             conn,
@@ -195,26 +197,34 @@ def collect_status(
         last_probe_at=_latest_time(conn, "SELECT MAX(probed_at) FROM claims"),
         live_prompt_version=_live_prompt_version(conn),
         triaged_exchanges=_count_params(
-            conn, "SELECT COUNT(*) FROM exchanges WHERE triage_version = ?", (rules.version,)
+            conn,
+            "SELECT COUNT(*) FROM current_exchanges WHERE triage_version = ?",
+            (rules.version,),
         ),
         above_threshold_exchanges=_count_params(
             conn,
-            "SELECT COUNT(*) FROM exchanges WHERE triage_version = ? AND triage_score >= ?",
+            "SELECT COUNT(*) FROM current_exchanges WHERE triage_version = ? AND triage_score >= ?",
             (rules.version, triage_min_score),
         ),
         labels_by_source=counts.by_source,
         labels_effective=counts.effective,
         latest_model_version=latest_model_version,
         latest_model_labels_used=latest_model_labels_used,
-        p_lore_scored=_count(conn, "SELECT COUNT(*) FROM exchanges WHERE p_lore IS NOT NULL"),
+        p_lore_scored=_count(
+            conn, "SELECT COUNT(*) FROM current_exchanges WHERE p_lore IS NOT NULL"
+        ),
         passing_gate=_count_params(
-            conn, f"SELECT COUNT(*) FROM exchanges WHERE {gate_clause}", gate_params
+            conn,
+            f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {gate_clause}",
+            gate_params,
         ),
         excluded_by_denylist=_excluded_by_denylist(
             conn, gate_clause, gate_params, exclude_channels
         ),
         pending_exchanges=_count_params(
-            conn, f"SELECT COUNT(*) FROM exchanges WHERE {pending_clause}", tuple(pending_params)
+            conn,
+            f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {pending_clause}",
+            tuple(pending_params),
         ),
         pending_gated=pending_gated,
         extraction_per_hour=extraction_per_hour,

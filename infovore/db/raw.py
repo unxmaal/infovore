@@ -374,7 +374,7 @@ def light_channel_messages(conn: sqlite3.Connection, channel_id: int) -> list[Me
 
 def latest_exchange_for_thread(conn: sqlite3.Connection, thread_id: int) -> int | None:
     row = conn.execute(
-        "SELECT id FROM exchanges WHERE thread_id = ? AND superseded_by_recipe IS NULL"
+        "SELECT id FROM current_exchanges WHERE thread_id = ?"
         " ORDER BY started_at DESC, id DESC LIMIT 1",
         (thread_id,),
     ).fetchone()
