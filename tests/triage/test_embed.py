@@ -208,9 +208,7 @@ def fake_backend(monkeypatch: pytest.MonkeyPatch) -> FakeEmbedder:
 def test_cli_compare_prints_the_table(tmp_path: Path, fake_backend: FakeEmbedder) -> None:
     labelled_db(tmp_path, 10, 20)
 
-    code, out, _ = run(
-        ["relevance", "compare", "--cv", "5", "--residue"], environment(tmp_path)
-    )
+    code, out, _ = run(["relevance", "compare", "--cv", "5", "--residue"], environment(tmp_path))
 
     assert code == ExitCode.OK
     assert "model=fake/keywords revision=r1" in out
@@ -283,3 +281,14 @@ def test_cli_embed_score_also_scores_held_out_labels(
     assert code == ExitCode.OK
     assert "wrote 30" in out
 
+
+def test_cli_compare_without_residue_skips_that_table(
+    tmp_path: Path, fake_backend: FakeEmbedder
+) -> None:
+    labelled_db(tmp_path, 10, 20)
+
+    code, out, _ = run(["relevance", "compare", "--cv", "5"], environment(tmp_path))
+
+    assert code == ExitCode.OK
+    assert "all labels" in out
+    assert "residue" not in out

@@ -1,8 +1,10 @@
 import argparse
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
+from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.eval.slices import BUILD, slice_ids, slice_names
 from infovore.rows import Label
@@ -20,6 +22,19 @@ from infovore.triage.cascade import (
     tuning_samples,
     write_outcomes,
 )
+from infovore.triage.embed import (
+    DEFAULT_MODEL,
+    DEFAULT_REVISION,
+    MAX_CHARS,
+    EmbeddingCache,
+    Summary,
+    cross_validate,
+    embed_scores,
+)
+from infovore.triage.embed import (
+    SCORER as EMBED_SCORER,
+)
+from infovore.triage.embed_backend import load_embedder
 from infovore.triage.human import HumanFit, held_out_ids, training_labels
 from infovore.triage.lexicon import (
     MAX_OFF,
@@ -59,6 +74,18 @@ class RelevanceCommand:
             "--min-per-class", type=int, default=None, dest="min_per_class", metavar="N"
         )
         cascade.add_argument("--explain", type=int, default=None, metavar="EXCHANGE_ID")
+        for name, text in (
+            ("compare", "stratified CV: human Bayes vs embedding + logistic head"),
+            ("embed-score", "write p_relevant_embed for labelled exchanges"),
+        ):
+            embed = sub.add_parser(name, help=text)
+            embed.add_argument("--cv", type=int, default=5)
+            embed.add_argument("--model", default=DEFAULT_MODEL)
+            embed.add_argument("--revision", default=DEFAULT_REVISION)
+            embed.add_argument("--max-chars", type=int, default=MAX_CHARS, dest="max_chars")
+            embed.add_argument("--cache", default=None, help="embedding cache file")
+            if name == "compare":
+                embed.add_argument("--residue", action="store_true")
         mine = sub.add_parser("mine", help="candidate lexicon terms by channel log-odds")
         mine.add_argument("--tech", default=",".join(TECH_CHANNELS))
         mine.add_argument("--off", default=",".join(OFF_CHANNELS))
@@ -74,11 +101,92 @@ class RelevanceCommand:
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.relevance_action == "mine":
             return self._mine(context, args)
+        if args.relevance_action == "compare":
+            return self._compare(context, args)
+        if args.relevance_action == "embed-score":
+            return self._embed_score(context, args)
         if args.relevance_action == "collisions":
             return self._collisions(context, args)
         if args.explain is not None:
             return self._explain(context, args.explain)
         return self._cascade(context, args)
+
+    @staticmethod
+    def _cache(context: "AppContext", args: argparse.Namespace) -> EmbeddingCache:
+        path = args.cache or context.settings.db_path.parent / "embed-cache.db"
+        return EmbeddingCache(Path(path))
+
+    def _compare(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        embedder = load_embedder(args.model, args.revision)
+        result = cross_validate(
+            context.conn,
+            embedder,
+            self._cache(context, args),
+            args.cv,
+            args.max_chars,
+            args.residue,
+            context.settings.exclude_channels,
+        )
+        context.stdout.write(
+            f"model={embedder.model_id} revision={embedder.revision} cv={result.folds}"
+            f" max_chars={args.max_chars}\n"
+        )
+        header = (
+            "scorer\trelevant\tirrelevant\tauc\tthreshold\tprecision\trecall\tf1"
+            "\tirr_recall@rel>=0.95\n"
+        )
+        for name, comparison in (("all labels", result.all_labels), ("residue", result.residue)):
+            if comparison is None:
+                continue
+            context.stdout.write(f"{name}\n{header}")
+            context.stdout.write(self._row("naive_bayes", comparison.bayes))
+            context.stdout.write(self._row("embed_lr", comparison.embed))
+        return int(ExitCode.OK)
+
+    @staticmethod
+    def _row(name: str, s: Summary) -> str:
+        def fmt(value: float | None) -> str:
+            return "n/a" if value is None else f"{value:.3f}"
+
+        return (
+            f"{name}\t{s.relevant}\t{s.irrelevant}\t{fmt(s.auc)}\t{fmt(s.threshold)}"
+            f"\t{s.precision:.3f}\t{s.recall:.3f}\t{s.f1:.3f}\t{fmt(s.irrelevant_recall)}\n"
+        )
+
+    def _embed_score(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        conn = context.conn
+        embedder = load_embedder(args.model, args.revision)
+        scores, recipe = embed_scores(
+            conn,
+            embedder,
+            self._cache(context, args),
+            args.cv,
+            args.max_chars,
+            context.settings.exclude_channels,
+        )
+        row = conn.execute(
+            "SELECT MAX(scorer_version) AS v FROM annotations WHERE scorer = ?", (EMBED_SCORER,)
+        ).fetchone()
+        version = int(row["v"] or 0) + 1
+        for eid, score in sorted(scores.items()):
+            note = Annotation(
+                "exchange",
+                eid,
+                EMBED_SCORER,
+                version,
+                "derived",
+                score=score,
+                recipe=recipe,
+                source_ref="relevance-embed-score",
+            )
+            record_annotation(conn, note, context.clock.now())
+        conn.commit()
+        context.stdout.write(f"wrote {len(scores)} labelled exchanges: {EMBED_SCORER} v{version}\n")
+        return int(ExitCode.OK)
 
     def _mine(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
