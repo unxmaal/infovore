@@ -1,12 +1,15 @@
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from itertools import pairwise
 
 from infovore.rows import GroupingRule, MessageRow
 
 DEFAULT_QUIET_GAP = timedelta(minutes=30)
 DEFAULT_MAX_MESSAGES = 50
 DEFAULT_OVERLAP = 3
+ZERO = timedelta(0)
 
 
 @dataclass(frozen=True)
@@ -103,6 +106,68 @@ def group_by_quiet_gap(
     return groups
 
 
+def channel_gap(
+    messages: Sequence[MessageRow],
+    percentile: float,
+    floor: timedelta,
+    ceiling: timedelta,
+    include_bots: bool = False,
+) -> timedelta:
+    times = sorted(m.created_at for m in drop_ungroupable(messages, include_bots))
+    gaps = sorted(gap for earlier, later in pairwise(times) if (gap := later - earlier) <= ceiling)
+    if not gaps:
+        return floor
+    rank = max(math.ceil(percentile / 100 * len(gaps)) - 1, 0)
+    return max(gaps[rank], floor)
+
+
+def _related(group: Group, target: Group) -> bool:
+    mine = {m.id for m in group.messages}
+    theirs = {m.id for m in target.messages}
+    return any(
+        (m.reply_to_id in theirs) or any(o.reply_to_id == m.id for o in target.messages)
+        for m in group.messages
+    ) or any(o.reply_to_id in mine for o in target.messages)
+
+
+def fold_small(
+    groups: Sequence[Group], gap: timedelta, max_messages: int, small: int = 1
+) -> list[Group]:
+    work = sorted(groups, key=lambda group: _sort_key(group.messages[0]))
+    result: list[Group] = []
+    for index, group in enumerate(work):
+        if len(group.messages) > small or group.rule == GroupingRule.THREAD:
+            result.append(group)
+            continue
+        first = group.messages[0].created_at
+        last = max(m.created_at for m in group.messages)
+        options: list[tuple[bool, timedelta, int, Group]] = []
+        if result:
+            end = max(m.created_at for m in result[-1].messages)
+            options.append((_related(group, result[-1]), first - end, 0, result[-1]))
+        if index + 1 < len(work):
+            nxt = work[index + 1]
+            options.append((_related(group, nxt), nxt.messages[0].created_at - last, 1, nxt))
+        eligible = [
+            (not related, max(distance, ZERO), side, target)
+            for related, distance, side, target in options
+            if distance <= gap
+            and small < len(target.messages)
+            and len(target.messages) + len(group.messages) <= max_messages
+            and (related or target.rule != GroupingRule.THREAD)
+        ]
+        if not eligible:
+            result.append(group)
+            continue
+        *_, side, target = min(eligible, key=lambda option: option[:3])
+        merged = Group(target.rule, _ordered((*target.messages, *group.messages)), target.context)
+        if side == 0:
+            result[-1] = merged
+        else:
+            work[index + 1] = merged
+    return result
+
+
 def split_oversized(group: Group, max_messages: int, overlap: int = DEFAULT_OVERLAP) -> list[Group]:
     if len(group.messages) <= max_messages:
         return [group]
@@ -131,6 +196,8 @@ def group_messages(
     quiet_gap: timedelta = DEFAULT_QUIET_GAP,
     max_messages: int = DEFAULT_MAX_MESSAGES,
     include_bots: bool = False,
+    fold_gap: timedelta | None = None,
+    fold_size: int = 1,
 ) -> list[Group]:
     kept = drop_ungroupable(messages, include_bots)
     thread_groups, after_threads = group_by_thread(kept)
@@ -139,6 +206,8 @@ def group_messages(
 
     groups = [*thread_groups, *chain_groups, *gap_groups]
     groups.sort(key=lambda group: _sort_key(group.messages[0]))
+    if fold_gap is not None:
+        groups = fold_small(groups, fold_gap, max_messages, fold_size)
 
     split: list[Group] = []
     for group in groups:
