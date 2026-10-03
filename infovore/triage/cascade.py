@@ -74,9 +74,7 @@ def tune_high(samples: Sequence[tuple[float, bool]], target: float = PRECISION_T
 
 
 def decide_lexicon(score: LexiconScore, t_high: float) -> str | None:
-    if score.hits == 0:
-        return IRRELEVANT
-    return RELEVANT if score.share >= t_high else None
+    return RELEVANT if score.hits and score.share >= t_high else None
 
 
 def decide_bayes(p: float | None) -> str | None:

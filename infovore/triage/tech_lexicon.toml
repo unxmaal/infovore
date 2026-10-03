@@ -63,7 +63,43 @@ terms = [
   "pbx", "isdn", "dsl", "fiber", "satellite", "radio", "antenna", "sdr", "gps", "ntp", "uptime",
   "syslog", "cron", "memory", "storage", "swap", "buffer", "bus", "scsi-2", "fibre", "channel",
   "san", "nas", "iscsi", "multiboot", "grub", "lilo", "sash", "arcs", "prom", "inst", "nekoware",
-  "mipspro", "hinv", "swmgr", "tardist"
+  "mipspro", "hinv", "swmgr", "tardist",
+  # vendor_sun
+  "enterprise", "e250", "e450", "e3500", "e4500", "e5500", "e6500", "e10k", "sunfire", "sunblade", "ultra5", "ultra10", "ultra60", "ultra80", "sun4u", "sun4m", "sun4c", "sun3", "sun4", "sparc64", "microsparc", "javastation", "sunray", "sunsolve", "slowaris",
+  # vendor_dec
+  "axp", "decstation", "microvax", "decwindows", "dcl", "pdp8", "pdp-8", "pdp10", "pdp-10", "rt-11", "rsx-11", "vt100", "vt220", "vt320", "rl02", "tk50", "tu58", "ds20", "es40", "gs320",
+  # vendor_hp
+  "hewlett", "packard", "hp9000", "hp3000", "pa-8000", "pa7100", "pa8500", "visualize", "superdome", "proliant", "integrity", "mpe", "rp3440", "j6000",
+  # vendor_ibm
+  "rs/6000", "pseries", "iseries", "power2", "power4", "power5", "power6", "power7", "power8", "power9", "power10", "micro-channel", "os/400", "z/os", "s390", "system/360", "powerstack",
+  # vendor_next
+  "nextcube", "nextstation", "rhapsody",
+  # vendor_apple
+  "powermac", "powerbook", "ibook", "performa", "nubus", "adb", "hfs", "hfs+", "a/ux", "68030", "68040", "68020", "68060", "g3", "g4", "apple2", "apple-ii",
+  # vendor_commodore
+  "vic-20", "c65", "plus4", "kickstart", "agnus", "zorro", "amigaone", "aros", "morphos", "1541", "6510", "vic-ii",
+  # vendor_atari
+  "falcon", "jaguar", "lynx", "2600", "7800", "gemdos", "antic", "pokey", "atari800", "tt030",
+  # vendor_acorn
+  "archimedes", "bbc", "riscos", "arm2", "arm3", "strongarm", "iyonix", "beeb",
+  # vendor_sinclair
+  "zx81", "zx80", "zxspectrum", "timex", "ql",
+  # vendor_msx
+  "msx2", "msx2+", "turbor",
+  # vendor_sgi_rivals
+  "apollo", "stardent", "kubota", "tektronix", "3dlabs", "wildcat", "quadro", "permedia", "evans", "sutherland",
+  # cpu
+  "ev4", "ev5", "ev6", "ev67", "ev7", "21064", "21164", "21264", "r3000", "r2000", "r4600", "r10000", "r8000", "r5900", "r3k", "x86-64", "i386", "i486", "i686", "i860", "i960", "m88k", "88k", "88000", "68010", "65816", "6800", "6809", "8080", "8085", "cortex", "aarch64", "riscv", "risc-v", "superscalar", "pipeline", "microarchitecture", "endian", "big-endian", "little-endian", "endianness", "vliw", "smp", "multiprocessor", "cmos", "nmos", "fpga", "cpld", "dsp", "soc", "mcu", "avr", "stm32", "atmega", "microcontroller", "alu", "fpu", "mmu",
+  # os
+  "nt", "nt3", "win2k", "w2k", "win2000", "winxp", "xp", "vista", "win3", "win3.1", "dos", "pcdos", "drdos", "freedos", "warp", "haiku", "dragonfly", "minix", "plan9", "qnx", "vxworks", "rtos", "unixware", "openserver", "xenix", "osf1", "osf/1", "dgux", "darwin", "coherent", "symbian", "palmos", "mvs", "multics", "tops-20", "tops20", "ucsd",
+  # emulators_dev
+  "gopher64", "mupen", "mupen64", "project64", "bsnes", "higan", "snes9x", "zsnes", "fceux", "nestopia", "dolphin", "pcsx", "pcsx2", "duckstation", "rpcs3", "yuzu", "ryujinx", "citra", "cemu", "retroarch", "libretro", "mednafen", "hercules", "aranym", "hatari", "vice", "winuae", "fs-uae", "uae", "basilisk", "sheepshaver", "pearpc", "bochs", "dosbox-x", "86box", "pcem", "xen", "proxmox", "proton", "emu", "emus", "romhack", "roms", "romset", "ines", "savestate", "savestates", "devkit", "devkitpro", "devkitarm", "libdragon", "psyq", "ndk", "cross-compile", "cross-compiler", "newlib", "uclibc", "musl", "buildroot", "yocto", "openwrt", "ninja", "bazel", "gradle", "maven", "npm", "cargo", "pip", "venv", "jtag", "openocd", "uart", "bootrom", "ida", "radare2", "objdump", "disassembler", "disassembly", "decompiler", "reversing", "hexedit", "flashrom", "ch341a",
+  # consoles
+  "ultra64", "3do", "neogeo", "neo-geo", "pcengine", "turbografx", "tg16", "mastersystem", "gamegear", "game-gear", "wonderswan", "gba", "gbc", "nds", "3ds", "psp", "wiiu", "xbox360", "ps4", "ps5", "psx", "megadrive", "mega-drive", "sega-cd", "32x", "famicom", "flashcart", "everdrive", "modchip", "modchips", "region-free", "scart", "svideo", "s-video", "upscaler", "scaler", "ossc", "retrotink", "framemeister", "xrgb",
+  # repair
+  "backlight", "inverter", "recap", "recapping", "reflow", "reflowed", "desoldering", "desolder", "hotair", "hot-air", "flux", "electrolytic", "elcaps", "leaky", "corroded", "corrosion", "ni-cd", "nicd", "nimh", "tantalum", "tantalums", "fuses", "tvs", "regulators", "ldo", "mosfet", "mosfets", "igbt", "ripple", "esr", "benchtop", "smps", "5v", "3.3v", "3v3", "volts", "milliamps", "ohms", "ohm", "continuity", "scope", "logic-analyzer", "saleae", "traces", "vias", "rework", "reballing", "reball", "smd", "smt", "through-hole", "ics", "sockets", "socketed", "zif", "plcc", "dip", "soic", "qfp", "pcba", "contact-cleaner", "isopropyl", "flyback", "yoke", "deflection", "degauss", "fbt", "high-voltage", "power-supply",
+  # calculators
+  "calculator", "calculators", "rpn", "hp48", "hp-48", "hp48g", "hp48gx", "hp49", "hp50g", "hp41", "hp-41c", "hp41c", "hp12c", "hp-12c", "hp15c", "hp16c", "hp35", "hp67", "hp71b", "hp28", "ti-83", "ti83", "ti-84", "ti84", "ti-89", "ti89", "ti-92", "ti92", "ti-nspire", "nspire", "ti-30", "sr-50", "casio", "fx-9860", "hp-prime", "algebraic", "rpl", "pocket-computer", "pc-1500", "slide-rule", "numworks", "dm42", "swissmicros", "free42", "emu48", "x48", "graphing"
 ]
 
 [mined]
