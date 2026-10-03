@@ -46,6 +46,10 @@ class GazetteerError(ValueError):
     pass
 
 
+class NoScorerAnnotationsError(ValueError):
+    pass
+
+
 class InsufficientHumanLabelsError(Exception):
     def __init__(self, relevant: int, irrelevant: int, minimum: int) -> None:
         self.relevant = relevant
@@ -266,3 +270,58 @@ def score_human(
             written += 1
         conn.commit()
     return version, written
+
+
+@dataclass(frozen=True)
+class ScorerEvaluation:
+    scorer: str
+    version: int
+    evaluated: int
+    relevant: int
+    irrelevant: int
+    auc: float | None
+    metrics: tuple[Metrics, ...]
+
+
+def evaluate_scorer(
+    conn: sqlite3.Connection, scorer: str, version: int | None = None
+) -> ScorerEvaluation:
+    """Any scorer's derived exchange annotations against the latest human labels,
+    so an external model is compared head to head with Bayes by writing annotations."""
+    if version is None:
+        row = conn.execute(
+            "SELECT MAX(scorer_version) AS v FROM annotations WHERE scorer = ?"
+            " AND subject_kind = 'exchange' AND reproducibility = 'derived'",
+            (scorer,),
+        ).fetchone()
+        version = row["v"]
+    scores = {
+        row["subject_id"]: row["score"]
+        for row in conn.execute(
+            "SELECT subject_id, score FROM annotations WHERE scorer = ? AND scorer_version = ?"
+            " AND subject_kind = 'exchange' AND reproducibility = 'derived'"
+            " AND score IS NOT NULL",
+            (scorer, version),
+        )
+    }
+    if not scores:
+        raise NoScorerAnnotationsError(
+            f"no derived annotations for scorer {scorer!r}"
+            + ("" if version is None else f" version {version}")
+        )
+    labels, _ = training_labels(conn)
+    scored = [
+        (scores[exchange_id], label)
+        for exchange_id, label in labels.items()
+        if exchange_id in scores
+    ]
+    relevant = sum(1 for _, label in scored if label is Label.LORE)
+    return ScorerEvaluation(
+        scorer=scorer,
+        version=version,
+        evaluated=len(scored),
+        relevant=relevant,
+        irrelevant=len(scored) - relevant,
+        auc=auc(scored),
+        metrics=tuple(evaluate(scored, EVAL_THRESHOLDS)),
+    )

@@ -11,6 +11,8 @@ from infovore.triage.human import (
     MIN_PER_CLASS,
     SCORER,
     InsufficientHumanLabelsError,
+    NoScorerAnnotationsError,
+    evaluate_scorer,
     fit_human,
     score_human,
 )
@@ -310,6 +312,8 @@ class TriageCommand:
         parser.add_argument(
             "--min-per-class", type=int, default=MIN_PER_CLASS, dest="min_per_class"
         )
+        parser.add_argument("--scorer", default=None)
+        parser.add_argument("--scorer-version", type=int, default=None, dest="scorer_version")
         parser.add_argument("--human-limit", type=int, default=None, dest="human_limit")
         parser.add_argument("--all-exchanges", action="store_true", dest="all_exchanges")
         parser.add_argument(
@@ -426,6 +430,8 @@ class TriageCommand:
     def _human(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
 
+        if args.human_report and args.scorer is not None:
+            return self._scorer_report(context, args)
         if args.train_human and args.human_limit is None and not args.all_exchanges:
             raise ConfigError("--train-human needs --human-limit N or --all-exchanges")
         try:
@@ -454,6 +460,21 @@ class TriageCommand:
                 f"wrote {written} derived annotations as {SCORER} v{version}"
                 " (not activated; exchanges.p_lore unchanged)\n"
             )
+        return ExitCode.OK
+
+    def _scorer_report(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        try:
+            result = evaluate_scorer(context.conn, args.scorer, args.scorer_version)
+        except NoScorerAnnotationsError as error:
+            raise ConfigError(str(error)) from error
+        auc_text = f"{result.auc:.3f}" if result.auc is not None else "n/a"
+        context.stdout.write(
+            f"scorer {result.scorer} v{result.version}: evaluated={result.evaluated}"
+            f" relevant={result.relevant} irrelevant={result.irrelevant} auc={auc_text}\n"
+        )
+        context.stdout.write(_render_metrics_table(result.metrics) + "\n")
         return ExitCode.OK
 
     def _recommend(self, context: "AppContext", args: argparse.Namespace) -> int:
