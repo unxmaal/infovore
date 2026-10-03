@@ -246,7 +246,7 @@ def test_a_cached_queue_is_built_once_across_requests_and_judged_items_drop_out(
         shutdown_all(servers)
 
     assert built_before_submit == 1
-    assert len(calls) == 3
+    assert len(calls) == 2
     assert isinstance(nxt, dict) and nxt["progress"]["queued"] == 1
     assert isinstance(view, dict) and view["exchange_id"] == 2
     assert isinstance(empty, dict) and empty["index"] is None
