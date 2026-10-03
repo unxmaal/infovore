@@ -392,6 +392,7 @@ def test_the_page_states_the_labelling_definition() -> None:
     from importlib import resources
 
     page = resources.files("infovore.eval").joinpath("templates/judge.html").read_text()
+    page = " ".join(page.split())
 
     assert "tech, computers, SGI, IRIX or retrocomputing" in page
     assert "reusable SGI/IRIX" not in page

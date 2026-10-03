@@ -199,6 +199,7 @@ uv run infovore review [--run-ids [ID_OR_RANGE ...]] [--out PATH]
 uv run infovore promote --prompt-version V
 uv run infovore label --from-runs [ID_OR_RANGE ...]
 uv run infovore label --exchange-id ID --lore|--noise
+uv run infovore relevance cascade --slices s1,gold [--write] [--explain EXCHANGE_ID]   # lexicon, then Bayes, then residue (#209); `relevance mine` lists lexicon candidates
 uv run infovore snapshot <dest> [--force]
 uv run infovore run [--interval SECONDS] [--once]
 uv run infovore sift export [--size N] [--strategy random|uncertain|mixed] [--seed S] [--mix FRACTION] [--channels a,b,c] --out DIR

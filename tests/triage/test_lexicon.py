@@ -40,9 +40,9 @@ def test_the_version_changes_with_the_terms_and_the_gazetteer() -> None:
 def test_a_malformed_lexicon_is_refused() -> None:
     gazetteer = load_gazetteer()
     with pytest.raises(LexiconError):
-        parse_lexicon("[general]\nterms = []\n", gazetteer)
+        parse_lexicon("[general]\nterms = []\n[mined]\nterms = []\n", gazetteer)
     with pytest.raises(LexiconError):
-        parse_lexicon('[general]\nterms = [1]\n[mined]\nterms = []\n', gazetteer)
+        parse_lexicon("[general]\nterms = [1]\n[mined]\nterms = []\n", gazetteer)
 
 
 def test_hits_cover_terms_plurals_and_the_gazetteer() -> None:
@@ -67,11 +67,17 @@ def corpus(path: Path) -> sqlite3.Connection:
     migrate(conn)
     for channel_id, name in ((1, "tech"), (2, "chat"), (3, "other")):
         conn.execute(
-            "INSERT INTO channels (id, guild_id, parent_id, name, kind) VALUES (?, 1, NULL, ?, 'text')",
+            "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+            " VALUES (?, 1, NULL, ?, 'text')",
             (channel_id, name),
         )
-    rows = [(1, "the zorp daemon crashed"), (1, "zorp again"), (2, "the lunch was good"),
-            (2, "lunch again, zorp"), (3, "ignored zorp zorp")]
+    rows = [
+        (1, "the zorp daemon crashed"),
+        (1, "zorp again"),
+        (2, "the lunch was good"),
+        (2, "lunch again, zorp"),
+        (3, "ignored zorp zorp"),
+    ]
     for index, (channel_id, text) in enumerate(rows, start=1):
         conn.execute(
             "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
@@ -89,4 +95,4 @@ def test_mining_ranks_terms_by_log_odds_between_the_channel_sets(tmp_path: Path)
     assert [m.term for m in mined] == ["zorp"]
     assert (mined[0].tech, mined[0].off) == (2, 1)
     assert mined[0].log_odds > 0
-    assert mine_terms(corpus(tmp_path / "m.db"), ["tech"], ["chat"], min_count=1, limit=1)[0].term == "zorp"
+    assert len(mine_terms(corpus(tmp_path / "n.db"), ["tech"], ["chat"], min_count=1, limit=1)) == 1

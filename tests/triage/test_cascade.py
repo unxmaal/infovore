@@ -7,13 +7,14 @@ import pytest
 from infovore.cli import ExitCode
 from infovore.db.annotations import annotation_history
 from infovore.db.connection import migrate, open_database
+from infovore.rows import Label
 from infovore.triage.cascade import (
     PRECISION_TARGET,
     Outcome,
+    decide_bayes,
     stage_reports,
     tune_high,
 )
-from infovore.rows import Label
 from tests.triage.test_command import environment, run
 from tests.triage.test_human import human, seed
 from tests.triage.test_lexicon import corpus
@@ -28,6 +29,13 @@ def test_tuning_takes_the_lowest_share_that_keeps_precision() -> None:
     assert tune_high([(0.2, False), (0.3, False)], 1.0) > 1.0
     assert tune_high([(0.0, True), (0.5, True)], 1.0) == 0.5
     assert PRECISION_TARGET > 0.9
+
+
+def test_the_bayes_band_decides_only_far_from_a_coin_flip() -> None:
+    assert decide_bayes(None) is None
+    assert decide_bayes(0.95) == "relevant"
+    assert decide_bayes(0.05) == "irrelevant"
+    assert decide_bayes(0.5) is None
 
 
 def outcome(eid: int, stage: str, decision: str) -> Outcome:
@@ -72,8 +80,13 @@ def build(tmp_path: Path) -> tuple[dict[str, str], sqlite3.Connection]:
         " VALUES (107, 1, 9, 7, 'a', ?, 'lol lunch', ?, '{}')",
         (NOW.isoformat(), NOW.isoformat()),
     )
-    conn.execute("INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, 107, 2)", (ids[6],))
-    for eid, label in zip(ids, ["relevant"] * 3 + ["irrelevant"] * 2 + ["relevant", "irrelevant"], strict=True):
+    conn.execute(
+        "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, 107, 2)",
+        (ids[6],),
+    )
+    for eid, label in zip(
+        ids, ["relevant"] * 3 + ["irrelevant"] * 2 + ["relevant", "irrelevant"], strict=True
+    ):
         human(conn, eid, label)
     for name, members in (("s1", [*ids[:5], ids[6]]), ("gold", [ids[5], ids[0]])):
         for position, eid in enumerate(members, start=1):
@@ -94,7 +107,7 @@ def test_the_cascade_reports_each_stage_per_slice(tmp_path: Path) -> None:
 
     assert code == ExitCode.OK
     assert "slice s1 (tuning, held-out excluded): n=5" in out
-    assert "slice gold: n=2" in out
+    assert "slice gold (held-out): n=2" in out
     assert "stage lexicon: decided=" in out
     assert "stage bayes: abstains on everything" in out
     assert "stage residue:" in out
@@ -112,15 +125,15 @@ def test_write_records_derived_annotations_per_stage(tmp_path: Path) -> None:
     assert code == ExitCode.OK
     assert "wrote" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
-    rows = annotation_history(conn, "exchange", 1, "relevance_lexicon")
+    rows = annotation_history(conn, "exchange", 2, "relevance_lexicon")
     assert rows[0]["reproducibility"] == "derived"
     assert '"lexicon_version": "lx-' in rows[0]["recipe_json"]
     assert rows[0]["label"] == "relevant"
-    assert annotation_history(conn, "exchange", 5, "relevance_residue")[0]["label"] == "residue"
-    assert annotation_history(conn, "exchange", 1, "relevance_bayes") == []
+    assert annotation_history(conn, "exchange", 7, "relevance_residue")[0]["label"] == "residue"
+    assert annotation_history(conn, "exchange", 2, "relevance_bayes") == []
     code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
     assert code == ExitCode.OK
-    assert len(annotation_history(conn, "exchange", 1, "relevance_lexicon")) == 2
+    assert len(annotation_history(conn, "exchange", 2, "relevance_lexicon")) == 2
     code, out, _ = run(["triage", "--human-report", "--scorer", "relevance_lexicon"], env)
     assert code == ExitCode.OK
     assert "scorer relevance_lexicon v2" in out
@@ -159,7 +172,7 @@ def test_bayes_scores_what_the_lexicon_abstained_on(
     assert "abstains on everything" not in out
     conn = open_database(env["INFOVORE_DB_PATH"])
     assert annotation_history(conn, "exchange", 7, "relevance_bayes")[0]["score"] is not None
-    assert annotation_history(conn, "exchange", 1, "relevance_bayes") == []
+    assert annotation_history(conn, "exchange", 2, "relevance_bayes") == []
 
 
 def test_mine_prints_candidates(tmp_path: Path) -> None:

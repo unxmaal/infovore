@@ -4,22 +4,26 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.db.annotations import Annotation, record_annotation
+from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.exchanges import claimable_condition, exchange_message_ids, get_exchange
 from infovore.db.raw import get_channel, messages_by_ids
-from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, slice_ids
+from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, HOLDOUT, REJECTED, slice_ids
 from infovore.extract.prompt import permalink
 from infovore.rows import MessageRow
+from infovore.triage.lexicon import load_lexicon, score_lexicon
 
 JUDGE_SCORER = "human_exchange"
 # What the page shows and asks IS the labelling function (RULE #309): bump
 # this on any change to the instructions, the context shown, or the layout,
 # so judgments made under different interfaces are never pooled by accident.
-JUDGE_INTERFACE_VERSION = 2
+JUDGE_INTERFACE_VERSION = 3
 RELEVANT = "relevant"
 IRRELEVANT = "irrelevant"
 BAD_GROUPING = "bad_grouping"
 LABELS = (RELEVANT, IRRELEVANT, BAD_GROUPING)
 UNCERTAIN = "uncertain"
+LIKELY_IRRELEVANT = "likely-irrelevant"
+LIKELY_IRRELEVANT_POOL = 2000
 UNCERTAIN_LIMIT = 200
 RELEVANCE_TARGET = 200
 CONTEXT_SIZE = 3
@@ -138,6 +142,47 @@ def uncertain_queue(
         return [QueueItem(row["id"], UNCERTAIN, row["id"]) for row in rows]
 
     return build
+
+
+_UNJUDGED = (
+    "id NOT IN (SELECT subject_id FROM annotations WHERE subject_kind = 'exchange' AND scorer = ?)"
+)
+
+
+def c1_queue(conn: sqlite3.Connection) -> list[QueueItem]:
+    judged = {
+        row["subject_id"]
+        for row in conn.execute(
+            "SELECT subject_id FROM annotations WHERE subject_kind = 'exchange' AND scorer = ?",
+            (JUDGE_SCORER,),
+        )
+    }
+    return [
+        QueueItem(exchange_id, REJECTED, position)
+        for position, exchange_id in enumerate(slice_ids(conn, REJECTED), start=1)
+        if exchange_id not in judged
+    ]
+
+
+def likely_irrelevant_queue(conn: sqlite3.Connection) -> list[QueueItem]:
+    """Unjudged exchanges outside s2 and gold, lowest lexicon share first then lowest p_lore;
+    only the LIKELY_IRRELEVANT_POOL lowest p_lore are scored, so no whole-corpus pass."""
+    rows = conn.execute(
+        f"SELECT id, p_lore FROM exchanges WHERE p_lore IS NOT NULL AND {_UNJUDGED}"
+        " AND id NOT IN (SELECT exchange_id FROM eval_slices WHERE name IN (?, ?))"
+        " ORDER BY p_lore, id LIMIT ?",
+        (JUDGE_SCORER, HOLDOUT, GOLD, LIKELY_IRRELEVANT_POOL),
+    ).fetchall()
+    lexicon = load_lexicon()
+    inputs = exchange_inputs_for_ids(conn, [row["id"] for row in rows])
+    ranked = sorted(
+        (score_lexicon(lexicon, inputs[row["id"]].messages).share, row["p_lore"], row["id"])
+        for row in rows
+    )
+    return [
+        QueueItem(exchange_id, LIKELY_IRRELEVANT, exchange_id)
+        for _, _, exchange_id in ranked[:UNCERTAIN_LIMIT]
+    ]
 
 
 def _item(queue: list[QueueItem], index: int) -> QueueItem:
