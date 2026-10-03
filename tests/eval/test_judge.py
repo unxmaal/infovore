@@ -24,6 +24,7 @@ from infovore.eval.judge import (
     labels_needed,
     likely_irrelevant_queue,
     progress,
+    queue_stats,
     self_agreement,
     slice_progress,
     submit,
@@ -397,3 +398,23 @@ def test_the_page_states_the_labelling_definition() -> None:
     assert "tech, computers, SGI, IRIX or retrocomputing" in page
     assert "reusable SGI/IRIX" not in page
     assert JUDGE_INTERFACE_VERSION == 3
+
+
+def test_queue_stats_count_judged_from_the_queue_across_rebuilds(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
+    build = uncertain_queue(3, 0.0, frozenset())
+    first = build(conn)
+    submit(conn, first, 0, first[0].exchange_id, IRRELEVANT, AT)
+
+    after = build(conn)
+
+    assert queue_stats(conn, UNCERTAIN, after) == {
+        "queue": UNCERTAIN,
+        "judged": 1,
+        "queued": 2,
+        "irrelevant_needed": 199,
+        "target": 200,
+    }
+    assert queue_stats(conn, "c1", after)["judged"] == 0
