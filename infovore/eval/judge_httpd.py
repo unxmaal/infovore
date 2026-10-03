@@ -17,10 +17,12 @@ from infovore.eval.judge import (
     InvalidLabelError,
     NotInExchangeError,
     QueueBuilder,
+    QueueItem,
     UnknownQueueItemError,
     exchange_view,
     first_unjudged,
     progress,
+    queue_stats,
     submit,
 )
 from infovore.timing import Clock
@@ -44,8 +46,10 @@ class JudgeServer(ThreadingHTTPServer):
         clock: Clock,
         page: str,
         build_queue: QueueBuilder,
+        queue_name: str | None = None,
     ) -> None:
         self.build_queue = build_queue
+        self.queue_name = queue_name
         self.conn = conn
         self.lock = lock
         self.clock = clock
@@ -53,12 +57,19 @@ class JudgeServer(ThreadingHTTPServer):
         super().__init__(address, _Handler)
 
 
+def _progress(server: JudgeServer, queue: list[QueueItem]) -> dict[str, Any]:
+    done, total = progress(server.conn, queue)
+    out: dict[str, Any] = {"done": done, "total": total}
+    if server.queue_name is not None:
+        out.update(queue_stats(server.conn, server.queue_name, queue))
+    return out
+
+
 def _view_payload(server: JudgeServer, index: int) -> dict[str, Any]:
     queue = server.build_queue(server.conn)
     view = exchange_view(server.conn, queue, index)
-    done, total = progress(server.conn, queue)
     payload = asdict(view)
-    payload["progress"] = {"done": done, "total": total}
+    payload["progress"] = _progress(server, queue)
     payload["interface_version"] = JUDGE_INTERFACE_VERSION
     return payload
 
@@ -91,10 +102,8 @@ class _Handler(BaseHTTPRequestHandler):
             with self.server.lock:
                 queue = self.server.build_queue(self.server.conn)
                 index = first_unjudged(self.server.conn, queue)
-                done, total = progress(self.server.conn, queue)
-            self._send_json(
-                HTTPStatus.OK, {"index": index, "progress": {"done": done, "total": total}}
-            )
+                stats = _progress(self.server, queue)
+            self._send_json(HTTPStatus.OK, {"index": index, "progress": stats})
             return
         if url.path == "/api/exchange":
             raw = parse_qs(url.query).get("index", ["0"])[0]
@@ -130,14 +139,14 @@ class _Handler(BaseHTTPRequestHandler):
             with self.server.lock:
                 queue = self.server.build_queue(self.server.conn)
                 submit(self.server.conn, queue, index, exchange_id, label, self.server.clock.now())
-                done, total = progress(self.server.conn, queue)
+                stats = _progress(self.server, queue)
         except UnknownQueueItemError as error:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": str(error)})
             return
         except (NotInExchangeError, InvalidLabelError) as error:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
             return
-        self._send_json(HTTPStatus.OK, {"progress": {"done": done, "total": total}})
+        self._send_json(HTTPStatus.OK, {"progress": stats})
 
 
 def start_all(
@@ -146,12 +155,13 @@ def start_all(
     conn: sqlite3.Connection,
     clock: Clock,
     build_queue: QueueBuilder,
+    queue_name: str | None = None,
 ) -> list[JudgeServer]:
     page = load_page()
     lock = threading.Lock()
     servers = []
     for host in hosts:
-        server = JudgeServer((host, port), conn, lock, clock, page, build_queue)
+        server = JudgeServer((host, port), conn, lock, clock, page, build_queue, queue_name)
         threading.Thread(target=server.serve_forever, daemon=True, name=f"judge-{host}").start()
         servers.append(server)
     return servers

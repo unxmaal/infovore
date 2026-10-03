@@ -5,7 +5,7 @@ from datetime import datetime
 
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
-from infovore.db.channel_filter import excluded_exchange_ids
+from infovore.db.channel_filter import exclude_channels_clause, excluded_exchange_ids
 from infovore.db.exchanges import claimable_condition, exchange_message_ids, get_exchange
 from infovore.db.raw import get_channel, messages_by_ids
 from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, HOLDOUT, REJECTED, slice_ids
@@ -150,7 +150,18 @@ _UNJUDGED = (
 )
 
 
-def c1_queue(conn: sqlite3.Connection) -> list[QueueItem]:
+def c1_queue(exclude_channels: frozenset[str]) -> QueueBuilder:
+    def build(conn: sqlite3.Connection) -> list[QueueItem]:
+        return _c1_items(conn, exclude_channels)
+
+    return build
+
+
+def _c1_items(conn: sqlite3.Connection, exclude_channels: frozenset[str]) -> list[QueueItem]:
+    clause, params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
+    allowed = {
+        row["id"] for row in conn.execute(f"SELECT id FROM exchanges WHERE 1 = 1{clause}", params)
+    }
     judged = {
         row["subject_id"]
         for row in conn.execute(
@@ -161,18 +172,28 @@ def c1_queue(conn: sqlite3.Connection) -> list[QueueItem]:
     return [
         QueueItem(exchange_id, REJECTED, position)
         for position, exchange_id in enumerate(slice_ids(conn, REJECTED), start=1)
-        if exchange_id not in judged
+        if exchange_id not in judged and exchange_id in allowed
     ]
 
 
-def likely_irrelevant_queue(conn: sqlite3.Connection) -> list[QueueItem]:
+def likely_irrelevant_queue(exclude_channels: frozenset[str]) -> QueueBuilder:
+    def build(conn: sqlite3.Connection) -> list[QueueItem]:
+        return _likely_irrelevant_items(conn, exclude_channels)
+
+    return build
+
+
+def _likely_irrelevant_items(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str]
+) -> list[QueueItem]:
     """Unjudged exchanges outside s2 and gold, lowest lexicon share first then lowest p_lore;
     only the LIKELY_IRRELEVANT_POOL lowest p_lore are scored, so no whole-corpus pass."""
+    clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     rows = conn.execute(
         f"SELECT id, p_lore FROM exchanges WHERE p_lore IS NOT NULL AND {_UNJUDGED}"
-        " AND id NOT IN (SELECT exchange_id FROM eval_slices WHERE name IN (?, ?))"
+        f" AND id NOT IN (SELECT exchange_id FROM eval_slices WHERE name IN (?, ?)){clause}"
         " ORDER BY p_lore, id LIMIT ?",
-        (JUDGE_SCORER, HOLDOUT, GOLD, LIKELY_IRRELEVANT_POOL),
+        (JUDGE_SCORER, HOLDOUT, GOLD, *excl_params, LIKELY_IRRELEVANT_POOL),
     ).fetchall()
     lexicon = load_lexicon()
     inputs = exchange_inputs_for_ids(conn, [row["id"] for row in rows])
@@ -284,6 +305,25 @@ def submit(
 def progress(conn: sqlite3.Connection, queue: list[QueueItem]) -> tuple[int, int]:
     judged = _judged_refs(conn)
     return sum(1 for item in queue if item.source_ref in judged), len(queue)
+
+
+def queue_stats(
+    conn: sqlite3.Connection, queue_name: str, queue: list[QueueItem]
+) -> dict[str, int | str]:
+    """Header numbers for a queue rebuilt after every submit, where a position
+    within it means nothing: judged is counted from the labels themselves."""
+    judged = conn.execute(
+        "SELECT COUNT(DISTINCT subject_id) FROM annotations"
+        " WHERE scorer = ? AND subject_kind = 'exchange' AND source_ref LIKE ?",
+        (JUDGE_SCORER, f"{_REF}{queue_name}:%"),
+    ).fetchone()[0]
+    return {
+        "queue": queue_name,
+        "judged": judged,
+        "queued": len(queue),
+        "irrelevant_needed": labels_needed(label_counts(conn))[IRRELEVANT],
+        "target": RELEVANCE_TARGET,
+    }
 
 
 def first_unjudged(conn: sqlite3.Connection, queue: list[QueueItem]) -> int | None:

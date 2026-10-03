@@ -12,6 +12,7 @@ from infovore.eval.judge import (
     JUDGE_SCORER,
     LIKELY_IRRELEVANT,
     RELEVANT,
+    UNCERTAIN,
     InvalidLabelError,
     NotInExchangeError,
     QueueItem,
@@ -24,6 +25,7 @@ from infovore.eval.judge import (
     labels_needed,
     likely_irrelevant_queue,
     progress,
+    queue_stats,
     self_agreement,
     slice_progress,
     submit,
@@ -354,7 +356,7 @@ def test_the_c1_queue_is_the_control_exchanges_nobody_has_judged(
     _slice(conn, "c1", [2, 4, 5])
     _label_with(conn, 4)
 
-    assert _ids(c1_queue(conn)) == [("c1", 1, 2), ("c1", 3, 5)]
+    assert _ids(c1_queue(frozenset())(conn)) == [("c1", 1, 2), ("c1", 3, 5)]
 
 
 def _content(conn: sqlite3.Connection, exchange_id: int, text: str) -> None:
@@ -377,7 +379,7 @@ def test_likely_irrelevant_ranks_by_lexicon_share_then_p_lore(conn: sqlite3.Conn
     conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id = 9")
     _label_with(conn, 7)
 
-    queue = likely_irrelevant_queue(conn)
+    queue = likely_irrelevant_queue(frozenset())(conn)
 
     assert [(i.slice_name, i.exchange_id) for i in queue] == [
         (LIKELY_IRRELEVANT, 6),
@@ -412,3 +414,44 @@ def test_usable_label_counts_skip_excluded_channels(conn: sqlite3.Connection) ->
     assert label_counts(conn)[IRRELEVANT] == 1
     assert label_counts(conn, frozenset({"food"}))[IRRELEVANT] == 0
     assert label_counts(conn, frozenset({"food"}))[RELEVANT] == 1
+
+
+def test_queue_stats_count_judged_from_the_queue_across_rebuilds(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
+    build = uncertain_queue(3, 0.0, frozenset())
+    first = build(conn)
+    submit(conn, first, 0, first[0].exchange_id, IRRELEVANT, AT)
+
+    after = build(conn)
+
+    assert queue_stats(conn, UNCERTAIN, after) == {
+        "queue": UNCERTAIN,
+        "judged": 1,
+        "queued": 2,
+        "irrelevant_needed": 199,
+        "target": 200,
+    }
+    assert queue_stats(conn, "c1", after)["judged"] == 0
+
+
+def test_c1_and_likely_irrelevant_queues_skip_excluded_channels(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (2, 9, NULL, 'Food', 'text')"
+    )
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (3, 9, 2, 'pizza', 'thread')"
+    )
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 4")
+    conn.execute("UPDATE exchanges SET channel_id = 3 WHERE id = 5")
+    _exchange(conn, 6, [61])
+    conn.execute("UPDATE exchanges SET p_lore = 0.1")
+    _slice(conn, "c1", [2, 4, 5])
+    excluded = frozenset({"food"})
+
+    assert [i.exchange_id for i in c1_queue(excluded)(conn)] == [2]
+    assert {i.exchange_id for i in likely_irrelevant_queue(excluded)(conn)} == {6}
+    assert {i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)} == {4, 5, 6}

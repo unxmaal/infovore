@@ -84,8 +84,15 @@ async function load(i) {
 }
 
 function render() {
-  $("where").textContent = "Exchange " + (view.index + 1) + " of " + view.total + " · #" + view.channel;
-  $("progress").textContent = view.progress.done + " judged · interface v" + view.interface_version;
+  const p = view.progress;
+  if (p.queue) {
+    $("where").textContent = "Exchange #" + view.exchange_id + " · #" + view.channel;
+    $("progress").textContent = p.judged + " judged from " + p.queue + " · " + p.queued + " queued · "
+      + p.irrelevant_needed + " more irrelevant needed for " + p.target + " · interface v" + view.interface_version;
+  } else {
+    $("where").textContent = "Exchange " + (view.index + 1) + " of " + view.total + " · #" + view.channel;
+    $("progress").textContent = p.done + " judged · interface v" + view.interface_version;
+  }
   LABELS.forEach(l => $(l).classList.toggle("chosen", view.label === l));
   const list = $("list"); list.innerHTML = "";
   view.messages.forEach(m => {
