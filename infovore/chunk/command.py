@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING
 
 from infovore.chunk.grouper import GroupingEvent, GroupingStarted, group_pending
 from infovore.chunk.measure import MeasureRule, measure, render
+from infovore.chunk.rechunk import apply_rechunk, plan_rechunk, render_plan
+from infovore.chunk.recipe import settings_recipe
+from infovore.config import ConfigError
 from infovore.timing import FixedClock
 
 if TYPE_CHECKING:
@@ -66,6 +69,9 @@ class ChunkCommand:
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("--now", type=aware_datetime, default=None)
+        parser.add_argument("--rechunk", action="store_true")
+        parser.add_argument("--recipe", type=int, default=None, metavar="N")
+        parser.add_argument("--dry-run", action="store_true")
         parser.add_argument("--measure", action="store_true")
         parser.add_argument("--gap", type=int, action="append", metavar="MINUTES")
         parser.add_argument("--adaptive", action="store_true")
@@ -80,6 +86,14 @@ class ChunkCommand:
         from infovore.cli import _say
 
         settings = context.settings
+        if args.rechunk:
+            if args.recipe is None:
+                raise ConfigError("--rechunk requires --recipe N")
+            plan = plan_rechunk(context.conn, args.recipe, settings.include_bot_messages)
+            if not args.dry_run:
+                apply_rechunk(context.conn, plan, context.clock.now())
+            context.stdout.write(render_plan(plan, args.dry_run))
+            return 0
         if args.measure:
             rules = measure_rules(args)
             results = measure(
@@ -94,6 +108,9 @@ class ChunkCommand:
             quiet_gap=timedelta(minutes=settings.quiet_gap_minutes),
             max_messages=settings.exchange_max_messages,
             include_bots=settings.include_bot_messages,
+            recipe=settings_recipe(
+                timedelta(minutes=settings.quiet_gap_minutes), settings.exchange_max_messages
+            ),
             progress=lambda event: _say(context.stdout, _describe_grouping_event(event)),
         )
         context.stdout.write(

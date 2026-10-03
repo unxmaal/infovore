@@ -7,6 +7,7 @@ from importlib import resources
 from importlib.resources.abc import Traversable
 from pathlib import Path
 
+REBUILD_MARKER = "-- rebuild: foreign_keys off"
 MIGRATION_NAME = re.compile(r"^(\d+)_[A-Za-z0-9_]+\.sql$")
 
 
@@ -76,6 +77,9 @@ def migrate(conn: sqlite3.Connection, migrations: Sequence[Migration] | None = N
     for migration in pending_source:
         if migration.version in done:
             continue
+        rebuild = REBUILD_MARKER in migration.sql
+        if rebuild:
+            conn.execute("PRAGMA foreign_keys = OFF")
         try:
             conn.executescript(
                 "BEGIN IMMEDIATE;\n"
@@ -84,9 +88,14 @@ def migrate(conn: sqlite3.Connection, migrations: Sequence[Migration] | None = N
                 f"PRAGMA user_version = {migration.version};\n"
                 "COMMIT;"
             )
+            if rebuild and conn.execute("PRAGMA foreign_key_check").fetchall():
+                raise MigrationError(f"{migration.name} left dangling foreign keys")
         except sqlite3.Error as error:
             if conn.in_transaction:
                 conn.execute("ROLLBACK")
             raise MigrationError(f"{migration.name} failed: {error}") from error
+        finally:
+            if rebuild:
+                conn.execute("PRAGMA foreign_keys = ON")
         newly_applied.append(migration.version)
     return newly_applied

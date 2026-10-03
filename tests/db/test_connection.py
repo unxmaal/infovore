@@ -199,3 +199,42 @@ def test_failure_after_a_migration_ends_its_own_transaction_is_still_reported(
         migrate(conn, load_migrations(tmp_path))
     assert not conn.in_transaction
     assert applied_versions(conn) == []
+
+
+REBUILD = (
+    "-- rebuild: foreign_keys off\n"
+    "CREATE TABLE parent_new (id INTEGER PRIMARY KEY);\n"
+    "INSERT INTO parent_new SELECT id FROM parent{keep};\n"
+    "DROP TABLE parent;\n"
+    "ALTER TABLE parent_new RENAME TO parent;"
+)
+
+
+def rebuild_database(tmp_path: Path, keep: str) -> sqlite3.Connection:
+    migrations = tmp_path / "migrations"
+    migrations.mkdir()
+    write(
+        migrations,
+        "0001_tables.sql",
+        "CREATE TABLE parent (id INTEGER PRIMARY KEY);\n"
+        "CREATE TABLE child (id INTEGER PRIMARY KEY, p INTEGER REFERENCES parent (id));\n"
+        "INSERT INTO parent VALUES (1), (2);\nINSERT INTO child VALUES (1, 1), (2, 2);",
+    )
+    write(migrations, "0002_rebuild.sql", REBUILD.format(keep=keep))
+    conn = open_database(tmp_path / "x.db")
+    migrate(conn, load_migrations(migrations))
+    return conn
+
+
+def test_a_rebuild_migration_swaps_a_referenced_table_and_restores_foreign_keys(
+    tmp_path: Path,
+) -> None:
+    conn = rebuild_database(tmp_path, "")
+    assert conn.execute("PRAGMA foreign_keys").fetchone()[0] == 1
+    assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
+    assert conn.execute("SELECT COUNT(*) FROM parent").fetchone()[0] == 2
+
+
+def test_a_rebuild_migration_that_orphans_rows_is_reported(tmp_path: Path) -> None:
+    with pytest.raises(MigrationError, match="dangling"):
+        rebuild_database(tmp_path, " WHERE id = 1")

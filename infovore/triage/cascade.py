@@ -96,7 +96,9 @@ def tuning_samples(
     labels, _ = training_labels(conn, exclude_channels=exclude_channels)
     build = {
         row["exchange_id"]
-        for row in conn.execute("SELECT exchange_id FROM eval_slices WHERE name = ?", (BUILD,))
+        for row in conn.execute(
+            "SELECT exchange_id FROM current_eval_slices WHERE name = ?", (BUILD,)
+        )
     } - held
     ids = sorted(eid for eid in build if eid in labels)
     inputs = exchange_inputs_for_ids(conn, ids)

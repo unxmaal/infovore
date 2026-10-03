@@ -3,8 +3,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 
 from infovore.chunk.rules import channel_gap, group_messages
-from infovore.db.codec import from_db_time
-from infovore.rows import MessageRow
+from infovore.db.raw import light_channel_messages
 
 BUCKET_LABELS = ("1", "2", "3-5", "6-15", "16-49", "cap")
 _BOUNDS = (1, 2, 5, 15, 49)
@@ -56,33 +55,6 @@ def _sum(left: Distribution, right: Distribution) -> Distribution:
     )
 
 
-def _channel_messages(conn: sqlite3.Connection, channel_id: int) -> list[MessageRow]:
-    rows = conn.execute(
-        "SELECT id, guild_id, author_id, author_is_bot, created_at, reply_to_id, thread_id,"
-        " deleted_at FROM messages WHERE channel_id = ? ORDER BY created_at, id",
-        (channel_id,),
-    )
-    return [
-        MessageRow(
-            id=row["id"],
-            channel_id=channel_id,
-            guild_id=row["guild_id"],
-            author_id=row["author_id"],
-            author_name_at_time="",
-            author_is_bot=bool(row["author_is_bot"]),
-            created_at=from_db_time(row["created_at"]),
-            edited_at=None,
-            content="",
-            reply_to_id=row["reply_to_id"],
-            thread_id=row["thread_id"],
-            deleted_at=from_db_time(row["deleted_at"]),
-            ingested_at=from_db_time(row["created_at"]),
-            raw_json="",
-        )
-        for row in rows
-    ]
-
-
 def measure(
     conn: sqlite3.Connection,
     rules: list[MeasureRule],
@@ -96,7 +68,7 @@ def measure(
         " LEFT JOIN channels c ON c.id = m.channel_id ORDER BY m.channel_id"
     ).fetchall()
     for channel in channels:
-        messages = _channel_messages(conn, channel["id"])
+        messages = light_channel_messages(conn, channel["id"])
         for result in results:
             rule = result.rule
             if rule.percentile is not None:

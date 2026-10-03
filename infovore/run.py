@@ -10,6 +10,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from infovore.chunk.grouper import group_pending
+from infovore.chunk.recipe import settings_recipe
 from infovore.config import Settings, Stage, resolve_guild_id
 from infovore.extract.llm_extractor import LLMClaimExtractor
 from infovore.extract.protocol import ClaimExtractor
@@ -93,6 +94,9 @@ async def _run_cycle(
         quiet_gap=timedelta(minutes=settings.quiet_gap_minutes),
         max_messages=settings.exchange_max_messages,
         include_bots=settings.include_bot_messages,
+        recipe=settings_recipe(
+            timedelta(minutes=settings.quiet_gap_minutes), settings.exchange_max_messages
+        ),
     )
     progress(CycleStepStarted(step="triage"))
     triage_pending(conn, rules=settings.triage_rules, workers=settings.workers)

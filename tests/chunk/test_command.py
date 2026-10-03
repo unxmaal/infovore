@@ -23,7 +23,7 @@ def seed(db_path: str) -> None:
     rows = [
         (1, "2026-01-01T00:00:00+00:00"),
         (2, "2026-01-01T00:05:00+00:00"),
-        (3, "2026-01-01T03:00:00+00:00"),
+        (3, "2026-01-01T07:00:00+00:00"),
     ]
     for message_id, created in rows:
         conn.execute(
@@ -48,7 +48,7 @@ def test_chunk_is_a_builtin_command() -> None:
 def test_chunk_groups_closed_exchanges_and_defers_open_ones(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed(env["INFOVORE_DB_PATH"])
-    code, out, _ = run(["chunk", "--now", "2026-01-01T03:10:00+00:00"], env)
+    code, out, _ = run(["chunk", "--now", "2026-01-01T07:10:00+00:00"], env)
     assert code == ExitCode.OK
     assert "exchanges created: 1" in out
     assert "messages grouped: 2" in out
@@ -92,7 +92,7 @@ def test_chunk_streams_flushed_progress_lines(tmp_path: Path) -> None:
     out = FlushCountingIO()
     err = io.StringIO()
     code = main(
-        ["chunk", "--now", "2026-01-01T03:10:00+00:00"],
+        ["chunk", "--now", "2026-01-01T07:10:00+00:00"],
         environ=env,
         dotenv_path=None,
         stdout=out,
@@ -124,7 +124,7 @@ def test_chunk_start_line_is_written_before_persisting_any_exchange(
 
     monkeypatch.setattr("infovore.chunk.grouper.insert_exchange", spy_insert_exchange)
     code = main(
-        ["chunk", "--now", "2026-01-01T03:10:00+00:00"],
+        ["chunk", "--now", "2026-01-01T07:10:00+00:00"],
         environ=env,
         dotenv_path=None,
         stdout=out,

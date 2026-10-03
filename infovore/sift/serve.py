@@ -456,14 +456,14 @@ class ServeApp:
         after = max(0, min(after, MAX_CONTEXT_WINDOW))
         exchange_id = self._by_id[message_id].exchange_id
         position = self._conn.execute(
-            "SELECT position FROM exchange_messages WHERE exchange_id = ? AND message_id = ?",
+            "SELECT position FROM all_exchange_messages WHERE exchange_id = ? AND message_id = ?",
             (exchange_id, message_id),
         ).fetchone()["position"]
         rows = self._conn.execute(
             "SELECT m.id AS id, m.author_id AS author_id,"
             " m.author_name_at_time AS author_name, m.created_at AS created_at,"
             " m.content AS content"
-            " FROM exchange_messages em JOIN messages m ON m.id = em.message_id"
+            " FROM all_exchange_messages em JOIN messages m ON m.id = em.message_id"
             " WHERE em.exchange_id = ? AND em.position BETWEEN ? AND ?"
             " ORDER BY em.position",
             (exchange_id, position - before, position + after),

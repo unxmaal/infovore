@@ -61,7 +61,7 @@ def exchange_inputs_for_ids(
     for chunk in _chunked(ids):
         placeholders = ",".join("?" for _ in chunk)
         rows = conn.execute(
-            "SELECT exchange_id, message_id FROM exchange_messages"
+            "SELECT exchange_id, message_id FROM all_exchange_messages"
             f" WHERE exchange_id IN ({placeholders}) ORDER BY exchange_id, position",
             chunk,
         ).fetchall()
