@@ -13,6 +13,7 @@ from infovore.triage.cascade import (
     Outcome,
     decide_bayes,
     decide_lexicon,
+    residue_channels,
     stage_reports,
     tune_high,
 )
@@ -296,3 +297,86 @@ def test_the_denylist_outranks_no_text(tmp_path: Path) -> None:
     assert code == ExitCode.OK
     assert "stage denylist: decided=1" in out
     assert "stage no_text: n=0" in out
+
+
+def test_all_runs_every_current_exchange_and_reports_share_and_residue_channels(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    env, conn = build(tmp_path)
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (1, 9, NULL, 'general', 'text')"
+    )
+    conn.execute("UPDATE exchanges SET superseded_by_recipe = 2 WHERE id = 7")
+    conn.commit()
+    conn.close()
+
+    code, out, _ = run(["relevance", "cascade", "--all"], env)
+
+    assert code == ExitCode.OK
+    assert "corpus: n=6" in out
+    assert "stage lexicon: decided=2 relevant=2 irrelevant=0 share=0.333" in out
+    assert "stage bayes: abstains on everything" in out
+    assert "residue: n=4 share=0.667" in out
+    assert "residue channel general: 4" in out
+    assert "labelled=" in out and "accuracy=" in out
+    assert "progress 6/6" in capsys.readouterr().err
+
+
+def test_all_with_write_annotates_exchanges_outside_every_slice(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    conn.execute("DELETE FROM eval_slices")
+    conn.commit()
+    conn.close()
+
+    code, out, _ = run(["relevance", "cascade", "--all", "--write"], env)
+
+    assert code == ExitCode.OK
+    assert "wrote 7 exchanges" in out
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    assert annotation_history(conn, "exchange", 2, "relevance_lexicon")[0]["label"] == "relevant"
+
+
+def test_min_per_class_lets_the_bayes_stage_fit(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    conn.close()
+
+    code, out, _ = run(["relevance", "cascade", "--all", "--min-per-class", "1"], env)
+
+    assert code == ExitCode.OK
+    assert "abstains on everything" not in out
+    assert "stage bayes: decided=" in out
+
+
+def test_residue_channels_counts_by_channel_name_and_falls_back_to_the_id(
+    tmp_path: Path,
+) -> None:
+    env, conn = build(tmp_path)
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (1, 9, NULL, 'general', 'text')"
+    )
+    conn.execute("UPDATE exchanges SET channel_id = 5 WHERE id IN (3, 4)")
+    conn.commit()
+    outcomes = [outcome(1, "residue", "residue"), outcome(2, "lexicon", "relevant")]
+    outcomes += [outcome(3, "residue", "residue"), outcome(4, "residue", "residue")]
+
+    assert residue_channels(conn, outcomes, 15) == [("5", 2), ("general", 1)]
+    assert residue_channels(conn, outcomes, 1) == [("5", 2)]
+    assert residue_channels(conn, [], 15) == []
+
+
+def test_batching_gives_the_same_outcomes_as_one_pass(tmp_path: Path) -> None:
+    from infovore.triage.cascade import run_cascade, run_cascade_batched
+    from infovore.triage.lexicon import load_lexicon
+
+    _, conn = build(tmp_path)
+    ids = [1, 2, 3, 4, 5, 6, 7]
+    seen: list[tuple[int, int]] = []
+
+    batched = run_cascade_batched(
+        conn, ids, load_lexicon(), 0.5, None, frozenset(), 3, lambda d, t: seen.append((d, t))
+    )
+
+    assert batched == run_cascade(conn, ids, load_lexicon(), 0.5, None, frozenset())
+    assert seen == [(3, 7), (6, 7), (7, 7)]

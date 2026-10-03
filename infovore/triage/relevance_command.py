@@ -1,20 +1,26 @@
 import argparse
+import sys
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
+from infovore.rows import Label
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.eval.slices import BUILD, slice_ids, slice_names
 from infovore.triage.cascade import (
     SCORERS,
+    Outcome,
     StageReport,
+    current_exchange_ids,
+    residue_channels,
     run_cascade,
+    run_cascade_batched,
     stage_reports,
     try_fit,
     tune_high,
     tuning_samples,
     write_outcomes,
 )
-from infovore.triage.human import held_out_ids, training_labels
+from infovore.triage.human import HumanFit, held_out_ids, training_labels
 from infovore.triage.lexicon import (
     MAX_OFF,
     MIN_COUNT,
@@ -28,6 +34,9 @@ from infovore.triage.lexicon import (
     mine_terms,
     score_lexicon,
 )
+
+ALL_BATCH = 2000
+RESIDUE_CHANNELS = 15
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -44,6 +53,10 @@ class RelevanceCommand:
         cascade = sub.add_parser("cascade", help="run the cascade over eval slices and report")
         cascade.add_argument("--slices", default=None, help="comma-separated slice names")
         cascade.add_argument("--write", action="store_true", help="record derived annotations")
+        cascade.add_argument("--all", action="store_true", help="every current exchange")
+        cascade.add_argument(
+            "--min-per-class", type=int, default=None, dest="min_per_class", metavar="N"
+        )
         cascade.add_argument("--explain", type=int, default=None, metavar="EXCHANGE_ID")
         mine = sub.add_parser("mine", help="candidate lexicon terms by channel log-odds")
         mine.add_argument("--tech", default=",".join(TECH_CHANNELS))
@@ -123,16 +136,16 @@ class RelevanceCommand:
         from infovore.cli import ExitCode
 
         conn = context.conn
-        if not args.slices:
-            raise ConfigError("--slices is required (comma-separated slice names)")
-        names = args.slices.split(",")
+        if not args.slices and not args.all:
+            raise ConfigError("--slices or --all is required")
+        names = args.slices.split(",") if args.slices else []
         unknown = [n for n in names if n not in slice_names(conn)]
         if unknown:
             raise ConfigError(f"unknown slice(s): {', '.join(unknown)}")
         lexicon = load_lexicon()
         exclude = context.settings.exclude_channels
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
-        fit, why = try_fit(conn, exclude)
+        fit, why = try_fit(conn, exclude, args.min_per_class)
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
         context.stdout.write(
@@ -150,16 +163,50 @@ class RelevanceCommand:
             context.stdout.write(f"slice {name} ({kind}): n={len(ids)}\n")
             for report in stage_reports(outcomes, labels):
                 context.stdout.write(self._line(report, fit is None, why))
+        everything_outcomes = None
+        if args.all:
+            everything = set(current_exchange_ids(conn))
+            everything_outcomes = self._all(context, sorted(everything), lexicon, t_high, fit, labels, why)
         if args.write:
             ids = sorted(everything)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
+            outcomes = everything_outcomes or run_cascade(conn, ids, lexicon, t_high, fit, exclude)
             versions = write_outcomes(conn, outcomes, lexicon, t_high, fit, context.clock.now())
             written = ", ".join(f"{SCORERS[s]} v{v}" for s, v in versions.items())
             context.stdout.write(f"wrote {len(ids)} exchanges: {written}\n")
         return int(ExitCode.OK)
 
+    def _all(
+        self,
+        context: "AppContext",
+        ids: list[int],
+        lexicon: Lexicon,
+        t_high: float,
+        fit: HumanFit | None,
+        labels: dict[int, Label],
+        why: str,
+    ) -> list[Outcome]:
+        def progress(done: int, total: int) -> None:
+            sys.stderr.write(f"progress {done}/{total}\n")
+
+        outcomes = run_cascade_batched(
+            context.conn,
+            ids,
+            lexicon,
+            t_high,
+            fit,
+            context.settings.exclude_channels,
+            ALL_BATCH,
+            progress,
+        )
+        context.stdout.write(f"corpus: n={len(ids)}\n")
+        for report in stage_reports(outcomes, labels):
+            context.stdout.write(self._line(report, fit is None, why, corpus=True))
+        for name, count in residue_channels(context.conn, outcomes, RESIDUE_CHANNELS):
+            context.stdout.write(f"residue channel {name}: {count}\n")
+        return outcomes
+
     @staticmethod
-    def _line(report: StageReport, no_bayes: bool, why: str) -> str:
+    def _line(report: StageReport, no_bayes: bool, why: str, corpus: bool = False) -> str:
         if report.stage == "residue":
             return f"stage residue: n={report.decided} share={report.share:.3f}\n"
         if report.stage == "no_text":
@@ -170,9 +217,10 @@ class RelevanceCommand:
         if report.stage == "bayes" and no_bayes:
             return f"stage bayes: abstains on everything ({why})\n"
         accuracy = "n/a" if report.accuracy is None else f"{report.accuracy:.3f}"
+        share = f" share={report.share:.3f}" if corpus else ""
         return (
             f"stage {report.stage}: decided={report.decided}"
-            f" relevant={report.relevant} irrelevant={report.irrelevant}"
+            f" relevant={report.relevant} irrelevant={report.irrelevant}{share}"
             f" labelled={report.labelled} accuracy={accuracy}"
             f" tp={report.tp} fp={report.fp} fn={report.fn} tn={report.tn}\n"
         )
