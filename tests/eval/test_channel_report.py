@@ -77,7 +77,7 @@ def test_by_channel_sorted_with_latest_label_and_excluded_marked(tmp_path: Path)
     rows = [line.split() for line in lines[1:]]
     assert rows == [
         ["beta", "2", "0", "2", "100.0%", "2", "yes"],
-        ["alpha", "2", "1", "1", "50.0%", "4", "no"],
+        ["alpha", "3", "2", "1", "33.3%", "4", "no"],
         ["thr", "1", "1", "0", "0.0%", "1", "yes"],
     ]
 

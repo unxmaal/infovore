@@ -177,7 +177,7 @@ uv run infovore search TERMS... [--limit N] [--context N] [--exchanges [--all]]
 uv run infovore slice freeze
 uv run infovore slice show [NAME]
 uv run infovore judge serve [--host HOST ...] [--port PORT] [--queue frozen|uncertain] [--scorer NAME]
-uv run infovore judge report
+uv run infovore judge report [--by-channel [--min-labels N]]
 uv run infovore export-archive PATH [--force]
 uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
