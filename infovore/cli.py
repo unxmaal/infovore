@@ -312,6 +312,7 @@ class SnapshotCommand:
 
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
+    from infovore.eval.command import JudgeCommand, SliceCommand
     from infovore.extract.command import ExtractCommand
     from infovore.extract.novelty import ProbeCommand
     from infovore.extract.review import PromoteCommand, ReviewCommand
@@ -324,6 +325,8 @@ def builtin_commands() -> list[Command]:
     return [
         StatusCommand(),
         SearchCommand(),
+        SliceCommand(),
+        JudgeCommand(),
         SyncOptOutsCommand(),
         ChunkCommand(),
         BackfillCommand(),

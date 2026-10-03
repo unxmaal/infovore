@@ -55,6 +55,7 @@ All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migration
 | `annotations` | append-only store for every answer a scorer has given about a subject (issue #176, migration 0022). Keyed by `subject_kind`/`subject_id`/`scorer`/`scorer_version`. `exchanges.p_lore` and `messages.p_trash` held exactly ONE answer each, so four triage models and sixteen message models were trained and all but the last of each left no recoverable trace. `reproducibility` splits the table by whether a value can be recomputed: `derived` is a droppable cache and MUST carry `recipe_json` (a CHECK enforces it), `recorded` is an archive of things that can never be recomputed (claims, human labels, LLM verdicts) and a trigger refuses to delete one. Updates are refused outright. A partial unique index allows one `derived` value per subject per scorer version, and deliberately does NOT constrain `recorded`, because repeat human judgments on the same item are the self-consistency measurement. `score` is continuous and there is no band column: bands discard ordering within a band, and ranking is what pays |
 | `scorer_activations` | append-only record of which scorer version became live and when (migration 0022), so "which gate was live in September" is answerable from the database rather than from git history. `db.annotations.version_active_at` reads it |
 | `current_annotations` | view: the annotations belonging to each scorer's most recently activated version. Writing a non-active version leaves `exchanges.p_lore` untouched, which is what lets a shadow scorer run over the whole corpus without moving the live gate |
+| `eval_slices` | frozen evaluation slices for tier 1 (#190, migration 0023): `name`, `exchange_id`, `position`, `population`, `seed`, `frozen_at`. `infovore slice freeze` draws them once, with seed 190, from the same predicate the extraction queue uses: `s1` (200 gate-passing exchanges, size-matched to the queue, the build set), `s2` (a disjoint 200, held out), `c1` (50 gate-rejected exchanges in the queue's size mix, the control for what the gate throws away), `gold` (40 from `s1` plus 10 from `c1`, read end to end by Eric) and `gold-repeats` (5 of the gold set shown again, unannounced, to measure self-agreement). Triggers refuse UPDATE and DELETE, because every judgment and measurement is keyed to these exact exchanges. Judgments from `infovore judge serve` are `recorded` rows in `annotations` with `subject_kind = 'exchange'`, `scorer = 'human_exchange'`, `scorer_version` = the page's interface version, `label` one of `relevant`, `irrelevant`, `bad_grouping`, and `source_ref` = `judge:<slice>:<position>`; append-only, so a repeat is a second row |
 | `message_revisions` | the prior content of every edited message; redacted in place on opt-out |
 | `attachments` | attachment metadata per message (files are not downloaded) |
 | `reactions` | current reaction count per message and emoji |
@@ -173,6 +174,10 @@ Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, e
 ```
 uv run infovore status
 uv run infovore search TERMS... [--limit N] [--context N]
+uv run infovore slice freeze
+uv run infovore slice show [NAME]
+uv run infovore judge serve [--host HOST ...] [--port PORT] [--queue frozen|uncertain]
+uv run infovore judge report
 uv run infovore backfill [--page-size N]
 uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
 uv run infovore triage [--report]

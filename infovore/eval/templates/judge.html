@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>infovore judge</title>
+<style>
+:root { --bg:#fbfbf9; --fg:#1d1d1b; --muted:#6b6b66; --line:#e3e2dc; --card:#ffffff;
+        --fact-edge:#2f7d3a; --focus:#3a6fb0; --ctx:#f1f0ec; --bad:#b0702a; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#161615; --fg:#e8e7e2; --muted:#9a9993; --line:#2c2c29; --card:#1e1e1c;
+          --fact-edge:#5fbf6e; --focus:#6f9fe0; --ctx:#232321; --bad:#d08a3f; }
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg);
+       font:15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+header { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line);
+         padding:10px 16px; z-index:1; }
+.bar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.where { font-weight:600; }
+.muted { color:var(--muted); }
+button { font:inherit; padding:6px 14px; border:1px solid var(--line); background:var(--card);
+         color:var(--fg); border-radius:6px; cursor:pointer; }
+button.lbl { padding:8px 18px; font-weight:600; }
+button.lbl.relevant { background:var(--fact-edge); border-color:var(--fact-edge); color:#fff; }
+button.lbl.bad { background:var(--bad); border-color:var(--bad); color:#fff; }
+button.lbl.chosen { outline:3px solid var(--focus); }
+details { margin-top:6px; }
+summary { cursor:pointer; color:var(--muted); }
+.rules { max-width:760px; margin:6px 0 0; }
+main { max-width:860px; margin:0 auto; padding:12px 16px 80px; }
+.msg { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--line);
+       border-radius:6px; padding:8px 12px; margin:8px 0; }
+.msg.ctx { background:var(--ctx); opacity:.75; }
+.meta { font-size:12px; color:var(--muted); display:flex; gap:10px; }
+.meta a { color:var(--muted); }
+.body { white-space:pre-wrap; word-break:break-word; margin-top:2px; }
+.tag { font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+.status { min-height:1.2em; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="where" id="where">loading…</span>
+    <span class="muted" id="progress"></span>
+    <span style="flex:1"></span>
+    <button id="prev" title="previous exchange (←)">←</button>
+    <button id="next" title="next exchange without saving (→)">→</button>
+    <button id="relevant" class="lbl relevant" title="relevant (r)">relevant (r)</button>
+    <button id="irrelevant" class="lbl" title="irrelevant (i)">irrelevant (i)</button>
+    <button id="bad_grouping" class="lbl bad" title="bad grouping (b)">bad grouping (b)</button>
+  </div>
+  <div class="status muted" id="status"></div>
+  <details>
+    <summary>What to judge</summary>
+    <div class="rules">
+      Judge the WHOLE exchange. <b>relevant</b>: it contains reusable SGI/IRIX technical
+      knowledge, something still true and useful to someone who never reads this
+      conversation. <b>irrelevant</b>: it does not. <b>bad grouping</b>: it mixes unrelated
+      conversations or cuts one off. Grey messages are earlier context from the parent
+      exchange. Judging again replaces nothing; every judgment is kept.
+      <div class="muted" style="margin-top:6px">
+        Keys: r relevant, i irrelevant, b bad grouping (each saves and moves on), ← / → move between exchanges.
+      </div>
+    </div>
+  </details>
+</header>
+<main id="list"></main>
+<script>
+let index = 0, view = null;
+const $ = id => document.getElementById(id);
+const LABELS = ["relevant", "irrelevant", "bad_grouping"];
+
+function say(text) { $("status").textContent = text; }
+
+async function load(i) {
+  const r = await fetch("/api/exchange?index=" + i);
+  if (!r.ok) { say((await r.json()).error); return; }
+  view = await r.json(); index = view.index;
+  render();
+  say(view.label ? "Already judged as " + view.label + ". Judging again appends." : "");
+  window.scrollTo(0, 0);
+}
+
+function render() {
+  $("where").textContent = "Exchange " + (view.index + 1) + " of " + view.total + " · #" + view.channel;
+  $("progress").textContent = view.progress.done + " judged · interface v" + view.interface_version;
+  LABELS.forEach(l => $(l).classList.toggle("chosen", view.label === l));
+  const list = $("list"); list.innerHTML = "";
+  view.messages.forEach(m => {
+    const el = document.createElement("div");
+    el.className = "msg" + (m.is_context ? " ctx" : "");
+    const meta = document.createElement("div"); meta.className = "meta";
+    const who = document.createElement("span"); who.textContent = m.author;
+    const when = document.createElement("span"); when.textContent = m.created_at.slice(0, 16).replace("T", " ");
+    const link = document.createElement("a"); link.href = m.link; link.target = "_blank"; link.textContent = "open";
+    meta.append(who, when, link);
+    if (m.is_context) { const t = document.createElement("span"); t.className = "tag"; t.textContent = "earlier context"; meta.append(t); }
+    const body = document.createElement("div"); body.className = "body"; body.textContent = m.content;
+    el.append(meta, body);
+    list.append(el);
+  });
+}
+
+async function save(label) {
+  if (!view) return;
+  const r = await fetch("/api/submit", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({index: index, exchange_id: view.exchange_id, label: label})});
+  const out = await r.json();
+  if (!r.ok) { say(out.error); return; }
+  const next = await (await fetch("/api/next")).json();
+  if (next.index === null) { say("Queue empty. Thank you."); view.progress = out.progress; view.label = label; render(); return; }
+  await load(next.index);
+  say("Saved " + label + ".");
+}
+
+LABELS.forEach(l => { $(l).onclick = () => save(l); });
+$("prev").onclick = () => index > 0 && load(index - 1);
+$("next").onclick = () => view && index < view.total - 1 && load(index + 1);
+document.addEventListener("keydown", e => {
+  if (!view || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "r") save("relevant");
+  else if (e.key === "i") save("irrelevant");
+  else if (e.key === "b") save("bad_grouping");
+  else if (e.key === "ArrowLeft") { e.preventDefault(); $("prev").click(); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); $("next").click(); }
+});
+
+fetch("/api/next").then(r => r.json()).then(n => n.index === null ? say("Queue empty.") : load(n.index));
+</script>
+</body>
+</html>

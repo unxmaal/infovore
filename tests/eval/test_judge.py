@@ -1,0 +1,336 @@
+import sqlite3
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+import pytest
+
+from infovore.db.connection import migrate, open_database
+from infovore.eval.judge import (
+    BAD_GROUPING,
+    IRRELEVANT,
+    JUDGE_INTERFACE_VERSION,
+    JUDGE_SCORER,
+    RELEVANT,
+    InvalidLabelError,
+    NotInExchangeError,
+    QueueItem,
+    UnknownQueueItemError,
+    exchange_view,
+    first_unjudged,
+    frozen_queue,
+    label_counts,
+    labels_needed,
+    progress,
+    self_agreement,
+    slice_progress,
+    submit,
+    uncertain_judged,
+    uncertain_queue,
+)
+from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS
+
+AT = datetime(2026, 10, 2, tzinfo=UTC)
+
+
+def _exchange(
+    conn: sqlite3.Connection, exchange_id: int, message_ids: list[int], parent: int | None = None
+) -> None:
+    conn.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
+        " ended_at, message_count, grouping_rule, content_hash, parent_exchange_id)"
+        " VALUES (?, 1, ?, ?, ?, ?, ?, 'quiet_gap', ?, ?)",
+        (
+            exchange_id,
+            message_ids[0],
+            message_ids[-1],
+            AT.isoformat(),
+            AT.isoformat(),
+            len(message_ids),
+            f"h{exchange_id}",
+            parent,
+        ),
+    )
+    for position, message_id in enumerate(message_ids, start=1):
+        conn.execute(
+            "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+            " created_at, content, ingested_at, raw_json)"
+            " VALUES (?, 1, 9, 5, 'hal', ?, ?, ?, '{}')",
+            (
+                message_id,
+                (AT + timedelta(minutes=message_id)).isoformat(),
+                f"msg {message_id}",
+                AT.isoformat(),
+            ),
+        )
+        conn.execute(
+            "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, ?)",
+            (exchange_id, message_id, position),
+        )
+
+
+def _slice(conn: sqlite3.Connection, name: str, ids: list[int]) -> None:
+    for position, exchange_id in enumerate(ids, start=1):
+        conn.execute(
+            "INSERT INTO eval_slices (name, exchange_id, position, population, seed, frozen_at)"
+            " VALUES (?, ?, ?, 'test', 0, ?)",
+            (name, exchange_id, position, AT.isoformat()),
+        )
+
+
+@pytest.fixture
+def conn(tmp_path: Path) -> sqlite3.Connection:
+    connection = open_database(tmp_path / "x.db")
+    migrate(connection)
+    connection.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (1, 9, NULL, 'hardware', 'text')"
+    )
+    _exchange(connection, 1, [11, 12, 13])
+    _exchange(connection, 2, [21, 22], parent=1)
+    _exchange(connection, 3, [31])
+    _exchange(connection, 4, [41])
+    _exchange(connection, 5, [51])
+    _slice(connection, GOLD, [1, 2, 3])
+    _slice(connection, GOLD_REPEATS, [1])
+    _slice(connection, BUILD, [3, 4, 5])
+    return connection
+
+
+def _ids(queue: list[QueueItem]) -> list[tuple[str, int, int]]:
+    return [(i.slice_name, i.position, i.exchange_id) for i in queue]
+
+
+def _label(conn: sqlite3.Connection, queue: list[QueueItem], index: int, label: str) -> None:
+    submit(conn, queue, index, queue[index].exchange_id, label, AT)
+
+
+def test_the_queue_is_gold_then_repeats_then_the_rest_of_s1(conn: sqlite3.Connection) -> None:
+    assert _ids(frozen_queue(conn)) == [
+        (GOLD, 1, 1),
+        (GOLD, 2, 2),
+        (GOLD, 3, 3),
+        (GOLD_REPEATS, 1, 1),
+        (BUILD, 1, 4),
+        (BUILD, 2, 5),
+    ]
+
+
+def test_a_repeat_arrives_unmarked(conn: sqlite3.Connection) -> None:
+    """The second showing must not be pre-labelled, or it measures memory of
+    the page rather than the judgment."""
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+
+    assert exchange_view(conn, queue, 0).label == RELEVANT
+    assert exchange_view(conn, queue, 3).label is None
+
+
+def test_submitting_records_one_exchange_annotation(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 1, BAD_GROUPING)
+
+    row = conn.execute("SELECT * FROM annotations").fetchone()
+    assert (row["subject_kind"], row["subject_id"], row["scorer"]) == ("exchange", 2, JUDGE_SCORER)
+    assert (row["label"], row["scorer_version"], row["reproducibility"]) == (
+        BAD_GROUPING,
+        JUDGE_INTERFACE_VERSION,
+        "recorded",
+    )
+    assert row["source_ref"] == "judge:gold:2"
+    assert row["created_at"].startswith("2026-10-02")
+
+
+def test_an_unjudged_exchange_has_no_row(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+
+    assert progress(conn, queue) == (1, 6)
+    assert first_unjudged(conn, queue) == 1
+    assert exchange_view(conn, queue, 1).label is None
+
+
+def test_judging_again_appends_and_the_newest_shows(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, 0, IRRELEVANT)
+
+    assert exchange_view(conn, queue, 0).label == IRRELEVANT
+    assert conn.execute("SELECT COUNT(*) AS n FROM annotations").fetchone()["n"] == 2
+
+
+def test_nothing_left_means_no_resume_point(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    for index in range(len(queue)):
+        _label(conn, queue, index, IRRELEVANT)
+
+    assert first_unjudged(conn, queue) is None
+
+
+def test_bad_submissions_are_refused_and_write_nothing(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    with pytest.raises(InvalidLabelError):
+        submit(conn, queue, 0, 1, "fact", AT)
+    with pytest.raises(NotInExchangeError, match="not exchange"):
+        submit(conn, queue, 0, 2, RELEVANT, AT)
+    with pytest.raises(UnknownQueueItemError):
+        submit(conn, queue, -1, 1, RELEVANT, AT)
+    with pytest.raises(UnknownQueueItemError):
+        exchange_view(conn, queue, 6)
+    assert conn.execute("SELECT COUNT(*) AS n FROM annotations").fetchone()["n"] == 0
+
+
+def test_context_from_the_parent_is_shown_but_marked_as_context(conn: sqlite3.Connection) -> None:
+    view = exchange_view(conn, frozen_queue(conn), 1)
+
+    assert [(m.id, m.is_context) for m in view.messages] == [
+        (11, True),
+        (12, True),
+        (13, True),
+        (21, False),
+        (22, False),
+    ]
+
+
+def test_the_view_carries_channel_link_and_position(conn: sqlite3.Connection) -> None:
+    view = exchange_view(conn, frozen_queue(conn), 2)
+
+    assert (view.index, view.total, view.exchange_id, view.channel) == (2, 6, 3, "hardware")
+    assert view.messages[0].link == "https://discord.com/channels/9/1/31"
+    assert view.messages[0].author == "hal"
+
+
+def test_label_counts_use_the_newest_judgment_and_skip_repeats(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, 3, IRRELEVANT)
+    _label(conn, queue, 1, IRRELEVANT)
+    _label(conn, queue, 1, BAD_GROUPING)
+
+    assert label_counts(conn) == {RELEVANT: 1, IRRELEVANT: 0, BAD_GROUPING: 1}
+
+
+def test_labels_needed_counts_down_to_the_bayes_minimum() -> None:
+    assert labels_needed({RELEVANT: 150, IRRELEVANT: 260, BAD_GROUPING: 9}) == {
+        RELEVANT: 50,
+        IRRELEVANT: 0,
+    }
+
+
+def test_slice_progress_counts_judged_per_slice(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    _label(conn, queue, 4, RELEVANT)
+
+    assert [(p.name, p.done, p.total) for p in slice_progress(conn)] == [
+        (GOLD, 1, 3),
+        (GOLD_REPEATS, 0, 1),
+        (BUILD, 1, 2),
+    ]
+
+
+def test_self_agreement_compares_the_two_showings(conn: sqlite3.Connection) -> None:
+    queue = frozen_queue(conn)
+    _label(conn, queue, 0, RELEVANT)
+    assert self_agreement(conn).rate is None
+
+    _label(conn, queue, 3, RELEVANT)
+    assert (self_agreement(conn).exchanges, self_agreement(conn).rate) == (1, 1.0)
+
+    _label(conn, queue, 3, IRRELEVANT)
+    assert self_agreement(conn).rate == 0.0
+
+
+def _gate(conn: sqlite3.Connection, scores: dict[int, float | None]) -> None:
+    for exchange_id, p_lore in scores.items():
+        conn.execute("UPDATE exchanges SET p_lore = ? WHERE id = ?", (p_lore, exchange_id))
+
+
+def test_the_uncertain_queue_is_closest_to_a_coin_flip_first(conn: sqlite3.Connection) -> None:
+    _gate(conn, {1: 0.9, 2: 0.45, 3: 0.52, 4: None, 5: 0.1})
+    queue = uncertain_queue(3, 0.0, frozenset())(conn)
+
+    assert [i.exchange_id for i in queue] == [3, 2, 1, 5]
+    assert [i.position for i in queue] == [3, 2, 1, 5]
+
+
+def _derived(conn: sqlite3.Connection, scorer: str, version: int, scores: dict[int, float]) -> None:
+    for exchange_id, score in scores.items():
+        conn.execute(
+            "INSERT INTO annotations (subject_kind, subject_id, scorer, scorer_version,"
+            " reproducibility, score, recipe_json, created_at)"
+            " VALUES ('exchange', ?, ?, ?, 'derived', ?, '{}', ?)",
+            (exchange_id, scorer, version, score, AT.isoformat()),
+        )
+
+
+def test_the_uncertain_queue_ranks_by_the_named_scorers_latest_version(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.5, 3: 0.5, 4: 0.5, 5: 0.5})
+    _derived(conn, "local-model", 1, {1: 0.5, 2: 0.9, 3: 0.1})
+    _derived(conn, "local-model", 2, {1: 0.95, 2: 0.6, 3: 0.45})
+    _derived(conn, "other", 1, {4: 0.5})
+    queue = uncertain_queue(3, 0.0, frozenset(), "local-model")(conn)
+
+    assert [i.exchange_id for i in queue] == [3, 2, 1]
+
+
+def test_the_uncertain_queue_default_ignores_annotations(conn: sqlite3.Connection) -> None:
+    _gate(conn, {1: 0.9, 2: 0.5})
+    _derived(conn, "local-model", 1, {1: 0.5, 2: 0.9})
+
+    assert [i.exchange_id for i in uncertain_queue(3, 0.0, frozenset())(conn)] == [2, 1]
+
+
+def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
+    build = uncertain_queue(3, 0.0, frozenset())
+    first = build(conn)
+    submit(conn, first, 0, first[0].exchange_id, RELEVANT, AT)
+    conn.execute("UPDATE exchanges SET extraction_status = 'done' WHERE id = 3")
+
+    assert [i.exchange_id for i in build(conn)] == [2]
+    assert uncertain_judged(conn) == 1
+    assert uncertain_queue(3, 0.0, frozenset({"hardware"}))(conn) == []
+
+
+def test_judging_in_the_uncertain_queue_never_marks_a_different_exchange_judged(
+    conn: sqlite3.Connection,
+) -> None:
+    _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
+    build = uncertain_queue(3, 0.0, frozenset())
+    first = build(conn)
+    submit(conn, first, 0, first[0].exchange_id, RELEVANT, AT)
+
+    after = build(conn)
+    assert [i.exchange_id for i in after] == [2, 3]
+    assert progress(conn, after) == (0, 2)
+    assert first_unjudged(conn, after) == 0
+
+
+def test_a_missing_channel_falls_back_to_its_id(tmp_path: Path) -> None:
+    connection = open_database(tmp_path / "y.db")
+    migrate(connection)
+    connection.execute("PRAGMA foreign_keys = OFF")
+    _exchange(connection, 1, [11])
+    _slice(connection, GOLD, [1])
+
+    assert exchange_view(connection, frozen_queue(connection), 0).channel == "1"
+
+
+def test_an_exchange_with_no_messages_is_refused(tmp_path: Path) -> None:
+    connection = open_database(tmp_path / "z.db")
+    migrate(connection)
+    connection.execute("PRAGMA foreign_keys = OFF")
+    connection.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
+        " ended_at, message_count, grouping_rule, content_hash)"
+        " VALUES (1, 1, 1, 1, ?, ?, 1, 'quiet_gap', 'h')",
+        (AT.isoformat(), AT.isoformat()),
+    )
+    _slice(connection, GOLD, [1])
+
+    with pytest.raises(NotInExchangeError, match="no messages"):
+        submit(connection, frozen_queue(connection), 0, 1, RELEVANT, AT)
