@@ -112,7 +112,7 @@ def test_an_exchange_comes_back_with_its_messages_and_interface_version(
     assert isinstance(body, dict)
     assert [m["id"] for m in body["messages"]] == [11, 12]
     assert body["label"] is None
-    assert body["interface_version"] == 2
+    assert body["interface_version"] == 3
 
 
 def _submit(server: JudgeServer, index: int, exchange_id: int, label: str) -> tuple[int, object]:

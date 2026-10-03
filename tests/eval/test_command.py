@@ -175,6 +175,19 @@ def test_serve_uncertain_accepts_a_scorer(tmp_path: Path, monkeypatch: pytest.Mo
     assert code == ExitCode.OK
 
 
+def test_serve_accepts_the_c1_and_likely_irrelevant_queues(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import infovore.sift.httpd
+
+    monkeypatch.setattr(infovore.sift.httpd, "block_until_interrupted", lambda event: None)
+
+    for queue in ("c1", "likely-irrelevant"):
+        code, out = run(["judge", "serve", "--port", "0", "--queue", queue], tmp_path)
+        assert code == ExitCode.OK
+        assert "listening on http://127.0.0.1:" in out
+
+
 def test_builtin_commands_include_slice_and_judge() -> None:
     from infovore.cli import builtin_commands
 

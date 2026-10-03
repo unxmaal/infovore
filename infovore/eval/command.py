@@ -5,12 +5,15 @@ from typing import TYPE_CHECKING
 from infovore.config import ConfigError
 from infovore.eval.judge import (
     LABELS,
+    LIKELY_IRRELEVANT,
     RELEVANCE_TARGET,
     UNCERTAIN,
     QueueBuilder,
+    c1_queue,
     frozen_queue,
     label_counts,
     labels_needed,
+    likely_irrelevant_queue,
     self_agreement,
     slice_progress,
     uncertain_judged,
@@ -94,7 +97,9 @@ class JudgeCommand:
         serve = sub.add_parser("serve", help="serve the judging page until Ctrl-C")
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_JUDGE_PORT)
-        serve.add_argument("--queue", choices=["frozen", UNCERTAIN], default="frozen")
+        serve.add_argument(
+            "--queue", choices=["frozen", UNCERTAIN, "c1", LIKELY_IRRELEVANT], default="frozen"
+        )
         serve.add_argument(
             "--scorer", default=None, help="uncertainty source for --queue uncertain"
         )
@@ -130,6 +135,10 @@ class JudgeCommand:
                 settings.exclude_channels,
                 args.scorer,
             )
+        elif args.queue == LIKELY_IRRELEVANT:
+            build_queue = likely_irrelevant_queue
+        elif args.queue == "c1":
+            build_queue = c1_queue
         elif not frozen_queue(context.conn):
             raise ConfigError("no gold set frozen yet; run `infovore slice freeze` first")
         hosts = args.hosts or ["127.0.0.1"]

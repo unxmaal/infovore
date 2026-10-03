@@ -10,16 +10,19 @@ from infovore.eval.judge import (
     IRRELEVANT,
     JUDGE_INTERFACE_VERSION,
     JUDGE_SCORER,
+    LIKELY_IRRELEVANT,
     RELEVANT,
     InvalidLabelError,
     NotInExchangeError,
     QueueItem,
     UnknownQueueItemError,
+    c1_queue,
     exchange_view,
     first_unjudged,
     frozen_queue,
     label_counts,
     labels_needed,
+    likely_irrelevant_queue,
     progress,
     self_agreement,
     slice_progress,
@@ -334,3 +337,63 @@ def test_an_exchange_with_no_messages_is_refused(tmp_path: Path) -> None:
 
     with pytest.raises(NotInExchangeError, match="no messages"):
         submit(connection, frozen_queue(connection), 0, 1, RELEVANT, AT)
+
+
+def _label_with(conn: sqlite3.Connection, exchange_id: int) -> None:
+    conn.execute(
+        "INSERT INTO annotations (subject_kind, subject_id, scorer, scorer_version,"
+        " reproducibility, label, created_at)"
+        " VALUES ('exchange', ?, ?, 2, 'recorded', 'relevant', ?)",
+        (exchange_id, JUDGE_SCORER, AT.isoformat()),
+    )
+
+
+def test_the_c1_queue_is_the_control_exchanges_nobody_has_judged(
+    conn: sqlite3.Connection,
+) -> None:
+    _slice(conn, "c1", [2, 4, 5])
+    _label_with(conn, 4)
+
+    assert _ids(c1_queue(conn)) == [("c1", 1, 2), ("c1", 3, 5)]
+
+
+def _content(conn: sqlite3.Connection, exchange_id: int, text: str) -> None:
+    conn.execute(
+        "UPDATE messages SET content = ? WHERE id IN"
+        " (SELECT message_id FROM exchange_messages WHERE exchange_id = ?)",
+        (text, exchange_id),
+    )
+
+
+def test_likely_irrelevant_ranks_by_lexicon_share_then_p_lore(conn: sqlite3.Connection) -> None:
+    for eid in (6, 7, 8, 9):
+        _exchange(conn, eid, [eid * 10 + 1])
+    _slice(conn, "s2", [8])
+    texts = {4: "great food", 5: "kernel panic", 6: "nothing", 9: "scsi disk", 7: "x", 8: "y"}
+    for eid, text in texts.items():
+        _content(conn, eid, text)
+    for eid, p in ((1, 0.0), (2, 0.0), (3, 0.0), (4, 0.2), (5, 0.1), (6, 0.0), (7, 0.0), (8, 0.0)):
+        conn.execute("UPDATE exchanges SET p_lore = ? WHERE id = ?", (p, eid))
+    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id = 9")
+    _label_with(conn, 7)
+
+    queue = likely_irrelevant_queue(conn)
+
+    assert [(i.slice_name, i.exchange_id) for i in queue] == [
+        (LIKELY_IRRELEVANT, 6),
+        (LIKELY_IRRELEVANT, 4),
+        (LIKELY_IRRELEVANT, 9),
+        (LIKELY_IRRELEVANT, 5),
+    ]
+    assert progress(conn, queue) == (0, 4)
+
+
+def test_the_page_states_the_labelling_definition() -> None:
+    from importlib import resources
+
+    page = resources.files("infovore.eval").joinpath("templates/judge.html").read_text()
+    page = " ".join(page.split())
+
+    assert "tech, computers, SGI, IRIX or retrocomputing" in page
+    assert "reusable SGI/IRIX" not in page
+    assert JUDGE_INTERFACE_VERSION == 3
