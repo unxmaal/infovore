@@ -181,6 +181,17 @@ def review_rows(conn: sqlite3.Connection, run_id: int) -> list[ReviewRow]:
     ]
 
 
+def rejection_rows(conn: sqlite3.Connection, run_id: int) -> list[Rejection]:
+    return [
+        Rejection(r["speaker"], r["statement"], r["cited"], r["reason"])
+        for r in conn.execute(
+            "SELECT speaker, statement, cited, reason FROM claim_rejections"
+            " WHERE run_id = ? ORDER BY id",
+            (run_id,),
+        )
+    ]
+
+
 def report_rows(conn: sqlite3.Connection, run_id: int | None) -> list[RunReport]:
     runs = conn.execute(
         "SELECT id, model_alias, model_id, model_id_source, prompt_hash FROM claim_runs"

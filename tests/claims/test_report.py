@@ -2,7 +2,13 @@ import io
 from pathlib import Path
 
 from infovore.cli import ExitCode, main
-from infovore.db.claims_v2 import ClaimIn, ExchangeOutcome, record_exchange, record_review
+from infovore.db.claims_v2 import (
+    ClaimIn,
+    ExchangeOutcome,
+    Rejection,
+    record_exchange,
+    record_review,
+)
 from tests.claims.seed import conversation, db, environment
 from tests.claims.test_store import AT, make_run
 
@@ -78,3 +84,39 @@ def test_an_unknown_run_is_refused(tmp_path: Path) -> None:
     code, _, err = report(tmp_path, "--run", "9")
 
     assert code == ExitCode.CONFIG and "unknown run 9" in err
+
+
+def show(tmp_path: Path, *argv: str) -> tuple[int, str, str]:
+    out, err = io.StringIO(), io.StringIO()
+    code = main(
+        ["claims", "show", *argv],
+        environ=environment(tmp_path),
+        dotenv_path=None,
+        stdout=out,
+        stderr=err,
+    )
+    return code, out.getvalue(), err.getvalue()
+
+
+def test_show_prints_claims_and_rejections_as_plain_text(tmp_path: Path) -> None:
+    run = populate(tmp_path)
+    conn = db(tmp_path)
+    eid, _ = conversation(conn, [(1, "ann", "c")], 3)
+    ok = ExchangeOutcome("ok", None, 1, 1, 1, 1.0)
+    record_exchange(conn, run, eid, ok, [], [Rejection("user-x", "why?", "[1]", "empty statement")])
+    conn.close()
+
+    code, out, _ = show(tmp_path, "--run", str(run))
+    assert code == ExitCode.OK
+    assert out.splitlines()[0].endswith("u: u said 0")
+    assert len(out.splitlines()) == 4 and "why?" not in out
+
+    code, out, _ = show(tmp_path, "--run", str(run), "--rejected")
+    assert code == ExitCode.OK
+    assert out.splitlines() == ["user-x: why? [empty statement]"]
+
+
+def test_show_rejects_an_unknown_run(tmp_path: Path) -> None:
+    db(tmp_path).close()
+    code, _, err = show(tmp_path, "--run", "99")
+    assert code != ExitCode.OK and "unknown run 99" in err

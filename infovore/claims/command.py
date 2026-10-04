@@ -29,6 +29,7 @@ from infovore.db.claims_v2 import (
     RunReport,
     create_run,
     record_exchange,
+    rejection_rows,
     report_rows,
     review_rows,
     run_ids,
@@ -220,6 +221,20 @@ def _report(context: "AppContext", args: argparse.Namespace) -> int:
     return int(ExitCode.OK)
 
 
+def _show(context: "AppContext", args: argparse.Namespace) -> int:
+    from infovore.cli import ExitCode
+
+    _require_run(context.conn, args.run)
+    out = context.stdout
+    if args.rejected:
+        for rejection in rejection_rows(context.conn, args.run):
+            out.write(f"{rejection.speaker}: {rejection.statement} [{rejection.reason}]\n")
+    else:
+        for row in review_rows(context.conn, args.run):
+            out.write(f"{row.claim_id}\t{row.speaker}: {row.statement}\n")
+    return int(ExitCode.OK)
+
+
 class ClaimsCommand:
     name = "claims"
     help = "claim extraction trial: extract with a local model, review, report"
@@ -243,6 +258,9 @@ class ClaimsCommand:
         serve.add_argument("--run", type=int, required=True)
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_CLAIMS_PORT)
+        show = sub.add_parser("show", help="print a run's claims or rejections as text")
+        show.add_argument("--run", type=int, required=True)
+        show.add_argument("--rejected", action="store_true")
         report = sub.add_parser("report", help="per-run trial numbers")
         report.add_argument("--run", type=int, default=None)
 
@@ -251,4 +269,6 @@ class ClaimsCommand:
             return _extract(context, args)
         if args.claims_action == "serve":
             return _serve(context, args)
+        if args.claims_action == "show":
+            return _show(context, args)
         return _report(context, args)
