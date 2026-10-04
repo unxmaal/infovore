@@ -10,6 +10,7 @@ from infovore.eval.slices import BUILD, slice_ids, slice_names
 from infovore.rows import Label
 from infovore.triage.cascade import (
     SCORERS,
+    EmbedStage,
     Outcome,
     StageReport,
     current_exchange_ids,
@@ -17,7 +18,6 @@ from infovore.triage.cascade import (
     run_cascade,
     run_cascade_batched,
     stage_reports,
-    try_fit,
     tune_high,
     tuning_labels,
     tuning_samples,
@@ -37,7 +37,8 @@ from infovore.triage.embed import (
     SCORER as EMBED_SCORER,
 )
 from infovore.triage.embed_backend import load_embedder
-from infovore.triage.human import HumanFit, held_out_ids, training_labels
+from infovore.triage.embed_stage import build_embed_stage, default_cache_path
+from infovore.triage.human import held_out_ids, training_labels
 from infovore.triage.lexicon import (
     MAX_OFF,
     MIN_COUNT,
@@ -64,7 +65,7 @@ if TYPE_CHECKING:
 
 class RelevanceCommand:
     name = "relevance"
-    help = "relevance cascade: lexicon, then Bayes, then residue (#209)"
+    help = "relevance cascade: lexicon, then embedding scorer, then residue (#209)"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         sub = parser.add_subparsers(
@@ -74,9 +75,6 @@ class RelevanceCommand:
         cascade.add_argument("--slices", default=None, help="comma-separated slice names")
         cascade.add_argument("--write", action="store_true", help="record derived annotations")
         cascade.add_argument("--all", action="store_true", help="every current exchange")
-        cascade.add_argument(
-            "--min-per-class", type=int, default=None, dest="min_per_class", metavar="N"
-        )
         cascade.add_argument("--explain", type=int, default=None, metavar="EXCHANGE_ID")
         for name, text in (
             ("compare", "stratified CV: human Bayes vs embedding + logistic head"),
@@ -266,9 +264,10 @@ class RelevanceCommand:
         tuned = tuning_labels(conn, exclude)
         lore = sum(label is Label.LORE for label in tuned.values())
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
-        fit, why = try_fit(conn, exclude, args.min_per_class)
+        stage = build_embed_stage(conn, exclude, default_cache_path(context.settings.db_path))
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
+        context.stdout.write(self._thresholds(stage))
         context.stdout.write(
             f"lexicon v={lexicon.version} size={lexicon.size} {lexicon.sources}"
             f" t_high={t_high:.3f} (tuned on {BUILD} random-slice labels, held-out and"
@@ -281,21 +280,23 @@ class RelevanceCommand:
             if name == BUILD:
                 ids = [i for i in ids if i not in held]
             everything.update(ids)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
+            outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude)
             kind = "tuning, held-out excluded" if name == BUILD else "held-out"
             context.stdout.write(f"slice {name} ({kind}): n={len(ids)}\n")
             for report in stage_reports(outcomes, labels):
-                context.stdout.write(self._line(report, fit is None, why))
+                context.stdout.write(self._line(report, stage))
         everything_outcomes = None
         if args.all:
             everything = set(current_exchange_ids(conn))
             everything_outcomes = self._all(
-                context, sorted(everything), lexicon, t_high, fit, labels, why
+                context, sorted(everything), lexicon, t_high, stage, labels
             )
         if args.write:
             ids = sorted(everything)
-            outcomes = everything_outcomes or run_cascade(conn, ids, lexicon, t_high, fit, exclude)
-            versions = write_outcomes(conn, outcomes, lexicon, t_high, fit, context.clock.now())
+            outcomes = everything_outcomes or run_cascade(
+                conn, ids, lexicon, t_high, stage, exclude
+            )
+            versions = write_outcomes(conn, outcomes, lexicon, t_high, stage, context.clock.now())
             written = ", ".join(f"{SCORERS[s]} v{v}" for s, v in versions.items())
             context.stdout.write(f"wrote {len(ids)} exchanges: {written}\n")
         return int(ExitCode.OK)
@@ -306,9 +307,8 @@ class RelevanceCommand:
         ids: list[int],
         lexicon: Lexicon,
         t_high: float,
-        fit: HumanFit | None,
+        stage: EmbedStage,
         labels: dict[int, Label],
-        why: str,
     ) -> list[Outcome]:
         def progress(done: int, total: int) -> None:
             sys.stderr.write(f"progress {done}/{total}\n")
@@ -318,20 +318,32 @@ class RelevanceCommand:
             ids,
             lexicon,
             t_high,
-            fit,
+            stage,
             context.settings.exclude_channels,
             ALL_BATCH,
             progress,
         )
         context.stdout.write(f"corpus: n={len(ids)}\n")
         for report in stage_reports(outcomes, labels):
-            context.stdout.write(self._line(report, fit is None, why, corpus=True))
+            context.stdout.write(self._line(report, stage, corpus=True))
         for name, count in residue_channels(context.conn, outcomes, RESIDUE_CHANNELS):
             context.stdout.write(f"residue channel {name}: {count}\n")
         return outcomes
 
     @staticmethod
-    def _line(report: StageReport, no_bayes: bool, why: str, corpus: bool = False) -> str:
+    def _thresholds(stage: EmbedStage) -> str:
+        if stage.abstain_reason:
+            return ""
+        labels = stage.recipe["labels"]
+        return (
+            f"embed {stage.recipe['model']}@{stage.recipe['revision']} pool={stage.recipe['pool']}"
+            f" irrelevant_below={stage.t_irrelevant:.4f}"
+            f" relevant_at_or_above={stage.t_relevant:.4f}"
+            f" labels={labels}\n"
+        )
+
+    @staticmethod
+    def _line(report: StageReport, stage: EmbedStage, corpus: bool = False) -> str:
         if report.stage == "residue":
             return f"stage residue: n={report.decided} share={report.share:.3f}\n"
         if report.stage == "no_text":
@@ -339,8 +351,8 @@ class RelevanceCommand:
                 f"stage no_text: n={report.decided} share={report.share:.3f}"
                 " (set aside, not scored)\n"
             )
-        if report.stage == "bayes" and no_bayes:
-            return f"stage bayes: abstains on everything ({why})\n"
+        if report.stage == "embed" and stage.abstain_reason:
+            return f"stage embed: abstains on everything ({stage.abstain_reason})\n"
         accuracy = "n/a" if report.accuracy is None else f"{report.accuracy:.3f}"
         share = f" share={report.share:.3f}" if corpus else ""
         return (

@@ -55,7 +55,7 @@ def test_status_on_a_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert "messages: 0" in out
     assert "current exchanges: 0" in out
     assert "archived: 0 (cascade relevant 0, residue 0)" in out
-    assert "irrelevant: 0 (denylist 0, bayes 0)" in out
+    assert "irrelevant: 0 (denylist 0, embed 0)" in out
     assert "set aside (no_text): 0" in out
     assert "residue: 0" in out
     assert "not yet cascaded: 0" in out
@@ -111,9 +111,9 @@ def test_status_reports_cascade_outcomes_on_current_exchanges_only(tmp_path: Pat
             (n, n, n, now, now, f"h{n}", "done" if n == 1 else "pending", 7 if n == 9 else None),
         )
     _annotate(conn, 1, "relevance_lexicon", "relevant", now)
-    _annotate(conn, 2, "relevance_bayes", "relevant", now)
+    _annotate(conn, 2, "relevance_embed", "relevant", now)
     _annotate(conn, 3, "relevance_residue", "residue", now)
-    _annotate(conn, 4, "relevance_bayes", "irrelevant", now)
+    _annotate(conn, 4, "relevance_embed", "irrelevant", now)
     _annotate(conn, 5, "relevance_denylist", "irrelevant", now)
     _annotate(conn, 6, "relevance_no_text", "no_text", later)
     _annotate(conn, 9, "relevance_lexicon", "relevant", now)
@@ -127,7 +127,7 @@ def test_status_reports_cascade_outcomes_on_current_exchanges_only(tmp_path: Pat
     assert code == ExitCode.OK
     assert "current exchanges: 8" in out
     assert "archived: 4 (cascade relevant 3, residue 1)" in out
-    assert "irrelevant: 2 (denylist 1, bayes 1)" in out
+    assert "irrelevant: 2 (denylist 1, embed 1)" in out
     assert "set aside (no_text): 1" in out
     assert "residue: 1" in out
     assert "not yet cascaded: 1" in out

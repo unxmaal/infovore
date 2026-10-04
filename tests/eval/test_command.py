@@ -51,7 +51,7 @@ def _seed(tmp_path: Path) -> None:
             (index, index),
         )
     mark_all(conn, range(1, 901), "residue")
-    mark_all(conn, range(901, 1201), "bayes_irrelevant")
+    mark_all(conn, range(901, 1201), "embed_irrelevant")
     conn.close()
 
 

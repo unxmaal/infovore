@@ -276,7 +276,7 @@ def test_the_uncertain_queue_is_closest_to_a_coin_flip_first(conn: sqlite3.Conne
 
 
 def _gate(conn: sqlite3.Connection, scores: dict[int, float | None]) -> None:
-    _derived(conn, "relevance_bayes", 1, {i: s for i, s in scores.items() if s is not None})
+    _derived(conn, "relevance_embed", 1, {i: s for i, s in scores.items() if s is not None})
 
 
 def _derived(conn: sqlite3.Connection, scorer: str, version: int, scores: dict[int, float]) -> None:
@@ -302,7 +302,7 @@ def test_the_uncertain_queue_ranks_by_the_named_scorers_latest_version(
     assert [i.exchange_id for i in queue] == [3, 2, 1]
 
 
-def test_the_uncertain_queue_defaults_to_the_cascade_bayes_score(conn: sqlite3.Connection) -> None:
+def test_the_uncertain_queue_defaults_to_the_cascade_embed_score(conn: sqlite3.Connection) -> None:
     _texty(conn, 2)
     conn.execute("UPDATE exchanges SET p_lore = 0.5 WHERE id = 1")
     _gate(conn, {1: 0.9, 2: 0.5})
@@ -394,7 +394,7 @@ def _content(conn: sqlite3.Connection, exchange_id: int, text: str) -> None:
     )
 
 
-def test_likely_irrelevant_ranks_by_lexicon_share_then_bayes_score(
+def test_likely_irrelevant_ranks_by_lexicon_share_then_embed_score(
     conn: sqlite3.Connection,
 ) -> None:
     for eid in (6, 7, 8, 9):

@@ -138,7 +138,7 @@ def test_reports_archived_exchanges_from_the_latest_cascade(tmp_path: Path) -> N
         """
     )
     mark(conn, 1, "lexicon")
-    mark(conn, 2, "bayes_irrelevant")
+    mark(conn, 2, "embed_irrelevant")
     assert collect_status(conn).archived_exchanges == 1
 
 

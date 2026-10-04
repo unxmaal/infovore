@@ -10,7 +10,9 @@ class SentenceTransformerEmbedder:
         try:
             module = import_module("sentence_transformers")
         except ImportError as error:
-            raise ConfigError("install the embed extra: uv sync --extra embed") from error
+            raise ConfigError(
+                "the cascade needs the embed extra: use `uv run --extra embed ...`"
+            ) from error
         self.model_id = model_id
         self.revision = revision
         self._model: Any = module.SentenceTransformer(model_id, revision=revision, device=device)

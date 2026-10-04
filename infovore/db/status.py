@@ -6,7 +6,7 @@ from infovore.config import (
     DEFAULT_MAX_RETRIES,
     DEFAULT_TRIAGE_MIN_SCORE,
 )
-from infovore.db.archived import archived_clause
+from infovore.db.archived import MIDDLE_SCORER, archived_clause
 from infovore.db.channel_filter import include_channels_clause
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.exchanges import claimable_condition
@@ -50,7 +50,7 @@ class StatusReport:
     cascade_relevant: int
     cascade_residue: int
     irrelevant_denylist: int
-    irrelevant_bayes: int
+    irrelevant_embed: int
     set_aside_no_text: int
     unscored: int
     last_cascade_at: datetime | None
@@ -250,10 +250,10 @@ def collect_status(
         throughput_window_hours=throughput_window_hours,
         current_exchanges=current,
         cascade_relevant=outcomes.get("relevance_lexicon:relevant", 0)
-        + outcomes.get("relevance_bayes:relevant", 0),
+        + outcomes.get(f"{MIDDLE_SCORER}:relevant", 0),
         cascade_residue=outcomes.get("relevance_residue:residue", 0),
         irrelevant_denylist=outcomes.get("relevance_denylist:irrelevant", 0),
-        irrelevant_bayes=outcomes.get("relevance_bayes:irrelevant", 0),
+        irrelevant_embed=outcomes.get(f"{MIDDLE_SCORER}:irrelevant", 0),
         set_aside_no_text=outcomes.get("relevance_no_text:no_text", 0),
         unscored=current - sum(outcomes.values()),
         last_cascade_at=_latest_time(

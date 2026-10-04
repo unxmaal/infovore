@@ -7,6 +7,7 @@ import urllib.error
 import urllib.request
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final
 
 from infovore.config import ConfigError
@@ -19,10 +20,10 @@ from infovore.triage.cascade import (
     RESIDUE,
     current_exchange_ids,
     run_cascade,
-    try_fit,
     tune_high,
     tuning_samples,
 )
+from infovore.triage.embed_stage import build_embed_stage, default_cache_path
 from infovore.triage.human import training_labels
 from infovore.triage.lexicon import load_lexicon
 
@@ -173,6 +174,7 @@ def select_ids(
     residue: bool,
     labelled_only: bool,
     exclude: frozenset[str],
+    cache_path: Path,
 ) -> list[int]:
     if slices:
         names = slices.split(",")
@@ -185,8 +187,8 @@ def select_ids(
     if residue:
         lexicon = load_lexicon()
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
-        fit, _ = try_fit(conn, exclude, None)
-        outcomes = run_cascade(conn, ids, lexicon, t_high, fit, exclude)
+        stage = build_embed_stage(conn, exclude, cache_path)
+        outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude)
         ids = [o.exchange_id for o in outcomes if o.stage == RESIDUE]
     if labelled_only:
         labels, _ = training_labels(conn)
@@ -230,7 +232,12 @@ def run_llm_score(
         raise ConfigError("--residue or --slices is required")
     conn, out = context.conn, context.stdout
     ids = select_ids(
-        conn, args.slices, args.residue, args.labelled_only, context.settings.exclude_channels
+        conn,
+        args.slices,
+        args.residue,
+        args.labelled_only,
+        context.settings.exclude_channels,
+        default_cache_path(context.settings.db_path),
     )
     if args.limit is not None:
         ids = ids[: args.limit]

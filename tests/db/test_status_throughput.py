@@ -132,7 +132,7 @@ def status(
 def test_pending_archived_counts_only_what_extract_would_claim(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
     add_exchange(conn, 1)  # passes
-    add_exchange(conn, 2, cascade="bayes_irrelevant")  # ruled out
+    add_exchange(conn, 2, cascade="embed_irrelevant")  # ruled out
     add_exchange(conn, 3, status="done")  # not pending
     add_exchange(conn, 4, retry_count=MAX_RETRIES)  # exhausted retries
 
@@ -147,7 +147,7 @@ def test_pending_archived_agrees_with_the_claim_query(tmp_path: Path) -> None:
     # other keeps.
     conn = fresh(tmp_path)
     add_exchange(conn, 1)
-    add_exchange(conn, 2, cascade="bayes_irrelevant")
+    add_exchange(conn, 2, cascade="embed_irrelevant")
     add_exchange(conn, 3, cascade="lexicon")
     add_exchange(conn, 4, cascade=None)
     add_exchange(conn, 5, retry_count=MAX_RETRIES)

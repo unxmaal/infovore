@@ -55,7 +55,7 @@ def _seed(conn: sqlite3.Connection, passing: int, rejected: int) -> None:
             ),
         )
     mark_all(conn, range(1, passing + 1), "residue")
-    mark_all(conn, range(passing + 1, passing + rejected + 1), "bayes_irrelevant")
+    mark_all(conn, range(passing + 1, passing + rejected + 1), "embed_irrelevant")
 
 
 @pytest.fixture

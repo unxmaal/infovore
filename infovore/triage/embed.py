@@ -317,7 +317,7 @@ class CrossValidation:
     recipe: dict[str, object]
 
 
-def _recipe(embedder: Embedder, folds: int, max_chars: int, pool: str) -> dict[str, object]:
+def embed_recipe(embedder: Embedder, folds: int, max_chars: int, pool: str) -> dict[str, object]:
     return {
         "model": embedder.model_id,
         "revision": embedder.revision,
@@ -346,7 +346,7 @@ def _recipe(embedder: Embedder, folds: int, max_chars: int, pool: str) -> dict[s
     }
 
 
-def _prepare(
+def prepare_labelled(
     conn: sqlite3.Connection,
     labels: dict[int, Label],
     embedder: Embedder,
@@ -358,7 +358,7 @@ def _prepare(
     return {eid: label for eid, label in labels.items() if eid in vectors}, vectors
 
 
-def _check_counts(labels: dict[int, Label], folds: int) -> None:
+def check_counts(labels: dict[int, Label], folds: int) -> None:
     relevant = sum(1 for label in labels.values() if label is Label.LORE)
     irrelevant = len(labels) - relevant
     if relevant < folds or irrelevant < folds:
@@ -380,7 +380,7 @@ def _held_out_folds(
     ]
 
 
-def _oof_embed(
+def oof_embed(
     ids: Sequence[int],
     labels: dict[int, Label],
     vectors: dict[int, list[float]],
@@ -432,15 +432,15 @@ def cross_validate(
     pool: str = "first",
 ) -> CrossValidation:
     trainable, _ = trainable_labels(conn, exclude_channels)
-    labels, vectors = _prepare(conn, trainable, embedder, cache, max_chars, pool)
-    _check_counts(labels, folds)
+    labels, vectors = prepare_labelled(conn, trainable, embedder, cache, max_chars, pool)
+    check_counts(labels, folds)
     assigned = stratified_folds(labels, folds)
     ids = sorted(labels)
     tokens = _tokens(conn, ids)
 
     def compare(subset: Sequence[int]) -> Comparison:
         bayes = _oof_bayes(subset, labels, tokens, assigned, folds)
-        embed = _oof_embed(subset, labels, vectors, assigned, folds)
+        embed = oof_embed(subset, labels, vectors, assigned, folds)
         return Comparison(
             summarize([(bayes[eid], labels[eid]) for eid in subset]),
             summarize([(embed[eid], labels[eid]) for eid in subset]),
@@ -453,7 +453,7 @@ def cross_validate(
         subset = sorted(residue_ids(conn, ids, lexicon, t_high, exclude_channels))
         residue_comparison = compare(subset)
     return CrossValidation(
-        folds, compare(ids), residue_comparison, _recipe(embedder, folds, max_chars, pool)
+        folds, compare(ids), residue_comparison, embed_recipe(embedder, folds, max_chars, pool)
     )
 
 
@@ -467,19 +467,19 @@ def embed_scores(
     pool: str = "first",
 ) -> tuple[dict[int, float], dict[str, object]]:
     trainable, _ = trainable_labels(conn, exclude_channels)
-    labels, vectors = _prepare(conn, trainable, embedder, cache, max_chars, pool)
-    _check_counts(labels, folds)
+    labels, vectors = prepare_labelled(conn, trainable, embedder, cache, max_chars, pool)
+    check_counts(labels, folds)
     ids = sorted(labels)
-    scores = _oof_embed(ids, labels, vectors, stratified_folds(labels, folds), folds)
+    scores = oof_embed(ids, labels, vectors, stratified_folds(labels, folds), folds)
     held_out = {
         eid: label
         for eid, label in training_labels(conn, exclude_channels=exclude_channels)[0].items()
         if eid not in trainable
     }
-    _, held_vectors = _prepare(conn, held_out, embedder, cache, max_chars, pool)
+    _, held_vectors = prepare_labelled(conn, held_out, embedder, cache, max_chars, pool)
     head = fit_head([vectors[eid] for eid in ids], [labels[eid] is Label.LORE for eid in ids])
     scores.update({eid: predict_head(head, vector) for eid, vector in held_vectors.items()})
-    recipe = _recipe(embedder, folds, max_chars, pool)
+    recipe = embed_recipe(embedder, folds, max_chars, pool)
     recipe["scores"] = (
         "out-of-fold for trainable labels; held-out labels from a head fit on all trainable"
     )

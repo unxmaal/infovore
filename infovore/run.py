@@ -16,6 +16,7 @@ from infovore.ingest.live import EventOutcome, handle_event
 from infovore.privacy.optout import sync_opt_outs
 from infovore.source.protocol import DiscordSource
 from infovore.timing import Clock, Sleeper
+from infovore.triage.embed_stage import default_cache_path
 from infovore.triage.incremental import cascade_new_exchanges
 from infovore.triage.runner import triage_pending
 
@@ -97,7 +98,9 @@ async def _run_cycle(
     progress(CycleStepStarted(step="triage"))
     triage_pending(conn, rules=settings.triage_rules, workers=settings.workers)
     progress(CycleStepStarted(step="cascade"))
-    cascade_new_exchanges(conn, settings.exclude_channels, clock.now())
+    cascade_new_exchanges(
+        conn, settings.exclude_channels, default_cache_path(settings.db_path), clock.now()
+    )
 
 
 async def _interruptible_wait(sleeper: Sleeper, seconds: float, stop: asyncio.Event) -> None:

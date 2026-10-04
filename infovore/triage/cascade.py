@@ -6,28 +6,17 @@ from datetime import datetime
 from typing import Final
 
 from infovore.db.annotations import Annotation, record_annotation
+from infovore.db.archived import STAGES
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import excluded_exchange_ids
 from infovore.db.exchange_text import text_message_counts
 from infovore.eval.slices import BUILD
 from infovore.rows import Label
-from infovore.triage.bayes import p_lore
-from infovore.triage.human import (
-    MIN_PER_CLASS,
-    HumanFit,
-    InsufficientHumanLabelsError,
-    fit_human,
-    held_out_ids,
-    human_features,
-    training_labels,
-)
+from infovore.triage.human import held_out_ids, training_labels
 from infovore.triage.lexicon import Lexicon, LexiconScore, score_lexicon
 
 QUEUE_REF_PREFIXES: Final = ("judge:likely-irrelevant:", "judge:uncertain:", "judge:c1:")
 PRECISION_TARGET: Final = 0.97
-BAYES_HIGH: Final = 0.9
-BAYES_LOW: Final = 0.1
-STAGES: Final = ("denylist", "no_text", "lexicon", "bayes", "residue")
 SCORERS: Final = {stage: f"relevance_{stage}" for stage in STAGES}
 RELEVANT: Final = "relevant"
 IRRELEVANT: Final = "irrelevant"
@@ -37,12 +26,25 @@ UNSCORED: Final = (RESIDUE, NO_TEXT)
 
 
 @dataclass(frozen=True)
+class EmbedStage:
+    score: Callable[[Sequence[int]], dict[int, float]]
+    t_irrelevant: float
+    t_relevant: float
+    recipe: dict[str, object]
+    abstain_reason: str = ""
+
+    @classmethod
+    def abstaining(cls, reason: str) -> "EmbedStage":
+        return cls(lambda ids: {}, 0.0, 1.01, {"abstained": reason}, reason)
+
+
+@dataclass(frozen=True)
 class Outcome:
     exchange_id: int
     share: float
     hits: int
     messages: int
-    p_bayes: float | None
+    p_embed: float | None
     stage: str
     decision: str
 
@@ -82,12 +84,12 @@ def decide_lexicon(score: LexiconScore, t_high: float) -> str | None:
     return RELEVANT if score.hits and score.share >= t_high else None
 
 
-def decide_bayes(p: float | None) -> str | None:
+def decide_embed(p: float | None, stage: EmbedStage) -> str | None:
     if p is None:
         return None
-    if p >= BAYES_HIGH:
-        return RELEVANT
-    return IRRELEVANT if p <= BAYES_LOW else None
+    if p < stage.t_irrelevant:
+        return IRRELEVANT
+    return RELEVANT if p >= stage.t_relevant else None
 
 
 def tuning_labels(
@@ -116,30 +118,21 @@ def tuning_samples(
     ]
 
 
-def try_fit(
-    conn: sqlite3.Connection,
-    exclude_channels: frozenset[str] = frozenset(),
-    minimum: int | None = None,
-) -> tuple[HumanFit | None, str]:
-    try:
-        floor = MIN_PER_CLASS if minimum is None else minimum
-        return fit_human(conn, minimum=floor, exclude_channels=exclude_channels), ""
-    except InsufficientHumanLabelsError as error:
-        return None, str(error)
-
-
 def run_cascade(
     conn: sqlite3.Connection,
     ids: Sequence[int],
     lexicon: Lexicon,
     t_high: float,
-    fit: HumanFit | None,
+    stage: EmbedStage,
     exclude_channels: frozenset[str] = frozenset(),
 ) -> list[Outcome]:
     denied = excluded_exchange_ids(conn, exclude_channels)
     live = [eid for eid in ids if eid not in denied]
     text = text_message_counts(conn, live)
     inputs = exchange_inputs_for_ids(conn, [eid for eid in live if text[eid]])
+    lexical = {eid: score_lexicon(lexicon, inputs[eid].messages) for eid in live if text[eid]}
+    abstained = [eid for eid, score in lexical.items() if decide_lexicon(score, t_high) is None]
+    probabilities = stage.score(abstained) if abstained else {}
     outcomes = []
     for eid in ids:
         if eid in denied:
@@ -148,17 +141,14 @@ def run_cascade(
         if not text[eid]:
             outcomes.append(Outcome(eid, 0.0, 0, 0, None, NO_TEXT, NO_TEXT))
             continue
-        one = inputs[eid]
-        score = score_lexicon(lexicon, one.messages)
+        score = lexical[eid]
         decision = decide_lexicon(score, t_high)
-        stage, p = "lexicon", None
-        if decision is None and fit is not None:
-            tokens = human_features(one.messages, one.reactions, one.attachments)
-            p = p_lore(fit.model, tokens)
-            stage, decision = "bayes", decide_bayes(p)
+        name, p = "lexicon", probabilities.get(eid)
         if decision is None:
-            stage, decision = "residue", RESIDUE
-        outcomes.append(Outcome(eid, score.share, score.hits, score.messages, p, stage, decision))
+            name, decision = "embed", decide_embed(p, stage)
+        if decision is None:
+            name, decision = "residue", RESIDUE
+        outcomes.append(Outcome(eid, score.share, score.hits, score.messages, p, name, decision))
     return outcomes
 
 
@@ -171,7 +161,7 @@ def run_cascade_batched(
     ids: Sequence[int],
     lexicon: Lexicon,
     t_high: float,
-    fit: HumanFit | None,
+    stage: EmbedStage,
     exclude_channels: frozenset[str],
     batch_size: int,
     progress: Callable[[int, int], None],
@@ -179,7 +169,7 @@ def run_cascade_batched(
     outcomes: list[Outcome] = []
     for start in range(0, len(ids), batch_size):
         chunk = ids[start : start + batch_size]
-        outcomes.extend(run_cascade(conn, chunk, lexicon, t_high, fit, exclude_channels))
+        outcomes.extend(run_cascade(conn, chunk, lexicon, t_high, stage, exclude_channels))
         progress(len(outcomes), len(ids))
     return outcomes
 
@@ -247,14 +237,13 @@ def write_outcomes(
     outcomes: Sequence[Outcome],
     lexicon: Lexicon,
     t_high: float,
-    fit: HumanFit | None,
+    stage: EmbedStage,
     at: datetime,
 ) -> dict[str, int]:
     versions = {stage: _next_version(conn, SCORERS[stage]) for stage in STAGES}
     base = {
         "lexicon_version": lexicon.version,
         "t_high": t_high,
-        "bayes_band": [BAYES_LOW, BAYES_HIGH],
     }
     for o in outcomes:
         if o.stage in ("denylist", NO_TEXT):
@@ -279,25 +268,25 @@ def write_outcomes(
                 {**base, "hits": o.hits, "messages": o.messages},
             )
         ]
-        if o.p_bayes is not None and fit is not None:
+        if o.p_embed is not None:
             rows.append(
                 (
-                    "bayes",
-                    o.p_bayes,
-                    o.decision if o.stage == "bayes" else None,
-                    {**base, "model": fit.recipe},
+                    "embed",
+                    o.p_embed,
+                    o.decision if o.stage == "embed" else None,
+                    {**base, **stage.recipe},
                 )
             )
         if o.stage == "residue":
             rows.append(("residue", None, RESIDUE, base))
-        for stage, score, label, recipe in rows:
+        for name, score, label, recipe in rows:
             record_annotation(
                 conn,
                 Annotation(
                     subject_kind="exchange",
                     subject_id=o.exchange_id,
-                    scorer=SCORERS[stage],
-                    scorer_version=versions[stage],
+                    scorer=SCORERS[name],
+                    scorer_version=versions[name],
                     reproducibility="derived",
                     score=score,
                     label=label,

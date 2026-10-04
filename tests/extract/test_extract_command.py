@@ -418,7 +418,7 @@ def test_extract_live_mode_refuses_untriaged_exchange(tmp_path: Path) -> None:
     assert "infovore triage" in err
 
 
-@pytest.mark.parametrize("cascade", [None, "bayes_irrelevant", "denylist", "no_text"])
+@pytest.mark.parametrize("cascade", [None, "embed_irrelevant", "denylist", "no_text"])
 def test_extract_live_mode_only_claims_archived_exchanges(
     tmp_path: Path, cascade: str | None
 ) -> None:
