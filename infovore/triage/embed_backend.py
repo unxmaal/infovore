@@ -14,6 +14,15 @@ class SentenceTransformerEmbedder:
         self.model_id = model_id
         self.revision = revision
         self._model: Any = module.SentenceTransformer(model_id, revision=revision, device=device)
+        self._tokenizer: Any = self._model.tokenizer
+        self.max_tokens = int(self._model.max_seq_length) - 2
+
+    def token_count(self, text: str) -> int:
+        return len(self._tokenizer.encode(text, add_special_tokens=False))
+
+    def split(self, text: str, limit: int) -> list[str]:
+        ids = self._tokenizer.encode(text, add_special_tokens=False)
+        return [self._tokenizer.decode(ids[i : i + limit]) for i in range(0, len(ids), limit)]
 
     def embed(self, texts: Sequence[str]) -> list[list[float]]:
         vectors = self._model.encode(

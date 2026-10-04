@@ -27,6 +27,7 @@ from infovore.triage.embed import (
     DEFAULT_MODEL,
     DEFAULT_REVISION,
     MAX_CHARS,
+    POOLS,
     EmbeddingCache,
     Summary,
     cross_validate,
@@ -84,6 +85,7 @@ class RelevanceCommand:
             embed.add_argument("--model", default=DEFAULT_MODEL)
             embed.add_argument("--revision", default=DEFAULT_REVISION)
             embed.add_argument("--max-chars", type=int, default=MAX_CHARS, dest="max_chars")
+            embed.add_argument("--pool", choices=POOLS, default="first")
             embed.add_argument("--cache", default=None, help="embedding cache file")
             if name == "compare":
                 embed.add_argument("--residue", action="store_true")
@@ -129,10 +131,11 @@ class RelevanceCommand:
             args.max_chars,
             args.residue,
             context.settings.exclude_channels,
+            args.pool,
         )
         context.stdout.write(
             f"model={embedder.model_id} revision={embedder.revision} cv={result.folds}"
-            f" max_chars={args.max_chars}\n"
+            f" max_chars={args.max_chars} pool={args.pool}\n"
         )
         header = (
             "scorer\trelevant\tirrelevant\tauc\tthreshold\tprecision\trecall\tf1"
@@ -168,6 +171,7 @@ class RelevanceCommand:
             args.cv,
             args.max_chars,
             context.settings.exclude_channels,
+            args.pool,
         )
         row = conn.execute(
             "SELECT MAX(scorer_version) AS v FROM annotations WHERE scorer = ?", (EMBED_SCORER,)

@@ -37,13 +37,61 @@ class NotEnoughLabelsError(ConfigError):
 class Embedder(Protocol):
     model_id: str
     revision: str
+    max_tokens: int
+
+    def token_count(self, text: str) -> int: ...
+
+    def split(self, text: str, limit: int) -> list[str]: ...
 
     def embed(self, texts: Sequence[str]) -> list[list[float]]: ...
 
 
+POOLS: Final = ("first", "mean", "max")
+
+
+def message_parts(messages: Sequence[MessageRow]) -> list[str]:
+    return [message.content for message in messages if message.content.strip()]
+
+
 def render_exchange(messages: Sequence[MessageRow], max_chars: int) -> str:
-    parts = [message.content for message in messages if message.content.strip()]
-    return "\n".join(parts)[:max_chars]
+    return "\n".join(message_parts(messages))[:max_chars]
+
+
+def window_parts(parts: Sequence[str], embedder: Embedder) -> list[str]:
+    limit = embedder.max_tokens
+    windows: list[str] = []
+    current: list[str] = []
+    used = 0
+    for part in parts:
+        size = embedder.token_count(part)
+        pieces = [part] if size <= limit else embedder.split(part, limit)
+        for piece in pieces:
+            count = size if len(pieces) == 1 else embedder.token_count(piece)
+            if current and used + count > limit:
+                windows.append("\n".join(current))
+                current, used = [], 0
+            current.append(piece)
+            used += count
+    if current:
+        windows.append("\n".join(current))
+    return windows
+
+
+def pool_vectors(vectors: Sequence[Sequence[float]], pool: str) -> list[float]:
+    if pool == "first":
+        return list(vectors[0])
+    columns = list(zip(*vectors, strict=True))
+    if pool == "mean":
+        return [sum(column) / len(vectors) for column in columns]
+    if pool == "max":
+        return [max(column) for column in columns]
+    raise ValueError(f"unknown pool {pool!r}; expected one of {', '.join(POOLS)}")
+
+
+def cache_model(embedder: Embedder, pool: str) -> str:
+    if pool == "first":
+        return embedder.model_id
+    return f"{embedder.model_id}#windows{embedder.max_tokens}-{pool}"
 
 
 class EmbeddingCache:
@@ -99,28 +147,42 @@ def embed_exchanges(
     cache: EmbeddingCache,
     max_chars: int,
     batch_size: int = EMBED_BATCH,
+    pool: str = "first",
 ) -> dict[int, list[float]]:
+    pool_vectors([[0.0]], pool)
+    model = cache_model(embedder, pool)
     found: dict[int, list[float]] = {}
-    pending: list[tuple[int, str, str]] = []
+    pending: list[tuple[int, str, list[str]]] = []
     for start in range(0, len(ids), BATCH_SIZE):
         chunk = ids[start : start + BATCH_SIZE]
         inputs = exchange_inputs_for_ids(conn, chunk)
         for eid in chunk:
-            text = render_exchange(inputs[eid].messages, max_chars)
-            if not text.strip():
+            parts = message_parts(inputs[eid].messages)
+            if not parts:
                 continue
+            if pool == "first":
+                text = "\n".join(parts)[:max_chars]
+                windows = [text]
+            else:
+                text = "\n".join(parts)
+                windows = window_parts(parts, embedder)
             digest = hashlib.sha256(text.encode()).hexdigest()
-            cached = cache.get(embedder.model_id, embedder.revision, eid, digest)
+            cached = cache.get(model, embedder.revision, eid, digest)
             if cached is None:
-                pending.append((eid, digest, text))
+                pending.append((eid, digest, windows))
             else:
                 found[eid] = cached
-    for start in range(0, len(pending), batch_size):
-        batch = pending[start : start + batch_size]
-        vectors = embedder.embed([text for _, _, text in batch])
-        for (eid, digest, _), vector in zip(batch, vectors, strict=True):
-            cache.put(embedder.model_id, embedder.revision, eid, digest, vector)
-            found[eid] = array("f", vector).tolist()
+    flat = [(index, window) for index, (_, _, windows) in enumerate(pending) for window in windows]
+    vectors: list[list[float]] = []
+    for start in range(0, len(flat), batch_size):
+        vectors.extend(embedder.embed([window for _, window in flat[start : start + batch_size]]))
+    grouped: dict[int, list[list[float]]] = {}
+    for (index, _), vector in zip(flat, vectors, strict=True):
+        grouped.setdefault(index, []).append(vector)
+    for index, (eid, digest, _) in enumerate(pending):
+        pooled = array("f", pool_vectors(grouped[index], pool))
+        cache.put(model, embedder.revision, eid, digest, pooled)
+        found[eid] = pooled.tolist()
     return found
 
 
@@ -255,12 +317,23 @@ class CrossValidation:
     recipe: dict[str, object]
 
 
-def _recipe(embedder: Embedder, folds: int, max_chars: int) -> dict[str, object]:
+def _recipe(embedder: Embedder, folds: int, max_chars: int, pool: str) -> dict[str, object]:
     return {
         "model": embedder.model_id,
         "revision": embedder.revision,
+        "pool": pool,
         "max_chars": max_chars,
-        "truncation": f"rendered exchange text cut to first {max_chars} characters",
+        "truncation": (
+            f"rendered exchange text cut to first {max_chars} characters"
+            if pool == "first"
+            else "none"
+        ),
+        "windows": (
+            "one window"
+            if pool == "first"
+            else f"messages packed into windows of <= {embedder.max_tokens} tokens;"
+            " oversized message split by tokenizer; window vectors pooled"
+        ),
         "text": "non-empty message contents joined by newline, in order",
         "head": {
             "kind": "standardized L2 logistic regression, full-batch gradient descent",
@@ -279,8 +352,9 @@ def _prepare(
     embedder: Embedder,
     cache: EmbeddingCache,
     max_chars: int,
+    pool: str,
 ) -> tuple[dict[int, Label], dict[int, list[float]]]:
-    vectors = embed_exchanges(conn, sorted(labels), embedder, cache, max_chars)
+    vectors = embed_exchanges(conn, sorted(labels), embedder, cache, max_chars, pool=pool)
     return {eid: label for eid, label in labels.items() if eid in vectors}, vectors
 
 
@@ -355,9 +429,10 @@ def cross_validate(
     max_chars: int,
     residue: bool = False,
     exclude_channels: frozenset[str] = frozenset(),
+    pool: str = "first",
 ) -> CrossValidation:
     trainable, _ = trainable_labels(conn, exclude_channels)
-    labels, vectors = _prepare(conn, trainable, embedder, cache, max_chars)
+    labels, vectors = _prepare(conn, trainable, embedder, cache, max_chars, pool)
     _check_counts(labels, folds)
     assigned = stratified_folds(labels, folds)
     ids = sorted(labels)
@@ -378,7 +453,7 @@ def cross_validate(
         subset = sorted(residue_ids(conn, ids, lexicon, t_high, exclude_channels))
         residue_comparison = compare(subset)
     return CrossValidation(
-        folds, compare(ids), residue_comparison, _recipe(embedder, folds, max_chars)
+        folds, compare(ids), residue_comparison, _recipe(embedder, folds, max_chars, pool)
     )
 
 
@@ -389,9 +464,10 @@ def embed_scores(
     folds: int,
     max_chars: int,
     exclude_channels: frozenset[str] = frozenset(),
+    pool: str = "first",
 ) -> tuple[dict[int, float], dict[str, object]]:
     trainable, _ = trainable_labels(conn, exclude_channels)
-    labels, vectors = _prepare(conn, trainable, embedder, cache, max_chars)
+    labels, vectors = _prepare(conn, trainable, embedder, cache, max_chars, pool)
     _check_counts(labels, folds)
     ids = sorted(labels)
     scores = _oof_embed(ids, labels, vectors, stratified_folds(labels, folds), folds)
@@ -400,10 +476,10 @@ def embed_scores(
         for eid, label in training_labels(conn, exclude_channels=exclude_channels)[0].items()
         if eid not in trainable
     }
-    _, held_vectors = _prepare(conn, held_out, embedder, cache, max_chars)
+    _, held_vectors = _prepare(conn, held_out, embedder, cache, max_chars, pool)
     head = fit_head([vectors[eid] for eid in ids], [labels[eid] is Label.LORE for eid in ids])
     scores.update({eid: predict_head(head, vector) for eid, vector in held_vectors.items()})
-    recipe = _recipe(embedder, folds, max_chars)
+    recipe = _recipe(embedder, folds, max_chars, pool)
     recipe["scores"] = (
         "out-of-fold for trainable labels; held-out labels from a head fit on all trainable"
     )

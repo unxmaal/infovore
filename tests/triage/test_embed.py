@@ -1,3 +1,4 @@
+import sqlite3
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -12,11 +13,13 @@ from infovore.triage.embed import (
     cross_validate,
     embed_exchanges,
     fit_head,
+    pool_vectors,
     predict_head,
     render_exchange,
     residue_ids,
     stratified_folds,
     summarize,
+    window_parts,
 )
 from infovore.triage.lexicon import load_lexicon
 from tests.triage.test_command import environment, run
@@ -29,8 +32,16 @@ class FakeEmbedder:
     model_id = "fake/keywords"
     revision = "r1"
 
-    def __init__(self) -> None:
+    def __init__(self, max_tokens: int = 512) -> None:
         self.calls: list[list[str]] = []
+        self.max_tokens = max_tokens
+
+    def token_count(self, text: str) -> int:
+        return len(text.split())
+
+    def split(self, text: str, limit: int) -> list[str]:
+        words = text.split()
+        return [" ".join(words[i : i + limit]) for i in range(0, len(words), limit)]
 
     def embed(self, texts: Sequence[str]) -> list[list[float]]:
         self.calls.append(list(texts))
@@ -292,3 +303,89 @@ def test_cli_compare_without_residue_skips_that_table(
     assert code == ExitCode.OK
     assert "all labels" in out
     assert "residue" not in out
+
+
+def test_windows_pack_whole_messages_up_to_the_token_limit() -> None:
+    fake = FakeEmbedder(max_tokens=4)
+
+    assert window_parts(["a b", "c", "d e f", "g"], fake) == ["a b\nc", "d e f\ng"]
+    assert window_parts(["a b c d"], fake) == ["a b c d"]
+    assert window_parts([], fake) == []
+
+
+def test_a_single_oversized_message_is_split_and_neighbours_start_a_new_window() -> None:
+    fake = FakeEmbedder(max_tokens=3)
+
+    assert window_parts(["x", "a b c d e", "y"], fake) == ["x", "a b c", "d e\ny"]
+
+
+def test_pooling_first_mean_max() -> None:
+    vectors = [[1.0, 4.0], [3.0, 2.0]]
+
+    assert pool_vectors(vectors, "first") == [1.0, 4.0]
+    assert pool_vectors(vectors, "mean") == [2.0, 3.0]
+    assert pool_vectors(vectors, "max") == [3.0, 4.0]
+    with pytest.raises(ValueError, match="pool"):
+        pool_vectors(vectors, "median")
+
+
+def long_exchange_db(tmp_path: Path) -> tuple[sqlite3.Connection, int]:
+    conn = db(tmp_path)
+    eid = seed(conn, 1, " ".join(f"w{i}" for i in range(10)))
+    conn.commit()
+    return conn, eid
+
+
+def test_windowed_pooling_embeds_every_window_and_pools(tmp_path: Path) -> None:
+    conn, eid = long_exchange_db(tmp_path)
+    fake = FakeEmbedder(max_tokens=4)
+    cache = EmbeddingCache(tmp_path / "c.db")
+
+    mean = embed_exchanges(conn, [eid], fake, cache, 5, pool="mean")[eid]
+    biggest = embed_exchanges(conn, [eid], fake, cache, 5, pool="max")[eid]
+    first = embed_exchanges(conn, [eid], fake, cache, 5, pool="first")[eid]
+
+    assert fake.calls[0] == ["w0 w1 w2 w3", "w4 w5 w6 w7", "w8 w9"]
+    assert fake.calls[2] == ["w0 w1"]
+    assert len(set(map(tuple, (mean, biggest, first)))) == 3
+    assert biggest[0] == pytest.approx(
+        max(FakeEmbedder().embed([t])[0][0] for t in ("w0 w1 w2 w3", "w4 w5 w6 w7", "w8 w9"))
+    )
+
+
+def test_cache_key_separates_pool_and_window_size(tmp_path: Path) -> None:
+    conn, eid = long_exchange_db(tmp_path)
+    cache = EmbeddingCache(tmp_path / "c.db")
+    four = FakeEmbedder(max_tokens=4)
+
+    embed_exchanges(conn, [eid], four, cache, 5, pool="mean")
+    embed_exchanges(conn, [eid], four, cache, 5, pool="mean")
+    assert len(four.calls) == 1
+    embed_exchanges(conn, [eid], four, cache, 5, pool="max")
+    assert len(four.calls) == 2
+    embed_exchanges(conn, [eid], FakeEmbedder(max_tokens=3), cache, 5, pool="mean")
+    embed_exchanges(conn, [eid], four, cache, 5, pool="first")
+    rows = cache._conn.execute("SELECT DISTINCT model FROM embeddings").fetchall()
+    assert len(rows) == 4
+    assert "fake/keywords" in {r[0] for r in rows}
+
+
+def test_cli_pool_is_recorded_in_header_and_recipe(
+    tmp_path: Path, fake_backend: FakeEmbedder
+) -> None:
+    path = labelled_db(tmp_path, 10, 20)
+    env = environment(tmp_path)
+
+    code, out, _ = run(["relevance", "compare", "--cv", "5", "--pool", "mean"], env)
+    assert code == ExitCode.OK
+    assert "pool=mean" in out
+    assert run(["relevance", "embed-score", "--cv", "5", "--pool", "max"], env)[0] == ExitCode.OK
+
+    conn = open_database(path)
+    recipe = conn.execute(
+        "SELECT recipe_json FROM annotations WHERE scorer = 'p_relevant_embed' LIMIT 1"
+    ).fetchone()[0]
+    assert '"pool": "max"' in recipe
+    assert "windows" in recipe
+    with pytest.raises(SystemExit):
+        run(["relevance", "compare", "--pool", "median"], env)
