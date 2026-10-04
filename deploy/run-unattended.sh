@@ -1,5 +1,5 @@
 #!/bin/zsh -l
-# Unattended infovore live extraction (best-first) in tmux, Mac kept awake. Resume-safe.
+# Unattended infovore run loop (ingest, chunk, relevance cascade; no LLM) in tmux, Mac kept awake. Resume-safe.
 #   ~/infovore/run-unattended.sh start --i-approved
 #   ~/infovore/run-unattended.sh stop    # end it (work in progress is kept)
 set -u
@@ -11,26 +11,18 @@ LOG=~/infovore/logs; mkdir -p $LOG
 case "${1:-start}" in
   start)
     [ "${2:-}" = "--i-approved" ] || { echo "refusing: start needs --i-approved (explicit approval)" >&2; exit 1; }
-    uv run infovore triage 2>&1 | tail -n 5 | tee -a $LOG/setup.log
-    code_version=$(uv run python -c 'from infovore.extract.prompt import PROMPT_VERSION; print(PROMPT_VERSION)')
-    live_version=$(uv run infovore status 2>/dev/null | awk '/^live prompt version:/ {print $NF}')
-    if [ "$code_version" != "$live_version" ]; then
-      echo "refusing to start: code prompt is $code_version, promoted is ${live_version:-none}." | tee -a $LOG/setup.log
-      echo "promote deliberately first: uv run infovore promote --prompt-version $code_version" | tee -a $LOG/setup.log
-      exit 1
-    fi
-    tmux new-session -d -s infovore -n extract "caffeinate -dimsu $SELF extract"
+    tmux new-session -d -s infovore -n run "caffeinate -dimsu $SELF loop"
     echo "started: tmux attach -t infovore  (logs in $LOG)"
     ;;
   stop)
     tmux kill-session -t infovore && echo stopped
     ;;
-  extract)
+  loop)
     while true; do
-      uv run infovore extract --mode live --order best >>$LOG/extract.log 2>&1
+      uv run infovore run >>$LOG/run.log 2>&1
       rc=$?
-      if [ $rc -eq 0 ]; then echo "$(date) extract queue drained" >>$LOG/extract.log; break; fi
-      echo "$(date) extract exited $rc, restarting in 60s" >>$LOG/extract.log; sleep 60
+      if [ $rc -eq 0 ]; then echo "$(date) run exited cleanly" >>$LOG/run.log; break; fi
+      echo "$(date) run exited $rc, restarting in 60s" >>$LOG/run.log; sleep 60
     done
     ;;
   *)

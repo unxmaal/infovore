@@ -128,7 +128,7 @@ Nothing host-specific lives in code. `infovore` is one console-script package (`
 - Initial load: fetch from the Discord API once with DiscordChatExporter (`exportguild --include-threads all`), set `INFOVORE_SOURCE=export` and `INFOVORE_EXPORT_DIR`, then `infovore backfill` and `infovore chunk`.
 - Steady state: `infovore run` keeps ingest and the chunk, triage and cascade loop alive. Run it under launchd, systemd or `docker run -d --restart unless-stopped -v "$PWD/data:/data" --env-file .env infovore run`.
 - Periodic alternative: a timer that runs `infovore backfill && infovore chunk`.
-- `deploy/run-unattended.sh start --i-approved` is the tmux and caffeinate runner for unattended macOS runs. It refuses to start without `--i-approved`.
+- `deploy/run-unattended.sh start --i-approved` is the tmux and caffeinate launcher for `infovore run` (no extraction). It refuses to start without `--i-approved`.
 - The `claude_cli` backend needs `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`) on headless hosts; `openai_compat` needs `INFOVORE_<STAGE>_BASE_URL` and `INFOVORE_<STAGE>_API_KEY`.
 
 ## Development
