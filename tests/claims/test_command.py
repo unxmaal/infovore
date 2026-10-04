@@ -52,10 +52,11 @@ class Fake(BaseHTTPRequestHandler):
             speaker = re.search(r"\[1\] (user-[0-9a-f]+):", user)
             assert speaker
             who = speaker.group(1)
-            claims = [{"speaker": who, "statement": f"{who} said the Indy runs IRIX", "refs": [1]}]
-        content = json.dumps({"claims": claims})
+            claims = [{"s": who, "t": f"{who} said the Indy runs IRIX", "r": [1]}]
+        content = json.dumps({"c": claims})
+        finish = "length" if Fake.mode == "truncate" else "stop"
         reply = {
-            "choices": [{"message": {"content": content}}],
+            "choices": [{"message": {"content": content}, "finish_reason": finish}],
             "usage": {"prompt_tokens": 40, "completion_tokens": 8},
         }
         self._send(200, json.dumps(reply).encode())
@@ -105,6 +106,7 @@ def test_extract_refuses_without_a_limit(tmp_path: Path, server: str) -> None:
     [
         (["--limit", "0", "--slices", "gold"], SALT, "--limit must be positive"),
         (["--limit", "2"], SALT, "--slices, --ids or --channels"),
+        (["--limit", "2", "--slices", "gold", "--max-tokens", "0"], SALT, "--max-tokens must be"),
         (["--limit", "2", "--slices", "nope"], SALT, "unknown slice"),
         (["--limit", "2", "--slices", "gold"], None, "INFOVORE_PSEUDONYM_SALT"),
         (["--limit", "2", "--ids", "999"], SALT, "unknown exchange"),
@@ -120,6 +122,49 @@ def test_extract_refuses_bad_input(
 
     assert code == ExitCode.CONFIG and message in err
     assert Fake.seen == []
+
+
+def test_dry_run_requests_carry_the_token_cap(tmp_path: Path) -> None:
+    seeded(tmp_path)
+
+    _, out, _ = run(
+        tmp_path,
+        extract("http://127.0.0.1:9/v1", "--ids", "1", "--limit", "5", "--dry-run", "--max-tokens", "123"),
+    )
+
+    assert '"max_tokens": 123' in out
+
+
+def test_the_default_cap_is_400_and_recorded_in_the_recipe(tmp_path: Path, server: str) -> None:
+    a, _ = seeded(tmp_path)
+
+    code, _, _ = run(tmp_path, extract(server, "--ids", str(a), "--limit", "1", "--write"))
+
+    assert code == ExitCode.OK
+    assert Fake.seen[0]["max_tokens"] == 400
+    conn = db(tmp_path)
+    recipe = conn.execute("SELECT recipe_json FROM claim_runs").fetchone()[0]
+    assert json.loads(recipe)["max_tokens"] == 400
+
+
+def test_a_truncated_reply_is_a_recorded_failure_and_retried_on_resume(
+    tmp_path: Path, server: str
+) -> None:
+    a, _ = seeded(tmp_path)
+    Fake.mode = "truncate"
+
+    code, out, _ = run(tmp_path, extract(server, "--ids", str(a), "--limit", "1", "--write"))
+
+    assert code == ExitCode.BACKEND and "truncated" in out
+    conn = db(tmp_path)
+    row = conn.execute("SELECT outcome, error FROM claim_run_exchanges").fetchone()
+    assert row[0] == "failed" and "truncated" in row[1]
+    conn.close()
+    Fake.mode = "ok"
+    code, out, _ = run(
+        tmp_path, extract(server, "--ids", str(a), "--limit", "1", "--write", "--resume")
+    )
+    assert code == ExitCode.OK and "skipping 0 already done" in out
 
 
 def test_dry_run_prints_redacted_requests_and_sends_nothing(tmp_path: Path) -> None:
