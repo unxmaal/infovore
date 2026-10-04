@@ -14,7 +14,7 @@ def wiki_db(tmp_path: Path) -> sqlite3.Connection:
         endpoint="e",
         model_alias="m",
         model_id="m",
-        model_id_source="s",
+        model_id_source="alias",
         prompt_hash="p",
         selection="s",
         recipe={},

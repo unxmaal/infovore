@@ -1,0 +1,173 @@
+# Canonical topics. aliases: literal, whole-word, case-insensitive. patterns: regexes.
+
+[[topic]]
+name = "Indy"
+aliases = ["indy"]
+
+[[topic]]
+name = "Indigo"
+aliases = ["indigo", "personal iris"]
+
+[[topic]]
+name = "Indigo2"
+aliases = ["indigo2", "indigo 2"]
+
+[[topic]]
+name = "O2"
+aliases = ["o2", "o2+"]
+
+[[topic]]
+name = "Octane"
+aliases = ["octane", "octane2"]
+
+[[topic]]
+name = "Onyx"
+aliases = ["onyx"]
+
+[[topic]]
+name = "Onyx2"
+aliases = ["onyx2", "onyx 2"]
+
+[[topic]]
+name = "Origin 200"
+aliases = ["origin 200", "o200"]
+
+[[topic]]
+name = "Origin 350"
+aliases = ["origin 350", "origin350", "o350"]
+
+[[topic]]
+name = "Origin 2000"
+aliases = ["origin 2000", "origin2000", "o2000", "o2k"]
+
+[[topic]]
+name = "Origin 3000"
+aliases = ["origin 3000", "origin3000", "o3000", "o3k"]
+
+[[topic]]
+name = "Fuel"
+aliases = ["fuel"]
+
+[[topic]]
+name = "Tezro"
+aliases = ["tezro"]
+
+[[topic]]
+name = "Crimson"
+aliases = ["crimson"]
+
+[[topic]]
+name = "Challenge"
+aliases = ["challenge"]
+
+[[topic]]
+name = "R4000"
+aliases = ["r4000", "r4k"]
+
+[[topic]]
+name = "R4400"
+aliases = ["r4400"]
+
+[[topic]]
+name = "R5000"
+aliases = ["r5000", "r5k"]
+
+[[topic]]
+name = "R8000"
+aliases = ["r8000", "r8k"]
+
+[[topic]]
+name = "R10000"
+aliases = ["r10000", "r10k"]
+
+[[topic]]
+name = "R12000"
+aliases = ["r12000", "r12k"]
+
+[[topic]]
+name = "R14000"
+aliases = ["r14000", "r14k"]
+
+[[topic]]
+name = "R16000"
+aliases = ["r16000", "r16k"]
+
+[[topic]]
+name = "IRIX"
+patterns = ['\birix']
+
+[[topic]]
+name = "IRIX 3.3"
+patterns = ['\birix\s*3\.3(?!\d)']
+
+[[topic]]
+name = "IRIX 4.0"
+patterns = ['\birix\s*4\.0(?!\d)']
+
+[[topic]]
+name = "IRIX 5.2"
+patterns = ['\birix\s*5\.2(?!\d)']
+
+[[topic]]
+name = "IRIX 5.3"
+patterns = ['\birix\s*5\.3(?!\d)']
+
+[[topic]]
+name = "IRIX 6.2"
+patterns = ['\birix\s*6\.2(?!\d)']
+
+[[topic]]
+name = "IRIX 6.3"
+patterns = ['\birix\s*6\.3(?!\d)']
+
+[[topic]]
+name = "IRIX 6.4"
+patterns = ['\birix\s*6\.4(?!\d)']
+
+[[topic]]
+name = "IRIX 6.5"
+patterns = ['\birix\s*6\.5(?!\d)', '(?<![\d.])6\.5\.\d{1,2}[mf]?\b']
+
+[[topic]]
+name = "Linux"
+aliases = ["linux"]
+
+[[topic]]
+name = "NetBSD"
+aliases = ["netbsd"]
+
+[[topic]]
+name = "OpenBSD"
+aliases = ["openbsd"]
+
+[[topic]]
+name = "Windows NT"
+aliases = ["windows nt", "winnt"]
+
+[[topic]]
+name = "SGI"
+aliases = ["sgi", "silicon graphics"]
+
+[[topic]]
+name = "Sun"
+aliases = ["sun microsystems", "sparcstation", "ultrasparc"]
+
+[[topic]]
+name = "HP"
+aliases = ["hp-ux", "hpux", "hewlett-packard", "hewlett packard"]
+
+[[topic]]
+name = "IBM"
+aliases = ["ibm"]
+
+[[topic]]
+name = "Cray"
+aliases = ["cray"]
+
+[[topic]]
+name = "MIPS"
+aliases = ["mips"]
+
+[[topic]]
+name = "DEC"
+aliases = ["dec alpha", "decstation", "digital equipment"]
