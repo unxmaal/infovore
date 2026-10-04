@@ -241,9 +241,7 @@ def _salted(exchange_id: int) -> str:
     return hashlib.sha256(f"{UNDECIDED_SALT}:{exchange_id}".encode()).hexdigest()
 
 
-def _undecided_items(
-    conn: sqlite3.Connection, exclude_channels: frozenset[str]
-) -> list[QueueItem]:
+def _undecided_items(conn: sqlite3.Connection, exclude_channels: frozenset[str]) -> list[QueueItem]:
     """A seeded random sample of the cascade residue, as-is: no text-message minimum, so the
     estimate over the undecided pile is not biased by what the other queues filter out."""
     clause, params = exclude_channels_clause("exchanges.channel_id", exclude_channels)

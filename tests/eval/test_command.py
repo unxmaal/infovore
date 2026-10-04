@@ -180,9 +180,7 @@ def test_serve_uncertain_accepts_a_scorer(tmp_path: Path, monkeypatch: pytest.Mo
     assert code == ExitCode.OK
 
 
-def test_serve_accepts_the_dynamic_queues(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_serve_accepts_the_dynamic_queues(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     import infovore.sift.httpd
 
     monkeypatch.setattr(infovore.sift.httpd, "block_until_interrupted", lambda event: None)

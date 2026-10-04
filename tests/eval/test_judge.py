@@ -560,7 +560,11 @@ def test_undecided_skips_judged_held_out_and_excluded(conn: sqlite3.Connection) 
     _pile(conn, range(6, 12))
     conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 6")
     _slice(conn, "s2", [7])
-    _slice(conn, GOLD, [8])
+    conn.execute(
+        "INSERT INTO eval_slices (name, exchange_id, position, population, seed, frozen_at)"
+        " VALUES (?, 8, 9, 'test', 0, ?)",
+        (GOLD, AT.isoformat()),
+    )
     _label_with(conn, 9)
 
     ids = {i.exchange_id for i in undecided_queue(frozenset({"food"}))(conn)}

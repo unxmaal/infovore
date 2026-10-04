@@ -6,27 +6,27 @@ from infovore.config import ConfigError
 from infovore.eval.channel_report import channel_report, format_channel_report
 from infovore.eval.judge import (
     DEFAULT_UNCERTAINTY_SCORER,
+    IRRELEVANT,
     LABELS,
     LIKELY_IRRELEVANT,
     RELEVANCE_TARGET,
+    RELEVANT,
     UNCERTAIN,
     UNDECIDED,
     UNDECIDED_RELEVANT_TARGET,
-    IRRELEVANT,
-    RELEVANT,
     QueueBuilder,
     c1_queue,
     cached_queue,
     frozen_queue,
     label_counts,
     likely_irrelevant_queue,
-    undecided_counts,
-    undecided_queue,
     self_agreement,
     slice_progress,
     trainable_needed,
     uncertain_judged,
     uncertain_queue,
+    undecided_counts,
+    undecided_queue,
 )
 from infovore.eval.judge_httpd import DEFAULT_JUDGE_PORT, listening_url, shutdown_all, start_all
 from infovore.eval.slices import (
@@ -106,7 +106,9 @@ class JudgeCommand:
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_JUDGE_PORT)
         serve.add_argument(
-            "--queue", choices=["frozen", UNCERTAIN, "c1", LIKELY_IRRELEVANT, UNDECIDED], default="frozen"
+            "--queue",
+            choices=["frozen", UNCERTAIN, "c1", LIKELY_IRRELEVANT, UNDECIDED],
+            default="frozen",
         )
         serve.add_argument(
             "--scorer",

@@ -431,7 +431,9 @@ def queue_label(conn: sqlite3.Connection, eid: int, label: str, ref: str) -> Non
     )
 
 
-@pytest.mark.parametrize("ref", ["judge:likely-irrelevant:3", "judge:uncertain:9", "judge:c1:2", "judge:undecided:7"])
+@pytest.mark.parametrize(
+    "ref", ["judge:likely-irrelevant:3", "judge:uncertain:9", "judge:c1:2", "judge:undecided:7"]
+)
 def test_tuning_ignores_queue_sourced_labels(tmp_path: Path, ref: str) -> None:
     _, conn = build(tmp_path)
     lexicon = load_lexicon()
