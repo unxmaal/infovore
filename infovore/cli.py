@@ -73,35 +73,6 @@ class Command(Protocol):
     async def run(self, context: AppContext, args: argparse.Namespace) -> int: ...
 
 
-def _format_counts(counts: Mapping[str, int]) -> str:
-    return " ".join(f"{key}={value}" for key, value in counts.items()) or "none"
-
-
-def _format_nested_counts(nested: Mapping[str, Mapping[str, int]]) -> str:
-    return (
-        " ".join(f"{source}({_format_counts(counts)})" for source, counts in nested.items())
-        or "none"
-    )
-
-
-def _format_rate(rate: float | None) -> str:
-    return "n/a" if rate is None else f"{rate:.1f}"
-
-
-def _format_eta(hours: float | None) -> str:
-    if hours is None:
-        return "unknown (no recent runs)"
-    if hours == 0.0:
-        return "queue empty"
-    if hours < 48:
-        return f"{hours:.1f}h"
-    return f"{hours / 24:.1f}d"
-
-
-def _format_cost(cost: float | None) -> str:
-    return "cost unreported" if cost is None else f"${cost:.2f}"
-
-
 def _format_time(value: datetime | None) -> str:
     return value.isoformat() if value is not None else "never"
 
@@ -126,39 +97,19 @@ class StatusCommand:
         lines = [
             f"channels: {report.channels}",
             f"messages: {report.messages} (deleted {report.deleted_messages})",
-            f"exchanges: {_format_counts(report.exchanges_by_status)}",
-            f"queue: {report.pending_gated} gated"
-            f" (of {report.pending_exchanges} claimable before the gate)",
-            f"claims: {_format_counts(report.claims_by_novelty)}"
-            f" (retracted {report.retracted_claims})",
-            f"runs: {_format_counts(report.runs_by_outcome)}",
-            f"last extraction: {_format_time(report.last_extraction_at)}",
-            f"last probe: {_format_time(report.last_probe_at)}",
-            f"live prompt version: {report.live_prompt_version or 'none'}",
-            f"triaged: {report.triaged_exchanges}"
-            f" (above threshold {report.above_threshold_exchanges})",
-            f"labels by source: {_format_nested_counts(report.labels_by_source)}",
-            f"labels effective: {_format_counts(report.labels_effective)}",
-            "triage model: "
-            + (
-                f"v{report.latest_model_version} (labels_used={report.latest_model_labels_used})"
-                if report.latest_model_version is not None
-                else "none"
-            ),
-            f"p_lore scored: {report.p_lore_scored}",
-            f"passing gate: {report.passing_gate}",
-            f"excluded by denylist: {report.excluded_by_denylist}",
-            f"throughput (last {report.throughput_window_hours}h):"
-            f" extract {_format_rate(report.extraction_per_hour)}/h,"
-            f" probe {_format_rate(report.probe_per_hour)}/h",
-            f"extract eta: {_format_eta(report.extraction_eta_hours)}",
-            f"extract spend: {report.extraction_input_tokens} in /"
-            f" {report.extraction_output_tokens} out"
-            f" / {_format_cost(report.extraction_cost_usd)}",
-            f"probe spend: {report.probe_input_tokens} in /"
-            f" {report.probe_output_tokens} out"
-            f" / {_format_cost(report.probe_cost_usd)}"
-            f" over {report.probe_claims} claims",
+            f"current exchanges: {report.current_exchanges}",
+            f"archived: {report.cascade_relevant + report.cascade_residue}"
+            f" (cascade relevant {report.cascade_relevant}, residue {report.cascade_residue})",
+            f"irrelevant: {report.irrelevant_denylist + report.irrelevant_bayes}"
+            f" (denylist {report.irrelevant_denylist}, bayes {report.irrelevant_bayes})",
+            f"set aside (no_text): {report.set_aside_no_text}",
+            f"residue: {report.cascade_residue}",
+            f"not yet cascaded: {report.unscored}",
+            f"last cascade: {_format_time(report.last_cascade_at)}",
+            f"human labels: relevant {report.human_relevant}, irrelevant {report.human_irrelevant}",
+            f"excluded channels: {', '.join(report.excluded_channels) or 'none'}",
+            f"extraction (history): done {report.exchanges_by_status.get('done', 0)},"
+            f" pending {report.exchanges_by_status.get('pending', 0)}",
             *(
                 f"{stage.value}: {stage_settings.backend} / {stage_settings.model}"
                 for stage, stage_settings in context.settings.stages.items()
