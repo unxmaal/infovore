@@ -15,7 +15,7 @@ while IFS= read -r f; do files+=("$f"); done < <(
 )
 if [ "${#files[@]}" -eq 0 ]; then echo "no changed test files"; exit 0; fi
 
-run() { (cd "$1" && uv run pytest -p no:cacheprovider --no-cov -q -rA "${files[@]}" 2>&1) | grep -E '^(PASSED|FAILED|ERROR) ' | sed -E 's/ - .*//' | sort -u || true; }
+run() { (cd "$1" && uv run pytest -p no:cacheprovider --no-cov -q -rA "${files[@]}" 2>&1) | grep -E '^(PASSED|FAILED|ERROR) [^ :]+\.py::' | sed -E 's/ - .*//' | sort -u || true; }
 
 git worktree add --detach "$wt" "$base" >/dev/null
 for f in "${files[@]}"; do
