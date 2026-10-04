@@ -129,7 +129,7 @@ def test_threshold_stats_report_cv_precision_recall_and_n_for_both_sides() -> No
     stats = threshold_stats(samples, 0.1, 0.7)
 
     assert stats["irrelevant"] == {"n": 3, "precision": 2 / 3, "recall": 2 / 3}
-    assert stats["relevant"] == {"n": 2, "precision": 0.5, "recall": 2 / 3}
+    assert stats["relevant"] == {"n": 2, "precision": 0.5, "recall": 1 / 3}
     empty = threshold_stats([(0.5, True)], 0.1, 1.01)
     assert empty["irrelevant"] == {"n": 0, "precision": 0.0, "recall": 0.0}
     assert empty["relevant"] == {"n": 0, "precision": 0.0, "recall": 0.0}
