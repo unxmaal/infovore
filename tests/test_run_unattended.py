@@ -11,9 +11,7 @@ UV_STUB = STUB + "exit 0\n"
 pytestmark = pytest.mark.skipif(shutil.which("zsh") is None, reason="zsh not installed")
 
 
-def run_script(
-    tmp_path: Path, *args: str, fail_first: bool = False
-) -> tuple[int, str, list[str]]:
+def run_script(tmp_path: Path, *args: str, fail_first: bool = False) -> tuple[int, str, list[str]]:
     home = tmp_path / "home"
     (home / "projects/github/unxmaal/infovore").mkdir(parents=True)
     (home / ".infovore.env").write_text("")
