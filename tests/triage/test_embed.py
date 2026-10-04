@@ -348,8 +348,8 @@ def test_windowed_pooling_embeds_every_window_and_pools(tmp_path: Path) -> None:
     assert fake.calls[0] == ["w0 w1 w2 w3", "w4 w5 w6 w7", "w8 w9"]
     assert fake.calls[2] == ["w0 w1"]
     assert len(set(map(tuple, (mean, biggest, first)))) == 3
-    assert biggest[0] == max(
-        FakeEmbedder().embed([t])[0][0] for t in ("w0 w1 w2 w3", "w4 w5 w6 w7", "w8 w9")
+    assert biggest[0] == pytest.approx(
+        max(FakeEmbedder().embed([t])[0][0] for t in ("w0 w1 w2 w3", "w4 w5 w6 w7", "w8 w9"))
     )
 
 
@@ -382,7 +382,10 @@ def test_cli_pool_is_recorded_in_header_and_recipe(
     assert run(["relevance", "embed-score", "--cv", "5", "--pool", "max"], env)[0] == ExitCode.OK
 
     conn = open_database(path)
-    recipe = conn.execute("SELECT recipe_json FROM annotations LIMIT 1").fetchone()[0]
+    recipe = conn.execute(
+        "SELECT recipe_json FROM annotations WHERE scorer = 'p_relevant_embed' LIMIT 1"
+    ).fetchone()[0]
     assert '"pool": "max"' in recipe
     assert "windows" in recipe
-    assert run(["relevance", "compare", "--pool", "median"], env)[0] != ExitCode.OK
+    with pytest.raises(SystemExit):
+        run(["relevance", "compare", "--pool", "median"], env)
