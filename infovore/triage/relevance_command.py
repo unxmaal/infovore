@@ -37,7 +37,11 @@ from infovore.triage.embed import (
     SCORER as EMBED_SCORER,
 )
 from infovore.triage.embed_backend import load_embedder
-from infovore.triage.embed_stage import build_embed_stage, default_cache_path
+from infovore.triage.embed_stage import (
+    RELEVANT_PRECISION,
+    build_embed_stage,
+    default_cache_path,
+)
 from infovore.triage.human import held_out_ids, training_labels
 from infovore.triage.lexicon import (
     MAX_OFF,
@@ -75,6 +79,12 @@ class RelevanceCommand:
         cascade.add_argument("--slices", default=None, help="comma-separated slice names")
         cascade.add_argument("--write", action="store_true", help="record derived annotations")
         cascade.add_argument("--all", action="store_true", help="every current exchange")
+        cascade.add_argument(
+            "--relevant-precision",
+            type=float,
+            default=RELEVANT_PRECISION,
+            dest="relevant_precision",
+        )
         cascade.add_argument("--explain", type=int, default=None, metavar="EXCHANGE_ID")
         for name, text in (
             ("compare", "stratified CV: human Bayes vs embedding + logistic head"),
@@ -264,7 +274,12 @@ class RelevanceCommand:
         tuned = tuning_labels(conn, exclude)
         lore = sum(label is Label.LORE for label in tuned.values())
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
-        stage = build_embed_stage(conn, exclude, default_cache_path(context.settings.db_path))
+        stage = build_embed_stage(
+            conn,
+            exclude,
+            default_cache_path(context.settings.db_path),
+            relevant_precision=args.relevant_precision,
+        )
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
         context.stdout.write(self._thresholds(stage))
@@ -335,7 +350,14 @@ class RelevanceCommand:
         if stage.abstain_reason:
             return ""
         labels = stage.recipe["labels"]
-        return (
+        cv = stage.recipe["cv"]
+        assert isinstance(cv, dict)
+        sides = "".join(
+            f"cv {side}: n={cv[side]['n']:.0f} precision={cv[side]['precision']:.3f}"
+            f" recall={cv[side]['recall']:.3f}\n"
+            for side in ("irrelevant", "relevant")
+        )
+        return sides + (
             f"embed {stage.recipe['model']}@{stage.recipe['revision']} pool={stage.recipe['pool']}"
             f" irrelevant_below={stage.t_irrelevant:.4f}"
             f" relevant_at_or_above={stage.t_relevant:.4f}"

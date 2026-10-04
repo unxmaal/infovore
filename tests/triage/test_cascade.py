@@ -201,6 +201,8 @@ def test_the_embed_stage_scores_what_the_lexicon_abstained_on(
     assert "abstains on everything" not in out
     assert "embed fake/keywords@r1 pool=first irrelevant_below=" in out
     assert "relevant_at_or_above=" in out
+    assert "cv irrelevant: n=" in out and "cv relevant: n=" in out
+    assert "precision=" in out and "recall=" in out
     assert "labels={'relevant': 2, 'irrelevant': 3}" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
     row = annotation_history(conn, "exchange", 7, "relevance_embed")[0]
@@ -468,3 +470,19 @@ def test_the_cascade_prints_the_tuning_population(tmp_path: Path) -> None:
 
     assert "tuned on s1 random-slice labels, held-out and queue-sourced excluded: n=5" in out
     assert "relevant=2 irrelevant=3" in out
+
+
+def test_the_relevant_precision_flag_reaches_the_recorded_recipe(
+    tmp_path: Path, fitted_embed: None
+) -> None:
+    env, conn = build(tmp_path)
+    conn.close()
+
+    code, _, _ = run(
+        ["relevance", "cascade", "--slices", "s1", "--write", "--relevant-precision", "0.5"], env
+    )
+
+    assert code == ExitCode.OK
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    row = annotation_history(conn, "exchange", 7, "relevance_embed")[0]
+    assert json.loads(row["recipe_json"])["thresholds"]["relevant_precision_target"] == 0.5

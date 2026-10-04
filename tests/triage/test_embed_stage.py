@@ -14,6 +14,7 @@ from infovore.triage.embed_stage import (
     default_cache_path,
     fit_embed_stage,
     irrelevant_threshold,
+    threshold_stats,
 )
 from infovore.triage.lexicon import load_lexicon
 from tests.triage.test_embed import FakeEmbedder
@@ -120,3 +121,31 @@ def test_the_cascade_sends_only_lexicon_abstentions_to_the_embed_stage(tmp_path:
         ("lexicon", "relevant"),
         ("embed", "irrelevant"),
     ]
+
+
+def test_threshold_stats_report_cv_precision_recall_and_n_for_both_sides() -> None:
+    samples = [(0.05, False), (0.08, False), (0.09, True), (0.5, True), (0.7, False), (0.9, True)]
+
+    stats = threshold_stats(samples, 0.1, 0.7)
+
+    assert stats["irrelevant"] == {"n": 3, "precision": 2 / 3, "recall": 2 / 3}
+    assert stats["relevant"] == {"n": 2, "precision": 0.5, "recall": 1 / 3}
+    empty = threshold_stats([(0.5, True)], 0.1, 1.01)
+    assert empty["irrelevant"] == {"n": 0, "precision": 0.0, "recall": 0.0}
+    assert empty["relevant"] == {"n": 0, "precision": 0.0, "recall": 0.0}
+
+
+def test_the_relevant_threshold_follows_the_configurable_precision_target(tmp_path: Path) -> None:
+    conn = labelled(tmp_path, 20, 20)
+    cache = EmbeddingCache(tmp_path / "c.db")
+
+    default = fit_embed_stage(conn, FakeEmbedder(), cache, frozenset())
+    loose = fit_embed_stage(conn, FakeEmbedder(), cache, frozenset(), relevant_precision=0.5)
+
+    assert default.recipe["thresholds"]["relevant_precision_target"] == 0.9  # type: ignore[index]
+    assert loose.recipe["thresholds"]["relevant_precision_target"] == 0.5  # type: ignore[index]
+    assert loose.t_relevant <= default.t_relevant
+    cv = default.recipe["cv"]
+    assert isinstance(cv, dict)
+    assert set(cv["relevant"]) == {"n", "precision", "recall"}
+    assert set(cv["irrelevant"]) == {"n", "precision", "recall"}
