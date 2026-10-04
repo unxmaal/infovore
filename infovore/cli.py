@@ -273,6 +273,7 @@ def builtin_commands() -> list[Command]:
     from infovore.sift.command import SiftCommand
     from infovore.triage.command import TriageCommand
     from infovore.triage.label import LabelCommand
+    from infovore.triage.labels_export import LabelsCommand
     from infovore.triage.relevance_command import RelevanceCommand
     from infovore.words.command import WordsCommand
 
@@ -293,6 +294,7 @@ def builtin_commands() -> list[Command]:
         ReviewCommand(),
         PromoteCommand(),
         LabelCommand(),
+        LabelsCommand(),
         RelevanceCommand(),
         SiftCommand(),
         WordsCommand(),

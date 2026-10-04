@@ -8,10 +8,21 @@ from tests.triage.test_cascade import NOW, build
 from tests.triage.test_command import run
 
 
-def derived(conn: sqlite3.Connection, eid: int, stage: str, label: str | None) -> None:
+def derived(
+    conn: sqlite3.Connection, eid: int, stage: str, label: str | None, version: int = 1
+) -> None:
     record_annotation(
         conn,
-        Annotation("exchange", eid, f"relevance_{stage}", 1, "derived", label=label),
+        Annotation(
+            "exchange",
+            eid,
+            f"relevance_{stage}",
+            version,
+            "derived",
+            score=0.5,
+            label=label,
+            recipe={"t": 1},
+        ),
         NOW,
     )
 
@@ -38,7 +49,7 @@ def prepare(tmp_path: Path) -> dict[str, str]:
     derived(conn, 3, "lexicon", None)
     derived(conn, 3, "residue", "residue")
     derived(conn, 7, "lexicon", "relevant")
-    derived(conn, 7, "lexicon", None)
+    derived(conn, 7, "lexicon", None, 2)
     derived(conn, 7, "short_no_tech", "irrelevant")
     judged(conn, 2, "irrelevant", "judge:likely-irrelevant:4")
     judged(conn, 3, "bad_grouping", "judge:s1:3")
@@ -49,9 +60,7 @@ def prepare(tmp_path: Path) -> dict[str, str]:
     return {**env, "INFOVORE_EXCLUDE_CHANNELS": "lounge"}
 
 
-def export(
-    env: dict[str, str], tmp_path: Path, *extra: str
-) -> tuple[list[dict[str, object]], str]:
+def export(env: dict[str, str], tmp_path: Path, *extra: str) -> tuple[list[dict[str, object]], str]:
     path = tmp_path / "out" / "labels.jsonl"
     code, out, _ = run(["labels", "export", "--jsonl", str(path), *extra], env)
     assert code == ExitCode.OK
