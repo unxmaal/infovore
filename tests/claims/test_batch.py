@@ -69,9 +69,9 @@ class Fake(BaseHTTPRequestHandler):
                 return
             who = re.search(r"\[1\] (user-[0-9a-f]+):", user)
             assert who
-            claim = {"speaker": who.group(1), "statement": f"claim {name}", "refs": [1]}
+            claim = [who.group(1), f"claim {name}", [1]]
             reply = {
-                "choices": [{"message": {"content": json.dumps({"claims": [claim]})}}],
+                "choices": [{"message": {"content": json.dumps({"c": [claim]})}}],
                 "usage": {"prompt_tokens": 10, "completion_tokens": 2},
             }
             self._send(200, json.dumps(reply).encode())

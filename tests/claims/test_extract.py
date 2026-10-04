@@ -1,10 +1,12 @@
 import json
+import re
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 from infovore.claims.extract import (
+    CLAIM_MAX_CHARS,
     SCHEMA,
     ClaimsReplyError,
     RawClaim,
@@ -20,6 +22,7 @@ from infovore.claims.extract import (
 from infovore.claims.redact import RenderedLine, pseudonym, redact_conversation
 from tests.claims.seed import SALT, conversation, db, messages_of
 
+OLD_HASHES = {"a82adb7b1e83"}
 U1, U2 = pseudonym(1, SALT), pseudonym(2, SALT)
 
 
@@ -27,9 +30,9 @@ def lines(*texts: str) -> list[RenderedLine]:
     return [RenderedLine(i + 1, 100 + i, U1, t) for i, t in enumerate(texts)]
 
 
-def reply(claims: list[dict[str, Any]], tin: int = 10, tout: int = 3) -> dict[str, Any]:
+def reply(claims: list[list[Any]], tin: int = 10, tout: int = 3) -> dict[str, Any]:
     return {
-        "choices": [{"message": {"content": json.dumps({"claims": claims})}}],
+        "choices": [{"message": {"content": json.dumps({"c": claims})}}],
         "usage": {"prompt_tokens": tin, "completion_tokens": tout},
     }
 
@@ -44,9 +47,91 @@ def test_the_request_pins_a_strict_schema_and_names_the_scope() -> None:
     for phrase in ("standalone", "IRIX", "first-hand", "zero", "pronouns", "questions", "jokes"):
         assert phrase in system
     assert system.count("Bad:") == 3 and system.count("Good:") == 3
+    assert request["max_tokens"] == 400 and build_request("m", "w", 77)["max_tokens"] == 77
+    assert len(system) < 1700
     assert request["messages"][1]["content"].endswith("[1] user-aaaa: hi")
     assert prompt_hash() == prompt_hash() and len(prompt_hash()) == 12
-    assert prompt_hash() != "a82adb7b1e83"
+    assert prompt_hash() not in OLD_HASHES
+
+
+def test_the_schema_is_compact_and_caps_claim_length() -> None:
+    item = SCHEMA["properties"]["c"]["items"]
+    s, t, r = item["prefixItems"]
+
+    assert list(SCHEMA["properties"]) == ["c"] and SCHEMA["required"] == ["c"]
+    assert item["minItems"] == item["maxItems"] == 3 and item["type"] == "array"
+    assert s["type"] == "string" and r["type"] == "array" and r["minItems"] == 1
+    assert t["maxLength"] == CLAIM_MAX_CHARS
+
+
+def test_a_reply_cut_off_at_the_token_cap_is_a_failure() -> None:
+    cut = reply([[U1, "s", [1]]])
+    cut["choices"][0]["finish_reason"] = "length"
+
+    with pytest.raises(ClaimsReplyError, match="truncated"):
+        parse_reply(cut, 0.0)
+    cut["choices"][0]["finish_reason"] = "stop"
+    assert len(parse_reply(cut, 0.0).claims) == 1
+
+
+def test_the_token_cap_reaches_every_request(redacted: Any) -> None:
+    sent: list[dict[str, Any]] = []
+
+    def post(payload: Any) -> tuple[dict[str, Any], float]:
+        sent.append(dict(payload))
+        return reply([]), 0.1
+
+    extract_exchange(post, "m", redacted, 1000, 55)
+    extract_exchange(post, "m", redacted, 1000)
+
+    assert [p["max_tokens"] for p in sent] == [55, 400]
+
+
+def estimate_tokens(text: str) -> int:
+    return len(re.findall(r"[A-Za-z]+|\d+|[^\sA-Za-z\d]", text))
+
+
+FIXTURE = (
+    "[1] user-1a2b: my Indy runs IRIX 6.5.3 off an external SCSI disk\n"
+    "[2] user-3c4d: try the PROM monitor to boot from it"
+)
+OLD_EXAMPLE = {
+    "claims": [
+        {
+            "speaker": "user-1a2b",
+            "statement": "user-1a2b says their SGI Indy runs IRIX 6.5.3 from an external disk.",
+            "refs": [1],
+        },
+        {
+            "speaker": "user-3c4d",
+            "statement": "user-3c4d says the PROM monitor can be used to boot an Indy from an"
+            " external disk.",
+            "refs": [2],
+        },
+    ]
+}
+NEW_EXAMPLE = {
+    "c": [
+        ["user-1a2b", "Indy runs IRIX 6.5.3 from external SCSI disk.", [1]],
+        ["user-3c4d", "PROM monitor boots an Indy from external disk.", [2]],
+    ]
+}
+
+
+def test_the_new_example_output_is_at_least_35_percent_shorter(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    old = estimate_tokens(json.dumps(OLD_EXAMPLE, separators=(",", ":")))
+    new = estimate_tokens(json.dumps(NEW_EXAMPLE, separators=(",", ":")))
+    with capsys.disabled():
+        print(f"\nexample output tokens (estimate): old={old} new={new} saved={1 - new / old:.0%}")
+
+    assert new <= old * 0.65
+    assert FIXTURE.count("\n") == 1
+    for claim in NEW_EXAMPLE["c"]:
+        assert len(claim[1]) <= CLAIM_MAX_CHARS
+    parsed = parse_reply({"choices": [{"message": {"content": json.dumps(NEW_EXAMPLE)}}]}, 0.0)
+    assert [c.refs for c in parsed.claims] == [(1,), (2,)]
 
 
 def test_windows_never_split_a_message_and_keep_global_refs() -> None:
@@ -66,11 +151,11 @@ def test_a_window_renders_one_ref_and_speaker_per_line() -> None:
 
 
 def test_replies_parse_into_claims_and_usage() -> None:
-    parsed = parse_reply(reply([{"speaker": U1, "statement": "s", "refs": [1, 2]}], 7, 2), 1.5)
+    parsed = parse_reply(reply([[U1, "s", [1, 2]]], 7, 2), 1.5)
 
     assert parsed.claims == [RawClaim(U1, "s", (1, 2))]
     assert (parsed.input_tokens, parsed.output_tokens, parsed.seconds) == (7, 2, 1.5)
-    bare = parse_reply({"choices": [{"message": {"content": '{"claims": []}'}}]}, 0)
+    bare = parse_reply({"choices": [{"message": {"content": '{"c": []}'}}]}, 0)
     assert (bare.claims, bare.input_tokens) == ([], 0)
 
 
@@ -79,9 +164,9 @@ def test_replies_parse_into_claims_and_usage() -> None:
     [
         {},
         {"choices": [{"message": {"content": "nope"}}]},
-        {"choices": [{"message": {"content": '{"claims": 3}'}}]},
-        {"choices": [{"message": {"content": '{"claims": [{"speaker": "u"}]}'}}]},
-        {"choices": [{"message": {"content": '{"claims": [1]}'}}]},
+        {"choices": [{"message": {"content": '{"c": 3}'}}]},
+        {"choices": [{"message": {"content": '{"c": [["u"]]}'}}]},
+        {"choices": [{"message": {"content": '{"c": [1]}'}}]},
     ],
 )
 def test_unusable_replies_raise(bad: dict[str, Any]) -> None:
@@ -146,8 +231,8 @@ def test_an_exchange_is_windowed_summed_and_validated(redacted: Any) -> None:
     sent: list[dict[str, Any]] = []
     answers = iter(
         [
-            reply([{"speaker": U1, "statement": f"{U1} said a", "refs": [1]}], 10, 1),
-            reply([{"speaker": U2, "statement": f"{U2} said b", "refs": [2]}], 20, 2),
+            reply([[U1, f"{U1} said a", [1]]], 10, 1),
+            reply([[U2, f"{U2} said b", [2]]], 20, 2),
         ]
     )
 
@@ -166,7 +251,7 @@ def test_an_exchange_is_windowed_summed_and_validated(redacted: Any) -> None:
 
 
 def test_a_window_citing_a_ref_outside_itself_is_rejected(redacted: Any) -> None:
-    answers = iter([[{"speaker": U1, "statement": f"{U1} said a", "refs": [2]}], []])
+    answers = iter([[[U1, f"{U1} said a", [2]]], []])
 
     def post(payload: Any) -> tuple[dict[str, Any], float]:
         return reply(next(answers)), 0.1
