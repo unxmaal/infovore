@@ -37,13 +37,22 @@ SCHEMA: Final[dict[str, Any]] = {
 }
 SYSTEM: Final = (
     "You read part of a community Discord conversation. Each line is '[ref] user-id: text'."
-    " Extract zero or more self-contained factual claims about technology, hardware, software,"
-    " SGI and IRIX, retrocomputing, people's first-hand experience, or where to find things."
-    " Each statement must make sense alone and be attributed to the user who said it, in the"
-    " form 'user-xxxx said ...', using exactly the user id shown. Put the ref numbers of the"
-    " lines the claim rests on in refs. Do not extract anything from jokes, banter, greetings"
-    " or chatter. Do not state anything the lines do not say. Zero claims is a valid answer:"
-    " reply with an empty claims list when nothing qualifies."
+    " Extract zero or more standalone factual claims about technology, hardware, software,"
+    " SGI and IRIX, retrocomputing, first-hand experience, or where to find things."
+    " Write each claim fresh in your own words, never copy a message. It must make sense"
+    " with no conversation around it: resolve pronouns and context (replace 'it' with the"
+    " thing meant). No questions, no opinions, no jokes, banter or greetings."
+    " First-hand experience is allowed, stated as the speaker's own: 'user-xxxx says they ...'."
+    " Set speaker to the exact user id shown for the line the claim rests on, and put the"
+    " ref numbers of those lines in refs. Do not state anything the lines do not say."
+    " Zero claims is a valid answer: reply with an empty claims list when nothing qualifies."
+    " Examples."
+    " Bad: 'It can even have an r12k. Mine is 400mhz' (copied, 'It' unresolved)."
+    " Good: 'The SGI O2 can be fitted with an R12000 CPU; user-xxxx says theirs runs at 400 MHz.'"
+    " Bad: 'isn't it just yoinking the chip and putting in a new one?' (a question)."
+    " Good: nothing, no claim is made."
+    " Bad: 'lol my O2 is the best machine ever' (joke and opinion)."
+    " Good: nothing, no claim is made."
 )
 
 Transport = Callable[[Mapping[str, Any]], tuple[Mapping[str, Any], float]]
@@ -176,8 +185,6 @@ def _problem(
             return f"ref {ref} not in window"
     if claim.speaker not in redacted.speakers:
         return "unknown speaker"
-    if claim.speaker not in claim.statement:
-        return "not attributed"
     if leaks(claim.statement, redacted.names):
         return "name leak"
     return None

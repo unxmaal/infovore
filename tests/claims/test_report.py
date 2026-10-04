@@ -101,7 +101,7 @@ def show(tmp_path: Path, *argv: str) -> tuple[int, str, str]:
 def test_show_prints_claims_and_rejections_as_plain_text(tmp_path: Path) -> None:
     run = populate(tmp_path)
     conn = db(tmp_path)
-    eid = conn.execute("SELECT id FROM exchanges").fetchone()[0]
+    eid, _ = conversation(conn, [(1, "ann", "c")], 3)
     ok = ExchangeOutcome("ok", None, 1, 1, 1, 1.0)
     record_exchange(conn, run, eid, ok, [], [Rejection("user-x", "why?", "[1]", "empty statement")])
     conn.close()
