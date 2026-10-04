@@ -45,6 +45,7 @@ All tables live in one SQLite file (`INFOVORE_DB_PATH`). Migrations run on open.
 | `message_labels`, `message_model`, `message_tokens`, `message_combiner` | message-level sifting labels and models |
 | `claim_runs`, `claim_run_exchanges`, `claims_v2`, `claims_v2_sources`, `claim_rejections` | claim trial: runs, per-conversation outcomes, redacted claims with their cited messages, and claims rejected with the reason; append-only |
 | `claim_reviews`, `current_claim_reviews` | append-only human verdicts on trial claims; the view shows the latest per claim |
+| `claim_checks`, `current_claim_checks` | append-only deterministic grounding checks of trial claims against their cited messages; the view shows the latest per claim |
 | `claims`, `claim_sources`, `claims_fts` | extracted claims and their source messages (paused) |
 | `extraction_runs`, `extraction_batches`, `prompt_versions`, `probe_runs` | extraction and probe bookkeeping (paused) |
 | `lore` | view: claims judged net-new (paused) |
@@ -112,6 +113,7 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
   - `--progress-every N`: stderr line (done/total, claims, conversations per hour, ETA) every N conversations, default 10.
 - `infovore claims serve --run RUN [--host H] [--port P]`: dense review page (g good, w wrong, m made up, n not useful); verdicts append and resume.
 - `infovore claims report [--run RUN]`: per run conversations, claims, zero-claim share, verdict counts, made-up rate, tokens and seconds.
+- `infovore claims check --run RUN [--run RUN] [--write] [--threshold T]`: no model calls; verifies each claim's numbers, versions, part numbers, models, quoted strings and file names against the cited messages and scores word overlap; prints a confusion table against your reviews and a tuned threshold. `claims show --run RUN --check` lists stored verdicts and the failing fact.
 - `infovore extract [--mode trial|live] [--sample N] [--seed N] [--exchange-id ID] [--min-score X] [--max-score X] [--strategy stratified|random] [--compare-prompt V]`: claim extraction (paused).
 - `infovore probe [--run-id IDS] [--limit N] [--probe-model M] [--retry-failed] [--compare]`: closed-book novelty probe over claims (paused).
 - `infovore review [--run-ids IDS] [--out FILE]`: HTML report for prompt-version run sets (paused).

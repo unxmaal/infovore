@@ -10,6 +10,7 @@ from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
+from infovore.claims.check import DEFAULT_THRESHOLD, run_check, show_checks
 from infovore.claims.extract import (
     RECIPE,
     TIMEOUT,
@@ -336,7 +337,9 @@ def _show(context: "AppContext", args: argparse.Namespace) -> int:
 
     _require_run(context.conn, args.run)
     out = context.stdout
-    if args.rejected:
+    if args.check:
+        show_checks(context.conn, args.run, out.write)
+    elif args.rejected:
         for rejection in rejection_rows(context.conn, args.run):
             out.write(f"{rejection.speaker}: {rejection.statement} [{rejection.reason}]\n")
     else:
@@ -375,6 +378,11 @@ class ClaimsCommand:
         show = sub.add_parser("show", help="print a run's claims or rejections as text")
         show.add_argument("--run", type=int, required=True)
         show.add_argument("--rejected", action="store_true")
+        show.add_argument("--check", action="store_true", help="show check verdicts")
+        check = sub.add_parser("check", help="verify claim facts against cited messages")
+        check.add_argument("--run", type=int, action="append", required=True)
+        check.add_argument("--write", action="store_true")
+        check.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
         report = sub.add_parser("report", help="per-run trial numbers")
         report.add_argument("--run", type=int, default=None)
 
@@ -383,6 +391,8 @@ class ClaimsCommand:
             return _extract(context, args)
         if args.claims_action == "serve":
             return _serve(context, args)
+        if args.claims_action == "check":
+            return run_check(context, args)
         if args.claims_action == "show":
             return _show(context, args)
         return _report(context, args)
