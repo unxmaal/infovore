@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Final
 
+from infovore.db.archived import archived_clause
+from infovore.db.channel_filter import exclude_channels_clause, include_channels_clause
 from infovore.db.codec import to_db_time
 from infovore.db.connection import transaction
 
@@ -243,3 +245,28 @@ def _report(conn: sqlite3.Connection, run: sqlite3.Row) -> RunReport:
         totals[3],
         totals[4],
     )
+
+
+def processed_ok(conn: sqlite3.Connection, model_id: str, prompt_hash: str) -> set[int]:
+    """Exchanges some run with this model id and prompt hash finished successfully."""
+    rows = conn.execute(
+        "SELECT DISTINCT e.exchange_id FROM claim_run_exchanges e"
+        " JOIN claim_runs r ON r.id = e.run_id"
+        " WHERE r.model_id = ? AND r.prompt_hash = ? AND e.outcome = 'ok'",
+        (model_id, prompt_hash),
+    )
+    return {row[0] for row in rows}
+
+
+def archived_exchange_ids(
+    conn: sqlite3.Connection, include: frozenset[str], exclude: frozenset[str]
+) -> list[int]:
+    """Current archived exchanges in the named channels, by id; excluded channels never."""
+    inc, inc_params = include_channels_clause("exchanges.channel_id", include)
+    exc, exc_params = exclude_channels_clause("exchanges.channel_id", exclude)
+    rows = conn.execute(
+        f"SELECT id FROM current_exchanges AS exchanges WHERE {archived_clause('exchanges.id')}"
+        f"{inc}{exc} ORDER BY id",
+        (*inc_params, *exc_params),
+    )
+    return [row[0] for row in rows]

@@ -3,7 +3,8 @@ import json
 import time
 import urllib.error
 import urllib.request
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass, replace
 from typing import Any, Final
 
@@ -208,6 +209,40 @@ def extract_exchange(
         tokens_out += reply.output_tokens
         seconds += reply.seconds
     return ExchangeResult(claims, rejected, len(parts), tokens_in, tokens_out, seconds)
+
+
+def extract_concurrently(
+    items: Iterable[tuple[int, Redacted]],
+    post: Transport,
+    model: str,
+    max_chars: int,
+    concurrency: int,
+    stop: Callable[[], bool],
+) -> Iterator[tuple[int, ExchangeResult | ClaimsReplyError]]:
+    """Yield (id, result or error) in completion order on the caller's thread; only
+    the HTTP work runs in workers. Once stop() is true nothing new starts and
+    in-flight work drains."""
+    source = iter(items)
+    pending: dict[Future[ExchangeResult], int] = {}
+    with ThreadPoolExecutor(concurrency) as pool:
+        exhausted = False
+        while True:
+            while not exhausted and not stop() and len(pending) < concurrency:
+                item = next(source, None)
+                if item is None:
+                    exhausted = True
+                    break
+                future = pool.submit(extract_exchange, post, model, item[1], max_chars)
+                pending[future] = item[0]
+            if not pending:
+                return
+            done, _ = wait(pending, return_when=FIRST_COMPLETED)
+            for future in sorted(done, key=pending.__getitem__):
+                eid = pending.pop(future)
+                try:
+                    yield eid, future.result()
+                except ClaimsReplyError as error:
+                    yield eid, error
 
 
 def fetch_model_id(endpoint: str, alias: str, get: Getter) -> tuple[str, str]:

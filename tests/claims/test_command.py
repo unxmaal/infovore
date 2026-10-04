@@ -104,7 +104,7 @@ def test_extract_refuses_without_a_limit(tmp_path: Path, server: str) -> None:
     ("extra", "salt", "message"),
     [
         (["--limit", "0", "--slices", "gold"], SALT, "--limit must be positive"),
-        (["--limit", "2"], SALT, "--slices or --ids"),
+        (["--limit", "2"], SALT, "--slices, --ids or --channels"),
         (["--limit", "2", "--slices", "nope"], SALT, "unknown slice"),
         (["--limit", "2", "--slices", "gold"], None, "INFOVORE_PSEUDONYM_SALT"),
         (["--limit", "2", "--ids", "999"], SALT, "unknown exchange"),

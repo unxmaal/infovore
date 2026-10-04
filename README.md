@@ -104,7 +104,12 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore triage [--report] [--human-report] [--train-human] [--scorer NAME] [--scorer-version V] [--include-training] [--human-limit N] [--all-exchanges]`: rule-based triage scores, reports and the human-label classifier.
 - `infovore label [--from-runs IDS] [--exchange-id ID] [--lore | --noise]`: record lore or noise labels.
 - `infovore sift export | import | citations | train | serve`: message-level trash sifting. `export` writes an lnav batch, `import` records its labels, `serve` is a browser UI; both take `--size`, `--strategy random|uncertain|mixed`, `--seed` and `--channels`.
-- `infovore claims extract --endpoint URL --model ALIAS (--slices LIST | --ids LIST) --limit N [--write] [--dry-run]`: author-redacted claim extraction with a served local model; `--limit` is required, `--dry-run` sends nothing, `--write` stores the run.
+- `infovore claims extract --endpoint URL --model ALIAS (--slices LIST | --ids LIST | --channels LIST) --limit N [--write] [--dry-run] [--resume] [--concurrency N] [--timeout S] [--progress-every N]`: author-redacted claim extraction with a served local model; `--limit` is required, `--dry-run` sends nothing, `--write` stores the run.
+  - `--channels a,b`: current archived conversations (cascade relevant or undecided) in those channels, by exchange id; excluded channels never.
+  - `--resume`: with `--write`, skip conversations already done with the same model id and prompt hash; failed ones retry. Ctrl-C or SIGTERM finishes in-flight requests, commits them, and exits 130.
+  - `--concurrency N`: requests in flight, default and maximum 4; each conversation is committed as it completes.
+  - `--timeout S`: per-request seconds, default 300; a timeout is a failure and retries on `--resume`.
+  - `--progress-every N`: stderr line (done/total, claims, conversations per hour, ETA) every N conversations, default 10.
 - `infovore claims serve --run RUN [--host H] [--port P]`: dense review page (g good, w wrong, m made up, n not useful); verdicts append and resume.
 - `infovore claims report [--run RUN]`: per run conversations, claims, zero-claim share, verdict counts, made-up rate, tokens and seconds.
 - `infovore extract [--mode trial|live] [--sample N] [--seed N] [--exchange-id ID] [--min-score X] [--max-score X] [--strategy stratified|random] [--compare-prompt V]`: claim extraction (paused).
