@@ -1,8 +1,13 @@
 import argparse
 import hashlib
 import json
+import signal
 import sqlite3
+import sys
 import threading
+import time
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from infovore.claims.extract import (
@@ -12,7 +17,7 @@ from infovore.claims.extract import (
     ClaimsReplyError,
     ExchangeResult,
     build_request,
-    extract_exchange,
+    extract_concurrently,
     fetch_model_id,
     http_get,
     http_post,
@@ -21,13 +26,16 @@ from infovore.claims.extract import (
     windows,
 )
 from infovore.claims.httpd import DEFAULT_CLAIMS_PORT, listening_url, shutdown_all, start_all
-from infovore.claims.redact import WIDTH, redact_conversation
-from infovore.config import ConfigError
+from infovore.claims.redact import WIDTH, Redacted, redact_conversation
+from infovore.config import ConfigError, normalize_channel_names
 from infovore.db.batch import exchange_inputs_for_ids
+from infovore.db.channel_filter import known_channel_names
 from infovore.db.claims_v2 import (
     ExchangeOutcome,
     RunReport,
+    archived_exchange_ids,
     create_run,
+    processed_ok,
     record_exchange,
     rejection_rows,
     report_rows,
@@ -40,12 +48,23 @@ if TYPE_CHECKING:
     from infovore.cli import AppContext
 
 
-def _select(conn: sqlite3.Connection, args: argparse.Namespace) -> tuple[list[int], str]:
+def _select(context: "AppContext", args: argparse.Namespace) -> tuple[list[int], str]:
+    conn = context.conn
+    if args.channels:
+        wanted = normalize_channel_names(args.channels)
+        known = known_channel_names(conn)
+        if unknown := sorted(wanted - known):
+            raise ConfigError(
+                f"unknown channel(s) in --channels: {', '.join(unknown)};"
+                f" known channels: {', '.join(sorted(known)) or 'none'}"
+            )
+        ids = archived_exchange_ids(conn, wanted, context.settings.exclude_channels)
+        return ids, f"channels={args.channels}"
     if args.slices:
         names = args.slices.split(",")
-        unknown = [n for n in names if n not in slice_names(conn)]
-        if unknown:
-            raise ConfigError(f"unknown slice(s): {', '.join(unknown)}")
+        unknown_slices = [n for n in names if n not in slice_names(conn)]
+        if unknown_slices:
+            raise ConfigError(f"unknown slice(s): {', '.join(unknown_slices)}")
         ids = list(dict.fromkeys(i for n in names for i in slice_ids(conn, n)))
         return ids, f"slices={args.slices}"
     try:
@@ -72,34 +91,108 @@ def _outcome(result: ExchangeResult) -> ExchangeOutcome:
     )
 
 
-def _extract(context: "AppContext", args: argparse.Namespace) -> int:
-    from infovore.cli import ExitCode
+class StopFlag:
+    """First SIGINT/SIGTERM asks the run to wind down; a second one aborts."""
 
-    conn, out, salt = context.conn, context.stdout, context.settings.pseudonym_salt
+    def __init__(self) -> None:
+        self.requested = False
+
+    def request(self) -> None:
+        self.requested = True
+
+    def handle(self, signum: int, frame: object) -> None:
+        if self.requested:
+            raise KeyboardInterrupt
+        self.request()
+
+
+@contextmanager
+def _stop_on_signals(flag: StopFlag) -> Iterator[None]:
+    signums = (signal.SIGINT, signal.SIGTERM)
+    previous = [signal.signal(n, flag.handle) for n in signums]
+    try:
+        yield
+    finally:
+        for number, handler in zip(signums, previous, strict=True):
+            signal.signal(number, handler)
+
+
+MAX_CONCURRENCY = 4
+
+
+def progress_line(done: int, total: int, claims: int, elapsed: float) -> str:
+    rate = done / elapsed * 3600 if elapsed > 0 else 0.0
+    if rate > 0:
+        left = round((total - done) / rate * 3600)
+        eta = f"{left // 3600}:{left % 3600 // 60:02d}:{left % 60:02d}"
+    else:
+        eta = "n/a"
+    return (
+        f"progress: {done}/{total} conversations, claims={claims}, {rate:.1f} conv/hour, eta {eta}"
+    )
+
+
+def _redacted_stream(
+    conn: sqlite3.Connection, ids: Sequence[int], salt: str
+) -> Iterator[tuple[int, Redacted]]:
+    for eid in ids:
+        messages = exchange_inputs_for_ids(conn, [eid])[eid].messages
+        yield eid, redact_conversation(messages, salt)
+
+
+def _check_args(args: argparse.Namespace, salt: str | None) -> str:
     if args.limit is None:
         raise ConfigError("claims extract needs --limit N (try 5)")
     if args.limit < 1:
         raise ConfigError("--limit must be positive")
+    if args.concurrency < 1:
+        raise ConfigError("--concurrency must be positive")
+    if args.progress_every < 1:
+        raise ConfigError("--progress-every must be positive")
     if not salt:
         raise ConfigError("INFOVORE_PSEUDONYM_SALT is required: names are redacted with it")
-    if not (args.slices or args.ids):
-        raise ConfigError("--slices or --ids is required")
-    ids, selection = _select(conn, args)
-    ids = ids[: args.limit]
-    inputs = exchange_inputs_for_ids(conn, ids)
-    redacted = {eid: redact_conversation(inputs[eid].messages, salt) for eid in ids}
+    if not (args.slices or args.ids or args.channels):
+        raise ConfigError("--slices, --ids or --channels is required")
+    if args.resume and not args.write:
+        raise ConfigError("--resume needs --write")
+    return salt
+
+
+def _dry_run(context: "AppContext", args: argparse.Namespace, ids: list[int], salt: str) -> int:
+    from infovore.cli import ExitCode
+
+    out, total = context.stdout, 0
+    for eid, redacted in _redacted_stream(context.conn, ids, salt):
+        for part in windows(redacted.lines, args.window_chars):
+            total += 1
+            request = build_request(args.model, render_window(part))
+            out.write(f"exchange {eid}\t{json.dumps(request)}\n")
+    out.write(f"dry-run: {total} requests for {len(ids)} conversations, none sent\n")
+    return int(ExitCode.OK)
+
+
+def _extract(context: "AppContext", args: argparse.Namespace) -> int:
+    from infovore.cli import ExitCode
+
+    conn, out = context.conn, context.stdout
+    salt = _check_args(args, context.settings.pseudonym_salt)
+    all_ids, selection = _select(context, args)
     if args.dry_run:
-        total = 0
-        for eid in ids:
-            for part in windows(redacted[eid].lines, args.window_chars):
-                total += 1
-                request = build_request(args.model, render_window(part))
-                out.write(f"exchange {eid}\t{json.dumps(request)}\n")
-        out.write(f"dry-run: {total} requests for {len(ids)} conversations, none sent\n")
-        return int(ExitCode.OK)
+        return _dry_run(context, args, all_ids[: args.limit], salt)
     model_id, source = fetch_model_id(args.endpoint, args.model, http_get)
     note = "" if source == "model_info" else " (alias; /model/info unavailable)"
     out.write(f"model_id={model_id}{note}\n")
+    if args.resume:
+        skip = processed_ok(conn, model_id, prompt_hash())
+        out.write(f"resume: skipping {len(skip.intersection(all_ids))} already done\n")
+        all_ids = [i for i in all_ids if i not in skip]
+    workers = min(args.concurrency, MAX_CONCURRENCY)
+    if workers < args.concurrency:
+        out.write(f"concurrency capped at {MAX_CONCURRENCY}\n")
+    ids = all_ids[: args.limit]
+    if not ids:
+        out.write("nothing to do\n")
+        return int(ExitCode.OK)
     run_id = None
     if args.write:
         recipe = {
@@ -124,36 +217,53 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
     send = http_post(args.endpoint, args.timeout)
     done = failed = claims = rejected = tokens_in = tokens_out = 0
     seconds = 0.0
-    for eid in ids:
-        try:
-            result = extract_exchange(send, args.model, redacted[eid], args.window_chars)
-        except ClaimsReplyError as error:
-            failed += 1
-            out.write(f"exchange {eid}\tERROR\t{error}\n")
-            if run_id is not None:
-                record_exchange(
-                    conn, run_id, eid, ExchangeOutcome("failed", str(error), 0, 0, 0, 0.0), [], []
-                )
-            continue
-        done += 1
-        claims += len(result.claims)
-        rejected += len(result.rejected)
-        tokens_in += result.input_tokens
-        tokens_out += result.output_tokens
-        seconds += result.seconds
-        out.write(
-            f"exchange {eid}\tclaims={len(result.claims)}\trejected={len(result.rejected)}"
-            f"\ttokens={result.input_tokens}+{result.output_tokens}\tseconds={result.seconds:.2f}\n"
+    started = time.monotonic()
+    stop = StopFlag()
+    with _stop_on_signals(stop):
+        results = extract_concurrently(
+            _redacted_stream(conn, ids, salt),
+            send,
+            args.model,
+            args.window_chars,
+            workers,
+            lambda: stop.requested,
         )
-        for claim in result.claims:
-            out.write(f"  {claim.statement}\n")
-        if run_id is not None:
-            record_exchange(conn, run_id, eid, _outcome(result), result.claims, result.rejected)
+        for eid, result in results:
+            if isinstance(result, ClaimsReplyError):
+                failed += 1
+                out.write(f"exchange {eid}\tERROR\t{result}\n")
+                if run_id is not None:
+                    failure = ExchangeOutcome("failed", str(result), 0, 0, 0, 0.0)
+                    record_exchange(conn, run_id, eid, failure, [], [])
+            else:
+                done += 1
+                claims += len(result.claims)
+                rejected += len(result.rejected)
+                tokens_in += result.input_tokens
+                tokens_out += result.output_tokens
+                seconds += result.seconds
+                out.write(
+                    f"exchange {eid}\tclaims={len(result.claims)}\trejected={len(result.rejected)}"
+                    f"\ttokens={result.input_tokens}+{result.output_tokens}"
+                    f"\tseconds={result.seconds:.2f}\n"
+                )
+                for claim in result.claims:
+                    out.write(f"  {claim.statement}\n")
+                if run_id is not None:
+                    record_exchange(
+                        conn, run_id, eid, _outcome(result), result.claims, result.rejected
+                    )
+            if (done + failed) % args.progress_every == 0:
+                line = progress_line(done + failed, len(ids), claims, time.monotonic() - started)
+                sys.stderr.write(f"{line}\n")
     out.write(
         f"conversations={done} failed={failed} claims={claims} rejected={rejected}"
         f" tokens={tokens_in}+{tokens_out} seconds={seconds:.2f}\n"
     )
     out.write(f"run {run_id} written\n" if run_id else "not written (use --write)\n")
+    if stop.requested:
+        out.write(f"interrupted after {done + failed} of {len(ids)}; rerun with --resume\n")
+        return 130
     return int(ExitCode.BACKEND if failed and not done else ExitCode.OK)
 
 
@@ -249,7 +359,11 @@ class ClaimsCommand:
         pick = extract.add_mutually_exclusive_group()
         pick.add_argument("--slices", default=None, help="comma-separated slice names")
         pick.add_argument("--ids", default=None, help="comma-separated exchange ids")
+        pick.add_argument("--channels", default=None, help="comma-separated channel names")
         extract.add_argument("--limit", type=int, default=None, metavar="N")
+        extract.add_argument("--resume", action="store_true")
+        extract.add_argument("--concurrency", type=int, default=MAX_CONCURRENCY, metavar="N")
+        extract.add_argument("--progress-every", type=int, default=10, dest="progress_every")
         extract.add_argument("--write", action="store_true")
         extract.add_argument("--dry-run", action="store_true", dest="dry_run")
         extract.add_argument("--window-chars", type=int, default=WINDOW_CHARS, dest="window_chars")
