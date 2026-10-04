@@ -155,6 +155,7 @@ def training_labels(
     conn: sqlite3.Connection,
     source: str = HUMAN_SCORER,
     exclude_channels: frozenset[str] = frozenset(),
+    skip_ref_prefixes: tuple[str, ...] = (),
 ) -> tuple[dict[int, Label], int]:
     if source != HUMAN_SCORER:
         raise LlmLabelsNotTrainableError(
@@ -162,12 +163,13 @@ def training_labels(
         )
     labels: dict[int, Label] = {}
     last_id = 0
+    skip = "".join(" AND COALESCE(source_ref, '') NOT LIKE ?" for _ in skip_ref_prefixes)
     rows = conn.execute(
         "SELECT id, subject_id, label FROM annotations WHERE scorer = ?"
         " AND subject_kind = 'exchange' AND reproducibility = 'recorded'"
-        " AND subject_id IN (SELECT id FROM current_exchanges)"
+        f" AND subject_id IN (SELECT id FROM current_exchanges){skip}"
         " ORDER BY id",
-        (HUMAN_SCORER,),
+        (HUMAN_SCORER, *(f"{prefix}%" for prefix in skip_ref_prefixes)),
     )
     for row in rows:
         last_id = row["id"]

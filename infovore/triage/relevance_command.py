@@ -19,6 +19,7 @@ from infovore.triage.cascade import (
     stage_reports,
     try_fit,
     tune_high,
+    tuning_labels,
     tuning_samples,
     write_outcomes,
 )
@@ -253,13 +254,17 @@ class RelevanceCommand:
             raise ConfigError(f"unknown slice(s): {', '.join(unknown)}")
         lexicon = load_lexicon()
         exclude = context.settings.exclude_channels
+        tuned = tuning_labels(conn, exclude)
+        lore = sum(label is Label.LORE for label in tuned.values())
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
         fit, why = try_fit(conn, exclude, args.min_per_class)
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
         context.stdout.write(
             f"lexicon v={lexicon.version} size={lexicon.size} {lexicon.sources}"
-            f" t_high={t_high:.3f} (tuned on {BUILD} labels outside gold and s2)\n"
+            f" t_high={t_high:.3f} (tuned on {BUILD} random-slice labels, held-out and"
+            f" queue-sourced excluded: n={len(tuned)}"
+            f" relevant={lore} irrelevant={len(tuned) - lore})\n"
         )
         everything: set[int] = set()
         for name in names:
