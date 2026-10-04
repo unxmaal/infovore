@@ -89,22 +89,27 @@ def decide_bayes(p: float | None) -> str | None:
     return IRRELEVANT if p <= BAYES_LOW else None
 
 
-def tuning_samples(
-    conn: sqlite3.Connection, lexicon: Lexicon, exclude_channels: frozenset[str] = frozenset()
-) -> list[tuple[float, bool]]:
-    held = held_out_ids(conn)
+def tuning_labels(
+    conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
+) -> dict[int, Label]:
     labels, _ = training_labels(conn, exclude_channels=exclude_channels)
     build = {
         row["exchange_id"]
         for row in conn.execute(
             "SELECT exchange_id FROM current_slice_members WHERE name = ?", (BUILD,)
         )
-    } - held
-    ids = sorted(eid for eid in build if eid in labels)
-    inputs = exchange_inputs_for_ids(conn, ids)
+    } - held_out_ids(conn)
+    return {eid: labels[eid] for eid in sorted(build) if eid in labels}
+
+
+def tuning_samples(
+    conn: sqlite3.Connection, lexicon: Lexicon, exclude_channels: frozenset[str] = frozenset()
+) -> list[tuple[float, bool]]:
+    labels = tuning_labels(conn, exclude_channels)
+    inputs = exchange_inputs_for_ids(conn, list(labels))
     return [
-        (score_lexicon(lexicon, inputs[eid].messages).share, labels[eid] is Label.LORE)
-        for eid in ids
+        (score_lexicon(lexicon, inputs[eid].messages).share, label is Label.LORE)
+        for eid, label in labels.items()
     ]
 
 

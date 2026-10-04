@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from infovore.cli import ExitCode
-from infovore.db.annotations import annotation_history
+from infovore.db.annotations import Annotation, annotation_history, record_annotation
 from infovore.db.connection import migrate, open_database
 from infovore.rows import Label
 from infovore.triage.cascade import (
@@ -16,8 +16,11 @@ from infovore.triage.cascade import (
     residue_channels,
     stage_reports,
     tune_high,
+    tuning_labels,
+    tuning_samples,
 )
-from infovore.triage.lexicon import LexiconScore
+from infovore.triage.human import HUMAN_SCORER
+from infovore.triage.lexicon import LexiconScore, load_lexicon
 from tests.triage.test_command import environment, run
 from tests.triage.test_human import human, seed
 from tests.triage.test_lexicon import corpus
@@ -379,3 +382,55 @@ def test_batching_gives_the_same_outcomes_as_one_pass(tmp_path: Path) -> None:
 
     assert batched == run_cascade(conn, ids, load_lexicon(), 0.5, None, frozenset())
     assert seen == [(3, 7), (6, 7), (7, 7)]
+
+
+def queue_label(conn: sqlite3.Connection, eid: int, label: str, ref: str) -> None:
+    record_annotation(
+        conn,
+        Annotation("exchange", eid, HUMAN_SCORER, 1, "recorded", label=label, source_ref=ref),
+        NOW,
+    )
+
+
+@pytest.mark.parametrize(
+    "ref", ["judge:likely-irrelevant:3", "judge:uncertain:9", "judge:c1:2"]
+)
+def test_tuning_ignores_queue_sourced_labels(tmp_path: Path, ref: str) -> None:
+    _, conn = build(tmp_path)
+    lexicon = load_lexicon()
+    before = tuning_samples(conn, lexicon)
+    ids = [row[0] for row in conn.execute("SELECT id FROM exchanges ORDER BY id")]
+    queue_label(conn, ids[1], "irrelevant", ref)
+    queue_label(conn, ids[2], "irrelevant", ref)
+    extra = seed(conn, 50, "scsi disk boot")
+    conn.execute(
+        "INSERT INTO eval_slices (name, exchange_id, position, population, seed, frozen_at)"
+        " VALUES ('s1', ?, 99, 't', 0, ?)",
+        (extra, NOW.isoformat()),
+    )
+    queue_label(conn, extra, "relevant", ref)
+    conn.commit()
+
+    assert tuning_samples(conn, lexicon) == before
+    assert len(tuning_labels(conn)) == len(before)
+    assert extra not in tuning_labels(conn)
+
+
+def test_a_random_slice_label_after_a_queue_label_still_counts(tmp_path: Path) -> None:
+    _, conn = build(tmp_path)
+    eid = conn.execute("SELECT id FROM exchanges ORDER BY id LIMIT 1 OFFSET 3").fetchone()[0]
+    queue_label(conn, eid, "irrelevant", "judge:likely-irrelevant:1")
+    human(conn, eid, "relevant")
+    conn.commit()
+
+    assert tuning_labels(conn)[eid] is Label.LORE
+
+
+def test_the_cascade_prints_the_tuning_population(tmp_path: Path) -> None:
+    env, conn = build(tmp_path)
+    conn.close()
+
+    _, out, _ = run(["relevance", "cascade", "--slices", "s1"], env)
+
+    assert "tuned on s1 random-slice labels, held-out and queue-sourced excluded: n=5" in out
+    assert "relevant=2 irrelevant=3" in out
