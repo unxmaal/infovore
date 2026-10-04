@@ -31,7 +31,7 @@ def cascade_new_exchanges(
     ids = unscored_exchange_ids(conn)
     if not ids:
         return 0
-    lexicon = load_lexicon()
+    lexicon = load_lexicon(conn)
     t_high = tune_high(tuning_samples(conn, lexicon, exclude_channels))
     stage = build_embed_stage(conn, exclude_channels, cache_path)
     limit = short_limit(conn, lexicon, t_high, exclude_channels)

@@ -6,11 +6,12 @@ import sqlite3
 import tomllib
 from collections import Counter
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from importlib import resources
 from typing import Final
 
+from infovore.db.reviewed_words import approved_words
 from infovore.rows import MessageRow
 from infovore.triage.bayes import MAX_TOKEN_LENGTH, TOKEN, TRAILING_PUNCTUATION
 from infovore.triage.human import Gazetteer, load_gazetteer
@@ -42,6 +43,8 @@ MINE_LIMIT: Final = 400
 MAX_OFF: Final = 10
 MIN_RATIO: Final = 10.0
 _WORD: Final = re.compile(r"[a-z][a-z0-9+#-]{2,}")
+_URL: Final = re.compile(r"https?://[^\s<>()]+")
+_SECOND_LEVEL: Final = frozenset({"co", "com", "org", "net", "ac", "gov", "edu"})
 
 
 class LexiconError(ValueError):
@@ -103,14 +106,45 @@ def parse_lexicon(text: str, gazetteer: Gazetteer) -> Lexicon:
 
 
 @lru_cache(maxsize=1)
-def load_lexicon() -> Lexicon:
+def _shipped_lexicon() -> Lexicon:
     path = resources.files("infovore.triage").joinpath("tech_lexicon.toml")
     return parse_lexicon(path.read_text(encoding="utf-8"), load_gazetteer())
 
 
+def with_reviewed(lexicon: Lexicon, approved: frozenset[str]) -> Lexicon:
+    added = approved - lexicon.terms
+    if not added:
+        return replace(lexicon, sources={**lexicon.sources, "reviewed": 0})
+    digest = hashlib.sha256(json.dumps([lexicon.version, sorted(added)]).encode()).hexdigest()
+    return Lexicon(
+        version="lx-" + digest[:12],
+        terms=lexicon.terms | added,
+        gazetteer=lexicon.gazetteer,
+        sources={**lexicon.sources, "reviewed": len(added)},
+    )
+
+
+def load_lexicon(conn: sqlite3.Connection | None = None) -> Lexicon:
+    base = _shipped_lexicon()
+    return base if conn is None else with_reviewed(base, approved_words(conn))
+
+
+def _domain_word(match: re.Match[str]) -> str:
+    labels = re.split(r"[/?#:]", match.group(0).split("://", 1)[1], maxsplit=1)[0].split(".")
+    labels = [label for label in labels if label != "www"]
+    if len(labels) >= 3 and labels[-2] in _SECOND_LEVEL:
+        return f" {labels[-3]} "
+    return f" {labels[-2] if len(labels) >= 2 else labels[0]} "
+
+
+def tokens(text: str) -> list[str]:
+    plain = _URL.sub(_domain_word, text.lower())
+    found = (t.rstrip(TRAILING_PUNCTUATION) for t in TOKEN.findall(plain))
+    return [t for t in found if len(t) <= MAX_TOKEN_LENGTH and any(c.isalnum() for c in t)]
+
+
 def words(text: str) -> set[str]:
-    found = {t.rstrip(TRAILING_PUNCTUATION) for t in TOKEN.findall(text.lower())}
-    return {t for t in found if t and len(t) <= MAX_TOKEN_LENGTH}
+    return set(tokens(text))
 
 
 def message_hits(lexicon: Lexicon, text: str) -> list[str]:

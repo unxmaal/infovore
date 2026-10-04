@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>word review</title>
+<style>
+body { margin: 0; font: 12px/18px ui-monospace, Menlo, monospace; background: #fff; color: #111; }
+#bar { display: flex; gap: 12px; align-items: center; height: 30px; padding: 0 8px; background: #eee; }
+#bar button { font: inherit; padding: 1px 10px; }
+table { border-collapse: collapse; margin: 0 8px; }
+th, td { height: 18px; padding: 0 14px 0 0; text-align: left; white-space: nowrap; }
+td.n { text-align: right; }
+tbody tr:hover { background: #ffd; }
+input { margin: 0; vertical-align: middle; }
+#msg { color: #a00; }
+</style>
+</head>
+<body>
+<form id="f">
+<div id="bar"><button type="submit">Save and next (Enter)</button><span id="left"></span><span id="msg"></span></div>
+<table>
+<thead><tr><th>word</th><th>count</th><th><label><input type="checkbox" id="all"> tech</label></th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</form>
+<script>
+"use strict";
+const rows = document.getElementById("rows"), all = document.getElementById("all");
+const left = document.getElementById("left"), msg = document.getElementById("msg");
+const size = () => Math.max(1, Math.floor((window.innerHeight - 30 - 18 - 8) / 18));
+let busy = false;
+
+function render(data) {
+  rows.textContent = "";
+  for (const [word, count] of data.rows) {
+    const tr = document.createElement("tr");
+    const w = document.createElement("td"), c = document.createElement("td"), t = document.createElement("td");
+    w.textContent = word; c.textContent = count; c.className = "n";
+    const box = document.createElement("input");
+    box.type = "checkbox"; box.value = word;
+    t.appendChild(box);
+    tr.append(w, c, t);
+    rows.appendChild(tr);
+  }
+  all.checked = false;
+  left.textContent = data.remaining + " words left";
+}
+
+async function load() {
+  const r = await fetch("/api/page?size=" + size());
+  render(await r.json());
+}
+
+async function submit() {
+  if (busy) return;
+  busy = true;
+  msg.textContent = "";
+  const boxes = Array.from(rows.querySelectorAll("input"));
+  const body = {
+    words: boxes.map(b => b.value),
+    tech: boxes.filter(b => b.checked).map(b => b.value),
+    size: size(),
+  };
+  try {
+    const r = await fetch("/api/submit", { method: "POST", body: JSON.stringify(body) });
+    const data = await r.json();
+    if (r.ok) render(data); else msg.textContent = data.error;
+  } catch (e) {
+    msg.textContent = String(e);
+  }
+  busy = false;
+}
+
+all.addEventListener("change", () => {
+  for (const b of rows.querySelectorAll("input")) b.checked = all.checked;
+});
+document.getElementById("f").addEventListener("submit", e => { e.preventDefault(); submit(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.repeat) { e.preventDefault(); submit(); }
+});
+load();
+</script>
+</body>
+</html>

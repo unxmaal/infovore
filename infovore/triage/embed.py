@@ -446,7 +446,7 @@ def cross_validate(
             summarize([(embed[eid], labels[eid]) for eid in subset]),
         )
 
-    lexicon = load_lexicon()
+    lexicon = load_lexicon(conn)
     residue_comparison = None
     if residue:
         t_high = tune_high(tuning_samples(conn, lexicon, exclude_channels))
