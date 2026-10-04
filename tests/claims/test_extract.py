@@ -41,10 +41,12 @@ def test_the_request_pins_a_strict_schema_and_names_the_scope() -> None:
     assert request["model"] == "eval-4b" and request["temperature"] == 0
     assert request["response_format"]["json_schema"]["strict"] is True
     assert request["response_format"]["json_schema"]["schema"] == SCHEMA
-    for phrase in ("self-contained", "IRIX", "first-hand", "zero", "said", "jokes"):
+    for phrase in ("standalone", "IRIX", "first-hand", "zero", "pronouns", "questions", "jokes"):
         assert phrase in system
+    assert system.count("Bad:") == 3 and system.count("Good:") == 3
     assert request["messages"][1]["content"].endswith("[1] user-aaaa: hi")
     assert prompt_hash() == prompt_hash() and len(prompt_hash()) == 12
+    assert prompt_hash() != "a82adb7b1e83"
 
 
 def test_windows_never_split_a_message_and_keep_global_refs() -> None:
@@ -106,12 +108,27 @@ def test_validation_accepts_a_grounded_attributed_claim(redacted: Any) -> None:
 
 
 @pytest.mark.parametrize(
+    "statement",
+    [
+        "The SGI O2 can take an R12000 CPU; one user's runs at 400 MHz.",
+        "sa, which contains sash, is 15.7 MB in the copy on IRIXnet's nonfree.",
+        "A socketed O2 board may allow a CPU swap.",
+    ],
+)
+def test_attribution_is_the_speaker_field_not_the_statement_text(
+    redacted: Any, statement: str
+) -> None:
+    accepted, rejected = validate([RawClaim(U1, statement, (1,))], redacted)
+
+    assert [c.statement for c in accepted] == [statement] and rejected == []
+
+
+@pytest.mark.parametrize(
     ("claim", "reason"),
     [
         (RawClaim(U1, f"{U1} said x", (1, 9)), "unknown ref 9"),
         (RawClaim(U1, f"{U1} said x", ()), "no refs"),
         (RawClaim("user-zzzz", "user-zzzz said x", (1,)), "unknown speaker"),
-        (RawClaim(U1, "someone said x", (1,)), "not attributed"),
         (RawClaim(U1, "  ", (1,)), "empty statement"),
         (RawClaim(U1, f"{U1} said bobby's Indy boots", (1,)), "name leak"),
     ],
