@@ -90,6 +90,7 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore slice freeze | show`: freeze the evaluation slices once; show exchanges and messages per size bucket.
 - `infovore judge serve | report`: human judging page and its report (see below).
 - `infovore words serve [--host H] [--port P] [--top-n N]`: dense page to mark undecided-conversation words as tech or not; checked words join the lexicon as `reviewed`.
+- `infovore labels export --jsonl PATH [--include-excluded-channels]`: one JSON object per labelled current exchange (text as `llm-score` renders it, label, held_out, slice, channel, cascade_stage, label_source) plus counts.
 - `infovore words report [--top-n N] [--show K]`: reviewed and approved counts, candidates left, and undecided conversations with an approved word.
 - `infovore relevance cascade [--slices LIST] [--all] [--write] [--explain ID]`: run the cascade and report; `--write` records derived annotations.
 - `infovore relevance compare [--cv K] [--model M] [--pool first|mean|max] [--cache FILE] [--residue]`: stratified cross-validation of human Bayes against embedding plus logistic head.
