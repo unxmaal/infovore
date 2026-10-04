@@ -138,7 +138,7 @@ def _domain_word(match: re.Match[str]) -> str:
 
 
 def tokens(text: str) -> list[str]:
-    plain = _URL.sub(_domain_word, text.lower())
+    plain = _URL.sub(_domain_word, text.lower().replace("\u2019", "'"))
     found = (t.rstrip(TRAILING_PUNCTUATION) for t in TOKEN.findall(plain))
     return [t for t in found if len(t) <= MAX_TOKEN_LENGTH and any(c.isalnum() for c in t)]
 
