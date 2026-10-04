@@ -225,7 +225,7 @@ class RelevanceCommand:
             args.off.split(","),
             args.min_count,
             args.limit,
-            load_lexicon(),
+            load_lexicon(context.conn),
         )
         if not mined:
             context.stdout.write("no candidates\n")
@@ -236,7 +236,7 @@ class RelevanceCommand:
     def _collisions(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
 
-        terms = args.terms.split(",") if args.terms else sorted(load_lexicon().terms)
+        terms = args.terms.split(",") if args.terms else sorted(load_lexicon(context.conn).terms)
         found = collisions(
             context.conn,
             terms,
@@ -254,7 +254,7 @@ class RelevanceCommand:
     def _explain(self, context: "AppContext", exchange_id: int) -> int:
         from infovore.cli import ExitCode
 
-        lexicon = load_lexicon()
+        lexicon = load_lexicon(context.conn)
         messages = exchange_inputs_for_ids(context.conn, [exchange_id])[exchange_id].messages
         if not messages:
             raise ConfigError(f"exchange {exchange_id} has no messages")
@@ -274,7 +274,7 @@ class RelevanceCommand:
 
         conn = context.conn
         exclude = context.settings.exclude_channels
-        lexicon = load_lexicon()
+        lexicon = load_lexicon(conn)
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
         labels, _ = training_labels(conn, exclude_channels=exclude)
         held = held_out_ids(conn)
@@ -311,7 +311,7 @@ class RelevanceCommand:
         unknown = [n for n in names if n not in slice_names(conn)]
         if unknown:
             raise ConfigError(f"unknown slice(s): {', '.join(unknown)}")
-        lexicon = load_lexicon()
+        lexicon = load_lexicon(conn)
         exclude = context.settings.exclude_channels
         tuned = tuning_labels(conn, exclude)
         lore = sum(label is Label.LORE for label in tuned.values())

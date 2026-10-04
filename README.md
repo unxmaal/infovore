@@ -36,6 +36,7 @@ All tables live in one SQLite file (`INFOVORE_DB_PATH`). Migrations run on open.
 | `chunk_recipes`, `channel_chunk_gaps` | chunking recipes and per-channel gap overrides |
 | `current_exchanges` | view: exchanges under the active recipe; the base object for everything below |
 | `all_exchange_messages` | view: members of every exchange |
+| `reviewed_words` | append-only tech or not decisions on words from undecided conversations |
 | `annotations`, `current_annotations` | derived and human annotations on exchanges; the view shows the latest per exchange |
 | `eval_slices`, `current_eval_slices`, `current_slice_members` | frozen evaluation slices and their current membership |
 | `exchange_labels`, `label_events` | human lore/noise labels and their event history |
@@ -88,6 +89,8 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore export-archive DEST [--force]`: shareable SQLite file of archived exchanges.
 - `infovore slice freeze | show`: freeze the evaluation slices once; show exchanges and messages per size bucket.
 - `infovore judge serve | report`: human judging page and its report (see below).
+- `infovore words serve [--host H] [--port P] [--top-n N]`: dense page to mark undecided-conversation words as tech or not; checked words join the lexicon as `reviewed`.
+- `infovore words report [--top-n N] [--show K]`: reviewed and approved counts, candidates left, and undecided conversations with an approved word.
 - `infovore relevance cascade [--slices LIST] [--all] [--write] [--explain ID]`: run the cascade and report; `--write` records derived annotations.
 - `infovore relevance compare [--cv K] [--model M] [--pool first|mean|max] [--cache FILE] [--residue]`: stratified cross-validation of human Bayes against embedding plus logistic head.
 - `infovore relevance embed-score [--cv K] [--model M] [--cache FILE]`: write `p_relevant_embed` for labelled exchanges.

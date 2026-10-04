@@ -274,6 +274,7 @@ def builtin_commands() -> list[Command]:
     from infovore.triage.command import TriageCommand
     from infovore.triage.label import LabelCommand
     from infovore.triage.relevance_command import RelevanceCommand
+    from infovore.words.command import WordsCommand
 
     return [
         StatusCommand(),
@@ -294,6 +295,7 @@ def builtin_commands() -> list[Command]:
         LabelCommand(),
         RelevanceCommand(),
         SiftCommand(),
+        WordsCommand(),
     ]
 
 

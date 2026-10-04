@@ -186,7 +186,7 @@ def select_ids(
     else:
         ids = current_exchange_ids(conn)
     if residue:
-        lexicon = load_lexicon()
+        lexicon = load_lexicon(conn)
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
         stage = build_embed_stage(conn, exclude, cache_path)
         limit = short_limit(conn, lexicon, t_high, exclude)

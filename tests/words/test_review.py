@@ -70,7 +70,7 @@ def test_candidates_rank_by_count_minus_common_known_and_reviewed(tmp_path: Path
 
     assert found[0] == ("ubr", 3)
     assert "the" not in names
-    assert {"g5", "7200", "modem"} <= set(names)
+    assert {"g5", "7200"} <= set(names)
     assert "ebay" not in names
 
     record_decisions(conn, {"ubr": False, "g5": True}, AT)

@@ -81,7 +81,7 @@ def test_submit_records_checked_and_unchecked_and_returns_the_next_page(served: 
 def test_a_malformed_submit_is_refused(served: Served) -> None:
     url, conn = served
 
-    assert call(f"{url}api/submit", {"words": "ubr"})[0] == 400
+    assert call(f"{url}api/submit", {"words": "ubr", "tech": []})[0] == 400
     assert call(f"{url}api/submit", {"tech": []})[0] == 400
     assert call(f"{url}api/submit", {"words": ["nope"], "tech": []})[0] == 400
     assert call(f"{url}api/submit", {"words": ["ubr"], "tech": ["g5"]})[0] == 400

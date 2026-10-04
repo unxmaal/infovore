@@ -214,7 +214,7 @@ def _likely_irrelevant_items(
             LIKELY_IRRELEVANT_POOL,
         ),
     ).fetchall()
-    lexicon = load_lexicon()
+    lexicon = load_lexicon(conn)
     inputs = exchange_inputs_for_ids(conn, [row["id"] for row in rows])
     ranked = sorted(
         (score_lexicon(lexicon, inputs[row["id"]].messages).share, row["s"], row["id"])

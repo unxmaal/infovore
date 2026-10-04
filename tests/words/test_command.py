@@ -58,7 +58,8 @@ def test_report_counts_decisions_and_projected_gain(tmp_path: Path) -> None:
     populate(tmp_path)
     conn = open_database(tmp_path / "infovore.db")
     conn.execute(
-        "INSERT INTO reviewed_words (word, tech, decided_at) VALUES ('g5', 1, 'x'), ('blorp', 0, 'x')"
+        "INSERT INTO reviewed_words (word, tech, decided_at)"
+        " VALUES ('g5', 1, 'x'), ('blorp', 0, 'x')"
     )
 
     code, out = run(["words", "report"], tmp_path)
@@ -103,7 +104,9 @@ def test_serve_accepts_hosts_and_a_common_word_size(
     populate(tmp_path)
     monkeypatch.setattr(infovore.sift.httpd, "block_until_interrupted", lambda event: None)
 
-    code, out = run(["words", "serve", "--port", "0", "--host", "127.0.0.1", "--top-n", "10"], tmp_path)
+    code, out = run(
+        ["words", "serve", "--port", "0", "--host", "127.0.0.1", "--top-n", "10"], tmp_path
+    )
 
     assert code == ExitCode.OK
     assert "listening on" in out
