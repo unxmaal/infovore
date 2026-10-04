@@ -115,3 +115,13 @@ def test_gain_counts_undecided_conversations_with_an_approved_word(tmp_path: Pat
     assert gain(conn, frozenset({"ubr"})) == (2, 2)
     assert gain(conn, frozenset({"modem"})) == (2, 1)
     assert gain(conn, frozenset({"modems"})) == (2, 0)
+
+
+def test_the_undecided_query_never_searches_annotations_by_scorer(tmp_path: Path) -> None:
+    from infovore.words.review import _LATEST_CASCADE
+
+    plan = " ".join(
+        str(tuple(row)) for row in db(tmp_path).execute("EXPLAIN QUERY PLAN " + _LATEST_CASCADE)
+    )
+
+    assert "annotations_scorer" not in plan

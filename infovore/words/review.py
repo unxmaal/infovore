@@ -11,12 +11,11 @@ from infovore.triage.lexicon import load_lexicon, tokens
 DEFAULT_TOP_N = 10000
 BATCH = 2000
 _LATEST_CASCADE = (
-    "SELECT a.subject_id FROM annotations a"
-    " JOIN (SELECT subject_id, MAX(id) AS last FROM annotations"
-    "  WHERE subject_kind = 'exchange' AND label IS NOT NULL"
-    "  AND scorer LIKE 'relevance\\_%' ESCAPE '\\' GROUP BY subject_id) l ON l.last = a.id"
-    " JOIN current_exchanges e ON e.id = a.subject_id"
-    " WHERE a.scorer = 'relevance_residue' AND a.label = 'residue' ORDER BY a.subject_id"
+    "SELECT l.subject_id FROM (SELECT subject_id, MAX(id) AS last, scorer, label FROM annotations"
+    " WHERE subject_kind = 'exchange' AND label IS NOT NULL"
+    " AND scorer LIKE 'relevance\\_%' ESCAPE '\\' GROUP BY subject_id) l"
+    " JOIN current_exchanges e ON e.id = l.subject_id"
+    " WHERE l.scorer = 'relevance_residue' AND l.label = 'residue' ORDER BY l.subject_id"
 )
 
 
