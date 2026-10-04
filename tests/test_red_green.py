@@ -13,6 +13,7 @@ else
   echo "FAILED tests/test_x.py::test_fixed - assert"
 fi
 echo "PASSED tests/test_x.py::test_always"
+if [ -f noisy.txt ]; then echo "ERROR    root:mod.py:5 boom"; fi
 """
 
 
@@ -49,12 +50,16 @@ def run_script(repo: Path, base: str, head: str, **env: str) -> tuple[int, str]:
     return done.returncode, done.stdout
 
 
-def commit_tests(repo: Path, with_fix: bool) -> tuple[str, str]:
+def commit_tests(
+    repo: Path, with_fix: bool, noisy: bool = False
+) -> tuple[str, str]:
     base = git(repo, "rev-parse", "HEAD")
     (repo / "tests").mkdir()
     (repo / "tests" / "test_x.py").write_text("pass\n")
     if with_fix:
         (repo / "fix.txt").write_text("fixed")
+    if noisy:
+        (repo / "noisy.txt").write_text("x")
     git(repo, "add", "-A")
     git(repo, "commit", "-qm", "head")
     return base, git(repo, "rev-parse", "HEAD")
@@ -99,3 +104,13 @@ def test_no_changed_tests_is_a_noop(repo: Path) -> None:
 
     assert code == 0
     assert "no changed test files" in out
+
+
+def test_error_log_lines_are_not_test_results(repo: Path) -> None:
+    base, head = commit_tests(repo, with_fix=True, noisy=True)
+
+    code, out = run_script(repo, base, head)
+
+    assert code == 0
+    assert "HEAD-NOT-GREEN" not in out
+    assert "head tests: 2" in out
