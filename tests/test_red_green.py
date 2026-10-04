@@ -50,9 +50,7 @@ def run_script(repo: Path, base: str, head: str, **env: str) -> tuple[int, str]:
     return done.returncode, done.stdout
 
 
-def commit_tests(
-    repo: Path, with_fix: bool, noisy: bool = False
-) -> tuple[str, str]:
+def commit_tests(repo: Path, with_fix: bool, noisy: bool = False) -> tuple[str, str]:
     base = git(repo, "rev-parse", "HEAD")
     (repo / "tests").mkdir()
     (repo / "tests" / "test_x.py").write_text("pass\n")
