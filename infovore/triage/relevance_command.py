@@ -52,6 +52,8 @@ from infovore.triage.lexicon import (
     mine_terms,
     score_lexicon,
 )
+from infovore.triage.llm_score import configure as configure_llm_score
+from infovore.triage.llm_score import run_llm_score
 
 ALL_BATCH = 2000
 RESIDUE_CHANNELS = 15
@@ -89,6 +91,7 @@ class RelevanceCommand:
             embed.add_argument("--cache", default=None, help="embedding cache file")
             if name == "compare":
                 embed.add_argument("--residue", action="store_true")
+        configure_llm_score(sub)
         mine = sub.add_parser("mine", help="candidate lexicon terms by channel log-odds")
         mine.add_argument("--tech", default=",".join(TECH_CHANNELS))
         mine.add_argument("--off", default=",".join(OFF_CHANNELS))
@@ -102,6 +105,8 @@ class RelevanceCommand:
         clash.add_argument("--terms", default=None, help="comma-separated; default: the lexicon")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
+        if args.relevance_action == "llm-score":
+            return run_llm_score(context, args)
         if args.relevance_action == "mine":
             return self._mine(context, args)
         if args.relevance_action == "compare":
