@@ -85,6 +85,7 @@ class Settings:
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
     triage_rules: TriageRules = DEFAULT_RULES
     workers: int = DEFAULT_WORKERS
+    pseudonym_salt: str = field(default="", repr=False)
     exclude_channels: frozenset[str] = field(default_factory=frozenset)
 
 
@@ -368,6 +369,7 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         triage_rules=triage_rules,
         workers=workers,
         exclude_channels=exclude_channels,
+        pseudonym_salt=env.get("INFOVORE_PSEUDONYM_SALT", ""),
     )
 
 
