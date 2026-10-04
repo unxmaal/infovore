@@ -43,6 +43,8 @@ All tables live in one SQLite file (`INFOVORE_DB_PATH`). Migrations run on open.
 | `scorer_activations`, `gate_predictions` | which scorer is active and its stored predictions |
 | `triage_model`, `triage_tokens` | triage classifier state |
 | `message_labels`, `message_model`, `message_tokens`, `message_combiner` | message-level sifting labels and models |
+| `claim_runs`, `claim_run_exchanges`, `claims_v2`, `claims_v2_sources`, `claim_rejections` | claim trial: runs, per-conversation outcomes, redacted claims with their cited messages, and claims rejected with the reason; append-only |
+| `claim_reviews`, `current_claim_reviews` | append-only human verdicts on trial claims; the view shows the latest per claim |
 | `claims`, `claim_sources`, `claims_fts` | extracted claims and their source messages (paused) |
 | `extraction_runs`, `extraction_batches`, `prompt_versions`, `probe_runs` | extraction and probe bookkeeping (paused) |
 | `lore` | view: claims judged net-new (paused) |
@@ -70,6 +72,7 @@ Settings come from the environment, or a `.env` file in the working directory. M
 | `INFOVORE_INCLUDE_BOT_MESSAGES` | false | ingest bot messages |
 | `INFOVORE_TRIAGE_MIN_SCORE` | `0.3` | minimum rule-based triage score |
 | `INFOVORE_TRIAGE_RULES` | built-in | triage rule overrides |
+| `INFOVORE_PSEUDONYM_SALT` | unset | secret salt for the per-user pseudonyms `claims extract` shows the model; keep it stable and never commit it |
 | `INFOVORE_WORKERS` | CPU count | worker processes |
 | `INFOVORE_<STAGE>_BACKEND`, `_MODEL`, `_CONCURRENCY`, `_TIMEOUT` | `claude_cli`, per stage, `2`, `60` | LLM backend per stage (`EXTRACT`, `PROBE`, `JUDGE`); other `INFOVORE_<STAGE>_*` keys, such as `BASE_URL` and `API_KEY` for `openai_compat`, pass through as backend options |
 
@@ -101,6 +104,9 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore triage [--report] [--human-report] [--train-human] [--scorer NAME] [--scorer-version V] [--include-training] [--human-limit N] [--all-exchanges]`: rule-based triage scores, reports and the human-label classifier.
 - `infovore label [--from-runs IDS] [--exchange-id ID] [--lore | --noise]`: record lore or noise labels.
 - `infovore sift export | import | citations | train | serve`: message-level trash sifting. `export` writes an lnav batch, `import` records its labels, `serve` is a browser UI; both take `--size`, `--strategy random|uncertain|mixed`, `--seed` and `--channels`.
+- `infovore claims extract --endpoint URL --model ALIAS (--slices LIST | --ids LIST) --limit N [--write] [--dry-run]`: author-redacted claim extraction with a served local model; `--limit` is required, `--dry-run` sends nothing, `--write` stores the run.
+- `infovore claims serve --run RUN [--host H] [--port P]`: dense review page (g good, w wrong, m made up, n not useful); verdicts append and resume.
+- `infovore claims report [--run RUN]`: per run conversations, claims, zero-claim share, verdict counts, made-up rate, tokens and seconds.
 - `infovore extract [--mode trial|live] [--sample N] [--seed N] [--exchange-id ID] [--min-score X] [--max-score X] [--strategy stratified|random] [--compare-prompt V]`: claim extraction (paused).
 - `infovore probe [--run-id IDS] [--limit N] [--probe-model M] [--retry-failed] [--compare]`: closed-book novelty probe over claims (paused).
 - `infovore review [--run-ids IDS] [--out FILE]`: HTML report for prompt-version run sets (paused).

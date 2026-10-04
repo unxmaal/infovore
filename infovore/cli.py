@@ -264,6 +264,7 @@ class SnapshotCommand:
 
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
+    from infovore.claims.command import ClaimsCommand
     from infovore.eval.command import JudgeCommand, SliceCommand
     from infovore.extract.command import ExtractCommand
     from infovore.extract.novelty import ProbeCommand
@@ -298,6 +299,7 @@ def builtin_commands() -> list[Command]:
         RelevanceCommand(),
         SiftCommand(),
         WordsCommand(),
+        ClaimsCommand(),
     ]
 
 
