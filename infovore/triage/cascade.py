@@ -15,7 +15,7 @@ from infovore.rows import Label, MessageRow
 from infovore.triage.human import held_out_ids, training_labels
 from infovore.triage.lexicon import Lexicon, LexiconScore, score_lexicon
 
-QUEUE_REF_PREFIXES: Final = ("judge:likely-irrelevant:", "judge:uncertain:", "judge:c1:")
+QUEUE_REF_PREFIXES: Final = ("judge:likely-irrelevant:", "judge:uncertain:", "judge:c1:", "judge:undecided:")
 PRECISION_TARGET: Final = 0.97
 SCORERS: Final = {stage: f"relevance_{stage}" for stage in STAGES}
 RELEVANT: Final = "relevant"

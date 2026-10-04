@@ -10,12 +10,18 @@ from infovore.eval.judge import (
     LIKELY_IRRELEVANT,
     RELEVANCE_TARGET,
     UNCERTAIN,
+    UNDECIDED,
+    UNDECIDED_RELEVANT_TARGET,
+    IRRELEVANT,
+    RELEVANT,
     QueueBuilder,
     c1_queue,
     cached_queue,
     frozen_queue,
     label_counts,
     likely_irrelevant_queue,
+    undecided_counts,
+    undecided_queue,
     self_agreement,
     slice_progress,
     trainable_needed,
@@ -100,7 +106,7 @@ class JudgeCommand:
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_JUDGE_PORT)
         serve.add_argument(
-            "--queue", choices=["frozen", UNCERTAIN, "c1", LIKELY_IRRELEVANT], default="frozen"
+            "--queue", choices=["frozen", UNCERTAIN, "c1", LIKELY_IRRELEVANT, UNDECIDED], default="frozen"
         )
         serve.add_argument(
             "--scorer",
@@ -143,6 +149,14 @@ class JudgeCommand:
             context.stdout.write(f"trainable irrelevant: {irrelevant}\n")
             for label, need in trainable_needed(context.conn, excluded).items():
                 context.stdout.write(f"needed: {need} more {label} to reach {RELEVANCE_TARGET}\n")
+            pile = undecided_counts(context.conn)
+            context.stdout.write(
+                f"undecided pile labels: {pile[RELEVANT]} relevant, {pile[IRRELEVANT]} irrelevant\n"
+            )
+            more = max(0, UNDECIDED_RELEVANT_TARGET - pile[RELEVANT])
+            context.stdout.write(
+                f"undecided: {more} more relevant to reach {UNDECIDED_RELEVANT_TARGET}\n"
+            )
             return int(ExitCode.OK)
 
         build_queue: QueueBuilder = frozen_queue
@@ -155,6 +169,8 @@ class JudgeCommand:
             )
         elif args.queue == LIKELY_IRRELEVANT:
             build_queue = likely_irrelevant_queue(context.settings.exclude_channels)
+        elif args.queue == UNDECIDED:
+            build_queue = undecided_queue(context.settings.exclude_channels)
         elif args.queue == "c1":
             build_queue = c1_queue(context.settings.exclude_channels)
         elif not frozen_queue(context.conn):

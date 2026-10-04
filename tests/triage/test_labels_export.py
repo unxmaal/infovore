@@ -4,6 +4,7 @@ from pathlib import Path
 
 from infovore.cli import ExitCode
 from infovore.db.annotations import Annotation, record_annotation
+from infovore.db.connection import open_database
 from tests.triage.test_cascade import NOW, build
 from tests.triage.test_command import run
 
@@ -114,3 +115,16 @@ def test_counts_are_printed(tmp_path: Path) -> None:
     assert "held_out true: 2" in out and "held_out false: 3" in out
     assert "cascade_stage lexicon: 1" in out and "cascade_stage embed: 1" in out
     assert "cascade_stage none: 2" in out
+
+
+def test_undecided_pile_labels_are_exported_with_their_source(tmp_path: Path) -> None:
+    env = prepare(tmp_path)
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    judged(conn, 3, "relevant", "judge:undecided:3")
+    conn.commit()
+    conn.close()
+
+    rows, _ = export(env, tmp_path)
+    by_id = {int(str(r["id"])): r for r in rows}
+
+    assert by_id[3]["label_source"] == "undecided" and by_id[3]["label"] == "relevant"

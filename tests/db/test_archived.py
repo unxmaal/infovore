@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from infovore.db.archived import SCORER_PREFIX, STAGES, archived_clause
+from infovore.db.archived import SCORER_PREFIX, STAGES, archived_clause, residue_clause
 from infovore.db.connection import migrate, open_database
 from infovore.triage.cascade import SCORERS
 from tests.cascade_marks import ARCHIVED_KINDS, AT, RULED_OUT_KINDS, mark
@@ -76,3 +76,25 @@ def test_other_scorers_do_not_decide_archival(conn: sqlite3.Connection) -> None:
         " VALUES ('exchange', 1, 'p_lore', 1, 'derived', 0.99, 'relevant', '{}', 't')"
     )
     assert archived(conn) == set()
+
+
+def residue(conn: sqlite3.Connection) -> set[int]:
+    rows = conn.execute(f"SELECT id FROM exchanges WHERE {residue_clause('exchanges.id')}")
+    return {row["id"] for row in rows}
+
+
+def test_residue_is_the_archived_exchanges_the_latest_run_left_undecided(
+    conn: sqlite3.Connection,
+) -> None:
+    for exchange_id, kind in enumerate((*ARCHIVED_KINDS, *RULED_OUT_KINDS), start=1):
+        mark(conn, exchange_id, kind)
+    assert residue(conn) == {ARCHIVED_KINDS.index("residue") + 1}
+    assert residue(conn) <= archived(conn)
+
+
+def test_residue_follows_the_latest_run(conn: sqlite3.Connection) -> None:
+    mark(conn, 1, "residue")
+    mark(conn, 1, "lexicon", AT + timedelta(days=1))
+    mark(conn, 2, "lexicon")
+    mark(conn, 2, "residue", AT + timedelta(days=1))
+    assert residue(conn) == {2}
