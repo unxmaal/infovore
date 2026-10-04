@@ -105,6 +105,8 @@ def test_report_before_any_judging(tmp_path: Path) -> None:
     assert "trainable relevant: 0" in out
     assert "needed: 200 more relevant to reach 200" in out
     assert "needed: 200 more irrelevant to reach 200" in out
+    assert "undecided pile labels: 0 relevant, 0 irrelevant" in out
+    assert "undecided: 60 more relevant to reach 60" in out
 
 
 def test_report_shows_counts_and_agreement_once_a_repeat_has_both_passes(tmp_path: Path) -> None:
@@ -178,14 +180,12 @@ def test_serve_uncertain_accepts_a_scorer(tmp_path: Path, monkeypatch: pytest.Mo
     assert code == ExitCode.OK
 
 
-def test_serve_accepts_the_c1_and_likely_irrelevant_queues(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_serve_accepts_the_dynamic_queues(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     import infovore.sift.httpd
 
     monkeypatch.setattr(infovore.sift.httpd, "block_until_interrupted", lambda event: None)
 
-    for queue in ("c1", "likely-irrelevant"):
+    for queue in ("c1", "likely-irrelevant", "undecided"):
         code, out = run(["judge", "serve", "--port", "0", "--queue", queue], tmp_path)
         assert code == ExitCode.OK
         assert "listening on http://127.0.0.1:" in out

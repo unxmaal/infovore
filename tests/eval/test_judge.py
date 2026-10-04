@@ -14,6 +14,7 @@ from infovore.eval.judge import (
     MIN_TEXT_MESSAGES,
     RELEVANT,
     UNCERTAIN,
+    UNDECIDED,
     InvalidLabelError,
     NotInExchangeError,
     QueueItem,
@@ -32,8 +33,11 @@ from infovore.eval.judge import (
     submit,
     uncertain_judged,
     uncertain_queue,
+    undecided_counts,
+    undecided_queue,
 )
 from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS
+from tests.cascade_marks import mark, mark_all
 
 AT = datetime(2026, 10, 2, tzinfo=UTC)
 
@@ -520,3 +524,87 @@ def test_the_likely_irrelevant_pool_is_drawn_after_the_fragment_filter(
     _gate(conn, {6: 0.5, 4: 0.0, 5: 0.0})
 
     assert [i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)] == [6]
+
+
+def _pile(conn: sqlite3.Connection, ids: range) -> None:
+    for eid in ids:
+        _exchange(conn, eid, [eid * 10 + 1])
+    mark_all(conn, ids, "residue")
+
+
+def test_undecided_is_the_residue_only_as_is(conn: sqlite3.Connection) -> None:
+    _pile(conn, range(6, 9))
+    mark(conn, 1, "lexicon")
+    mark(conn, 2, "embed_irrelevant")
+    mark(conn, 3, "residue", AT + timedelta(days=1))
+    mark(conn, 3, "lexicon", AT + timedelta(days=2))
+    queue = undecided_queue(frozenset())(conn)
+
+    assert {i.exchange_id for i in queue} == {6, 7, 8}
+    assert {i.slice_name for i in queue} == {UNDECIDED}
+    assert queue[0].source_ref == f"judge:undecided:{queue[0].exchange_id}"
+
+
+def test_undecided_applies_no_text_minimum(conn: sqlite3.Connection) -> None:
+    _pile(conn, range(6, 8))
+    _texty(conn, 7)
+
+    assert {i.exchange_id for i in undecided_queue(frozenset())(conn)} == {6, 7}
+
+
+def test_undecided_skips_judged_held_out_and_excluded(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (2, 9, NULL, 'Food', 'text')"
+    )
+    _pile(conn, range(6, 12))
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = 6")
+    _slice(conn, "s2", [7])
+    conn.execute(
+        "INSERT INTO eval_slices (name, exchange_id, position, population, seed, frozen_at)"
+        " VALUES (?, 8, 9, 'test', 0, ?)",
+        (GOLD, AT.isoformat()),
+    )
+    _label_with(conn, 9)
+
+    ids = {i.exchange_id for i in undecided_queue(frozenset({"food"}))(conn)}
+
+    assert ids == {10, 11}
+
+
+def test_undecided_sample_is_seeded_stable_and_not_id_order(conn: sqlite3.Connection) -> None:
+    _pile(conn, range(6, 40))
+    build = undecided_queue(frozenset())
+    first = [i.exchange_id for i in build(conn)]
+
+    assert first == [i.exchange_id for i in build(conn)]
+    assert first != sorted(first)
+    assert sorted(first) == list(range(6, 40))
+
+
+def test_undecided_takes_the_head_of_the_shuffle_and_the_next_batch_follows(
+    conn: sqlite3.Connection, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _pile(conn, range(6, 30))
+    full = [i.exchange_id for i in undecided_queue(frozenset())(conn)]
+    monkeypatch.setattr("infovore.eval.judge.UNCERTAIN_LIMIT", 5)
+    head = [i.exchange_id for i in undecided_queue(frozenset())(conn)]
+    for eid in head:
+        _label_with(conn, eid)
+    after = [i.exchange_id for i in undecided_queue(frozenset())(conn)]
+
+    assert head == full[:5]
+    assert after == full[5:10]
+
+
+def test_undecided_counts_use_the_newest_label_of_the_pile_only(conn: sqlite3.Connection) -> None:
+    _pile(conn, range(6, 10))
+    queue = undecided_queue(frozenset())(conn)
+    by_id = {i.exchange_id: i for i in queue}
+    submit(conn, [by_id[6]], 0, 6, RELEVANT, AT)
+    submit(conn, [by_id[7]], 0, 7, RELEVANT, AT)
+    submit(conn, [by_id[7]], 0, 7, IRRELEVANT, AT)
+    submit(conn, [by_id[8]], 0, 8, BAD_GROUPING, AT)
+    submit(conn, [QueueItem(9, LIKELY_IRRELEVANT, 9)], 0, 9, RELEVANT, AT)
+
+    assert undecided_counts(conn) == {RELEVANT: 1, IRRELEVANT: 1}

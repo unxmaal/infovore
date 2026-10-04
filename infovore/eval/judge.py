@@ -1,10 +1,11 @@
+import hashlib
 import sqlite3
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.db.annotations import Annotation, record_annotation
-from infovore.db.archived import MIDDLE_SCORER
+from infovore.db.archived import MIDDLE_SCORER, residue_clause
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import exclude_channels_clause, excluded_exchange_ids
 from infovore.db.exchange_text import enough_text_clause
@@ -13,7 +14,7 @@ from infovore.db.raw import get_channel, messages_by_ids
 from infovore.eval.slices import BUILD, GOLD, GOLD_REPEATS, HOLDOUT, REJECTED, slice_ids
 from infovore.extract.prompt import permalink
 from infovore.rows import MessageRow
-from infovore.triage.human import trainable_counts
+from infovore.triage.human import held_out_ids, trainable_counts
 from infovore.triage.lexicon import load_lexicon, score_lexicon
 
 JUDGE_SCORER = "human_exchange"
@@ -28,6 +29,9 @@ LABELS = (RELEVANT, IRRELEVANT, BAD_GROUPING)
 UNCERTAIN = "uncertain"
 LIKELY_IRRELEVANT = "likely-irrelevant"
 LIKELY_IRRELEVANT_POOL = 2000
+UNDECIDED = "undecided"
+UNDECIDED_SALT = "undecided-v1"
+UNDECIDED_RELEVANT_TARGET = 60
 MIN_TEXT_MESSAGES = 3
 UNCERTAIN_LIMIT = 200
 RELEVANCE_TARGET = 200
@@ -224,6 +228,45 @@ def _likely_irrelevant_items(
         QueueItem(exchange_id, LIKELY_IRRELEVANT, exchange_id)
         for _, _, exchange_id in ranked[:UNCERTAIN_LIMIT]
     ]
+
+
+def undecided_queue(exclude_channels: frozenset[str]) -> QueueBuilder:
+    def build(conn: sqlite3.Connection) -> list[QueueItem]:
+        return _undecided_items(conn, exclude_channels)
+
+    return build
+
+
+def _salted(exchange_id: int) -> str:
+    return hashlib.sha256(f"{UNDECIDED_SALT}:{exchange_id}".encode()).hexdigest()
+
+
+def _undecided_items(conn: sqlite3.Connection, exclude_channels: frozenset[str]) -> list[QueueItem]:
+    """A seeded random sample of the cascade residue, as-is: no text-message minimum, so the
+    estimate over the undecided pile is not biased by what the other queues filter out."""
+    clause, params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
+    skip = held_out_ids(conn)
+    rows = conn.execute(
+        f"SELECT id FROM current_exchanges AS exchanges WHERE {residue_clause()}"
+        f" AND {_UNJUDGED}{clause}",
+        (JUDGE_SCORER, *params),
+    )
+    pool = sorted((row["id"] for row in rows if row["id"] not in skip), key=_salted)
+    return [QueueItem(eid, UNDECIDED, eid) for eid in pool[:UNCERTAIN_LIMIT]]
+
+
+def undecided_counts(conn: sqlite3.Connection) -> dict[str, int]:
+    """Undecided-pile labels, newest judgment per exchange."""
+    counts = {RELEVANT: 0, IRRELEVANT: 0}
+    for row in conn.execute(
+        "SELECT label FROM annotations a WHERE scorer = ? AND subject_kind = 'exchange'"
+        " AND source_ref LIKE ? AND id = (SELECT MAX(id) FROM annotations WHERE scorer = a.scorer"
+        " AND subject_kind = 'exchange' AND subject_id = a.subject_id AND source_ref LIKE ?)",
+        (JUDGE_SCORER, f"{_REF}{UNDECIDED}:%", f"{_REF}{UNDECIDED}:%"),
+    ):
+        if row["label"] in counts:
+            counts[row["label"]] += 1
+    return counts
 
 
 def cached_queue(build: QueueBuilder) -> QueueBuilder:
