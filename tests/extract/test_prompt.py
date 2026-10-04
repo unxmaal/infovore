@@ -1,7 +1,6 @@
 import hashlib
 import math
 from datetime import UTC, datetime
-from pathlib import Path
 
 from infovore.extract.prompt import (
     PROMPT_SHA256,

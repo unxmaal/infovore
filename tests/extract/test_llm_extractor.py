@@ -1,6 +1,5 @@
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 
 from infovore.extract.llm_extractor import (
     JUDGE_SYSTEM_PROMPT,
