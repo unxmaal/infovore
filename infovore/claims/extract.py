@@ -16,44 +16,45 @@ WINDOW_CHARS: Final = 6000
 TIMEOUT: Final = 300.0
 INFO_TIMEOUT: Final = 10.0
 API_KEY: Final = "sk-local"
+CLAIM_MAX_CHARS: Final = 220
+MAX_TOKENS: Final = 400
 SCHEMA: Final[dict[str, Any]] = {
     "type": "object",
     "properties": {
-        "claims": {
+        "c": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "speaker": {"type": "string"},
-                    "statement": {"type": "string"},
-                    "refs": {"type": "array", "items": {"type": "integer"}, "minItems": 1},
-                },
-                "required": ["speaker", "statement", "refs"],
-                "additionalProperties": False,
+                "type": "array",
+                "prefixItems": [
+                    {"type": "string"},
+                    {"type": "string", "maxLength": CLAIM_MAX_CHARS},
+                    {"type": "array", "items": {"type": "integer"}, "minItems": 1},
+                ],
+                "minItems": 3,
+                "maxItems": 3,
             },
         }
     },
-    "required": ["claims"],
+    "required": ["c"],
     "additionalProperties": False,
 }
 SYSTEM: Final = (
-    "You read part of a community Discord conversation. Each line is '[ref] user-id: text'."
-    " Extract zero or more standalone factual claims about technology, hardware, software,"
-    " SGI and IRIX, retrocomputing, first-hand experience, or where to find things."
-    " Write each claim fresh in your own words, never copy a message. It must make sense"
-    " with no conversation around it: resolve pronouns and context (replace 'it' with the"
-    " thing meant). No questions, no opinions, no jokes, banter or greetings."
-    " First-hand experience is allowed, stated as the speaker's own: 'user-xxxx says they ...'."
-    " Set speaker to the exact user id shown for the line the claim rests on, and put the"
-    " ref numbers of those lines in refs. Do not state anything the lines do not say."
-    " Zero claims is a valid answer: reply with an empty claims list when nothing qualifies."
-    " Examples."
+    "Lines are '[ref] user-id: text'. Extract standalone factual claims about technology,"
+    " hardware, software, SGI and IRIX, retrocomputing, first-hand experience, or where to"
+    " find things. Rewrite each in your own words as one short sentence, never copy a message."
+    " It must make sense alone: resolve pronouns ('it' becomes the thing meant)."
+    " No questions, opinions, jokes, banter or greetings."
+    " First-hand experience is stated as the speaker's own ('they run ...')."
+    ' Reply {"c":[[user-id, claim, [refs]], ...]}: the exact user id of the line the claim'
+    " rests on, the claim without any user id in it, the ref numbers of its lines."
+    " Say only what the lines say."
+    ' With zero claims, reply {"c":[]}.'
     " Bad: 'It can even have an r12k. Mine is 400mhz' (copied, 'It' unresolved)."
-    " Good: 'The SGI O2 can be fitted with an R12000 CPU; user-xxxx says theirs runs at 400 MHz.'"
+    " Good: 'The O2 takes an R12000 CPU; theirs runs at 400 MHz.'"
     " Bad: 'isn't it just yoinking the chip and putting in a new one?' (a question)."
-    " Good: nothing, no claim is made."
-    " Bad: 'lol my O2 is the best machine ever' (joke and opinion)."
-    " Good: nothing, no claim is made."
+    " Good: nothing."
+    " Bad: 'lol my O2 is the best machine ever' (joke, opinion)."
+    " Good: nothing."
 )
 
 Transport = Callable[[Mapping[str, Any]], tuple[Mapping[str, Any], float]]
@@ -94,10 +95,11 @@ def prompt_hash() -> str:
     return hashlib.sha256(blob).hexdigest()[:12]
 
 
-def build_request(model: str, window: str) -> dict[str, Any]:
+def build_request(model: str, window: str, max_tokens: int = MAX_TOKENS) -> dict[str, Any]:
     return {
         "model": model,
         "temperature": 0,
+        "max_tokens": max_tokens,
         "messages": [
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": f"Conversation:\n{window}"},
@@ -136,11 +138,11 @@ def windows(lines: Sequence[RenderedLine], max_chars: int) -> list[list[Rendered
 
 def parse_reply(reply: Mapping[str, Any], seconds: float) -> Reply:
     try:
-        body = json.loads(reply["choices"][0]["message"]["content"])
-        claims = [
-            RawClaim(str(c["speaker"]), str(c["statement"]), tuple(int(r) for r in c["refs"]))
-            for c in body["claims"]
-        ]
+        choice = reply["choices"][0]
+        if choice.get("finish_reason") == "length":
+            raise ClaimsReplyError("truncated: reply hit max_tokens")
+        body = json.loads(choice["message"]["content"])
+        claims = [RawClaim(str(c[0]), str(c[1]), tuple(int(r) for r in c[2])) for c in body["c"]]
         usage = reply.get("usage") or {}
         return Reply(
             claims,
@@ -192,7 +194,7 @@ def _problem(
 
 
 def extract_exchange(
-    post: Transport, model: str, redacted: Redacted, max_chars: int
+    post: Transport, model: str, redacted: Redacted, max_chars: int, max_tokens: int = MAX_TOKENS
 ) -> ExchangeResult:
     claims: list[ClaimIn] = []
     rejected: list[Rejection] = []
@@ -200,7 +202,7 @@ def extract_exchange(
     seconds = 0.0
     parts = windows(redacted.lines, max_chars)
     for part in parts:
-        body, elapsed = post(build_request(model, render_window(part)))
+        body, elapsed = post(build_request(model, render_window(part), max_tokens))
         reply = parse_reply(body, elapsed)
         good, bad = validate(reply.claims, redacted, frozenset(line.ref for line in part))
         claims += good
@@ -218,6 +220,7 @@ def extract_concurrently(
     max_chars: int,
     concurrency: int,
     stop: Callable[[], bool],
+    max_tokens: int = MAX_TOKENS,
 ) -> Iterator[tuple[int, ExchangeResult | ClaimsReplyError]]:
     """Yield (id, result or error) in completion order on the caller's thread; only
     the HTTP work runs in workers. Once stop() is true nothing new starts and
@@ -232,7 +235,7 @@ def extract_concurrently(
                 if item is None:
                     exhausted = True
                     break
-                future = pool.submit(extract_exchange, post, model, item[1], max_chars)
+                future = pool.submit(extract_exchange, post, model, item[1], max_chars, max_tokens)
                 pending[future] = item[0]
             if not pending:
                 return

@@ -30,7 +30,7 @@ def lines(*texts: str) -> list[RenderedLine]:
     return [RenderedLine(i + 1, 100 + i, U1, t) for i, t in enumerate(texts)]
 
 
-def reply(claims: list[dict[str, Any]], tin: int = 10, tout: int = 3) -> dict[str, Any]:
+def reply(claims: list[list[Any]], tin: int = 10, tout: int = 3) -> dict[str, Any]:
     return {
         "choices": [{"message": {"content": json.dumps({"c": claims})}}],
         "usage": {"prompt_tokens": tin, "completion_tokens": tout},
@@ -56,15 +56,16 @@ def test_the_request_pins_a_strict_schema_and_names_the_scope() -> None:
 
 def test_the_schema_is_compact_and_caps_claim_length() -> None:
     item = SCHEMA["properties"]["c"]["items"]
+    s, t, r = item["prefixItems"]
 
     assert list(SCHEMA["properties"]) == ["c"] and SCHEMA["required"] == ["c"]
-    assert list(item["properties"]) == ["s", "t", "r"] and item["required"] == ["s", "t", "r"]
-    assert item["properties"]["t"]["maxLength"] == CLAIM_MAX_CHARS
-    assert item["additionalProperties"] is False
+    assert item["minItems"] == item["maxItems"] == 3 and item["type"] == "array"
+    assert s["type"] == "string" and r["type"] == "array" and r["minItems"] == 1
+    assert t["maxLength"] == CLAIM_MAX_CHARS
 
 
 def test_a_reply_cut_off_at_the_token_cap_is_a_failure() -> None:
-    cut = reply([{"s": U1, "t": "s", "r": [1]}])
+    cut = reply([[U1, "s", [1]]])
     cut["choices"][0]["finish_reason"] = "length"
 
     with pytest.raises(ClaimsReplyError, match="truncated"):
@@ -90,25 +91,29 @@ def estimate_tokens(text: str) -> int:
     return len(re.findall(r"[A-Za-z]+|\d+|[^\sA-Za-z\d]", text))
 
 
+FIXTURE = (
+    "[1] user-1a2b: my Indy runs IRIX 6.5.3 off an external SCSI disk\n"
+    "[2] user-3c4d: try the PROM monitor to boot from it"
+)
 OLD_EXAMPLE = {
     "claims": [
         {
             "speaker": "user-1a2b",
-            "statement": "The SGI O2 can be fitted with an R12000 CPU; user-1a2b says theirs runs at"
-            " 400 MHz.",
-            "refs": [3, 5],
+            "statement": "user-1a2b says their SGI Indy runs IRIX 6.5.3 from an external disk.",
+            "refs": [1],
         },
         {
             "speaker": "user-3c4d",
-            "statement": "user-3c4d says the Indy boots IRIX 6.5 from an external SCSI disk.",
-            "refs": [7],
+            "statement": "user-3c4d says the PROM monitor can be used to boot an Indy from an"
+            " external disk.",
+            "refs": [2],
         },
     ]
 }
 NEW_EXAMPLE = {
     "c": [
-        {"s": "user-1a2b", "t": "O2 takes an R12000 CPU; user-1a2b runs one at 400 MHz.", "r": [3, 5]},
-        {"s": "user-3c4d", "t": "user-3c4d boots an Indy to IRIX 6.5 from external SCSI.", "r": [7]},
+        ["user-1a2b", "Indy runs IRIX 6.5.3 from external SCSI disk.", [1]],
+        ["user-3c4d", "PROM monitor boots an Indy from external disk.", [2]],
     ]
 }
 
@@ -122,12 +127,11 @@ def test_the_new_example_output_is_at_least_35_percent_shorter(
         print(f"\nexample output tokens (estimate): old={old} new={new} saved={1 - new / old:.0%}")
 
     assert new <= old * 0.65
+    assert FIXTURE.count("\n") == 1
     for claim in NEW_EXAMPLE["c"]:
-        assert len(claim["t"]) <= CLAIM_MAX_CHARS  # type: ignore[arg-type]
-    parsed = parse_reply(
-        {"choices": [{"message": {"content": json.dumps(NEW_EXAMPLE)}}]}, 0.0
-    )
-    assert [c.refs for c in parsed.claims] == [(3, 5), (7,)]
+        assert len(claim[1]) <= CLAIM_MAX_CHARS
+    parsed = parse_reply({"choices": [{"message": {"content": json.dumps(NEW_EXAMPLE)}}]}, 0.0)
+    assert [c.refs for c in parsed.claims] == [(1,), (2,)]
 
 
 def test_windows_never_split_a_message_and_keep_global_refs() -> None:
@@ -147,7 +151,7 @@ def test_a_window_renders_one_ref_and_speaker_per_line() -> None:
 
 
 def test_replies_parse_into_claims_and_usage() -> None:
-    parsed = parse_reply(reply([{"s": U1, "t": "s", "r": [1, 2]}], 7, 2), 1.5)
+    parsed = parse_reply(reply([[U1, "s", [1, 2]]], 7, 2), 1.5)
 
     assert parsed.claims == [RawClaim(U1, "s", (1, 2))]
     assert (parsed.input_tokens, parsed.output_tokens, parsed.seconds) == (7, 2, 1.5)
@@ -161,7 +165,7 @@ def test_replies_parse_into_claims_and_usage() -> None:
         {},
         {"choices": [{"message": {"content": "nope"}}]},
         {"choices": [{"message": {"content": '{"c": 3}'}}]},
-        {"choices": [{"message": {"content": '{"c": [{"s": "u"}]}'}}]},
+        {"choices": [{"message": {"content": '{"c": [["u"]]}'}}]},
         {"choices": [{"message": {"content": '{"c": [1]}'}}]},
     ],
 )
@@ -227,8 +231,8 @@ def test_an_exchange_is_windowed_summed_and_validated(redacted: Any) -> None:
     sent: list[dict[str, Any]] = []
     answers = iter(
         [
-            reply([{"s": U1, "t": f"{U1} said a", "r": [1]}], 10, 1),
-            reply([{"s": U2, "t": f"{U2} said b", "r": [2]}], 20, 2),
+            reply([[U1, f"{U1} said a", [1]]], 10, 1),
+            reply([[U2, f"{U2} said b", [2]]], 20, 2),
         ]
     )
 
@@ -247,7 +251,7 @@ def test_an_exchange_is_windowed_summed_and_validated(redacted: Any) -> None:
 
 
 def test_a_window_citing_a_ref_outside_itself_is_rejected(redacted: Any) -> None:
-    answers = iter([[{"s": U1, "t": f"{U1} said a", "r": [2]}], []])
+    answers = iter([[[U1, f"{U1} said a", [2]]], []])
 
     def post(payload: Any) -> tuple[dict[str, Any], float]:
         return reply(next(answers)), 0.1

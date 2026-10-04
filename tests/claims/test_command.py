@@ -52,7 +52,7 @@ class Fake(BaseHTTPRequestHandler):
             speaker = re.search(r"\[1\] (user-[0-9a-f]+):", user)
             assert speaker
             who = speaker.group(1)
-            claims = [{"s": who, "t": f"{who} said the Indy runs IRIX", "r": [1]}]
+            claims = [[who, f"{who} said the Indy runs IRIX", [1]]]
         content = json.dumps({"c": claims})
         finish = "length" if Fake.mode == "truncate" else "stop"
         reply = {
@@ -129,7 +129,16 @@ def test_dry_run_requests_carry_the_token_cap(tmp_path: Path) -> None:
 
     _, out, _ = run(
         tmp_path,
-        extract("http://127.0.0.1:9/v1", "--ids", "1", "--limit", "5", "--dry-run", "--max-tokens", "123"),
+        extract(
+            "http://127.0.0.1:9/v1",
+            "--ids",
+            "1",
+            "--limit",
+            "5",
+            "--dry-run",
+            "--max-tokens",
+            "123",
+        ),
     )
 
     assert '"max_tokens": 123' in out

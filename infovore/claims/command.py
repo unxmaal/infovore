@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from infovore.claims.check import DEFAULT_THRESHOLD, run_check, show_checks
 from infovore.claims.extract import (
+    MAX_TOKENS,
     RECIPE,
     TIMEOUT,
     WINDOW_CHARS,
@@ -148,6 +149,8 @@ def _check_args(args: argparse.Namespace, salt: str | None) -> str:
         raise ConfigError("--limit must be positive")
     if args.concurrency < 1:
         raise ConfigError("--concurrency must be positive")
+    if args.max_tokens < 1:
+        raise ConfigError("--max-tokens must be positive")
     if args.progress_every < 1:
         raise ConfigError("--progress-every must be positive")
     if not salt:
@@ -166,7 +169,7 @@ def _dry_run(context: "AppContext", args: argparse.Namespace, ids: list[int], sa
     for eid, redacted in _redacted_stream(context.conn, ids, salt):
         for part in windows(redacted.lines, args.window_chars):
             total += 1
-            request = build_request(args.model, render_window(part))
+            request = build_request(args.model, render_window(part), args.max_tokens)
             out.write(f"exchange {eid}\t{json.dumps(request)}\n")
     out.write(f"dry-run: {total} requests for {len(ids)} conversations, none sent\n")
     return int(ExitCode.OK)
@@ -200,6 +203,7 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
             "recipe": RECIPE,
             "window_chars": args.window_chars,
             "temperature": 0,
+            "max_tokens": args.max_tokens,
             "limit": args.limit,
             "pseudonym_width": WIDTH,
             "salt_fingerprint": hashlib.sha256(f"fp:{salt}".encode()).hexdigest()[:8],
@@ -228,6 +232,7 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
             args.window_chars,
             workers,
             lambda: stop.requested,
+            args.max_tokens,
         )
         for eid, result in results:
             if isinstance(result, ClaimsReplyError):
@@ -370,6 +375,7 @@ class ClaimsCommand:
         extract.add_argument("--write", action="store_true")
         extract.add_argument("--dry-run", action="store_true", dest="dry_run")
         extract.add_argument("--window-chars", type=int, default=WINDOW_CHARS, dest="window_chars")
+        extract.add_argument("--max-tokens", type=int, default=MAX_TOKENS, dest="max_tokens")
         extract.add_argument("--timeout", type=float, default=TIMEOUT)
         serve = sub.add_parser("serve", help="serve the claim review page until Ctrl-C")
         serve.add_argument("--run", type=int, required=True)
