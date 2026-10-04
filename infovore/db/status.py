@@ -12,6 +12,7 @@ from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.exchanges import claimable_condition
 from infovore.db.labels import label_counts
 from infovore.triage.gate import gate_sql
+from infovore.triage.human import trainable_counts
 from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
 
@@ -49,6 +50,17 @@ class StatusReport:
     probe_cost_usd: float | None
     probe_claims: int
     throughput_window_hours: int
+    current_exchanges: int
+    cascade_relevant: int
+    cascade_residue: int
+    irrelevant_denylist: int
+    irrelevant_bayes: int
+    set_aside_no_text: int
+    unscored: int
+    last_cascade_at: datetime | None
+    human_relevant: int
+    human_irrelevant: int
+    excluded_channels: tuple[str, ...]
 
 
 def _count(conn: sqlite3.Connection, sql: str) -> int:
@@ -132,6 +144,22 @@ def _eta_hours(pending: int, rate: float | None) -> float | None:
     return pending / rate
 
 
+def _cascade_outcomes(conn: sqlite3.Connection) -> dict[str, int]:
+    """Latest decided cascade annotation per current exchange, bucketed by
+    (scorer, label). Each cascade outcome writes exactly one labelled row."""
+    rows = conn.execute(
+        "SELECT a.scorer, a.label, COUNT(*) AS n FROM annotations a"
+        " JOIN current_exchanges e ON e.id = a.subject_id"
+        " WHERE a.subject_kind = 'exchange' AND a.label IS NOT NULL"
+        " AND a.scorer LIKE 'relevance\\_%' ESCAPE '\\'"
+        " AND a.id = (SELECT MAX(b.id) FROM annotations b WHERE b.subject_kind = 'exchange'"
+        "  AND b.subject_id = a.subject_id AND b.label IS NOT NULL"
+        "  AND b.scorer LIKE 'relevance\\_%' ESCAPE '\\')"
+        " GROUP BY a.scorer, a.label"
+    )
+    return {f"{row['scorer']}:{row['label']}": int(row["n"]) for row in rows}
+
+
 def collect_status(
     conn: sqlite3.Connection,
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE,
@@ -177,6 +205,9 @@ def collect_status(
         else 0
     )
     extraction_per_hour = _rate_per_hour(recent_runs, throughput_window_hours)
+    outcomes = _cascade_outcomes(conn)
+    current = _count(conn, "SELECT COUNT(*) FROM current_exchanges")
+    human_relevant, human_irrelevant = trainable_counts(conn, exclude_channels)
 
     return StatusReport(
         channels=_count(conn, "SELECT COUNT(*) FROM channels"),
@@ -246,4 +277,20 @@ def collect_status(
         probe_cost_usd=_sum_optional(conn, "SELECT SUM(cost_usd) FROM probe_runs"),
         probe_claims=_sum(conn, "SELECT SUM(claim_count) FROM probe_runs"),
         throughput_window_hours=throughput_window_hours,
+        current_exchanges=current,
+        cascade_relevant=outcomes.get("relevance_lexicon:relevant", 0)
+        + outcomes.get("relevance_bayes:relevant", 0),
+        cascade_residue=outcomes.get("relevance_residue:residue", 0),
+        irrelevant_denylist=outcomes.get("relevance_denylist:irrelevant", 0),
+        irrelevant_bayes=outcomes.get("relevance_bayes:irrelevant", 0),
+        set_aside_no_text=outcomes.get("relevance_no_text:no_text", 0),
+        unscored=current - sum(outcomes.values()),
+        last_cascade_at=_latest_time(
+            conn,
+            "SELECT MAX(created_at) FROM annotations WHERE subject_kind = 'exchange'"
+            " AND scorer LIKE 'relevance\\_%' ESCAPE '\\'",
+        ),
+        human_relevant=human_relevant,
+        human_irrelevant=human_irrelevant,
+        excluded_channels=tuple(sorted(exclude_channels)),
     )

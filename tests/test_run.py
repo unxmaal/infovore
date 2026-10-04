@@ -1,7 +1,6 @@
 import argparse
 import asyncio
 import io
-import logging
 import os
 import signal
 import sqlite3
@@ -10,17 +9,12 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-import pytest
-
 from infovore.cli import AppContext, ExitCode, builtin_commands, main
 from infovore.config import Settings, Stage, StageSettings
-from infovore.db.claims import promote_prompt_version, register_prompt_version
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import get_exchange, insert_exchange
-from infovore.extract.fake import MarkerExtractor
-from infovore.extract.prompt import PROMPT_SHA256, PROMPT_VERSION
 from infovore.llm.fake import FakeBackend
-from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
+from infovore.llm.protocol import LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import Registry, default_registry
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
 from infovore.run import (
@@ -146,13 +140,31 @@ class BlockingSleeper:
         await asyncio.sleep(100000)
 
 
-async def test_run_forever_ingests_groups_and_extracts_then_stops(tmp_path: Path) -> None:
+class ForbiddenFactory:
+    name = "forbidden"
+
+    def __init__(self) -> None:
+        self.builds = 0
+        self.calls = 0
+
+    def validate(self, settings: object) -> list[str]:
+        return []
+
+    def build(self, settings: object) -> LLMBackend:
+        self.builds += 1
+
+        def responder(request: LLMRequest) -> LLMResult:
+            self.calls += 1
+            raise AssertionError("the run loop must not call an LLM")
+
+        return FakeBackend(responder)
+
+
+async def test_run_forever_ingests_chunks_and_cascades_a_new_message(tmp_path: Path) -> None:
     conn = db(tmp_path)
-    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
-    promote_prompt_version(conn, PROMPT_VERSION, NOW)
     settings = make_settings(tmp_path)
     fake_source = FakeDiscordSource()
-    old = NOW - timedelta(minutes=40)
+    old = NOW - timedelta(minutes=400)
     fake_source.push(MessageCreated(make_message(1, old, "FACT: Octane2 :: needs a jumper")))
     fake_source.close()
     stop = asyncio.Event()
@@ -162,7 +174,6 @@ async def test_run_forever_ingests_groups_and_extracts_then_stops(tmp_path: Path
         run_forever(
             conn,
             source,
-            MarkerExtractor(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -176,55 +187,63 @@ async def test_run_forever_ingests_groups_and_extracts_then_stops(tmp_path: Path
     assert report.events_failed == 0
     assert report.cycles_completed == 1
     assert report.cycles_failed == 0
-
     assert conn.execute("SELECT id FROM messages WHERE id = 1").fetchone() is not None
-    exchange = conn.execute("SELECT extraction_status FROM exchanges").fetchone()
-    assert exchange is not None
-    assert exchange["extraction_status"] == "done"
-    # The closed-book probe was retired under #165 and novelty is corpus
-    # novelty (migration 0019). The loop used to probe every claim anyway, and
-    # a v8 claim has an empty probe_question, so that was an LLM call with an
-    # empty prompt whose verdict could drop the claim from `lore` (#188).
-    claim = conn.execute("SELECT novelty, probe_model FROM claims").fetchone()
-    assert claim is not None
-    assert claim["novelty"] == "unprobed"
-    assert claim["probe_model"] is None
-
-
-async def test_run_forever_skips_extraction_when_prompt_not_promoted_but_still_groups(
-    tmp_path: Path, caplog: pytest.LogCaptureFixture
-) -> None:
-    conn = db(tmp_path)
-    settings = make_settings(tmp_path)
-    fake_source = FakeDiscordSource()
-    old = NOW - timedelta(minutes=40)
-    fake_source.push(MessageCreated(make_message(1, old, "FACT: Octane2 :: needs a jumper")))
-    fake_source.close()
-    stop = asyncio.Event()
-    source = StoppingSource(fake_source, stop)
-
-    with caplog.at_level(logging.WARNING):
-        report = await asyncio.wait_for(
-            run_forever(
-                conn,
-                source,
-                MarkerExtractor(),
-                FixedClock(NOW),
-                RecordingSleeper(),
-                settings,
-                interval_seconds=1000.0,
-                stop=stop,
-            ),
-            timeout=2.0,
-        )
-
-    assert report.cycles_completed == 1
-    assert report.cycles_failed == 0
-    exchange = conn.execute("SELECT extraction_status FROM exchanges").fetchone()
+    exchange = conn.execute(
+        "SELECT e.id, e.extraction_status, e.chunk_recipe FROM current_exchanges e"
+        " JOIN exchange_messages m ON m.exchange_id = e.id WHERE m.message_id = 1"
+    ).fetchone()
     assert exchange is not None
     assert exchange["extraction_status"] == "pending"
+    assert exchange["chunk_recipe"] is not None
+    scorers = {
+        row["scorer"]
+        for row in conn.execute(
+            "SELECT scorer FROM annotations WHERE subject_kind = 'exchange' AND subject_id = ?",
+            (exchange["id"],),
+        )
+    }
+    assert "relevance_lexicon" in scorers
     assert conn.execute("SELECT COUNT(*) AS c FROM claims").fetchone()["c"] == 0
-    assert any("not promoted" in message for message in caplog.messages)
+    assert conn.execute("SELECT COUNT(*) AS c FROM extraction_runs").fetchone()["c"] == 0
+
+
+async def test_a_second_cycle_cascades_only_exchanges_it_has_not_scored(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    settings = make_settings(tmp_path)
+    first = _seed_pending_exchange_in_channel(conn, 1, "general", 1)
+
+    await run_once(conn, FakeDiscordSource(), FixedClock(NOW), RecordingSleeper(), settings)
+    before = conn.execute("SELECT COUNT(*) AS c FROM annotations").fetchone()["c"]
+    second = _seed_pending_exchange_in_channel(conn, 2, "general", 2)
+    await run_once(conn, FakeDiscordSource(), FixedClock(NOW), RecordingSleeper(), settings)
+
+    rows = conn.execute(
+        "SELECT subject_id, COUNT(DISTINCT scorer_version) AS v FROM annotations"
+        " WHERE scorer = 'relevance_lexicon' GROUP BY subject_id"
+    ).fetchall()
+    assert {row["subject_id"]: row["v"] for row in rows} == {first: 1, second: 1}
+    assert conn.execute("SELECT COUNT(*) AS c FROM annotations").fetchone()["c"] > before
+
+
+def test_run_never_builds_or_calls_an_llm_backend(tmp_path: Path) -> None:
+    env = environment(tmp_path)
+    for stage in ("EXTRACT", "PROBE", "JUDGE"):
+        env[f"INFOVORE_{stage}_BACKEND"] = "forbidden"
+    factory = ForbiddenFactory()
+    registry = Registry()
+    registry.register(factory)
+
+    @asynccontextmanager
+    async def source_factory(settings: Settings) -> AsyncIterator[DiscordSource]:
+        yield FakeDiscordSource()
+
+    code, out, _ = run_cli(["run", "--once"], env, source_factory, registry)
+
+    assert code == ExitCode.OK
+    assert factory.builds == 0
+    assert factory.calls == 0
+    assert "checking" not in out
+    assert "cycle: extract" not in out
 
 
 async def test_run_forever_counts_a_failing_event_and_continues(tmp_path: Path) -> None:
@@ -241,7 +260,6 @@ async def test_run_forever_counts_a_failing_event_and_continues(tmp_path: Path) 
         run_forever(
             conn,
             source,
-            MarkerExtractor(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -270,7 +288,6 @@ async def test_run_forever_counts_an_ignored_event_and_continues(tmp_path: Path)
         run_forever(
             conn,
             source,
-            MarkerExtractor(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -297,7 +314,6 @@ async def test_run_forever_counts_a_failing_cycle_step_and_continues(tmp_path: P
         run_forever(
             conn,
             source,
-            MarkerExtractor(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -321,7 +337,6 @@ async def test_run_forever_multiple_cycles_then_stop_between_intervals(tmp_path:
         run_forever(
             conn,
             source,
-            MarkerExtractor(),
             FixedClock(NOW),
             RecordingSleeper(),
             settings,
@@ -346,7 +361,6 @@ async def test_stop_during_interval_wait_returns_promptly(tmp_path: Path) -> Non
         run_forever(
             conn,
             source,
-            MarkerExtractor(),
             FixedClock(NOW),
             sleeper,
             settings,
@@ -366,8 +380,6 @@ async def test_stop_during_interval_wait_returns_promptly(tmp_path: Path) -> Non
 
 async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path) -> None:
     conn = db(tmp_path)
-    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
-    promote_prompt_version(conn, PROMPT_VERSION, NOW)
     settings = make_settings(tmp_path)
     source = FakeDiscordSource()
     events: list[CycleStepStarted] = []
@@ -375,7 +387,6 @@ async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path)
     report = await run_once(
         conn,
         source,
-        MarkerExtractor(),
         FixedClock(NOW),
         RecordingSleeper(),
         settings,
@@ -387,7 +398,7 @@ async def test_run_once_emits_cycle_step_started_events_in_order(tmp_path: Path)
         CycleStepStarted(step="sync-optouts"),
         CycleStepStarted(step="chunk"),
         CycleStepStarted(step="triage"),
-        CycleStepStarted(step="extract"),
+        CycleStepStarted(step="cascade"),
     ]
 
 
@@ -429,31 +440,30 @@ def _seed_pending_exchange_in_channel(
     return exchange_id
 
 
-async def test_run_once_extraction_never_claims_a_denylisted_channel(tmp_path: Path) -> None:
+async def test_run_once_annotates_a_denylisted_channel_irrelevant_and_extracts_nothing(
+    tmp_path: Path,
+) -> None:
     conn = db(tmp_path)
-    register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
-    promote_prompt_version(conn, PROMPT_VERSION, NOW)
     kept_id = _seed_pending_exchange_in_channel(conn, 1, "general", 1)
     excluded_id = _seed_pending_exchange_in_channel(conn, 2, "food", 2)
     settings = make_settings(tmp_path, exclude_channels=frozenset({"food"}))
-    source = FakeDiscordSource()
 
     report = await run_once(
-        conn,
-        source,
-        MarkerExtractor(),
-        FixedClock(NOW),
-        RecordingSleeper(),
-        settings,
+        conn, FakeDiscordSource(), FixedClock(NOW), RecordingSleeper(), settings
     )
 
     assert report.cycles_completed == 1
-    kept = get_exchange(conn, kept_id)
-    excluded = get_exchange(conn, excluded_id)
-    assert kept is not None
-    assert excluded is not None
-    assert kept.extraction_status is ExtractionStatus.DONE
-    assert excluded.extraction_status is ExtractionStatus.PENDING
+    labels = {
+        row["subject_id"]: row["scorer"]
+        for row in conn.execute(
+            "SELECT subject_id, scorer FROM annotations WHERE scorer = 'relevance_denylist'"
+        )
+    }
+    assert labels == {excluded_id: "relevance_denylist"}
+    for exchange_id in (kept_id, excluded_id):
+        exchange = get_exchange(conn, exchange_id)
+        assert exchange is not None
+        assert exchange.extraction_status is ExtractionStatus.PENDING
 
 
 async def test_run_once_progress_defaults_to_noop(tmp_path: Path) -> None:
@@ -464,7 +474,6 @@ async def test_run_once_progress_defaults_to_noop(tmp_path: Path) -> None:
     report = await run_once(
         conn,
         source,
-        MarkerExtractor(),
         FixedClock(NOW),
         RecordingSleeper(),
         settings,
@@ -515,18 +524,6 @@ def run_cli(
     return code, out.getvalue(), err.getvalue()
 
 
-class UnhealthyFactory:
-    name = "unhealthy"
-
-    def validate(self, settings: StageSettings) -> list[str]:
-        return []
-
-    def build(self, settings: StageSettings) -> LLMBackend:
-        from infovore.llm.fake import FakeBackend
-
-        return FakeBackend.scripted([LLMResult.failed(ErrorKind.FATAL, "not logged in", None)])
-
-
 def test_run_is_a_builtin_command() -> None:
     assert "run" in [command.name for command in builtin_commands()]
 
@@ -569,17 +566,6 @@ def test_run_command_once_flag_counts_a_failing_cycle(tmp_path: Path) -> None:
     assert code == ExitCode.OK
     assert "cycles_failed=1" in out
     assert "cycles_completed=0" in out
-
-
-def test_run_command_health_check_failure_exits_backend(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    env["INFOVORE_EXTRACT_BACKEND"] = "unhealthy"
-    registry = Registry()
-    registry.register(UnhealthyFactory())
-
-    code, _, _ = run_cli(["run", "--once"], env, registry=registry)
-
-    assert code == ExitCode.BACKEND
 
 
 async def test_run_command_continuous_mode_stops_on_signal_and_closes_source(
@@ -647,14 +633,13 @@ def test_run_command_once_flag_streams_flushed_progress_lines(tmp_path: Path) ->
     )
     assert code == ExitCode.OK
     lines = out.getvalue().splitlines()
-    assert lines[0] == "checking extract backend (fake / sonnet)..."
-    assert lines[1] == "opening discord source..."
-    assert lines[2] == "cycle: sync-optouts"
-    assert lines[3] == "cycle: chunk"
-    assert lines[4] == "cycle: triage"
-    assert lines[5] == "cycle: extract"
-    assert "cycle: probe" not in lines
-    assert out.flushes_at[:6] == [1, 2, 3, 4, 5, 6]
+    assert lines[0] == "opening discord source..."
+    assert lines[1] == "cycle: sync-optouts"
+    assert lines[2] == "cycle: chunk"
+    assert lines[3] == "cycle: triage"
+    assert lines[4] == "cycle: cascade"
+    assert "cycle: extract" not in lines
+    assert out.flushes_at[:5] == [1, 2, 3, 4, 5]
 
 
 def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: Path) -> None:
@@ -677,53 +662,3 @@ def test_run_command_writes_opening_line_before_connecting_to_source(tmp_path: P
     )
     assert code == ExitCode.OK
     assert seen_before_connect == [True]
-
-
-def test_run_command_prints_checking_backend_lines_before_each_stage_health_check(
-    tmp_path: Path,
-) -> None:
-    env = environment(tmp_path)
-    env["INFOVORE_EXTRACT_BACKEND"] = "spy"
-    env["INFOVORE_PROBE_BACKEND"] = "spy"
-    env["INFOVORE_JUDGE_BACKEND"] = "spy"
-    fake_source = FakeDiscordSource()
-
-    @asynccontextmanager
-    async def factory(settings: Settings) -> AsyncIterator[DiscordSource]:
-        yield fake_source
-
-    out = io.StringIO()
-    snapshots: list[str] = []
-
-    def responder(request: LLMRequest) -> LLMResult:
-        snapshots.append(out.getvalue())
-        return LLMResult.ok_text("pong", "m")
-
-    class SpyFactory:
-        name = "spy"
-
-        def validate(self, settings: object) -> list[str]:
-            return []
-
-        def build(self, settings: object) -> LLMBackend:
-            return FakeBackend(responder)
-
-    registry = Registry()
-    registry.register(SpyFactory())
-
-    code = main(
-        ["run", "--once"],
-        environ=env,
-        dotenv_path=None,
-        stdout=out,
-        stderr=io.StringIO(),
-        source_factory=factory,
-        registry=registry,
-    )
-
-    assert code == ExitCode.OK
-    assert "checking extract backend (spy / sonnet)..." in snapshots[0]
-    # `run` no longer builds the probe or judge backends, so a misconfigured
-    # probe stage cannot stop the extraction loop from starting.
-    assert "checking probe backend" not in out.getvalue()
-    assert "checking judge backend" not in out.getvalue()

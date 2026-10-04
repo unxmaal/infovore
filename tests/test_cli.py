@@ -1,5 +1,6 @@
 import argparse
 import io
+import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -13,14 +14,10 @@ from infovore.cli import (
     Command,
     ExitCode,
     SourceFactory,
-    _format_cost,
-    _format_eta,
-    _format_rate,
     main,
 )
 from infovore.config import Settings
 from infovore.source.protocol import DiscordSource, SourceUnavailableError
-from infovore.triage.score import TRIAGE_VERSION
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -56,92 +53,91 @@ def test_status_on_a_fresh_database_reports_zeros(tmp_path: Path) -> None:
     code, out, _ = run(["status"], environment(tmp_path))
     assert code == ExitCode.OK
     assert "messages: 0" in out
-    assert "exchanges: none" in out
-    assert "claims: none" in out
-    assert "last extraction: never" in out
-    assert "live prompt version: none" in out
-    assert "labels by source: none" in out
-    assert "labels effective: none" in out
+    assert "current exchanges: 0" in out
+    assert "archived: 0 (cascade relevant 0, residue 0)" in out
+    assert "irrelevant: 0 (denylist 0, bayes 0)" in out
+    assert "set aside (no_text): 0" in out
+    assert "residue: 0" in out
+    assert "not yet cascaded: 0" in out
+    assert "last cascade: never" in out
+    assert "human labels: relevant 0, irrelevant 0" in out
+    assert "excluded channels: none" in out
+    assert "extraction (history): done 0, pending 0" in out
     assert "extract: claude_cli / sonnet" in out
     assert "judge: fake / haiku" in out
     assert "secret-token" not in out
-    assert "triaged: 0 (above threshold 0)" in out
-    assert "triage model: none" in out
-    assert "p_lore scored: 0" in out
-    assert "passing gate: 0" in out
-    assert "excluded by denylist: 0" in out
+    assert "passing gate" not in out
+    assert "last probe" not in out
     assert (tmp_path / "nested" / "dir" / "infovore.db").exists()
 
 
-def test_status_shows_excluded_by_denylist_count(tmp_path: Path) -> None:
+def _annotate(conn: sqlite3.Connection, exchange_id: int, scorer: str, label: str, at: str) -> None:
+    conn.execute(
+        "INSERT INTO annotations (subject_kind, subject_id, scorer, scorer_version,"
+        " reproducibility, label, recipe_json, source_ref, created_at)"
+        " VALUES ('exchange', ?, ?, 1, 'derived', ?, '{}', 'relevance-cascade', ?)",
+        (exchange_id, scorer, label, at),
+    )
+
+
+def test_status_reports_cascade_outcomes_on_current_exchanges_only(tmp_path: Path) -> None:
     env = environment(tmp_path)
-    env["INFOVORE_TRIAGE_MIN_SCORE"] = "0.3"
-    env["INFOVORE_EXCLUDE_CHANNELS"] = "food"
+    env["INFOVORE_EXCLUDE_CHANNELS"] = "food,#memes"
     assert run(["status"], env)[0] == ExitCode.OK
     from infovore.db.connection import open_database
 
     conn = open_database(env["INFOVORE_DB_PATH"])
     now = "2026-01-01T00:00:00+00:00"
+    later = "2026-01-02T00:00:00+00:00"
     conn.executescript(
         f"""
-        INSERT INTO channels (id, guild_id, name, kind) VALUES
-          (1, 9, 'general', 'text'), (2, 9, 'food', 'text');
-        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
-          created_at, content, ingested_at, raw_json)
-          VALUES (1, 1, 9, 1, 'a', '{now}', 'x', '{now}', '{{}}'),
-                 (2, 2, 9, 1, 'a', '{now}', 'y', '{now}', '{{}}');
-        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
-          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
-          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}'),
-                 (2, 2, 2, '{now}', '{now}', 1, 'quiet_gap', 'b', 0.9, '{TRIAGE_VERSION}');
+        INSERT INTO channels (id, guild_id, name, kind) VALUES (1, 9, 'general', 'text');
+        INSERT INTO chunk_recipes (version, quiet_gap_seconds, max_messages, overlap,
+          created_at) VALUES (7, 1, 1, 1, '{now}');
         """
     )
+    for n in range(1, 10):
+        conn.execute(
+            "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+            " created_at, content, ingested_at, raw_json)"
+            " VALUES (?, 1, 9, 1, 'a', ?, 'x', ?, '{}')",
+            (n, now, now),
+        )
+        conn.execute(
+            "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id,"
+            " started_at, ended_at, message_count, grouping_rule, content_hash,"
+            " extraction_status, superseded_by_recipe)"
+            " VALUES (?, 1, ?, ?, ?, ?, 1, 'quiet_gap', ?, ?, ?)",
+            (n, n, n, now, now, f"h{n}", "done" if n == 1 else "pending", 7 if n == 9 else None),
+        )
+    _annotate(conn, 1, "relevance_lexicon", "relevant", now)
+    _annotate(conn, 2, "relevance_bayes", "relevant", now)
+    _annotate(conn, 3, "relevance_residue", "residue", now)
+    _annotate(conn, 4, "relevance_bayes", "irrelevant", now)
+    _annotate(conn, 5, "relevance_denylist", "irrelevant", now)
+    _annotate(conn, 6, "relevance_no_text", "no_text", later)
+    _annotate(conn, 9, "relevance_lexicon", "relevant", now)
+    # exchange 7 was residue, then re-scored relevant: only the latest counts
+    _annotate(conn, 7, "relevance_residue", "residue", now)
+    _annotate(conn, 7, "relevance_lexicon", "relevant", now)
+    conn.commit()
+
     code, out, _ = run(["status"], env)
+
     assert code == ExitCode.OK
-    assert "passing gate: 2" in out
-    assert "excluded by denylist: 1" in out
+    assert "current exchanges: 8" in out
+    assert "archived: 4 (cascade relevant 3, residue 1)" in out
+    assert "irrelevant: 2 (denylist 1, bayes 1)" in out
+    assert "set aside (no_text): 1" in out
+    assert "residue: 1" in out
+    assert "not yet cascaded: 1" in out
+    assert "last cascade: 2026-01-02T00:00:00+00:00" in out
+    assert "excluded channels: food, memes" in out
+    assert "extraction (history): done 1, pending 7" in out
 
 
-def test_status_lists_non_empty_counts(tmp_path: Path) -> None:
+def test_status_reports_trainable_human_labels(tmp_path: Path) -> None:
     env = environment(tmp_path)
-    assert run(["status"], env)[0] == ExitCode.OK
-    from infovore.db.connection import open_database
-
-    conn = open_database(env["INFOVORE_DB_PATH"])
-    now = "2026-01-01T00:00:00+00:00"
-    conn.executescript(
-        f"""
-        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
-          created_at, content, ingested_at, raw_json)
-          VALUES (1, 1, 9, 1, 'a', '{now}', 'x', '{now}', '{{}}');
-        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
-          ended_at, message_count, grouping_rule, content_hash)
-          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a');
-        INSERT INTO prompt_versions VALUES ('v1', 'sha', '{now}', '{now}');
-        INSERT INTO extraction_runs (exchange_id, model, prompt_version, started_at, mode, outcome)
-          VALUES (1, 'm', 'v1', '{now}', 'live', 'ok');
-        INSERT INTO claims (exchange_id, extraction_run_id, statement, subject, kind, confidence,
-          probe_question, permalink, novelty, probed_at)
-          VALUES (1, 1, 's', 'subj', 'fact', 0.5, 'q?', 'p', 'unknown', '{now}');
-        INSERT INTO exchange_labels (exchange_id, label, source, labeled_at)
-          VALUES (1, 'lore', 'llm', '{now}');
-        """
-    )
-    code, out, _ = run(["status"], env)
-    assert code == ExitCode.OK
-    assert "exchanges: pending=1" in out
-    assert "claims: unknown=1" in out
-    assert "runs: ok=1" in out
-    assert "last extraction: 2026-01-01T00:00:00+00:00" in out
-    assert "last probe: 2026-01-01T00:00:00+00:00" in out
-    assert "live prompt version: v1" in out
-    assert "labels by source: llm(lore=1)" in out
-    assert "labels effective: lore=1" in out
-
-
-def test_status_shows_triaged_and_above_threshold_counts(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    env["INFOVORE_TRIAGE_MIN_SCORE"] = "0.3"
     assert run(["status"], env)[0] == ExitCode.OK
     from infovore.db.connection import open_database
 
@@ -153,42 +149,22 @@ def test_status_shows_triaged_and_above_threshold_counts(tmp_path: Path) -> None
           created_at, content, ingested_at, raw_json)
           VALUES (1, 1, 9, 1, 'a', '{now}', 'x', '{now}', '{{}}'),
                  (2, 1, 9, 1, 'a', '{now}', 'y', '{now}', '{{}}');
-        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
-          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version)
-          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}'),
-                 (1, 2, 2, '{now}', '{now}', 1, 'quiet_gap', 'b', 0.1, '{TRIAGE_VERSION}');
+        INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,
+          ended_at, message_count, grouping_rule, content_hash)
+          VALUES (1, 1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a'),
+                 (2, 1, 2, 2, '{now}', '{now}', 1, 'quiet_gap', 'b');
+        INSERT INTO annotations (subject_kind, subject_id, scorer, scorer_version,
+          reproducibility, label, created_at)
+          VALUES ('exchange', 1, 'human_exchange', 1, 'recorded', 'relevant', '{now}'),
+                 ('exchange', 2, 'human_exchange', 1, 'recorded', 'irrelevant', '{now}');
         """
     )
+    conn.commit()
+
     code, out, _ = run(["status"], env)
+
     assert code == ExitCode.OK
-    assert "triaged: 2 (above threshold 1)" in out
-
-
-def test_status_shows_latest_model_p_lore_scored_and_passing_gate(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    assert run(["status"], env)[0] == ExitCode.OK
-    from infovore.db.connection import open_database
-
-    conn = open_database(env["INFOVORE_DB_PATH"])
-    now = "2026-01-01T00:00:00+00:00"
-    conn.executescript(
-        f"""
-        INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,
-          created_at, content, ingested_at, raw_json)
-          VALUES (1, 1, 9, 1, 'a', '{now}', 'x', '{now}', '{{}}');
-        INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)
-          VALUES ('{now}', 40, 8, '{{}}');
-        INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
-          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version,
-          p_lore, p_lore_model)
-          VALUES (1, 1, 1, '{now}', '{now}', 1, 'quiet_gap', 'a', 0.0, 't1', 0.9, 1);
-        """
-    )
-    code, out, _ = run(["status"], env)
-    assert code == ExitCode.OK
-    assert "triage model: v1 (labels_used=40)" in out
-    assert "p_lore scored: 1" in out
-    assert "passing gate: 1" in out
+    assert "human labels: relevant 1, irrelevant 1" in out
 
 
 def test_missing_configuration_exits_with_config_code(tmp_path: Path) -> None:
@@ -372,28 +348,3 @@ def test_sync_optouts_writes_opening_line_before_connecting_to_source(tmp_path: 
     )
     assert code == ExitCode.OK
     assert seen_before_connect == [True]
-
-
-def test_eta_is_rendered_in_the_unit_a_reader_can_act_on() -> None:
-    assert _format_eta(None) == "unknown (no recent runs)"
-    assert _format_eta(0.0) == "queue empty"
-    assert _format_eta(3.25) == "3.2h"
-    assert _format_eta(240.0) == "10.0d"
-
-
-def test_a_missing_rate_or_cost_says_so_rather_than_showing_zero() -> None:
-    assert _format_rate(None) == "n/a"
-    assert _format_rate(0.5) == "0.5"
-    assert _format_cost(None) == "cost unreported"
-    assert _format_cost(1.5) == "$1.50"
-
-
-def test_status_reports_the_gated_queue_and_spend(tmp_path: Path) -> None:
-    code, out, _ = run(["status"], environment(tmp_path))
-
-    assert code == ExitCode.OK
-    assert "queue: 0 gated (of 0 claimable before the gate)" in out
-    assert "throughput (last 6h): extract n/a/h, probe n/a/h" in out
-    assert "extract eta: queue empty" in out
-    assert "extract spend: 0 in / 0 out / cost unreported" in out
-    assert "probe spend: 0 in / 0 out / cost unreported over 0 claims" in out

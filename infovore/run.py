@@ -11,15 +11,12 @@ from typing import TYPE_CHECKING
 
 from infovore.chunk.grouper import group_pending
 from infovore.chunk.recipe import settings_recipe
-from infovore.config import Settings, Stage, resolve_guild_id
-from infovore.extract.llm_extractor import LLMClaimExtractor
-from infovore.extract.protocol import ClaimExtractor
-from infovore.extract.runner import PromptNotPromotedError, run_extraction
+from infovore.config import Settings, resolve_guild_id
 from infovore.ingest.live import EventOutcome, handle_event
 from infovore.privacy.optout import sync_opt_outs
-from infovore.rows import RunMode
 from infovore.source.protocol import DiscordSource
 from infovore.timing import Clock, Sleeper
+from infovore.triage.incremental import cascade_new_exchanges
 from infovore.triage.runner import triage_pending
 
 if TYPE_CHECKING:
@@ -73,7 +70,6 @@ async def _consume_events(
 async def _run_cycle(
     conn: sqlite3.Connection,
     source: DiscordSource,
-    extractor: ClaimExtractor,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -100,29 +96,8 @@ async def _run_cycle(
     )
     progress(CycleStepStarted(step="triage"))
     triage_pending(conn, rules=settings.triage_rules, workers=settings.workers)
-    extract_stage = settings.stages[Stage.EXTRACT]
-    progress(CycleStepStarted(step="extract"))
-    try:
-        await run_extraction(
-            conn,
-            extractor,
-            clock,
-            sleeper,
-            mode=RunMode.LIVE,
-            model_label=extract_stage.model,
-            batch_size=settings.batch_size,
-            max_retries=settings.max_retries,
-            concurrency=extract_stage.concurrency,
-            min_score=settings.triage_min_score,
-            min_p_lore=settings.triage_min_p_lore,
-            rules=settings.triage_rules,
-            exclude_channels=settings.exclude_channels,
-        )
-    except PromptNotPromotedError as error:
-        logger.warning(
-            "live prompt version %s is not promoted; skipping extraction this cycle",
-            error.version,
-        )
+    progress(CycleStepStarted(step="cascade"))
+    cascade_new_exchanges(conn, settings.exclude_channels, clock.now())
 
 
 async def _interruptible_wait(sleeper: Sleeper, seconds: float, stop: asyncio.Event) -> None:
@@ -140,7 +115,6 @@ async def _interruptible_wait(sleeper: Sleeper, seconds: float, stop: asyncio.Ev
 async def _cycle_until_stop(
     conn: sqlite3.Connection,
     source: DiscordSource,
-    extractor: ClaimExtractor,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -151,7 +125,7 @@ async def _cycle_until_stop(
 ) -> None:
     while not stop.is_set():
         try:
-            await _run_cycle(conn, source, extractor, clock, sleeper, settings, progress)
+            await _run_cycle(conn, source, clock, sleeper, settings, progress)
         except Exception:
             logger.exception("periodic cycle failed")
             report.cycles_failed += 1
@@ -165,7 +139,6 @@ async def _cycle_until_stop(
 async def run_once(
     conn: sqlite3.Connection,
     source: DiscordSource,
-    extractor: ClaimExtractor,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -173,7 +146,7 @@ async def run_once(
 ) -> RunReport:
     report = RunReport()
     try:
-        await _run_cycle(conn, source, extractor, clock, sleeper, settings, progress)
+        await _run_cycle(conn, source, clock, sleeper, settings, progress)
     except Exception:
         logger.exception("periodic cycle failed")
         report.cycles_failed += 1
@@ -185,7 +158,6 @@ async def run_once(
 async def run_forever(
     conn: sqlite3.Connection,
     source: DiscordSource,
-    extractor: ClaimExtractor,
     clock: Clock,
     sleeper: Sleeper,
     settings: Settings,
@@ -204,7 +176,6 @@ async def run_forever(
         _cycle_until_stop(
             conn,
             source,
-            extractor,
             clock,
             sleeper,
             settings,
@@ -239,19 +210,14 @@ def remove_stop_handlers(signals: Sequence[signal.Signals]) -> None:
 
 class RunCommand:
     name = "run"
-    help = "live ingest plus a periodic chunk/triage/extract loop, until SIGTERM/SIGINT"
+    help = "live ingest plus a periodic chunk/triage/cascade loop (no LLM), until SIGTERM/SIGINT"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("--interval", type=float, default=600.0)
         parser.add_argument("--once", action="store_true")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
-        from infovore.cli import ExitCode, _say, stage_backend
-
-        # No probe in the loop: it was retired under #165, and v6+ claims carry
-        # no probe_question to probe with (#188).
-        extract_backend = await stage_backend(context, Stage.EXTRACT)
-        extractor = LLMClaimExtractor(extract_backend)
+        from infovore.cli import ExitCode, _say
 
         def report_progress(event: CycleStepStarted) -> None:
             _say(context.stdout, f"cycle: {event.step}")
@@ -265,7 +231,6 @@ class RunCommand:
                     report = await run_once(
                         context.conn,
                         source,
-                        extractor,
                         context.clock,
                         context.sleeper,
                         context.settings,
@@ -275,7 +240,6 @@ class RunCommand:
                     report = await run_forever(
                         context.conn,
                         source,
-                        extractor,
                         context.clock,
                         context.sleeper,
                         context.settings,
