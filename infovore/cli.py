@@ -265,6 +265,7 @@ class SnapshotCommand:
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
     from infovore.claims.command import ClaimsCommand
+    from infovore.doctor import DoctorCommand
     from infovore.eval.command import JudgeCommand, SliceCommand
     from infovore.extract.command import ExtractCommand
     from infovore.extract.novelty import ProbeCommand
@@ -300,6 +301,7 @@ def builtin_commands() -> list[Command]:
         SiftCommand(),
         WordsCommand(),
         ClaimsCommand(),
+        DoctorCommand(),
     ]
 
 
@@ -342,6 +344,11 @@ def main(
         args = _build_parser(available, stderr).parse_args(argv)
     except _UsageError:
         return ExitCode.CONFIG
+    chosen: Any = next(command for command in available if command.name == args.command)
+    if getattr(chosen, "standalone", False):
+        return int(
+            chosen.run_standalone(args, environ if environ is not None else os.environ, stdout)
+        )
     try:
         settings = settings_from_environment(
             environ if environ is not None else os.environ,

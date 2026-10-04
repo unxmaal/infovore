@@ -89,6 +89,7 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore chunk [--rechunk] [--recipe N] [--dry-run] [--measure] [--gap M] [--adaptive] [--fold F] [--channels LIST]`: group messages into closed exchanges; `--measure` reports without writing.
 - `infovore run [--interval S] [--once]`: live ingest plus a periodic chunk, triage and cascade loop, with no LLM, until SIGTERM or SIGINT.
 - `infovore sync-optouts`: sync the opt-out role and redact newly opted-out users' history.
+- `infovore doctor [--deep] [--gateway URL]`: read-only PASS/WARN/FAIL health check of `~/.infovore.env`, the database (never created or migrated), the uv environment, GPU lock, model gateway and host facts; exits 1 on any FAIL.
 - `infovore snapshot DEST [--force]`: consistent copy of the database through the SQLite backup API.
 - `infovore export-archive DEST [--force]`: shareable SQLite file of archived exchanges.
 - `infovore slice freeze | show`: freeze the evaluation slices once; show exchanges and messages per size bucket.
