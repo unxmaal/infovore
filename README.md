@@ -2,744 +2,136 @@
 
 ## Purpose
 
-infovore is a passive archivist for a hobbyist SGI/IRIX Discord community. It reads channel history and live messages, groups them into conversations ("exchanges"), and uses a language model to pull out specific factual claims — part numbers, jumper settings, PROM and firmware versions, IRIX quirks and workarounds, repair procedures, compatibility facts, where to find software and manuals — each tied back to the Discord messages it came from.
+infovore is a passive archivist for an SGI, IRIX and retrocomputing Discord community. It ingests channel history and live messages, groups them into conversations called exchanges, and decides which exchanges are worth keeping. Exchanges are the base object: every label, score and archive decision attaches to an exchange, not to a single message.
 
-It keeps only **net-new** knowledge: things a frontier LLM does not already know from pretraining. Every claim is checked with a closed-book probe (the model is asked the question cold, and a judge compares its answer to the claim); only claims the model didn't know, only partly knew, or got wrong reach the product.
-
-The product is a SQLite file (see "Consuming the database"). Nothing talks to infovore at runtime: it has no API, no MCP server, and no Discord commands, and it never posts.
+The decision is made by a zero-token relevance cascade. It runs locally with no LLM calls. The product is a SQLite file of archived exchanges. infovore has no API, no MCP server and no Discord commands, and it never posts.
 
 ## Architecture
 
-```
- Discord ──► DiscordSource ──► ingest ─────────► raw tables
- (history,   source/live.py     backfill.py        channels, messages,
-  events)    source/export.py   live.py            revisions, attachments,
-             source/fake.py     normalize.py       reactions
-                                privacy/optout.py  opt_outs (redaction before storage)
-                                        │
-                                        ▼
-                               chunk/rules.py + grouper.py ──► exchanges (+ members)
-                                        │
-                                        ▼
-            extract/request.py + prompt.py ──► extract/llm_extractor.py ──► claims + sources
-                  extract/runner.py (trial | live)      │
-                                        │               │  llm/protocol.py LLMBackend
-                                        ▼               │   ├ llm/claude_cli.py   (claude -p)
-                             extract/novelty.py ────────┤   ├ llm/openai_compat.py
-                             recall + judge per claim   │   └ llm/fake.py
-                                        │               │  llm/registry.py picks one per stage
-                                        ▼
-                                 lore view (the product) ──► infovore snapshot ──► consumers
-```
+Pipeline:
 
-- **Ingest.** `infovore backfill` walks every allowlisted channel and its threads oldest-first with a per-channel checkpoint, one transaction per page, against whichever `DiscordSource` is configured: `source/live.py` (`discord.py`, live Discord) or `source/export.py` (a DiscordChatExporter JSON export, no Discord API access at all — see "Configuration" and "Running" → "Runbook"). `infovore run` consumes live events, which only `source/live.py` produces. Every message is normalized, then redacted if its author has opted out, then upserted — so a re-run never un-redacts anything.
-- **Chunking.** Messages are grouped by thread, then reply chain, then quiet gap, split when too large, and persisted only once closed (see "Grouping rules"). Late replies and thread revivals link to the earlier exchange as read-only context.
-- **Extraction.** For each pending or stale exchange the runner builds a request (messages, uncitable context, related existing claims found through `claims_fts`, opted-out authors), renders the versioned prompt, and asks the extract-stage backend for JSON matching a strict schema, with one repair attempt. `trial` runs are for prompt iteration and never touch exchange status or the product; `live` runs require the prompt version to be promoted.
-- **Novelty probe.** Each claim's `probe_question` is asked closed-book of the probe-stage model, and the judge-stage model classifies the answer as `unknown`, `partial`, `contradicts`, or `known`.
-- **Backends.** Every LLM call goes through `LLMBackend`; each stage (extract, probe, judge) picks its backend and model in configuration, so extraction can run on a local model while the probe stays on Claude. Nothing above `llm/` knows which backend is in use.
-- **Import boundaries** (enforced by ruff `banned-api`): `discord` only in `source/live.py`; process spawning only in `llm/claude_cli.py`; `openai`/`httpx2` only in `llm/openai_compat.py`.
-- **One writer.** SQLite runs in WAL mode; the whole pipeline runs on the host that holds the file, and readers open it read-only. LLM backends may be remote.
+1. Ingest. `backfill` walks allowlisted channels and threads oldest-first with a per-channel checkpoint; `run` consumes live events. Messages are normalized, redacted if the author opted out, then upserted. The source is either live Discord or a DiscordChatExporter JSON export (`INFOVORE_SOURCE`).
+2. Chunk, recipe v2. Messages are grouped by thread, reply chain and quiet gap, then persisted once closed. Gap, folding of singletons and adaptive gaps are recipe parameters recorded in `chunk_recipes`. Late replies link to the earlier exchange as read-only context.
+3. Relevance cascade. Each current exchange passes through, in order:
+   1. excluded channels (`INFOVORE_EXCLUDE_CHANNELS`): never archived;
+   2. `no_text`: nothing to judge;
+   3. lexicon: terms that settle clearly relevant or clearly irrelevant exchanges;
+   4. middle stage: an embedding plus Bayes classifier trained on human labels;
+   5. residue: what the earlier stages abstain on.
+4. Archive. Exchanges the cascade accepts are archived and exported with `export-archive`.
 
-`infovore search` queries `messages_fts` over the raw corpus rather than over extracted claims, so a fact the extractor missed is findable and re-extractable instead of lost. `--context N` shows the N messages either side of a hit in its **channel**, not its exchange, because 54% of messages belong to no exchange the gate ever admitted and those are the ones the index exists to reach. `--exchanges` instead ranks whole gate-passing conversations (`--all` adds rejected ones), and `export-archive` writes a shareable SQLite of those exchanges with opted-out content removed.
+An optional local-model residue scorer (`relevance llm-score --residue`) scores the residue with an OpenAI-compatible server. Claim extraction (extract, probe, review, promote) still ships but is paused and is not part of the archive path.
+
+Import boundaries are enforced by ruff `banned-api`: `discord` only in `infovore/source/live.py`, process spawning only in `infovore/llm/claude_cli.py`, `openai` and `httpx` only in `infovore/llm/openai_compat.py`.
 
 ## Data model
 
-All timestamps are ISO-8601 UTC text; Discord ids are 64-bit integers. Migrations in `infovore/db/migrations/` are applied in order and recorded in `schema_migrations`; `PRAGMA user_version` is the latest applied migration.
+All tables live in one SQLite file (`INFOVORE_DB_PATH`). Migrations run on open.
 
-| object | holds |
-| --- | --- |
-| `schema_migrations` | applied migration versions and when they ran |
-| `channels` | channels and threads (`parent_id` set for threads), their names, and each one's backfill checkpoint `last_backfilled_message_id` |
-| `messages` | every ingested message: author and display name at the time, content, reply and thread links, `edited_at`, `deleted_at` (rows are never deleted), raw JSON, and the message-level classifier's `p_trash` / `p_trash_model` (issue #128 PR 3; `NULL` until a message classifier has scored the message) |
-| `messages_fts` | FTS5 over `messages.content` (issue #176, migration 0021), external content keyed on `messages.id`, tokenised `unicode61 tokenchars '-./_'` so `6.5.22m`, `030-1234-567` and `/usr/people` are single tokens rather than fragments. It exists because `claims_fts` only covers what extraction already produced, so a fact extraction MISSED was unreachable except by `LIKE` over 1,381,473 rows. With it, a miss is a deferral: the source text is still there and still re-extractable. THE UPDATE TRIGGER IS A PRIVACY MECHANISM, not hygiene: `privacy.optout.redact_stored` overwrites `content` with `[redacted]`, and an external-content FTS5 index keeps its own tokens, so without the trigger a redacted message's words stay searchable and a query could prove what it said. Queries go through `db.messages_fts.search_messages`, which quotes each term because FTS5 treats `.`, `-` and `/` as query syntax even when they are indexing tokenchars, and an unquoted term is both a crash and an injection surface |
-| `annotations` | append-only store for every answer a scorer has given about a subject (issue #176, migration 0022). Keyed by `subject_kind`/`subject_id`/`scorer`/`scorer_version`. `exchanges.p_lore` and `messages.p_trash` held exactly ONE answer each, so four triage models and sixteen message models were trained and all but the last of each left no recoverable trace. `reproducibility` splits the table by whether a value can be recomputed: `derived` is a droppable cache and MUST carry `recipe_json` (a CHECK enforces it), `recorded` is an archive of things that can never be recomputed (claims, human labels, LLM verdicts) and a trigger refuses to delete one. Updates are refused outright. A partial unique index allows one `derived` value per subject per scorer version, and deliberately does NOT constrain `recorded`, because repeat human judgments on the same item are the self-consistency measurement. `score` is continuous and there is no band column: bands discard ordering within a band, and ranking is what pays |
-| `scorer_activations` | append-only record of which scorer version became live and when (migration 0022), so "which gate was live in September" is answerable from the database rather than from git history. `db.annotations.version_active_at` reads it |
-| `current_annotations` | view: the annotations belonging to each scorer's most recently activated version. Writing a non-active version leaves `exchanges.p_lore` untouched, which is what lets a shadow scorer run over the whole corpus without moving the live gate |
-| `eval_slices` | frozen evaluation slices for tier 1 (#190, migration 0023): `name`, `exchange_id`, `position`, `population`, `seed`, `frozen_at`. `infovore slice freeze` draws them once, with seed 190, from the same predicate the extraction queue uses: `s1` (200 gate-passing exchanges, size-matched to the queue, the build set), `s2` (a disjoint 200, held out), `c1` (50 gate-rejected exchanges in the queue's size mix, the control for what the gate throws away), `gold` (40 from `s1` plus 10 from `c1`, read end to end by Eric) and `gold-repeats` (5 of the gold set shown again, unannounced, to measure self-agreement). Triggers refuse UPDATE and DELETE, because every judgment and measurement is keyed to these exact exchanges. Judgments from `infovore judge serve` are `recorded` rows in `annotations` with `subject_kind = 'exchange'`, `scorer = 'human_exchange'`, `scorer_version` = the page's interface version, `label` one of `relevant`, `irrelevant`, `bad_grouping`, and `source_ref` = `judge:<slice>:<position>`; append-only, so a repeat is a second row |
-| `message_revisions` | the prior content of every edited message; redacted in place on opt-out |
-| `attachments` | attachment metadata per message (files are not downloaded) |
-| `reactions` | current reaction count per message and emoji |
-| `opt_outs` | users holding the opt-out role, and since when |
-| `exchanges` | grouped conversations: channel, thread, first/last message, grouping rule, `content_hash` (unique), `parent_exchange_id` for context, `extraction_status` (`pending`, `done`, `skipped`, `failed`, `stale`), retry count and last error, the deterministic `triage_score` / `triage_reasons` / `triage_version`, and the trained classifier's `p_lore` / `p_lore_model` (the `triage_model.version` that produced it; `NULL` until a model has scored the exchange) (see "Triage"); `chunk_recipe` (issue #176, migration 0020) names the `chunk_recipes` row holding every parameter that produced the grouping. `grouping_rule` records WHICH rule fired but recorded none of the parameters it fired with, so an exchange meant "whatever the chunker produced the day it ran" and re-chunking could not be compared against what came before: new groupings get new ids while 77,184 `claims.exchange_id` values still point at the old ones. `extraction_runs` already did this correctly by recording `prompt_version` and `model`; the chunker did not |
-| `chunk_recipes` | one row per distinct set of chunker parameters (issue #176, migrations 0020 and 0024): `quiet_gap_seconds`, `max_messages`, `overlap`, `gap_percentile`, `gap_floor_seconds`, `gap_ceiling_seconds`, `fold_factor`, `fold_size`, `created_at`, unique on all eight. Identity is every parameter, so moving a constant registers a NEW version rather than silently relabelling the existing corpus. Version 1 is the 30 minute gap, 50 message cap, 3 messages of overlap that chunked the first 203,634 exchanges. Version 2 (#218) derives each channel's gap as the 95th percentile of the channel's own message gaps up to 6 hours, floored at 30 minutes, and folds groups of at most 2 messages into a larger neighbour within 4 times that gap, preferring a reply relationship; it exists because 54.3% of exchanges had 1-2 messages |
-| `channel_chunk_gaps` | the per-channel gap each adaptive recipe used (migration 0024), keyed `recipe`, `channel_id`, so a recipe's output is reproducible after the channel grows |
-| `exchange_remap` | append-only map from an exchange to the exchange that holds the majority of its messages under a new recipe (migration 0024, `infovore chunk --rechunk --recipe N`): `kind` is `one_to_one`, `merged`, `split` or `ambiguous` (no majority, `new_exchange_id` NULL) |
-| `superseded_exchange_messages` | the membership of exchanges a rechunk replaced (migration 0024). `exchange_messages` keeps one row per message for the current exchanges only; superseded exchanges keep their rows, claims and annotations, are flagged `exchanges.superseded_by_recipe`, and are `skipped` unless extraction was already `done` |
-| `all_exchange_messages` | view: `exchange_messages` plus `superseded_exchange_messages`, for readers that must still reach a superseded exchange (citations, context windows, batch inputs) |
-| `current_exchanges` | view: `exchanges` without those superseded by a rechunk; every reader of exchanges counts, queues, searches and exports through it, and a test fails on a raw `FROM exchanges` elsewhere |
-| `current_slice_members` | view: `current_eval_slices` restricted to current exchanges; what slice resolution serves |
-| `current_eval_slices` | view: each slice at its latest recipe. A slice rebuilt for recipe N is stored in `eval_slices` as `name@N` with its members mapped by message membership; the frozen rows are never touched, and judge, cascade and `trainable_labels` read this view |
-| `exchange_messages` | ordered membership; a message belongs to at most one exchange |
-| `prompt_versions` | every extraction prompt version with its text hash; the most recently promoted one is live |
-| `extraction_runs` | one row per extraction attempt: exchange, model, prompt version, mode (`trial` or `live`), outcome, tokens, `cost_usd` (issue #149, migration 0015, `NULL` on rows predating it, and `NULL` whenever the backend reports no cost), error, `started_at`/`finished_at` bracketing the one attempt this row describes rather than the whole retry loop (before #149 both were written as the same finish instant, so every row read as zero duration), `batch_id` (one value per `extract` invocation, written with each run as it is recorded so an interrupted invocation's completed runs still form its batch; `NULL` for rows predating it; see "Running"), `sampled_by` (which sampling strategy actually picked this exchange for a trial run — `stratified`/`random`/`uncertain`; `NULL` for a live run, an explicit `--exchange-id`, or a row predating issue #107; see "Running" and "Triage") |
-| `extraction_batches` | one row per `extract` invocation, written before any exchange is processed (so a run interrupted before its first completed exchange still leaves its batch described): `batch_id` (primary key, shared with `extraction_runs.batch_id`), `mode`, `strategy` (`NULL` for a live-mode batch, or a trial batch with only `--exchange-id` and no `--sample`), `seed`, `sample` (`NULL` alongside `strategy`), `created_at` (see "Running") |
-| `claims` | extracted claims: statement, subject, kind, confidence, `probe_question`, permalink, `supersedes_claim_id`, novelty verdict with probe model/answer/error, `probe_run_id` (issue #149: the `probe_runs` call pair that produced the verdict; `NULL` until probed, and on rows probed before migration 0015), retraction; `probe_question` is empty on claims extracted under prompt v6 and later, because the field existed only to feed the closed-book novelty probe (issue #165, migration 0019): it was 34.8% of the claim payload (10.07M of 28.95M chars) and output is 67% of extraction cost, so asking for it cost about 23% of extraction to support a stage that spent 52,900 tokens per claim it suppressed. The column stays `NOT NULL` rather than being relaxed, because rebuilding a 77k-row table carrying FTS triggers is not worth the risk |
-| `claim_sources` | which messages each claim cites |
-| `probe_runs` | one row per novelty-probe call pair (issue #149, migration 0015): `probe_model`/`judge_model`, `started_at`/`finished_at`, `claim_count` (how many claims shared the pair), `batched` (0 for a one-claim call, 1 for a batched one), `recall_input_tokens`/`recall_output_tokens`/`judge_input_tokens`/`judge_output_tokens`, `cost_usd`, `outcome` and `error`. One row per CALL PAIR rather than per claim, so `SUM(cost_usd)` is the probe's true cost: a batch's tokens recorded on each of its claims would be counted `claim_count` times over. Per-claim cost is `cost_usd / claim_count`. A failed pair still gets a row, because it still spent what it spent; a pair that stopped on a usage limit does not, because nothing was charged and the claims are retried |
-| `claims_fts` | full-text index over claim subject and statement (`unicode61`, keeping `-./_` inside tokens) |
-| `lore` | the product view: current, live, probed, net-new claims (see "Consuming the database"); since migration 0019 the novelty rule is `novelty != 'known'` rather than `novelty IN ('unknown','partial','contradicts')`. NOVELTY NOW MEANS CORPUS NOVELTY: whether a frontier model happened to recall a fact on a given day is neither stable nor intrinsic to the source, so it is no longer an inclusion criterion. Unprobed claims publish, while the 3,048 `known` verdicts already paid for keep suppressing, so nothing bought is discarded |
-| `exchange_labels` | ground-truth `lore`/`noise` labels per exchange, one row per `(exchange_id, source)`: `llm` (derived from trial runs) or `human` (hand correction), with `source_ref` and `labeled_at`; a human label always wins over an LLM one (see "Triage") |
-| `triage_model` | one row per trained Bayes classifier: `version` (autoincrementing primary key), `trained_at`, `labels_used`, `holdout_size`, and `params_json` (the Robinson/Fisher hyperparameters plus the trained `lore_documents`/`noise_documents` totals needed to reconstruct the model) (see "Triage") |
-| `triage_tokens` | that model version's per-token counts: `(model_version, token)` primary key, `lore_count`, `noise_count` (see "Triage") |
-| `message_labels` | ground-truth `trash`/`keep` labels per message, one row per `(message_id, source)`: `human` (a maintainer sifting in lnav — see "Running" → `sift`), `citation`/`rule` (issue #128 PR 3, the message classifier), with `source_ref` and `labeled_at`; a human label always wins over a `citation`/`rule` one, same rule as `exchange_labels`; `regime` (issue #170, migration 0017) records whether the judgment was made with the conversation around the message visible (`context`) or on the message alone (`isolated`). The two are different labelling functions and must not be pooled: the pre-#139 batches ran 4.6-10.7% `keep` while every batch since runs 76.5-84.5%, and re-showing 20 of the old ones with context flipped 12, all of them trash to keep. `effective_message_labels_with_source` therefore returns only `context` human labels by default, so the retired 1,016 stay in the database as history without training anything |
-| `label_events` | append-only log of every human `trash`/`keep` judgment (issue #166, migration 0016): `message_id`, `label`, `source_ref` (the round, e.g. `sift-serve:batch-005`), `labeled_at`. `message_labels` holds the LATEST verdict per message and is what training reads; this table holds the history, which is what makes self-consistency measurable. A message judged in two different rounds has two rows, and `infovore.db.label_events.self_consistency` compares its first round's label against its last, giving the ceiling no technique can beat. Only `human` labels are evented, because `citation`/`rule` labels are regenerable and carry no judgment. Undo deletes the message's most recent row, so a withdrawn call does not count toward the ceiling. Backfilled from the 1,184 existing human labels; `regime` records the labelling regime of THAT round, read from the event's own `source_ref` rather than from the message's current label (migration 0017 did the latter and mistagged 18 earlier judgments on the live database, repaired by 0018). A repeat therefore has one `isolated` event and one `context` event, which is what lets `self_consistency` tell a UI change apart from genuine disagreement |
-| `gate_predictions` | one row per (`technique`, `message_id`) (issue #166, migration 0016): `score`, `predicted`, `created_at`. A technique's predictions for a round must be stored BEFORE that round is judged, so `created_at` predating the round's `label_events` is what distinguishes a holdout from a fit. Without it every round silently becomes training data and the scores drift upward for free |
-| `message_model` | one row per trained message-level Bayes classifier: `version` (autoincrementing primary key), `trained_at`, `labels_used`, `holdout_size`, `params_json` (`trash_documents`/`keep_documents` totals needed to reconstruct the model), and `kind` (issue #135: `'citation'` or `'human'` — one classifier of each kind is trained per `sift train`, with honest, non-duplicated counts; `'legacy'`, the column's default, marks a pre-#135 row trained by the single combined classifier) (see "Sifting") |
-| `message_tokens` | that model version's per-token counts: `(model_version, token)` primary key, `trash_count`, `keep_count` (see "Sifting") |
-| `message_combiner` | one row per `sift train` run (issue #135): `version` (autoincrementing primary key, what `messages.p_trash_model` records), `trained_at`, `citation_model_version`/`human_model_version` (the `message_model` rows it combines; `human_model_version` is `NULL` in fallback mode), `fallback` (1 if there weren't enough human labels to train a combiner, so `p_trash` is the citation model alone), `params_json` (the fitted combiner's intercept and per-feature weights), `feature_set_version` (issue #141, default `1`: the `infovore.sift.features.FEATURE_SET_VERSION` this row's models were trained under — scoring refuses, pointing back at `infovore sift train`, when it no longer matches), and `feature_set_name` (issue #144, additive migration 0014, `NULL` on any row written before it: the named `plain`/`structural`/`context` feature set (`infovore.sift.features.FeatureSet`) `--features` chose for this run — a `NULL` row is resolved from `feature_set_version` alone instead, `1` → `plain`, `2` → `context`, the only two shapes #141 ever produced, so a model stored before this issue keeps scoring exactly as it did, no forced retrain) (see "Sifting") |
+| Object | Role |
+|---|---|
+| `channels`, `messages`, `message_revisions`, `attachments`, `reactions` | raw ingest; `messages_fts` and its shadow tables index message text |
+| `opt_outs` | opted-out users; their history is redacted |
+| `exchanges`, `exchange_messages`, `superseded_exchange_messages`, `exchange_remap` | closed exchanges, membership, and the mapping across rechunks |
+| `chunk_recipes`, `channel_chunk_gaps` | chunking recipes and per-channel gap overrides |
+| `current_exchanges` | view: exchanges under the active recipe; the base object for everything below |
+| `all_exchange_messages` | view: members of every exchange |
+| `annotations`, `current_annotations` | derived and human annotations on exchanges; the view shows the latest per exchange |
+| `eval_slices`, `current_eval_slices`, `current_slice_members` | frozen evaluation slices and their current membership |
+| `exchange_labels`, `label_events` | human lore/noise labels and their event history |
+| `scorer_activations`, `gate_predictions` | which scorer is active and its stored predictions |
+| `triage_model`, `triage_tokens` | triage classifier state |
+| `message_labels`, `message_model`, `message_tokens`, `message_combiner` | message-level sifting labels and models |
+| `claims`, `claim_sources`, `claims_fts` | extracted claims and their source messages (paused) |
+| `extraction_runs`, `extraction_batches`, `prompt_versions`, `probe_runs` | extraction and probe bookkeeping (paused) |
+| `lore` | view: claims judged net-new (paused) |
+| `schema_migrations` | applied migrations |
 
 ## Configuration
 
-Settings are read from the process environment by `infovore.config.load_settings`. `infovore.config.settings_from_environment(environ, dotenv_path)` first loads an optional `.env` file (`infovore.config.read_dotenv`: `KEY=VALUE` lines, blank lines and lines starting with `#` are ignored, surrounding single or double quotes on the value are stripped, a missing file yields no values) and then overlays the real environment on top of it, so real environment variables always win over the `.env` file. Startup fails loudly: every problem (missing required value, a value that fails to parse, an empty channel list, a non-positive number) is collected and raised together in one `ConfigError`, so all problems are visible at once instead of one at a time. The discord token is never included in any error message or in `repr()`/`str()` of the settings object.
-
-`INFOVORE_SOURCE` (`discord` default, or `export`) picks which `DiscordSource` implementation backs every command, and shifts which of the settings below are required, per the "Default" column. **`export` is the recommended source for the historic backfill**: fetch from Discord's API exactly once, with DiscordChatExporter (see "Running" → "Runbook", step 1), and every `infovore` command afterwards reads only that export's local JSON files and the SQLite database — re-runnable as often as needed with zero further Discord API traffic. `discord` (talking to Discord live via `discord.py`) is only needed for `infovore run`, which is optional.
+Settings come from the environment, or a `.env` file in the working directory. Missing or malformed required values fail at startup with all errors listed.
 
 | Variable | Default | Meaning |
-| --- | --- | --- |
-| `INFOVORE_SOURCE` | `discord` | `discord` or `export`. `discord` talks to Discord live (`infovore backfill`, `sync-optouts`, `infovore run`); `export` reads a DiscordChatExporter JSON export from `INFOVORE_EXPORT_DIR` and never touches Discord's API. |
-| `INFOVORE_EXPORT_DIR` | *(required when `INFOVORE_SOURCE=export`)* | Root directory of a DiscordChatExporter JSON export, searched recursively for `*.json` files (`infovore.source.export.ExportDiscordSource`). |
-| `INFOVORE_DISCORD_TOKEN` | *(required when `INFOVORE_SOURCE=discord`)* | Discord bot token. Never logged or included in error messages. Not needed with `INFOVORE_SOURCE=export` — DiscordChatExporter uses its own token, once, outside of infovore. |
-| `INFOVORE_GUILD_ID` | *(required when `INFOVORE_SOURCE=discord`; optional with `export`)* | Discord guild (server) id to operate in. Must be a positive integer. With `INFOVORE_SOURCE=export` and unset, it is inferred from the export at source-open time (`infovore.config.resolve_guild_id`); a `ConfigError` if the export holds more than one guild and none is configured. |
-| `INFOVORE_CHANNEL_IDS` | *(optional)* | Comma-separated list of allowlisted channel ids; every entry must be a positive integer. Unset or blank means every text channel and thread the source can see — every channel in the export with `INFOVORE_SOURCE=export`, or every channel the bot can read with `INFOVORE_SOURCE=discord`. `infovore.ingest.allowlist.is_channel_allowed` is the one predicate both `backfill` and live ingest (`infovore run`) apply: a channel is allowed if the list is empty, its own id is listed, or it is a thread whose parent channel id is listed (the parent comes from the `channels` table, filled in by `backfill` or a live `ThreadCreated` event; a message arriving in a thread infovore hasn't seen yet has its parent resolved through the open `DiscordSource` and cached, or is otherwise ignored and counted rather than stored). |
-| `INFOVORE_EXCLUDE_CHANNELS` | *(optional)* | Comma-separated list of denylisted channel **names** (case-insensitive; a leading `#` is stripped if present). Unset or blank excludes nothing. `infovore run`'s live extraction (`claimable_exchanges`), `extract --mode trial` sampling, and `sift export`/`sift serve --new` sampling all skip exchanges/messages in these channels — a thread whose parent channel is denylisted is excluded too, resolved through the `channels` table's `parent_id`. This is a separate filter from the triage gate (`gate_sql`/`passes_gate` are unchanged); `infovore status` reports how many gate-passing exchanges it currently excludes. See "Running" and "Sifting" below. |
-| `INFOVORE_DB_PATH` | *(required)* | Filesystem path to the SQLite database file. |
-| `INFOVORE_SCRATCH_DIR` | `scratch` | Working directory for backend scratch files (e.g. an empty cwd for `claude_cli` subprocesses). |
-| `INFOVORE_QUIET_GAP_MINUTES` | `30` | Minutes of silence in a channel before the quiet-gap grouping rule closes an exchange. Must be a positive integer. |
-| `INFOVORE_BATCH_SIZE` | `10` | Number of pending exchanges processed per extraction/probe batch. Must be a positive integer. |
-| `INFOVORE_MAX_RETRIES` | `3` | Maximum retry count for a failed exchange before it stops being retried automatically. Must be a positive integer. |
-| `INFOVORE_EXCHANGE_MAX_MESSAGES` | `50` | Maximum messages in one exchange before it is split (Lifecycle rule 6). Must be a positive integer. |
-| `INFOVORE_OPT_OUT_ROLE` | `no-archive` | Name of the Discord role that opts a member's messages out of extraction. |
-| `INFOVORE_INCLUDE_BOT_MESSAGES` | `false` | Whether bot-authored messages are ingested. Accepts `1`/`true`/`yes`/`on` and `0`/`false`/`no`/`off` (case-insensitive). |
-| `INFOVORE_TRIAGE_MIN_SCORE` | `0.3` | Threshold (0..1) the rule `triage_score` is compared against by `infovore triage --report` and `status`; it no longer gates extraction. |
-| `INFOVORE_TRIAGE_MIN_P_LORE` | *(removed)* | Setting it is a config error: the p_lore gate is retired (issue #236). |
-| `INFOVORE_TRIAGE_RULES` | *(optional, shipped `infovore/triage/rules.toml`)* | Path to a triage rules TOML file (`infovore.triage.rules.TriageRules`), overriding the shipped defaults — see "Triage". A missing file, invalid TOML, or a rules file with an unknown/missing/mistyped key is a `ConfigError` (exit `2`). |
-| `INFOVORE_WORKERS` | every CPU core (`os.cpu_count()`) | Worker processes for triage's CPU-bound scoring (`p_lore`, rule-based `score_exchange`, and the `--suggest-terms` corpus document-frequency scan — see "Triage"). Must be a positive integer; `1` disables the process pool (in-process scoring, one core). |
-
-Each stage — `extract`, `probe`, `judge` — has its own backend selection, all under an `INFOVORE_<STAGE>_*` prefix (`<STAGE>` is `EXTRACT`, `PROBE`, or `JUDGE`):
-
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `INFOVORE_<STAGE>_BACKEND` | `claude_cli` for every stage | Backend name for that stage, looked up in the `llm.registry.Registry` (e.g. `claude_cli`, `openai_compat`, `fake`). |
-| `INFOVORE_<STAGE>_MODEL` | `sonnet` (`extract`, `probe`), `haiku` (`judge`) | Model alias or id passed to the stage's backend. |
-| `INFOVORE_<STAGE>_CONCURRENCY` | `2` | Concurrent in-flight requests allowed for that stage. Must be a positive integer. |
-| `INFOVORE_<STAGE>_TIMEOUT` | `60` | Per-request timeout in seconds for that stage. Must be a positive number. |
-| `INFOVORE_<STAGE>_<KEY>` | *(none)* | Any other `INFOVORE_<STAGE>_*` variable is passed through to that stage's `StageSettings.options` under its lowercased key (e.g. `INFOVORE_EXTRACT_BINARY_PATH` becomes `options["binary_path"]`), for backend-specific settings such as `claude_cli`'s binary path or `openai_compat`'s base URL and key. |
-
-`infovore.llm.registry.Registry` maps each stage's configured backend name to a `BackendFactory` (`name`, `validate(StageSettings) -> list[str]`, `build(StageSettings) -> LLMBackend`); `default_registry()` registers the `fake`, `claude_cli`, and `openai_compat` factories. `Registry.validate(settings)` reports an unknown backend name per stage plus anything the matching factory's own `validate` rejects; `Registry.build_backends(settings)` raises `ConfigError` if validation fails, otherwise returns one backend per stage; `Registry.health_check(backends)` sends one trivial request per backend and reports `None` on success or the error message on failure, without ever raising. `extract`, `probe`, and `run` build and health-check their stage backends through `infovore.cli.stage_backend`, which prints a flushed `checking <stage> backend (<backend> / <model>)...` line before each stage's health check — visible feedback while a slow backend (e.g. `claude_cli` spawning `claude -p`) is still starting up, before any of that command's own streamed progress lines.
-
-### `claude_cli` backend
-
-`infovore.llm.claude_cli.ClaudeCliBackend` runs the `claude` CLI headless, once per `complete()` call, through an injected `infovore.llm.process.ProcessRunner`; it is the only module allowed to spawn a process (`subprocess`/`asyncio.create_subprocess_exec` banned everywhere else by ruff `banned-api`). `ClaudeCliFactory` (registry name `claude_cli`) validates that `StageSettings.model` is non-empty and builds a backend with `SubprocessRunner`, the stage's `model`, `concurrency`, and `timeout_seconds`, `options["binary"]` (default `claude`), and `options["scratch_dir"]` (default `scratch`, the same default as the top-level `INFOVORE_SCRATCH_DIR`).
-
-Argv, in exact order: `<binary> -p --model <model> --system-prompt <request.system> --tools "" --strict-mcp-config --setting-sources "" --no-session-persistence --output-format json`, plus `--json-schema <json.dumps(request.json_schema, sort_keys=True)>` when the request carries a schema. `--bare` is never passed — it makes the CLI read only `ANTHROPIC_API_KEY` and ignore the Max-plan OAuth login or a `claude setup-token` token. The prompt goes on stdin. `cwd` is a fresh, empty directory created with `tempfile.TemporaryDirectory` under `scratch_dir` (created with `parents=True` if missing) for every call, so no `CLAUDE.md` is ever discovered there; the directory is removed again once the call finishes, whether it succeeds, returns an error result, or the runner raises, so a long-running process never accumulates empty scratch directories.
-
-`claude -p --output-format json` emits one JSON object on stdout. Mapping to `LLMResult`:
-
-- `structured_output` (schema requests) or `result` (plain text); a schema request whose response has no `structured_output` object is `fatal`.
-- The canonical model id is the `modelUsage` key with the highest `outputTokens` (ties broken arbitrarily by iteration order); if `modelUsage` is absent or empty, the requested model alias is used instead.
-- `Usage.input_tokens` is `usage.input_tokens` + `usage.cache_creation_input_tokens` + `usage.cache_read_input_tokens` (each absent field treated as `0`; if all three are absent, `input_tokens` is `None`) — Claude Code splits prompt tokens across all three, and reading only `input_tokens` under-reports real usage by orders of magnitude once prompt caching kicks in. `Usage.output_tokens` is `usage.output_tokens`, unchanged. `total_cost_usd` (an API-equivalent cost, informational) populates `Usage.cost_usd`. `modelUsage`'s per-model `inputTokens`/`cacheReadInputTokens`/`cacheCreationInputTokens` (if present) are not used for token accounting — that block is only consulted for `outputTokens`, to pick the canonical model id above.
-- A timed-out run is `transient`. A non-zero exit with stdout that isn't a JSON object is `transient` when stderr looks like a network error (connection refused/reset, unreachable network, DNS/`getaddrinfo`, a socket error) and `fatal` otherwise.
-- Within a parsed `is_error` payload: `api_error_status == 429`, or `result`/`stderr` mentioning "usage limit", "rate limit", or "limit reached" (case-insensitive), is `usage_limit`, with `retry_after` parsed from an ISO-8601 timestamp or a 10-digit Unix epoch seconds value found in that text (rounded to the nearest second, floored at zero), defaulting to `300.0` seconds when no such timestamp is present. `api_error_status == 529` or in `500..599` is `transient`. `api_error_status` in `401`/`403`, or "not logged in"/"authentication" in the text, is `fatal`. Anything else `is_error` is `fatal`.
-
-Capabilities: `native_json_schema=True`, `max_concurrency` is the stage's configured concurrency.
-
-### `openai_compat` backend
-
-`infovore.llm.openai_compat.OpenAICompatFactory` (registered as `openai_compat`) drives any OpenAI-compatible Chat Completions endpoint through the `openai` SDK: vLLM, llama.cpp, Ollama, LM Studio/MLX, or a hosted provider. It is the only module allowed to import `openai` or `httpx2` (enforced by ruff `banned-api`; classic `httpx` stays banned everywhere too, in case a future dependency bump reintroduces it).
-
-A stage picks this backend with `INFOVORE_<STAGE>_BACKEND=openai_compat` and configures it with these `INFOVORE_<STAGE>_*` options (passed through `StageSettings.options`):
-
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `INFOVORE_<STAGE>_BASE_URL` | *(required)* | Base URL of the OpenAI-compatible endpoint, e.g. `http://localhost:11434/v1` for Ollama. |
-| `INFOVORE_<STAGE>_API_KEY` | *(required)* | API key sent to the endpoint. Never logged or included in error messages; local servers that don't check it still need a placeholder value such as `ollama`. |
-| `INFOVORE_<STAGE>_JSON_SCHEMA_SUPPORTED` | `false` | `true` or `false` (case-insensitive). Whether the endpoint supports native `response_format` json_schema output. When `false`, the backend asks for plain text and the extractor layer extracts the first JSON object from it instead. |
-
-Examples:
-
-```
-INFOVORE_EXTRACT_BACKEND=openai_compat
-INFOVORE_EXTRACT_BASE_URL=https://vllm.internal.example/v1
-INFOVORE_EXTRACT_API_KEY=sk-...
-INFOVORE_EXTRACT_JSON_SCHEMA_SUPPORTED=true
-
-INFOVORE_PROBE_BACKEND=openai_compat
-INFOVORE_PROBE_BASE_URL=http://localhost:11434/v1
-INFOVORE_PROBE_API_KEY=ollama
-INFOVORE_PROBE_MODEL=llama3.1
-INFOVORE_PROBE_JSON_SCHEMA_SUPPORTED=false
-
-INFOVORE_JUDGE_BACKEND=openai_compat
-INFOVORE_JUDGE_BASE_URL=http://localhost:1234/v1
-INFOVORE_JUDGE_API_KEY=lm-studio
-```
-
-Error mapping: HTTP 429 maps to `transient` and honors a `retry-after` header, except when the response body reports the OpenAI error code `insufficient_quota`, which maps to `usage_limit` instead (a hard billing/plan cap rather than a retryable rate limit) — also honoring `retry-after` when present. HTTP 5xx and connection/timeout errors map to `transient`. HTTP 401/403/400/404 map to `fatal`. A `finish_reason` of `length` or `content_filter`, an empty completion, or (when a JSON schema was requested and natively supported) a response that fails to parse as JSON all map to `fatal`. Usage is recorded from the response when the endpoint reports it, `None` otherwise; the model id is whatever the server echoes back, falling back to the configured model if blank.
-
-## Running
-
-```
-uv run infovore status
-uv run infovore search TERMS... [--limit N] [--context N] [--exchanges [--all]]
-uv run infovore slice freeze
-uv run infovore slice show [NAME]
-uv run infovore judge serve [--host HOST ...] [--port PORT] [--queue frozen|uncertain] [--scorer NAME]
-uv run infovore judge report [--by-channel [--min-labels N]]
-uv run infovore export-archive PATH [--force]
-uv run infovore backfill [--page-size N]
-uv run infovore chunk [--now 2026-01-01T00:00:00+00:00]
-uv run infovore chunk --measure [--gap MINUTES ...] [--adaptive --percentile P ...] [--fold F --fold-size N] [--channels N]   # read-only size distributions per candidate rule
-uv run infovore chunk --rechunk --recipe N [--dry-run]   # rebuild exchanges under recipe N, mapping slices and human labels by message membership
-uv run infovore triage [--report]
-uv run infovore triage --human-report [--min-per-class N]   # held-out precision/recall, or labels still needed
-uv run infovore triage --human-report --scorer NAME [--scorer-version V]   # any scorer's derived exchange annotations vs the latest human labels
-uv run infovore extract [--mode trial|live] [--sample N] [--seed S] [--exchange-id ID ...]
-                        [--min-score F] [--max-score F]
-                        [--strategy stratified|random]
-uv run infovore probe [--run-id [ID_OR_RANGE ...]] [--limit N] [--probe-model CANONICAL_ID] [--retry-failed] [--batch-size N] [--compare] [--compare-limit N]
-uv run infovore review [--run-ids [ID_OR_RANGE ...]] [--out PATH]
-uv run infovore promote --prompt-version V
-uv run infovore label --from-runs [ID_OR_RANGE ...]
-uv run infovore label --exchange-id ID --lore|--noise
-uv run infovore relevance cascade --slices s1,gold [--write] [--explain EXCHANGE_ID]   # lexicon, then Bayes, then residue (#209); `relevance mine` lists lexicon candidates
-uv run infovore snapshot <dest> [--force]
-uv run infovore run [--interval SECONDS] [--once]
-uv run infovore sift export [--size N] [--strategy random|uncertain|mixed] [--seed S] [--mix FRACTION] [--channels a,b,c] --out DIR
-uv run infovore sift import DIR [--save-rules NAME]
-uv run infovore sift serve [DIR] [--new --size N --strategy random|uncertain|mixed --seed S --mix FRACTION --channels a,b,c --out DIR] [--host HOST ...] [--port PORT]
-```
-
-`chunk` groups ingested messages into exchanges and persists the closed ones; `--now` overrides the clock, which is useful when iterating over an old backfill. While it runs, `chunk` streams progress, one flushed line at a time: `grouping: N channels with ungrouped messages`, then one `channel <id>: +E exchanges, D deferred` line per channel that has ungrouped messages, before the existing summary.
-
-`triage` (`infovore.triage.runner.triage_pending`, `infovore.triage.command.TriageCommand`) scores every exchange whose `triage_version` differs from the current `infovore.triage.score.TRIAGE_VERSION` — idempotent, so a rerun with no rule change scores nothing new, and bumping `TRIAGE_VERSION` re-scores the whole table. After scoring, it computes each channel's mean *raw* rule score (the sum of that exchange's signal weights, clamped to 0..1, before any channel adjustment) and the database-wide raw mean, then applies a bounded prior: `delta = clamp(WEIGHT * (channel_mean - global_mean), -CAP, CAP)` and `adjusted = clamp(raw + delta, 0, 1)`, with `WEIGHT = 0.3` and `CAP = 0.1` (`infovore.triage.runner.CHANNEL_PRIOR_WEIGHT`/`CHANNEL_PRIOR_CAP`) — a chatty channel whose average is below the database mean gets pulled down by at most 0.1, and one running consistently hot lore gets pulled up by at most 0.1, without hand-tuning per channel. `triage_score` is overwritten with `adjusted`; the delta itself is appended to `triage_reasons` as a `channel_prior` entry, and the per-channel deltas are returned in the report. While it runs, `triage` streams progress, one flushed line at a time: a start line with the candidate count (`triage: N exchanges to score`), one `exchange <id>: score=<raw> (k/N)` line per exchange scored, and a closing `channel priors applied: C channels` line, before the `scored=`/`channels_adjusted=` summary. `--report` additionally prints a score histogram in 0.1-wide buckets, each channel's adjusted-score mean and exchange count, counts of exchanges at/above and below `INFOVORE_TRIAGE_MIN_SCORE`, and the 10 most frequent triage reasons database-wide. After rule scoring and channel priors, plain `infovore triage` also loads the latest trained classifier, if any (`infovore.triage.train.load_latest_model`), and rescopes `p_lore`/`p_lore_model` (`infovore.triage.train.score_stale`) only for exchanges whose `p_lore_model` isn't that model's version yet — idempotent the same way rule scoring is, and cheap on a rerun with no new model.
-
-
-
-`label --from-runs`, `review --run-ids`, and `probe --run-id` share one run selector (`infovore.db.run_selection.resolve_run_selector`/`parse_run_tokens`), so none of them requires spelling out `$(seq 220 419)` by hand: each token is either a bare run id (`220`) or an inclusive `A-B` range (`220-419`), tokens can be mixed and repeated in the same flag and the result is de-duplicated and sorted, and an unrecognized token exits `2`. Every `extract` invocation stamps each run it records with a `batch_id`, written in the same transaction as the run itself (so a run interrupted by Ctrl-C, a crash, or a usage limit still leaves its completed runs correctly batched) (a new nullable `extraction_runs` column, see "Data model"; rows from before this feature stay `NULL`), so for `label --from-runs` and `review --run-ids`, giving the flag with no ids at all resolves to the latest trial batch — every run from the most recent `extract --mode trial` invocation, grouped by that `batch_id` (`infovore.db.run_selection.latest_trial_batch_run_ids`) — and exits `2` pointing at `infovore extract --mode trial` if no trial batch has been recorded yet. `probe --run-id` keeps its old default of no filter (every unprobed claim across the database) when the flag is omitted entirely; giving it with no ids resolves to the latest trial batch the same way, and giving it with ids accepts the same bare-id/range tokens.
-
-Separately, `infovore.db.batches.record_extraction_batch` writes one `extraction_batches` row (issue #107) *before* any exchange is processed — mode, `--strategy`, `--seed`, and `--sample`, keyed by the same `batch_id` — so a batch's own parameters are described even if the run never completes a single exchange (a `--strategy uncertain`/`mixed` invocation that turns out to need a trained model still leaves its attempted batch described, for instance). Every exchange a trial sample actually selects also gets an `extraction_runs.sampled_by` value naming the strategy that picked it (`stratified`, `random`, or `uncertain` — see "Triage" for why this matters and `--strategy mixed` below), `NULL` for a live run or an explicit `--exchange-id`.
-
-
-
-`extract --compare-prompt VERSION` (issue #164) re-extracts already-extracted exchanges under the live prompt and a candidate one, writes nothing, and reports claims per exchange, the compression ratio (claim payload chars over source chars), the share of claims whose grammatical subject is a person, and tokens per claim. The sample is STRATIFIED to match the size mix of the pending queue rather than the already-extracted population, because 90% of what has been extracted is 16-49 message exchanges while 76% of the queue is 15 messages or fewer; drawing from the latter measures a population the pipeline will not meet. `--compare-dump DIR` writes one JSONL record per exchange per arm, including exchanges that yielded nothing, because the aggregate is not the evidence: the first run of this command discarded its outputs and the follow-up question it immediately raised, whether the candidate's claims still cover the messages the incumbent's claims cited, went from free to another 40 calls. Each arm's label is checked against the extractor's own `prompt_version`, so an arm cannot be labelled for a configuration it did not run. Measured over two runs of 40 queue-matched exchanges, v5 against itself varies by 1.4% (138 then 136 claims), so a between-arm difference of this size is signal rather than run-to-run noise. v6 recovered only 26.5% of the messages v5's stored claims cited against v5's own 83% re-run ceiling, and produced nothing at all on 20 of the 40 exchanges, because refusing anything hedged also refuses facts: in this archive almost every real fact arrives attributed and tentative. v7 changes that one paragraph and nothing else, keeping a fact stated tentatively while still refusing a guess, a plan, a question or an unsettled dispute, with the uncertainty carried in `confidence`. Measured v5 against v6 over 40 queue-matched exchanges: compression fell from 0.630 to 0.105 and the person-subject share from 27.5% to 0.0%, while claims per exchange fell from 3.45 to 0.78. The last number is not yet interpretable: there is no same-version arm, so the run-to-run spread of a single prompt is unmeasured and some of that 4.4x may be variance rather than v6 refusing occasions.
-
-`probe --compare` (issue #158) re-probes claims that ALREADY carry a verdict and diffs the new answers against the stored ones, which are the reference. It never writes `claims.novelty`: a comparison that destroys its own baseline cannot be run twice. It does record `probe_runs`, so it reports its own cost through the same instrumentation as everything else. Output is the agreement rate, the full was-to-now matrix with disagreeing rows marked `*`, and a called-out count of `known` to `unknown` flips, the direction that silently inflates the novelty rate. `--compare-limit` (default 50) caps the sample, because this costs real calls.
-
-This is how a change to the probe gets trusted. Run it at `--batch-size 1` and again at the batch size under consideration over the same claims, and move the default only if the verdicts agree. The same applies to a prompt or model change. Nothing here is ever pointed at the whole corpus to find out whether it works.
-
-`probe` runs the closed-book novelty probe (`infovore.extract.novelty.run_probe`) over claims that still need it, built from the `probe` and `judge` stage backends (`infovore.extract.llm_extractor.BatchedLLMNoveltyProbe`), with the `probe` stage's configured concurrency. `--batch-size` (default `1`, i.e. off) is how many claims share one pair of LLM calls. It defaults to off because batching was measured to degrade verdicts (issue #160): over the same 30 already-probed claims, agreement with the stored verdicts fell from 83.3% at batch 1 to 73.3% at batch 3 to 66.7% at batch 10, and the disagreements are not noise. Nine of ten at batch 10 move toward `unknown`, monotonically with batch size, taking the sample from 50% `unknown` to 77%. Since `unknown` is what the pipeline counts as novel, batching inflates the novelty rate rather than merely trading quality for cost. Batching costs 3.5x fewer tokens (4,144 per claim at batch 1 against 1,184 at batch 10, measured over that same sample) and remains available for anyone who has re-measured it; do not raise it without re-running `--compare`. `--run-id` scopes the run to the non-retracted claims of those extraction runs only, instead of the whole database. `--limit` (default `INFOVORE_BATCH_SIZE`) is the number of candidates fetched per batch; the command loops fetching batches until a fetch turns up nothing left to probe. `--probe-model` names the canonical model id (e.g. `claude-sonnet-5`) the operator expects the configured probe backend to resolve to; passing it after a probe model upgrade re-probes exactly the claims that model hasn't seen (`db.claims.claims_needing_probe` / `claims_for_runs_needing_probe`), since probing is idempotent per `(claim, probe_model)`. Without `--probe-model`, only claims with novelty `unprobed` are considered, because the canonical model id is only known from a call's own result, not in advance. A claim whose `probe_error` is set (a `transient`/`fatal`/`invalid_output` failure from a previous probe attempt) is parked: it is skipped by every future `probe` run, on this or any other invocation, until `--retry-failed` is passed, which includes parked claims in the candidate set again for this run only. While it runs, `probe` streams progress, one flushed line at a time: `probe: N candidates` for the first batch fetched, then one line per claim — `claim <id>: <verdict>`, `claim <id>: failed`, or `claim <id>: paused` — before the existing summary. `probe` prints `probed`, `by verdict` (counts per `Novelty`), `failed`, and `pauses`, and exits `1` if any claim failed (`0` otherwise, even if some claims paused on a usage limit and later succeeded, or were parked and skipped).
-
-
-`review` (`infovore.extract.review.build_review`/`render_review_html`, `ReviewCommand`) renders a prompt-iteration report over one or more "run sets": the run ids in `--run-ids` (bare ids and/or `A-B` ranges, defaulting to the latest trial batch when omitted or given with none — see the run selector paragraph above; trial mode creates one run per exchange, so this is typically every run id `extract --mode trial` printed) are grouped by `(prompt_version, model)` (`infovore.extract.review.VersionKey`, labelled `<prompt_version> / <model>`) rather than `prompt_version` alone, so a local backend and Claude run at the same prompt version show up as separate columns and a local-vs-Claude comparison is exactly the two-version diff case below. Every exchange covered by any run is rendered with its messages, its rule `triage_score`, `p_lore`, `triage_reasons`, and effective `exchange_labels` label (see "Triage" and "Data model"; each is `—` when not yet set), and, per `(prompt_version, model)` present for that exchange, that version's claims (kind, subject, statement, confidence, cited message ids, novelty and probe answer), run outcome/error, and tokens. With exactly two versions covering the same exchange, a per-exchange diff shows claims added, dropped, and changed (claims are matched by `(subject, statement)` normalized; a "changed" match is the same subject with a different statement or kind, found among claims left over after the exact match pass) plus verdict shifts on matched claims. A summary header gives, per version: exchanges, claims per exchange, verdict distribution, share of `known`, failed runs, and tokens per 100 exchanges (runs don't record a dollar cost, so token counts are the number to watch). The report is one self-contained HTML file — inline CSS only, no external requests, readable in light and dark, collapsible per-exchange `<details>` sections — written to `--out` (default `review.html` under `INFOVORE_SCRATCH_DIR`, parent directories created as needed) and the path is printed. An unknown run id exits `2`.
-
-`promote` (`infovore.db.claims.promote_prompt_version`, `PromoteCommand`) records `--prompt-version V` as the live prompt version, so the next `extract` without `--mode trial` uses it. If `V` equals the current `infovore.extract.prompt.PROMPT_VERSION`, it is registered first (same as `extract` would); any other version must already be registered (by a prior `extract --mode trial` run, which registers the prompt version it ran with) or the command exits `2` with a clear message. It prints the resulting live prompt version.
-
-`label` (`infovore.triage.label.LabelCommand`, `infovore.db.labels`) records ground-truth `lore`/`noise` labels on `exchange_labels` (see "Data model" and "Triage"). `--from-runs` (bare ids and/or `A-B` ranges, defaulting to the latest trial batch when omitted or given with none — see the run selector paragraph above) derives an `llm`-sourced label per run (`infovore.triage.label.derive_labels_from_runs`), one `run {id}: {outcome}` progress line per run id (flushed immediately) followed by a `labeled: lore=N noise=N skipped=N` summary line (with the skipped run ids and their reasons in parentheses when any were skipped): a run whose outcome is `failed` is skipped ("failed run"); otherwise, a run with at least one claim probed `unknown`, `partial`, or `contradicts` is labeled `lore`; a run whose claims are all `known` (including a run with zero claims) is labeled `noise`; a run with neither — i.e. it still has an `unprobed` claim and no `unknown`/`partial`/`contradicts` claim — is skipped ("unprobed claims"). An unknown run id exits `2`. `--exchange-id ID --lore` or `--exchange-id ID --noise` instead records a `human`-sourced label directly, for hand corrections; `--lore` and `--noise` are mutually exclusive, `--exchange-id` requires exactly one of them, and `--from-runs`/`--exchange-id` are themselves mutually exclusive — every missing or conflicting combination exits `2`. Since `exchange_labels` has one row per `(exchange_id, source)`, re-labelling the same exchange from the same source (a later trial run, or a corrected hand label) replaces the earlier row rather than accumulating duplicates, and a human label always wins over an LLM one for the same exchange regardless of insert order.
-
-`sift export` (`infovore.sift.command.SiftCommand`, issue #128) writes one **message-level** trash-sifting batch to `--out DIR`, for a human to filter in lnav (the maintainer's log viewer of choice — see `man lnav` / https://lnav.org) and hand back with `infovore sift import` (issue #128 PR 2). Every message that belongs to an exchange (`exchange_messages`; ungrouped messages aren't part of the corpus this loop triages), isn't from an opted-out author, and doesn't already carry a `human` `message_labels` row is eligible (`infovore.sift.sampling.eligible_message_pool`). `--size` (default `1000`) picks how many messages the batch holds; `--seed` (default `0`) makes the draw reproducible. `--repeat N` (default `0`, issue #166) seeds the batch with `N` messages that ALREADY carry a human label, drawn from the same channel-stratified pool and mixed in by message id so nothing marks them out; re-judging them measures the maintainer's agreement with his own earlier call, which is the ceiling no technique can beat (`infovore.db.label_events.self_consistency`). `N` is clamped to the batch size and to however many labelled messages exist, so an over-large `--repeat` takes what there is rather than failing. `--allocation` (default `round-robin`, issue #166) chooses how `--size` is split across channels. `round-robin` spans channels for coverage of distinct trash patterns; `proportional` splits in proportion to each channel's share of the eligible pool, by largest remainder so the parts sum exactly to `--size`. Use `proportional` whenever a rate measured over the batch is meant to estimate the same rate over the corpus: under round-robin `#general` is 46% of the corpus but 3.5% of a 200-message batch, a 13x under-representation, so a raw keep-rate over the batch is not the corpus keep-rate and any corpus estimate rests on the handful of messages drawn from the largest channel. A channel too small to earn a whole slot gets none. Every strategy allocates `--size` round-robin across channels first (`infovore.sift.sampling._allocate_round_robin`, the same round-robin stratification `extract --strategy stratified` uses), so a batch can't be dominated by a single chatty channel like `#general`: `random` (default) then draws uniformly within each channel's share; `uncertain` takes, within that same per-channel share, the messages whose `p_trash` is closest to `0.5` (least sure) — this requires at least one message already scored (`infovore.sift.train`, PR 3) and exits `2` with a clear message otherwise (mirrors `extract --strategy uncertain`); `mixed` (`--mix`, default `0.5`) splits the batch between `uncertain` and `random` the same way `extract --strategy mixed` does, but falls back to an all-`random` batch when nothing anywhere has a `p_trash` yet, rather than waiting on a trained classifier. `--mix` outside `[0, 1]` exits `2`.
-
-`DIR` gets three files: `batch.log`, one line per message — ISO timestamp, `#channel`, author display name (local use only; this file never leaves the host), a `[msg:<id> ex:<exchange_id> p:<p_trash or ->]` tag, then the message text collapsed to one line and truncated to 300 characters with an ellipsis — in chronological order; `infovore-sift.json`, an lnav (0.14) JSON log format file, verified against real lnav on the maintainer's Mac, that parses `batch.log` into a queryable `infovore_sift` table with `channel` and `author` marked as filter identifiers, so `:filter-expr :channel = 'food'` works; and `manifest.json` (the batch's message ids in batch order, `strategy`, `seed`, `created_at`). The command prints where the files went and the exact lnav invocation: install the format once with `lnav -i DIR/infovore-sift.json`, then open the batch with `lnav DIR/batch.log`.
-
-`sift import DIR` (`infovore.sift.importer.import_batch`, issue #128 PR 2) reads back a human's lnav sift session over a batch previously written by `sift export`, and records `message_labels` rows with `source='human'` (re-importing the same `DIR` replaces the earlier human labels, same "human always wins, latest human label wins" rule as `exchange_labels`). It looks in `DIR` for either of two result files a human produces in lnav (see "Sifting" below), preferring `kept.csv` when both are present since it's a direct enumeration of the outcome rather than a derived one: **(a)** `kept.csv` — every message id still visible after filtering (a SQL export of `infovore_sift`'s `msg` column); every other id from the batch's `manifest.json` is recorded `trash`, every id in `kept.csv` is recorded `keep`. **(b)** `trash-regexes.csv` — the regex patterns actually applied as `:filter-out` filters (a SQL export of `lnav_view_filters`); each batch message is recorded `trash` if any pattern matches its `batch.log` line (the same text lnav filtered against), `keep` otherwise. Neither file present exits `2` with the exact lnav commands to produce one; no `manifest.json` in `DIR` exits `2` pointing at `infovore sift export`. `--save-rules NAME` (path (b) only; exits `2` on path (a), which has no regexes) stores the batch's trash regexes to `<INFOVORE_SCRATCH_DIR>/sift_trash_rules/<NAME>.json` for later corpus-wide use — issue #128 only stores them here, applying them corpus-wide is a later issue. It prints total and per-channel `keep=`/`trash=` counts.
-
-`sift serve` (`infovore.sift.command.SiftCommand`, `infovore.sift.serve`, `infovore.sift.httpd`, issue #131) replaces the lnav loop above with a keyboard-driven browser page for the same batches — see "Sifting in the browser" below for the full runbook. It serves either an existing export dir (`DIR`, positional) or a freshly sampled one (`--new`, taking the same `--size`/`--strategy`/`--seed`/`--mix`/`--out` as `sift export`, which it calls directly — exactly one of `DIR` or `--new` is required, and `--new` requires `--out`); `--mix` outside `[0, 1]` and `--strategy uncertain`/`mixed` without a trained model behave exactly as they do for `sift export`. It binds `--port` (default `8765`) on every address `--host` names (repeatable; overrides auto-detection entirely) or, with no `--host` at all, on `127.0.0.1` plus every private LAN (`10/8`, `172.16/12`, `192.168/16`) and Tailscale (`100.64.0.0/10`) IPv4 address the host has (`infovore.sift.addresses.default_hosts`) — never a public one. Every listening URL is printed immediately, before the command blocks (Ctrl-C to stop).
-
-`snapshot` writes a consistent copy of the product database to `<dest>` using the SQLite backup API (`infovore.db.snapshot.snapshot`), safe to run at any time, including while `backfill`/`chunk`/`extract`/`run` is mid-write against the same file: the backup only ever sees committed data, never a writer's in-flight transaction. It refuses to overwrite an existing `<dest>` unless `--force` is given, creates `<dest>`'s parent directories as needed, and writes through a temporary file in the same directory that it atomically renames into place, so a reader never observes a partially written snapshot. It reports the destination path, its size in bytes, and its `PRAGMA user_version` (the schema version). This is how the product database leaves a host — see "Deployment" below.
-
-Every subcommand loads configuration (environment, then `.env` in the working directory for anything not set), opens and migrates the database, and runs. `status` prints, from `current_exchanges` only: the current exchange count; `archived` (cascade relevant plus residue); `irrelevant` (denylist, bayes); `set aside (no_text)`; `residue`; `not yet cascaded`; `last cascade` time; trainable `human labels` (relevant/irrelevant, `triage.human.trainable_counts`); `excluded channels`; a short `extraction (history)` done/pending line; and each stage's backend and model. Cascade outcomes are the latest labelled `relevance_*` annotation per exchange.
-
-
-`backfill` walks every channel in `INFOVORE_CHANNEL_IDS` (or, if it's unset, every channel the source has), plus their threads (including archived ones), oldest message first, from `infovore.ingest.backfill.backfill`. Each channel's checkpoint (`channels.last_backfilled_message_id`) is stored after every page of messages, in the same transaction as that page's rows, so an interrupted run resumes exactly where it left off and never re-walks or loses data. A page that fails with a rate limit sleeps for the retry-after duration and retries from the checkpoint; a page that fails because the source is unavailable backs off exponentially (1s, 2s, 4s, ...); a channel that fails five consecutive times (configurable via the `backfill()` function's `max_attempts`) is recorded as failed and the walk continues with the remaining channels. `source/live.py` resolves each channel with `client.get_channel()` (a cache lookup) first and falls back to `await client.fetch_channel()` on a cache miss — archived threads are never in discord.py's cache, so a fresh thread found by `list_channels`'s `archived_threads()` walk is still fetched directly instead of failing; a channel the bot is forbidden from reading, or one that genuinely no longer exists (a deleted channel or thread), fails that channel immediately without retrying. While it runs, `backfill` streams progress, one flushed line at a time: `opening discord source...` before connecting, `found N channels (M selected)`, `channel <id> <name>: start` (with `resuming after message <id>` when a checkpoint exists), one `page +new, updated, unchanged (total so far)` line per saved page, and `done` or `failed: <reason>` per channel. At the end it prints one summary line per channel (pages walked, messages inserted/updated/unchanged, messages skipped as system or bot) and one line per failed channel, then exits `0` if every channel completed or `1` if any channel failed. `--page-size` (default `100`) controls how many messages are requested per history page. `backfill` and `sync-optouts` log in to Discord with `INFOVORE_DISCORD_TOKEN`, wait up to 60 seconds for the gateway to be ready, and always close the connection when they finish. A bad token, missing privileged intents, or a timeout exits `3` without printing the token. `sync-optouts` prints the same immediate `opening <source> source...` line as `backfill` before connecting, then its usual `added=`/`removed=`/`redacted_messages=`/`retracted_claims=` summary.
-
-`extract` (`infovore.extract.runner.run_extraction`, `infovore.extract.command.ExtractCommand`) turns pending and stale exchanges into claims with the extract stage's configured backend (`LLMClaimExtractor`), model, and concurrency. `--mode` defaults to `live`: it registers the current prompt version (`infovore.extract.prompt.PROMPT_VERSION`/`PROMPT_SHA256`) and refuses to run unless that exact version is the live, promoted one (exit `2`, "run `infovore promote --prompt-version vN`"). Live mode is gated on triage: before claiming anything, it refuses (exit `2`, "run `infovore triage` first") if any exchange still queued for extraction (`pending` or `stale`, under `INFOVORE_MAX_RETRIES`) has a `triage_version` that is `NULL` or not the current one; once every queued exchange is triaged, it repeatedly pulls up to `INFOVORE_BATCH_SIZE` claimable exchanges that pass the gate — oldest first by default (`--order chronological`), or with `--order best` highest `p_lore` first (exchanges with no `p_lore` last, then by rule `triage_score`, then oldest), so an unattended run that is stopped early has already processed the most promising exchanges (issue #115); chronological order remains the default because a later correction can only supersede a claim that already exists, and best-first weakens those `supersedes` links (below that, an exchange simply stays `pending` — it is lore-negative, not an error) until none remain. The gate is one function, `infovore.triage.gate.passes_gate(exchange, min_score, min_p_lore)` (mirrored in SQL by `gate_sql(min_score, min_p_lore)`, which `claimable_exchanges` uses so the live queue and a trial `--strategy uncertain` sample see exactly the same exchanges a live run would): an exchange with a `p_lore` (scored by a trained classifier) passes when `p_lore >= INFOVORE_TRIAGE_MIN_P_LORE`; one with no `p_lore` yet (cold start, or a classifier hasn't scored it) falls back to the rule `triage_score >= INFOVORE_TRIAGE_MIN_SCORE`. See "Triage" for how `p_lore` gets populated. Both the live queue and every trial sampling pool (`select_trial_sample`/`select_trial_sample_origins`) additionally exclude channels named in `INFOVORE_EXCLUDE_CHANNELS` — the channel denylist (see "Configuration") — a separate filter applied alongside, not inside, the gate; a thread whose parent channel is denylisted is excluded too. In either mode, an exchange whose every message is from an opted-out author is skipped without calling the extractor (it would only ever see `[redacted]`) and counted in `report.skipped`; only in live mode is the exchange's status also written to `skipped` — trial mode leaves status and retry count untouched, same as any other trial-mode exchange. On success, claims are recorded under the live run and the exchange is marked `done` (zero claims is still `done`); a `stale` exchange's previous live claims are retracted (`reextracted`) in the same step. A `transient`/`fatal`/`invalid_output` failure records a failed run and increments the exchange's retry count, marking it `failed` once `INFOVORE_MAX_RETRIES` is reached; a `usage_limit` result pauses on the configured `Sleeper` for its `retry_after` (default 300s) without touching retry counts, then retries the same exchange. `--mode trial` runs the extractor over an explicit set of exchanges (any status, untriaged or not — trial mode is never gated) picked with `--sample N` (a reproducible sample via `infovore.extract.runner.select_trial_sample`, using `--seed`, default `0`) and/or repeatable `--exchange-id`; `--min-score`/`--max-score` (either or both, inclusive, filtered against the rule `triage_score` regardless of `--strategy`) narrow the sampling pool to a score band for calibration — running a sample from just below and just above a candidate `INFOVORE_TRIAGE_MIN_SCORE` and comparing extraction results is how that threshold gets picked. `--strategy` (default `stratified`) picks how `--sample N` draws from that pool: `stratified`, the original behavior, allocates the sample round-robin across `(channel, exchange-size-bucket)` strata so recall isn't biased by channel or size, including rule-score-zero exchanges; `random` draws a uniform sample seeded by `--seed`; `uncertain` orders the pool by `|p_lore - 0.5|` ascending (ties broken by exchange id) and takes the `N` exchanges the trained classifier is least sure about — the ones where a label teaches it the most — and requires a trained model (at least one exchange with `p_lore` set) or exits `2` ("run `infovore triage --train` first"); `mixed` (issue #107) splits `N` between `uncertain` and `random` — `--mix FRACTION` (default `0.5`, i.e. 50/50) is the fraction assigned to `uncertain`, `round(N * FRACTION)` exchanges (capped at how many are actually scored), the rest `random` from what's left, deterministic under `--seed` and never double-picking an exchange (`infovore.extract.runner.select_trial_sample_origins`) — unlike plain `uncertain`, `mixed` never refuses for lack of a trained model: with no `p_lore` anywhere it just falls back to an all-`random` split, since a mixed round shouldn't have to wait on training the way a pure uncertainty sample does. `--mix` outside `[0, 1]` exits `2`. Every strategy stamps each exchange it selects with the strategy that picked it (`extraction_runs.sampled_by`; `stratified`/`random`/`uncertain` even under `mixed`) — see "Triage" for why. Trial mode never changes exchange status, retry counts, or existing claims, and its claims are recorded under a `trial` run for prompt iteration. Extractor calls are bounded by the extract stage's configured concurrency (`asyncio.Semaphore`). While it runs, `extract` streams progress, one flushed line at a time: a start line naming the mode and how many exchanges are queued (`extract: trial mode, N exchanges queued`) or that it is draining the live queue (`extract: live mode, draining queued exchanges`), then one line per exchange outcome — `exchange <id>: <n> claims`, `skipped`, `failed: <kind>`, or `paused <s>s (usage limit)` — each suffixed with a running counter, `(k/N)` in trial mode or `(k done)` in live mode, before the existing summary. `extract` prints processed/succeeded/failed/skipped/claims_recorded/pauses counts and the recorded run ids, and exits `1` if any exchange failed.
-
-`run` (`infovore.run.run_forever`/`run_once`, `infovore.run.RunCommand`) is the long-running mode: live ingest concurrently with a periodic cycle that makes no LLM call and never runs extraction (`infovore extract` is an explicit separate command). It opens the configured `DiscordSource` once (`context.source_factory`, closed on shutdown) and builds no backend. One task consumes `source.events()` via `infovore.ingest.live.handle_event`, applying the same `INFOVORE_CHANNEL_IDS` allowlist as `backfill`: an event outside the allowlist is counted in `events_ignored`, a failing event in `events_failed`. A cycle runs immediately and then every `--interval` seconds (default `600`): `sync_opt_outs` → `chunk.grouper.group_pending` (current recipe, adaptive gap and folding; only ungrouped messages, so incremental) → `triage_pending` → `triage.incremental.cascade_new_exchanges`, which runs the relevance cascade and writes its annotations for current exchanges that have none yet. An unexpected exception from any step is counted in `cycles_failed`; the loop waits out the interval and tries again. `--once` runs one cycle with no live consumption. On `SIGTERM` or `SIGINT` the running cycle finishes its step, the source closes, and `run` prints `events_handled`/`events_failed`/`events_ignored`/`cycles_completed`/`cycles_failed` and exits `0`. Progress: `opening <source> source...`, then one flushed `cycle: <step>` line (`sync-optouts`, `chunk`, `triage`, `cascade`) per step.
-
-Exit codes: `0` ok, `1` unexpected failure, `2` configuration or usage error, `3` Discord or an LLM backend is unavailable.
-
-### Runbook
-
-The guiding principle: **fetch from the Discord API once, then do everything else as a secondary step.** Step 1 below (exporting with DiscordChatExporter) is the only step that touches Discord's API, and it is done by DCE, not infovore. With `INFOVORE_SOURCE=export`, every infovore command — `infovore sync-optouts`, `infovore backfill`, `infovore chunk`, `infovore extract --mode trial`, `infovore probe`, `infovore review`, `infovore promote`, a real `infovore extract`/`infovore probe`, and `infovore snapshot` — reads only the export's local JSON files and the SQLite database. None of them make Discord API calls, so the whole pipeline is re-runnable as often as needed with zero further Discord API traffic; re-export and re-run `infovore backfill` whenever the channel history has moved on. `infovore run` (live ingest, step 9) is the only thing that talks to Discord at all, and it is optional.
-
-**1. Export the server with DiscordChatExporter.** Download [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) (Tyrrrz), create a Discord bot application for **DCE's own use** (not infovore's — infovore's `discord.py` client, set up in steps 2–3, is only needed for the optional `infovore run`), and on that bot's application enable the same two privileged intents DCE needs to read message bodies and resolve member/role info: **Message Content** and **Server Members**. Invite it read-only (**View Channels**, **Read Message History**), then export:
-
-```
-DiscordChatExporter.Cli exportguild -t <bot-token> -g <guild-id> -f Json --include-threads all -o export/
-```
-
-`-f Json` is the JSON export format `infovore.source.export.ExportDiscordSource` reads; `--include-threads all` is required — a lot of the lore lives in threads. Set `INFOVORE_SOURCE=export` and `INFOVORE_EXPORT_DIR=export/` (see "Configuration"); `INFOVORE_DISCORD_TOKEN` is not needed by infovore in this mode.
-
-**2. Create infovore's own bot** (only if you plan to use `infovore run` for live ingest — step 9; skip to step 4 otherwise). In the Discord Developer Portal, create an application and add a bot. On the Bot tab, enable the two privileged intents **Message Content** (message bodies) and **Server Members** (role membership, for opt-out sync); without both, the gateway rejects the connection. Copy the bot token.
-
-**3. Invite it read-only.** Invite the bot with the `bot` scope and only the **View Channels** and **Read Message History** permissions on the channels you want archived. It never sends messages.
-
-**4. Create the opt-out role and post the notice.** Create a role named `no-archive` (or set `INFOVORE_OPT_OUT_ROLE`), make it self-assignable (e.g. through your roles bot or onboarding), and post this Server notice in an announcements channel before the first backfill:
-
-> **Server notice — channel archiving.** A read-only bot is archiving the technical history of #channel-a and #channel-b so that hard-won SGI/IRIX knowledge (part numbers, jumper settings, PROM versions, fixes, procedures) isn't lost. It reads messages, never posts, and keeps specific technical facts with a link back to the original message. If you don't want your messages archived, give yourself the `no-archive` role: your past and future messages will be redacted in the archive (content and name replaced with `[redacted]`), and facts that came only from you will be removed. Removing the role later only affects future messages; redacted history stays redacted.
-
-With `INFOVORE_SOURCE=export`, `infovore sync-optouts` derives role membership from `ExportDiscordSource.role_member_ids`, i.e. from the roles recorded on authors in the export — so only members who have posted somewhere in the exported history can be recognized as opted out; a member who never posted has nothing to redact regardless.
-
-**5. Configure.** With the export (recommended): set at least `INFOVORE_SOURCE=export`, `INFOVORE_EXPORT_DIR` and `INFOVORE_DB_PATH` (see Configuration) — `INFOVORE_GUILD_ID` and `INFOVORE_CHANNEL_IDS` are optional and default to "every guild/channel the export holds" (one guild only). With live Discord: set at least `INFOVORE_DISCORD_TOKEN`, `INFOVORE_GUILD_ID` and `INFOVORE_DB_PATH` — `INFOVORE_CHANNEL_IDS` is optional here too and defaults to every channel and thread the bot can see. Either way, make sure the extract/probe/judge backends work: `infovore status` shows each stage's backend and model, and every LLM command health-checks its backend first (exit `3` if it's unavailable).
-
-**6. First backfill.** Always sync opt-outs first so nothing from an opted-out user is ever stored unredacted:
-
-```
-infovore sync-optouts
-infovore backfill
-infovore chunk
-infovore triage
-infovore status
-```
-
-`backfill` is resumable; if it's interrupted, run it again. With the export source, re-running it after re-exporting only ingests what's new (per-channel checkpoints), and a re-run over unchanged data changes nothing. The workflow order is always **backfill → chunk → triage → extract**: `triage` must run (or already be current) over every queued exchange before `extract` in live mode will claim any of them.
-
-**7. Settle the prompt** with the trial loop (next section): `infovore extract --mode trial`, `infovore probe`, `infovore review`, then `infovore promote` once a prompt version looks right. Trial mode is never gated on triage, so this loop works even before the first `infovore triage` run.
-
-**8. Extract for real:**
-
-```
-infovore triage
-infovore extract
-infovore probe
-```
-
-**9. Steady state (optional).** Everything above is re-runnable by hand with the export source and needs no live connection. If you also want live ingest, either keep one process running, which follows live messages and runs a sync → chunk → triage → extract → probe cycle every `--interval` seconds (this requires `INFOVORE_SOURCE=discord`):
-
-```
-infovore run --interval 600
-```
-
-or schedule `infovore run --once` from cron, launchd, or a systemd timer (see Deployment). Stop `run` with SIGTERM or Ctrl-C; it finishes the current step and closes the Discord connection.
-
-**10. Ship the product.** `infovore snapshot /path/to/lore-2026-10-01.db` writes a consistent copy of the database, safe while `run` is writing; consumers read its `lore` view (see "Consuming the database").
-
-**When things go wrong:** exit `2` is configuration (the message names every problem), exit `3` is Discord or an LLM backend being unavailable (bad token, missing intents, `claude` not logged in), exit `1` means some exchanges or claims failed and were counted — `infovore status` shows the queues, failed exchanges retry until `INFOVORE_MAX_RETRIES`, and parked probe failures come back with `infovore probe --retry-failed`.
-
-### Iterating the prompt
-
-This is the prompt-iteration loop: run the current prompt over a reproducible sample of the backfill, look at what it extracted, and either promote it or change the prompt and compare. Every step is `--mode trial`, so it never touches `live` claims or exchange status.
-
-1. `infovore backfill` then `infovore chunk`, once, to populate exchanges from the real history.
-2. `infovore extract --mode trial --sample 50 --seed 1` — runs `infovore.extract.prompt.PROMPT_VERSION` over 50 exchanges, stratified by channel and size, chosen deterministically by `--seed`. Note the run ids it prints.
-3. `infovore probe --run-id <the run ids from step 2>` — closed-book novelty probe over the trial's claims.
-4. `infovore review --run-ids <the same run ids>` — writes `review.html`; open it and read the claims, verdicts, and summary numbers (claims per exchange, share of `known`, tokens per 100 exchanges).
-5. Edit the prompt in `infovore/extract/prompt.py` and bump `PROMPT_VERSION` (this changes `PROMPT_SHA256` too, so the new version is distinguishable from the old one in the database).
-6. Repeat step 2 with the same `--seed` (`infovore extract --mode trial --sample 50 --seed 1`) so the new version runs over the same exchanges, then step 3 against the new run ids.
-7. `infovore review --run-ids <old run ids from step 2> <new run ids from step 6>` — with two prompt versions covering the same exchanges, the report adds a side-by-side diff per exchange (added/dropped/changed claims, verdict shifts) so a wording change's effect is visible exchange by exchange, not just in the summary.
-8. Once a version looks right, `infovore promote --prompt-version vN` makes it live.
-9. `infovore extract` (no `--mode`, so it defaults to `live`) now runs the promoted version over the real pending/stale queue.
-
-### Sifting
-
-Message-level trash sifting (issue #128): a subtractive, human-in-the-loop loop that hands small batches of messages to the maintainer in [lnav](https://lnav.org) (0.14+) and feeds the result back as `message_labels`. Every command below was verified against real lnav 0.14.0.
-
-1. `infovore sift export --out DIR` (see "Running" above for `--size`/`--strategy`/`--seed`/`--mix`) writes `DIR/batch.log`, `DIR/infovore-sift.json` (the lnav format), and `DIR/manifest.json`. Add `--channels a,b,c` (channel names, same normalization as `INFOVORE_EXCLUDE_CHANNELS`) to draw the batch only from those channels and their threads — useful for a batch drawn only from the technical channels where keep-vs-trash is actually hard, rather than one padded out by channels already known to be all trash. An unknown channel name exits `2` listing the known ones. The channel denylist (`INFOVORE_EXCLUDE_CHANNELS`) always wins over `--channels`, so naming a denylisted channel here samples nothing from it.
-2. `lnav -i DIR/infovore-sift.json` — install the format, once ever (it's remembered across lnav sessions; skip this step on every later batch).
-3. `lnav DIR/batch.log` — open the batch. `#channel`/author/`msg`/`ex`/`p` are queryable columns on the `infovore_sift` table (`:filter-expr :channel = 'food'` scopes the view to one channel); the message body is displayed and searched in the log view but isn't a separate SQL column.
-4. Filter out trash, repeating as needed: `:filter-out <regex>` hides every line whose text (the same `#channel author [msg:... ex:... p:...] body` text `batch.log` holds) matches `<regex>`; `:filter-in <regex>` keeps only matching lines. Preview highlights the matched portion in red before you commit.
-5. Save the result — either path (b) below alone, or path (a) for a final "here's exactly what's left" export; `sift import` accepts either, or both (preferring (a)):
-   - **(a) kept lines** — the exact set of messages still visible:
-     ```
-     ;SELECT msg FROM infovore_sift
-     :write-csv-to DIR/kept.csv
-     ```
-   - **(b) the trash regexes themselves** — every `:filter-out` regex you applied:
-     ```
-     ;SELECT pattern FROM lnav_view_filters WHERE view_name='log' AND type='out' AND language='regex' AND enabled=1
-     :write-csv-to DIR/trash-regexes.csv
-     ```
-6. `infovore sift import DIR` (optionally `--save-rules NAME` to keep path (b)'s regexes for later corpus-wide use) records the labels and prints keep/trash counts per channel.
-
-**What surprised me verifying this on real lnav:** `:write-to`/`:write-view-to`/`:write-raw-to` only ever operate on lines you've *bookmarked* (pressed `m` on) — a `:filter-out` alone doesn't make a line eligible for them, so they're a poor fit for a headless/scripted workflow. `;`-prefixed SQL queries against a log format's table, though, only ever return currently-*visible* rows — filtered-out lines simply aren't in the result set — and `:write-csv-to` writes any query's result straight to a file. That combination (steps 5 above) needs no bookmarking at all and is exactly as scriptable non-interactively (`lnav -n -c ...`) as it is interactively, which is how this was verified: synthetic batches in a throwaway temp directory on the maintainer's Mac, with `lnav -I <temp-config-dir>` so the real `~/.config/lnav` was never touched.
-
-7. **`infovore sift citations`** (`infovore.sift.citations.derive_citation_labels`, issue #128 PR 3) derives weak, free `citation` labels for every message belonging to an exchange with at least one successfully extracted (`mode='live'`, `outcome='ok'`) run: `keep` if any non-retracted claim from an `ok` live run of that exchange cites it (`claim_sources`), else `trash`. An exchange that was never successfully extracted live is left alone entirely — its messages get no citation label, since "nothing has cited it yet" isn't evidence either way. These are written as `message_labels` rows with `source='citation'`, so a human label (from `sift import`) always wins over a citation one for the same message (`infovore.db.message_labels.effective_message_labels`/`effective_message_labels_with_source`), and re-running `sift citations` after new live runs simply overwrites the prior citation rows rather than accumulating duplicates.
-8. **`infovore sift train`** (`infovore.sift.train.train_and_store`, issue #135) trains **two** naive Bayes message classifiers, reusing `infovore.triage.bayes`'s Robinson/Fisher combining unchanged: word tokens plus structural signals (`SIG_url`, `SIG_digits` — covers version strings and part numbers alike, `SIG_code`, `SIG_question`, `SIG_reply`), a `CHAN_<channel_id>` token, a per-message length bucket, and **conversation context** (issue #141, `infovore.sift.features.message_features`/`build_context_tokens`/`exchange_context_tokens`): since #137 the maintainer labels a message with its surrounding conversation in view — "that works" is junk in isolation but a meaningful confirmation after a how-to — so each message's exchange is loaded once, in position order (batched across every labeled message's exchange via `infovore.db.batch.exchange_inputs_for_ids`, the same loader `infovore.triage.train` uses), and namespaced virtual tokens are added: `PREV_<tok>`/`NEXT_<tok>` (the neighbouring message's own word tokens, capped at 30 distinct per neighbour) and `REPLYTO_<tok>` (the message it replies to, resolved with one more batched lookup when `reply_to_id` points outside the exchange, omitted otherwise); `*_FACT_url`/`*_FACT_version`/`*_FACT_partnumber`/`*_FACT_path`/`*_FACT_code` (a neighbour's fact-shaped signals); `POS_first`/`POS_early`/`POS_middle`/`POS_last` and `EXSIZE_<bucket>` (position and exchange-size buckets); and `CTX_is_reply`/`CTX_prev_ends_question`/`CTX_same_author_prev`. An opted-out author's message contributes **no** tokens to a neighbour's features (their own messages are still scored/trained like any other message, unchanged by this issue) — same rule as prompts. The feature set is versioned (`infovore.sift.features.FEATURE_SET_VERSION`, stored as `message_combiner.feature_set_version`): scoring with a stored model trained under a different version raises `infovore.sift.train.FeatureSetMismatchError` pointing back at `infovore sift train` rather than silently mixing incompatible tokens.
-
-   **Issue #144 — the ablation below showed context features *hurt* on real data**, so these conversation-context tokens are no longer always on. `infovore sift train --features plain|structural|context` (`infovore.sift.features.FeatureSet`) picks which named token set the persisted/scored model actually trains and scores with, and defaults to **`plain`** (`infovore.sift.features.DEFAULT_FEATURE_SET`) — no conversation-context tokens at all, exactly issue #141's own pre-context baseline. `structural` adds only the *shape* signals above (`POS_*`/`EXSIZE_*`/`CTX_*`, and a neighbour's fact-shape `*_FACT_*` tokens) but never a neighbour's own word tokens (`PREV_`/`NEXT_`/`REPLYTO_<word>`) — real-corpus ablation (1,184 human labels, ~238k citation labels) found those word tokens actively hurt naive Bayes, a length-bias-like failure where a long, wordy neighbour swamps the model: combined out-of-fold AUC against human labels dropped from 0.854 (no context) to 0.805 (full context), `keep_lost@0.7` rose from 8.4% to 13.9%, and `trash_caught@0.9` fell from 28% to 19%. `context` is everything, unfiltered — issue #141's original, always-on-until-now behaviour. Scoring always builds exactly the persisted set's tokens (`infovore.sift.features.context_tokens_for_feature_set`), skipping the exchange-context lookup entirely for `plain`. The chosen name is stored alongside `feature_set_version` (`message_combiner.feature_set_name`, additive migration 0014); a row written before this issue has no name at all and is resolved from its version alone — `1` → `plain`, `2` → `context`, the only two shapes #141 ever produced — so an existing stored model keeps scoring exactly as it did before, with no forced retrain.
-
-   `--human-weight` **is removed** — the old design counted a non-holdout human example `--human-weight` times by plain repetition, but Naive Bayes has no defense against duplicated evidence: at a weight high enough for human labels to matter, a single human-trashed message's distinctive words dominated the model outright (issue #135's motivating example: one message mentioning an SGI "Judge" graphics card sent every unrelated message containing "judge" to a high `p_trash`). Passing `--human-weight` now fails fast with an error pointing here instead of silently doing nothing. Instead:
-   - A **citation model** trains on citation-labeled messages only, excluding any message that also has a human label (a human label always wins, so that message belongs to the human model, not both — no example is ever double-counted).
-   - A **human model** trains on human-labeled messages only, with the same honest, non-duplicated counts.
-   - A **combiner** — an L2 logistic regression (`infovore.triage.logistic`, extended by #135 to fit continuous-valued features via a `Mapping[str, float]`, not just the binary indicator sets `infovore.triage.tuning` uses, though both still work) — is fit on three features per human-labeled message: `logit(p_citation)`, `logit(p_human)` (probabilities clipped to `[1e-6, 1 - 1e-6]` first, so neither logit blows up), and a `human_seen` indicator (whether the human model found any token clue at all — a message whose tokens the human model never saw scores exactly `0.5`, uninformative, and the fitted weight lets the combiner learn to fall back on the citation score alone for those). The human-side inputs are **out-of-fold**: messages are split into 5 folds by `sha256(message_id)`, and each fold's `p_human` comes from a human model trained on the *other* four folds only, so the combiner never sees a human model's in-sample overconfidence — the same failure mode `--human-weight` had, this time by construction rather than a knob. Citation predictions need no folding: the citation model never trains on a human-labeled message in the first place.
-   - **Below `--min-human-labels` (default `30`) examples of either class**, there's too little to fit a combiner honestly, so `sift train` falls back to the citation model alone (`p_trash = p_citation`) and says so in its output; `message_combiner.fallback` records it and `human_model_version` is left `NULL`.
-   - The **final** model retrains the human model on *all* human labels (the fold split above is only for generating the combiner's honest training inputs) and keeps the already-fitted combiner; `p_trash` for every message is then the combiner's output over the final citation and human models, computed the same batched/parallel way as before (`infovore.db.batch.BATCH_SIZE`, `INFOVORE_WORKERS`, `infovore.triage.parallel.ChunkPool`) — `messages.p_trash`/`p_trash_model` are unchanged columns, so nothing downstream (`sift export --strategy uncertain`, `sift serve`) needed to change.
-   - Both models and the combiner are versioned and persisted (`message_model`/`message_tokens`/`message_combiner` — see "Data model"); `load_latest_message_model` returns the full ensemble.
-9. **The report** `sift train` prints, evaluated **only against human labels, out-of-fold** (the honest read — citation labels are noisy, and everything here is scored on data the relevant model never trained on): AUC for the citation-only score, the human-only score, and the combined score, so you can see whether combining actually helps; and a **discard-pile view** for the combined score — at `p_trash` thresholds 0.5/0.7/0.9, the share of human-`keep` messages that would be lost and the share of human-`trash` messages that would be caught. A secondary section keeps the old citation-holdout metrics (a precision/recall/f1 table across thresholds 0.1–0.9, AUC, and precision/recall **per channel**, by channel name — not id — at the confusion threshold) from a 1-in-5 holdout carved out of the citation labels alone, for a quick sanity check on the citation model by itself. Top tokens are reported separately for each model. Finally, a **three-way ablation** (issue #144, superseding #141's original two-way version) prints the combined model's out-of-fold AUC and discard pile for **all three** feature sets — `plain`, `structural`, `context` — fit on the exact same folds and the exact same fallback decision (the expensive per-exchange context loading is shared once across all three; only the token-building and the three separate model fits repeat), with the persisted/scored set (`--features`, default `plain`) marked in the table, so the gain or loss any one set brings over the others is measured, not assumed, on every run. **Guidance:** keep the default (`plain`) unless this ablation shows another set clearly better against your own human labels — the real-corpus numbers above (0.854 vs 0.805 combined AUC) are why `plain` is the default, but a different labeling style (context always in view while labeling, which issue #137 later made the norm) could tip this the other way, which is exactly what re-running this ablation is for.
-
-`infovore sift export --strategy uncertain` (or `mixed`, once some messages have scores) reads `messages.p_trash` exactly like `--strategy random` reads nothing — no changes needed once `sift train` has run once; see "Running" above for the flags.
-### Sifting in the browser
-
-`infovore sift serve` (issue #131) replaces the lnav loop above with a purpose-built, keyboard-driven page for making hundreds of quick keep/trash calls — the lnav export/import path stays as an alternative for anyone who prefers it.
-
-**Privacy note — read this before running it.** The page shows real Discord usernames and full message text, and it has **no authentication**: anyone who can reach the bound address can open it. It is meant for a trusted home LAN and personal tailnet only, exactly the same trust boundary the maintainer's other local-only tools already assume. **Never expose it publicly** — don't port-forward it, don't bind it to a public interface, don't put it behind a reverse proxy open to the internet.
-
-1. **Serve a batch.** Either an existing one: `infovore sift serve DIR` (a directory `sift export` already wrote); or a fresh one, sampled directly: `infovore sift serve --new --size 500 --strategy mixed --out DIR` (same flags as `sift export`, including `--channels` and the `INFOVORE_EXCLUDE_CHANNELS` denylist, which this calls internally, so `DIR` is also a perfectly ordinary export batch afterwards — importable with plain `sift import` too, and resumable: labels already recorded for a batch's messages show up already labeled if the page is reloaded or the server is restarted). Add `--host` (repeatable) to override which addresses it binds instead of auto-detecting them, and `--port` (default `8765`) to change the port. It prints every URL it's listening on immediately, for example:
-   ```
-   listening on http://127.0.0.1:8765/
-   listening on http://192.168.0.47:8765/
-   listening on http://100.127.62.78:8765/
-   serving batch 'DIR': 500 messages (Ctrl-C to stop; run `infovore sift train` once everything is labeled)
-   ```
-2. **Open one of those URLs** on a laptop or a big monitor — the page is one self-contained HTML document (inline CSS/JS, no external requests, no build step), readable in light and dark (`prefers-color-scheme`), with large type and high contrast. Messages are grouped by exchange, in time order, each showing its channel, author and full text (long messages collapse and expand on click).
-3. **Sift with the keyboard** (mouse/tap equivalents are on every message too): `j`/`k` move to the next/previous message; `x` trashes the focused message, `space` keeps it; `u` undoes the last action (single or bulk); `X` trashes every remaining unlabeled message in the focused message's channel, within this batch only; `?` toggles this key list. The question to ask for every message: **would anything be lost if this message vanished from the conversation?** If yes — a fact, a decision, an answer someone would miss — `keep`; if not — "lol", a reaction-only reply, filler, chatter that doesn't carry the thread — `trash`. A single sampled line rarely answers that on its own, which is what the next step is for.
-4. **Judge with context, not just the sampled line** (issue #137): the focused message is shown with its surrounding conversation — the messages immediately before and after it in the same exchange (ordered the way the chunker reconstructed the conversation, not raw channel time, so a busy channel's unrelated crosstalk doesn't leak in), dimmed and smaller, clearly marked "context — view only": they're there to inform the keep/trash call on the focused message, never to be labeled themselves. Context is fetched on demand per message (debounced, cached) and is on by default; `c` toggles it off and on, `+`/`-` grow or shrink how many messages before/after are shown (default 4 each way, capped at 20). An opted-out author's messages, in or out of context, always show as `[redacted]`, never their real name or text.
-5. **Bulk-hide ("hide everything like this"):** select some text in a message (or don't), press `h` to open the panel, and pick a rule — contains phrase (case-insensitive), exact whole message, by author, by channel, shorter than N characters, or an advanced regex. **Preview** shows how many batch messages it would trash and how many of those are already labeled `keep` (a conflict, since applying overrides them); the server computes this, and applying it, itself (`infovore.sift.rules`), so the preview and the actual result always agree. **Confirm** and every match becomes trash in one undoable step; the rule is saved under a name you give it, in the same `<INFOVORE_SCRATCH_DIR>/sift_trash_rules/` directory `sift import --save-rules` uses, for a human to review before any future corpus-wide use — like that command, this one only stores it here.
-6. **Progress** (labeled/total, keep/trash counts) is always visible in the header; each label is written to `message_labels` (`source='human'`, `source_ref` like `sift-serve:<batch>`) in its own short transaction as soon as you act, so it's safe to run alongside a live `extract`/`probe` process against the same database (WAL + `busy_timeout`, same as every other `infovore` command). Once everything is labeled, the page shows a summary and the same next steps as the CLI: `infovore sift train` to retrain, or another `infovore sift serve --new --out DIR` batch.
-
-## Grouping rules
-
-`infovore/chunk/rules.py` groups the `MessageRow`s of one channel (plus its threads, which carry a `thread_id`) into `Group`s. Each `Group` has a `rule` (`GroupingRule.THREAD` | `REPLY_CHAIN` | `QUIET_GAP`), an ordered `messages` tuple, and a `context` tuple of uncitable overlap messages, non-empty only for parts produced by the size-cap split below. Every message given to `group_messages` ends up in exactly one group's `messages`, or is dropped first. Messages within a group, and groups within the returned list, are ordered by `(created_at, id)` (a group's position is its first message's key).
-
-**Drops** (lifecycle rule 7): `drop_ungroupable` removes deleted messages (`deleted_at` set) unconditionally, and bot-authored messages (`author_is_bot`) unless `include_bots=True`. System messages never reach the chunker; they are filtered at ingest/normalize time and have no representation in `MessageRow`.
-
-**Precedence** is thread > reply_chain > quiet_gap. Each rule claims messages from what the previous rule left behind; nothing is grouped by more than one rule.
-
-- **thread**: every kept message with a non-null `thread_id` is grouped with every other kept message sharing that `thread_id`, one group per distinct `thread_id`. This runs first, so a message inside a thread is never pulled into a reply chain or quiet-gap group with anything outside its thread, even if it replies to a message outside the thread — that parent is simply not part of the thread's group, and is handled by a later rule on its own. This is the "reply inside a thread whose parent is outside the thread" case: the reply stays in its thread group; the outside parent, if it has no other links, becomes its own quiet_gap group of one.
-- **reply_chain**: among messages not claimed by `thread`, this is the transitive closure over `reply_to_id` — the connected components of the reply graph, treating each message as a node and each `reply_to_id` that points at another message in the same input as an edge. A component is a `reply_chain` group only if it has more than one message; a message with no reply links, or whose only reply link points outside this input (already grouped by `thread`, in a different channel, or missing entirely), forms a component of size one and falls through to `quiet_gap` instead. A cycle in the reply graph (possible only from malformed data) is tolerated: union-find just treats it as an already-merged edge and the messages still end up in one group.
-- **quiet_gap**: the messages left after `thread` and `reply_chain` are sorted by `(created_at, id)` and split into a new group whenever the gap between consecutive messages strictly exceeds `quiet_gap` (a `timedelta`, default 30 minutes — exactly 30 minutes does not split). A single leftover message becomes a group of one.
-
-**Size cap** (lifecycle rule 6): after the three rules produce their groups, `split_oversized` splits any group whose `messages` exceeds `max_messages` (default 50) into consecutive, non-overlapping parts, each within the cap, by repeatedly cutting the longest prefix that still fits. Concretely: while more than `max_messages` messages remain unsplit, look at the first `max_messages + 1` of them, find the internal gap (the time delta between two consecutive messages) that is largest — ties broken toward the later position, so a run of equal gaps fills each part up to the cap rather than making many tiny parts — and cut the prefix there; that prefix (at most `max_messages` messages, at least one) becomes the next part, and the scan continues on the rest. The final remainder, now `<= max_messages`, becomes the last part. Each part after the first carries the previous part's last `overlap` messages (default 3) as its `context`, capped at however many messages that previous part actually has; `context` never contains any message that is also in the same part's `messages`, and it is never itself split or citable.
-
-**Closing** (lifecycle rule 2): `is_closed(group, now, quiet_gap)` reports a group as closed only once its newest message's `created_at` is strictly older than `quiet_gap` relative to `now`; at exactly `quiet_gap` it is still open. This applies uniformly to `thread`, `reply_chain`, and `quiet_gap` groups alike — the grouper (#16) uses it to decide when a group is done accumulating messages and can be persisted as an exchange.
-
-**Persisting** (`infovore/chunk/grouper.py`): `group_pending(conn, clock, quiet_gap, max_messages, include_bots)` loads, for every distinct `channel_id` with at least one message not yet in `exchange_messages` (a thread's messages carry their thread's id as `channel_id`, so a thread is naturally its own batch), every such message ordered by `(created_at, id)`, and runs `group_messages` over that batch. Only groups for which `is_closed(group, clock.now(), quiet_gap)` is true are persisted; the rest are left ungrouped for a later run (lifecycle rule 2) and counted as deferred. Each persisted group becomes one `exchanges` row via `insert_exchange`, in its own transaction: `content_hash` is the hex SHA-256 of the group's message ids, in the same `(created_at, id)` order as `messages`, joined by `,`; `started_at`/`ended_at` come from the first/last message; `grouping_rule` and `channel_id`/`thread_id` come from the group and the batch's channel. `group_pending` returns a `GroupingReport(exchanges_created, messages_grouped, groups_deferred)`. Re-running with nothing new to group creates nothing, since a message already in `exchange_messages` is never loaded again; if `insert_exchange` reports `DuplicateExchangeError` (its `content_hash` already exists) the group is treated as already persisted and grouping continues with the next one.
-
-`parent_exchange_id` is resolved per group, in this precedence, highest first:
-
-1. **Size-cap split part** (lifecycle rule 6): if the group is part `N > 0` of an oversized group's split (its `context` is non-empty), the parent is whichever exchange already owns `context`'s messages — that is always part `N - 1`, since a later part can only be closed once every earlier part of the same split is too. The renderer takes the parent's last messages (its `context` at persist time) as uncitable background.
-2. **Late reply** (lifecycle rule 1): otherwise, if the group's first message (by `(created_at, id)`) has a non-null `reply_to_id` and that target message already belongs to an exchange, the parent is that exchange.
-3. **Thread revival**: otherwise, if the group is a `thread` group and that `thread_id` already has at least one exchange, the parent is the most recently started one.
-
-A group matching none of these is a new, unparented exchange. Precedence matters because a group can match more than one case at once — a split part whose first message is also a late reply still links to the previous part, not to the reply target, and a revived thread whose first message is a late reply links to the reply target, not to the thread's own prior exchange.
-
-## Triage
-
-Most Discord chatter carries no lore, so exchanges are scored with deterministic, programmatic signals before any LLM sees them; only exchanges that score high enough are sent to extraction. Scoring is free and re-runs in seconds over the whole database. Scores live on `exchanges.triage_score` (0–1, clamped sum of the signals below), with the contributing signals in `triage_reasons` (JSON) and the rule version in `triage_version`.
-
-Rule scoring, `p_lore` scoring, and the `--suggest-terms` corpus document-frequency scan are all CPU-bound, per-exchange, and embarrassingly parallel, so they run across `INFOVORE_WORKERS` worker processes (default: every core; see "Configuration"). SQLite access stays in the main process (single-writer, batched loads and batched commits — `infovore.db.batch.exchange_inputs_for_ids`, `BATCH_SIZE`): a batch of exchanges' inputs is loaded in the main process, handed to `infovore.triage.parallel.ChunkPool` as plain, already-picklable data (`MessageRow`/`ReactionRow`/`AttachmentRow` lists, never a `sqlite3.Connection`), scored across worker processes (the model or rules a worker needs are sent once, via the pool's initializer, not per task), and the scored results come back for one batched write. `INFOVORE_WORKERS=1` disables the process pool entirely (in-process, one core) — the test suite's default, and a safe fallback on a platform where spawning worker processes is unavailable or undesirable. Output is identical either way: same scores, reasons, and floats, regardless of how many workers computed them.
-
-Every weight, cap, penalty, threshold, and term list below (the `domain_terms`, `archive_link`, and `gif_links` word lists included) is data, not code: it lives in the shipped `infovore/triage/rules.toml` (`infovore.triage.rules.TriageRules`, loaded with `tomllib`, validated so unknown/missing keys and wrong types are a clear config error). `INFOVORE_TRIAGE_RULES=<path>` points at an edited copy instead — copy `rules.toml`, change what you need, and set the variable (see "Configuration"). Only `irix_version`, `part_number`, `unix_path`, and `code` stay as regexes in `infovore/triage/score.py`, since they're structural rather than word lists; their weights still come from the rules file.
-
-`infovore.triage.score.TRIAGE_VERSION` (`"r-" + sha256(canonical rules)[:12]`, e.g. `r-3f9a2b7c1d04`) is a hash of the loaded rules' parsed content, canonicalized (`json.dumps(..., sort_keys=True)`) so whitespace-only or comment-only edits never change it — only the values do. **Editing the rules file changes this hash**, so the next `infovore triage` treats every already-scored exchange as stale (`triage_version` no longer matches) and rescores it with the new rules; `infovore extract` refuses to run live until that rescore is done (`has_untriaged_claimable`), so the very first `triage` after an upgrade or a rules edit rescores the whole database once, and every run after that is incremental again.
-
-| signal | weight | fires when |
-| --- | --- | --- |
-| `domain_terms` | +0.15 per distinct term, max +0.45 | SGI/IRIX vocabulary: model and board names (Indy, Indigo2, O2, Octane, Fuel, Tezro, Onyx, Origin, IPxx), CPUs (R10000, R12k…), tools and subsystems (hinv, inst, swmgr, nvram, PROM, XFS, XLV, MIPSpro, sash, GIO/XIO, VPro, Odyssey, Impact…) |
-| `irix_version` | +0.2 | IRIX-style versions such as `6.5.22`, `6.5.30m`, `IRIX 5.3` |
-| `part_number` | +0.3 | SGI part numbers such as `030-1234-001` |
-| `unix_path` | +0.15 | paths under `/usr`, `/var`, `/etc`, `/opt`, `/dev`, `/stand`, `/hw`… |
-| `code` | +0.15 | code blocks or inline backticks |
-| `archive_link` | +0.15 | links to FTP, archive.org, bitsavers, techpubs, or SGI/IRIX sites |
-| `pdf_attachment` | +0.15 | a PDF attachment (manuals, datasheets) |
-| `answered_question` | +0.2 | a message with a `?` followed by a reply of 40+ characters from a different author |
-| `agreed_answer` | +0.05 | a ✅/👍/☑️/✔️/💯 reaction on a message after the first |
-| `thread` | +0.05 | the exchange is in a thread |
-| `substantial` | +0.1 | 400+ characters of text in total |
-| `mostly_tiny_messages` | −0.2 | more than 70% of messages are under 20 characters |
-| `gif_links` | −0.1 | tenor, giphy, or `.gif` links |
-| `laughter` | −0.1 | more than 30% of messages are just "lol", "lmao", "haha"… |
-
-Channel priors and gating are applied by `infovore triage` and `extract` (see "Running"). The rule score above is a cold-start heuristic, not the final word: it only ever governs gating for an exchange the trained classifier below hasn't scored yet.
-
-### Ground truth: labels
-
-Ground truth accumulates in `exchange_labels` (see "Data model") and never shrinks: `infovore label --from-runs` derives `lore`/`noise` labels from trial extraction runs (a run with a claim probed `unknown`/`partial`/`contradicts` is `lore`; all-`known` or zero claims is `noise`), and `infovore label --exchange-id ID --lore|--noise` records hand corrections, which always win over a derived label for the same exchange (see "Running"). `infovore.db.labels.effective_labels` resolves one label per exchange this way. Those labels are the training data for the Bayesian classifier below.
-
-### The classifier
-
-`infovore/triage/bayes.py` (standard library only, deterministic) is a naive Bayes spam-filter classifier in the tradition of Graham's "A Plan for Spam" and Robinson's refinements:
-
-- **Features** (`features`): lower-cased word tokens (bounded to 40 characters) from the exchange's messages, plus *virtual tokens* for every rule signal from the table above that fired (`SIG_<name>`, e.g. `SIG_part_number`), a `CHAN_<channel_id>` token, and a message-count bucket token (`LEN_1`, `LEN_2-5`, `LEN_6-20`, `LEN_21+`) — so the classifier learns channel and length priors from data instead of the hand-tuned channel-prior formula above.
-- **Per-token probability** (`token_probability`): Robinson's smoothed estimate, `(s * x + n * p) / (s + n)`, where `n` is how many labeled documents contain the token, `p` is that token's raw `lore / (lore + noise)` document ratio, and `s = 1.0` (`UNKNOWN_WORD_STRENGTH`), `x = 0.5` (`UNKNOWN_WORD_PROBABILITY`) pull an unseen or rare token toward "uninformative" rather than overfitting on one example. A token seen in no labeled document, or before either class has any labeled document at all, is exactly `0.5`.
-- **Combining** (`p_lore`): only the `MAX_CLUES = 150` most "interesting" tokens are used — those with `|p - 0.5| >= MINIMUM_PROBABILITY_STRENGTH` (`0.1`), ranked by that distance — same as the classic filters, so one exchange's score isn't diluted by hundreds of uninformative common words. Fisher's method combines their probabilities into two independent chi-square statistics (evidence for lore, evidence for noise via `1 - p`) with `chi2q` (the regularized upper incomplete gamma function for an even-degrees chi-square, computed by direct series summation — no `scipy` dependency), and `p_lore` is `(lore_strength - noise_strength + 1) / 2`, back in 0..1. No informative clues at all scores exactly `0.5`.
-- **Held-out split** (`in_holdout`): `sha256(str(exchange_id))`'s first byte mod `HOLDOUT_BUCKETS` (`5`) — deterministic and stable across runs (adding new exchanges never reshuffles old ones' bucket), about a fifth of labels.
-
-The p_lore gate, `triage --train` and LLM-label training are retired (issue #236): the archive, `search --exchanges`, `export-archive` and the extract queue follow each exchange's latest `relevance cascade` annotations (`infovore.db.archived.archived_clause`: relevant or residue in; denylist, bayes-irrelevant, no_text and never-cascaded out), and every `run` cycle cascades new exchanges (`infovore.triage.incremental.cascade_new_exchanges`).
-
-`review` (see "Running") shows each exchange's rule score, `p_lore`, reasons, and effective label alongside its claims, grouped by `(prompt_version, model)`, so a local model and Claude on the same sample — or the rule score and the classifier — are easy to compare side by side.
-
-## Extraction prompt
-
-`infovore.extract.prompt` assembles a versioned prompt from an `infovore.extract.protocol.ExtractionRequest` (built by `infovore.extract.request.build_request` from an exchange). `PROMPT_VERSION` (currently `v1`) identifies the exact system prompt below, whose sha256 is `PROMPT_SHA256`; `prompt_version` is written to every `extraction_runs` row so a change to the wording is a new version, never a silent edit. `render_prompt(request)` returns a `RenderedPrompt(system, prompt, version, token_estimate)`; `token_estimate` is `ceil(len(system + prompt) / 4)`.
-
-The system prompt, verbatim:
-
-```
-You are reading an archived exchange from a hobbyist SGI/IRIX community.
-
-Record durable technical facts: statements that stay true and useful to someone who never reads this conversation. Part numbers, jumper and switch settings, PROM/firmware versions, IRIX quirks and the workarounds for them, repair and installation procedures, compatibility between specific parts, where software and manuals can be obtained, and what a model sold for and when. Generic computing knowledge is not wanted.
-
-Every claim is about a THING. Its grammatical subject must be the hardware, the software, the part or the procedure, never a person and never an unnamed someone. Write 'The SGI O2 power supply can be substituted with a Meanwell modular unit', not 'a member found that it can'. Who said it is recorded in sources and the permalink; it does not belong in the sentence. Authors appear as pseudonyms (member-A, member-B, ...) and must never be named. Businesses and resellers may be named, and a price needs its date.
-
-An occasion is not a fact, but an occasion can be the evidence for one. The event itself is never the claim: one person's purchase, a dispute with a seller, what somebody intends to try next, an unanswered question and an opinion all yield nothing. But when one machine's behaviour tells you something about that model or part, record it: a fault and the symptoms it produces, a part that turned out to fit, a command that did or did not work, a limit someone ran into. Write it as a statement about the hardware or software rather than about the occasion. Ask of each claim whether it would still be worth reading in ten years by someone holding the same hardware.
-
-Record only what the messages establish, and never add specifics from your own knowledge. A fact stated tentatively is still a fact: 'the ucontext struct reportedly holds no program counter' is worth recording, written as a statement about the struct, with the uncertainty carried in confidence rather than in the words. What yields nothing is a GUESS about what might be true, a plan, a question, or a statement the exchange itself disputes and never settles.
-
-Most exchanges yield nothing, and zero claims is the correct and common answer for ordinary conversation. Never return more than five claims from one exchange; if more seem available, keep the most durable.
-
-If a claim corrects one of the supplied related existing claims, cite that claim's id in supersedes. If the community corrects itself within this exchange, record only the corrected version, never the original mistake.
-
-Every claim must list in sources the refs (m1, m2, ...) of the messages in this exchange that support it. Never cite a message from the CONTEXT section (refs c1, c2, ...): those messages are read-only background from a prior exchange and cannot be cited.
-
-Reactions are provided as a weak signal of community agreement, not proof.
-
-Output ONLY a JSON object matching the given schema. No other text.
-```
-
-The user prompt (`RenderedPrompt.prompt`) lays out, in order:
-
-- `CHANNEL:` the channel name (falls back to the numeric channel id when the channel is unknown) and `PERMALINK:` the exchange's permalink, `https://discord.com/channels/{guild_id}/{channel_id}/{first_message_id}` (built by `infovore.extract.prompt.permalink`).
-- `CONTEXT (do not cite):`, present only when the exchange has a `parent_exchange_id` — the last `context_size` messages of the parent exchange, read-only and never citable, each labelled with a context ref `c1`, `c2`, ... in order.
-- `EXCHANGE:` — every message of the exchange itself, each rendered as `[ref] member-X @ ISO-8601 timestamp:` where `ref` is `m1`, `m2`, ... in exchange order, followed by its content, then an optional `Reactions: emoji×count, ...` line and an optional `Attachments: filename, ...` line.
-- `RELATED EXISTING CLAIMS:` — up to `related_limit` claims from `claims_fts` matching the exchange's own message contents (never the exchange's own earlier claims, which would otherwise make a re-extraction or a trial of an already-extracted exchange see its previous output as "already captured" and skip it) (excluding any message authored by an opted-out user, so their words never influence what is sent to the model), each as `[claim:<id>] (<kind>) <subject>: <statement>`, or the literal `none` when there are no matches.
-
-Authors are never shown to the model by name: each distinct author in the context and exchange gets a stable pseudonym (`member-A`, `member-B`, ..., `member-AA` after `member-Z`) in order of first appearance, and Discord mentions (`<@id>`, `<@!id>`) in message text are rewritten to the mentioned author's pseudonym, to `another member` if they aren't in the exchange, or to `[redacted]` if they opted out — so a claim can't leak a username the model never saw (issue #120's v3 trial showed instructions alone didn't prevent it). Before rendering, any message whose author has opted out (`infovore.db.raw.opted_out_user_ids`) has its author and content replaced with `[redacted]`; the message keeps its ref so citations and ordering stay consistent.
-
-Messages are labelled with short refs rather than Discord message ids because snowflakes exceed 2^53: a backend whose JSON runtime uses IEEE-754 doubles (the Node-based `claude -p`) rounds them, so a cited id would no longer match any message. `RenderedPrompt.refs` maps each exchange ref (`m1`, ...) to its real message id; context refs are deliberately absent from it, so citing one is rejected like any other unknown ref. Claims cite refs in `sources` (a list of strings), and `schema.parse_extraction` maps them back to message ids, so `ExtractedClaim.source_message_ids` and everything downstream still hold real Discord ids. Rendering is otherwise pure and deterministic: the same `ExtractionRequest` always renders to the same `RenderedPrompt`, and no wall-clock time is read.
-
-### Backend-neutral extraction
-
-`infovore.extract.llm_extractor.LLMClaimExtractor` implements `ClaimExtractor` (#5) against any `LLMBackend` (#5), never branching on which backend is configured. `LLMClaimExtractor(backend, max_output_tokens=8000)` renders the prompt (above), requests `json_schema_for(ExtractionOut)`, and reads the result: when `backend.capabilities().native_json_schema` is true and `result.structured` is present, that structured payload is used directly; otherwise the first JSON object is extracted from `result.text` (`schema.first_json_object`). The payload is always validated with `schema.parse_extraction`, given `RenderedPrompt.refs` (the exchange's own message refs mapped to message ids) as the citable set and the ids of the supplied related claims as the valid `supersedes` targets.
-
-On `InvalidExtractionError`, exactly one repair call is made: same system prompt, and a user prompt that is the original prompt plus a clearly delimited section (`--- PREVIOUS OUTPUT (invalid) ---` / `--- VALIDATION ERROR ---`) quoting the previous output verbatim and the validation error, asking for a corrected JSON object only. If the repair call itself returns an `LLMResult` error, that error is mapped normally (below); if the repair call succeeds but its payload still fails `parse_extraction`, the outcome is `Failure(FailureKind.INVALID_OUTPUT, <validation error>)` with `model=None`. There is no second repair attempt.
-
-`LLMResult` errors map to `Failure` kinds one-for-one: `ErrorKind.TRANSIENT` -> `FailureKind.TRANSIENT`, `ErrorKind.FATAL` -> `FailureKind.FATAL`, `ErrorKind.USAGE_LIMIT` -> `FailureKind.USAGE_LIMIT` (carrying `retry_after`). This applies to an error from either the initial call or the repair call. `ExtractionOutcome.model` is always the canonical model id from `LLMResult.model` (the backend's own resolved id, never a configured alias) on the call that ultimately produced the claims — the initial call's model normally, or the repair call's model when a repair was needed. `input_tokens`/`output_tokens` are summed across the initial and repair calls (a missing count from one call is treated as zero once the other call reports a count); if neither call reports token counts, both fields are `None`.
-
-### Novelty probe
-
-`infovore.extract.llm_extractor.LLMNoveltyProbe` implements `NoveltyProbe` (#5) as two backend-neutral calls, `LLMNoveltyProbe(probe_backend, judge_backend)`:
-
-1. **Recall** — `probe_backend` is asked the claim's `probe_question`, and nothing else: no exchange text, no statement, no claim id. The system prompt (`RECALL_SYSTEM_PROMPT`, verbatim below) tells it to answer from its own knowledge only, briefly, and to say exactly "I don't know" if unsure. The schema is `RecallOut`; native structured output is used when the backend reports it, otherwise `first_json_object` on the text, same as extraction.
-2. **Judge** — `judge_backend` is given the recall answer alongside the claim's subject and statement, and asked to return a `JudgeOut` verdict: `unknown` (the answer says it doesn't know, or is unrelated), `partial` (some but not all of the specifics), `contradicts` (the answer confidently asserts something incompatible with the claim), or `known` (substantively the same fact). The system prompt is `JUDGE_SYSTEM_PROMPT`, verbatim below.
-
-`ProbeOutcome.model` is always the **recall** call's canonical model id — that is the model whose knowledge was actually probed; the judge model is not recorded, since "net-new" is defined relative to the probe model's knowledge, not the judge's. `ProbeOutcome.answer` is the recall answer once the recall call has produced one, even if a later step (the judge call) fails. An error from either call maps to a `Failure` exactly as in extraction (`TRANSIENT`/`FATAL`/`USAGE_LIMIT`); invalid JSON from either call is `FailureKind.INVALID_OUTPUT`. Unlike extraction, the probe makes **no repair call** on invalid output from either the recall or the judge call — keeping the probe simple was chosen over matching the extractor's one-repair-attempt behavior, since a probe/judge failure just leaves the claim `unprobed` for a later run (Phase 4 task 6), rather than losing a batch of extracted claims.
-
-`RECALL_SYSTEM_PROMPT`, verbatim:
-
-```
-Answer the following question using only your own knowledge, with no other context. Be brief. If you are not sure of the answer, respond with exactly "I don't know".
-```
-
-`JUDGE_SYSTEM_PROMPT`, verbatim:
-
-```
-You are comparing a closed-book recall answer against a claim, to judge how much the answering model already knew.
-
-Return unknown if the answer says it does not know, or is unrelated to the claim.
-Return partial if the answer gives some but not all of the claim's specifics.
-Return contradicts if the answer confidently asserts something incompatible with the claim.
-Return known if the answer is substantively the same fact as the claim.
-
-Output ONLY a JSON object matching the given schema. No other text.
-```
-
-`infovore.extract.novelty.run_probe(conn, probe, clock, sleeper, *, probe_model, limit, concurrency, run_ids=None, retry_failed=False)` drives a `NoveltyProbe` (`LLMNoveltyProbe` or the fake `MarkerProbe`) over the database. Candidates come from one of three `db.claims` queries, in this precedence, each taking an `include_failed` flag set from `retry_failed`:
-
-1. `run_ids` given: `db.claims.claims_for_runs_needing_probe(conn, run_ids, probe_model, limit, include_failed)` — the non-retracted claims of exactly those extraction runs, that are `unprobed` or (when `probe_model` is given) whose recorded `probe_model` differs from it.
-2. `run_ids` is `None` and `probe_model` is given: `db.claims.claims_needing_probe(conn, probe_model, limit, include_failed)` — every non-retracted claim database-wide that is `unprobed` or whose `probe_model` differs.
-3. Neither: `db.claims.unprobed_claims(conn, limit, include_failed=include_failed)` — every non-retracted claim with novelty `unprobed`, since without a target model there is nothing to compare a claim's existing `probe_model` against.
-
-Each of these three queries additionally requires `probe_error IS NULL` unless `include_failed` is true. This means a claim that previously failed with a non-`USAGE_LIMIT` error is **parked**: once `db.claims.set_probe_error` has recorded a `probe_error` for it, no candidate query returns it again — in this run or any future one — until something clears `probe_error` (a successful `set_novelty` call, which always clears it) or the caller explicitly asks for parked claims back with `include_failed=True` (`retry_failed=True` from `run_probe`, `--retry-failed` from the CLI). This keeps a handful of permanently failing claims (e.g. persistent model refusals) from occupying the front of the `id`-ordered candidate window and starving every claim behind them.
-
-Each candidate is probed at most once per fetched batch, with an `asyncio.Semaphore(concurrency)` bounding how many probe calls are in flight at once. With `--batch-size N` above 1, candidates are grouped into batches of `N` and each batch is answered by one `probe.probe_batch()` call instead of `N` `probe.probe()` calls: one recall call carrying every probe question and one judge call carrying every (claim, answer) pair. `novelty._interleave_by_exchange` deals one claim per exchange per pass before grouping, so a batch does not carry two claims from the same conversation while other exchanges remain to deal from — two questions from one conversation can hint at each other's answers. A batch response is mapped onto its claims by the `index` each entry carries, never by position, and a response whose indices do not cover exactly the batch is rejected (`schema.parse_batch_recall` / `parse_batch_judge`), because a misaligned batch would write one claim's verdict onto another. A batch-level `INVALID_OUTPUT`, `TRANSIENT` or `FATAL` failure re-probes that batch's claims one at a time, so each gets its own verdict or its own recorded error rather than one call's failure being charged to all of them; a batch-level `USAGE_LIMIT` sleeps and retries the whole batch. A successful outcome calls `db.claims.set_novelty(conn, claim.id, outcome.verdict, outcome.model, outcome.answer, clock.now())`, which also clears `probe_error`. A `TRANSIENT`, `FATAL`, or `INVALID_OUTPUT` failure calls `db.claims.set_probe_error(conn, claim.id, failure.message)` (parking the claim as above), counts it in `failed`, and — for this run only — is not retried again even if `retry_failed=True` keeps returning it as a candidate; an in-memory "gave up this run" set filters it out of later batches so a claim that fails on every attempt cannot loop forever within a single `--retry-failed` run. A `USAGE_LIMIT` failure counts in `pauses`, calls `sleeper.sleep(failure.retry_after or 300)`, and retries the same claim — indefinitely, if the backend keeps returning `USAGE_LIMIT` — rather than pausing other claims already in flight; it never sets `probe_error` and so never parks the claim.
-
-`run_probe` fetches a batch of up to `limit` candidates, processes it fully (concurrently, bounded as above), then fetches again; it stops once a fetch returns nothing left to process (after filtering out claims already given up on this run). Because parking is a database-level exclusion rather than an in-memory one, this loop reaches every real (non-parked) candidate in one run regardless of how many claims are parked, without needing a paged/offset query.
-
-`run_probe` returns a `ProbeReport(probed, by_verdict, failed, pauses)`: `probed` is the count of claims that got a verdict this run; `by_verdict` maps `Novelty` (`unknown`/`partial`/`contradicts`/`known`) to how many of those probed claims got that verdict; `failed` is the count newly parked (or re-parked, under `--retry-failed`) this run; `pauses` is the number of `USAGE_LIMIT` sleeps taken (a single claim retried three times before succeeding counts three pauses).
+|---|---|---|
+| `INFOVORE_SOURCE` | `discord` | `discord` or `export` (`ExportDiscordSource`, a DiscordChatExporter JSON export) |
+| `INFOVORE_DB_PATH` | required | SQLite file; keep on local durable storage, never a network filesystem |
+| `INFOVORE_SCRATCH_DIR` | `scratch` | scratch files |
+| `INFOVORE_DISCORD_TOKEN` | required for `discord` | bot token |
+| `INFOVORE_GUILD_ID` | required for `discord`; optional for `export` | guild id, inferred from the export when unset |
+| `INFOVORE_EXPORT_DIR` | required for `export` | directory of exported JSON |
+| `INFOVORE_CHANNEL_IDS` | unset | optional comma-separated channel id allowlist; unset means all channels |
+| `INFOVORE_EXCLUDE_CHANNELS` | unset | comma-separated channel names that are never archived or sampled; always beats `--channels` |
+| `INFOVORE_QUIET_GAP_MINUTES` | `30` | quiet gap that closes an exchange |
+| `INFOVORE_EXCHANGE_MAX_MESSAGES` | `50` | split size for long exchanges |
+| `INFOVORE_BATCH_SIZE` | `10` | extraction batch size |
+| `INFOVORE_MAX_RETRIES` | `3` | retries for transient failures |
+| `INFOVORE_OPT_OUT_ROLE` | `no-archive` | role name that opts a member out |
+| `INFOVORE_INCLUDE_BOT_MESSAGES` | false | ingest bot messages |
+| `INFOVORE_TRIAGE_MIN_SCORE` | `0.3` | minimum rule-based triage score |
+| `INFOVORE_TRIAGE_RULES` | built-in | triage rule overrides |
+| `INFOVORE_WORKERS` | CPU count | worker processes |
+| `INFOVORE_<STAGE>_BACKEND`, `_MODEL`, `_CONCURRENCY`, `_TIMEOUT` | `claude_cli`, per stage, `2`, `60` | LLM backend per stage (`EXTRACT`, `PROBE`, `JUDGE`); other `INFOVORE_<STAGE>_*` keys, such as `BASE_URL` and `API_KEY` for `openai_compat`, pass through as backend options |
+
+`INFOVORE_TRIAGE_MIN_P_LORE` was removed and is rejected at startup.
+
+## Commands
+
+Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once installed. `--help` on any command lists all flags.
+
+- `infovore status`: row counts, queues, last runs and configured backends.
+- `infovore search TERMS [--limit N] [--context N] [--exchanges] [--all]`: full-text search of the message corpus.
+- `infovore backfill [--page-size N]`: walk allowlisted channels into the raw tables, resuming from checkpoint.
+- `infovore chunk [--rechunk] [--recipe N] [--dry-run] [--measure] [--gap M] [--adaptive] [--fold F] [--channels LIST]`: group messages into closed exchanges; `--measure` reports without writing.
+- `infovore run [--interval S] [--once]`: live ingest plus a periodic chunk, triage and cascade loop, with no LLM, until SIGTERM or SIGINT.
+- `infovore sync-optouts`: sync the opt-out role and redact newly opted-out users' history.
+- `infovore snapshot DEST [--force]`: consistent copy of the database through the SQLite backup API.
+- `infovore export-archive DEST [--force]`: shareable SQLite file of archived exchanges.
+- `infovore slice freeze | show`: freeze the evaluation slices once; show exchanges and messages per size bucket.
+- `infovore judge serve | report`: human judging page and its report (see below).
+- `infovore relevance cascade [--slices LIST] [--all] [--write] [--explain ID]`: run the cascade and report; `--write` records derived annotations.
+- `infovore relevance compare [--cv K] [--model M] [--pool first|mean|max] [--cache FILE] [--residue]`: stratified cross-validation of human Bayes against embedding plus logistic head.
+- `infovore relevance embed-score [--cv K] [--model M] [--cache FILE]`: write `p_relevant_embed` for labelled exchanges.
+- `infovore relevance llm-score --endpoint URL --model NAME [--residue] [--slices LIST] [--limit N] [--write] [--dry-run]`: score exchanges with a served OpenAI-compatible model.
+- `infovore relevance mine [--tech CH] [--off CH] [--min-count N]`: candidate lexicon terms by channel log-odds.
+- `infovore relevance collisions [--tech CH] [--off CH] [--terms LIST]`: lexicon terms common in off-topic channels.
+- `infovore triage [--report] [--human-report] [--train-human] [--scorer NAME] [--scorer-version V] [--include-training] [--human-limit N] [--all-exchanges]`: rule-based triage scores, reports and the human-label classifier.
+- `infovore label [--from-runs IDS] [--exchange-id ID] [--lore | --noise]`: record lore or noise labels.
+- `infovore sift export | import | citations | train | serve`: message-level trash sifting. `export` writes an lnav batch, `import` records its labels, `serve` is a browser UI; both take `--size`, `--strategy random|uncertain|mixed`, `--seed` and `--channels`.
+- `infovore extract [--mode trial|live] [--sample N] [--seed N] [--exchange-id ID] [--min-score X] [--max-score X] [--strategy stratified|random] [--compare-prompt V]`: claim extraction (paused).
+- `infovore probe [--run-id IDS] [--limit N] [--probe-model M] [--retry-failed] [--compare]`: closed-book novelty probe over claims (paused).
+- `infovore review [--run-ids IDS] [--out FILE]`: HTML report for prompt-version run sets (paused).
+- `infovore promote --prompt-version V`: promote a prompt version to live (paused).
+
+## Human judging workflow
+
+1. `infovore slice freeze` once, to fix the evaluation slices.
+2. `infovore judge serve [--host H] [--port P] --queue frozen|uncertain|c1|likely-irrelevant` serves the judging page until Ctrl-C. `--queue uncertain` orders by scorer uncertainty and takes `--scorer`.
+3. Judge exchanges in the browser; labels land in `exchange_labels` and `label_events`.
+4. `infovore judge report [--by-channel] [--min-labels N]` prints labels, slice progress, self-agreement and labels still needed. `--by-channel` breaks labels down per channel.
+
+## Measuring
+
+- `infovore relevance cascade --slices s1,s2,...` evaluates the cascade on the named frozen slices without writing; add `--write` to record annotations and `--explain ID` to show which stage decided an exchange.
+- `infovore triage --human-report --scorer NAME` reports a scorer against the human labels.
+- `infovore relevance compare` compares the human Bayes stage with the embedding head under cross-validation; `--residue` restricts it to residue exchanges.
+
+Measurement history and results are kept in the mcm-engine knowledge base, not in this repository.
 
 ## Privacy and opt-out
 
-A Discord role (`INFOVORE_OPT_OUT_ROLE`, default `no-archive`) lets a guild member opt their messages out of extraction. `infovore sync-optouts` fetches the role's current members via `DiscordSource.role_member_ids` and reconciles them against the `opt_outs` table (`infovore.privacy.optout.sync_opt_outs`): a member holding the role who is not yet in `opt_outs` is added with `since` set to now; a member in `opt_outs` who no longer holds the role is removed. Removing a user from `opt_outs` only stops future redaction — **opting back in never restores previously redacted history**, since redaction is destructive (the original content is overwritten, not merely hidden).
-
-For each newly added user, every message they already authored is redacted in place: `content` and `author_name_at_time` become `[redacted]`, `raw_json` becomes `{}`, every `message_revisions` row for their messages is redacted the same way, and their `attachments` rows are deleted. `reactions` are left untouched (no author-identifying content). This redaction is a set of plain `UPDATE`/`DELETE` statements in one transaction; it never goes through `upsert_message`, so it never writes a new revision.
-
-Going forward, every message from an opted-out author is redacted *before* it reaches storage: `infovore.privacy.optout.redact_normalized` replaces `content`, `author_name_at_time`, and `raw_json` (attachments dropped, reactions kept) on the `NormalizedMessage` produced by `ingest.normalize`, and this must run before `db.raw.upsert_message` is called. This ordering matters for backfill re-runs: `upsert_message` treats any difference in `content` from the stored row as an edit and writes a revision. If an already-opted-out author's original, unredacted content arrived from Discord again and were upserted directly, it would look like an edit and overwrite the redacted row (with the unredacted text saved as a "prior" revision). Redacting first means the incoming row always matches the already-redacted stored row, so the upsert is a no-op and no revision is ever written — a backfill can be re-run any number of times over an opted-out author's history without ever un-redacting it.
-
-Per lifecycle rule 5: when `sync_opt_outs` adds users, it also calls `db.claims.retract_claims_with_all_sources_opted_out`, which retracts (`retraction_reason = 'sources_opted_out'`) every claim whose *every* source message is authored by an opted-out user. A claim with at least one source from a non-opted-out author is kept; only its opted-out source messages are redacted.
-
-`sync_opt_outs` logs one `logging` info line per added or removed user id (never message content), so the change is auditable without exposing what was said.
-
-**Before any extraction** against real Discord data, run `infovore sync-optouts`; `backfill`, live ingest and `run` redact opted-out authors before storing anything, and prompt rendering (`extract/prompt.py`, `ExtractionRequest.opted_out_user_ids`) redacts them again.
-
-## Coverage exclusions
-
-- `...` bodies: Protocol method stubs have no executable behavior; they define shapes that implementations are tested against.
-- `if TYPE_CHECKING:` blocks: imports needed only by the type checker never run at runtime.
-- `infovore.llm.claude_cli.SubprocessRunner.run`: this is the one place allowed to spawn a real process, and exercising it would mean either spawning the real `claude` binary (never done in tests: no network, no dependency on being logged in) or spawning some other process as a stand-in, which still violates "no test spawns a process." Every other `claude_cli` behavior (argv, stdin, cwd, result mapping, every `ErrorKind`) is tested against `ClaudeCliBackend` with a fake `ProcessRunner`; `SubprocessRunner` itself is a thin, direct translation of `asyncio.create_subprocess_exec` plus `asyncio.wait_for` with no branching of its own to verify beyond what the standard library already guarantees.
-- `infovore.source.live.connect` and `infovore.source.live._real_start`: perform the real Discord login/gateway handshake over the network; PLAN operating rule 4 forbids tests from opening a network connection, so these one-line wrappers around `discord.Client.start` cannot be exercised in the test suite. The lifecycle around them (`open_discord_source`) is fully tested with a fake client and starter.
-
-## Consuming the database
-
-The SQLite file is the product. Read it directly; open it read-only (`file:infovore.db?mode=ro`) so readers never block the writer (the database runs in WAL mode).
-
-### The `lore` view
-
-`lore` is the contract. It contains only **current, net-new** claims:
-
-- from `live` extraction runs (trial runs are for prompt iteration and never appear);
-- not retracted (source messages deleted, or every source author opted out);
-- not superseded by a newer live, non-retracted correction;
-- novelty `unknown`, `partial`, or `contradicts` — claims the closed-book probe found the model did **not** already know. `known` and not-yet-probed (`unprobed`) claims are excluded.
-
-| column | meaning |
-| --- | --- |
-| `claim_id` | stable id of the claim |
-| `subject` | what the claim is about (e.g. `Octane2`, `IP35`) |
-| `statement` | the fact itself |
-| `kind` | `fact`, `correction`, `procedure`, or `reference` |
-| `confidence` | extractor confidence, 0–1 |
-| `novelty` | `unknown` (model had no idea), `partial`, or `contradicts` (model confidently believed something else — the most valuable) |
-| `permalink` | Discord link to the exchange the claim came from |
-| `source_message_ids` | comma-separated Discord message ids the claim cites, ascending |
-| `channel_id` | channel or thread the exchange belongs to |
-| `extracted_at` | when the extraction run started (ISO-8601 UTC) |
-| `supersedes_claim_id` | the claim this one corrects, if any |
-
-### Example queries
-
-What do we know about a subject:
-
-```sql
-SELECT subject, statement, novelty, permalink
-FROM lore
-WHERE subject LIKE '%Octane%'
-ORDER BY novelty = 'contradicts' DESC, confidence DESC;
-```
-
-Full-text search (the `claims_fts` index keeps part numbers, versions and paths such as `030-1234-001`, `6.5.22`, `/usr/sbin/inst` as single tokens; quote each term):
-
-```sql
-SELECT lore.subject, lore.statement, lore.permalink
-FROM claims_fts
-JOIN lore ON lore.claim_id = claims_fts.rowid
-WHERE claims_fts MATCH '"030-1234-001" OR "Octane2"'
-ORDER BY bm25(claims_fts, 2.0, 1.0);
-```
-
-Where the model is confidently wrong:
-
-```sql
-SELECT subject, statement, permalink FROM lore WHERE novelty = 'contradicts';
-```
-
-### Stability
-
-`PRAGMA user_version` holds the schema version (the latest applied migration). Columns of `lore` are only ever added; renaming or removing one bumps the version and is called out here.
+Members opt out by holding the role named by `INFOVORE_OPT_OUT_ROLE` (default `no-archive`). The bot needs the Message Content and Server Members intents. `infovore sync-optouts` syncs the role and redacts the history of newly opted-out users. Redaction happens before storage in ingest, so a re-run never un-redacts anything. `INFOVORE_EXCLUDE_CHANNELS` keeps whole channels out of the archive and out of every sampler. Share archives only through `export-archive`.
 
 ## Deployment
 
-Nothing host-specific lives in code. Every setting comes from the environment (or a `.env` file next to the working directory, see "Configuration"); `INFOVORE_DB_PATH` and `INFOVORE_SCRATCH_DIR` are the only paths involved and both must sit on durable, local (non-network) storage. `infovore` is one console-script package (`uv tool install .`) plus one container image built from the repo's `Dockerfile`; the recipes below are the same few commands on every host.
+Nothing host-specific lives in code. `infovore` is one console-script package (`uv tool install .`) and one container image from the `Dockerfile`; `/data` holds `INFOVORE_DB_PATH` and `INFOVORE_SCRATCH_DIR`. Never place the database on EFS, FSx or any network filesystem.
 
-### Laptop
+- Initial load: fetch from the Discord API once with DiscordChatExporter (`exportguild --include-threads all`), set `INFOVORE_SOURCE=export` and `INFOVORE_EXPORT_DIR`, then `infovore backfill` and `infovore chunk`.
+- Steady state: `infovore run` keeps ingest and the chunk, triage and cascade loop alive. Run it under launchd, systemd or `docker run -d --restart unless-stopped -v "$PWD/data:/data" --env-file .env infovore run`.
+- Periodic alternative: a timer that runs `infovore backfill && infovore chunk`.
+- `deploy/run-unattended.sh start --i-approved` is the tmux and caffeinate runner for unattended macOS runs. It refuses to start without `--i-approved`.
+- The `claude_cli` backend needs `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`) on headless hosts; `openai_compat` needs `INFOVORE_<STAGE>_BASE_URL` and `INFOVORE_<STAGE>_API_KEY`.
 
-```
-uv tool install .
-infovore backfill && infovore chunk
-```
-
-or, from a checkout without installing anything system-wide, `uv run infovore <command>`.
-
-### macOS launchd (Mac Studio)
-
-A `launchd` user agent runs a periodic `backfill` + `chunk` pair. Save as `~/Library/LaunchAgents/com.example.infovore.plist` and load with `launchctl load ~/Library/LaunchAgents/com.example.infovore.plist`:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key><string>com.example.infovore</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/bin/sh</string>
-    <string>-c</string>
-    <string>infovore backfill && infovore chunk</string>
-  </array>
-  <key>EnvironmentVariables</key>
-  <dict>
-    <key>PATH</key><string>/usr/local/bin:/usr/bin:/bin</string>
-  </dict>
-  <key>WorkingDirectory</key><string>/Users/you/infovore</string>
-  <key>StartInterval</key><integer>1800</integer>
-  <key>StandardOutPath</key><string>/Users/you/infovore/infovore.log</string>
-  <key>StandardErrorPath</key><string>/Users/you/infovore/infovore.log</string>
-</dict>
-</plist>
-```
-
-`WorkingDirectory` is where `infovore` looks for `.env`; put every `INFOVORE_*` and backend credential variable there instead of in the plist so secrets never end up in `launchctl list` output.
-
-### macOS tmux runner (unattended, over SSH)
-
-`deploy/run-unattended.sh` is the runner used for the first long unattended run on a Mac mini. Copy it to `~/infovore/run-unattended.sh` on the host. `start` rescores triage, promotes the prompt version (`INFOVORE_PROMPT_VERSION`, default `v5`), and opens a tmux session `infovore` with two windows, each under `caffeinate` so the Mac can't sleep:
-- `extract`: `extract --mode live`, restarting after crashes;
-- `probe`: a probe pass every 10 minutes.
-
-`stop` kills the session; work in progress is kept and everything resumes on the next `start`. Logs go to `~/infovore/logs/`.
-
-Over SSH or tmux on macOS the login keychain is locked, so `claude -p` must authenticate with `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`) exported in `~/.infovore.env`, which should be mode `600`.
-
-### Linux systemd
-
-A oneshot service plus a timer, run as the unprivileged user that owns the database:
-
-```ini
-# /etc/systemd/system/infovore.service
-[Unit]
-Description=infovore backfill + chunk
-
-[Service]
-Type=oneshot
-User=infovore
-EnvironmentFile=/etc/infovore/infovore.env
-WorkingDirectory=/var/lib/infovore
-ExecStart=/usr/local/bin/infovore backfill
-ExecStart=/usr/local/bin/infovore chunk
-```
-
-```ini
-# /etc/systemd/system/infovore.timer
-[Unit]
-Description=Run infovore periodically
-
-[Timer]
-OnBootSec=5min
-OnUnitActiveSec=30min
-
-[Install]
-WantedBy=timers.target
-```
-
-`sudo systemctl enable --now infovore.timer`.
-
-### Container on unknown hardware
-
-Build with `docker build -t infovore .` (add `--build-arg WITH_CLAUDE_CLI=1` to bundle the `claude` CLI for the `claude_cli` backend; it adds Node.js and `@anthropic-ai/claude-code`, needed only for that backend). The image runs as a non-root user (uid/gid 1000) and declares `/data` as the volume holding both `INFOVORE_DB_PATH` (`/data/infovore.db` by default) and `INFOVORE_SCRATCH_DIR` (`/data/scratch` by default). A bind-mounted host directory must be owned by uid 1000 (or `chown 1000:1000` it first); a named Docker volume is populated with the image's own ownership automatically and needs no extra step:
-
-```
-mkdir -p data && sudo chown 1000:1000 data
-docker run --rm -v "$PWD/data:/data" --env-file .env infovore backfill
-docker run --rm -v "$PWD/data:/data" --env-file .env infovore chunk
-```
-
-or `docker run -d --name infovore --restart unless-stopped -v "$PWD/data:/data" --env-file .env infovore run` keeps the same container alive as the live ingest + periodic pipeline (see "Running" above). `--env-file .env` carries every `INFOVORE_*` setting plus whichever backend credentials apply (see "Headless auth" below); none of it needs to be baked into the image.
-
-### AWS
-
-Run the same image on ECS (Fargate or EC2 launch type) or a plain EC2 instance, with `/data` backed by a **persistent block volume** — an EBS volume, attached to the task (Fargate's EBS volume attachment support) or mounted on the instance and bind-mounted into the container (EC2 launch type or plain `docker run`). **Never put `INFOVORE_DB_PATH` on EFS, FSx, or any other network filesystem**: SQLite's locking (and WAL mode especially) depends on POSIX byte-range advisory locks that network filesystems emulate poorly or not at all, leading to silent corruption or "database is locked" errors that never clear. Credentials and endpoint URLs come from the task definition's environment/secrets (Secrets Manager or SSM Parameter Store), the same `INFOVORE_*` and backend variables as everywhere else.
-
-### Headless auth per backend
-
-- **`claude_cli`**: run `claude setup-token` once, interactively, on any machine with a browser and a Claude Pro/Max/Team/Enterprise subscription; it prints a one-year OAuth token and does not store it anywhere. Set that token as `CLAUDE_CODE_OAUTH_TOKEN` in the environment (or `.env`/secrets store) of the host that runs `infovore`. Verified 2026-09-26 against Claude Code's current documentation at `https://code.claude.com/docs/en/authentication` ("Generate a long-lived token"): *"The command opens the same browser authorization flow as `/login`, and the token prints to the terminal after you approve access in the browser. It does not save the token anywhere; copy it and set it as the `CLAUDE_CODE_OAUTH_TOKEN` environment variable wherever you want to authenticate."* This is also confirmed by running `claude setup-token --help` locally (a Claude Code v2.1.283 install), though the CLI's own `--help` text does not name the variable — only the docs page does. `infovore`'s `claude_cli` backend never passes `--bare`, and the same docs page states bare mode does not read `CLAUDE_CODE_OAUTH_TOKEN`, so this token works with it.
-
-  Claude Code's own cloud-credential modes work the same way, as an alternative to a subscription token, also verified against the current docs on 2026-09-26:
-  - Amazon Bedrock (`https://code.claude.com/docs/en/amazon-bedrock`): set `CLAUDE_CODE_USE_BEDROCK=1`, AWS credentials by any of the AWS SDK's normal means (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN`, `AWS_PROFILE`, or `AWS_BEARER_TOKEN_BEDROCK`), and `AWS_REGION` (falls back to `AWS_DEFAULT_REGION`, then the active AWS profile's region, then `us-east-1`).
-  - Google Cloud's Agent Platform / Vertex AI (`https://code.claude.com/docs/en/google-vertex-ai`): set `CLAUDE_CODE_USE_VERTEX=1`, `ANTHROPIC_VERTEX_PROJECT_ID`, `CLOUD_ML_REGION`, and `GOOGLE_APPLICATION_CREDENTIALS` pointing at a service account key (or other Application Default Credentials).
-
-  These are Claude Code's own environment variables, not infovore's; set them alongside `INFOVORE_*` in the same environment/`.env` file/secrets store, since the `claude_cli` backend spawns `claude` inheriting its process environment untouched.
-- **`openai_compat`**: no interactive login — set `INFOVORE_<STAGE>_BASE_URL` and `INFOVORE_<STAGE>_API_KEY` (see "`openai_compat` backend" above for the full option list). Any OpenAI-compatible endpoint works: a hosted provider, or a local server (vLLM, llama.cpp, Ollama, LM Studio/MLX) reachable from the host running `infovore`.
-
-## Development workflow
+## Development
 
 ```
 uv sync
@@ -748,6 +140,4 @@ uv run ruff check . && uv run ruff format --check .
 uv run mypy
 ```
 
-Every change is red/green TDD on a feature branch named `<issue>-<slug>`, opened as a PR that references its issue. Coverage is enforced at 100% line and branch.
-
-Import boundaries are enforced by ruff `banned-api`: `discord` only in `infovore/source/live.py`, process spawning only in `infovore/llm/claude_cli.py`, `openai`/`httpx`/`httpx2` only in `infovore/llm/openai_compat.py`.
+Work is red/green TDD on a branch opened as a PR that references its issue. Coverage is enforced at 100% line and branch. `scripts/red_green.sh BASE HEAD` checks that changed tests fail on BASE and pass on HEAD.

@@ -1,6 +1,5 @@
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 
 from infovore.extract.llm_extractor import (
     JUDGE_SYSTEM_PROMPT,
@@ -584,13 +583,6 @@ async def test_probe_uses_recall_and_judge_schemas() -> None:
 async def test_llm_novelty_probe_conforms_to_novelty_probe_protocol() -> None:
     probe: NoveltyProbe = LLMNoveltyProbe(FakeBackend.scripted([]), FakeBackend.scripted([]))
     assert isinstance(probe, LLMNoveltyProbe)
-
-
-def test_readme_contains_recall_and_judge_system_prompts_verbatim() -> None:
-    readme = Path(__file__).resolve().parents[2] / "README.md"
-    text = readme.read_text()
-    assert RECALL_SYSTEM_PROMPT in text
-    assert JUDGE_SYSTEM_PROMPT in text
 
 
 async def test_extract_cites_snowflake_ids_via_refs_without_precision_loss() -> None:
