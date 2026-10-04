@@ -59,6 +59,13 @@ from infovore.triage.lexicon import (
 )
 from infovore.triage.llm_score import configure as configure_llm_score
 from infovore.triage.llm_score import run_llm_score
+from infovore.triage.short_report import (
+    best_cutoff,
+    bucket_table,
+    cutoff_line,
+    reached_stage_four,
+    short_limit,
+)
 
 ALL_BATCH = 2000
 RESIDUE_CHANNELS = 15
@@ -85,6 +92,7 @@ class RelevanceCommand:
             default=RELEVANT_PRECISION,
             dest="relevant_precision",
         )
+        sub.add_parser("short-report", help="short conversations with no tech words, by length")
         cascade.add_argument("--explain", type=int, default=None, metavar="EXCHANGE_ID")
         for name, text in (
             ("compare", "stratified CV: human Bayes vs embedding + logistic head"),
@@ -115,6 +123,8 @@ class RelevanceCommand:
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.relevance_action == "llm-score":
             return run_llm_score(context, args)
+        if args.relevance_action == "short-report":
+            return self._short_report(context)
         if args.relevance_action == "mine":
             return self._mine(context, args)
         if args.relevance_action == "compare":
@@ -259,6 +269,38 @@ class RelevanceCommand:
             context.stdout.write(f"{message.id}\t{hits}\t{text}\n")
         return int(ExitCode.OK)
 
+    def _short_report(self, context: "AppContext") -> int:
+        from infovore.cli import ExitCode
+
+        conn = context.conn
+        exclude = context.settings.exclude_channels
+        lexicon = load_lexicon()
+        t_high = tune_high(tuning_samples(conn, lexicon, exclude))
+        labels, _ = training_labels(conn, exclude_channels=exclude)
+        held = held_out_ids(conn)
+
+        def progress(done: int, total: int) -> None:
+            sys.stderr.write(f"progress {done}/{total}\n")
+
+        rows = reached_stage_four(
+            conn, current_exchange_ids(conn), lexicon, t_high, exclude, progress
+        )
+        context.stdout.write(
+            f"reached the embedding check: {len(rows)}; trainable labels {len(labels)}"
+            f" ({len(held)} held out, reported apart)\n"
+            "length\ttech words\tconversations\tlabelled\trelevant\tirrelevant"
+            "\t% irrelevant\theld-out relevant\theld-out irrelevant\n"
+        )
+        for line in bucket_table(rows, labels, held):
+            share = "n/a" if line.percent_irrelevant is None else f"{line.percent_irrelevant:.1f}"
+            context.stdout.write(
+                f"{line.bucket}\t{'tech words' if line.tech else 'no tech words'}"
+                f"\t{line.corpus}\t{line.relevant + line.irrelevant}\t{line.relevant}"
+                f"\t{line.irrelevant}\t{share}\t{line.held_relevant}\t{line.held_irrelevant}\n"
+            )
+        context.stdout.write(cutoff_line(best_cutoff(rows, labels, held)))
+        return int(ExitCode.OK)
+
     def _cascade(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode
 
@@ -282,7 +324,13 @@ class RelevanceCommand:
         )
         labels, _ = training_labels(conn)
         held = held_out_ids(conn)
+        limit = short_limit(conn, lexicon, t_high, exclude)
         context.stdout.write(self._thresholds(stage))
+        context.stdout.write(
+            f"short_no_tech limit={limit}\n"
+            if limit
+            else "short_no_tech: off (no cutoff qualifies)\n"
+        )
         context.stdout.write(
             f"lexicon v={lexicon.version} size={lexicon.size} {lexicon.sources}"
             f" t_high={t_high:.3f} (tuned on {BUILD} random-slice labels, held-out and"
@@ -295,7 +343,7 @@ class RelevanceCommand:
             if name == BUILD:
                 ids = [i for i in ids if i not in held]
             everything.update(ids)
-            outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude)
+            outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude, limit)
             kind = "tuning, held-out excluded" if name == BUILD else "held-out"
             context.stdout.write(f"slice {name} ({kind}): n={len(ids)}\n")
             for report in stage_reports(outcomes, labels):
@@ -304,14 +352,16 @@ class RelevanceCommand:
         if args.all:
             everything = set(current_exchange_ids(conn))
             everything_outcomes = self._all(
-                context, sorted(everything), lexicon, t_high, stage, labels
+                context, sorted(everything), lexicon, t_high, stage, labels, limit
             )
         if args.write:
             ids = sorted(everything)
             outcomes = everything_outcomes or run_cascade(
-                conn, ids, lexicon, t_high, stage, exclude
+                conn, ids, lexicon, t_high, stage, exclude, limit
             )
-            versions = write_outcomes(conn, outcomes, lexicon, t_high, stage, context.clock.now())
+            versions = write_outcomes(
+                conn, outcomes, lexicon, t_high, stage, context.clock.now(), limit
+            )
             written = ", ".join(f"{SCORERS[s]} v{v}" for s, v in versions.items())
             context.stdout.write(f"wrote {len(ids)} exchanges: {written}\n")
         return int(ExitCode.OK)
@@ -324,6 +374,7 @@ class RelevanceCommand:
         t_high: float,
         stage: EmbedStage,
         labels: dict[int, Label],
+        limit: int | None,
     ) -> list[Outcome]:
         def progress(done: int, total: int) -> None:
             sys.stderr.write(f"progress {done}/{total}\n")
@@ -337,6 +388,7 @@ class RelevanceCommand:
             context.settings.exclude_channels,
             ALL_BATCH,
             progress,
+            limit,
         )
         context.stdout.write(f"corpus: n={len(ids)}\n")
         for report in stage_reports(outcomes, labels):

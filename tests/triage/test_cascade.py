@@ -72,16 +72,17 @@ def test_stage_reports_count_decisions_confusion_and_residue() -> None:
         outcome(5, "residue", "residue"),
     ]
     labels = {1: Label.LORE, 2: Label.NOISE, 3: Label.LORE, 4: Label.NOISE}
-    denylist, no_text, lexicon, embed, residue = stage_reports(outcomes, labels)
+    denylist, no_text, lexicon, short, embed, residue = stage_reports(outcomes, labels)
 
     assert (lexicon.decided, lexicon.relevant, lexicon.irrelevant) == (4, 2, 2)
     assert (lexicon.tp, lexicon.fp, lexicon.fn, lexicon.tn) == (1, 1, 1, 1)
     assert (lexicon.labelled, lexicon.correct, lexicon.accuracy) == (4, 2, 0.5)
     assert denylist.decided == 0 and denylist.accuracy is None
     assert embed.decided == 0 and embed.accuracy is None
+    assert short.decided == 0
     assert (residue.decided, residue.share) == (1, 0.2)
     assert no_text.decided == 0
-    assert stage_reports([], {})[4].share == 0.0
+    assert stage_reports([], {})[5].share == 0.0
 
 
 def build(tmp_path: Path) -> tuple[dict[str, str], sqlite3.Connection]:

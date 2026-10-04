@@ -10,6 +10,7 @@ from infovore.triage.cascade import (
 )
 from infovore.triage.embed_stage import build_embed_stage
 from infovore.triage.lexicon import load_lexicon
+from infovore.triage.short_report import short_limit
 
 
 def unscored_exchange_ids(conn: sqlite3.Connection) -> list[int]:
@@ -33,6 +34,7 @@ def cascade_new_exchanges(
     lexicon = load_lexicon()
     t_high = tune_high(tuning_samples(conn, lexicon, exclude_channels))
     stage = build_embed_stage(conn, exclude_channels, cache_path)
-    outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude_channels)
-    write_outcomes(conn, outcomes, lexicon, t_high, stage, at)
+    limit = short_limit(conn, lexicon, t_high, exclude_channels)
+    outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude_channels, limit)
+    write_outcomes(conn, outcomes, lexicon, t_high, stage, at, limit)
     return len(ids)

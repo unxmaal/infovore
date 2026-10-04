@@ -26,6 +26,7 @@ from infovore.triage.cascade import (
 from infovore.triage.embed_stage import build_embed_stage, default_cache_path
 from infovore.triage.human import training_labels
 from infovore.triage.lexicon import load_lexicon
+from infovore.triage.short_report import short_limit
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -188,7 +189,8 @@ def select_ids(
         lexicon = load_lexicon()
         t_high = tune_high(tuning_samples(conn, lexicon, exclude))
         stage = build_embed_stage(conn, exclude, cache_path)
-        outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude)
+        limit = short_limit(conn, lexicon, t_high, exclude)
+        outcomes = run_cascade(conn, ids, lexicon, t_high, stage, exclude, limit)
         ids = [o.exchange_id for o in outcomes if o.stage == RESIDUE]
     if labelled_only:
         labels, _ = training_labels(conn)
