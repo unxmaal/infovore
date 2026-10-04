@@ -6,7 +6,7 @@ from wordfreq import top_n_list
 
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.reviewed_words import approved_words, decided_words
-from infovore.triage.lexicon import load_lexicon, tokens
+from infovore.triage.lexicon import load_lexicon, message_hits, tokens
 
 DEFAULT_TOP_N = 10000
 BATCH = 2000
@@ -47,12 +47,12 @@ def common_words(top_n: int) -> frozenset[str]:
 
 
 def candidates(conn: sqlite3.Connection, top_n: int = DEFAULT_TOP_N) -> list[tuple[str, int]]:
-    terms = load_lexicon(conn).terms
-    skip = common_words(top_n) | terms | decided_words(conn)
+    lexicon = load_lexicon(conn)
+    skip = common_words(top_n) | decided_words(conn)
     kept = [
         (word, count)
         for word, count in build_pile(conn).items()
-        if word not in skip and not (word.endswith("s") and word[:-1] in terms)
+        if not word.isdigit() and word not in skip and not message_hits(lexicon, word)
     ]
     return sorted(kept, key=lambda item: (-item[1], item[0]))
 

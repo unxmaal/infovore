@@ -70,7 +70,8 @@ def test_candidates_rank_by_count_minus_common_known_and_reviewed(tmp_path: Path
 
     assert found[0] == ("ubr", 3)
     assert "the" not in names
-    assert {"g5", "7200"} <= set(names)
+    assert "g5" in names
+    assert "7200" not in names
     assert "ebay" not in names
 
     record_decisions(conn, {"ubr": False, "g5": True}, AT)
@@ -125,3 +126,21 @@ def test_the_undecided_query_never_searches_annotations_by_scorer(tmp_path: Path
     )
 
     assert "annotations_scorer" not in plan
+
+
+def test_ids_digits_contractions_and_gazetteer_words_are_not_candidates(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    text = "<@142833170897698816> 100 zq7200 didn\N{RIGHT SINGLE QUOTATION MARK}t zxqv"
+    text += " octane o2 indy iris"
+    mark(conn, seed(conn, 1, text), "residue")
+
+    names = [w for w, _ in candidates(conn, 10000)]
+
+    assert "zq7200" in names
+    assert "zxqv" in names
+    assert "142833170897698816" not in names
+    assert "100" not in names
+    assert "didn" not in names
+    assert "octane" not in names
+    assert "o2" not in names
+    assert "indy" not in names

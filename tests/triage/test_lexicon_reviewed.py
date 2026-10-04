@@ -33,3 +33,8 @@ def test_tokens_reduce_urls_to_their_domain_word_and_drop_punctuation() -> None:
     assert "..." not in tokens("wait ... what")
     assert "-" not in tokens("a - b")
     assert tokens("a a b").count("a") == 2
+
+
+def test_curly_apostrophes_do_not_split_contractions() -> None:
+    assert "didn't" in tokens("it didn\N{RIGHT SINGLE QUOTATION MARK}t work")
+    assert "didn" not in tokens("it didn\N{RIGHT SINGLE QUOTATION MARK}t work")
