@@ -266,18 +266,17 @@ def _texty(conn: sqlite3.Connection, *exchange_ids: int) -> None:
             )
 
 
-def _gate(conn: sqlite3.Connection, scores: dict[int, float | None]) -> None:
-    for exchange_id, p_lore in scores.items():
-        conn.execute("UPDATE exchanges SET p_lore = ? WHERE id = ?", (p_lore, exchange_id))
-
-
 def test_the_uncertain_queue_is_closest_to_a_coin_flip_first(conn: sqlite3.Connection) -> None:
     _texty(conn, 2, 3, 5)
     _gate(conn, {1: 0.9, 2: 0.45, 3: 0.52, 4: None, 5: 0.1})
-    queue = uncertain_queue(3, 0.0, frozenset())(conn)
+    queue = uncertain_queue(3, frozenset())(conn)
 
     assert [i.exchange_id for i in queue] == [3, 2, 1, 5]
     assert [i.position for i in queue] == [3, 2, 1, 5]
+
+
+def _gate(conn: sqlite3.Connection, scores: dict[int, float | None]) -> None:
+    _derived(conn, "relevance_bayes", 1, {i: s for i, s in scores.items() if s is not None})
 
 
 def _derived(conn: sqlite3.Connection, scorer: str, version: int, scores: dict[int, float]) -> None:
@@ -298,17 +297,18 @@ def test_the_uncertain_queue_ranks_by_the_named_scorers_latest_version(
     _derived(conn, "local-model", 1, {1: 0.5, 2: 0.9, 3: 0.1})
     _derived(conn, "local-model", 2, {1: 0.95, 2: 0.6, 3: 0.45})
     _derived(conn, "other", 1, {4: 0.5})
-    queue = uncertain_queue(3, 0.0, frozenset(), "local-model")(conn)
+    queue = uncertain_queue(3, frozenset(), "local-model")(conn)
 
     assert [i.exchange_id for i in queue] == [3, 2, 1]
 
 
-def test_the_uncertain_queue_default_ignores_annotations(conn: sqlite3.Connection) -> None:
+def test_the_uncertain_queue_defaults_to_the_cascade_bayes_score(conn: sqlite3.Connection) -> None:
     _texty(conn, 2)
+    conn.execute("UPDATE exchanges SET p_lore = 0.5 WHERE id = 1")
     _gate(conn, {1: 0.9, 2: 0.5})
     _derived(conn, "local-model", 1, {1: 0.5, 2: 0.9})
 
-    assert [i.exchange_id for i in uncertain_queue(3, 0.0, frozenset())(conn)] == [2, 1]
+    assert [i.exchange_id for i in uncertain_queue(3, frozenset())(conn)] == [2, 1]
 
 
 def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
@@ -316,14 +316,14 @@ def test_the_uncertain_queue_drops_judged_exchanges_and_excluded_channels(
 ) -> None:
     _texty(conn, 2, 3)
     _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
-    build = uncertain_queue(3, 0.0, frozenset())
+    build = uncertain_queue(3, frozenset())
     first = build(conn)
     submit(conn, first, 0, first[0].exchange_id, RELEVANT, AT)
     conn.execute("UPDATE exchanges SET extraction_status = 'done' WHERE id = 3")
 
     assert [i.exchange_id for i in build(conn)] == [2]
     assert uncertain_judged(conn) == 1
-    assert uncertain_queue(3, 0.0, frozenset({"hardware"}))(conn) == []
+    assert uncertain_queue(3, frozenset({"hardware"}))(conn) == []
 
 
 def test_judging_in_the_uncertain_queue_never_marks_a_different_exchange_judged(
@@ -331,7 +331,7 @@ def test_judging_in_the_uncertain_queue_never_marks_a_different_exchange_judged(
 ) -> None:
     _texty(conn, 2, 3)
     _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
-    build = uncertain_queue(3, 0.0, frozenset())
+    build = uncertain_queue(3, frozenset())
     first = build(conn)
     submit(conn, first, 0, first[0].exchange_id, RELEVANT, AT)
 
@@ -394,7 +394,9 @@ def _content(conn: sqlite3.Connection, exchange_id: int, text: str) -> None:
     )
 
 
-def test_likely_irrelevant_ranks_by_lexicon_share_then_p_lore(conn: sqlite3.Connection) -> None:
+def test_likely_irrelevant_ranks_by_lexicon_share_then_bayes_score(
+    conn: sqlite3.Connection,
+) -> None:
     for eid in (6, 7, 8, 9):
         _exchange(conn, eid, [eid * 10 + 1])
     _texty(conn, 3, 4, 5, 6, 7, 8, 9)
@@ -402,9 +404,7 @@ def test_likely_irrelevant_ranks_by_lexicon_share_then_p_lore(conn: sqlite3.Conn
     texts = {4: "great food", 5: "kernel panic", 6: "nothing", 9: "scsi disk", 7: "x", 8: "y"}
     for eid, text in texts.items():
         _content(conn, eid, text)
-    for eid, p in ((1, 0.0), (2, 0.0), (3, 0.0), (4, 0.2), (5, 0.1), (6, 0.0), (7, 0.0), (8, 0.0)):
-        conn.execute("UPDATE exchanges SET p_lore = ? WHERE id = ?", (p, eid))
-    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id = 9")
+    _gate(conn, {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.2, 5: 0.1, 6: 0.0, 7: 0.0, 8: 0.0, 9: 0.0})
     _label_with(conn, 7)
 
     queue = likely_irrelevant_queue(frozenset())(conn)
@@ -449,7 +449,7 @@ def test_queue_stats_count_judged_from_the_queue_across_rebuilds(
 ) -> None:
     _texty(conn, 2, 3)
     _gate(conn, {1: 0.5, 2: 0.51, 3: 0.52})
-    build = uncertain_queue(3, 0.0, frozenset())
+    build = uncertain_queue(3, frozenset())
     first = build(conn)
     submit(conn, first, 0, first[0].exchange_id, IRRELEVANT, AT)
 
@@ -479,7 +479,7 @@ def test_c1_and_likely_irrelevant_queues_skip_excluded_channels(conn: sqlite3.Co
     conn.execute("UPDATE exchanges SET channel_id = 3 WHERE id = 5")
     _exchange(conn, 6, [61])
     _texty(conn, 2, 4, 5, 6)
-    conn.execute("UPDATE exchanges SET p_lore = 0.1")
+    _gate(conn, {i: 0.1 for i in range(1, 7)})
     _slice(conn, "c1", [2, 4, 5])
     excluded = frozenset({"food"})
 
@@ -503,12 +503,13 @@ def test_dynamic_queues_skip_exchanges_with_fewer_than_three_text_messages(
     _blank(conn, 62, "  \n\t ")
     _blank(conn, 72, "[redacted]")
     conn.execute("UPDATE messages SET deleted_at = ? WHERE id = 82", (AT.isoformat(),))
-    conn.execute("UPDATE exchanges SET p_lore = 0.1, extraction_status = 'pending'")
+    _gate(conn, {i: 0.1 for i in range(1, 10)})
+    conn.execute("UPDATE exchanges SET extraction_status = 'pending'")
     _slice(conn, "c1", [1, 2, 3, 6, 7, 8, 9])
 
     assert [i.exchange_id for i in c1_queue(frozenset())(conn)] == [1, 9]
     assert {i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)} == {9}
-    assert [i.exchange_id for i in uncertain_queue(3, 0.0, frozenset())(conn)] == [1, 9]
+    assert [i.exchange_id for i in uncertain_queue(3, frozenset())(conn)] == [1, 9]
 
 
 def test_the_likely_irrelevant_pool_is_drawn_after_the_fragment_filter(
@@ -516,7 +517,6 @@ def test_the_likely_irrelevant_pool_is_drawn_after_the_fragment_filter(
 ) -> None:
     monkeypatch.setattr("infovore.eval.judge.LIKELY_IRRELEVANT_POOL", 2)
     _exchange(conn, 6, [61, 62, 63])
-    conn.execute("UPDATE exchanges SET p_lore = 0.5 WHERE id = 6")
-    conn.execute("UPDATE exchanges SET p_lore = 0.0 WHERE id IN (4, 5)")
+    _gate(conn, {6: 0.5, 4: 0.0, 5: 0.0})
 
     assert [i.exchange_id for i in likely_irrelevant_queue(frozenset())(conn)] == [6]

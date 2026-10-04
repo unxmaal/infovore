@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from infovore.db.archived import archived_clause
 from infovore.db.connection import migrate, open_database
 from infovore.eval.slices import (
     BUILD,
@@ -22,14 +23,14 @@ from infovore.eval.slices import (
     slice_names,
     slice_summary,
 )
+from tests.cascade_marks import mark_all
 
 AT = datetime(2026, 10, 2, tzinfo=UTC)
-GATE = 0.9
 SIZES = (1, 2, 4, 9, 20, 60)
 
 
 def _seed(conn: sqlite3.Connection, passing: int, rejected: int) -> None:
-    """`passing` gate-passing and `rejected` gate-rejected pending exchanges,
+    """`passing` archived and `rejected` unarchived pending exchanges,
     cycling through every size bucket."""
     conn.execute(
         "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
@@ -39,22 +40,22 @@ def _seed(conn: sqlite3.Connection, passing: int, rejected: int) -> None:
         "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
         " VALUES (2, 1, NULL, 'food', 'text')"
     )
-    rows = [(GATE + 0.05, 1)] * passing + [(GATE - 0.5, 1)] * rejected
-    for index, (p_lore, channel) in enumerate(rows, start=1):
+    for index in range(1, passing + rejected + 1):
         conn.execute(
             "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
-            " ended_at, message_count, grouping_rule, content_hash, p_lore, triage_score)"
-            " VALUES (?, ?, 1, 1, ?, ?, ?, 'quiet_gap', ?, ?, 0.5)",
+            " ended_at, message_count, grouping_rule, content_hash)"
+            " VALUES (?, ?, 1, 1, ?, ?, ?, 'quiet_gap', ?)",
             (
                 index,
-                channel,
+                1,
                 AT.isoformat(),
                 AT.isoformat(),
                 SIZES[index % len(SIZES)],
                 f"h{index}",
-                p_lore,
             ),
         )
+    mark_all(conn, range(1, passing + 1), "residue")
+    mark_all(conn, range(passing + 1, passing + rejected + 1), "bayes_irrelevant")
 
 
 @pytest.fixture
@@ -68,8 +69,6 @@ def conn(tmp_path: Path) -> sqlite3.Connection:
 def _freeze(conn: sqlite3.Connection, **overrides: object) -> dict[str, list[int]]:
     args: dict[str, object] = {
         "max_retries": 3,
-        "min_score": 0.3,
-        "min_p_lore": GATE,
         "exclude_channels": frozenset(),
         "at": AT,
     }
@@ -116,12 +115,15 @@ def test_build_and_holdout_never_share_an_exchange(conn: sqlite3.Connection) -> 
     assert not set(frozen[BUILD]) & set(frozen[HOLDOUT])
 
 
-def test_the_control_comes_only_from_gate_rejected_exchanges(conn: sqlite3.Connection) -> None:
+def test_the_control_comes_only_from_unarchived_exchanges(conn: sqlite3.Connection) -> None:
     frozen = _freeze(conn)
-    p_lore = {r["id"]: r["p_lore"] for r in conn.execute("SELECT id, p_lore FROM exchanges")}
+    in_archive = {
+        r["id"]
+        for r in conn.execute(f"SELECT id FROM exchanges WHERE {archived_clause('exchanges.id')}")
+    }
 
-    assert all(p_lore[i] < GATE for i in frozen[REJECTED])
-    assert all(p_lore[i] >= GATE for i in frozen[BUILD] + frozen[HOLDOUT])
+    assert not set(frozen[REJECTED]) & in_archive
+    assert set(frozen[BUILD] + frozen[HOLDOUT]) <= in_archive
 
 
 def test_the_gold_set_is_forty_from_build_and_ten_from_the_control(
@@ -188,15 +190,11 @@ def test_denylisted_channels_are_excluded_like_the_queue(tmp_path: Path) -> None
     pools = queue_population(
         connection,
         max_retries=3,
-        min_score=0.3,
-        min_p_lore=GATE,
         exclude_channels=frozenset({"food"}),
     )
     rejected = rejected_population(
         connection,
         max_retries=3,
-        min_score=0.3,
-        min_p_lore=GATE,
         exclude_channels=frozenset({"food"}),
     )
 

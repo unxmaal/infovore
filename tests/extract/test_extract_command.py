@@ -3,6 +3,8 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
 from infovore.cli import ExitCode, builtin_commands, main
 from infovore.config import StageSettings
 from infovore.db.claims import promote_prompt_version, register_prompt_version
@@ -14,6 +16,7 @@ from infovore.llm.protocol import ErrorKind, LLMBackend, LLMRequest, LLMResult
 from infovore.llm.registry import Registry
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
 from infovore.triage.score import TRIAGE_VERSION
+from tests.cascade_marks import mark
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -67,8 +70,13 @@ def registry_with(results: list[LLMResult]) -> Registry:
 
 
 def mark_triaged(
-    conn: sqlite3.Connection, exchange_id: int, triage_score: float | None = 1.0
+    conn: sqlite3.Connection,
+    exchange_id: int,
+    triage_score: float | None = 1.0,
+    cascade: str | None = "residue",
 ) -> None:
+    if cascade is not None:
+        mark(conn, exchange_id, cascade)
     conn.execute(
         "UPDATE exchanges SET triage_score = ?, triage_reasons = ?, triage_version = ?"
         " WHERE id = ?",
@@ -82,7 +90,10 @@ def mark_triaged(
 
 
 def seed_pending_exchange(
-    db_path: str, promoted: bool = True, triage_score: float | None = 1.0
+    db_path: str,
+    promoted: bool = True,
+    triage_score: float | None = 1.0,
+    cascade: str | None = "residue",
 ) -> int:
     conn = open_database(db_path)
     migrate(conn)
@@ -109,7 +120,7 @@ def seed_pending_exchange(
         last_error=None,
     )
     exchange_id = insert_exchange(conn, row, [1])
-    mark_triaged(conn, exchange_id, triage_score)
+    mark_triaged(conn, exchange_id, triage_score, cascade)
     if promoted:
         register_prompt_version(conn, PROMPT_VERSION, PROMPT_SHA256, NOW)
         promote_prompt_version(conn, PROMPT_VERSION, NOW)
@@ -407,10 +418,12 @@ def test_extract_live_mode_refuses_untriaged_exchange(tmp_path: Path) -> None:
     assert "infovore triage" in err
 
 
-def test_extract_live_mode_only_claims_above_threshold(tmp_path: Path) -> None:
+@pytest.mark.parametrize("cascade", [None, "bayes_irrelevant", "denylist", "no_text"])
+def test_extract_live_mode_only_claims_archived_exchanges(
+    tmp_path: Path, cascade: str | None
+) -> None:
     env = environment(tmp_path)
-    env["INFOVORE_TRIAGE_MIN_SCORE"] = "0.5"
-    seed_pending_exchange(env["INFOVORE_DB_PATH"], triage_score=0.2)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"], cascade=cascade)
     registry = registry_with(success_results())
 
     code, out, _ = run(["extract"], env, registry)
@@ -494,43 +507,6 @@ def test_extract_trial_mode_max_score_filters_the_sample(tmp_path: Path) -> None
     conn.close()
 
 
-def test_extract_trial_mode_strategy_uncertain_requires_a_trained_model(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
-    registry = registry_with(success_results())
-
-    code, _, err = run(
-        ["extract", "--mode", "trial", "--sample", "10", "--strategy", "uncertain"], env, registry
-    )
-
-    assert code == ExitCode.CONFIG
-    assert "triage --train" in err
-
-
-def test_extract_trial_mode_strategy_uncertain_picks_scored_exchanges(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    qualifying_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
-    conn = open_database(env["INFOVORE_DB_PATH"])
-    conn.execute(
-        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
-        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
-    )
-    version = conn.execute("SELECT version FROM triage_model").fetchone()["version"]
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?",
-        (version, qualifying_id),
-    )
-    conn.close()
-    registry = registry_with(success_results())
-
-    code, out, _ = run(
-        ["extract", "--mode", "trial", "--sample", "10", "--strategy", "uncertain"], env, registry
-    )
-
-    assert code == ExitCode.OK
-    assert "processed=1" in out
-
-
 def test_extract_records_an_extraction_batch_for_live_mode(tmp_path: Path) -> None:
     env = environment(tmp_path)
     seed_pending_exchange(env["INFOVORE_DB_PATH"])
@@ -591,80 +567,6 @@ def test_extract_trial_mode_with_only_exchange_id_records_a_batch_with_no_strate
     assert rows[0]["sample"] is None
 
 
-def test_extract_mix_out_of_range_is_a_config_error(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
-    registry = registry_with(success_results())
-
-    code, _, err = run(
-        ["extract", "--mode", "trial", "--sample", "1", "--mix", "1.5"], env, registry
-    )
-
-    assert code == ExitCode.CONFIG
-    assert "--mix" in err
-
-
-def test_extract_trial_mode_strategy_mixed_splits_the_sample(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    qualifying_id = seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
-    conn = open_database(env["INFOVORE_DB_PATH"])
-    second_id = _seed_second_exchange(conn, triage_score=1.0)
-    conn.execute(
-        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
-        " created_at, content, ingested_at, raw_json)"
-        " VALUES (3, 1, 9, 1, 'alice', '2026-01-01T00:00:00+00:00', 'Octane2 jumper talk',"
-        " '2026-01-01T00:00:00+00:00', '{}')"
-    )
-    third_row = ExchangeRow(
-        id=None,
-        channel_id=1,
-        thread_id=None,
-        first_message_id=3,
-        last_message_id=3,
-        started_at=NOW,
-        ended_at=NOW,
-        message_count=1,
-        grouping_rule=GroupingRule.QUIET_GAP,
-        content_hash="hash-3",
-        parent_exchange_id=None,
-        extraction_status=ExtractionStatus.PENDING,
-        retry_count=0,
-        last_error=None,
-    )
-    third_id = insert_exchange(conn, third_row, [3])
-    mark_triaged(conn, third_id, triage_score=1.0)  # left unscored (no p_lore): the "random" half
-    conn.execute(
-        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
-        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
-    )
-    version = conn.execute("SELECT version FROM triage_model").fetchone()["version"]
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?",
-        (version, qualifying_id),
-    )
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.9, p_lore_model = ? WHERE id = ?",
-        (version, second_id),
-    )
-    conn.close()
-    registry = registry_with(
-        [HEALTH_OK, *([LLMResult.ok_structured(VALID_EXTRACTION_OUT, "scripted-model")] * 2)]
-    )
-
-    code, out, _ = run(
-        ["extract", "--mode", "trial", "--sample", "2", "--strategy", "mixed", "--seed", "0"],
-        env,
-        registry,
-    )
-
-    assert code == ExitCode.OK
-    assert "processed=2" in out
-    conn = open_database(env["INFOVORE_DB_PATH"])
-    origins = {row["sampled_by"] for row in conn.execute("SELECT sampled_by FROM extraction_runs")}
-    conn.close()
-    assert origins == {"uncertain", "random"}
-
-
 def test_extract_start_line_is_written_before_backend_processes_any_exchange(
     tmp_path: Path,
 ) -> None:
@@ -704,27 +606,6 @@ def test_extract_start_line_is_written_before_backend_processes_any_exchange(
 
     assert code == ExitCode.OK
     assert seen_first_line_early == [True]
-
-
-def test_extract_accepts_order_best(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    seed_pending_exchange(env["INFOVORE_DB_PATH"])
-    registry = registry_with(success_results())
-
-    code, out, _ = run(["extract", "--order", "best"], env, registry)
-
-    assert code == ExitCode.OK
-    assert "succeeded=1" in out
-
-
-def test_extract_rejects_unknown_order(tmp_path: Path) -> None:
-    env = environment(tmp_path)
-    registry = registry_with(success_results())
-
-    code, _, err = run(["extract", "--order", "sideways"], env, registry)
-
-    assert code == ExitCode.CONFIG
-    assert "--order" in err
 
 
 # --- INFOVORE_EXCLUDE_CHANNELS (issue #138) ----------------------------------
@@ -902,3 +783,22 @@ def test_compare_prompt_runs_without_a_dump_directory(tmp_path: Path) -> None:
 
     assert code == int(ExitCode.OK)
     assert "prompt comparison" in out
+
+
+@pytest.mark.parametrize(
+    "flags",
+    [
+        ["--order", "best"],
+        ["--mix", "0.5"],
+        ["--mode", "trial", "--sample", "1", "--strategy", "uncertain"],
+        ["--mode", "trial", "--sample", "1", "--strategy", "mixed"],
+    ],
+)
+def test_extract_rejects_the_retired_p_lore_options(tmp_path: Path, flags: list[str]) -> None:
+    env = environment(tmp_path)
+    seed_pending_exchange(env["INFOVORE_DB_PATH"], promoted=False)
+
+    code, _, err = run(["extract", *flags], env, registry_with(success_results()))
+
+    assert code == ExitCode.CONFIG
+    assert flags[-1] in err or flags[0] in err

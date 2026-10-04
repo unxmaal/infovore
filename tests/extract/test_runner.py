@@ -27,7 +27,6 @@ from infovore.extract.protocol import (
     FailureKind,
 )
 from infovore.extract.runner import (
-    DEFAULT_MIX_FRACTION_UNCERTAIN,
     ExchangeClaimed,
     ExchangeFailed,
     ExchangePaused,
@@ -35,7 +34,6 @@ from infovore.extract.runner import (
     ExtractionEvent,
     ExtractionReport,
     ExtractionStarted,
-    NoScoredExchangesError,
     PromptNotPromotedError,
     TrialSampleStrategy,
     UntriagedExchangesError,
@@ -56,6 +54,7 @@ from infovore.rows import (
 from infovore.timing import Clock, FixedClock, RecordingSleeper
 from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.score import TRIAGE_VERSION
+from tests.cascade_marks import mark
 
 GUILD_ID = 500
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -100,6 +99,7 @@ def seed_exchange(
     parent_exchange_id: int | None = None,
     triage_score: float | None = 1.0,
     triage_version: str | None = TRIAGE_VERSION,
+    cascade: str | None = "residue",
 ) -> ExchangeRow:
     for message in messages:
         conn.execute(
@@ -138,6 +138,8 @@ def seed_exchange(
         last_error=None,
     )
     exchange_id = insert_exchange(conn, row, [m.id for m in messages])
+    if cascade is not None:
+        mark(conn, exchange_id, cascade)
     conn.execute(
         "UPDATE exchanges SET triage_score = ?, triage_reasons = ?, triage_version = ?"
         " WHERE id = ?",
@@ -1183,14 +1185,6 @@ def test_select_trial_sample_without_filters_ignores_triage(tmp_path: Path) -> N
     assert select_trial_sample(conn, 10, seed=0) == [1]
 
 
-def _insert_stub_model(conn: sqlite3.Connection) -> int:
-    cursor = conn.execute(
-        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
-        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
-    )
-    return int(cursor.lastrowid or 0)
-
-
 def test_select_trial_sample_random_strategy_is_reproducible_for_same_seed(
     tmp_path: Path,
 ) -> None:
@@ -1230,81 +1224,6 @@ def test_select_trial_sample_random_strategy_differs_from_stratified(tmp_path: P
     random_sample = select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.RANDOM)
 
     assert stratified != random_sample
-
-
-def test_select_trial_sample_uncertain_strategy_orders_by_distance_from_half(
-    tmp_path: Path,
-) -> None:
-    conn = db(tmp_path)
-    version = _insert_stub_model(conn)
-    certain_lore = seed_exchange(conn, [a_message(1, channel_id=1)])
-    uncertain = seed_exchange(conn, [a_message(2, channel_id=1)])
-    certain_noise = seed_exchange(conn, [a_message(3, channel_id=1)])
-    assert certain_lore.id is not None
-    assert uncertain.id is not None
-    assert certain_noise.id is not None
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.95, p_lore_model = ? WHERE id = ?",
-        (version, certain_lore.id),
-    )
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?",
-        (version, uncertain.id),
-    )
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.02, p_lore_model = ? WHERE id = ?",
-        (version, certain_noise.id),
-    )
-
-    sample = select_trial_sample(conn, 2, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
-
-    assert sample == sorted([uncertain.id, certain_lore.id])
-
-
-def test_select_trial_sample_uncertain_strategy_ties_broken_by_id(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    version = _insert_stub_model(conn)
-    first = seed_exchange(conn, [a_message(1, channel_id=1)])
-    second = seed_exchange(conn, [a_message(2, channel_id=1)])
-    assert first.id is not None
-    assert second.id is not None
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, first.id)
-    )
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, second.id)
-    )
-
-    sample = select_trial_sample(conn, 1, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
-
-    assert sample == [first.id]
-
-
-def test_select_trial_sample_uncertain_strategy_ignores_unscored_exchanges(
-    tmp_path: Path,
-) -> None:
-    conn = db(tmp_path)
-    version = _insert_stub_model(conn)
-    scored = seed_exchange(conn, [a_message(1, channel_id=1)])
-    seed_exchange(conn, [a_message(2, channel_id=1)])
-    assert scored.id is not None
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, scored.id)
-    )
-
-    sample = select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
-
-    assert sample == [scored.id]
-
-
-def test_select_trial_sample_uncertain_strategy_without_any_scored_exchange_raises(
-    tmp_path: Path,
-) -> None:
-    conn = db(tmp_path)
-    seed_exchange(conn, [a_message(1, channel_id=1)])
-
-    with pytest.raises(NoScoredExchangesError):
-        select_trial_sample(conn, 5, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
 
 
 def test_live_refuses_when_pending_exchange_untriaged(tmp_path: Path) -> None:
@@ -1405,13 +1324,15 @@ def test_trial_mode_never_checked_for_untriaged_exchanges(tmp_path: Path) -> Non
     assert report.claims_recorded == 1
 
 
-def test_live_only_claims_exchanges_at_or_above_min_score(tmp_path: Path) -> None:
+def test_live_only_claims_archived_exchanges(tmp_path: Path) -> None:
     conn = db(tmp_path)
     high = seed_exchange(
-        conn, [a_message(1, content="FACT: Octane2 :: needs a jumper")], triage_score=0.9
+        conn, [a_message(1, content="FACT: Octane2 :: needs a jumper")], cascade="lexicon"
     )
     low = seed_exchange(
-        conn, [a_message(2, channel_id=2, content="FACT: Fuel :: needs a fan")], triage_score=0.1
+        conn,
+        [a_message(2, channel_id=2, content="FACT: Fuel :: needs a fan")],
+        cascade="bayes_irrelevant",
     )
     assert high.id is not None
     assert low.id is not None
@@ -1428,7 +1349,6 @@ def test_live_only_claims_exchanges_at_or_above_min_score(tmp_path: Path) -> Non
             batch_size=10,
             max_retries=3,
             concurrency=2,
-            min_score=0.3,
         )
 
     report = asyncio.run(go())
@@ -1515,121 +1435,6 @@ def test_select_trial_sample_origins_random_strategy_labels_every_id_random(
     assert len(origins) == 2
 
 
-def test_select_trial_sample_origins_uncertain_strategy_labels_every_id_uncertain(
-    tmp_path: Path,
-) -> None:
-    conn = db(tmp_path)
-    version = _insert_stub_model(conn)
-    first = seed_exchange(conn, [a_message(1, channel_id=1)])
-    second = seed_exchange(conn, [a_message(2, channel_id=1)])
-    assert first.id is not None
-    assert second.id is not None
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, first.id)
-    )
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.9, p_lore_model = ? WHERE id = ?", (version, second.id)
-    )
-
-    origins = select_trial_sample_origins(conn, 2, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
-
-    assert origins == {first.id: "uncertain", second.id: "uncertain"}
-
-
-def test_select_trial_sample_origins_uncertain_strategy_without_a_model_still_raises(
-    tmp_path: Path,
-) -> None:
-    conn = db(tmp_path)
-    seed_exchange(conn, [a_message(1, channel_id=1)])
-
-    with pytest.raises(NoScoredExchangesError):
-        select_trial_sample_origins(conn, 5, seed=0, strategy=TrialSampleStrategy.UNCERTAIN)
-
-
-def test_select_trial_sample_delegates_mixed_to_origins(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    for i in range(1, 11):
-        seed_exchange(conn, [a_message(i, channel_id=1)])
-
-    sample = select_trial_sample(conn, 4, seed=0, strategy=TrialSampleStrategy.MIXED)
-    origins = select_trial_sample_origins(conn, 4, seed=0, strategy=TrialSampleStrategy.MIXED)
-
-    assert sample == sorted(origins)
-    assert set(origins.values()) == {"random"}  # no p_lore anywhere: falls back to all-random
-
-
-def _seed_scored_pool(conn: sqlite3.Connection, count: int) -> list[int]:
-    version = _insert_stub_model(conn)
-    ids: list[int] = []
-    for i in range(count):
-        exchange = seed_exchange(conn, [a_message(i + 1, channel_id=1)])
-        assert exchange.id is not None
-        ids.append(exchange.id)
-        conn.execute(
-            "UPDATE exchanges SET p_lore = ?, p_lore_model = ? WHERE id = ?",
-            (0.1 * (i % 10), version, exchange.id),
-        )
-    return ids
-
-
-def test_mixed_strategy_splits_the_sample_between_uncertain_and_random(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    _seed_scored_pool(conn, 20)
-
-    origins = select_trial_sample_origins(conn, 10, seed=3, strategy=TrialSampleStrategy.MIXED)
-
-    assert len(origins) == 10
-    counts = {origin: list(origins.values()).count(origin) for origin in set(origins.values())}
-    assert counts.get("uncertain", 0) == 5
-    assert counts.get("random", 0) == 5
-    assert len(set(origins)) == len(origins)  # no id chosen twice
-
-
-def test_mixed_strategy_is_deterministic_for_the_same_seed(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    _seed_scored_pool(conn, 20)
-
-    first = select_trial_sample_origins(conn, 10, seed=9, strategy=TrialSampleStrategy.MIXED)
-    second = select_trial_sample_origins(conn, 10, seed=9, strategy=TrialSampleStrategy.MIXED)
-
-    assert first == second
-
-
-def test_mixed_strategy_mix_fraction_controls_the_split(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    _seed_scored_pool(conn, 20)
-
-    all_random = select_trial_sample_origins(
-        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, mix=0.0
-    )
-    mostly_uncertain = select_trial_sample_origins(
-        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, mix=1.0
-    )
-
-    assert set(all_random.values()) == {"random"}
-    assert list(mostly_uncertain.values()).count("uncertain") == 10
-
-
-def test_mixed_strategy_default_mix_is_fifty_fifty() -> None:
-    assert DEFAULT_MIX_FRACTION_UNCERTAIN == 0.5
-
-
-def test_mixed_strategy_returns_all_when_n_ge_total(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    version = _insert_stub_model(conn)
-    scored = seed_exchange(conn, [a_message(1, channel_id=1)])
-    unscored = seed_exchange(conn, [a_message(2, channel_id=1)])
-    assert scored.id is not None
-    assert unscored.id is not None
-    conn.execute(
-        "UPDATE exchanges SET p_lore = 0.5, p_lore_model = ? WHERE id = ?", (version, scored.id)
-    )
-
-    origins = select_trial_sample_origins(conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED)
-
-    assert origins == {scored.id: "uncertain", unscored.id: "random"}
-
-
 # --- run_extraction stamps sampled_by (issue #107) ---------------------------
 
 
@@ -1714,21 +1519,6 @@ def test_select_trial_sample_excludes_thread_whose_parent_is_denylisted(tmp_path
     assert sample == [kept.id]
 
 
-def test_select_trial_sample_mixed_strategy_respects_exclude_channels(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    insert_channel(conn, 1, "general")
-    insert_channel(conn, 2, "food")
-    kept = seed_exchange(conn, [a_message(1, channel_id=1)])
-    seed_exchange(conn, [a_message(2, channel_id=2)])
-    assert kept.id is not None
-
-    sample = select_trial_sample(
-        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, exclude_channels=frozenset({"food"})
-    )
-
-    assert sample == [kept.id]
-
-
 def test_select_trial_sample_origins_excludes_denylisted_channel(tmp_path: Path) -> None:
     conn = db(tmp_path)
     insert_channel(conn, 1, "general")
@@ -1740,21 +1530,6 @@ def test_select_trial_sample_origins_excludes_denylisted_channel(tmp_path: Path)
     origins = select_trial_sample_origins(conn, 10, seed=0, exclude_channels=frozenset({"food"}))
 
     assert origins == {kept.id: "stratified"}
-
-
-def test_select_trial_sample_origins_mixed_respects_exclude_channels(tmp_path: Path) -> None:
-    conn = db(tmp_path)
-    insert_channel(conn, 1, "general")
-    insert_channel(conn, 2, "food")
-    kept = seed_exchange(conn, [a_message(1, channel_id=1)])
-    seed_exchange(conn, [a_message(2, channel_id=2)])
-    assert kept.id is not None
-
-    origins = select_trial_sample_origins(
-        conn, 10, seed=0, strategy=TrialSampleStrategy.MIXED, exclude_channels=frozenset({"food"})
-    )
-
-    assert list(origins) == [kept.id]
 
 
 def test_run_extraction_live_never_claims_a_denylisted_channel(tmp_path: Path) -> None:

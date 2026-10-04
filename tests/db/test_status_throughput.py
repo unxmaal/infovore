@@ -3,12 +3,11 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from infovore.db.connection import migrate, open_database
-from infovore.db.exchanges import ExchangeOrder, claimable_exchanges
+from infovore.db.exchanges import claimable_exchanges
 from infovore.db.status import StatusReport, collect_status
+from tests.cascade_marks import mark
 
 NOW = datetime(2026, 1, 2, 12, 0, tzinfo=UTC)
-GATE_P_LORE = 0.9994206
-MIN_SCORE = 0.3
 MAX_RETRIES = 3
 
 
@@ -27,8 +26,7 @@ def add_exchange(
     exchange_id: int,
     *,
     status: str = "pending",
-    p_lore: float | None = None,
-    triage_score: float | None = None,
+    cascade: str | None = "residue",
     retry_count: int = 0,
     channel_id: int = 1,
 ) -> None:
@@ -44,9 +42,8 @@ def add_exchange(
     )
     conn.execute(
         "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
-        " ended_at, message_count, grouping_rule, content_hash, extraction_status, retry_count,"
-        " p_lore, triage_score)"
-        " VALUES (?, ?, ?, ?, ?, ?, 1, 'quiet_gap', ?, ?, ?, ?, ?)",
+        " ended_at, message_count, grouping_rule, content_hash, extraction_status, retry_count)"
+        " VALUES (?, ?, ?, ?, ?, ?, 1, 'quiet_gap', ?, ?, ?)",
         (
             exchange_id,
             channel_id,
@@ -57,10 +54,10 @@ def add_exchange(
             f"h{exchange_id}",
             status,
             retry_count,
-            p_lore,
-            triage_score,
         ),
     )
+    if cascade is not None:
+        mark(conn, exchange_id, cascade)
     conn.commit()
 
 
@@ -125,8 +122,6 @@ def status(
 ) -> StatusReport:
     return collect_status(
         conn,
-        MIN_SCORE,
-        GATE_P_LORE,
         exclude_channels=exclude_channels,
         now=NOW,
         max_retries=MAX_RETRIES,
@@ -134,55 +129,48 @@ def status(
     )
 
 
-def test_pending_gated_counts_only_what_extract_would_claim(tmp_path: Path) -> None:
+def test_pending_archived_counts_only_what_extract_would_claim(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999)  # passes
-    add_exchange(conn, 2, p_lore=0.5)  # below the gate
-    add_exchange(conn, 3, p_lore=0.99999, status="done")  # not pending
-    add_exchange(conn, 4, p_lore=0.99999, retry_count=MAX_RETRIES)  # exhausted retries
+    add_exchange(conn, 1)  # passes
+    add_exchange(conn, 2, cascade="bayes_irrelevant")  # ruled out
+    add_exchange(conn, 3, status="done")  # not pending
+    add_exchange(conn, 4, retry_count=MAX_RETRIES)  # exhausted retries
 
     report = status(conn)
 
-    assert report.pending_exchanges == 2  # pending with retries left, gate aside
-    assert report.pending_gated == 1
+    assert report.pending_exchanges == 2  # pending with retries left, archive aside
+    assert report.pending_archived == 1
 
 
-def test_pending_gated_agrees_with_the_claim_query(tmp_path: Path) -> None:
+def test_pending_archived_agrees_with_the_claim_query(tmp_path: Path) -> None:
     # The count and the queue must not drift apart: one is the promise the
     # other keeps.
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999)
-    add_exchange(conn, 2, p_lore=0.5)
-    add_exchange(conn, 3, p_lore=None, triage_score=0.9)
-    add_exchange(conn, 4, p_lore=None, triage_score=0.1)
-    add_exchange(conn, 5, p_lore=0.99999, retry_count=MAX_RETRIES)
-    add_exchange(conn, 6, p_lore=0.99999, status="done")
+    add_exchange(conn, 1)
+    add_exchange(conn, 2, cascade="bayes_irrelevant")
+    add_exchange(conn, 3, cascade="lexicon")
+    add_exchange(conn, 4, cascade=None)
+    add_exchange(conn, 5, retry_count=MAX_RETRIES)
+    add_exchange(conn, 6, status="done")
 
-    claimable = claimable_exchanges(
-        conn,
-        1000,
-        MAX_RETRIES,
-        min_score=MIN_SCORE,
-        min_p_lore=GATE_P_LORE,
-        order=ExchangeOrder.BEST,
-    )
+    claimable = claimable_exchanges(conn, 1000, MAX_RETRIES)
 
-    assert status(conn).pending_gated == len(claimable)
+    assert status(conn).pending_archived == len(claimable)
 
 
-def test_pending_gated_honours_the_channel_denylist(tmp_path: Path) -> None:
+def test_pending_archived_honours_the_channel_denylist(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999, channel_id=1)
-    add_exchange(conn, 2, p_lore=0.99999, channel_id=2)
+    add_exchange(conn, 1, channel_id=1)
+    add_exchange(conn, 2, channel_id=2)
 
     report = status(conn, exclude_channels=frozenset({"channel-2"}))
 
-    assert report.pending_gated == 1
+    assert report.pending_archived == 1
 
 
 def test_extraction_throughput_uses_a_trailing_window(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999)
+    add_exchange(conn, 1)
     for minutes in (10, 70, 130):  # three runs inside a 6 hour window
         add_run(conn, 1, NOW - timedelta(minutes=minutes))
     add_run(conn, 1, NOW - timedelta(hours=20))  # outside it
@@ -204,10 +192,10 @@ def test_probe_throughput_counts_claims_not_calls(tmp_path: Path) -> None:
     assert report.probe_per_hour == 3.0  # 18 claims / 6 hours
 
 
-def test_eta_divides_the_gated_queue_by_the_trailing_rate(tmp_path: Path) -> None:
+def test_eta_divides_the_archived_queue_by_the_trailing_rate(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
     for exchange_id in range(1, 13):
-        add_exchange(conn, exchange_id, p_lore=0.99999)
+        add_exchange(conn, exchange_id)
     add_run(conn, 1, NOW - timedelta(minutes=10))
     add_run(conn, 1, NOW - timedelta(minutes=20))
 
@@ -220,7 +208,7 @@ def test_eta_divides_the_gated_queue_by_the_trailing_rate(tmp_path: Path) -> Non
 
 def test_no_recent_runs_means_no_rate_and_no_eta(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999)
+    add_exchange(conn, 1)
     add_run(conn, 1, NOW - timedelta(days=3))
 
     report = status(conn, throughput_window_hours=6)
@@ -232,18 +220,18 @@ def test_no_recent_runs_means_no_rate_and_no_eta(tmp_path: Path) -> None:
 
 def test_an_empty_queue_has_a_zero_eta_not_a_missing_one(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999, status="done")
+    add_exchange(conn, 1, status="done")
     add_run(conn, 1, NOW - timedelta(minutes=10))
 
     report = status(conn, throughput_window_hours=6)
 
-    assert report.pending_gated == 0
+    assert report.pending_archived == 0
     assert report.extraction_eta_hours == 0.0
 
 
 def test_spend_totals_come_from_both_stages(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999)
+    add_exchange(conn, 1)
     add_run(conn, 1, NOW - timedelta(minutes=10), input_tokens=100, output_tokens=20, cost_usd=0.01)
     add_run(conn, 1, NOW - timedelta(minutes=20), input_tokens=200, output_tokens=30, cost_usd=0.02)
     add_probe_run(conn, NOW - timedelta(minutes=5), claim_count=4, cost_usd=0.04)
@@ -263,7 +251,7 @@ def test_spend_totals_come_from_both_stages(tmp_path: Path) -> None:
 def test_unreported_cost_is_none_rather_than_zero(tmp_path: Path) -> None:
     # A backend that reports no cost must not make the run look free.
     conn = fresh(tmp_path)
-    add_exchange(conn, 1, p_lore=0.99999)
+    add_exchange(conn, 1)
     add_run(conn, 1, NOW - timedelta(minutes=10), cost_usd=None)
 
     report = status(conn)

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from infovore.config import ConfigError
 from infovore.eval.channel_report import channel_report, format_channel_report
 from infovore.eval.judge import (
+    DEFAULT_UNCERTAINTY_SCORER,
     LABELS,
     LIKELY_IRRELEVANT,
     RELEVANCE_TARGET,
@@ -61,8 +62,6 @@ class SliceCommand:
                 frozen = freeze_slices(
                     context.conn,
                     max_retries=settings.max_retries,
-                    min_score=settings.triage_min_score,
-                    min_p_lore=settings.triage_min_p_lore,
                     exclude_channels=settings.exclude_channels,
                     at=context.clock.now(),
                 )
@@ -104,7 +103,9 @@ class JudgeCommand:
             "--queue", choices=["frozen", UNCERTAIN, "c1", LIKELY_IRRELEVANT], default="frozen"
         )
         serve.add_argument(
-            "--scorer", default=None, help="uncertainty source for --queue uncertain"
+            "--scorer",
+            default=DEFAULT_UNCERTAINTY_SCORER,
+            help="uncertainty source for --queue uncertain",
         )
         report = sub.add_parser(
             "report", help="labels, slice progress, self-agreement, labels still needed"
@@ -149,7 +150,6 @@ class JudgeCommand:
             settings = context.settings
             build_queue = uncertain_queue(
                 settings.max_retries,
-                settings.triage_min_p_lore,
                 settings.exclude_channels,
                 args.scorer,
             )

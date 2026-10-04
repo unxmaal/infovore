@@ -122,55 +122,10 @@ def test_running_section_documents_the_shared_run_selector() -> None:
         assert needle in running, needle
 
 
-def test_tuning_loop_runbook_exists_and_covers_the_full_cycle() -> None:
-    triage = section("Triage")
-    parts = triage.split("### Tuning loop", 1)
-    assert len(parts) == 2, "README 'Triage' needs a '### Tuning loop' subsection"
-    body = parts[1]
-    for needle in (
-        "infovore extract --mode trial",
-        "infovore probe",
-        "infovore label --from-runs",
-        "infovore triage --train",
-        "infovore triage --signal-report",
-        "infovore triage --suggest-terms",
-        "INFOVORE_TRIAGE_RULES",
-        "infovore triage --report",
-        "human",
-    ):
-        assert needle in body, needle
-
-
-def test_triage_section_documents_the_tuning_flags() -> None:
-    triage = section("Triage")
-    for needle in (
-        "--signal-report",
-        "--suggest-terms",
-        "--min-support",
-        "--max-corpus-df",
-        "--fit-weights",
-        "--out",
-        "--force",
-        "infovore/triage/logistic.py",
-        "infovore.triage.tuning",
-        "useless",
-        "harmful",
-        "class_imbalance",
-        "BAYES_00",
-    ):
-        assert needle in triage, needle
-
-
 def test_running_section_documents_strategy_mixed_and_the_batches_table() -> None:
     running = section("Running")
     for needle in ("mixed", "--mix", "extraction_batches", "sampled_by"):
         assert needle in running, needle
-
-
-def test_triage_section_documents_the_uncertain_sampling_warning() -> None:
-    triage = section("Triage")
-    for needle in ("sampling_bias_warning", "sampled_by", "--strategy mixed"):
-        assert needle in triage, needle
 
 
 def test_sifting_section_documents_citations_train_and_report() -> None:
@@ -235,12 +190,6 @@ def test_sifting_section_documents_the_channels_filter() -> None:
         assert needle in sifting, needle
 
 
-def test_tuning_loop_recommends_mixed_rounds() -> None:
-    triage = section("Triage")
-    body = triage.split("### Tuning loop", 1)[1]
-    assert "mixed" in body
-
-
 def test_triage_section_documents_every_signal_and_the_version() -> None:
     import inspect
 
@@ -254,3 +203,9 @@ def test_triage_section_documents_every_signal_and_the_version() -> None:
     assert "TRIAGE_VERSION" in triage
     assert re.search(r"r-[0-9a-f]{12}", triage) is not None
     assert "INFOVORE_TRIAGE_RULES" in triage
+
+
+def test_triage_section_documents_the_retired_p_lore_gate() -> None:
+    triage = section("Triage")
+    assert "archived_clause" in triage and "cascade_new_exchanges" in triage
+    assert "triage --train" not in triage.replace("`triage --train` and", "")

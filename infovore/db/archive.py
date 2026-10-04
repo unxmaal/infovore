@@ -4,10 +4,10 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from infovore.db.archived import archived_clause
 from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.exchange_search import SHAREABLE_MESSAGE
 from infovore.db.fts import TOKENIZE
-from infovore.triage.gate import gate_sql
 
 _SCHEMA = f"""
 CREATE TABLE channels (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
@@ -46,12 +46,10 @@ class ArchiveReport:
 def export_archive(
     conn: sqlite3.Connection,
     dest: Path | str,
-    min_score: float,
-    min_p_lore: float,
     exclude_channels: frozenset[str] = frozenset(),
     force: bool = False,
 ) -> ArchiveReport:
-    """A shareable copy holding only what search needs: gate-passing exchanges
+    """A shareable copy holding only what search needs: archived exchanges
     and their messages, minus opted-out authors, already-redacted rows and
     deleted rows. Author ids, raw JSON, revisions, attachments, claims and
     every other table stay behind (issue #191)."""
@@ -67,7 +65,7 @@ def export_archive(
     try:
         out = sqlite3.connect(tmp_path)
         try:
-            exchanges, messages = _write(conn, out, min_score, min_p_lore, exclude_channels)
+            exchanges, messages = _write(conn, out, exclude_channels)
         finally:
             out.close()
         os.replace(tmp_path, dest_path)
@@ -82,11 +80,8 @@ def export_archive(
 def _write(
     conn: sqlite3.Connection,
     out: sqlite3.Connection,
-    min_score: float,
-    min_p_lore: float,
     exclude_channels: frozenset[str],
 ) -> tuple[int, int]:
-    gate_clause, gate_params = gate_sql(min_score, min_p_lore)
     excl_clause, excl_params = exclude_channels_clause("e.channel_id", exclude_channels)
     out.executescript(_SCHEMA)
     rows = conn.execute(
@@ -95,10 +90,10 @@ def _write(
         " FROM current_exchanges e"
         " JOIN exchange_messages em ON em.exchange_id = e.id"
         " JOIN messages m ON m.id = em.message_id"
-        f" WHERE {gate_clause}{excl_clause}"
+        f" WHERE {archived_clause('e.id')}{excl_clause}"
         f"   AND {SHAREABLE_MESSAGE}"
         " ORDER BY em.exchange_id, em.position",
-        (*gate_params, *excl_params),
+        tuple(excl_params),
     ).fetchall()
     exchange_ids = sorted({row[1] for row in rows})
     for start in range(0, len(exchange_ids), 500):
