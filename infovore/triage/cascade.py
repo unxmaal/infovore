@@ -23,6 +23,7 @@ from infovore.triage.human import (
 )
 from infovore.triage.lexicon import Lexicon, LexiconScore, score_lexicon
 
+QUEUE_REF_PREFIXES: Final = ("judge:likely-irrelevant:", "judge:uncertain:", "judge:c1:")
 PRECISION_TARGET: Final = 0.97
 BAYES_HIGH: Final = 0.9
 BAYES_LOW: Final = 0.1
@@ -92,7 +93,9 @@ def decide_bayes(p: float | None) -> str | None:
 def tuning_labels(
     conn: sqlite3.Connection, exclude_channels: frozenset[str] = frozenset()
 ) -> dict[int, Label]:
-    labels, _ = training_labels(conn, exclude_channels=exclude_channels)
+    labels, _ = training_labels(
+        conn, exclude_channels=exclude_channels, skip_ref_prefixes=QUEUE_REF_PREFIXES
+    )
     build = {
         row["exchange_id"]
         for row in conn.execute(
