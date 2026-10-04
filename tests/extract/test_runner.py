@@ -1332,7 +1332,7 @@ def test_live_only_claims_archived_exchanges(tmp_path: Path) -> None:
     low = seed_exchange(
         conn,
         [a_message(2, channel_id=2, content="FACT: Fuel :: needs a fan")],
-        cascade="bayes_irrelevant",
+        cascade="embed_irrelevant",
     )
     assert high.id is not None
     assert low.id is not None

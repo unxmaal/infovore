@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
@@ -10,8 +11,9 @@ from infovore.db.connection import migrate, open_database
 from infovore.rows import Label
 from infovore.triage.cascade import (
     PRECISION_TARGET,
+    EmbedStage,
     Outcome,
-    decide_bayes,
+    decide_embed,
     decide_lexicon,
     residue_channels,
     stage_reports,
@@ -22,6 +24,7 @@ from infovore.triage.cascade import (
 from infovore.triage.human import HUMAN_SCORER
 from infovore.triage.lexicon import LexiconScore, load_lexicon
 from tests.triage.test_command import environment, run
+from tests.triage.test_embed import FakeEmbedder
 from tests.triage.test_human import human, seed
 from tests.triage.test_lexicon import corpus
 
@@ -43,11 +46,17 @@ def test_the_lexicon_abstains_without_hits_and_decides_on_share() -> None:
     assert decide_lexicon(LexiconScore(0.5, 2, 4), 0.3) == "relevant"
 
 
-def test_the_bayes_band_decides_only_far_from_a_coin_flip() -> None:
-    assert decide_bayes(None) is None
-    assert decide_bayes(0.95) == "relevant"
-    assert decide_bayes(0.05) == "irrelevant"
-    assert decide_bayes(0.5) is None
+def test_the_embed_band_decides_only_outside_the_thresholds() -> None:
+    stage = EmbedStage(lambda ids: {}, 0.3, 0.8, {})
+
+    assert decide_embed(None, stage) is None
+    assert decide_embed(0.95, stage) == "relevant"
+    assert decide_embed(0.8, stage) == "relevant"
+    assert decide_embed(0.29, stage) == "irrelevant"
+    assert decide_embed(0.3, stage) is None
+    assert decide_embed(0.5, stage) is None
+    assert decide_embed(0.0, EmbedStage.abstaining("why")) is None
+    assert decide_embed(1.0, EmbedStage.abstaining("why")) is None
 
 
 def outcome(eid: int, stage: str, decision: str) -> Outcome:
@@ -63,13 +72,13 @@ def test_stage_reports_count_decisions_confusion_and_residue() -> None:
         outcome(5, "residue", "residue"),
     ]
     labels = {1: Label.LORE, 2: Label.NOISE, 3: Label.LORE, 4: Label.NOISE}
-    denylist, no_text, lexicon, bayes, residue = stage_reports(outcomes, labels)
+    denylist, no_text, lexicon, embed, residue = stage_reports(outcomes, labels)
 
     assert (lexicon.decided, lexicon.relevant, lexicon.irrelevant) == (4, 2, 2)
     assert (lexicon.tp, lexicon.fp, lexicon.fn, lexicon.tn) == (1, 1, 1, 1)
     assert (lexicon.labelled, lexicon.correct, lexicon.accuracy) == (4, 2, 0.5)
     assert denylist.decided == 0 and denylist.accuracy is None
-    assert bayes.decided == 0 and bayes.accuracy is None
+    assert embed.decided == 0 and embed.accuracy is None
     assert (residue.decided, residue.share) == (1, 0.2)
     assert no_text.decided == 0
     assert stage_reports([], {})[4].share == 0.0
@@ -123,7 +132,7 @@ def test_the_cascade_reports_each_stage_per_slice(tmp_path: Path) -> None:
     assert "slice s1 (tuning, held-out excluded): n=5" in out
     assert "slice gold (held-out): n=2" in out
     assert "stage lexicon: decided=" in out
-    assert "stage bayes: abstains on everything" in out
+    assert "stage embed: abstains on everything" in out
     assert "stage residue:" in out
     assert "accuracy=1.000" in out
     assert "irrelevant=0" in out
@@ -145,7 +154,7 @@ def test_write_records_derived_annotations_per_stage(tmp_path: Path) -> None:
     assert '"lexicon_version": "lx-' in rows[0]["recipe_json"]
     assert rows[0]["label"] == "relevant"
     assert annotation_history(conn, "exchange", 7, "relevance_residue")[0]["label"] == "residue"
-    assert annotation_history(conn, "exchange", 2, "relevance_bayes") == []
+    assert annotation_history(conn, "exchange", 2, "relevance_embed") == []
     code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
     assert code == ExitCode.OK
     assert len(annotation_history(conn, "exchange", 2, "relevance_lexicon")) == 2
@@ -174,20 +183,36 @@ def test_the_slices_are_validated(tmp_path: Path) -> None:
     assert run(["relevance", "cascade"], env)[0] == ExitCode.CONFIG
 
 
-def test_bayes_scores_what_the_lexicon_abstained_on(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+@pytest.fixture
+def fitted_embed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("infovore.triage.embed_stage.FOLDS", 2)
+    monkeypatch.setattr("infovore.triage.embed_stage.load_embedder", lambda *_: FakeEmbedder())
+
+
+def test_the_embed_stage_scores_what_the_lexicon_abstained_on(
+    tmp_path: Path, fitted_embed: None
 ) -> None:
     env, conn = build(tmp_path)
     conn.close()
-    monkeypatch.setattr("infovore.triage.cascade.MIN_PER_CLASS", 1)
 
     code, out, _ = run(["relevance", "cascade", "--slices", "s1", "--write"], env)
 
     assert code == ExitCode.OK
     assert "abstains on everything" not in out
+    assert "embed fake/keywords@r1 pool=first irrelevant_below=" in out
+    assert "relevant_at_or_above=" in out
+    assert "labels={'relevant': 2, 'irrelevant': 3}" in out
     conn = open_database(env["INFOVORE_DB_PATH"])
-    assert annotation_history(conn, "exchange", 7, "relevance_bayes")[0]["score"] is not None
-    assert annotation_history(conn, "exchange", 2, "relevance_bayes") == []
+    row = annotation_history(conn, "exchange", 7, "relevance_embed")[0]
+    assert row["score"] is not None
+    recipe = json.loads(row["recipe_json"])
+    assert recipe["model"] == "fake/keywords"
+    assert recipe["revision"] == "r1"
+    assert recipe["pool"] == "first"
+    assert recipe["labels"] == {"relevant": 2, "irrelevant": 3}
+    assert set(recipe["thresholds"]) >= {"irrelevant_below", "relevant_at_or_above"}
+    assert annotation_history(conn, "exchange", 2, "relevance_embed") == []
+    assert (tmp_path / "embed-cache.db").exists()
 
 
 def test_mine_prints_candidates(tmp_path: Path) -> None:
@@ -319,7 +344,7 @@ def test_all_runs_every_current_exchange_and_reports_share_and_residue_channels(
     assert code == ExitCode.OK
     assert "corpus: n=6" in out
     assert "stage lexicon: decided=4 relevant=4 irrelevant=0 share=0.667" in out
-    assert "stage bayes: abstains on everything" in out
+    assert "stage embed: abstains on everything" in out
     assert "residue: n=2 share=0.333" in out
     assert "residue channel general: 2" in out
     assert "labelled=" in out and "accuracy=" in out
@@ -339,15 +364,17 @@ def test_all_with_write_annotates_exchanges_outside_every_slice(tmp_path: Path) 
     assert annotation_history(conn, "exchange", 2, "relevance_lexicon")[0]["label"] == "relevant"
 
 
-def test_min_per_class_lets_the_bayes_stage_fit(tmp_path: Path) -> None:
+def test_all_with_a_fitted_embed_stage_reports_the_stage(
+    tmp_path: Path, fitted_embed: None
+) -> None:
     env, conn = build(tmp_path)
     conn.close()
 
-    code, out, _ = run(["relevance", "cascade", "--all", "--min-per-class", "1"], env)
+    code, out, _ = run(["relevance", "cascade", "--all"], env)
 
     assert code == ExitCode.OK
     assert "abstains on everything" not in out
-    assert "stage bayes: decided=" in out
+    assert "stage embed: decided=" in out
 
 
 def test_residue_channels_counts_by_channel_name_and_falls_back_to_the_id(
@@ -377,10 +404,19 @@ def test_batching_gives_the_same_outcomes_as_one_pass(tmp_path: Path) -> None:
     seen: list[tuple[int, int]] = []
 
     batched = run_cascade_batched(
-        conn, ids, load_lexicon(), 0.5, None, frozenset(), 3, lambda d, t: seen.append((d, t))
+        conn,
+        ids,
+        load_lexicon(),
+        0.5,
+        EmbedStage.abstaining("x"),
+        frozenset(),
+        3,
+        lambda d, t: seen.append((d, t)),
     )
 
-    assert batched == run_cascade(conn, ids, load_lexicon(), 0.5, None, frozenset())
+    assert batched == run_cascade(
+        conn, ids, load_lexicon(), 0.5, EmbedStage.abstaining("x"), frozenset()
+    )
     assert seen == [(3, 7), (6, 7), (7, 7)]
 
 

@@ -16,7 +16,7 @@ Pipeline:
    1. excluded channels (`INFOVORE_EXCLUDE_CHANNELS`): never archived;
    2. `no_text`: nothing to judge;
    3. lexicon: terms that settle clearly relevant or clearly irrelevant exchanges;
-   4. middle stage: an embedding plus Bayes classifier trained on human labels;
+   4. middle stage: bge-small embedding plus logistic head trained on human labels (`relevance_embed`, needs `uv run --extra embed`);
    5. residue: what the earlier stages abstain on.
 4. Archive. Exchanges the cascade accepts are archived and exported with `export-archive`.
 

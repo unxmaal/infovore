@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from infovore.db.annotations import Annotation, record_annotation
+from infovore.db.archived import MIDDLE_SCORER
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import exclude_channels_clause, excluded_exchange_ids
 from infovore.db.exchange_text import enough_text_clause
@@ -114,7 +115,7 @@ def frozen_queue(conn: sqlite3.Connection) -> list[QueueItem]:
     ]
 
 
-DEFAULT_UNCERTAINTY_SCORER = "relevance_bayes"
+DEFAULT_UNCERTAINTY_SCORER = MIDDLE_SCORER
 _LATEST_SCORE = (
     "(SELECT a.score FROM annotations a WHERE a.subject_kind = 'exchange'"
     " AND a.subject_id = exchanges.id AND a.scorer = ? AND a.reproducibility = 'derived'"

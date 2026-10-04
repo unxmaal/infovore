@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from infovore.db.archived import SCORER_PREFIX, archived_clause
+from infovore.db.archived import SCORER_PREFIX, STAGES, archived_clause
 from infovore.db.connection import migrate, open_database
-from infovore.triage.cascade import SCORERS, STAGES
+from infovore.triage.cascade import SCORERS
 from tests.cascade_marks import ARCHIVED_KINDS, AT, RULED_OUT_KINDS, mark
 
 
@@ -58,7 +58,7 @@ def test_each_exchange_follows_its_own_latest_run(conn: sqlite3.Connection) -> N
     mark(conn, 2, "denylist")
     mark(conn, 3, "lexicon")
     later = AT + timedelta(days=1)
-    mark(conn, 1, "bayes_irrelevant", later)
+    mark(conn, 1, "embed_irrelevant", later)
     mark(conn, 2, "lexicon", later)
     assert archived(conn) == {2, 3}
 

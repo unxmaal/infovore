@@ -129,7 +129,7 @@ def test_exchange_line_has_channel_span_participants_snippet_and_jump_link(
 def test_unarchived_exchanges_are_hidden_unless_all(tmp_path: Path) -> None:
     a = Archive(tmp_path)
     a.exchange([(1, "IRIX gate pass")], cascade="lexicon")
-    a.exchange([(1, "IRIX gate fail")], cascade="bayes_irrelevant")
+    a.exchange([(1, "IRIX gate fail")], cascade="embed_irrelevant")
     a.exchange([(1, "IRIX no p_lore pass")], cascade="residue")
     a.exchange([(1, "IRIX untriaged")], cascade=None)
     a.exchange([(1, "IRIX denied")], cascade="denylist")
@@ -200,7 +200,7 @@ def test_exchange_search_reports_no_match(tmp_path: Path) -> None:
 def test_export_keeps_only_archived_non_opted_out_content(tmp_path: Path) -> None:
     a = Archive(tmp_path)
     a.exchange([(1, "Octane keep me"), (OPTED_OUT, "Octane opted out words")], start=0)
-    a.exchange([(1, "Octane rejected exchange")], cascade="bayes_irrelevant", start=1)
+    a.exchange([(1, "Octane rejected exchange")], cascade="embed_irrelevant", start=1)
     a.exchange([(1, "Octane [redacted]"), (1, "[redacted]")], start=2, channel=2)
     a.conn.execute("UPDATE messages SET deleted_at = 'x' WHERE content = 'Octane [redacted]'")
     a.conn.commit()
