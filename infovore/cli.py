@@ -93,14 +93,16 @@ class StatusCommand:
             now=context.clock.now(),
             max_retries=context.settings.max_retries,
         )
+        irrelevant = report.irrelevant_denylist + report.irrelevant_short + report.irrelevant_embed
         lines = [
             f"channels: {report.channels}",
             f"messages: {report.messages} (deleted {report.deleted_messages})",
             f"current exchanges: {report.current_exchanges}",
             f"archived: {report.archived_exchanges}"
             f" (cascade relevant {report.cascade_relevant}, residue {report.cascade_residue})",
-            f"irrelevant: {report.irrelevant_denylist + report.irrelevant_embed}"
-            f" (denylist {report.irrelevant_denylist}, embed {report.irrelevant_embed})",
+            f"irrelevant: {irrelevant}"
+            f" (denylist {report.irrelevant_denylist}, short no tech {report.irrelevant_short},"
+            f" embed {report.irrelevant_embed})",
             f"set aside (no_text): {report.set_aside_no_text}",
             f"residue: {report.cascade_residue}",
             f"not yet cascaded: {report.unscored}",

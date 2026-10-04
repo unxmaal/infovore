@@ -1,9 +1,10 @@
 SCORER_PREFIX = "relevance_"
-STAGES = ("denylist", "no_text", "lexicon", "embed", "residue")
+STAGES = ("denylist", "no_text", "lexicon", "short_no_tech", "embed", "residue")
 MIDDLE_SCORER = f"{SCORER_PREFIX}embed"
 _SCORERS = ", ".join(f"'{SCORER_PREFIX}{stage}'" for stage in STAGES)
 _RULED_OUT = (
-    f"a.scorer IN ('{SCORER_PREFIX}denylist', '{SCORER_PREFIX}no_text')"
+    f"a.scorer IN ('{SCORER_PREFIX}denylist', '{SCORER_PREFIX}no_text',"
+    f" '{SCORER_PREFIX}short_no_tech')"
     f" OR (a.scorer = '{MIDDLE_SCORER}' AND a.label = 'irrelevant')"
 )
 

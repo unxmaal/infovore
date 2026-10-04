@@ -11,7 +11,7 @@ from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import excluded_exchange_ids
 from infovore.db.exchange_text import text_message_counts
 from infovore.eval.slices import BUILD
-from infovore.rows import Label
+from infovore.rows import Label, MessageRow
 from infovore.triage.human import held_out_ids, training_labels
 from infovore.triage.lexicon import Lexicon, LexiconScore, score_lexicon
 
@@ -22,6 +22,7 @@ RELEVANT: Final = "relevant"
 IRRELEVANT: Final = "irrelevant"
 RESIDUE: Final = "residue"
 NO_TEXT: Final = "no_text"
+SHORT_NO_TECH: Final = "short_no_tech"
 UNSCORED: Final = (RESIDUE, NO_TEXT)
 
 
@@ -84,6 +85,10 @@ def decide_lexicon(score: LexiconScore, t_high: float) -> str | None:
     return RELEVANT if score.hits and score.share >= t_high else None
 
 
+def text_chars(messages: Sequence[MessageRow]) -> int:
+    return sum(len(m.content.strip()) for m in messages)
+
+
 def decide_embed(p: float | None, stage: EmbedStage) -> str | None:
     if p is None:
         return None
@@ -125,13 +130,26 @@ def run_cascade(
     t_high: float,
     stage: EmbedStage,
     exclude_channels: frozenset[str] = frozenset(),
+    short_limit: int | None = None,
 ) -> list[Outcome]:
     denied = excluded_exchange_ids(conn, exclude_channels)
     live = [eid for eid in ids if eid not in denied]
     text = text_message_counts(conn, live)
     inputs = exchange_inputs_for_ids(conn, [eid for eid in live if text[eid]])
     lexical = {eid: score_lexicon(lexicon, inputs[eid].messages) for eid in live if text[eid]}
-    abstained = [eid for eid, score in lexical.items() if decide_lexicon(score, t_high) is None]
+    short = {
+        eid
+        for eid, score in lexical.items()
+        if short_limit is not None
+        and decide_lexicon(score, t_high) is None
+        and score.hits == 0
+        and text_chars(inputs[eid].messages) < short_limit
+    }
+    abstained = [
+        eid
+        for eid, score in lexical.items()
+        if decide_lexicon(score, t_high) is None and eid not in short
+    ]
     probabilities = stage.score(abstained) if abstained else {}
     outcomes = []
     for eid in ids:
@@ -144,6 +162,13 @@ def run_cascade(
         score = lexical[eid]
         decision = decide_lexicon(score, t_high)
         name, p = "lexicon", probabilities.get(eid)
+        if eid in short:
+            outcomes.append(
+                Outcome(
+                    eid, score.share, score.hits, score.messages, None, SHORT_NO_TECH, IRRELEVANT
+                )
+            )
+            continue
         if decision is None:
             name, decision = "embed", decide_embed(p, stage)
         if decision is None:
@@ -165,11 +190,14 @@ def run_cascade_batched(
     exclude_channels: frozenset[str],
     batch_size: int,
     progress: Callable[[int, int], None],
+    short_limit: int | None = None,
 ) -> list[Outcome]:
     outcomes: list[Outcome] = []
     for start in range(0, len(ids), batch_size):
         chunk = ids[start : start + batch_size]
-        outcomes.extend(run_cascade(conn, chunk, lexicon, t_high, stage, exclude_channels))
+        outcomes.extend(
+            run_cascade(conn, chunk, lexicon, t_high, stage, exclude_channels, short_limit)
+        )
         progress(len(outcomes), len(ids))
     return outcomes
 
@@ -239,6 +267,7 @@ def write_outcomes(
     t_high: float,
     stage: EmbedStage,
     at: datetime,
+    short_limit: int | None = None,
 ) -> dict[str, int]:
     versions = {stage: _next_version(conn, SCORERS[stage]) for stage in STAGES}
     base = {
@@ -268,6 +297,8 @@ def write_outcomes(
                 {**base, "hits": o.hits, "messages": o.messages},
             )
         ]
+        if o.stage == SHORT_NO_TECH:
+            rows.append((SHORT_NO_TECH, None, o.decision, {**base, "short_limit": short_limit}))
         if o.p_embed is not None:
             rows.append(
                 (

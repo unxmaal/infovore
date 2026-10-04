@@ -14,9 +14,10 @@ _OUTCOMES = {
     "residue": ("residue", "residue", 0.1, 0.5),
     "denylist": ("denylist", "irrelevant", 0.0, None),
     "no_text": ("no_text", "no_text", 0.0, None),
+    "short_no_tech": ("short_no_tech", "irrelevant", 0.0, None),
 }
 ARCHIVED_KINDS = ("lexicon", "embed_relevant", "residue")
-RULED_OUT_KINDS = ("embed_irrelevant", "denylist", "no_text")
+RULED_OUT_KINDS = ("embed_irrelevant", "denylist", "no_text", "short_no_tech")
 
 
 def mark_all(

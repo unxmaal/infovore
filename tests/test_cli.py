@@ -55,7 +55,7 @@ def test_status_on_a_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert "messages: 0" in out
     assert "current exchanges: 0" in out
     assert "archived: 0 (cascade relevant 0, residue 0)" in out
-    assert "irrelevant: 0 (denylist 0, embed 0)" in out
+    assert "irrelevant: 0 (denylist 0, short no tech 0, embed 0)" in out
     assert "set aside (no_text): 0" in out
     assert "residue: 0" in out
     assert "not yet cascaded: 0" in out
@@ -127,7 +127,7 @@ def test_status_reports_cascade_outcomes_on_current_exchanges_only(tmp_path: Pat
     assert code == ExitCode.OK
     assert "current exchanges: 8" in out
     assert "archived: 4 (cascade relevant 3, residue 1)" in out
-    assert "irrelevant: 2 (denylist 1, embed 1)" in out
+    assert "irrelevant: 2 (denylist 1, short no tech 0, embed 1)" in out
     assert "set aside (no_text): 1" in out
     assert "residue: 1" in out
     assert "not yet cascaded: 1" in out

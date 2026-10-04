@@ -51,6 +51,7 @@ class StatusReport:
     cascade_residue: int
     irrelevant_denylist: int
     irrelevant_embed: int
+    irrelevant_short: int
     set_aside_no_text: int
     unscored: int
     last_cascade_at: datetime | None
@@ -254,6 +255,7 @@ def collect_status(
         cascade_residue=outcomes.get("relevance_residue:residue", 0),
         irrelevant_denylist=outcomes.get("relevance_denylist:irrelevant", 0),
         irrelevant_embed=outcomes.get(f"{MIDDLE_SCORER}:irrelevant", 0),
+        irrelevant_short=outcomes.get("relevance_short_no_tech:irrelevant", 0),
         set_aside_no_text=outcomes.get("relevance_no_text:no_text", 0),
         unscored=current - sum(outcomes.values()),
         last_cascade_at=_latest_time(
