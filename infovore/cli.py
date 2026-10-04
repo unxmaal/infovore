@@ -88,7 +88,6 @@ class StatusCommand:
         report = collect_status(
             context.conn,
             context.settings.triage_min_score,
-            context.settings.triage_min_p_lore,
             rules=context.settings.triage_rules,
             exclude_channels=context.settings.exclude_channels,
             now=context.clock.now(),
@@ -98,7 +97,7 @@ class StatusCommand:
             f"channels: {report.channels}",
             f"messages: {report.messages} (deleted {report.deleted_messages})",
             f"current exchanges: {report.current_exchanges}",
-            f"archived: {report.cascade_relevant + report.cascade_residue}"
+            f"archived: {report.archived_exchanges}"
             f" (cascade relevant {report.cascade_relevant}, residue {report.cascade_residue})",
             f"irrelevant: {report.irrelevant_denylist + report.irrelevant_bayes}"
             f" (denylist {report.irrelevant_denylist}, bayes {report.irrelevant_bayes})",

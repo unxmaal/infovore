@@ -21,15 +21,10 @@ from infovore.eval.judge import (
 from infovore.eval.slices import slice_ids, slice_summary
 from infovore.extract.prompt_compare import queue_size_mix, sample_extracted_exchanges
 from infovore.extract.runner import select_trial_sample
-from infovore.triage.bayes import Model
-from infovore.triage.gain_curve import compute_gain_curve
 from infovore.triage.human import held_out_ids, trainable_labels
 from infovore.triage.report import compute_triage_stats
 from infovore.triage.rules import DEFAULT_RULES
-from infovore.triage.scorer_compare import candidates_for
-from infovore.triage.train import score_all, score_stale
-from infovore.triage.tuning import corpus_document_frequencies
-from infovore.triage.yield_report import compute_yield_by_band
+from tests.cascade_marks import mark_all
 
 AT = "2026-01-01T00:00:00+00:00"
 CURRENT, OLD = 1, 2
@@ -65,6 +60,7 @@ def conn(tmp_path: Path) -> sqlite3.Connection:
                 (exchange_id, first + offset, offset),
             )
     connection.execute("UPDATE exchanges SET superseded_by_recipe = 1 WHERE id = ?", (OLD,))
+    mark_all(connection, [CURRENT, OLD], "residue")
     connection.commit()
     return connection
 
@@ -114,12 +110,12 @@ def test_the_view_is_the_definition(conn: sqlite3.Connection) -> None:
 
 
 def test_status_counts_only_current_exchanges(conn: sqlite3.Connection) -> None:
-    report = collect_status(conn, triage_min_score=0.3, triage_min_p_lore=0.5)
+    report = collect_status(conn, triage_min_score=0.3)
     assert report.exchanges_by_status == {"pending": 1}
     assert report.triaged_exchanges == 1
     assert report.above_threshold_exchanges == 1
-    assert report.p_lore_scored == 1
-    assert report.passing_gate == 1
+    assert report.archived_exchanges == 1
+    assert report.pending_archived == 1
     assert report.pending_exchanges == 1
     denied = collect_status(conn, exclude_channels=frozenset({"general"}))
     assert denied.excluded_by_denylist == 1
@@ -130,31 +126,12 @@ def test_triage_readers_ignore_superseded_exchanges(conn: sqlite3.Connection) ->
     run_for(conn, OLD)
     stats = compute_triage_stats(conn, 0.3)
     assert stats.above_threshold + stats.below_threshold == 1
-    assert sum(band.exchanges for band in compute_yield_by_band(conn)) == 1
-    assert compute_gain_curve(conn, "live", min_input_tokens=0).exchanges == 1
-    assert [c.exchange_id for c in candidates_for(conn, "live", min_input_tokens=0)] == [CURRENT]
-    assert corpus_document_frequencies(conn)[1] == 1
-
-
-def test_scoring_never_touches_superseded_exchanges(conn: sqlite3.Connection) -> None:
-    for version in (1, 2):
-        conn.execute(
-            "INSERT INTO triage_model (version, trained_at, labels_used, holdout_size,"
-            " params_json) VALUES (?, ?, 0, 0, '{}')",
-            (version, AT),
-        )
-    model = Model(lore_documents=1, noise_documents=1, counts={"prom": (1, 0)})
-    assert score_all(conn, model, 1) == 1
-    assert score_stale(conn, model, 2) == 1
-    versions = {row[0]: row[1] for row in conn.execute("SELECT id, p_lore_model FROM exchanges")}
-    assert versions[OLD] is None
-    assert versions[CURRENT] == 2
 
 
 def test_judge_queues_never_serve_superseded_exchanges(conn: sqlite3.Connection) -> None:
     served = [
         item.exchange_id
-        for item in uncertain_queue(3, 0.0, frozenset())(conn)
+        for item in uncertain_queue(3, frozenset())(conn)
         + c1_queue(frozenset())(conn)
         + likely_irrelevant_queue(frozenset())(conn)
     ]
@@ -181,7 +158,6 @@ def test_labels_on_superseded_exchanges_do_not_train(conn: sqlite3.Connection) -
 
 def test_extraction_queue_never_claims_superseded_exchanges(conn: sqlite3.Connection) -> None:
     assert [e.id for e in claimable_exchanges(conn, 10, 3)] == [CURRENT]
-    assert [e.id for e in claimable_exchanges(conn, 10, 3, min_score=0.3)] == [CURRENT]
     conn.execute("UPDATE exchanges SET triage_version = 'old' WHERE id = ?", (CURRENT,))
     assert has_untriaged_claimable(conn, DEFAULT_RULES.version, 3) is True
     conn.execute(
@@ -203,11 +179,11 @@ def test_prompt_compare_samples_only_current_exchanges(conn: sqlite3.Connection)
 def test_search_and_export_never_serve_superseded_exchanges(
     conn: sqlite3.Connection, tmp_path: Path
 ) -> None:
-    hits = search_exchanges(conn, "octane", 0.3, 0.5)
+    hits = search_exchanges(conn, "octane")
     assert [hit.exchange_id for hit in hits] == [CURRENT]
-    rejected = search_exchanges(conn, "octane", 0.3, 0.5, include_rejected=True)
+    rejected = search_exchanges(conn, "octane", include_rejected=True)
     assert [hit.exchange_id for hit in rejected] == [CURRENT]
-    report = export_archive(conn, tmp_path / "a.db", 0.3, 0.5)
+    report = export_archive(conn, tmp_path / "a.db")
     assert report.exchanges == 1
     assert report.messages == 3
     archived = sqlite3.connect(tmp_path / "a.db")

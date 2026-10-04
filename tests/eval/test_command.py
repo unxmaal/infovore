@@ -5,6 +5,7 @@ import pytest
 
 from infovore.cli import ExitCode, main
 from infovore.db.connection import open_database
+from tests.cascade_marks import mark_all
 
 
 def environment(tmp_path: Path) -> dict[str, str]:
@@ -13,7 +14,6 @@ def environment(tmp_path: Path) -> dict[str, str]:
         "INFOVORE_GUILD_ID": "1",
         "INFOVORE_DB_PATH": str(tmp_path / "infovore.db"),
         "INFOVORE_JUDGE_BACKEND": "fake",
-        "INFOVORE_TRIAGE_MIN_P_LORE": "0.9",
     }
 
 
@@ -34,10 +34,10 @@ def _seed(tmp_path: Path) -> None:
     for index in range(1, 1201):
         conn.execute(
             "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
-            " ended_at, message_count, grouping_rule, content_hash, p_lore, triage_score)"
+            " ended_at, message_count, grouping_rule, content_hash)"
             " VALUES (?, 1, 1, 1, '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00', ?,"
-            " 'quiet_gap', ?, ?, 0.5)",
-            (index, sizes[index % len(sizes)], f"h{index}", 0.95 if index <= 900 else 0.1),
+            " 'quiet_gap', ?)",
+            (index, sizes[index % len(sizes)], f"h{index}"),
         )
         conn.execute(
             "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
@@ -50,6 +50,8 @@ def _seed(tmp_path: Path) -> None:
             "INSERT INTO exchange_messages (exchange_id, message_id, position) VALUES (?, ?, 1)",
             (index, index),
         )
+    mark_all(conn, range(1, 901), "residue")
+    mark_all(conn, range(901, 1201), "bayes_irrelevant")
     conn.close()
 
 

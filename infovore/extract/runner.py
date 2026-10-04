@@ -6,13 +6,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 
-from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
 from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.claims import NewClaim, record_run, register_prompt_version
 from infovore.db.claims import live_prompt_version as db_live_prompt_version
 from infovore.db.claims import retract_claim as db_retract_claim
 from infovore.db.exchanges import (
-    ExchangeOrder,
     claimable_exchanges,
     get_exchange,
     has_untriaged_claimable,
@@ -39,18 +37,9 @@ class UntriagedExchangesError(Exception):
     pass
 
 
-class NoScoredExchangesError(Exception):
-    pass
-
-
 class TrialSampleStrategy(StrEnum):
     STRATIFIED = "stratified"
     RANDOM = "random"
-    UNCERTAIN = "uncertain"
-    MIXED = "mixed"
-
-
-DEFAULT_MIX_FRACTION_UNCERTAIN = 0.5
 
 
 @dataclass(frozen=True)
@@ -176,14 +165,6 @@ def _size_bucket(message_count: int) -> str:
     return "21+"
 
 
-def _select_uncertain(rows: Sequence[sqlite3.Row], n: int) -> list[int]:
-    eligible = [row for row in rows if row["p_lore"] is not None]
-    if not eligible:
-        raise NoScoredExchangesError
-    ordered = sorted(eligible, key=lambda row: (abs(row["p_lore"] - 0.5), row["id"]))
-    return sorted(row["id"] for row in ordered[:n])
-
-
 def _select_random(rows: Sequence[sqlite3.Row], n: int, seed: int) -> list[int]:
     ids = [row["id"] for row in rows]
     if n >= len(ids):
@@ -212,7 +193,7 @@ def _sample_pool(
         params.extend(excl_params)
     where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
     return conn.execute(
-        f"SELECT id, channel_id, message_count, p_lore FROM current_exchanges AS exchanges{where}"
+        f"SELECT id, channel_id, message_count FROM current_exchanges AS exchanges{where}"
         f" ORDER BY id",
         params,
     ).fetchall()
@@ -227,22 +208,8 @@ def select_trial_sample(
     strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
     exclude_channels: frozenset[str] = frozenset(),
 ) -> list[int]:
-    if strategy is TrialSampleStrategy.MIXED:
-        origins = select_trial_sample_origins(
-            conn,
-            n,
-            seed,
-            min_score=min_score,
-            max_score=max_score,
-            strategy=strategy,
-            exclude_channels=exclude_channels,
-        )
-        return sorted(origins)
-
     rows = _sample_pool(conn, min_score, max_score, exclude_channels)
 
-    if strategy is TrialSampleStrategy.UNCERTAIN:
-        return _select_uncertain(rows, n)
     if strategy is TrialSampleStrategy.RANDOM:
         return _select_random(rows, n, seed)
 
@@ -279,54 +246,14 @@ def select_trial_sample_origins(
     min_score: float | None = None,
     max_score: float | None = None,
     strategy: TrialSampleStrategy = TrialSampleStrategy.STRATIFIED,
-    mix: float = DEFAULT_MIX_FRACTION_UNCERTAIN,
     exclude_channels: frozenset[str] = frozenset(),
 ) -> dict[int, str]:
-    """Every exchange id `select_trial_sample` would pick for this call,
-    mapped to the sampling strategy that picked it — `extraction_runs
-    .sampled_by`'s source (issue #107), so a mixed batch can attribute each
-    exchange to `random` vs `uncertain` and the tuning warning can compute
-    the share of labels that trace back to `uncertain` sampling.
-
-    For every strategy but `mixed` this is just `strategy.value` for each id
-    `select_trial_sample` returns. `mixed` splits `n` between `uncertain` and
-    `random`: `mix` (default 50/50) is the fraction assigned to `uncertain`,
-    deterministic under `seed`, and no id is chosen by both halves. It falls
-    back to an all-`random` split when no exchange has a `p_lore` yet — a
-    `mixed` round shouldn't have to wait on a trained model the way
-    `--strategy uncertain` alone does (which raises `NoScoredExchangesError`
-    in that case, unchanged by this function)."""
-    if strategy is not TrialSampleStrategy.MIXED:
-        selected = select_trial_sample(
-            conn, n, seed, min_score, max_score, strategy, exclude_channels=exclude_channels
-        )
-        return {exchange_id: strategy.value for exchange_id in selected}
-
-    rows = _sample_pool(conn, min_score, max_score, exclude_channels)
-    if n >= len(rows):
-        return {
-            row["id"]: (
-                TrialSampleStrategy.UNCERTAIN.value
-                if row["p_lore"] is not None
-                else TrialSampleStrategy.RANDOM.value
-            )
-            for row in rows
-        }
-
-    scored_rows = [row for row in rows if row["p_lore"] is not None]
-    if not scored_rows:
-        random_ids = _select_random(rows, n, seed)
-        return {exchange_id: TrialSampleStrategy.RANDOM.value for exchange_id in random_ids}
-
-    n_uncertain = max(0, min(round(n * mix), len(scored_rows), n))
-    uncertain_ids = _select_uncertain(scored_rows, n_uncertain)
-    uncertain_id_set = set(uncertain_ids)
-    remaining_rows = [row for row in rows if row["id"] not in uncertain_id_set]
-    random_ids = _select_random(remaining_rows, n - len(uncertain_ids), seed)
-
-    origins = {exchange_id: TrialSampleStrategy.UNCERTAIN.value for exchange_id in uncertain_ids}
-    origins.update({exchange_id: TrialSampleStrategy.RANDOM.value for exchange_id in random_ids})
-    return origins
+    """Every exchange id `select_trial_sample` would pick, mapped to the strategy
+    that picked it (`extraction_runs.sampled_by`'s source, issue #107)."""
+    selected = select_trial_sample(
+        conn, n, seed, min_score, max_score, strategy, exclude_channels=exclude_channels
+    )
+    return {exchange_id: strategy.value for exchange_id in selected}
 
 
 def _previous_live_claim_ids(conn: sqlite3.Connection, exchange_id: int) -> list[int]:
@@ -542,12 +469,9 @@ async def run_extraction(
     batch_size: int,
     max_retries: int,
     concurrency: int,
-    min_score: float = 0.0,
-    min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     exchange_ids: Sequence[int] | None = None,
     progress: Progress = _ignore_progress,
     batch_id: str | None = None,
-    order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
     rules: TriageRules = DEFAULT_RULES,
     sampled_by: Mapping[int, str] | None = None,
     exclude_channels: frozenset[str] = frozenset(),
@@ -592,9 +516,6 @@ async def run_extraction(
                 conn,
                 batch_size,
                 max_retries,
-                min_score=min_score,
-                min_p_lore=min_p_lore,
-                order=order,
                 exclude_channels=exclude_channels,
             )
             if not batch:

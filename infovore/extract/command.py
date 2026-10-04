@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 from infovore.config import ConfigError, Stage
 from infovore.db.batches import record_extraction_batch
 from infovore.db.codec import to_db_time
-from infovore.db.exchanges import ExchangeOrder
 from infovore.extract.llm_extractor import LLMClaimExtractor
 from infovore.extract.prompt import LIVE_PROMPT_VERSION, PROMPTS
 from infovore.extract.prompt_compare import (
@@ -16,13 +15,11 @@ from infovore.extract.prompt_compare import (
     sample_extracted_exchanges,
 )
 from infovore.extract.runner import (
-    DEFAULT_MIX_FRACTION_UNCERTAIN,
     ExchangeClaimed,
     ExchangeFailed,
     ExchangeSkipped,
     ExtractionEvent,
     ExtractionStarted,
-    NoScoredExchangesError,
     PromptNotPromotedError,
     TrialSampleStrategy,
     UntriagedExchangesError,
@@ -89,13 +86,6 @@ class ExtractCommand:
             choices=[strategy.value for strategy in TrialSampleStrategy],
             default=TrialSampleStrategy.STRATIFIED.value,
         )
-        parser.add_argument("--mix", type=float, default=DEFAULT_MIX_FRACTION_UNCERTAIN, dest="mix")
-        parser.add_argument(
-            "--order",
-            choices=[order.value for order in ExchangeOrder],
-            default=ExchangeOrder.CHRONOLOGICAL.value,
-            help="live mode: chronological (default) or best (highest p_lore first)",
-        )
 
     async def _compare_prompt(self, context: "AppContext", args: argparse.Namespace) -> int:
         from infovore.cli import ExitCode, stage_backend
@@ -137,8 +127,6 @@ class ExtractCommand:
         mode = RunMode(args.mode)
         if mode is RunMode.TRIAL and args.sample is None and not args.exchange_id:
             raise ConfigError("--mode trial requires --sample or --exchange-id")
-        if not 0.0 <= args.mix <= 1.0:
-            raise ConfigError("--mix must be between 0 and 1")
 
         now = context.clock.now()
         batch_id = to_db_time(now)
@@ -158,22 +146,15 @@ class ExtractCommand:
         if mode is RunMode.TRIAL:
             ids: list[int] = []
             if args.sample is not None:
-                try:
-                    sampled_origins = select_trial_sample_origins(
-                        context.conn,
-                        args.sample,
-                        args.seed,
-                        min_score=args.min_score,
-                        max_score=args.max_score,
-                        strategy=TrialSampleStrategy(args.strategy),
-                        mix=args.mix,
-                        exclude_channels=context.settings.exclude_channels,
-                    )
-                except NoScoredExchangesError as error:
-                    raise ConfigError(
-                        "--strategy uncertain requires a trained model;"
-                        " run `infovore triage --train` first"
-                    ) from error
+                sampled_origins = select_trial_sample_origins(
+                    context.conn,
+                    args.sample,
+                    args.seed,
+                    min_score=args.min_score,
+                    max_score=args.max_score,
+                    strategy=TrialSampleStrategy(args.strategy),
+                    exclude_channels=context.settings.exclude_channels,
+                )
                 ids.extend(sampled_origins)
             ids.extend(args.exchange_id)
             exchange_ids = sorted(set(ids))
@@ -193,9 +174,6 @@ class ExtractCommand:
                 batch_size=context.settings.batch_size,
                 max_retries=context.settings.max_retries,
                 concurrency=stage_settings.concurrency,
-                min_score=context.settings.triage_min_score,
-                min_p_lore=context.settings.triage_min_p_lore,
-                order=ExchangeOrder(args.order),
                 exchange_ids=exchange_ids,
                 progress=lambda event: _say(context.stdout, _describe_extraction_event(event)),
                 batch_id=batch_id,

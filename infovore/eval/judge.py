@@ -114,6 +114,7 @@ def frozen_queue(conn: sqlite3.Connection) -> list[QueueItem]:
     ]
 
 
+DEFAULT_UNCERTAINTY_SCORER = "relevance_bayes"
 _LATEST_SCORE = (
     "(SELECT a.score FROM annotations a WHERE a.subject_kind = 'exchange'"
     " AND a.subject_id = exchanges.id AND a.scorer = ? AND a.reproducibility = 'derived'"
@@ -123,27 +124,25 @@ _LATEST_SCORE = (
 
 def uncertain_queue(
     max_retries: int,
-    min_p_lore: float,
     exclude_channels: frozenset[str],
-    scorer: str | None = None,
+    scorer: str = DEFAULT_UNCERTAINTY_SCORER,
 ) -> QueueBuilder:
     """Unjudged exchanges extraction could still claim, the ones the scorer is
     least sure about first (uncertainty sampling). The ref is the exchange id,
     since a rank shifts as items are judged and would alias another exchange.
-    `scorer` reads that scorer's latest derived annotation; None reads p_lore."""
+    `scorer` reads that scorer's latest derived annotation."""
 
     def build(conn: sqlite3.Connection) -> list[QueueItem]:
-        condition, params = claimable_condition(max_retries, None, min_p_lore, exclude_channels)
-        score, score_params = ("p_lore", []) if scorer is None else (_LATEST_SCORE, [scorer])
+        condition, params = claimable_condition(max_retries, exclude_channels)
         rows = conn.execute(
-            f"SELECT id FROM (SELECT id, {score} AS s FROM current_exchanges AS exchanges WHERE"
-            f" {condition}"
+            f"SELECT id FROM (SELECT id, {_LATEST_SCORE} AS s FROM current_exchanges AS exchanges"
+            f" WHERE {condition}"
             f" AND {enough_text_clause('exchanges.id')})"
             " WHERE s IS NOT NULL"
             " AND id NOT IN (SELECT subject_id FROM annotations"
             " WHERE subject_kind = 'exchange' AND scorer = ?)"
             " ORDER BY ABS(s - 0.5), id LIMIT ?",
-            (*score_params, *params, MIN_TEXT_MESSAGES, JUDGE_SCORER, UNCERTAIN_LIMIT),
+            (scorer, *params, MIN_TEXT_MESSAGES, JUDGE_SCORER, UNCERTAIN_LIMIT),
         ).fetchall()
         return [QueueItem(row["id"], UNCERTAIN, row["id"]) for row in rows]
 
@@ -196,20 +195,28 @@ def likely_irrelevant_queue(exclude_channels: frozenset[str]) -> QueueBuilder:
 def _likely_irrelevant_items(
     conn: sqlite3.Connection, exclude_channels: frozenset[str]
 ) -> list[QueueItem]:
-    """Unjudged exchanges outside s2 and gold, lowest lexicon share first then lowest p_lore;
-    only the LIKELY_IRRELEVANT_POOL lowest p_lore are scored, so no whole-corpus pass."""
+    """Unjudged exchanges outside s2 and gold, lowest lexicon share first then lowest bayes score;
+    only the LIKELY_IRRELEVANT_POOL lowest bayes scores are read, so no whole-corpus pass."""
     clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     rows = conn.execute(
-        f"SELECT id, p_lore FROM current_exchanges AS exchanges WHERE p_lore IS NOT NULL AND"
-        f" {_UNJUDGED}"
+        f"SELECT id, s FROM (SELECT id, {_LATEST_SCORE} AS s FROM current_exchanges AS exchanges"
+        f" WHERE {_UNJUDGED}"
         f" AND id NOT IN (SELECT exchange_id FROM current_eval_slices WHERE name IN (?, ?)){clause}"
-        f" AND {enough_text_clause('exchanges.id')} ORDER BY p_lore, id LIMIT ?",
-        (JUDGE_SCORER, HOLDOUT, GOLD, *excl_params, MIN_TEXT_MESSAGES, LIKELY_IRRELEVANT_POOL),
+        f" AND {enough_text_clause('exchanges.id')}) WHERE s IS NOT NULL ORDER BY s, id LIMIT ?",
+        (
+            DEFAULT_UNCERTAINTY_SCORER,
+            JUDGE_SCORER,
+            HOLDOUT,
+            GOLD,
+            *excl_params,
+            MIN_TEXT_MESSAGES,
+            LIKELY_IRRELEVANT_POOL,
+        ),
     ).fetchall()
     lexicon = load_lexicon()
     inputs = exchange_inputs_for_ids(conn, [row["id"] for row in rows])
     ranked = sorted(
-        (score_lexicon(lexicon, inputs[row["id"]].messages).share, row["p_lore"], row["id"])
+        (score_lexicon(lexicon, inputs[row["id"]].messages).share, row["s"], row["id"])
         for row in rows
     )
     return [

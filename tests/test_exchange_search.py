@@ -7,6 +7,7 @@ import pytest
 
 from infovore.cli import ExitCode, main
 from infovore.db import archive
+from tests.cascade_marks import mark
 
 AT = datetime(2026, 1, 1, tzinfo=UTC)
 OPTED_OUT = 66
@@ -33,6 +34,7 @@ class Archive:
     def __init__(self, tmp_path: Path) -> None:
         run(["status"], environment(tmp_path))
         self.conn = sqlite3.connect(tmp_path / "infovore.db")
+        self.conn.row_factory = sqlite3.Row
         self.conn.execute(
             "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
             " VALUES (1, 9, NULL, 'hardware', 'text'), (2, 9, NULL, 'offtopic', 'text')"
@@ -42,8 +44,7 @@ class Archive:
     def exchange(
         self,
         messages: list[tuple[int, str]],
-        p_lore: float | None = 0.9,
-        triage_score: float | None = None,
+        cascade: str | None = "residue",
         channel: int = 1,
         start: int = 0,
     ) -> int:
@@ -67,8 +68,8 @@ class Archive:
             )
         cursor = self.conn.execute(
             "INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,"
-            " ended_at, message_count, grouping_rule, content_hash, p_lore, triage_score)"
-            " VALUES (?, ?, ?, ?, ?, ?, 'quiet_gap', ?, ?, ?)",
+            " ended_at, message_count, grouping_rule, content_hash)"
+            " VALUES (?, ?, ?, ?, ?, ?, 'quiet_gap', ?)",
             (
                 channel,
                 ids[0],
@@ -77,8 +78,6 @@ class Archive:
                 (AT + timedelta(days=start, minutes=len(ids))).isoformat(),
                 len(ids),
                 f"hash{ids[0]}",
-                p_lore,
-                triage_score,
             ),
         )
         exchange_id = cursor.lastrowid
@@ -89,6 +88,8 @@ class Archive:
                 " VALUES (?, ?, ?)",
                 (exchange_id, message_id, position),
             )
+        if cascade is not None:
+            mark(self.conn, exchange_id, cascade)
         self.conn.commit()
         return exchange_id
 
@@ -125,12 +126,14 @@ def test_exchange_line_has_channel_span_participants_snippet_and_jump_link(
     assert "https://discord.com/channels/9/1/101" in out
 
 
-def test_gate_failing_exchanges_are_hidden_unless_all(tmp_path: Path) -> None:
+def test_unarchived_exchanges_are_hidden_unless_all(tmp_path: Path) -> None:
     a = Archive(tmp_path)
-    a.exchange([(1, "IRIX gate pass")], p_lore=0.9)
-    a.exchange([(1, "IRIX gate fail")], p_lore=0.1)
-    a.exchange([(1, "IRIX no p_lore pass")], p_lore=None, triage_score=0.9)
-    a.exchange([(1, "IRIX untriaged")], p_lore=None, triage_score=None)
+    a.exchange([(1, "IRIX gate pass")], cascade="lexicon")
+    a.exchange([(1, "IRIX gate fail")], cascade="bayes_irrelevant")
+    a.exchange([(1, "IRIX no p_lore pass")], cascade="residue")
+    a.exchange([(1, "IRIX untriaged")], cascade=None)
+    a.exchange([(1, "IRIX denied")], cascade="denylist")
+    a.exchange([(1, "IRIX textless")], cascade="no_text")
 
     _, default, _ = run(["search", "--exchanges", "IRIX"], environment(tmp_path))
     _, everything, _ = run(["search", "--exchanges", "--all", "IRIX"], environment(tmp_path))
@@ -140,7 +143,8 @@ def test_gate_failing_exchanges_are_hidden_unless_all(tmp_path: Path) -> None:
     assert "REJECTED" not in default
     assert "gate fail" in everything and "untriaged" in everything
     assert "gate pass" in everything
-    assert everything.count("REJECTED") == 2
+    assert "denied" not in default and "textless" not in default
+    assert everything.count("REJECTED") == 4
 
 
 def test_opted_out_author_never_appears_even_before_redaction(tmp_path: Path) -> None:
@@ -193,10 +197,10 @@ def test_exchange_search_reports_no_match(tmp_path: Path) -> None:
     assert "no exchanges for '-'" in empty
 
 
-def test_export_keeps_only_gated_non_opted_out_content(tmp_path: Path) -> None:
+def test_export_keeps_only_archived_non_opted_out_content(tmp_path: Path) -> None:
     a = Archive(tmp_path)
     a.exchange([(1, "Octane keep me"), (OPTED_OUT, "Octane opted out words")], start=0)
-    a.exchange([(1, "Octane rejected exchange")], p_lore=0.1, start=1)
+    a.exchange([(1, "Octane rejected exchange")], cascade="bayes_irrelevant", start=1)
     a.exchange([(1, "Octane [redacted]"), (1, "[redacted]")], start=2, channel=2)
     a.conn.execute("UPDATE messages SET deleted_at = 'x' WHERE content = 'Octane [redacted]'")
     a.conn.commit()

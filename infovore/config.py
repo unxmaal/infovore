@@ -21,7 +21,10 @@ DEFAULT_STAGE_CONCURRENCY = 2
 DEFAULT_PROBE_BATCH_SIZE = 1
 DEFAULT_STAGE_TIMEOUT_SECONDS = 60.0
 DEFAULT_TRIAGE_MIN_SCORE = 0.3
-DEFAULT_TRIAGE_MIN_P_LORE = 0.5
+REMOVED_P_LORE_GATE = (
+    "INFOVORE_TRIAGE_MIN_P_LORE was removed: the p_lore gate is retired;"
+    " unset it (the archive follows `infovore relevance cascade --all --write`)"
+)
 
 # Worker processes for triage's CPU-bound scoring (issue #113): `p_lore`,
 # rule-based `score_exchange`, and the `--suggest-terms` corpus
@@ -80,7 +83,6 @@ class Settings:
     opt_out_role_name: str = DEFAULT_OPT_OUT_ROLE_NAME
     include_bot_messages: bool = DEFAULT_INCLUDE_BOT_MESSAGES
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE
-    triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE
     triage_rules: TriageRules = DEFAULT_RULES
     workers: int = DEFAULT_WORKERS
     exclude_channels: frozenset[str] = field(default_factory=frozenset)
@@ -335,12 +337,8 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         "INFOVORE_TRIAGE_MIN_SCORE",
         errors,
     )
-    triage_min_p_lore = _optional_unit_float(
-        env.get("INFOVORE_TRIAGE_MIN_P_LORE"),
-        DEFAULT_TRIAGE_MIN_P_LORE,
-        "INFOVORE_TRIAGE_MIN_P_LORE",
-        errors,
-    )
+    if env.get("INFOVORE_TRIAGE_MIN_P_LORE") is not None:
+        errors.append(REMOVED_P_LORE_GATE)
     stages = {stage: _parse_stage(env, stage, errors) for stage in Stage}
     triage_rules = _load_triage_rules(env.get("INFOVORE_TRIAGE_RULES"), errors)
     workers = _optional_positive_int(
@@ -367,7 +365,6 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         opt_out_role_name=opt_out_role_name,
         include_bot_messages=include_bot_messages,
         triage_min_score=triage_min_score,
-        triage_min_p_lore=triage_min_p_lore,
         triage_rules=triage_rules,
         workers=workers,
         exclude_channels=exclude_channels,

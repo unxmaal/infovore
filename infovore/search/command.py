@@ -27,7 +27,7 @@ def format_context_line(message: ContextMessage) -> str:
 
 
 def format_exchange_hit(hit: ExchangeHit) -> list[str]:
-    gate = "" if hit.passes_gate else " REJECTED"
+    gate = "" if hit.in_archive else " REJECTED"
     lines = [
         f"#{hit.channel_name} [ex:{hit.exchange_id}]{gate} {hit.started_at} .. {hit.ended_at}"
         f" {hit.participants} participant(s), {hit.hit_count} matching message(s)"
@@ -77,8 +77,6 @@ class SearchCommand:
         found = search_exchanges(
             context.conn,
             query,
-            settings.triage_min_score,
-            settings.triage_min_p_lore,
             include_rejected=args.include_rejected,
             exclude_channels=settings.exclude_channels,
             limit=args.limit,
@@ -96,7 +94,7 @@ class SearchCommand:
 
 class ExportArchiveCommand:
     name = "export-archive"
-    help = "write a shareable SQLite archive of gate-passing exchanges"
+    help = "write a shareable SQLite archive of archived exchanges"
 
     def configure(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("dest")
@@ -110,8 +108,6 @@ class ExportArchiveCommand:
             report = export_archive(
                 context.conn,
                 args.dest,
-                settings.triage_min_score,
-                settings.triage_min_p_lore,
                 exclude_channels=settings.exclude_channels,
                 force=args.force,
             )

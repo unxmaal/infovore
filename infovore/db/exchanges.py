@@ -1,14 +1,12 @@
 import sqlite3
 from collections.abc import Sequence
-from enum import StrEnum
 from typing import cast
 
-from infovore.config import DEFAULT_TRIAGE_MIN_P_LORE
+from infovore.db.archived import archived_clause
 from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.connection import transaction
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
-from infovore.triage.gate import gate_sql
 
 
 class DuplicateExchangeError(Exception):
@@ -133,22 +131,11 @@ def grouped_message_ids(conn: sqlite3.Connection) -> set[int]:
     return {row["message_id"] for row in rows}
 
 
-class ExchangeOrder(StrEnum):
-    CHRONOLOGICAL = "chronological"
-    BEST = "best"
-
-
-_ORDER_BY: dict[ExchangeOrder, str] = {
-    ExchangeOrder.CHRONOLOGICAL: "started_at, id",
-    ExchangeOrder.BEST: "p_lore IS NULL, p_lore DESC, triage_score DESC, started_at, id",
-}
-
-
 def claimable_condition(
     max_retries: int,
-    min_score: float | None = None,
-    min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     exclude_channels: frozenset[str] = frozenset(),
+    *,
+    archived_only: bool = False,
 ) -> tuple[str, list[object]]:
     """The predicate for "extract would work on this exchange next".
 
@@ -161,10 +148,8 @@ def claimable_condition(
         ExtractionStatus.STALE.value,
         max_retries,
     ]
-    if min_score is not None:
-        clause, gate_params = gate_sql(min_score, min_p_lore)
-        condition += f" AND {clause}"
-        params.extend(gate_params)
+    if archived_only:
+        condition += f" AND {archived_clause('exchanges.id')}"
     excl_clause, excl_params = exclude_channels_clause("exchanges.channel_id", exclude_channels)
     condition += excl_clause
     params.extend(excl_params)
@@ -175,15 +160,12 @@ def claimable_exchanges(
     conn: sqlite3.Connection,
     limit: int,
     max_retries: int,
-    min_score: float | None = None,
-    min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
-    order: ExchangeOrder = ExchangeOrder.CHRONOLOGICAL,
     exclude_channels: frozenset[str] = frozenset(),
 ) -> list[ExchangeRow]:
-    condition, params = claimable_condition(max_retries, min_score, min_p_lore, exclude_channels)
+    condition, params = claimable_condition(max_retries, exclude_channels, archived_only=True)
     rows = conn.execute(
         f"SELECT * FROM current_exchanges AS exchanges WHERE {condition} ORDER BY"
-        f" {_ORDER_BY[order]} LIMIT ?",
+        " started_at, id LIMIT ?",
         (*params, limit),
     ).fetchall()
     return [_row_to_exchange(row) for row in rows]

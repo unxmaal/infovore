@@ -4,14 +4,13 @@ from datetime import datetime, timedelta
 
 from infovore.config import (
     DEFAULT_MAX_RETRIES,
-    DEFAULT_TRIAGE_MIN_P_LORE,
     DEFAULT_TRIAGE_MIN_SCORE,
 )
+from infovore.db.archived import archived_clause
 from infovore.db.channel_filter import include_channels_clause
 from infovore.db.codec import from_db_time, to_db_time
 from infovore.db.exchanges import claimable_condition
 from infovore.db.labels import label_counts
-from infovore.triage.gate import gate_sql
 from infovore.triage.human import trainable_counts
 from infovore.triage.rules import DEFAULT_RULES, TriageRules
 
@@ -32,13 +31,10 @@ class StatusReport:
     above_threshold_exchanges: int
     labels_by_source: dict[str, dict[str, int]]
     labels_effective: dict[str, int]
-    latest_model_version: int | None
-    latest_model_labels_used: int | None
-    p_lore_scored: int
-    passing_gate: int
+    archived_exchanges: int
     excluded_by_denylist: int
     pending_exchanges: int
-    pending_gated: int
+    pending_archived: int
     extraction_per_hour: float | None
     probe_per_hour: float | None
     extraction_eta_hours: float | None
@@ -88,21 +84,7 @@ def _live_prompt_version(conn: sqlite3.Connection) -> str | None:
     return str(row[0]) if row is not None else None
 
 
-def _latest_model(conn: sqlite3.Connection) -> tuple[int | None, int | None]:
-    row = conn.execute(
-        "SELECT version, labels_used FROM triage_model ORDER BY version DESC LIMIT 1"
-    ).fetchone()
-    if row is None:
-        return None, None
-    return int(row["version"]), int(row["labels_used"])
-
-
-def _excluded_by_denylist(
-    conn: sqlite3.Connection,
-    gate_clause: str,
-    gate_params: tuple[float, float],
-    exclude_channels: frozenset[str],
-) -> int:
+def _excluded_by_denylist(conn: sqlite3.Connection, exclude_channels: frozenset[str]) -> int:
     if not exclude_channels:
         return 0
     denylist_clause, denylist_params = include_channels_clause(
@@ -110,8 +92,9 @@ def _excluded_by_denylist(
     )
     return _count_params(
         conn,
-        f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {gate_clause}{denylist_clause}",
-        (*gate_params, *denylist_params),
+        "SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE"
+        f" {archived_clause()}{denylist_clause}",
+        tuple(denylist_params),
     )
 
 
@@ -163,7 +146,6 @@ def _cascade_outcomes(conn: sqlite3.Connection) -> dict[str, int]:
 def collect_status(
     conn: sqlite3.Connection,
     triage_min_score: float = DEFAULT_TRIAGE_MIN_SCORE,
-    triage_min_p_lore: float = DEFAULT_TRIAGE_MIN_P_LORE,
     rules: TriageRules = DEFAULT_RULES,
     exclude_channels: frozenset[str] = frozenset(),
     *,
@@ -172,17 +154,14 @@ def collect_status(
     throughput_window_hours: int = DEFAULT_THROUGHPUT_WINDOW_HOURS,
 ) -> StatusReport:
     counts = label_counts(conn)
-    latest_model_version, latest_model_labels_used = _latest_model(conn)
-    gate_clause, gate_params = gate_sql(triage_min_score, triage_min_p_lore)
-
     pending_clause, pending_params = claimable_condition(max_retries)
-    gated_clause, gated_params = claimable_condition(
-        max_retries, triage_min_score, triage_min_p_lore, exclude_channels
+    archived_cond, archived_params = claimable_condition(
+        max_retries, exclude_channels, archived_only=True
     )
-    pending_gated = _count_params(
+    pending_archived = _count_params(
         conn,
-        f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {gated_clause}",
-        tuple(gated_params),
+        f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {archived_cond}",
+        tuple(archived_params),
     )
 
     since = to_db_time(now - timedelta(hours=throughput_window_hours)) if now else None
@@ -239,28 +218,20 @@ def collect_status(
         ),
         labels_by_source=counts.by_source,
         labels_effective=counts.effective,
-        latest_model_version=latest_model_version,
-        latest_model_labels_used=latest_model_labels_used,
-        p_lore_scored=_count(
-            conn, "SELECT COUNT(*) FROM current_exchanges WHERE p_lore IS NOT NULL"
-        ),
-        passing_gate=_count_params(
+        archived_exchanges=_count(
             conn,
-            f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {gate_clause}",
-            gate_params,
+            f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {archived_clause()}",
         ),
-        excluded_by_denylist=_excluded_by_denylist(
-            conn, gate_clause, gate_params, exclude_channels
-        ),
+        excluded_by_denylist=_excluded_by_denylist(conn, exclude_channels),
         pending_exchanges=_count_params(
             conn,
             f"SELECT COUNT(*) FROM current_exchanges AS exchanges WHERE {pending_clause}",
             tuple(pending_params),
         ),
-        pending_gated=pending_gated,
+        pending_archived=pending_archived,
         extraction_per_hour=extraction_per_hour,
         probe_per_hour=_rate_per_hour(recent_probe_claims, throughput_window_hours),
-        extraction_eta_hours=_eta_hours(pending_gated, extraction_per_hour),
+        extraction_eta_hours=_eta_hours(pending_archived, extraction_per_hour),
         extraction_input_tokens=_sum(conn, "SELECT SUM(input_tokens) FROM extraction_runs"),
         extraction_output_tokens=_sum(conn, "SELECT SUM(output_tokens) FROM extraction_runs"),
         extraction_cost_usd=_sum_optional(conn, "SELECT SUM(cost_usd) FROM extraction_runs"),

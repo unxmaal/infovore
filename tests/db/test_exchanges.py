@@ -10,7 +10,6 @@ from infovore.db.codec import to_db_time
 from infovore.db.connection import migrate, open_database
 from infovore.db.exchanges import (
     DuplicateExchangeError,
-    ExchangeOrder,
     MessageAlreadyGroupedError,
     claimable_exchanges,
     exchange_for_message,
@@ -18,14 +17,29 @@ from infovore.db.exchanges import (
     get_exchange,
     grouped_message_ids,
     has_untriaged_claimable,
-    insert_exchange,
     mark_stale_for_message,
     record_failure,
     set_status,
 )
+from infovore.db.exchanges import (
+    insert_exchange as insert_exchange_row,
+)
 from infovore.rows import ExchangeRow, ExtractionStatus, GroupingRule
+from tests.cascade_marks import ARCHIVED_KINDS, RULED_OUT_KINDS, mark
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
+
+
+def insert_exchange(
+    conn: sqlite3.Connection,
+    exchange: ExchangeRow,
+    message_ids: Sequence[int],
+    cascade: str | None = "residue",
+) -> int:
+    exchange_id = insert_exchange_row(conn, exchange, message_ids)
+    if cascade is not None:
+        mark(conn, exchange_id, cascade)
+    return exchange_id
 
 
 @pytest.fixture
@@ -243,32 +257,6 @@ def test_claimable_exchanges_filters_status_and_retry_and_orders(
     assert [row.id for row in limited] == [stale_id]
 
 
-def test_claimable_exchanges_filters_by_min_score(conn: sqlite3.Connection) -> None:
-    insert_messages(conn, [1, 2, 3])
-    high_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="high"), [1])
-    low_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="low"), [2])
-    insert_exchange(conn, make_exchange(message_count=1, content_hash="untriaged"), [3])
-    conn.execute(
-        "UPDATE exchanges SET triage_score = 0.9, triage_version = 't1' WHERE id = ?", (high_id,)
-    )
-    conn.execute(
-        "UPDATE exchanges SET triage_score = 0.1, triage_version = 't1' WHERE id = ?", (low_id,)
-    )
-
-    result = claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3)
-
-    assert [row.id for row in result] == [high_id]
-
-
-def test_claimable_exchanges_without_min_score_ignores_triage(conn: sqlite3.Connection) -> None:
-    insert_messages(conn, [1])
-    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="any"), [1])
-
-    result = claimable_exchanges(conn, limit=10, max_retries=3)
-
-    assert [row.id for row in result] == [exchange_id]
-
-
 def test_claimable_exchanges_excludes_denylisted_channel_by_name(
     conn: sqlite3.Connection,
 ) -> None:
@@ -344,58 +332,6 @@ def test_claimable_exchanges_without_denylist_ignores_channels(conn: sqlite3.Con
     result = claimable_exchanges(conn, limit=10, max_retries=3, exclude_channels=frozenset())
 
     assert [row.id for row in result] == [exchange_id]
-
-
-def _insert_stub_model(conn: sqlite3.Connection) -> int:
-    cursor = conn.execute(
-        "INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)"
-        " VALUES ('2026-01-01T00:00:00Z', 20, 4, '{}')"
-    )
-    return int(cursor.lastrowid or 0)
-
-
-def test_claimable_exchanges_prefers_p_lore_over_triage_score_when_set(
-    conn: sqlite3.Connection,
-) -> None:
-    model_version = _insert_stub_model(conn)
-    insert_messages(conn, [1, 2])
-    low_rule_high_p_lore = insert_exchange(
-        conn, make_exchange(message_count=1, content_hash="a"), [1]
-    )
-    high_rule_low_p_lore = insert_exchange(
-        conn, make_exchange(message_count=1, content_hash="b"), [2]
-    )
-    conn.execute(
-        "UPDATE exchanges SET triage_score = 0.0, triage_version = 't1',"
-        " p_lore = 0.9, p_lore_model = ? WHERE id = ?",
-        (model_version, low_rule_high_p_lore),
-    )
-    conn.execute(
-        "UPDATE exchanges SET triage_score = 1.0, triage_version = 't1',"
-        " p_lore = 0.1, p_lore_model = ? WHERE id = ?",
-        (model_version, high_rule_low_p_lore),
-    )
-
-    result = claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5)
-
-    assert [row.id for row in result] == [low_rule_high_p_lore]
-
-
-def test_claimable_exchanges_respects_custom_min_p_lore(conn: sqlite3.Connection) -> None:
-    model_version = _insert_stub_model(conn)
-    insert_messages(conn, [1])
-    exchange_id = insert_exchange(conn, make_exchange(message_count=1, content_hash="a"), [1])
-    conn.execute(
-        "UPDATE exchanges SET triage_score = 0.0, triage_version = 't1', p_lore = 0.6,"
-        " p_lore_model = ? WHERE id = ?",
-        (model_version, exchange_id),
-    )
-
-    assert claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.7) == []
-    assert [
-        row.id
-        for row in claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5)
-    ] == [exchange_id]
 
 
 def test_has_untriaged_claimable_true_when_version_null(conn: sqlite3.Connection) -> None:
@@ -544,68 +480,6 @@ def test_mark_stale_for_message_returns_none_when_ungrouped(conn: sqlite3.Connec
     assert mark_stale_for_message(conn, 1) is None
 
 
-def _seed_ordering(conn: sqlite3.Connection) -> tuple[int, int, int, int]:
-    model_version = _insert_stub_model(conn)
-    insert_messages(conn, [1, 2, 3, 4])
-    early_low = insert_exchange(
-        conn, make_exchange(message_count=1, content_hash="a", started_at=NOW), [1]
-    )
-    mid_high = insert_exchange(
-        conn,
-        make_exchange(message_count=1, content_hash="b", started_at=NOW + timedelta(hours=1)),
-        [2],
-    )
-    late_best = insert_exchange(
-        conn,
-        make_exchange(message_count=1, content_hash="c", started_at=NOW + timedelta(hours=2)),
-        [3],
-    )
-    unscored = insert_exchange(
-        conn,
-        make_exchange(message_count=1, content_hash="d", started_at=NOW + timedelta(hours=3)),
-        [4],
-    )
-    for exchange_id, p_lore, rule in (
-        (early_low, 0.6, 0.9),
-        (mid_high, 0.9, 0.1),
-        (late_best, 0.99, 0.5),
-    ):
-        conn.execute(
-            "UPDATE exchanges SET triage_score = ?, triage_version = 't1',"
-            " p_lore = ?, p_lore_model = ? WHERE id = ?",
-            (rule, p_lore, model_version, exchange_id),
-        )
-    conn.execute(
-        "UPDATE exchanges SET triage_score = 0.95, triage_version = 't1' WHERE id = ?",
-        (unscored,),
-    )
-    return early_low, mid_high, late_best, unscored
-
-
-def test_claimable_exchanges_default_order_is_chronological(conn: sqlite3.Connection) -> None:
-    early_low, mid_high, late_best, unscored = _seed_ordering(conn)
-    result = claimable_exchanges(conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5)
-    assert [row.id for row in result] == [early_low, mid_high, late_best, unscored]
-
-
-def test_claimable_exchanges_best_order_puts_highest_p_lore_first(
-    conn: sqlite3.Connection,
-) -> None:
-    early_low, mid_high, late_best, unscored = _seed_ordering(conn)
-    result = claimable_exchanges(
-        conn, limit=10, max_retries=3, min_score=0.3, min_p_lore=0.5, order=ExchangeOrder.BEST
-    )
-    assert [row.id for row in result] == [late_best, mid_high, early_low, unscored]
-
-
-def test_claimable_exchanges_best_order_respects_limit(conn: sqlite3.Connection) -> None:
-    _, mid_high, late_best, _ = _seed_ordering(conn)
-    result = claimable_exchanges(
-        conn, limit=2, max_retries=3, min_score=0.3, min_p_lore=0.5, order=ExchangeOrder.BEST
-    )
-    assert [row.id for row in result] == [late_best, mid_high]
-
-
 def test_excluded_exchange_ids_cover_threads_and_an_empty_set(tmp_path: Path) -> None:
     from infovore.db.channel_filter import excluded_exchange_ids
 
@@ -627,3 +501,32 @@ def test_excluded_exchange_ids_cover_threads_and_an_empty_set(tmp_path: Path) ->
 
     assert excluded_exchange_ids(conn, frozenset({"food"})) == {2, 3}
     assert excluded_exchange_ids(conn, frozenset()) == frozenset()
+
+
+def test_claimable_exchanges_are_chronological(conn: sqlite3.Connection) -> None:
+    insert_messages(conn, [1, 2, 3])
+    ids = [
+        insert_exchange(
+            conn,
+            make_exchange(
+                message_count=1, content_hash=f"h{i}", started_at=NOW + timedelta(hours=h)
+            ),
+            [i],
+        )
+        for i, h in ((1, 2), (2, 0), (3, 1))
+    ]
+    result = claimable_exchanges(conn, limit=10, max_retries=3)
+    assert [row.id for row in result] == [ids[1], ids[2], ids[0]]
+
+
+def test_claimable_exchanges_only_return_archived_ones(conn: sqlite3.Connection) -> None:
+    kinds = [*ARCHIVED_KINDS, *RULED_OUT_KINDS, None]
+    insert_messages(conn, list(range(1, len(kinds) + 1)))
+    ids = {
+        kind: insert_exchange(
+            conn, make_exchange(message_count=1, content_hash=f"h{index}"), [index], cascade=kind
+        )
+        for index, kind in enumerate(kinds, start=1)
+    }
+    result = claimable_exchanges(conn, limit=10, max_retries=3)
+    assert {row.id for row in result} == {ids[kind] for kind in ARCHIVED_KINDS}

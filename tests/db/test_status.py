@@ -7,6 +7,7 @@ from infovore.db.connection import migrate, open_database
 from infovore.db.status import collect_status
 from infovore.triage.rules import DEFAULT_RULES
 from infovore.triage.score import TRIAGE_VERSION
+from tests.cascade_marks import mark
 
 NOW = "2026-01-01T00:00:00+00:00"
 LATER = "2026-01-02T00:00:00+00:00"
@@ -34,10 +35,7 @@ def test_fresh_database_reports_zeros(tmp_path: Path) -> None:
     assert report.above_threshold_exchanges == 0
     assert report.labels_by_source == {}
     assert report.labels_effective == {}
-    assert report.latest_model_version is None
-    assert report.latest_model_labels_used is None
-    assert report.p_lore_scored == 0
-    assert report.passing_gate == 0
+    assert report.archived_exchanges == 0
     assert report.excluded_by_denylist == 0
 
 
@@ -124,7 +122,7 @@ def test_counts_and_last_runs(tmp_path: Path) -> None:
     assert report.labels_effective == {"noise": 2}
 
 
-def test_reports_latest_model_p_lore_scored_and_passing_gate(tmp_path: Path) -> None:
+def test_reports_archived_exchanges_from_the_latest_cascade(tmp_path: Path) -> None:
     conn = fresh(tmp_path)
     conn.executescript(
         f"""
@@ -133,24 +131,18 @@ def test_reports_latest_model_p_lore_scored_and_passing_gate(tmp_path: Path) -> 
           created_at, content, ingested_at, raw_json)
           VALUES (1, 1, 9, 1, 'a', '{NOW}', 'x', '{NOW}', '{{}}'),
                  (2, 1, 9, 1, 'a', '{NOW}', 'y', '{NOW}', '{{}}');
-        INSERT INTO triage_model (trained_at, labels_used, holdout_size, params_json)
-          VALUES ('{NOW}', 40, 8, '{{}}');
         INSERT INTO exchanges (channel_id, first_message_id, last_message_id, started_at,
-          ended_at, message_count, grouping_rule, content_hash, triage_score, triage_version,
-          p_lore, p_lore_model)
-          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.0, '{TRIAGE_VERSION}', 0.9, 1),
-                 (1, 2, 2, '{NOW}', '{NOW}', 1, 'quiet_gap', 'b', 1.0, '{TRIAGE_VERSION}', NULL,
-                  NULL);
+          ended_at, message_count, grouping_rule, content_hash)
+          VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a'),
+                 (1, 2, 2, '{NOW}', '{NOW}', 1, 'quiet_gap', 'b');
         """
     )
-    report = collect_status(conn, triage_min_score=0.3, triage_min_p_lore=0.5)
-    assert report.latest_model_version == 1
-    assert report.latest_model_labels_used == 40
-    assert report.p_lore_scored == 1
-    assert report.passing_gate == 2
+    mark(conn, 1, "lexicon")
+    mark(conn, 2, "bayes_irrelevant")
+    assert collect_status(conn).archived_exchanges == 1
 
 
-def test_excluded_by_denylist_counts_gate_passing_exchanges_in_denylisted_channels(
+def test_excluded_by_denylist_counts_archived_exchanges_in_denylisted_channels(
     tmp_path: Path,
 ) -> None:
     conn = fresh(tmp_path)
@@ -170,8 +162,10 @@ def test_excluded_by_denylist_counts_gate_passing_exchanges_in_denylisted_channe
                  (2, 3, 3, '{NOW}', '{NOW}', 1, 'quiet_gap', 'c', 0.0, '{TRIAGE_VERSION}');
         """
     )
-    report = collect_status(conn, triage_min_score=0.3, exclude_channels=frozenset({"food"}))
-    assert report.passing_gate == 2
+    for exchange_id, kind in ((1, "residue"), (2, "lexicon"), (3, "no_text")):
+        mark(conn, exchange_id, kind)
+    report = collect_status(conn, exclude_channels=frozenset({"food"}))
+    assert report.archived_exchanges == 2
     assert report.excluded_by_denylist == 1
 
 
@@ -188,5 +182,6 @@ def test_excluded_by_denylist_is_zero_without_a_denylist(tmp_path: Path) -> None
           VALUES (1, 1, 1, '{NOW}', '{NOW}', 1, 'quiet_gap', 'a', 0.9, '{TRIAGE_VERSION}');
         """
     )
+    mark(conn, 1, "residue")
     report = collect_status(conn, triage_min_score=0.3)
     assert report.excluded_by_denylist == 0

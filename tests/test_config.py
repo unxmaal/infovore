@@ -224,49 +224,11 @@ def test_load_settings_triage_min_score_non_numeric_reported() -> None:
         load_settings(env)
 
 
-def test_load_settings_triage_min_p_lore_defaults_to_point_five() -> None:
-    assert load_settings(REQUIRED_ENV).triage_min_p_lore == 0.5
-
-
-def test_load_settings_triage_min_p_lore_from_env() -> None:
-    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": "0.65"}
-    assert load_settings(env).triage_min_p_lore == 0.65
-
-
-def test_load_settings_triage_min_p_lore_accepts_boundaries() -> None:
-    low = load_settings({**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": "0"})
-    high = load_settings({**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": "1"})
-    assert (low.triage_min_p_lore, high.triage_min_p_lore) == (0.0, 1.0)
-
-
-def test_load_settings_triage_min_p_lore_out_of_range_reported() -> None:
-    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": "1.5"}
-    with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_MIN_P_LORE"):
-        load_settings(env)
-
-
-def test_load_settings_triage_min_p_lore_non_numeric_reported() -> None:
-    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": "nope"}
-    with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_MIN_P_LORE"):
-        load_settings(env)
-
-
-def test_load_settings_triage_min_p_lore_round_trips_a_formatted_high_precision_threshold() -> None:
-    from infovore.rows import Label
-    from infovore.triage.bayes import candidate_thresholds, format_threshold
-
-    scored = [
-        (0.9999999999646519, Label.LORE),
-        (0.9994, Label.LORE),
-        (0.0011281727425668242, Label.NOISE),
-    ]
-    threshold = candidate_thresholds(scored)[-1]
-    formatted = format_threshold(threshold, scored)
-
-    env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": formatted}
-    parsed = load_settings(env).triage_min_p_lore
-
-    assert [p >= parsed for p, _ in scored] == [p >= threshold for p, _ in scored]
+def test_load_settings_rejects_the_retired_p_lore_gate_setting() -> None:
+    for value in ("0.65", "nope", ""):
+        env = {**REQUIRED_ENV, "INFOVORE_TRIAGE_MIN_P_LORE": value}
+        with pytest.raises(ConfigError, match="INFOVORE_TRIAGE_MIN_P_LORE was removed"):
+            load_settings(env)
 
 
 def test_load_settings_per_stage_backend_model_concurrency_timeout() -> None:

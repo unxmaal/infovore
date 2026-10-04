@@ -4,10 +4,10 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
+from infovore.db.archived import archived_clause
 from infovore.db.codec import to_db_time
 from infovore.db.exchanges import claimable_condition
 from infovore.extract.prompt_compare import SIZE_BUCKETS
-from infovore.triage.gate import GATE_SQL_CLAUSE
 
 SLICE_SEED = 190
 
@@ -81,13 +81,11 @@ def queue_population(
     conn: sqlite3.Connection,
     *,
     max_retries: int,
-    min_score: float,
-    min_p_lore: float,
     exclude_channels: frozenset[str],
 ) -> dict[Bucket, list[int]]:
     """What extraction would work on next, by the same predicate the queue
     and `status` use, so the slice cannot describe a different queue."""
-    condition, params = claimable_condition(max_retries, min_score, min_p_lore, exclude_channels)
+    condition, params = claimable_condition(max_retries, exclude_channels, archived_only=True)
     return _population(conn, condition, params)
 
 
@@ -95,16 +93,12 @@ def rejected_population(
     conn: sqlite3.Connection,
     *,
     max_retries: int,
-    min_score: float,
-    min_p_lore: float,
     exclude_channels: frozenset[str],
 ) -> dict[Bucket, list[int]]:
-    """Claimable exchanges the gate turns away. The control for what the
-    gate throws out, which the gate's own numbers cannot show."""
-    condition, params = claimable_condition(max_retries, None, min_p_lore, exclude_channels)
-    return _population(
-        conn, f"{condition} AND NOT {GATE_SQL_CLAUSE}", [*params, min_p_lore, min_score]
-    )
+    """Claimable exchanges the archive turns away: the control for what it
+    throws out, which the archive's own numbers cannot show."""
+    condition, params = claimable_condition(max_retries, exclude_channels)
+    return _population(conn, f"{condition} AND NOT {archived_clause()}", params)
 
 
 def _draw(
@@ -144,13 +138,11 @@ def freeze_slices(
     conn: sqlite3.Connection,
     *,
     max_retries: int,
-    min_score: float,
-    min_p_lore: float,
     exclude_channels: frozenset[str],
     at: datetime,
     seed: int = SLICE_SEED,
 ) -> dict[str, list[int]]:
-    """Freeze the build slice, its held-out twin, the gate-rejected control,
+    """Freeze the build slice, its held-out twin, the archive-rejected control,
     and the gold set Eric reads end to end (#190). Done once: a second call
     is refused, because every judgment is keyed to these exact exchanges."""
     existing = conn.execute("SELECT COUNT(*) AS n FROM eval_slices").fetchone()["n"]
@@ -159,15 +151,11 @@ def freeze_slices(
     queue = queue_population(
         conn,
         max_retries=max_retries,
-        min_score=min_score,
-        min_p_lore=min_p_lore,
         exclude_channels=exclude_channels,
     )
     rejected = rejected_population(
         conn,
         max_retries=max_retries,
-        min_score=min_score,
-        min_p_lore=min_p_lore,
         exclude_channels=exclude_channels,
     )
     mix = {bucket: len(ids) for bucket, ids in queue.items()}
@@ -181,7 +169,7 @@ def freeze_slices(
     holdout = [i for b in SIZE_BUCKETS for i in paired[b][build_counts[b] :]]
 
     # The control uses the QUEUE's size mix, so it differs from S1 only in
-    # what the gate decided, not in exchange size.
+    # what the archive decided, not in exchange size.
     control_draw = _draw(rng, rejected, allocate(mix, REJECTED_SIZE))
     control = [i for b in SIZE_BUCKETS for i in control_draw[b]]
 
@@ -194,7 +182,7 @@ def freeze_slices(
     plan = {
         BUILD: (build, "queue"),
         HOLDOUT: (holdout, "queue"),
-        REJECTED: (control, "gate-rejected"),
+        REJECTED: (control, "archive-rejected"),
         GOLD: (gold, "s1+c1"),
         GOLD_REPEATS: (repeats, "gold"),
     }
