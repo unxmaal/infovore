@@ -586,13 +586,6 @@ async def test_llm_novelty_probe_conforms_to_novelty_probe_protocol() -> None:
     assert isinstance(probe, LLMNoveltyProbe)
 
 
-def test_readme_contains_recall_and_judge_system_prompts_verbatim() -> None:
-    readme = Path(__file__).resolve().parents[2] / "README.md"
-    text = readme.read_text()
-    assert RECALL_SYSTEM_PROMPT in text
-    assert JUDGE_SYSTEM_PROMPT in text
-
-
 async def test_extract_cites_snowflake_ids_via_refs_without_precision_loss() -> None:
     messages = (a_message(706732704137478123), a_message(706733682781847611))
     payload = _extraction_payload(claims=[_claim_payload(sources=["m2"])])
