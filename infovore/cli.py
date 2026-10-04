@@ -277,6 +277,7 @@ def builtin_commands() -> list[Command]:
     from infovore.triage.label import LabelCommand
     from infovore.triage.labels_export import LabelsCommand
     from infovore.triage.relevance_command import RelevanceCommand
+    from infovore.wiki.command import WikiCommand
     from infovore.words.command import WordsCommand
 
     return [
@@ -302,6 +303,7 @@ def builtin_commands() -> list[Command]:
         WordsCommand(),
         ClaimsCommand(),
         DoctorCommand(),
+        WikiCommand(),
     ]
 
 
