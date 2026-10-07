@@ -16,6 +16,7 @@ from tests.claims.seed import SALT, conversation, db, environment
 
 LINES_A = [(11, "Alice Smith", "my Indy runs IRIX 6.5"), (22, "bobby", "<@11> try the PROM")]
 LINES_B = [(33, "carol", "lol")]
+KEY = "sk-test-gateway"
 
 
 class Fake(BaseHTTPRequestHandler):
@@ -33,7 +34,10 @@ class Fake(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self) -> None:
-        assert self.headers["Authorization"] == "Bearer sk-local"
+        assert self.headers["Authorization"] == f"Bearer {KEY}"
+        if Fake.mode == "401":
+            self._send(401, b"{}")
+            return
         if self.path != "/model/info" or not Fake.info:
             self._send(404, b"{}")
             return
@@ -41,6 +45,7 @@ class Fake(BaseHTTPRequestHandler):
         self._send(200, json.dumps(data).encode())
 
     def do_POST(self) -> None:
+        assert self.headers["Authorization"] == f"Bearer {KEY}"
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         Fake.seen.append(body)
         if Fake.mode == "500":
@@ -63,7 +68,8 @@ class Fake(BaseHTTPRequestHandler):
 
 
 @pytest.fixture
-def server() -> Iterator[str]:
+def server(monkeypatch: pytest.MonkeyPatch) -> Iterator[str]:
+    monkeypatch.setenv("SOHOT_GATEWAY_KEY", KEY)
     Fake.seen = []
     Fake.mode = "ok"
     Fake.info = True
@@ -275,3 +281,14 @@ def test_a_failure_without_write_stores_nothing(tmp_path: Path, server: str) -> 
     assert code == ExitCode.BACKEND and "not written" in out
     conn = open_database(tmp_path / "infovore.db")
     assert conn.execute("SELECT COUNT(*) FROM claim_run_exchanges").fetchone()[0] == 0
+
+
+def test_a_refused_gateway_key_stops_the_run_and_names_the_fix(tmp_path: Path, server: str) -> None:
+    seeded(tmp_path)
+    Fake.mode = "401"
+
+    code, _, err = run(tmp_path, extract(server, "--slices", "gold", "--limit", "2"))
+
+    assert code == ExitCode.CONFIG
+    assert "soh gateway key" in err and "401" in err
+    assert Fake.seen == []

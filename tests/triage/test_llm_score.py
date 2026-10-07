@@ -11,6 +11,7 @@ import pytest
 from infovore.cli import ExitCode
 from infovore.db.annotations import annotation_history
 from infovore.db.connection import open_database
+from infovore.llm.gateway_key import GatewayKeyError
 from infovore.rows import MessageRow
 from infovore.triage.llm_score import (
     SCORER_PREFIX,
@@ -29,6 +30,7 @@ from tests.triage.test_command import run
 
 class Fake(BaseHTTPRequestHandler):
     seen: ClassVar[list[dict[str, Any]]] = []
+    auth: ClassVar[list[str | None]] = []
     mode = "ok"
 
     def log_message(self, *args: object) -> None:
@@ -37,8 +39,9 @@ class Fake(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         Fake.seen.append(body)
-        if Fake.mode == "500":
-            self.send_response(500)
+        Fake.auth.append(self.headers["Authorization"])
+        if Fake.mode in ("500", "401"):
+            self.send_response(int(Fake.mode))
             self.end_headers()
             return
         text = body["messages"][1]["content"]
@@ -65,6 +68,7 @@ class Fake(BaseHTTPRequestHandler):
 @pytest.fixture
 def server() -> Iterator[str]:
     Fake.seen = []
+    Fake.auth = []
     Fake.mode = "ok"
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), Fake)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
@@ -158,6 +162,22 @@ def test_the_real_transport_posts_and_reports_latency_and_failures(server: str) 
         http_transport(server)(build_request("eval-4b", "x"))
     with pytest.raises(LlmCallError):
         http_transport("http://127.0.0.1:1/v1", 1.0)(build_request("eval-4b", "x"))
+
+
+def test_the_transport_sends_the_resolved_gateway_key(
+    server: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    http_transport(server)(build_request("eval-4b", "x"))
+    monkeypatch.setenv("SOHOT_GATEWAY_KEY", "sk-from-env")
+    http_transport(server)(build_request("eval-4b", "x"))
+
+    assert Fake.auth == [None, "Bearer sk-from-env"]
+
+
+def test_a_refused_key_is_a_config_error_naming_the_fix(server: str) -> None:
+    Fake.mode = "401"
+    with pytest.raises(GatewayKeyError, match="soh gateway key"):
+        http_transport(server)(build_request("eval-4b", "x"))
 
 
 def llm(args: list[str], env: dict[str, str], endpoint: str) -> tuple[int, str, str]:
