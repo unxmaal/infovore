@@ -75,6 +75,7 @@ Settings come from the environment, or a `.env` file in the working directory. M
 | `INFOVORE_TRIAGE_RULES` | built-in | triage rule overrides |
 | `INFOVORE_PSEUDONYM_SALT` | unset | secret salt for the per-user pseudonyms `claims extract` shows the model; keep it stable and never commit it |
 | `INFOVORE_WORKERS` | CPU count | worker processes |
+| `INFOVORE_GATEWAY_API_KEY`, `SOHOT_GATEWAY_KEY` | SoHoT store | key for the LiteLLM gateway that `claims extract` and `relevance llm-score` call; unset, infovore reads SoHoT's store (macOS Keychain service `localharness-gateway`, else `$LOCALHARNESS_HOME/gateway.key`). On the serving machine `soh gateway key` prints it |
 | `INFOVORE_<STAGE>_BACKEND`, `_MODEL`, `_CONCURRENCY`, `_TIMEOUT` | `claude_cli`, per stage, `2`, `60` | LLM backend per stage (`EXTRACT`, `PROBE`, `JUDGE`); other `INFOVORE_<STAGE>_*` keys, such as `BASE_URL` and `API_KEY` for `openai_compat`, pass through as backend options |
 
 `INFOVORE_TRIAGE_MIN_P_LORE` was removed and is rejected at startup.
