@@ -14,6 +14,7 @@ from infovore.config import ConfigError
 from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.eval.slices import slice_ids, slice_names
+from infovore.llm.gateway_key import headers, refusal
 from infovore.rows import Label, MessageRow
 from infovore.triage.bayes import auc
 from infovore.triage.cascade import (
@@ -143,19 +144,16 @@ def parse_reply(reply: Mapping[str, Any], seconds: float) -> Call:
 
 def http_transport(endpoint: str, timeout: float = TIMEOUT) -> Transport:
     url = endpoint.rstrip("/") + "/chat/completions"
+    sent = {"Content-Type": "application/json", **headers()}
 
     def send(payload: Mapping[str, Any]) -> tuple[Mapping[str, Any], float]:
-        request = urllib.request.Request(
-            url,
-            json.dumps(payload).encode("utf-8"),
-            {"Content-Type": "application/json", "Authorization": "Bearer not-needed"},
-        )
+        request = urllib.request.Request(url, json.dumps(payload).encode("utf-8"), sent)
         start = time.monotonic()
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 body = json.loads(response.read())
         except (urllib.error.URLError, OSError, ValueError) as error:
-            raise LlmCallError(str(error)) from error
+            raise refusal(error) or LlmCallError(str(error)) from error
         return body, time.monotonic() - start
 
     return send

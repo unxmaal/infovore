@@ -10,12 +10,12 @@ from typing import Any, Final
 
 from infovore.claims.redact import Redacted, RenderedLine, leaks
 from infovore.db.claims_v2 import ClaimIn, Rejection
+from infovore.llm.gateway_key import headers, refusal
 
 RECIPE: Final = "claims-v2"
 WINDOW_CHARS: Final = 6000
 TIMEOUT: Final = 300.0
 INFO_TIMEOUT: Final = 10.0
-API_KEY: Final = "sk-local"
 CLAIM_MAX_CHARS: Final = 220
 MAX_TOKENS: Final = 400
 SCHEMA: Final[dict[str, Any]] = {
@@ -260,26 +260,29 @@ def fetch_model_id(endpoint: str, alias: str, get: Getter) -> tuple[str, str]:
 
 
 def http_get(url: str) -> Any:
-    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {API_KEY}"})
-    with urllib.request.urlopen(request, timeout=INFO_TIMEOUT) as response:
-        return json.loads(response.read())
+    request = urllib.request.Request(url, headers=headers())
+    try:
+        with urllib.request.urlopen(request, timeout=INFO_TIMEOUT) as response:
+            return json.loads(response.read())
+    except urllib.error.HTTPError as error:
+        refused = refusal(error)
+        if refused is None:
+            raise
+        raise refused from error
 
 
 def http_post(endpoint: str, timeout: float = TIMEOUT) -> Transport:
     url = endpoint.rstrip("/") + "/chat/completions"
+    sent = {"Content-Type": "application/json", **headers()}
 
     def send(payload: Mapping[str, Any]) -> tuple[Mapping[str, Any], float]:
-        request = urllib.request.Request(
-            url,
-            json.dumps(payload).encode("utf-8"),
-            {"Content-Type": "application/json", "Authorization": f"Bearer {API_KEY}"},
-        )
+        request = urllib.request.Request(url, json.dumps(payload).encode("utf-8"), sent)
         start = time.monotonic()
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 body = json.loads(response.read())
         except (urllib.error.URLError, OSError, ValueError) as error:
-            raise ClaimsReplyError(str(error)) from error
+            raise refusal(error) or ClaimsReplyError(str(error)) from error
         return body, time.monotonic() - start
 
     return send
