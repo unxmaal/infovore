@@ -147,7 +147,9 @@ def leaks(text: str, names: Sequence[str]) -> bool:
     return any(re.search(rf"(?<!\w){re.escape(n)}(?!\w)", text, re.I) for n in names)
 
 
-def redact_conversation(messages: Sequence[MessageRow], salt: str) -> Redacted:
+def redact_conversation(
+    messages: Sequence[MessageRow], salt: str, drop: frozenset[int] = frozenset()
+) -> Redacted:
     by_user = pseudonyms((m.author_id for m in messages), salt)
     replacements: dict[str, str] = {}
     for message in messages:
@@ -169,6 +171,8 @@ def redact_conversation(messages: Sequence[MessageRow], salt: str) -> Redacted:
 
     lines: list[RenderedLine] = []
     for message in messages:
+        if message.author_id in drop:
+            continue
         text = MENTION.sub(mention, message.content).strip()
         if name_pattern is not None:
             text = name_pattern.sub(lambda m: replacements[m.group(0).lstrip("@").lower()], text)

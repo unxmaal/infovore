@@ -27,7 +27,9 @@ class WikiCommand:
         stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
-        claims, excluded = load_claims(context.conn, args.claim_gate)
+        claims, excluded = load_claims(
+            context.conn, tech_only=args.claim_gate, salt=context.settings.pseudonym_salt
+        )
         stats = compute_stats(claims, args.min_claims)
         lines = [
             f"topics: {stats.topics}",
