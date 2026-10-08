@@ -307,8 +307,6 @@ def test_the_speaker_slot_rejects_anything_but_a_pseudonym(bad: str) -> None:
 
 
 def test_the_speaker_slot_accepts_every_pseudonym_width() -> None:
-    from infovore.claims.redact import pseudonym
-
     pattern = SCHEMA["properties"]["c"]["items"]["prefixItems"][0]["pattern"]
 
     assert all(re.fullmatch(pattern.strip("^$"), pseudonym(7, "salt", w)) for w in (4, 5, 9))
