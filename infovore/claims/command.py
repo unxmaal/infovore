@@ -12,6 +12,8 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from infovore.claims.check import DEFAULT_THRESHOLD, run_check, show_checks
+from infovore.claims.compare import DEFAULT_THRESHOLD as COMPARE_THRESHOLD
+from infovore.claims.compare import run_compare
 from infovore.claims.export_cases import export_cases
 from infovore.claims.extract import (
     MAX_TOKENS,
@@ -452,6 +454,10 @@ class ClaimsCommand:
         score.add_argument("--densities", default=DEFAULT_DENSITIES)
         score.add_argument("--shares", default=DEFAULT_SHARES)
         score.add_argument("--word-floor", type=int, default=DEFAULT_WORD_FLOOR, dest="word_floor")
+        comp = sub.add_parser("compare", help="score a run against reviews of earlier runs")
+        comp.add_argument("--base-runs", required=True, dest="base_runs")
+        comp.add_argument("--run", type=int, required=True)
+        comp.add_argument("--threshold", type=float, default=COMPARE_THRESHOLD)
         show = sub.add_parser("show", help="print a run's claims or rejections as text")
         show.add_argument("--run", type=int, required=True)
         show.add_argument("--rejected", action="store_true")
@@ -480,6 +486,8 @@ class ClaimsCommand:
             return run_value(context, args)
         if args.claims_action == "gate-score":
             return run_gate_score(context, args)
+        if args.claims_action == "compare":
+            return run_compare(context, args)
         if args.claims_action == "check":
             return run_check(context, args)
         if args.claims_action == "export-cases":

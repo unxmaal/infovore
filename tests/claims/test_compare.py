@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 
 from infovore.claims.compare import Comparison, best_match, compare, format_comparison
+from infovore.claims.value import tokens
 from infovore.cli import ExitCode, main
 from infovore.db.claims_v2 import ClaimIn, ExchangeOutcome, record_exchange, record_review
-from infovore.claims.value import tokens
 from tests.claims.seed import conversation, db, environment
 from tests.claims.test_store import AT, make_run
 
@@ -61,6 +61,7 @@ def test_best_match_is_max_jaccard_and_zero_without_overlap_or_tokens() -> None:
     assert best_match("O2 fan", sets) == pytest.approx(2 / 3)
     assert best_match("anything", []) == 0.0
     assert best_match("the a", sets) == 0.0
+    assert best_match("the a", [frozenset()]) == 0.0
 
 
 def test_compare_counts_reproduced_reviews_and_unmatched_new(tmp_path: Path) -> None:
