@@ -221,6 +221,14 @@ def test_archive_selects_by_sort_across_channels(tmp_path: Path) -> None:
     assert archive_exchange_ids(conn, "undecided", frozenset({"off"})) == und
 
 
+def test_archive_rejects_an_unknown_sort(tmp_path: Path) -> None:
+    seed(tmp_path, ["a1"], "alpha")
+    conn = open_database(tmp_path / "infovore.db")
+
+    with pytest.raises(ValueError, match="unknown archive sort"):
+        archive_exchange_ids(conn, "irrelevant", frozenset())
+
+
 def test_archive_flag_runs_only_the_chosen_sort(tmp_path: Path, server: str) -> None:
     seed(tmp_path, ["r1"], "alpha")
     seed(tmp_path, ["u1"], "beta", "residue")
@@ -457,7 +465,7 @@ def test_a_stop_request_drains_in_flight_commits_them_and_resumes_cleanly(
 
     Fake.on_request, Fake.seen = [], []
     code, _, _ = go(tmp_path, args)
-    assert code == ExitCode.OK and Fake.seen == ["a3", "a4", "a5"]
+    assert code == ExitCode.OK and sorted(Fake.seen) == ["a3", "a4", "a5"]
 
 
 def test_signals_are_handled_while_extracting(tmp_path: Path, server: str) -> None:

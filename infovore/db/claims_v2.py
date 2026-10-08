@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Final
 
-from infovore.db.archived import archived_clause
+from infovore.db.archived import archived_clause, residue_clause
 from infovore.db.channel_filter import exclude_channels_clause, include_channels_clause
 from infovore.db.codec import to_db_time
 from infovore.db.connection import transaction
@@ -279,6 +279,26 @@ def archived_exchange_ids(
         f"SELECT id FROM current_exchanges AS exchanges WHERE {archived_clause('exchanges.id')}"
         f"{inc}{exc} ORDER BY id",
         (*inc_params, *exc_params),
+    )
+    return [row[0] for row in rows]
+
+
+ARCHIVE_SORTS: Final = ("relevant", "undecided")
+
+
+def archive_exchange_ids(
+    conn: sqlite3.Connection, which: str, exclude: frozenset[str]
+) -> list[int]:
+    if which == "relevant":
+        sort = f"{archived_clause('exchanges.id')} AND NOT ({residue_clause('exchanges.id')})"
+    elif which == "undecided":
+        sort = residue_clause("exchanges.id")
+    else:
+        raise ValueError(f"unknown archive sort: {which}")
+    clause, params = exclude_channels_clause("exchanges.channel_id", exclude)
+    rows = conn.execute(
+        f"SELECT id FROM current_exchanges AS exchanges WHERE {sort}{clause} ORDER BY id",
+        params,
     )
     return [row[0] for row in rows]
 
