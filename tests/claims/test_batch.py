@@ -145,7 +145,10 @@ def test_channels_select_archived_conversations_in_id_order(tmp_path: Path, serv
     seed(tmp_path, ["d1"], "delta")
     seed(tmp_path, ["e1"], "alpha", None)
 
-    code, out, _ = go(tmp_path, extract(server, "--channels", "beta,alpha,gamma", "--limit", "99"))
+    code, out, _ = go(
+        tmp_path,
+        extract(server, "--channels", "beta,alpha,gamma", "--limit", "99", "--concurrency", "1"),
+    )
 
     assert code == ExitCode.OK
     assert sent(out) == [*a, b]
@@ -164,7 +167,7 @@ def test_channels_combine_with_limit_and_ignore_excluded_channels(
     code, out, _ = go(
         tmp_path, extract(server, "--channels", "alpha,beta", "--limit", "9"), exclude="beta"
     )
-    assert sent(out) == a
+    assert sorted(sent(out)) == a
 
 
 def test_unknown_channel_is_refused(tmp_path: Path, server: str) -> None:
