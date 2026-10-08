@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Final
 
 from infovore.wiki.eligibility import is_publishable
-from infovore.wiki.topics import load_topics, slug
+from infovore.wiki.topics import Topics, load_topics, slug
 
 BUCKETS: Final = ((1, 1, "1"), (2, 2, "2"), (3, 4, "3-4"), (5, 9, "5-9"), (10, 24, "10-24"))
 BUCKETS_TAIL: Final = ((25, 99, "25-99"), (100, 10**9, "100+"))
@@ -44,6 +44,10 @@ def _line(text: str) -> str:
     return " ".join(text.split())
 
 
+def subjects(topics: Topics, statement: str) -> frozenset[str]:
+    return topics.assign(_line(statement))
+
+
 def load_claims(conn: sqlite3.Connection) -> tuple[list[WikiClaim], int]:
     topics = load_topics()
     rows = conn.execute(
@@ -69,7 +73,7 @@ def load_claims(conn: sqlite3.Connection) -> tuple[list[WikiClaim], int]:
                 row["day"],
                 row["speaker"],
                 statement,
-                topics.assign(statement),
+                subjects(topics, statement),
             ),
         )
     return list(claims.values()), excluded
