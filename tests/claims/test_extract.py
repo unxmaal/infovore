@@ -297,3 +297,16 @@ def test_model_id_comes_from_model_info_else_the_alias() -> None:
 
     assert fetch_model_id("http://h/v1", "eval-4b", boom) == ("eval-4b", "alias")
     assert fetch_model_id("http://h/v1", "a", lambda url: {"data": "no"}) == ("a", "alias")
+
+
+@pytest.mark.parametrize("bad", ["22f9", "[12]", "I always wondered why", "user-", "user-XYZ1"])
+def test_the_speaker_slot_rejects_anything_but_a_pseudonym(bad: str) -> None:
+    pattern = SCHEMA["properties"]["c"]["items"]["prefixItems"][0]["pattern"]
+
+    assert re.fullmatch(pattern.strip("^$"), bad) is None
+
+
+def test_the_speaker_slot_accepts_every_pseudonym_width() -> None:
+    pattern = SCHEMA["properties"]["c"]["items"]["prefixItems"][0]["pattern"]
+
+    assert all(re.fullmatch(pattern.strip("^$"), pseudonym(7, "salt", w)) for w in (4, 5, 9))

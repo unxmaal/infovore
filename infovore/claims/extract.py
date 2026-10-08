@@ -17,6 +17,7 @@ WINDOW_CHARS: Final = 6000
 TIMEOUT: Final = 300.0
 INFO_TIMEOUT: Final = 10.0
 CLAIM_MAX_CHARS: Final = 220
+SPEAKER_PATTERN: Final = "^user-[0-9a-f]{4,}$"
 MAX_TOKENS: Final = 400
 SCHEMA: Final[dict[str, Any]] = {
     "type": "object",
@@ -26,7 +27,7 @@ SCHEMA: Final[dict[str, Any]] = {
             "items": {
                 "type": "array",
                 "prefixItems": [
-                    {"type": "string"},
+                    {"type": "string", "pattern": SPEAKER_PATTERN},
                     {"type": "string", "maxLength": CLAIM_MAX_CHARS},
                     {"type": "array", "items": {"type": "integer"}, "minItems": 1},
                 ],
