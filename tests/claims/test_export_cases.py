@@ -74,7 +74,7 @@ def test_exports_one_case_per_reviewed_window(tmp_path: Path) -> None:
     c1, _ = store(conn, run, ex, [(A, "Indy runs IRIX", (ids[0], ids[1])), (B, "PROM", (ids[1],))])
     (c3,) = store(conn, run, other, [(pseudonym(33, SALT), "hi", (oids[0],))])
     record_review(conn, c1, "good", NOW)
-    record_review(conn, c3, "wrong", NOW)
+    record_review(conn, c3, "wrong", NOW, "cited-only")
     conn.commit()
     redacted = redact_conversation(messages_of(conn, ex), SALT)
     transcript = render_window(windows(redacted.lines, 6000)[0])
@@ -88,9 +88,18 @@ def test_exports_one_case_per_reviewed_window(tmp_path: Path) -> None:
         "system": SYSTEM,
         "transcript": transcript,
         "schema": SCHEMA,
-        "reviews": [{"user": A, "claim": "Indy runs IRIX", "refs": [1, 2], "verdict": "good"}],
+        "reviews": [
+            {
+                "user": A,
+                "claim": "Indy runs IRIX",
+                "refs": [1, 2],
+                "verdict": "good",
+                "interface": "conversation",
+            }
+        ],
     }
     assert rows[1]["id"] == str(other) and rows[1]["reviews"][0]["verdict"] == "wrong"
+    assert rows[1]["reviews"][0]["interface"] == "cited-only"
     assert "Alice" not in json.dumps(rows) and "bobby" not in json.dumps(rows)
 
 

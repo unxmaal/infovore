@@ -16,6 +16,7 @@ from infovore.db.claims_v2 import (
     review_rows,
     run_ids,
 )
+from infovore.db.connection import load_migrations, migrate, open_database
 from tests.claims.seed import conversation, db
 
 AT = datetime(2026, 2, 1, tzinfo=UTC)
@@ -164,3 +165,69 @@ def test_report_counts_everything_per_run(conn: sqlite3.Connection) -> None:
     assert report.seconds == 8.0
     assert report_rows(conn, None)[0].run_id == run
     assert report_rows(conn, run + 5) == []
+
+
+def test_reviews_record_their_interface_and_default_to_conversation(
+    conn: sqlite3.Connection,
+) -> None:
+    eid, ids = conversation(conn, [(1, "ann", "hi")], 1)
+    run = make_run(conn)
+    record_exchange(conn, run, eid, outcome(), [ClaimIn("u", "u said", (ids[0],))], [])
+    claim = review_rows(conn, run)[0].claim_id
+
+    record_review(conn, claim, "good", AT)
+    record_review(conn, claim, "wrong", AT, "cited-only")
+
+    rows = conn.execute("SELECT interface FROM claim_reviews ORDER BY id").fetchall()
+    assert [r[0] for r in rows] == ["conversation", "cited-only"]
+    assert conn.execute("SELECT interface FROM current_claim_reviews").fetchone()[0] == "cited-only"
+    with pytest.raises(sqlite3.IntegrityError):
+        record_review(conn, claim, "good", AT, "bogus")
+
+
+def test_the_report_splits_current_reviews_by_interface(conn: sqlite3.Connection) -> None:
+    run = make_run(conn)
+    e1, i1 = conversation(conn, [(1, "ann", "a")], 1)
+    claims = [ClaimIn("u", f"u said {n}", (i1[0],)) for n in range(3)]
+    record_exchange(conn, run, e1, outcome(), claims, [])
+    ids = [r.claim_id for r in review_rows(conn, run)]
+    record_review(conn, ids[0], "good", AT, "cited-only")
+    record_review(conn, ids[0], "made_up", AT, "conversation")
+    record_review(conn, ids[1], "good", AT, "cited-only")
+
+    (report,) = report_rows(conn, run)
+
+    assert report.interfaces["cited-only"] == {"good": 1, "wrong": 0, "made_up": 0, "not_useful": 0}
+    assert report.interfaces["conversation"]["made_up"] == 1
+    assert report.verdicts["good"] == 1 and report.verdicts["made_up"] == 1
+
+
+def test_the_migration_backfills_existing_reviews_as_cited_only(tmp_path: Path) -> None:
+    conn = open_database(tmp_path / "x.db")
+    older = [m for m in load_migrations() if m.version < 29]
+    migrate(conn, older)
+    conn.execute("INSERT INTO claim_runs VALUES (1, 't', 'e', 'a', 'm', 'alias', 'h', 's', '{}')")
+    conn.execute(
+        "INSERT INTO messages (id, channel_id, guild_id, author_id, author_name_at_time,"
+        " created_at, content, ingested_at, raw_json) VALUES (1, 1, 9, 1, 'a', 'n', 'x', 'n', '{}')"
+    )
+    conn.execute(
+        "INSERT INTO exchanges (id, channel_id, first_message_id, last_message_id, started_at,"
+        " ended_at, message_count, grouping_rule, content_hash)"
+        " VALUES (1, 1, 1, 1, 'n', 'n', 1, 'quiet_gap', 'h1')"
+    )
+    conn.execute(
+        "INSERT INTO claims_v2 (id, run_id, exchange_id, speaker, statement)"
+        " VALUES (1, 1, 1, 'u', 's')"
+    )
+    conn.execute(
+        "INSERT INTO claim_reviews (claim_id, verdict, reviewed_at) VALUES (1, 'good', 't')"
+    )
+
+    migrate(conn)
+    record_review(conn, 1, "wrong", AT)
+
+    rows = conn.execute("SELECT verdict, interface FROM claim_reviews ORDER BY id").fetchall()
+    assert [tuple(r) for r in rows] == [("good", "cited-only"), ("wrong", "conversation")]
+    with pytest.raises(sqlite3.DatabaseError, match="append-only"):
+        conn.execute("UPDATE claim_reviews SET interface = 'conversation'")

@@ -11,6 +11,7 @@ from infovore.db.codec import to_db_time
 from infovore.db.connection import transaction
 
 VERDICTS: Final = ("good", "wrong", "made_up", "not_useful")
+INTERFACES: Final = ("cited-only", "conversation")
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,7 @@ class RunReport:
     rejected: int
     zero_claim_conversations: int
     verdicts: dict[str, int]
+    interfaces: dict[str, dict[str, int]]
     unreviewed: int
     input_tokens: int
     output_tokens: int
@@ -136,10 +138,16 @@ def record_exchange(
         )
 
 
-def record_review(conn: sqlite3.Connection, claim_id: int, verdict: str, now: datetime) -> None:
+def record_review(
+    conn: sqlite3.Connection,
+    claim_id: int,
+    verdict: str,
+    now: datetime,
+    interface: str = "conversation",
+) -> None:
     conn.execute(
-        "INSERT INTO claim_reviews (claim_id, verdict, reviewed_at) VALUES (?, ?, ?)",
-        (claim_id, verdict, to_db_time(now)),
+        "INSERT INTO claim_reviews (claim_id, verdict, reviewed_at, interface) VALUES (?, ?, ?, ?)",
+        (claim_id, verdict, to_db_time(now), interface),
     )
 
 
@@ -222,12 +230,14 @@ def _report(conn: sqlite3.Connection, run: sqlite3.Row) -> RunReport:
         (rid,),
     ).fetchone()[0]
     verdicts = dict.fromkeys(VERDICTS, 0)
+    interfaces = {name: dict.fromkeys(VERDICTS, 0) for name in INTERFACES}
     for row in conn.execute(
-        "SELECT r.verdict, COUNT(*) FROM claims_v2 c JOIN current_claim_reviews r"
-        " ON r.claim_id = c.id WHERE c.run_id = ? GROUP BY r.verdict",
+        "SELECT r.interface, r.verdict, COUNT(*) FROM claims_v2 c JOIN current_claim_reviews r"
+        " ON r.claim_id = c.id WHERE c.run_id = ? GROUP BY r.interface, r.verdict",
         (rid,),
     ):
-        verdicts[row[0]] = row[1]
+        verdicts[row[1]] += row[2]
+        interfaces[row[0]][row[1]] = row[2]
     return RunReport(
         rid,
         run["model_alias"],
@@ -240,6 +250,7 @@ def _report(conn: sqlite3.Connection, run: sqlite3.Row) -> RunReport:
         rejected,
         zero,
         verdicts,
+        interfaces,
         claims - sum(verdicts.values()),
         totals[2],
         totals[3],
@@ -280,6 +291,7 @@ class ReviewedClaim:
     statement: str
     verdict: str
     message_ids: tuple[int, ...]
+    interface: str
 
 
 def reviewed_claims(conn: sqlite3.Connection, runs: Sequence[int]) -> list[ReviewedClaim]:
@@ -299,9 +311,11 @@ def reviewed_claims(conn: sqlite3.Connection, runs: Sequence[int]) -> list[Revie
             row["statement"],
             row["verdict"],
             tuple(sources.get(row["id"], ())),
+            row["interface"],
         )
         for row in conn.execute(
-            "SELECT c.id, c.exchange_id, c.speaker, c.statement, r.id AS rid, r.verdict"
+            "SELECT c.id, c.exchange_id, c.speaker, c.statement, r.id AS rid, r.verdict,"
+            " r.interface"
             " FROM claims_v2 c JOIN claim_reviews r ON r.claim_id = c.id"
             " WHERE r.id = (SELECT MAX(id) FROM claim_reviews WHERE claim_id = c.id)"
             f" AND c.run_id IN ({marks}) ORDER BY c.exchange_id, c.id",

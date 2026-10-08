@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from infovore.claims.extract import SCHEMA, SYSTEM, render_window, windows
-from infovore.claims.redact import redact_conversation, require_salt
+from infovore.claims.redact import RenderedLine, redact_conversation, require_salt
 from infovore.config import ConfigError
 from infovore.db.archived import SCORER_PREFIX, STAGES
 from infovore.db.batch import BATCH_SIZE, exchange_inputs_for_ids
@@ -50,13 +50,18 @@ def _case(eid: int, k: int, parts: list[Any], reviews: list[dict[str, Any]]) -> 
     }
 
 
+def exchange_windows(
+    conn: sqlite3.Connection, eid: int, salt: str, size: int
+) -> tuple[list[list[RenderedLine]], dict[int, int]]:
+    messages = exchange_inputs_for_ids(conn, [eid])[eid].messages
+    redacted = redact_conversation(messages, salt)
+    return windows(redacted.lines, size), {ln.message_id: ln.ref for ln in redacted.lines}
+
+
 def _exchange_cases(
     context: "AppContext", eid: int, claims: list[ReviewedClaim], salt: str, size: int
 ) -> list[dict[str, Any]]:
-    messages = exchange_inputs_for_ids(context.conn, [eid])[eid].messages
-    redacted = redact_conversation(messages, salt)
-    parts = windows(redacted.lines, size)
-    ref_of = {line.message_id: line.ref for line in redacted.lines}
+    parts, ref_of = exchange_windows(context.conn, eid, salt, size)
     window_of = {line.ref: k for k, part in enumerate(parts) for line in part}
     kept: dict[tuple[int, str, str], ReviewedClaim] = {}
     refs_of: dict[tuple[int, str, str], list[int]] = {}
@@ -70,7 +75,13 @@ def _exchange_cases(
     cases: list[dict[str, Any]] = []
     for k in sorted({key[0] for key in kept}):
         reviews = [
-            {"user": c.speaker, "claim": c.statement, "refs": refs_of[key], "verdict": c.verdict}
+            {
+                "user": c.speaker,
+                "claim": c.statement,
+                "refs": refs_of[key],
+                "verdict": c.verdict,
+                "interface": c.interface,
+            }
             for key, c in kept.items()
             if key[0] == k
         ]
