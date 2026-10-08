@@ -10,6 +10,7 @@ import pytest
 from infovore.claims.extract import SCHEMA, SYSTEM, render_window, windows
 from infovore.claims.redact import pseudonym, redact_conversation
 from infovore.cli import ExitCode, main
+from infovore.db.annotations import Annotation, record_annotation
 from infovore.db.claims_v2 import (
     ClaimIn,
     ExchangeOutcome,
@@ -17,6 +18,7 @@ from infovore.db.claims_v2 import (
     record_exchange,
     record_review,
 )
+from infovore.triage.human import HUMAN_SCORER
 from tests.claims.seed import SALT, conversation, db, environment, messages_of
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -239,3 +241,142 @@ def test_the_database_is_not_modified(tmp_path: Path) -> None:
     assert len(rows) == 1
     conn = db(tmp_path)
     assert [list(conn.execute(f"SELECT * FROM {n}")) for n in names] == before
+
+
+def annotate(
+    conn: sqlite3.Connection, eid: int, scorer: str, label: str | None, day: int = 0
+) -> None:
+    note = Annotation("exchange", eid, scorer, 1 + day, "recorded", score=0.5, label=label)
+    record_annotation(conn, note, datetime(2026, 2, 1 + day, tzinfo=UTC))
+
+
+def negatives(tmp_path: Path, *more: str) -> tuple[int, str, list[dict[str, Any]]]:
+    target = tmp_path / "outside" / "neg.jsonl"
+    argv = ["claims", "export-cases", "--negatives", "--out", str(target), *more]
+    code, out, _ = run_cli(tmp_path, argv)
+    rows = [json.loads(x) for x in target.read_text().splitlines()] if target.exists() else []
+    return code, out, rows
+
+
+def labelled(
+    conn: sqlite3.Connection, base: int, label: str | None, cascade: str | None = None
+) -> int:
+    lines = [(11, "Alice Smith", f"chatter {base}"), (22, "bobby", "lol")]
+    eid, _ = conversation(conn, lines, base, None)
+    if label:
+        annotate(conn, eid, HUMAN_SCORER, label)
+    if cascade:
+        verdict = "residue" if cascade == "residue" else "irrelevant"
+        annotate(conn, eid, f"relevance_{cascade}", verdict)
+    return eid
+
+
+def test_negatives_export_human_irrelevant_windows_with_their_origin(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    ex = labelled(conn, 1, "irrelevant", "residue")
+    redacted = redact_conversation(messages_of(conn, ex), SALT)
+    transcript = render_window(windows(redacted.lines, 6000)[0])
+    conn.commit()
+    conn.close()
+
+    code, out, rows = negatives(tmp_path)
+
+    assert code == ExitCode.OK
+    assert rows == [
+        {
+            "id": str(ex),
+            "system": SYSTEM,
+            "transcript": transcript,
+            "schema": SCHEMA,
+            "reviews": [],
+            "expect_empty": True,
+            "basis": "human_irrelevant",
+            "origin": "undecided",
+        }
+    ]
+    assert "wrote 1 cases to" in out and "undecided: 1" in out
+    assert "Alice" not in json.dumps(rows)
+
+
+def test_negatives_skip_unlabelled_relevant_and_relabelled(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    labelled(conn, 1, None, "residue")
+    labelled(conn, 2, "relevant", "residue")
+    flipped = labelled(conn, 3, "irrelevant")
+    annotate(conn, flipped, HUMAN_SCORER, "relevant", 1)
+    conn.commit()
+    conn.close()
+
+    code, out, rows = negatives(tmp_path)
+
+    assert code == ExitCode.OK and rows == [] and "wrote 0 cases" in out
+
+
+def test_negatives_origin_is_the_stage_that_decided_in_the_latest_run(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    stages = ["denylist", "no_text", "lexicon", "short_no_tech", "embed"]
+    ids = {stage: labelled(conn, n, "irrelevant", stage) for n, stage in enumerate(stages, 1)}
+    never = labelled(conn, 6, "irrelevant")
+    moved = labelled(conn, 7, "irrelevant", "residue")
+    annotate(conn, moved, "relevance_lexicon", None, 3)
+    annotate(conn, moved, "relevance_embed", "irrelevant", 3)
+    conn.commit()
+    conn.close()
+
+    _, out, rows = negatives(tmp_path)
+
+    origin = {r["id"]: r["origin"] for r in rows}
+    assert all(origin[str(eid)] == stage for stage, eid in ids.items())
+    assert origin[str(never)] == "unsorted" and origin[str(moved)] == "embed"
+    assert "embed: 2" in out and "unsorted: 1" in out
+
+
+def test_negatives_are_windowed_and_drop_excluded_channels(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    ex = labelled(conn, 1, "irrelevant")
+    conn.execute(
+        "INSERT INTO channels (id, guild_id, parent_id, name, kind)"
+        " VALUES (2, 9, NULL, 'food', 'text')"
+    )
+    hidden = labelled(conn, 2, "irrelevant")
+    conn.execute("UPDATE exchanges SET channel_id = 2 WHERE id = ?", (hidden,))
+    conn.commit()
+    conn.close()
+    target = tmp_path / "outside" / "neg.jsonl"
+    argv = ["claims", "export-cases", "--negatives", "--out", str(target), "--window-chars", "10"]
+    env = environment(tmp_path) | {"INFOVORE_EXCLUDE_CHANNELS": "food"}
+
+    main(argv, environ=env, dotenv_path=None, stdout=io.StringIO(), stderr=io.StringIO())
+
+    ids = [json.loads(x)["id"] for x in target.read_text().splitlines()]
+    assert ids == [f"{ex}/0", f"{ex}/1"]
+
+
+def test_negatives_ignore_labels_on_superseded_exchanges(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    old = labelled(conn, 1, "irrelevant")
+    current = labelled(conn, 2, "irrelevant")
+    conn.execute("UPDATE exchanges SET superseded_by_recipe = 1 WHERE id = ?", (old,))
+    conn.commit()
+    conn.close()
+
+    _, _, rows = negatives(tmp_path)
+
+    assert [r["id"] for r in rows] == [str(current)]
+
+
+def test_negatives_are_guarded_and_exclusive_with_runs(tmp_path: Path) -> None:
+    db(tmp_path).close()
+    repo = tmp_path / "repo"
+    (repo / ".git").mkdir(parents=True)
+    target = repo / "n.jsonl"
+
+    argv = ["claims", "export-cases", "--negatives", "--out", str(target)]
+    code, _, err = run_cli(tmp_path, argv)
+    assert code == ExitCode.CONFIG and "work tree" in err and not target.exists()
+
+    both = ["claims", "export-cases", "--negatives", "--runs", "1", "--out", str(tmp_path / "x")]
+    neither = ["claims", "export-cases", "--out", str(tmp_path / "x")]
+    for argv in (both, neither):
+        with pytest.raises(SystemExit):
+            run_cli(tmp_path, argv)
