@@ -34,8 +34,12 @@ def populate(tmp_path: Path) -> int:
     claims = [ClaimIn("u", f"u said {n}", (i1[0],)) for n in range(4)]
     record_exchange(conn, run, e1, ok, claims, [])
     record_exchange(conn, run, e2, ok, [], [])
-    for claim_id, verdict in ((1, "good"), (2, "made_up"), (3, "not_useful")):
-        record_review(conn, claim_id, verdict, AT)
+    for claim_id, verdict, interface in (
+        (1, "good", "cited-only"),
+        (2, "made_up", "conversation"),
+        (3, "not_useful", "conversation"),
+    ):
+        record_review(conn, claim_id, verdict, AT, interface)
     conn.close()
     return run
 
@@ -51,6 +55,8 @@ def test_report_prints_the_trial_numbers_for_a_run(tmp_path: Path) -> None:
     assert "claims: 4 (2.00 per conversation, rejected 0)" in out
     assert "zero-claim conversations: 1 (50.0%)" in out
     assert "reviews: good 1, wrong 0, made_up 1, not_useful 1, unreviewed 1" in out
+    assert "  cited-only: good 1, wrong 0, made_up 0, not_useful 0" in out
+    assert "  conversation: good 0, wrong 0, made_up 1, not_useful 1" in out
     assert "made-up rate: 33.3% (1 of 3 reviewed)" in out
     assert "tokens: 200 in, 20 out" in out
     assert "seconds per conversation: 3.00" in out
@@ -120,3 +126,13 @@ def test_show_rejects_an_unknown_run(tmp_path: Path) -> None:
     db(tmp_path).close()
     code, _, err = show(tmp_path, "--run", "99")
     assert code != ExitCode.OK and "unknown run 99" in err
+
+
+def test_report_omits_interfaces_with_no_reviews(tmp_path: Path) -> None:
+    conn = db(tmp_path)
+    run = make_run(conn)
+    conn.close()
+
+    _, out, _ = report(tmp_path, "--run", str(run))
+
+    assert "cited-only:" not in out and "conversation:" not in out
