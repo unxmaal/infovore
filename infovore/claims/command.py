@@ -34,8 +34,10 @@ from infovore.config import ConfigError, normalize_channel_names
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import known_channel_names
 from infovore.db.claims_v2 import (
+    ARCHIVE_SORTS,
     ExchangeOutcome,
     RunReport,
+    archive_exchange_ids,
     archived_exchange_ids,
     create_run,
     processed_ok,
@@ -63,6 +65,9 @@ def _select(context: "AppContext", args: argparse.Namespace) -> tuple[list[int],
             )
         ids = archived_exchange_ids(conn, wanted, context.settings.exclude_channels)
         return ids, f"channels={args.channels}"
+    if args.archive:
+        ids = archive_exchange_ids(conn, args.archive, context.settings.exclude_channels)
+        return ids, f"archive={args.archive}"
     if args.slices:
         names = args.slices.split(",")
         unknown_slices = [n for n in names if n not in slice_names(conn)]
@@ -155,8 +160,8 @@ def _check_args(args: argparse.Namespace, salt: str | None) -> str:
     if args.progress_every < 1:
         raise ConfigError("--progress-every must be positive")
     salt = require_salt(salt)
-    if not (args.slices or args.ids or args.channels):
-        raise ConfigError("--slices, --ids or --channels is required")
+    if not (args.slices or args.ids or args.channels or args.archive):
+        raise ConfigError("--slices, --ids, --channels or --archive is required")
     if args.resume and not args.write:
         raise ConfigError("--resume needs --write")
     return salt
@@ -375,6 +380,12 @@ class ClaimsCommand:
         pick.add_argument("--slices", default=None, help="comma-separated slice names")
         pick.add_argument("--ids", default=None, help="comma-separated exchange ids")
         pick.add_argument("--channels", default=None, help="comma-separated channel names")
+        pick.add_argument(
+            "--archive",
+            choices=ARCHIVE_SORTS,
+            default=None,
+            help="every archived conversation of one sort",
+        )
         extract.add_argument("--limit", type=int, default=None, metavar="N")
         extract.add_argument("--resume", action="store_true")
         extract.add_argument("--concurrency", type=int, default=MAX_CONCURRENCY, metavar="N")
