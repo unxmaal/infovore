@@ -7,7 +7,15 @@ from importlib import resources
 from typing import Any
 from urllib.parse import urlsplit
 
-from infovore.db.claims_v2 import VERDICTS, claim_exists, record_review, review_rows
+from infovore.claims.export_cases import exchange_windows
+from infovore.claims.extract import WINDOW_CHARS
+from infovore.db.claims_v2 import (
+    VERDICTS,
+    ReviewRow,
+    claim_exists,
+    record_review,
+    review_rows,
+)
 from infovore.timing import Clock
 
 DEFAULT_CLAIMS_PORT = 8768
@@ -29,30 +37,48 @@ class ClaimServer(ThreadingHTTPServer):
         clock: Clock,
         page: str,
         run_id: int,
+        salt: str,
     ) -> None:
         self.conn = conn
         self.lock = lock
         self.clock = clock
         self.page = page
         self.run_id = run_id
+        self.salt = salt
         super().__init__(address, _Handler)
 
 
-def payload(conn: sqlite3.Connection, run_id: int) -> dict[str, Any]:
+def payload(conn: sqlite3.Connection, run_id: int, salt: str) -> dict[str, Any]:
     rows = review_rows(conn, run_id)
-    claims = [
-        {
-            "id": r.claim_id,
-            "exchange": r.exchange_id,
-            "speaker": r.speaker,
-            "statement": r.statement,
-            "verdict": r.verdict,
-            "sources": [{"id": i, "author": a, "text": t} for i, a, t in r.sources],
-        }
-        for r in rows
-    ]
-    first = next((i for i, r in enumerate(rows) if r.verdict is None), len(rows))
-    return {"claims": claims, "first_unreviewed": first, "run": run_id}
+    by_exchange: dict[int, list[ReviewRow]] = {}
+    for r in rows:
+        by_exchange.setdefault(r.exchange_id, []).append(r)
+    cited = {r.claim_id: {i for i, _, _ in r.sources} for r in rows}
+    conversations: list[dict[str, Any]] = []
+    for eid, group in by_exchange.items():
+        parts, ref_of = exchange_windows(conn, eid, salt, WINDOW_CHARS)
+        conversations.append(
+            {
+                "exchange": eid,
+                "windows": [
+                    [{"ref": ln.ref, "speaker": ln.speaker, "text": ln.text} for ln in part]
+                    for part in parts
+                ],
+                "claims": [
+                    {
+                        "id": r.claim_id,
+                        "speaker": r.speaker,
+                        "statement": r.statement,
+                        "verdict": r.verdict,
+                        "refs": sorted(ref_of[m] for m in cited[r.claim_id] if m in ref_of),
+                    }
+                    for r in group
+                ],
+            }
+        )
+    flat = [c for conv in conversations for c in conv["claims"]]
+    first = next((i for i, c in enumerate(flat) if c["verdict"] is None), len(flat))
+    return {"conversations": conversations, "first_unreviewed": first, "run": run_id}
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -77,7 +103,7 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(HTTPStatus.OK, self.server.page.encode("utf-8"), "text/html; charset=utf-8")
         elif path == "/api/claims":
             with self.server.lock:
-                data = payload(self.server.conn, self.server.run_id)
+                data = payload(self.server.conn, self.server.run_id, self.server.salt)
             self._send_json(HTTPStatus.OK, data)
         else:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": "not found"})
@@ -98,7 +124,9 @@ class _Handler(BaseHTTPRequestHandler):
         with self.server.lock:
             known = claim_exists(self.server.conn, claim_id)
             if known:
-                record_review(self.server.conn, claim_id, verdict, self.server.clock.now())
+                record_review(
+                    self.server.conn, claim_id, verdict, self.server.clock.now(), "conversation"
+                )
         if not known:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": "unknown claim"})
             return
@@ -106,13 +134,13 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 def start_all(
-    hosts: list[str], port: int, conn: sqlite3.Connection, clock: Clock, run_id: int
+    hosts: list[str], port: int, conn: sqlite3.Connection, clock: Clock, run_id: int, salt: str
 ) -> list[ClaimServer]:
     page = load_page()
     lock = threading.Lock()
     servers = []
     for host in hosts:
-        server = ClaimServer((host, port), conn, lock, clock, page, run_id)
+        server = ClaimServer((host, port), conn, lock, clock, page, run_id, salt)
         threading.Thread(target=server.serve_forever, daemon=True, name=f"claims-{host}").start()
         servers.append(server)
     return servers

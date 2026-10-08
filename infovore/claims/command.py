@@ -283,11 +283,12 @@ def _serve(context: "AppContext", args: argparse.Namespace) -> int:
     from infovore.sift.httpd import block_until_interrupted
 
     _require_run(context.conn, args.run)
+    salt = require_salt(context.settings.pseudonym_salt)
     rows = review_rows(context.conn, args.run)
     reviewed = sum(1 for r in rows if r.verdict is not None)
     context.stdout.write(f"{len(rows)} claims, {reviewed} reviewed\n")
     servers = start_all(
-        args.hosts or ["127.0.0.1"], args.port, context.conn, context.clock, args.run
+        args.hosts or ["127.0.0.1"], args.port, context.conn, context.clock, args.run, salt
     )
     try:
         for server in servers:
@@ -308,6 +309,11 @@ def _format(r: RunReport) -> str:
     processed = r.conversations + r.failed
     per_conv = f"{r.claims / r.conversations:.2f}" if r.conversations else "n/a"
     verdicts = ", ".join(f"{k} {v}" for k, v in r.verdicts.items())
+    by_interface = "".join(
+        f"    {name}: {', '.join(f'{k} {v}' for k, v in counts.items())}\n"
+        for name, counts in r.interfaces.items()
+        if sum(counts.values())
+    )
     zero = f"{r.zero_claim_conversations} ({_pct(r.zero_claim_conversations, r.conversations)})"
     made_up = (
         f"{_pct(r.verdicts['made_up'], reviewed)} ({r.verdicts['made_up']} of {reviewed} reviewed)"
@@ -321,6 +327,7 @@ def _format(r: RunReport) -> str:
         f"  claims: {r.claims} ({per_conv} per conversation, rejected {r.rejected})\n"
         f"  zero-claim conversations: {zero}\n"
         f"  reviews: {verdicts}, unreviewed {r.unreviewed}\n"
+        f"{by_interface}"
         f"  made-up rate: {made_up}\n"
         f"  tokens: {r.input_tokens} in, {r.output_tokens} out\n"
         f"  seconds per conversation: {seconds}\n"

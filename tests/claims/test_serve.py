@@ -9,13 +9,12 @@ from typing import Any
 
 import pytest
 
-from infovore.claims.httpd import listening_url, shutdown_all, start_all
+from infovore.claims.httpd import listening_url, payload, shutdown_all, start_all
+from infovore.claims.redact import pseudonym
 from infovore.cli import ExitCode, main
 from infovore.db.claims_v2 import ClaimIn, ExchangeOutcome, record_exchange, record_review
 from infovore.db.connection import open_database
 from infovore.timing import SystemClock
-from infovore.claims.httpd import payload
-from infovore.claims.redact import pseudonym
 from tests.claims.seed import SALT, conversation, db, environment
 from tests.claims.test_store import AT, make_run
 

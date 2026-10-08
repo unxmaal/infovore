@@ -135,4 +135,4 @@ def test_report_omits_interfaces_with_no_reviews(tmp_path: Path) -> None:
 
     _, out, _ = report(tmp_path, "--run", str(run))
 
-    assert "cited-only:" not in out and "conversation:" not in out
+    assert "    cited-only:" not in out and "    conversation: good" not in out
