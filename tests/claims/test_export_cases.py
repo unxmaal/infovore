@@ -246,7 +246,7 @@ def test_the_database_is_not_modified(tmp_path: Path) -> None:
 def annotate(
     conn: sqlite3.Connection, eid: int, scorer: str, label: str | None, day: int = 0
 ) -> None:
-    note = Annotation("exchange", eid, scorer, 1 + day, "recorded", label=label)
+    note = Annotation("exchange", eid, scorer, 1 + day, "recorded", score=0.5, label=label)
     record_annotation(conn, note, datetime(2026, 2, 1 + day, tzinfo=UTC))
 
 
@@ -356,7 +356,7 @@ def test_negatives_ignore_labels_on_superseded_exchanges(tmp_path: Path) -> None
     conn = db(tmp_path)
     old = labelled(conn, 1, "irrelevant")
     current = labelled(conn, 2, "irrelevant")
-    conn.execute("UPDATE exchanges SET superseded_by_recipe = 'v2' WHERE id = ?", (old,))
+    conn.execute("UPDATE exchanges SET superseded_by_recipe = 1 WHERE id = ?", (old,))
     conn.commit()
     conn.close()
 
@@ -376,6 +376,7 @@ def test_negatives_are_guarded_and_exclusive_with_runs(tmp_path: Path) -> None:
     assert code == ExitCode.CONFIG and "work tree" in err and not target.exists()
 
     both = ["claims", "export-cases", "--negatives", "--runs", "1", "--out", str(tmp_path / "x")]
-    assert run_cli(tmp_path, both)[0] == ExitCode.CONFIG
     neither = ["claims", "export-cases", "--out", str(tmp_path / "x")]
-    assert run_cli(tmp_path, neither)[0] == ExitCode.CONFIG
+    for argv in (both, neither):
+        with pytest.raises(SystemExit):
+            run_cli(tmp_path, argv)

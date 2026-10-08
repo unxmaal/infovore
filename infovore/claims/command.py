@@ -390,7 +390,11 @@ class ClaimsCommand:
         check.add_argument("--write", action="store_true")
         check.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
         export = sub.add_parser("export-cases", help="write reviewed claims as JSONL eval cases")
-        export.add_argument("--runs", required=True, help="comma-separated run ids")
+        which = export.add_mutually_exclusive_group(required=True)
+        which.add_argument("--runs", help="comma-separated run ids")
+        which.add_argument(
+            "--negatives", action="store_true", help="human-irrelevant conversations, no claims"
+        )
         export.add_argument("--out", required=True, help="output path, outside any git work tree")
         export.add_argument("--window-chars", type=int, default=WINDOW_CHARS, dest="window_chars")
         report = sub.add_parser("report", help="per-run trial numbers")
