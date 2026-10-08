@@ -51,3 +51,13 @@ def test_stats_reports_topics_pages_distribution_and_unassigned(tmp_path: Path) 
     assert "unassigned: 1" in out
     assert "excluded: 1" in out
     assert "3-4: 1" in out
+
+
+def test_claim_gate_drops_techless_claims_from_stats_and_build(tmp_path: Path) -> None:
+    env = seeded(tmp_path)
+    code, out = run(["wiki", "stats", "--min-claims", "3", "--claim-gate"], env)
+    assert code == ExitCode.OK
+    assert "unassigned: 0" in out and "excluded: 2" in out
+    out_dir = tmp_path / "site"
+    run(["wiki", "build", "--out", str(out_dir), "--claim-gate"], env)
+    assert (out_dir / "o2.md").exists()
