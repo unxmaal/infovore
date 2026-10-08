@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Final
 
 from infovore.claims.gate import claim_has_tech
+from infovore.claims.speakers import dropped_pairs
 from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.eligibility import is_publishable
 from infovore.wiki.topics import Topics, load_topics, slug
@@ -50,9 +51,12 @@ def subjects(topics: Topics, statement: str) -> frozenset[str]:
     return topics.assign(_line(statement))
 
 
-def load_claims(conn: sqlite3.Connection, tech_only: bool = False) -> tuple[list[WikiClaim], int]:
+def load_claims(
+    conn: sqlite3.Connection, tech_only: bool = False, salt: str | None = None
+) -> tuple[list[WikiClaim], int]:
     topics = load_topics()
     lexicon = load_lexicon(conn) if tech_only else None
+    dropped = dropped_pairs(conn, salt)
     rows = conn.execute(
         "SELECT c.id, c.exchange_id, c.speaker, c.statement, substr(e.started_at, 1, 10) AS day,"
         " r.verdict AS review, k.verdict AS chk FROM claims_v2 c"
@@ -63,7 +67,9 @@ def load_claims(conn: sqlite3.Connection, tech_only: bool = False) -> tuple[list
     claims: dict[tuple[int, str, str], WikiClaim] = {}
     excluded = 0
     for row in rows:
-        if not is_publishable(row["review"], row["chk"]):
+        if (row["exchange_id"], row["speaker"]) in dropped or not is_publishable(
+            row["review"], row["chk"]
+        ):
             excluded += 1
             continue
         statement = _line(row["statement"])

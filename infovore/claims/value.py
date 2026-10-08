@@ -10,8 +10,10 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
 
 from infovore.claims.gate import claim_has_tech
+from infovore.claims.speakers import dropped_pairs, exclude_dropped, speaker_stats
 from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
+from infovore.db.speaker_drops import dropped_authors
 from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki.build import subjects
 from infovore.wiki.topics import load_topics
@@ -31,6 +33,7 @@ ROWS: Final = 4
 THRESHOLD: Final = 0.6
 WINDOW: Final = 1000
 Z95: Final = 1.96
+SPEAKER_LINES: Final = 20
 _WORD = re.compile(r"[a-z0-9]+")
 
 
@@ -109,6 +112,7 @@ _SCAN = (
     " LEFT JOIN current_exchanges x ON x.id = e.exchange_id"
     " LEFT JOIN channels ch ON ch.id = x.channel_id"
     " LEFT JOIN claims_v2 c ON c.run_id = e.run_id AND c.exchange_id = e.exchange_id"
+    " AND NOT is_dropped(c.exchange_id, c.speaker)"
     " WHERE e.run_id <= ? ORDER BY e.run_id, e.rowid, c.id"
 )
 
@@ -208,13 +212,15 @@ def _tail(
     conn: sqlite3.Connection, runs: frozenset[int], lexicon: Lexicon | None = None
 ) -> list[str]:
     marks, params = _in(runs)
+    kept = "NOT is_dropped(c.exchange_id, c.speaker)"
     total = conn.execute(
-        f"SELECT COUNT(*) FROM claims_v2 WHERE run_id IN ({marks})", params
+        f"SELECT COUNT(*) FROM claims_v2 c WHERE c.run_id IN ({marks}) AND {kept}", params
     ).fetchone()[0]
     checks = dict(
         conn.execute(
             "SELECT k.verdict, COUNT(*) FROM claims_v2 c JOIN current_claim_checks k"
-            f" ON k.claim_id = c.id WHERE c.run_id IN ({marks}) GROUP BY k.verdict ORDER BY 1",
+            f" ON k.claim_id = c.id WHERE c.run_id IN ({marks}) AND {kept}"
+            " GROUP BY k.verdict ORDER BY 1",
             params,
         ).fetchall()
     )
@@ -225,7 +231,8 @@ def _tail(
     reviews: dict[str, int] = {}
     for row in conn.execute(
         "SELECT r.verdict, c.statement FROM claims_v2 c JOIN current_claim_reviews r"
-        f" ON r.claim_id = c.id WHERE c.run_id IN ({marks}) AND r.interface = 'conversation'",
+        f" ON r.claim_id = c.id WHERE c.run_id IN ({marks}) AND r.interface = 'conversation'"
+        f" AND {kept}",
         params,
     ):
         if lexicon is None or claim_has_tech(lexicon, topics, row["statement"]):
@@ -256,11 +263,34 @@ def run_value(context: "AppContext", args: argparse.Namespace) -> int:
     if args.min_claims < 1:
         raise ConfigError("--min-claims must be positive")
     marks, params = _in(runs)
+    salt = context.settings.pseudonym_salt
+    exclude_dropped(conn, dropped_pairs(conn, salt))
     rejected = conn.execute(
         f"SELECT COUNT(*) FROM claim_rejections WHERE run_id IN ({marks})", params
     ).fetchone()[0]
     lexicon = load_lexicon(conn) if args.claim_gate else None
     lines = _scan(conn, runs, args.min_claims, lexicon)
     lines[0] = f"runs {','.join(map(str, sorted(runs)))}: {lines[0]}, rejected {rejected}"
-    context.stdout.write("\n".join([*lines, *_tail(conn, runs, lexicon)]) + "\n")
+    context.stdout.write(
+        "\n".join([*lines, *_tail(conn, runs, lexicon), *_speakers(conn, salt, runs)]) + "\n"
+    )
     return int(ExitCode.OK)
+
+
+def _speakers(conn: sqlite3.Connection, salt: str | None, runs: frozenset[int]) -> list[str]:
+    if not salt:
+        return ["per speaker: needs INFOVORE_PSEUDONYM_SALT"]
+    dropped = dropped_authors(conn)
+    stats = speaker_stats(conn, salt, sorted(runs))
+    gone = [s for s in stats if s.author_id in dropped]
+    kept = [s for s in stats if s.author_id not in dropped and s.reviewed]
+    out = [
+        f"per speaker (interface=conversation, reviewed only): {len(kept)} of {len(stats)} speakers"
+    ]
+    for s in sorted(kept, key=lambda s: (-s.reviewed, s.label))[:SPEAKER_LINES]:
+        out.append(
+            f"  {s.label}: good {s.good} of {s.reviewed} ({_pct(s.good, s.reviewed)}),"
+            f" claims {len(s.claims)}"
+        )
+    out.append(f"dropped speakers: {len(gone)} ({sum(len(s.claims) for s in gone)} claims ignored)")
+    return out

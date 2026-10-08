@@ -39,6 +39,7 @@ from infovore.claims.gate import (
 )
 from infovore.claims.httpd import DEFAULT_CLAIMS_PORT, listening_url, shutdown_all, start_all
 from infovore.claims.redact import WIDTH, Redacted, redact_conversation, require_salt
+from infovore.claims.speakers import kept_exchange_ids, run_speakers
 from infovore.claims.value import run_value, sample_ids
 from infovore.config import ConfigError, normalize_channel_names
 from infovore.db.batch import exchange_inputs_for_ids
@@ -57,6 +58,7 @@ from infovore.db.claims_v2 import (
     review_rows,
     run_ids,
 )
+from infovore.db.speaker_drops import dropped_authors
 from infovore.eval.slices import slice_ids, slice_names
 from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.command import DEFAULT_MIN_CLAIMS
@@ -154,11 +156,11 @@ def progress_line(done: int, total: int, claims: int, elapsed: float) -> str:
 
 
 def _redacted_stream(
-    conn: sqlite3.Connection, ids: Sequence[int], salt: str
+    conn: sqlite3.Connection, ids: Sequence[int], salt: str, drop: frozenset[int]
 ) -> Iterator[tuple[int, Redacted]]:
     for eid in ids:
         messages = exchange_inputs_for_ids(conn, [eid])[eid].messages
-        yield eid, redact_conversation(messages, salt)
+        yield eid, redact_conversation(messages, salt, drop)
 
 
 def _check_args(args: argparse.Namespace, salt: str | None) -> str:
@@ -181,11 +183,17 @@ def _check_args(args: argparse.Namespace, salt: str | None) -> str:
     return salt
 
 
-def _dry_run(context: "AppContext", args: argparse.Namespace, ids: list[int], salt: str) -> int:
+def _dry_run(
+    context: "AppContext",
+    args: argparse.Namespace,
+    ids: list[int],
+    salt: str,
+    drop: frozenset[int],
+) -> int:
     from infovore.cli import ExitCode
 
     out, total = context.stdout, 0
-    for eid, redacted in _redacted_stream(context.conn, ids, salt):
+    for eid, redacted in _redacted_stream(context.conn, ids, salt, drop):
         for part in windows(redacted.lines, args.window_chars):
             total += 1
             request = build_request(args.model, render_window(part), args.max_tokens)
@@ -212,8 +220,12 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
     if args.shuffle is not None:
         random.Random(args.shuffle).shuffle(all_ids)
         selection = f"{selection} shuffle={args.shuffle}"
+    drop = dropped_authors(conn)
+    if skipped := len(all_ids) - len(kept := kept_exchange_ids(conn, all_ids, drop)):
+        out.write(f"skipped {skipped} conversations whose speakers are all dropped\n")
+    all_ids = kept
     if args.dry_run:
-        return _dry_run(context, args, all_ids[: args.limit], salt)
+        return _dry_run(context, args, all_ids[: args.limit], salt, drop)
     model_id, source = fetch_model_id(args.endpoint, args.model, http_get)
     note = "" if source == "model_info" else " (alias; /model/info unavailable)"
     out.write(f"model_id={model_id}{note}\n")
@@ -257,7 +269,7 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
     stop = StopFlag()
     with _stop_on_signals(stop):
         results = extract_concurrently(
-            _redacted_stream(conn, ids, salt),
+            _redacted_stream(conn, ids, salt, drop),
             send,
             args.model,
             args.window_chars,
@@ -443,6 +455,13 @@ class ClaimsCommand:
         serve.add_argument("--port", type=int, default=DEFAULT_CLAIMS_PORT)
         serve.add_argument("--sample", type=int, default=None, metavar="N")
         serve.add_argument("--seed", type=int, default=0)
+        speakers = sub.add_parser("speakers", help="review prolific speakers: keep or drop each")
+        speakers.add_argument("--run", type=int, required=True)
+        speakers.add_argument("--top", type=int, default=20, metavar="K")
+        speakers.add_argument("--per", type=int, default=8, metavar="N")
+        speakers.add_argument("--seed", type=int, default=0)
+        speakers.add_argument("--host", action="append", default=None, dest="hosts")
+        speakers.add_argument("--port", type=int, default=DEFAULT_CLAIMS_PORT)
         value = sub.add_parser("value", help="is a bulk run worth continuing: yield, novelty, wiki")
         value.add_argument("--runs", required=True, help="comma-separated run ids")
         value.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS, dest="min_claims")
@@ -476,6 +495,8 @@ class ClaimsCommand:
             return _extract(context, args)
         if args.claims_action == "serve":
             return _serve(context, args)
+        if args.claims_action == "speakers":
+            return run_speakers(context, args)
         if args.claims_action == "value":
             return run_value(context, args)
         if args.claims_action == "gate-score":

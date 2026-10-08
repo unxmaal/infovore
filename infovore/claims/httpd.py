@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import threading
+from collections.abc import Sequence
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
@@ -158,12 +159,12 @@ def start_all(
     return servers
 
 
-def listening_url(server: ClaimServer) -> str:
+def listening_url(server: ThreadingHTTPServer) -> str:
     host, port = str(server.server_address[0]), server.server_address[1]
     return f"http://{host}:{port}/"
 
 
-def shutdown_all(servers: list[ClaimServer]) -> None:
+def shutdown_all(servers: Sequence[ThreadingHTTPServer]) -> None:
     for server in servers:
         server.shutdown()
         server.server_close()

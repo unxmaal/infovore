@@ -1,5 +1,6 @@
 import io
 import json
+import re
 import sqlite3
 from collections.abc import Iterator
 from pathlib import Path
@@ -220,16 +221,16 @@ def test_value_refuses_when_speakers_are_dropped_and_there_is_no_salt(tmp_path: 
 def test_wiki_ignores_dropped_speakers(tmp_path: Path) -> None:
     conn, _, _ = seeded(tmp_path)
     record_checks(conn, [CheckRow(i, "supported", 1.0, []) for i in range(1, 8)], {}, AT)
-    before, _ = load_claims(conn, SALT)
+    before, _ = load_claims(conn, salt=SALT)
     assert len(before) == 7
     record_decision(conn, 1, "drop", AT)
 
-    claims, excluded = load_claims(conn, SALT)
+    claims, excluded = load_claims(conn, salt=SALT)
 
     assert len(claims) == 4 and excluded == 3
     assert all(c.speaker != ANN for c in claims)
     with pytest.raises(ConfigError):
-        load_claims(conn, None)
+        load_claims(conn, salt=None)
 
 
 def test_wiki_command_uses_the_configured_salt(tmp_path: Path) -> None:
@@ -338,3 +339,39 @@ def test_speakers_command_refuses_bad_input(
     code, _, err = run_cli(tmp_path, "claims", "speakers", *extra, salt=salt)
 
     assert code == ExitCode.CONFIG and message in err
+
+
+def claim_count(out: str) -> int:
+    match = re.search(r"conversations \d+ \(failed \d+\), claims (\d+)", out)
+    assert match
+    return int(match.group(1))
+
+
+def test_wiki_applies_the_claim_gate_and_the_drop_list_together(tmp_path: Path) -> None:
+    conn, _, _ = seeded(tmp_path)
+    record_checks(conn, [CheckRow(i, "supported", 1.0, []) for i in range(1, 8)], {}, AT)
+    everything = {c.claim_id for c in load_claims(conn)[0]}
+    gated = {c.claim_id for c in load_claims(conn, tech_only=True)[0]}
+    record_decision(conn, 1, "drop", AT)
+    dropped = {c.claim_id for c in load_claims(conn, salt=SALT)[0]}
+
+    both = {c.claim_id for c in load_claims(conn, tech_only=True, salt=SALT)[0]}
+
+    assert gated < everything and dropped < everything
+    assert both == gated & dropped and both < gated and both < dropped
+
+
+def test_value_applies_the_claim_gate_and_the_drop_list_together(tmp_path: Path) -> None:
+    conn, run, _ = seeded(tmp_path)
+    conn.close()
+    base = ("claims", "value", "--runs", str(run))
+    everything = claim_count(run_cli(tmp_path, *base)[1])
+    gated = claim_count(run_cli(tmp_path, *base, "--claim-gate")[1])
+    conn = db(tmp_path)
+    record_decision(conn, 1, "drop", AT)
+    conn.close()
+    dropped = claim_count(run_cli(tmp_path, *base)[1])
+
+    both = claim_count(run_cli(tmp_path, *base, "--claim-gate")[1])
+
+    assert gated < everything and dropped < everything and both < gated and both < dropped

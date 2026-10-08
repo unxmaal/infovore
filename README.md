@@ -45,6 +45,7 @@ All tables live in one SQLite file (`INFOVORE_DB_PATH`). Migrations run on open.
 | `message_labels`, `message_model`, `message_tokens`, `message_combiner` | message-level sifting labels and models |
 | `claim_runs`, `claim_run_exchanges`, `claims_v2`, `claims_v2_sources`, `claim_rejections` | claim trial: runs, per-conversation outcomes, redacted claims with their cited messages, and claims rejected with the reason; append-only |
 | `claim_reviews`, `current_claim_reviews` | append-only human verdicts on trial claims; the view shows the latest per claim |
+| `speaker_drops`, `current_speaker_drops` | append-only keep/drop decisions per Discord author id (quality, not privacy); the view shows the latest per author |
 | `claim_checks`, `current_claim_checks` | append-only deterministic grounding checks of trial claims against their cited messages; the view shows the latest per claim |
 | `claims`, `claim_sources`, `claims_fts` | extracted claims and their source messages (paused) |
 | `extraction_runs`, `extraction_batches`, `prompt_versions`, `probe_runs` | extraction and probe bookkeeping (paused) |
@@ -114,6 +115,7 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
   - `--timeout S`: per-request seconds, default 300; a timeout is a failure and retries on `--resume`.
   - `--progress-every N`: stderr line (done/total, claims, conversations per hour, ETA) every N conversations, default 10.
 - `infovore claims serve --run RUN [--host H] [--port P]`: dense review page (g good, w wrong, m made up, n not useful); verdicts append and resume.
+- `infovore claims speakers --run RUN [--top K] [--per N] [--seed S] [--host H] [--port P]`: top K speakers by claims (default 20) with N random claims each (default 8) and keep/drop buttons; dropped authors are skipped by `claims extract`, `claims value` and `wiki build`, which need INFOVORE_PSEUDONYM_SALT to map pseudonyms back to authors. `claims value` also prints per-speaker good rates.
 - `infovore claims export-cases --runs N[,M] --out PATH [--window-chars N]`: read-only; writes one JSONL case per prompt window with a reviewed claim (id, system, transcript, schema, reviews with the latest verdict) for SoHoT's claims lane. Needs `INFOVORE_PSEUDONYM_SALT`; refuses a PATH inside any git work tree because transcripts are verbatim Discord text.
 - `infovore claims report [--run RUN]`: per run conversations, claims, zero-claim share, verdict counts, made-up rate, tokens and seconds.
 - `infovore claims check --run RUN [--run RUN] [--write] [--threshold T]`: no model calls; verifies each claim's numbers, versions, part numbers, models, quoted strings and file names against the cited messages and scores word overlap; prints a confusion table against your reviews and a tuned threshold. `claims show --run RUN --check` lists stored verdicts and the failing fact.
