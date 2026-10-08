@@ -181,9 +181,9 @@ def test_a_claim_whose_sources_left_the_transcript_is_skipped(tmp_path: Path) ->
     conn.commit()
     conn.close()
 
-    _, _, rows = export(tmp_path, str(run))
+    code, out, rows = export(tmp_path, str(run))
 
-    assert rows == []
+    assert code == ExitCode.OK and "0 cases" in out and rows == []
 
 
 @pytest.mark.parametrize("marker", ["dir", "file"])
@@ -234,7 +234,8 @@ def test_the_database_is_not_modified(tmp_path: Path) -> None:
     before = [list(conn.execute(f"SELECT * FROM {n}")) for n in names]
     conn.close()
 
-    export(tmp_path, str(run))
+    _, _, rows = export(tmp_path, str(run))
 
+    assert len(rows) == 1
     conn = db(tmp_path)
     assert [list(conn.execute(f"SELECT * FROM {n}")) for n in names] == before
