@@ -128,3 +128,13 @@ def test_pages_carry_no_discord_links(tmp_path: Path) -> None:
     page = render_page("O2", claims, {"O2"})
     assert "discord" not in page.lower()
     assert "(user-aaaa, exchange" in page
+
+
+def test_load_claims_claim_gate_drops_techless_claims(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    e1 = add_exchange(conn, 1, "2026-02-01")
+    add_claim(conn, e1, "user-aaaa", "The O2 is quiet.")
+    add_claim(conn, e1, "user-bbbb", "People are friendly.")
+    claims, excluded = load_claims(conn, tech_only=True)
+    assert [c.speaker for c in claims] == ["user-aaaa"] and excluded == 1
+    assert len(load_claims(conn)[0]) == 2
