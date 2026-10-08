@@ -145,7 +145,10 @@ def test_channels_select_archived_conversations_in_id_order(tmp_path: Path, serv
     seed(tmp_path, ["d1"], "delta")
     seed(tmp_path, ["e1"], "alpha", None)
 
-    code, out, _ = go(tmp_path, extract(server, "--channels", "beta,alpha,gamma", "--limit", "99"))
+    code, out, _ = go(
+        tmp_path,
+        extract(server, "--channels", "beta,alpha,gamma", "--limit", "99", "--concurrency", "1"),
+    )
 
     assert code == ExitCode.OK
     assert sent(out) == [*a, b]
@@ -164,7 +167,7 @@ def test_channels_combine_with_limit_and_ignore_excluded_channels(
     code, out, _ = go(
         tmp_path, extract(server, "--channels", "alpha,beta", "--limit", "9"), exclude="beta"
     )
-    assert sent(out) == a
+    assert sorted(sent(out)) == a
 
 
 def test_unknown_channel_is_refused(tmp_path: Path, server: str) -> None:
@@ -350,18 +353,58 @@ def test_concurrent_and_serial_runs_store_the_same_results(tmp_path: Path, serve
     assert results[0] == results[1] and len(results[0]) == 4
 
 
-def test_default_is_four_in_flight_and_more_is_capped_at_four(tmp_path: Path, server: str) -> None:
-    seed(tmp_path, [f"a{n}" for n in range(8)], "alpha")
-    Fake.delays = {f"a{n}": 0.2 for n in range(8)}
+def test_default_is_eight_in_flight_and_only_absurd_requests_are_capped(
+    tmp_path: Path, server: str
+) -> None:
+    seed(tmp_path, [f"a{n}" for n in range(40)], "alpha")
+    Fake.delays = {f"a{n}": 0.3 for n in range(40)}
 
-    go(tmp_path, extract(server, "--channels", "alpha", "--limit", "9"))
-    assert Fake.peak == 4
+    go(tmp_path, extract(server, "--channels", "alpha", "--limit", "10"))
+    assert Fake.peak == 8
 
-    Fake.peak = 0
+    Fake.peak, Fake.seen = 0, []
     _, out, _ = go(
-        tmp_path, extract(server, "--channels", "alpha", "--limit", "9", "--concurrency", "9")
+        tmp_path, extract(server, "--channels", "alpha", "--limit", "12", "--concurrency", "12")
     )
-    assert Fake.peak == 4 and "capped at 4" in out
+    assert Fake.peak == 12 and "capped" not in out
+
+    Fake.peak, Fake.seen = 0, []
+    _, out, _ = go(
+        tmp_path, extract(server, "--channels", "alpha", "--limit", "40", "--concurrency", "99")
+    )
+    assert Fake.peak == 32 and "capped at 32" in out
+
+
+def test_shuffle_orders_the_selection_by_seed_and_resume_continues_it(
+    tmp_path: Path, server: str
+) -> None:
+    names = [f"a{n}" for n in range(12)]
+    seed(tmp_path, names, "alpha")
+    base = ["--channels", "alpha", "--concurrency", "1", "--write", "--resume"]
+
+    go(tmp_path, extract(server, *base, "--limit", "4", "--shuffle", "7"))
+    first = list(Fake.seen)
+    Fake.seen = []
+    go(tmp_path, extract(server, *base, "--limit", "12", "--shuffle", "7"))
+    rest = list(Fake.seen)
+
+    assert first != names[:4] and sorted(first + rest) == sorted(names)
+    assert not set(first) & set(rest)
+    conn = open_database(tmp_path / "infovore.db")
+    selections = [r[0] for r in conn.execute("SELECT selection FROM claim_runs ORDER BY id")]
+    assert selections == ["channels=alpha shuffle=7"] * 2
+
+
+def test_the_same_seed_gives_the_same_order(tmp_path: Path, server: str) -> None:
+    seed(tmp_path, [f"a{n}" for n in range(12)], "alpha")
+    args = ["--channels", "alpha", "--concurrency", "1", "--limit", "12", "--shuffle", "3"]
+
+    go(tmp_path, extract(server, *args))
+    once = list(Fake.seen)
+    Fake.seen = []
+    go(tmp_path, extract(server, *args))
+
+    assert Fake.seen == once and sorted(once) != once
 
 
 def test_concurrency_must_be_positive(tmp_path: Path, server: str) -> None:

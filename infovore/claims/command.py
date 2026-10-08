@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import json
+import random
 import signal
 import sqlite3
 import sys
@@ -125,7 +126,8 @@ def _stop_on_signals(flag: StopFlag) -> Iterator[None]:
             signal.signal(number, handler)
 
 
-MAX_CONCURRENCY = 4
+MAX_CONCURRENCY = 32
+DEFAULT_CONCURRENCY = 8
 
 
 def progress_line(done: int, total: int, claims: int, elapsed: float) -> str:
@@ -186,6 +188,9 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
     conn, out = context.conn, context.stdout
     salt = _check_args(args, context.settings.pseudonym_salt)
     all_ids, selection = _select(context, args)
+    if args.shuffle is not None:
+        random.Random(args.shuffle).shuffle(all_ids)
+        selection = f"{selection} shuffle={args.shuffle}"
     if args.dry_run:
         return _dry_run(context, args, all_ids[: args.limit], salt)
     model_id, source = fetch_model_id(args.endpoint, args.model, http_get)
@@ -388,7 +393,10 @@ class ClaimsCommand:
         )
         extract.add_argument("--limit", type=int, default=None, metavar="N")
         extract.add_argument("--resume", action="store_true")
-        extract.add_argument("--concurrency", type=int, default=MAX_CONCURRENCY, metavar="N")
+        extract.add_argument(
+            "--shuffle", type=int, default=None, metavar="SEED", help="seeded random order"
+        )
+        extract.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY, metavar="N")
         extract.add_argument("--progress-every", type=int, default=10, dest="progress_every")
         extract.add_argument("--write", action="store_true")
         extract.add_argument("--dry-run", action="store_true", dest="dry_run")
