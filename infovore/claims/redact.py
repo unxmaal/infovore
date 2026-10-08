@@ -3,6 +3,7 @@ import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
+from infovore.config import ConfigError
 from infovore.rows import MessageRow
 
 MENTION = re.compile(r"<@!?(\d+)>")
@@ -109,6 +110,12 @@ class Redacted:
     lines: list[RenderedLine]
     speakers: set[str]
     names: list[str]
+
+
+def require_salt(salt: str | None) -> str:
+    if not salt:
+        raise ConfigError("INFOVORE_PSEUDONYM_SALT is required: names are redacted with it")
+    return salt
 
 
 def _digest(user_id: int, salt: str) -> str:

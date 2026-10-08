@@ -270,3 +270,41 @@ def archived_exchange_ids(
         (*inc_params, *exc_params),
     )
     return [row[0] for row in rows]
+
+
+@dataclass(frozen=True)
+class ReviewedClaim:
+    review_id: int
+    exchange_id: int
+    speaker: str
+    statement: str
+    verdict: str
+    message_ids: tuple[int, ...]
+
+
+def reviewed_claims(conn: sqlite3.Connection, runs: Sequence[int]) -> list[ReviewedClaim]:
+    marks = ",".join("?" for _ in runs)
+    sources: dict[int, list[int]] = {}
+    for claim_id, message_id in conn.execute(
+        "SELECT s.claim_id, s.message_id FROM claims_v2_sources s JOIN claims_v2 c"
+        f" ON c.id = s.claim_id WHERE c.run_id IN ({marks}) ORDER BY s.claim_id, s.message_id",
+        list(runs),
+    ):
+        sources.setdefault(claim_id, []).append(message_id)
+    return [
+        ReviewedClaim(
+            row["rid"],
+            row["exchange_id"],
+            row["speaker"],
+            row["statement"],
+            row["verdict"],
+            tuple(sources.get(row["id"], ())),
+        )
+        for row in conn.execute(
+            "SELECT c.id, c.exchange_id, c.speaker, c.statement, r.id AS rid, r.verdict"
+            " FROM claims_v2 c JOIN claim_reviews r ON r.claim_id = c.id"
+            " WHERE r.id = (SELECT MAX(id) FROM claim_reviews WHERE claim_id = c.id)"
+            f" AND c.run_id IN ({marks}) ORDER BY c.exchange_id, c.id",
+            list(runs),
+        )
+    ]

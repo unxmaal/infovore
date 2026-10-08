@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from infovore.claims.check import DEFAULT_THRESHOLD, run_check, show_checks
+from infovore.claims.export_cases import export_cases
 from infovore.claims.extract import (
     MAX_TOKENS,
     RECIPE,
@@ -28,7 +29,7 @@ from infovore.claims.extract import (
     windows,
 )
 from infovore.claims.httpd import DEFAULT_CLAIMS_PORT, listening_url, shutdown_all, start_all
-from infovore.claims.redact import WIDTH, Redacted, redact_conversation
+from infovore.claims.redact import WIDTH, Redacted, redact_conversation, require_salt
 from infovore.config import ConfigError, normalize_channel_names
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import known_channel_names
@@ -153,8 +154,7 @@ def _check_args(args: argparse.Namespace, salt: str | None) -> str:
         raise ConfigError("--max-tokens must be positive")
     if args.progress_every < 1:
         raise ConfigError("--progress-every must be positive")
-    if not salt:
-        raise ConfigError("INFOVORE_PSEUDONYM_SALT is required: names are redacted with it")
+    salt = require_salt(salt)
     if not (args.slices or args.ids or args.channels):
         raise ConfigError("--slices, --ids or --channels is required")
     if args.resume and not args.write:
@@ -389,6 +389,10 @@ class ClaimsCommand:
         check.add_argument("--run", type=int, action="append", required=True)
         check.add_argument("--write", action="store_true")
         check.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
+        export = sub.add_parser("export-cases", help="write reviewed claims as JSONL eval cases")
+        export.add_argument("--runs", required=True, help="comma-separated run ids")
+        export.add_argument("--out", required=True, help="output path, outside any git work tree")
+        export.add_argument("--window-chars", type=int, default=WINDOW_CHARS, dest="window_chars")
         report = sub.add_parser("report", help="per-run trial numbers")
         report.add_argument("--run", type=int, default=None)
 
@@ -399,6 +403,8 @@ class ClaimsCommand:
             return _serve(context, args)
         if args.claims_action == "check":
             return run_check(context, args)
+        if args.claims_action == "export-cases":
+            return export_cases(context, args)
         if args.claims_action == "show":
             return _show(context, args)
         return _report(context, args)
