@@ -88,7 +88,7 @@ def test_reduction_counts_good_lost_and_removed_verdicts() -> None:
     row = reduction({"good": 3, "not_useful": 2, "wrong": 1, "made_up": 1}, {"not_useful": 2})
     assert (row.good_lost, row.not_useful_removed, row.bad_removed) == (0, 2, 0)
     assert row.good_rate == (3, 5)
-    cut = reduction({"good": 3, "wrong": 1}, {"good": 1, "wrong": 1, "made_up": 2})
+    cut = reduction({"good": 3, "wrong": 1, "made_up": 2}, {"good": 1, "wrong": 1, "made_up": 2})
     assert (cut.good_lost, cut.bad_removed, cut.good_rate) == (1, 3, (2, 2))
 
 
@@ -179,7 +179,8 @@ def test_extract_gate_is_off_by_default(tmp_path: Path, server: str) -> None:
 def test_extract_gate_drops_chatter_before_the_limit(tmp_path: Path, server: str) -> None:
     seeded_reviews(tmp_path)
 
-    code, out, _ = run(tmp_path, *extract_argv(server, "--gate-density", "1", "--gate-share", "0.5"))
+    gate = ("--gate-density", "1", "--gate-share", "0.5")
+    code, out, _ = run(tmp_path, *extract_argv(server, *gate))
 
     assert code == ExitCode.OK
     assert "gate: dropped 1 of 2 conversations" in out

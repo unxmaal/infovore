@@ -9,8 +9,10 @@ import struct
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
 
+from infovore.claims.gate import claim_has_tech
 from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
+from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki.build import subjects
 from infovore.wiki.topics import load_topics
 
@@ -111,7 +113,9 @@ _SCAN = (
 )
 
 
-def _scan(conn: sqlite3.Connection, runs: frozenset[int], min_claims: int) -> list[str]:
+def _scan(
+    conn: sqlite3.Connection, runs: frozenset[int], min_claims: int, lexicon: Lexicon | None = None
+) -> list[str]:
     topics = load_topics()
     index = NearDuplicateIndex()
     counts: dict[str, int] = {}
@@ -134,6 +138,8 @@ def _scan(conn: sqlite3.Connection, runs: frozenset[int], min_claims: int) -> li
                 stats = channels.setdefault(r["channel"], [0, 0, 0])
                 stats[0] += 1
         if r["statement"] is None:
+            continue
+        if lexicon and not claim_has_tech(lexicon, topics, r["statement"]):
             continue
         toks = tokens(r["statement"])
         dup = chosen and index.seen(toks)
@@ -198,7 +204,9 @@ def _in(runs: frozenset[int]) -> tuple[str, list[int]]:
     return ",".join("?" for _ in runs), sorted(runs)
 
 
-def _tail(conn: sqlite3.Connection, runs: frozenset[int]) -> list[str]:
+def _tail(
+    conn: sqlite3.Connection, runs: frozenset[int], lexicon: Lexicon | None = None
+) -> list[str]:
     marks, params = _in(runs)
     total = conn.execute(
         f"SELECT COUNT(*) FROM claims_v2 WHERE run_id IN ({marks})", params
@@ -213,14 +221,15 @@ def _tail(conn: sqlite3.Connection, runs: frozenset[int]) -> list[str]:
     mix = ", ".join(f"{k} {v}" for k, v in checks.items())
     if checks:
         mix += f", unchecked {total - sum(checks.values())}"
-    reviews = dict(
-        conn.execute(
-            "SELECT r.verdict, COUNT(*) FROM claims_v2 c JOIN current_claim_reviews r"
-            f" ON r.claim_id = c.id WHERE c.run_id IN ({marks}) AND r.interface = 'conversation'"
-            " GROUP BY r.verdict",
-            params,
-        ).fetchall()
-    )
+    topics = load_topics()
+    reviews: dict[str, int] = {}
+    for row in conn.execute(
+        "SELECT r.verdict, c.statement FROM claims_v2 c JOIN current_claim_reviews r"
+        f" ON r.claim_id = c.id WHERE c.run_id IN ({marks}) AND r.interface = 'conversation'",
+        params,
+    ):
+        if lexicon is None or claim_has_tech(lexicon, topics, row["statement"]):
+            reviews[row["verdict"]] = reviews.get(row["verdict"], 0) + 1
     good, reviewed = reviews.get("good", 0), sum(reviews.values())
     interval = wilson(good, reviewed)
     if interval:
@@ -250,7 +259,8 @@ def run_value(context: "AppContext", args: argparse.Namespace) -> int:
     rejected = conn.execute(
         f"SELECT COUNT(*) FROM claim_rejections WHERE run_id IN ({marks})", params
     ).fetchone()[0]
-    lines = _scan(conn, runs, args.min_claims)
+    lexicon = load_lexicon(conn) if args.claim_gate else None
+    lines = _scan(conn, runs, args.min_claims, lexicon)
     lines[0] = f"runs {','.join(map(str, sorted(runs)))}: {lines[0]}, rejected {rejected}"
-    context.stdout.write("\n".join([*lines, *_tail(conn, runs)]) + "\n")
+    context.stdout.write("\n".join([*lines, *_tail(conn, runs, lexicon)]) + "\n")
     return int(ExitCode.OK)

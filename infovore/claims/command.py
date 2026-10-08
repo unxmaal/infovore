@@ -29,6 +29,14 @@ from infovore.claims.extract import (
     render_window,
     windows,
 )
+from infovore.claims.gate import (
+    DEFAULT_DENSITIES,
+    DEFAULT_SHARES,
+    DEFAULT_WORD_FLOOR,
+    check_gate_args,
+    gated_ids,
+    run_gate_score,
+)
 from infovore.claims.httpd import DEFAULT_CLAIMS_PORT, listening_url, shutdown_all, start_all
 from infovore.claims.redact import WIDTH, Redacted, redact_conversation, require_salt
 from infovore.claims.value import run_value, sample_ids
@@ -50,6 +58,7 @@ from infovore.db.claims_v2 import (
     run_ids,
 )
 from infovore.eval.slices import slice_ids, slice_names
+from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.command import DEFAULT_MIN_CLAIMS
 
 if TYPE_CHECKING:
@@ -168,6 +177,7 @@ def _check_args(args: argparse.Namespace, salt: str | None) -> str:
         raise ConfigError("--slices, --ids, --channels or --archive is required")
     if args.resume and not args.write:
         raise ConfigError("--resume needs --write")
+    check_gate_args(args.gate_density, args.gate_share, args.gate_word_floor)
     return salt
 
 
@@ -190,6 +200,15 @@ def _extract(context: "AppContext", args: argparse.Namespace) -> int:
     conn, out = context.conn, context.stdout
     salt = _check_args(args, context.settings.pseudonym_salt)
     all_ids, selection = _select(context, args)
+    gate = check_gate_args(args.gate_density, args.gate_share, args.gate_word_floor)
+    if gate.active:
+        kept = gated_ids(conn, all_ids, gate, load_lexicon(conn))
+        out.write(f"gate: dropped {len(all_ids) - len(kept)} of {len(all_ids)} conversations\n")
+        all_ids = kept
+        selection = (
+            f"{selection} gate=density>={gate.min_density:g},share>={gate.min_share:g},"
+            f"floor={gate.word_floor}"
+        )
     if args.shuffle is not None:
         random.Random(args.shuffle).shuffle(all_ids)
         selection = f"{selection} shuffle={args.shuffle}"
@@ -406,6 +425,11 @@ class ClaimsCommand:
         extract.add_argument(
             "--shuffle", type=int, default=None, metavar="SEED", help="seeded random order"
         )
+        extract.add_argument("--gate-density", type=float, default=0.0, dest="gate_density")
+        extract.add_argument("--gate-share", type=float, default=0.0, dest="gate_share")
+        extract.add_argument(
+            "--gate-word-floor", type=int, default=DEFAULT_WORD_FLOOR, dest="gate_word_floor"
+        )
         extract.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY, metavar="N")
         extract.add_argument("--progress-every", type=int, default=10, dest="progress_every")
         extract.add_argument("--write", action="store_true")
@@ -422,6 +446,12 @@ class ClaimsCommand:
         value = sub.add_parser("value", help="is a bulk run worth continuing: yield, novelty, wiki")
         value.add_argument("--runs", required=True, help="comma-separated run ids")
         value.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS, dest="min_claims")
+        value.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        score = sub.add_parser("gate-score", help="score conversation and claim gates on reviews")
+        score.add_argument("--runs", required=True, help="comma-separated run ids")
+        score.add_argument("--densities", default=DEFAULT_DENSITIES)
+        score.add_argument("--shares", default=DEFAULT_SHARES)
+        score.add_argument("--word-floor", type=int, default=DEFAULT_WORD_FLOOR, dest="word_floor")
         show = sub.add_parser("show", help="print a run's claims or rejections as text")
         show.add_argument("--run", type=int, required=True)
         show.add_argument("--rejected", action="store_true")
@@ -448,6 +478,8 @@ class ClaimsCommand:
             return _serve(context, args)
         if args.claims_action == "value":
             return run_value(context, args)
+        if args.claims_action == "gate-score":
+            return run_gate_score(context, args)
         if args.claims_action == "check":
             return run_check(context, args)
         if args.claims_action == "export-cases":

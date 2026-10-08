@@ -21,11 +21,13 @@ class WikiCommand:
         build = sub.add_parser("build", help="write one page per topic plus an index")
         build.add_argument("--out", type=Path, required=True)
         build.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
+        build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         stats = sub.add_parser("stats", help="topics, pages and claims per page")
         stats.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
+        stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
-        claims, excluded = load_claims(context.conn)
+        claims, excluded = load_claims(context.conn, args.claim_gate)
         stats = compute_stats(claims, args.min_claims)
         lines = [
             f"topics: {stats.topics}",
