@@ -19,6 +19,7 @@ from infovore.claims.redact import Redacted, RenderedLine
 from infovore.cli import ExitCode, main
 from infovore.db.claims_v2 import (
     ExchangeOutcome,
+    archive_exchange_ids,
     archived_exchange_ids,
     create_run,
     processed_ok,
@@ -181,7 +182,7 @@ def test_a_selection_is_required_and_channels_exclude_the_others(
     seed(tmp_path, ["a1"], "alpha")
 
     code, _, err = go(tmp_path, extract(server, "--limit", "2"))
-    assert code == ExitCode.CONFIG and "--slices, --ids or --channels" in err
+    assert code == ExitCode.CONFIG and "--slices, --ids, --channels or --archive" in err
 
     argv = extract(server, "--limit", "2", "--channels", "alpha", "--ids", "1")
     with pytest.raises(SystemExit):
@@ -202,6 +203,38 @@ def test_archived_exchange_ids_helper(tmp_path: Path) -> None:
 
     assert archived_exchange_ids(conn, frozenset({"alpha", "beta"}), frozenset()) == a
     assert archived_exchange_ids(conn, frozenset({"alpha"}), frozenset({"alpha"})) == []
+
+
+def test_archive_selects_by_sort_across_channels(tmp_path: Path) -> None:
+    lex = seed(tmp_path, ["a1"], "alpha")
+    emb = seed(tmp_path, ["b1"], "beta", "embed_relevant")
+    und = seed(tmp_path, ["c1", "c2"], "gamma", "residue")
+    seed(tmp_path, ["d1"], "delta", "embed_irrelevant")
+    seed(tmp_path, ["e1"], "eps", "short_no_tech")
+    seed(tmp_path, ["f1"], "zeta", None)
+    off = seed(tmp_path, ["g1"], "off")
+    seed(tmp_path, ["h1"], "off", "residue")
+    conn = open_database(tmp_path / "infovore.db")
+
+    assert archive_exchange_ids(conn, "relevant", frozenset()) == sorted(lex + emb + off)
+    assert archive_exchange_ids(conn, "relevant", frozenset({"off"})) == sorted(lex + emb)
+    assert archive_exchange_ids(conn, "undecided", frozenset({"off"})) == und
+
+
+def test_archive_flag_runs_only_the_chosen_sort(tmp_path: Path, server: str) -> None:
+    seed(tmp_path, ["r1"], "alpha")
+    seed(tmp_path, ["u1"], "beta", "residue")
+
+    code, _, _ = go(tmp_path, extract(server, "--archive", "relevant", "--limit", "9", "--write"))
+
+    assert code == ExitCode.OK and Fake.seen == ["r1"]
+    conn = open_database(tmp_path / "infovore.db")
+    assert conn.execute("SELECT selection FROM claim_runs").fetchone()[0] == "archive=relevant"
+
+
+def test_archive_excludes_the_other_selectors(tmp_path: Path, server: str) -> None:
+    with pytest.raises(SystemExit):
+        go(tmp_path, extract(server, "--archive", "relevant", "--channels", "alpha"))
 
 
 def test_resume_skips_done_conversations_and_retries_failures(tmp_path: Path, server: str) -> None:
