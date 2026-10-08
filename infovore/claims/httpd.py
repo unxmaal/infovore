@@ -38,6 +38,7 @@ class ClaimServer(ThreadingHTTPServer):
         page: str,
         run_id: int,
         salt: str,
+        only: frozenset[int] | None = None,
     ) -> None:
         self.conn = conn
         self.lock = lock
@@ -45,11 +46,14 @@ class ClaimServer(ThreadingHTTPServer):
         self.page = page
         self.run_id = run_id
         self.salt = salt
+        self.only = only
         super().__init__(address, _Handler)
 
 
-def payload(conn: sqlite3.Connection, run_id: int, salt: str) -> dict[str, Any]:
-    rows = review_rows(conn, run_id)
+def payload(
+    conn: sqlite3.Connection, run_id: int, salt: str, only: frozenset[int] | None = None
+) -> dict[str, Any]:
+    rows = [r for r in review_rows(conn, run_id) if only is None or r.claim_id in only]
     by_exchange: dict[int, list[ReviewRow]] = {}
     for r in rows:
         by_exchange.setdefault(r.exchange_id, []).append(r)
@@ -103,7 +107,9 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(HTTPStatus.OK, self.server.page.encode("utf-8"), "text/html; charset=utf-8")
         elif path == "/api/claims":
             with self.server.lock:
-                data = payload(self.server.conn, self.server.run_id, self.server.salt)
+                data = payload(
+                    self.server.conn, self.server.run_id, self.server.salt, self.server.only
+                )
             self._send_json(HTTPStatus.OK, data)
         else:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": "not found"})
@@ -134,13 +140,19 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 def start_all(
-    hosts: list[str], port: int, conn: sqlite3.Connection, clock: Clock, run_id: int, salt: str
+    hosts: list[str],
+    port: int,
+    conn: sqlite3.Connection,
+    clock: Clock,
+    run_id: int,
+    salt: str,
+    only: frozenset[int] | None = None,
 ) -> list[ClaimServer]:
     page = load_page()
     lock = threading.Lock()
     servers = []
     for host in hosts:
-        server = ClaimServer((host, port), conn, lock, clock, page, run_id, salt)
+        server = ClaimServer((host, port), conn, lock, clock, page, run_id, salt, only)
         threading.Thread(target=server.serve_forever, daemon=True, name=f"claims-{host}").start()
         servers.append(server)
     return servers

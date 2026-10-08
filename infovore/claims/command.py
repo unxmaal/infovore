@@ -30,6 +30,7 @@ from infovore.claims.extract import (
 )
 from infovore.claims.httpd import DEFAULT_CLAIMS_PORT, listening_url, shutdown_all, start_all
 from infovore.claims.redact import WIDTH, Redacted, redact_conversation, require_salt
+from infovore.claims.value import run_value, sample_ids
 from infovore.config import ConfigError, normalize_channel_names
 from infovore.db.batch import exchange_inputs_for_ids
 from infovore.db.channel_filter import known_channel_names
@@ -48,6 +49,7 @@ from infovore.db.claims_v2 import (
     run_ids,
 )
 from infovore.eval.slices import slice_ids, slice_names
+from infovore.wiki.command import DEFAULT_MIN_CLAIMS
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -290,10 +292,18 @@ def _serve(context: "AppContext", args: argparse.Namespace) -> int:
     _require_run(context.conn, args.run)
     salt = require_salt(context.settings.pseudonym_salt)
     rows = review_rows(context.conn, args.run)
+    only = None
+    label = f"{len(rows)} claims"
+    if args.sample is not None:
+        if args.sample < 1:
+            raise ConfigError("--sample must be positive")
+        only = frozenset(sample_ids([r.claim_id for r in rows], args.sample, args.seed))
+        label = f"sample {len(only)} of {len(rows)} claims"
+        rows = [r for r in rows if r.claim_id in only]
     reviewed = sum(1 for r in rows if r.verdict is not None)
-    context.stdout.write(f"{len(rows)} claims, {reviewed} reviewed\n")
+    context.stdout.write(f"{label}, {reviewed} reviewed\n")
     servers = start_all(
-        args.hosts or ["127.0.0.1"], args.port, context.conn, context.clock, args.run, salt
+        args.hosts or ["127.0.0.1"], args.port, context.conn, context.clock, args.run, salt, only
     )
     try:
         for server in servers:
@@ -399,6 +409,11 @@ class ClaimsCommand:
         serve.add_argument("--run", type=int, required=True)
         serve.add_argument("--host", action="append", default=None, dest="hosts")
         serve.add_argument("--port", type=int, default=DEFAULT_CLAIMS_PORT)
+        serve.add_argument("--sample", type=int, default=None, metavar="N")
+        serve.add_argument("--seed", type=int, default=0)
+        value = sub.add_parser("value", help="is a bulk run worth continuing: yield, novelty, wiki")
+        value.add_argument("--runs", required=True, help="comma-separated run ids")
+        value.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS, dest="min_claims")
         show = sub.add_parser("show", help="print a run's claims or rejections as text")
         show.add_argument("--run", type=int, required=True)
         show.add_argument("--rejected", action="store_true")
@@ -423,6 +438,8 @@ class ClaimsCommand:
             return _extract(context, args)
         if args.claims_action == "serve":
             return _serve(context, args)
+        if args.claims_action == "value":
+            return run_value(context, args)
         if args.claims_action == "check":
             return run_check(context, args)
         if args.claims_action == "export-cases":
