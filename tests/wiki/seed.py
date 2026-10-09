@@ -7,9 +7,15 @@ from infovore.db.claims_v2 import create_run, record_review
 from tests.claims.seed import NOW, conversation, db
 
 
-def wiki_db(tmp_path: Path) -> sqlite3.Connection:
+def wiki_db(tmp_path: Path, runs: int = 1) -> sqlite3.Connection:
     conn = db(tmp_path)
-    create_run(
+    for _ in range(runs):
+        add_run(conn)
+    return conn
+
+
+def add_run(conn: sqlite3.Connection) -> int:
+    return create_run(
         conn,
         endpoint="e",
         model_alias="m",
@@ -20,7 +26,6 @@ def wiki_db(tmp_path: Path) -> sqlite3.Connection:
         recipe={},
         now=NOW,
     )
-    return conn
 
 
 def add_exchange(conn: sqlite3.Connection, base: int, day: str) -> int:
@@ -38,10 +43,11 @@ def add_claim(
     *,
     check: str | None = "supported",
     review: str | None = None,
+    run_id: int = 1,
 ) -> int:
     cursor = conn.execute(
-        "INSERT INTO claims_v2 (run_id, exchange_id, speaker, statement) VALUES (1, ?, ?, ?)",
-        (exchange_id, speaker, statement),
+        "INSERT INTO claims_v2 (run_id, exchange_id, speaker, statement) VALUES (?, ?, ?, ?)",
+        (run_id, exchange_id, speaker, statement),
     )
     claim_id = int(cursor.lastrowid or 0)
     if check is not None:
