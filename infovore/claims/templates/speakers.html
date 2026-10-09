@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>speaker review</title>
 <style>
 * { box-sizing: border-box; }
@@ -16,10 +17,16 @@ body { margin: 0; font: 13px/18px ui-monospace, Menlo, monospace; background: #f
 button { font: inherit; padding: 2px 10px; cursor: pointer; }
 .claim { padding: 2px 0 2px 12px; }
 .claim .v { color: #666; }
+@media (max-width: 800px), (pointer: coarse) {
+  body { font-size: 15px; line-height: 21px; }
+  #bar { height: auto; flex-wrap: wrap; gap: 8px; padding: 6px 10px; }
+  .head { flex-wrap: wrap; }
+  button { font-size: 16px; padding: 10px 18px; }
+}
 </style>
 </head>
 <body>
-<div id="bar"><span id="progress"></span><span id="err"></span></div>
+<div id="bar"><span id="progress"></span><button id="keepall">keep all undecided</button><span id="err"></span></div>
 <div id="list"></div>
 <script>
 "use strict";
@@ -63,6 +70,10 @@ function render() {
   }
   progress.textContent = open + " of " + all.length + " undecided";
 }
+
+document.getElementById("keepall").onclick = async () => {
+  for (const s of all) if (!s.decision) await decide(s, "keep");
+};
 
 fetch("/api/speakers").then(r => r.json()).then(data => { all = data.speakers; render(); });
 </script>
