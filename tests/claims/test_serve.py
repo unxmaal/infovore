@@ -51,6 +51,26 @@ def test_the_page_has_the_keys(served: tuple[str, int, Any]) -> None:
         assert key in page.decode()
 
 
+def test_the_page_works_by_touch(served: tuple[str, int, Any]) -> None:
+    url, _, _ = served
+
+    _, page = fetch(url)
+
+    text = page.decode()
+    assert 'name="viewport"' in text
+    for tap in (
+        'data-verdict="good"',
+        'data-verdict="not_useful"',
+        'data-verdict="wrong"',
+        'data-verdict="made_up"',
+        'data-step="-1"',
+        'data-step="1"',
+        'data-jump="-1"',
+        'data-jump="1"',
+    ):
+        assert tap in text
+
+
 def test_the_payload_is_whole_pseudonymised_conversations_with_cited_refs(
     served: tuple[str, int, Any],
 ) -> None:
