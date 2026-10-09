@@ -61,3 +61,13 @@ def test_claim_gate_drops_techless_claims_from_stats_and_build(tmp_path: Path) -
     out_dir = tmp_path / "site"
     run(["wiki", "build", "--out", str(out_dir), "--claim-gate"], env)
     assert (out_dir / "o2.md").exists()
+
+
+def test_runs_limits_stats_and_rejects_bad_ids(tmp_path: Path) -> None:
+    env = seeded(tmp_path)
+    code, out = run(["wiki", "stats", "--runs", "1"], env)
+    assert code == ExitCode.OK and "claims: 5" in out
+    code, out = run(["wiki", "stats", "--runs", "1,9"], env)
+    assert code != ExitCode.OK
+    code, out = run(["wiki", "stats", "--runs", "x"], env)
+    assert code != ExitCode.OK

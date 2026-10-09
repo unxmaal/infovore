@@ -77,6 +77,17 @@ def test_load_claims_collapses_duplicates_across_runs(tmp_path: Path) -> None:
     assert len(claims) == 1
 
 
+def test_load_claims_keeps_only_the_chosen_runs(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path, runs=3)
+    e1 = add_exchange(conn, 1, "2026-02-01")
+    add_claim(conn, e1, "user-aaaa", "The O2 is quiet.", run_id=1)
+    add_claim(conn, e1, "user-aaaa", "The Octane is loud.", run_id=2)
+    add_claim(conn, e1, "user-aaaa", "The Indy is small.", run_id=3)
+    claims, _ = load_claims(conn, runs=[2, 3])
+    assert sorted(c.statement for c in claims) == ["The Indy is small.", "The Octane is loud."]
+    assert len(load_claims(conn)[0]) == 3
+
+
 def test_stats_counts_pages_distribution_and_unassigned() -> None:
     claims = [*CLAIMS, claim(6, "No topic here.", set())]
     stats = compute_stats(claims, 2)
