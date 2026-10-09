@@ -22,7 +22,7 @@ from infovore.claims.extract import (
 from infovore.claims.redact import RenderedLine, pseudonym, redact_conversation
 from tests.claims.seed import SALT, conversation, db, messages_of
 
-OLD_HASHES = {"a82adb7b1e83"}
+OLD_HASHES = {"a82adb7b1e83", "1f0f60b13a83"}
 U1, U2 = pseudonym(1, SALT), pseudonym(2, SALT)
 
 
@@ -44,9 +44,9 @@ def test_the_request_pins_a_strict_schema_and_names_the_scope() -> None:
     assert request["model"] == "eval-4b" and request["temperature"] == 0
     assert request["response_format"]["json_schema"]["strict"] is True
     assert request["response_format"]["json_schema"]["schema"] == SCHEMA
-    for phrase in ("standalone", "IRIX", "first-hand", "zero", "pronouns", "questions", "jokes"):
+    for phrase in ("wiki", "IRIX", "own result", "zero", "pronouns", "prices", "plans"):
         assert phrase in system
-    assert system.count("Bad:") == 3 and system.count("Good:") == 3
+    assert system.count("Bad:") == 5 and system.count("Good:") == 1
     assert request["max_tokens"] == 400 and build_request("m", "w", 77)["max_tokens"] == 77
     assert len(system) < 1700
     assert request["messages"][1]["content"].endswith("[1] user-aaaa: hi")
