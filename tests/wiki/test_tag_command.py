@@ -1,6 +1,8 @@
 import io
 import json
+import os
 import re
+import signal
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -84,6 +86,26 @@ def test_a_failed_batch_is_counted_and_the_others_are_written(tmp_path: Path) ->
         2: ["tag-two"],
         5: ["tag-four"],
     }
+
+
+def test_sigint_stops_after_the_batches_in_flight(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def interrupting_post(endpoint: str) -> Any:
+        inner = fake_post(endpoint)
+
+        def send(payload: Mapping[str, Any]) -> tuple[Mapping[str, Any], float]:
+            os.kill(os.getpid(), signal.SIGINT)
+            return inner(payload)
+
+        return send
+
+    monkeypatch.setattr(tag_command, "post_for", interrupting_post)
+    env = seed(tmp_path, ["one", "two", "three", "four"])
+    code, out, _ = run([*BASE, "--write", "--concurrency", "1"], env)
+    assert code == 130
+    assert "interrupted after 1 batches; rerun with --resume" in out
+    assert tags_for(db(tmp_path), [1]) == {1: ["tag-one"], 2: ["tag-two"]}
 
 
 def test_dry_run_prints_the_first_request_and_writes_nothing(tmp_path: Path) -> None:
