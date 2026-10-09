@@ -12,3 +12,6 @@
 - T-03: red ok, green ok; 1 local call (tests and impl together); tests rewritten (fixture misuse, empty written_sections cases), SQL and module used with line wrapping; README row added (not in record)
 - T-09: red ok, green ok; 2 local calls (draft, review); draft unusable (placeholder imports, broken SQL, undefined names), hand-written; review: no actionable issues
 - cold-read gap: tasks.md files lists omit README.md data model rows (tests/test_readme.py fails without them) for T-02 and T-03
+- T-10: red ok, green ok; 0 local calls (hand-written, small); one test expectation fixed (display-name ties are alphabetical)
+- T-11: red ok, green ok; 0 local calls (hand-written; the T-09 local draft was unusable); record defect: Files omits infovore/wiki/build.py (shared sections_of helper) and README
+- T-12: red ok, green ok; 0 local calls (hand-written, the local slot was shared and prior drafts needed full rewrites); record defects: Files omits README and infovore/wiki/groups.py needs a lazy import in build.py (circular import via WikiClaim)
