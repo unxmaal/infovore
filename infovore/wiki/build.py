@@ -1,6 +1,6 @@
 import sqlite3
 from collections import Counter
-from collections.abc import Collection, Iterable, Mapping
+from collections.abc import Collection, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
@@ -52,7 +52,10 @@ def subjects(topics: Topics, statement: str) -> frozenset[str]:
 
 
 def load_claims(
-    conn: sqlite3.Connection, tech_only: bool = False, salt: str | None = None
+    conn: sqlite3.Connection,
+    tech_only: bool = False,
+    salt: str | None = None,
+    runs: Sequence[int] | None = None,
 ) -> tuple[list[WikiClaim], int]:
     topics = load_topics()
     lexicon = load_lexicon(conn) if tech_only else None
@@ -62,7 +65,10 @@ def load_claims(
         " r.verdict AS review, k.verdict AS chk FROM claims_v2 c"
         " JOIN current_exchanges e ON e.id = c.exchange_id"
         " LEFT JOIN current_claim_reviews r ON r.claim_id = c.id"
-        " LEFT JOIN current_claim_checks k ON k.claim_id = c.id ORDER BY c.id"
+        " LEFT JOIN current_claim_checks k ON k.claim_id = c.id"
+        + (f" WHERE c.run_id IN ({','.join('?' for _ in runs)})" if runs else "")
+        + " ORDER BY c.id",
+        list(runs or []),
     )
     claims: dict[tuple[int, str, str], WikiClaim] = {}
     excluded = 0

@@ -1,13 +1,28 @@
 import argparse
+import sqlite3
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from infovore.config import ConfigError
+from infovore.db.claims_v2 import run_ids
 from infovore.wiki.build import build_site, compute_stats, load_claims
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
 
 DEFAULT_MIN_CLAIMS = 3
+
+
+def _runs(conn: sqlite3.Connection, text: str | None) -> list[int] | None:
+    if text is None:
+        return None
+    try:
+        runs = sorted({int(p) for p in text.split(",")})
+    except ValueError as error:
+        raise ConfigError("--runs must be comma-separated run ids") from error
+    if unknown := sorted(set(runs) - set(run_ids(conn))):
+        raise ConfigError(f"unknown run {unknown[0]}")
+    return runs
 
 
 class WikiCommand:
@@ -22,13 +37,18 @@ class WikiCommand:
         build.add_argument("--out", type=Path, required=True)
         build.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        build.add_argument("--runs", default=None, help="comma-separated claim run ids")
         stats = sub.add_parser("stats", help="topics, pages and claims per page")
         stats.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        stats.add_argument("--runs", default=None, help="comma-separated claim run ids")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         claims, excluded = load_claims(
-            context.conn, tech_only=args.claim_gate, salt=context.settings.pseudonym_salt
+            context.conn,
+            tech_only=args.claim_gate,
+            salt=context.settings.pseudonym_salt,
+            runs=_runs(context.conn, args.runs),
         )
         stats = compute_stats(claims, args.min_claims)
         lines = [
