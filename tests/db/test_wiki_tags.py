@@ -57,6 +57,11 @@ def test_updates_and_deletes_are_append_only(tmp_path: Path) -> None:
         conn.execute("DELETE FROM claim_tags")
 
 
+def test_tags_for_without_runs_is_empty(tmp_path: Path) -> None:
+    conn, _ = one_claim(tmp_path)
+    assert tags_for(conn, []) == {}
+
+
 def test_highest_run_wins_and_other_runs_are_ignored(tmp_path: Path) -> None:
     conn, claim = one_claim(tmp_path)
     first, second, third = make_run(conn), make_run(conn), make_run(conn)

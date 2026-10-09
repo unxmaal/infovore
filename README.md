@@ -45,6 +45,7 @@ All tables live in one SQLite file (`INFOVORE_DB_PATH`). Migrations run on open.
 | `message_labels`, `message_model`, `message_tokens`, `message_combiner` | message-level sifting labels and models |
 | `claim_runs`, `claim_run_exchanges`, `claims_v2`, `claims_v2_sources`, `claim_rejections` | claim trial: runs, per-conversation outcomes, redacted claims with their cited messages, and claims rejected with the reason; append-only |
 | `claim_reviews`, `current_claim_reviews` | append-only human verdicts on trial claims; the view shows the latest per claim |
+| `tag_runs`, `claim_tags` | wiki topic tagging: one run per model and prompt, and the topic names a run gave each claim; append-only |
 | `speaker_drops`, `current_speaker_drops` | append-only keep/drop decisions per Discord author id (quality, not privacy); the view shows the latest per author |
 | `claim_checks`, `current_claim_checks` | append-only deterministic grounding checks of trial claims against their cited messages; the view shows the latest per claim |
 | `claims`, `claim_sources`, `claims_fts` | extracted claims and their source messages (paused) |

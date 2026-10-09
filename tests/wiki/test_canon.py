@@ -35,6 +35,10 @@ def test_display_names_breaks_ties_by_string_order() -> None:
     assert display_names(["indigo", "Indigo"]) == {"indigo": "Indigo"}
 
 
+def test_display_names_skips_tags_that_canonicalise_to_nothing() -> None:
+    assert display_names(["  ", "Indy"]) == {"indy": "Indy"}
+
+
 def test_display_names_empty() -> None:
     assert display_names([]) == {}
 
