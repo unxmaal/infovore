@@ -39,10 +39,12 @@ class WikiCommand:
         build.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         build.add_argument("--runs", default=None, help="comma-separated claim run ids")
+        build.add_argument("--tag-run", type=int, default=None, dest="tag_run")
         stats = sub.add_parser("stats", help="topics, pages and claims per page")
         stats.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         stats.add_argument("--runs", default=None, help="comma-separated claim run ids")
+        stats.add_argument("--tag-run", type=int, default=None, dest="tag_run")
         tag = sub.add_parser("tag", help="tag claims with the things they are about")
         tag.add_argument("--runs", required=True, help="comma-separated claim run ids")
         tag.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL")
@@ -61,6 +63,7 @@ class WikiCommand:
             tech_only=args.claim_gate,
             salt=context.settings.pseudonym_salt,
             runs=_runs(context.conn, args.runs),
+            tag_runs=None if args.tag_run is None else [args.tag_run],
         )
         stats = compute_stats(claims, args.min_claims)
         lines = [

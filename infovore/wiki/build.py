@@ -1,13 +1,15 @@
 import sqlite3
 from collections import Counter
 from collections.abc import Collection, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Final
 
 from infovore.claims.gate import claim_has_tech
 from infovore.claims.speakers import dropped_pairs
+from infovore.db.wiki_tags import tags_for
 from infovore.triage.lexicon import load_lexicon
+from infovore.wiki.canon import alias_names, canonical, display_names
 from infovore.wiki.eligibility import is_publishable
 from infovore.wiki.topics import Topics, load_topics, slug
 
@@ -56,6 +58,7 @@ def load_claims(
     tech_only: bool = False,
     salt: str | None = None,
     runs: Sequence[int] | None = None,
+    tag_runs: Sequence[int] | None = None,
 ) -> tuple[list[WikiClaim], int]:
     topics = load_topics()
     lexicon = load_lexicon(conn) if tech_only else None
@@ -91,10 +94,26 @@ def load_claims(
                 row["day"],
                 row["speaker"],
                 statement,
-                subjects(topics, statement),
+                frozenset() if tag_runs else subjects(topics, statement),
             ),
         )
-    return list(claims.values()), excluded
+    loaded = list(claims.values())
+    return (_tagged(conn, loaded, tag_runs, topics) if tag_runs else loaded), excluded
+
+
+def _tagged(
+    conn: sqlite3.Connection, claims: list[WikiClaim], tag_runs: Sequence[int], topics: Topics
+) -> list[WikiClaim]:
+    tags = tags_for(conn, tag_runs)
+    names = {
+        **display_names(t for c in claims for t in tags.get(c.claim_id, [])),
+        **alias_names(topics),
+    }
+    out = []
+    for c in claims:
+        keys = {canonical(t) for t in tags.get(c.claim_id, [])} - {""}
+        out.append(replace(c, topics=frozenset(names[k] for k in keys)))
+    return out
 
 
 def _ordered(claims: Iterable[WikiClaim]) -> list[WikiClaim]:
@@ -113,20 +132,25 @@ def _entry(c: WikiClaim) -> str:
     return f"- {_line(c.statement)} ({c.speaker}, exchange {c.exchange_id}, {c.date})"
 
 
-def render_page(name: str, claims: Collection[WikiClaim], page_names: Collection[str]) -> str:
+def sections_of(name: str, claims: Collection[WikiClaim]) -> dict[str, list[WikiClaim]]:
     cooc = Counter(t for c in claims for t in c.topics if t != name)
     groups: dict[str, list[WikiClaim]] = {}
     for c in _ordered(claims):
         others = [t for t in c.topics if t != name]
         key = min(others, key=lambda t: (-cooc[t], t)) if others else GENERAL
-        groups.setdefault(key, []).append(c)
+        groups.setdefault(key if key == GENERAL else f"With {key}", []).append(c)
+    return {k: groups[k] for k in sorted(groups, key=lambda k: (k == GENERAL, -len(groups[k]), k))}
+
+
+def render_page(name: str, claims: Collection[WikiClaim], page_names: Collection[str]) -> str:
+    cooc = Counter(t for c in claims for t in c.topics if t != name)
+    groups = sections_of(name, claims)
     lines = [f"# {name}", "", f"Claims: {len(claims)}"]
-    grouped = list(groups) != [GENERAL]
-    for key in sorted(groups, key=lambda k: (k == GENERAL, -len(groups[k]), k)):
+    for key, members in groups.items():
         lines.append("")
-        if grouped:
-            lines += [f"## {key if key == GENERAL else f'With {key}'}", ""]
-        lines += [_entry(c) for c in groups[key]]
+        if list(groups) != [GENERAL]:
+            lines += [f"## {key}", ""]
+        lines += [_entry(c) for c in members]
     related = sorted((t for t in cooc if t in page_names), key=lambda t: (-cooc[t], t))
     if related:
         lines += ["", "## See also", ""]

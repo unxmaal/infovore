@@ -44,13 +44,13 @@ def test_variant_tags_land_on_one_page_with_the_topics_toml_name(tmp_path: Path)
     assert by_id[1] == frozenset({"Indigo2"})
     assert by_id[2] == frozenset({"Indigo2", "R4400"})
     assert by_id[3] == frozenset()
-    assert by_id[4] == by_id[5] == frozenset({"Foo widget"})
+    assert by_id[4] == by_id[5] == frozenset({"Foo Widget"})
 
 
 def test_without_a_tag_run_topics_toml_is_used(tmp_path: Path) -> None:
     seed(tmp_path)
     claims, _ = load_claims(db(tmp_path))
-    assert all("Foo widget" not in c.topics for c in claims)
+    assert all("Foo Widget" not in c.topics for c in claims)
 
 
 def test_cli_build_and_stats_take_a_tag_run(tmp_path: Path) -> None:
