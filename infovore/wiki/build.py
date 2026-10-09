@@ -26,6 +26,7 @@ class WikiClaim:
     speaker: str
     statement: str
     topics: frozenset[str]
+    check: str | None = None
 
 
 @dataclass(frozen=True)
@@ -95,6 +96,7 @@ def load_claims(
                 row["speaker"],
                 statement,
                 frozenset() if tag_runs else subjects(topics, statement),
+                row["chk"],
             ),
         )
     loaded = list(claims.values())
@@ -128,8 +130,27 @@ def _by_topic(claims: Iterable[WikiClaim]) -> dict[str, list[WikiClaim]]:
     return out
 
 
-def _entry(c: WikiClaim) -> str:
-    return f"- {_line(c.statement)} ({c.speaker}, exchange {c.exchange_id}, {c.date})"
+def _entry(c: WikiClaim, similar: int = 0) -> str:
+    more = f" (+{similar} similar)" if similar else ""
+    return f"- {_line(c.statement)}{more} ({c.speaker}, exchange {c.exchange_id}, {c.date})"
+
+
+Article = Mapping[str, Sequence[tuple[str, Sequence[int]]]]
+
+
+def _prose(
+    sentences: Iterable[tuple[str, Sequence[int]]],
+    known: Mapping[int, WikiClaim],
+    numbers: dict[int, int],
+) -> str:
+    parts = []
+    for text, ids in sentences:
+        cited = [i for i in dict.fromkeys(ids) if i in known]
+        if cited:
+            for i in cited:
+                numbers.setdefault(i, len(numbers) + 1)
+            parts.append(f"{text} " + "".join(f"[{numbers[i]}]" for i in cited))
+    return " ".join(parts)
 
 
 def sections_of(name: str, claims: Collection[WikiClaim]) -> dict[str, list[WikiClaim]]:
@@ -142,15 +163,36 @@ def sections_of(name: str, claims: Collection[WikiClaim]) -> dict[str, list[Wiki
     return {k: groups[k] for k in sorted(groups, key=lambda k: (k == GENERAL, -len(groups[k]), k))}
 
 
-def render_page(name: str, claims: Collection[WikiClaim], page_names: Collection[str]) -> str:
+def render_page(
+    name: str,
+    claims: Collection[WikiClaim],
+    page_names: Collection[str],
+    article: Article | None = None,
+) -> str:
+    from infovore.wiki.groups import group_claims
+
     cooc = Counter(t for c in claims for t in c.topics if t != name)
     groups = sections_of(name, claims)
+    known = {c.claim_id: c for c in claims}
+    numbers: dict[int, int] = {}
     lines = [f"# {name}", "", f"Claims: {len(claims)}"]
     for key, members in groups.items():
         lines.append("")
         if list(groups) != [GENERAL]:
             lines += [f"## {key}", ""]
-        lines += [_entry(c) for c in members]
+        prose = _prose((article or {}).get(key, []), known, numbers)
+        if prose:
+            lines.append(prose)
+        else:
+            lines += [_entry(g.lead, len(g.members) - 1) for g in group_claims(members)]
+    if numbers:
+        lines += ["", "## Sources", ""]
+        for claim_id, n in numbers.items():
+            c = known[claim_id]
+            lines.append(
+                f"{n}. {c.statement} ({c.speaker}, {c.date}, exchange {c.exchange_id},"
+                f" check: {c.check or 'unchecked'})"
+            )
     related = sorted((t for t in cooc if t in page_names), key=lambda t: (-cooc[t], t))
     if related:
         lines += ["", "## See also", ""]
@@ -175,12 +217,19 @@ def compute_stats(claims: Iterable[WikiClaim], min_claims: int) -> Stats:
     )
 
 
-def build_site(claims: Iterable[WikiClaim], min_claims: int, out: Path) -> list[str]:
+def build_site(
+    claims: Iterable[WikiClaim],
+    min_claims: int,
+    out: Path,
+    articles: Mapping[str, Article] | None = None,
+) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
     files = {"index.md": render_index({n: len(v) for n, v in by_topic.items()})}
     for name, group in by_topic.items():
-        files[f"{slug(name)}.md"] = render_page(name, group, by_topic.keys())
+        files[f"{slug(name)}.md"] = render_page(
+            name, group, by_topic.keys(), (articles or {}).get(name)
+        )
     for filename, text in files.items():
         (out / filename).write_text(text)
     return sorted(files)

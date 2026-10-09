@@ -1,11 +1,13 @@
 import argparse
 import sqlite3
+from collections.abc import Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
-from infovore.wiki.build import build_site, compute_stats, load_claims
+from infovore.db.wiki_articles import sections_for
+from infovore.wiki.build import Article, build_site, compute_stats, load_claims
 from infovore.wiki.tag_command import run_tag
 from infovore.wiki.write_command import run_write
 
@@ -27,6 +29,19 @@ def _runs(conn: sqlite3.Connection, text: str | None) -> list[int] | None:
     return runs
 
 
+def _articles(conn: sqlite3.Connection, args: argparse.Namespace) -> Mapping[str, Article] | None:
+    if args.article_run is None:
+        return None
+    if args.tag_run is None:
+        raise ConfigError("--article-run needs --tag-run")
+    if (
+        conn.execute("SELECT 1 FROM article_runs WHERE id = ?", (args.article_run,)).fetchone()
+        is None
+    ):
+        raise ConfigError(f"unknown article run {args.article_run}")
+    return sections_for(conn, [args.article_run])
+
+
 class WikiCommand:
     name = "wiki"
     help = "static Markdown wiki from publishable claims: build pages, print stats"
@@ -41,6 +56,7 @@ class WikiCommand:
         build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         build.add_argument("--runs", default=None, help="comma-separated claim run ids")
         build.add_argument("--tag-run", type=int, default=None, dest="tag_run")
+        build.add_argument("--article-run", type=int, default=None, dest="article_run")
         stats = sub.add_parser("stats", help="topics, pages and claims per page")
         stats.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
@@ -73,6 +89,7 @@ class WikiCommand:
             return run_tag(context, args)
         if args.wiki_action == "write":
             return run_write(context, args, _runs(context.conn, args.runs))
+        articles = _articles(context.conn, args) if args.wiki_action == "build" else None
         claims, excluded = load_claims(
             context.conn,
             tech_only=args.claim_gate,
@@ -89,7 +106,7 @@ class WikiCommand:
             f"excluded: {excluded}",
         ]
         if args.wiki_action == "build":
-            build_site(claims, args.min_claims, args.out)
+            build_site(claims, args.min_claims, args.out, articles)
             lines.append(f"wrote: {args.out}")
         else:
             lines += [f"  {label}: {n}" for label, n in stats.distribution().items()]
