@@ -9,7 +9,7 @@ from typing import Any
 
 import pytest
 
-from infovore.claims.extract import ClaimsReplyError
+from infovore.claims.extract import ClaimsReplyError, Transport
 from infovore.cli import ExitCode, main
 from infovore.db.wiki_tags import tags_for
 from infovore.wiki import tag_command, tagger
@@ -19,7 +19,7 @@ from tests.wiki.seed import add_claim, add_exchange, wiki_db
 BASE = ["wiki", "tag", "--runs", "1", "--endpoint", "http://fake", "--model", "m"]
 
 
-def fake_post(endpoint: str) -> Any:
+def fake_post(endpoint: str) -> Transport:
     def send(payload: Mapping[str, Any]) -> tuple[Mapping[str, Any], float]:
         text = payload["messages"][1]["content"]
         if "poison" in text:
@@ -91,7 +91,7 @@ def test_a_failed_batch_is_counted_and_the_others_are_written(tmp_path: Path) ->
 def test_sigint_stops_after_the_batches_in_flight(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    def interrupting_post(endpoint: str) -> Any:
+    def interrupting_post(endpoint: str) -> Transport:
         inner = fake_post(endpoint)
 
         def send(payload: Mapping[str, Any]) -> tuple[Mapping[str, Any], float]:
