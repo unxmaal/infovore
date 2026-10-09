@@ -104,7 +104,7 @@ def test_failed_sections_are_retried_and_written_ones_skipped_on_resume(tmp_path
 def test_limit_counts_topics_in_descending_claim_count(tmp_path: Path) -> None:
     extra = [(f"Octane two {w}", ["Octane"]) for w in ("alpha", "beta", "gamma", "delta")]
     env = seed(tmp_path, extra)
-    code, out, _ = run([*BASE, "--min-claims", "3", "--write", "--limit", "1"], env)
+    code, _, _ = run([*BASE, "--min-claims", "3", "--write", "--limit", "1", "--runs", "1"], env)
     assert code == ExitCode.OK
     assert set(sections_for(db(tmp_path), [1])) == {"Octane"}
 
@@ -129,10 +129,10 @@ def test_sigint_stops_after_the_sections_in_flight(
     assert len(sections_for(db(tmp_path), [1])["Indigo2"]) == 1
 
 
-def test_progress_goes_to_stderr(tmp_path: Path) -> None:
+def test_progress_goes_to_stderr(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     env = seed(tmp_path)
-    _, _, err = run([*BASE, "--min-claims", "3", "--write", "--progress-every", "1"], env)
-    assert "progress: 2/2 sections" in err
+    run([*BASE, "--min-claims", "3", "--runs", "1", "--write", "--progress-every", "1"], env)
+    assert "progress: 2/2 sections" in capsys.readouterr().err
 
 
 def test_dry_run_prints_the_first_request_and_writes_nothing(tmp_path: Path) -> None:
@@ -141,6 +141,12 @@ def test_dry_run_prints_the_first_request_and_writes_nothing(tmp_path: Path) -> 
     assert code == ExitCode.OK
     assert out.startswith("Topic: Indigo2\nSection: With IRIX\n\n1. Indigo2 runs IRIX fast\n")
     assert db(tmp_path).execute("SELECT COUNT(*) FROM article_runs").fetchone()[0] == 0
+
+
+def test_dry_run_with_no_eligible_topic(tmp_path: Path) -> None:
+    env = seed(tmp_path)
+    code, out, _ = run([*BASE, "--min-claims", "99"], env)
+    assert code == ExitCode.OK and out == "nothing to do\n"
 
 
 def test_bad_arguments_are_config_errors(tmp_path: Path) -> None:

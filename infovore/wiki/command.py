@@ -7,6 +7,7 @@ from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
 from infovore.wiki.build import build_site, compute_stats, load_claims
 from infovore.wiki.tag_command import run_tag
+from infovore.wiki.write_command import run_write
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -54,10 +55,24 @@ class WikiCommand:
         tag.add_argument("--write", action="store_true", help="without it: print one request")
         tag.add_argument("--resume", action="store_true")
         tag.add_argument("--progress-every", type=int, default=500, dest="progress_every")
+        write = sub.add_parser("write", help="write cited article sections for each topic")
+        write.add_argument("--tag-run", type=int, required=True, dest="tag_run")
+        write.add_argument("--runs", default=None, help="comma-separated claim run ids")
+        write.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        write.add_argument("--min-claims", type=int, default=10, dest="min_claims")
+        write.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL")
+        write.add_argument("--model", required=True, help="model alias on the server")
+        write.add_argument("--concurrency", type=int, default=8)
+        write.add_argument("--limit", type=int, default=None, help="number of topics")
+        write.add_argument("--write", action="store_true", help="without it: print one request")
+        write.add_argument("--resume", action="store_true")
+        write.add_argument("--progress-every", type=int, default=10, dest="progress_every")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.wiki_action == "tag":
             return run_tag(context, args)
+        if args.wiki_action == "write":
+            return run_write(context, args, _runs(context.conn, args.runs))
         claims, excluded = load_claims(
             context.conn,
             tech_only=args.claim_gate,
