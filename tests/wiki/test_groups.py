@@ -18,7 +18,12 @@ def test_paraphrases_join_and_a_distinct_claim_stays_apart() -> None:
 
 
 def test_groups_sort_by_size_first() -> None:
-    a, b, c, d = claim(1, "Octane has V12"), claim(2, INDIGO), claim(3, INDIGO_PARAPHRASE), claim(4, "x")
+    a, b, c, d = (
+        claim(1, "Octane has V12"),
+        claim(2, INDIGO),
+        claim(3, INDIGO_PARAPHRASE),
+        claim(4, "x"),
+    )
     groups = group_claims([a, b, c, d])
     assert [len(g.members) for g in groups] == [2, 1, 1]
     assert [g.lead for g in groups] == [b, a, d]
