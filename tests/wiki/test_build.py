@@ -63,9 +63,11 @@ def test_load_claims_applies_eligibility_and_topics(tmp_path: Path) -> None:
     claims, excluded = load_claims(conn)
     assert [(c.speaker, c.date, c.exchange_id, c.topics) for c in claims] == [
         ("user-aaaa", "2026-02-01", e1, frozenset({"O2"})),
+        ("user-cccc", "2026-02-02", e2, frozenset({"O2"})),
+        ("user-dddd", "2026-02-02", e2, frozenset({"O2"})),
         ("user-eeee", "2026-02-02", e2, frozenset()),
     ]
-    assert excluded == 3
+    assert excluded == 1
 
 
 def test_load_claims_collapses_duplicates_across_runs(tmp_path: Path) -> None:
