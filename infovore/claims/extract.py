@@ -40,22 +40,27 @@ SCHEMA: Final[dict[str, Any]] = {
     "additionalProperties": False,
 }
 SYSTEM: Final = (
-    "Lines are '[ref] user-id: text'. Extract standalone factual claims about technology,"
-    " hardware, software, SGI and IRIX, retrocomputing, first-hand experience, or where to"
-    " find things. Rewrite each in your own words as one short sentence, never copy a message."
-    " It must make sense alone: resolve pronouns ('it' becomes the thing meant)."
-    " No questions, opinions, jokes, banter or greetings."
-    " First-hand experience is stated as the speaker's own ('they run ...')."
+    "Lines are '[ref] user-id: text'. Extract only facts a vintage computing wiki would keep."
+    " Each claim names a specific machine, part, OS, program, command, spec or source and says"
+    " something reusable about it: what it is or does, compatibility, limits, failures and"
+    " fixes, steps, or where to get it. A speaker's own result counts when it says what"
+    " happened with the thing ('their O2 boots IRIX 6.5.22')."
+    " Rewrite each in your own words as one short sentence that makes sense alone:"
+    " resolve pronouns ('it' becomes the thing meant), never copy a message."
+    " Skip plans, wishes, intentions, questions, requests for help, opinions, prices, buying,"
+    " selling, shipping, jokes, greetings, bare links, and anything about the people rather"
+    " than the technology. Most conversations have zero to three claims."
     ' Reply {"c":[[user-id, claim, [refs]], ...]}: the exact user id of the line the claim'
     " rests on, the claim without any user id in it, the ref numbers of its lines."
     " Say only what the lines say."
     ' With zero claims, reply {"c":[]}.'
     " Bad: 'It can even have an r12k. Mine is 400mhz' (copied, 'It' unresolved)."
     " Good: 'The O2 takes an R12000 CPU; theirs runs at 400 MHz.'"
-    " Bad: 'isn't it just yoinking the chip and putting in a new one?' (a question)."
-    " Good: nothing."
-    " Bad: 'lol my O2 is the best machine ever' (joke, opinion)."
-    " Good: nothing."
+    " Bad: 'They plan to put a V10 in their Octane someday' (a plan)."
+    " Bad: 'Indigo2 prices on eBay went up' (prices)."
+    " Bad: 'Someone needs the jumper settings for their drive' (a request)."
+    " Bad: 'The Indy is the best SGI ever' (opinion)."
+    " Good for all four: nothing."
 )
 
 Transport = Callable[[Mapping[str, Any]], tuple[Mapping[str, Any], float]]
