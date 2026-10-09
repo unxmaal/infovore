@@ -267,6 +267,7 @@ def test_the_page_lists_speakers_without_author_ids(
     assert data["speakers"][0]["total"] == 3 and len(data["speakers"][0]["sample"]) == 2
     assert data["speakers"][0]["decision"] is None and data["run"] == 1
     assert "author" not in body.decode()
+    assert b'name="viewport"' in page and b'id="keepall"' in page
 
 
 def test_decisions_are_appended_by_rank(served: tuple[str, sqlite3.Connection]) -> None:
