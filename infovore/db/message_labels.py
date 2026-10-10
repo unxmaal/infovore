@@ -47,8 +47,10 @@ def effective_message_labels(conn: sqlite3.Connection) -> dict[int, MessageLabel
     order — mirrors `infovore.db.labels.effective_labels`."""
     result: dict[int, MessageLabel] = {}
     weak: dict[int, MessageLabel] = {}
-    for row in conn.execute("SELECT message_id, label, source FROM message_labels"):
+    for row in conn.execute("SELECT message_id, label, source, regime FROM message_labels"):
         if row["source"] == MessageLabelSource.HUMAN.value:
+            if row["regime"] == LabelRegime.VALUE.value:
+                continue
             result[row["message_id"]] = MessageLabel(row["label"])
         else:
             weak[row["message_id"]] = MessageLabel(row["label"])

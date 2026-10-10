@@ -8,11 +8,13 @@ from typing import Final
 
 from infovore.db.channel_filter import exclude_channels_clause
 from infovore.db.codec import to_db_time
+from infovore.rows import LabelRegime
 from infovore.sift.export import MANIFEST_NAME
 from infovore.triage.lexicon import Lexicon, message_hits, tokens
 
 SEED_FLOOR: Final = 20
 SEED_TOP: Final = 50
+SEED_REGIME: Final = LabelRegime.VALUE.value
 SEED_SOURCE_REF_PREFIX: Final = "sift:seed-lexicon:"
 REPORT_FLOORS: Final = (5, 10, 20, 40)
 PERCENTILES: Final = (50, 75, 90, 95, 99)
@@ -45,6 +47,8 @@ def _scan(
         " WHERE m.deleted_at IS NULL AND m.author_is_bot = 0"
         " AND m.author_id NOT IN (SELECT user_id FROM opt_outs)"
         " AND EXISTS (SELECT 1 FROM exchange_messages e WHERE e.message_id = m.id)"
+        " AND NOT EXISTS (SELECT 1 FROM message_labels ml"
+        " WHERE ml.message_id = m.id AND ml.source = 'human')"
         f"{clause}{length_clause}",
         (*params, *([floor] if counts is None else [])),
     )
@@ -113,6 +117,7 @@ def write_seed_queue(rows: list[SeedRow], out_dir: Path, now: datetime) -> str:
         "size": len(rows),
         "created_at": to_db_time(now),
         "source_ref": source_ref,
+        "regime": SEED_REGIME,
     }
     (out_dir / MANIFEST_NAME).write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return source_ref

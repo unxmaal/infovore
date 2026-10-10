@@ -35,7 +35,7 @@ from infovore.db.connection import transaction
 from infovore.db.label_events import drop_last_label_event
 from infovore.db.message_labels import set_message_label
 from infovore.extract.prompt import REDACTED
-from infovore.rows import MessageLabel, MessageLabelSource
+from infovore.rows import LabelRegime, MessageLabel, MessageLabelSource
 from infovore.sift.export import MANIFEST_NAME, SiftBatchMessage, export_batch, fetch_batch_messages
 from infovore.sift.importer import MissingManifestError
 from infovore.sift.rules import BulkRule, RulePreview, preview_rule, save_bulk_rule
@@ -74,6 +74,7 @@ class BatchSource:
     dir: Path
     message_ids: list[int]
     source_ref: str | None = None
+    regime: LabelRegime | None = None
 
 
 def _opted_out_ids(conn: sqlite3.Connection, message_ids: Sequence[int]) -> frozenset[int]:
@@ -156,7 +157,10 @@ def resolve_batch(
     manifest = json.loads(manifest_path.read_text())
     message_ids = [int(value) for value in manifest["message_ids"]]
     return BatchSource(
-        dir=target_dir, message_ids=message_ids, source_ref=manifest.get("source_ref")
+        dir=target_dir,
+        message_ids=message_ids,
+        source_ref=manifest.get("source_ref"),
+        regime=LabelRegime(manifest["regime"]) if "regime" in manifest else None,
     )
 
 
@@ -249,7 +253,9 @@ class ServeApp:
         scratch_dir: Path,
         clock: Clock,
         source_ref: str | None = None,
+        regime: LabelRegime | None = None,
     ) -> None:
+        self._regime = regime
         self._conn = conn
         self._source_ref = source_ref or f"sift-serve:{batch_name}"
         self._lock = threading.Lock()
@@ -331,6 +337,7 @@ class ServeApp:
                     MessageLabelSource.HUMAN,
                     self.source_ref,
                     self._clock.now(),
+                    self._regime,
                 )
             self._actions.append(_SingleAction(message_id, prior))
 
@@ -363,6 +370,7 @@ class ServeApp:
                         MessageLabelSource.HUMAN,
                         self.source_ref,
                         self._clock.now(),
+                        self._regime,
                     )
             self._actions.append(_BulkAction(priors))
             return len(targets)
@@ -392,6 +400,7 @@ class ServeApp:
                             MessageLabelSource.HUMAN,
                             self.source_ref,
                             self._clock.now(),
+                            self._regime,
                         )
                 self._actions.append(_BulkAction(priors))
             saved_path = save_bulk_rule(self._scratch_dir, name, rule, self._clock.now())
@@ -524,4 +533,6 @@ def build_serve_app(
         allocation=allocation,
     )
     messages = load_batch_messages(conn, batch.message_ids)
-    return ServeApp(conn, messages, batch.dir.name, scratch_dir, clock, batch.source_ref)
+    return ServeApp(
+        conn, messages, batch.dir.name, scratch_dir, clock, batch.source_ref, batch.regime
+    )

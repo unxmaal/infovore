@@ -65,6 +65,7 @@ class MessageLabel(StrEnum):
 class LabelRegime(StrEnum):
     ISOLATED = "isolated"
     CONTEXT = "context"
+    VALUE = "value"
 
 
 class MessageLabelSource(StrEnum):
