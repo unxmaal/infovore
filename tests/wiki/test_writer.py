@@ -12,7 +12,7 @@ def reply(content: str, finish: str = "stop") -> dict[str, Any]:
 
 
 def sentences(*entries: list[Any]) -> str:
-    return json.dumps({"s": list(entries)})
+    return json.dumps({"s": [{"text": text, "claims": claims} for text, claims in entries]})
 
 
 def test_prompt_hash_is_twelve_hex_and_stable() -> None:
@@ -29,7 +29,7 @@ def test_build_request_general_has_no_section_line() -> None:
     assert build_request("m", "O2", "General", ["a", "b"]) == {
         "model": "m",
         "temperature": 0,
-        "max_tokens": 900,
+        "max_tokens": 1500,
         "messages": [
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": "Topic: O2\n\n1. a\n2. b"},
@@ -76,6 +76,14 @@ def test_parse_reply_accepts_other_finish_reasons() -> None:
 
 def test_schema_requires_at_least_one_sentence() -> None:
     assert SCHEMA["properties"]["s"]["minItems"] == 1
+
+
+def test_schema_items_are_named_objects_with_a_real_sentence() -> None:
+    item = SCHEMA["properties"]["s"]["items"]
+    assert item["type"] == "object" and item["required"] == ["text", "claims"]
+    assert item["additionalProperties"] is False
+    assert item["properties"]["text"] == {"type": "string", "minLength": 20, "maxLength": 400}
+    assert item["properties"]["claims"]["minItems"] == 1
 
 
 def test_parse_reply_strips_inline_citation_markers() -> None:
