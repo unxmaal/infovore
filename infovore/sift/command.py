@@ -25,10 +25,14 @@ from infovore.sift.sampling import (
     SiftStrategy,
 )
 from infovore.sift.seed import (
+    SEED_DEEP_SOURCE_REF_PREFIX,
     SEED_FLOOR,
+    SEED_SOURCE_REF_PREFIX,
     SEED_TOP,
     format_rows,
+    parse_ranks,
     render_report,
+    sample_window,
     seed_rows,
     top_rows,
     write_seed_queue,
@@ -257,6 +261,9 @@ class SiftCommand:
         seed_parser.add_argument("--floor", type=int, default=SEED_FLOOR)
         seed_parser.add_argument("--top", type=int, default=SEED_TOP)
         seed_parser.add_argument("--report", action="store_true")
+        seed_parser.add_argument("--ranks", type=str, default=None, help="rank window A-B")
+        seed_parser.add_argument("--sample", type=int, default=None)
+        seed_parser.add_argument("--seed", type=int, default=0)
         seed_parser.add_argument(
             "--out",
             type=str,
@@ -471,10 +478,24 @@ class SiftCommand:
                 render_report(context.conn, lexicon, exclude, args.floor, args.top)
             )
             return ExitCode.OK
-        best = top_rows(seed_rows(context.conn, lexicon, exclude, args.floor), args.top)
+        if (args.ranks is None) != (args.sample is None):
+            raise ConfigError("--ranks and --sample must be given together")
+        ranked = seed_rows(context.conn, lexicon, exclude, args.floor)
+        prefix = SEED_SOURCE_REF_PREFIX
+        if args.ranks is None:
+            best = top_rows(ranked, args.top)
+        else:
+            if args.sample < 1:
+                raise ConfigError("--sample must be at least 1")
+            try:
+                start, end = parse_ranks(args.ranks)
+            except ValueError as exc:
+                raise ConfigError(f"--ranks: {exc}") from exc
+            best = sample_window(ranked, start, end, args.sample, args.seed)
+            prefix = SEED_DEEP_SOURCE_REF_PREFIX
         context.stdout.write(format_rows(best))
         if args.out:
-            source_ref = write_seed_queue(best, Path(args.out), context.clock.now())
+            source_ref = write_seed_queue(best, Path(args.out), context.clock.now(), prefix)
             context.stdout.write(
                 f"wrote {len(best)} messages to {args.out} (source_ref={source_ref});"
                 f" serve with: infovore sift serve {args.out}\n"
