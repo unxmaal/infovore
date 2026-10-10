@@ -64,17 +64,28 @@ class Reputation:
     people: People
     smoothing: Smoothing
     floor: float
+    ratings: Mapping[str, int] | None = None
+    unrated: float = 0.0
 
     def of(self, person: str, removed: Ledger | None = None) -> float:
         if self.people.is_banned(person):
             return self.floor
+        if self.ratings is not None:
+            return float(self.ratings.get(person, self.unrated))
         cells = cells_after(self.evidence.totals.get(person, {}), (removed or {}).get(person, {}))
         return earned(cells, self.evidence.priors, self.smoothing)
 
 
 def build_reputation(
-    evidence: Evidence, people: People, smoothing: Smoothing = DEFAULT_SMOOTHING
+    evidence: Evidence,
+    people: People,
+    smoothing: Smoothing = DEFAULT_SMOOTHING,
+    ratings: Mapping[str, int] | None = None,
 ) -> Reputation:
+    if ratings is not None:
+        unrated = sum(ratings.values()) / len(ratings) if ratings else 0.0
+        floor = min(ratings.values(), default=0) - BAN_MARGIN
+        return Reputation(evidence, people, smoothing, floor, ratings, unrated)
     lowest = min(
         (
             earned(cells, evidence.priors, smoothing)

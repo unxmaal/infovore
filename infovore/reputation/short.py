@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Final
 
+from infovore.db.author_ratings import RATINGS
 from infovore.db.channel_filter import excluded_exchange_ids
 from infovore.reputation.score import Reputation
 from infovore.reputation.stats import permutation_p, wilson
@@ -42,6 +43,33 @@ class ShortTest:
     low: float
     high: float
     p: float
+
+
+@dataclass(frozen=True)
+class RatingLevel:
+    level: str
+    n: int
+    kept: int
+    rate: float
+    low: float
+    high: float
+
+
+def by_rating(reputation: Reputation, messages: Sequence[ShortMessage]) -> list[RatingLevel]:
+    if reputation.ratings is None:
+        return []
+    buckets: dict[str, list[bool]] = {str(r): [] for r in RATINGS}
+    buckets["unrated"] = []
+    for m in messages:
+        rating = reputation.ratings.get(reputation.people.person(m.author_id))
+        buckets["unrated" if rating is None else str(rating)].append(m.keep)
+    out = []
+    for level, keeps in buckets.items():
+        kept = sum(keeps)
+        low, high = wilson(kept, len(keeps))
+        rate = kept / len(keeps) if keeps else 0.0
+        out.append(RatingLevel(level, len(keeps), kept, rate, low, high))
+    return out
 
 
 def short_messages(
