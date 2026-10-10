@@ -47,5 +47,10 @@ def test_support_only_counts_cited_claims() -> None:
 
 
 def test_support_equal_to_the_threshold_is_kept() -> None:
-    kept, dropped = keep_supported([("Indigo2 cache", [0])], [INDIGO], threshold=0.5)
-    assert kept == [("Indigo2 cache", [0])] and dropped == 0
+    text = "Indigo2 R10000 cache"
+    kept, dropped = keep_supported([(text, [0])], [INDIGO], threshold=2 / 3)
+    assert kept == [(text, [0])] and dropped == 0
+
+
+def test_sentence_with_fewer_than_three_tokens_is_dropped() -> None:
+    assert keep_supported([("2", [0]), ("Indigo2 R10000", [0])], ["2 " + INDIGO]) == ([], 2)

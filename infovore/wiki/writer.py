@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 from collections.abc import Mapping, Sequence
 from typing import Any, Final
 
@@ -16,6 +17,7 @@ SCHEMA: dict[str, Any] = {
     "properties": {
         "s": {
             "type": "array",
+            "minItems": 1,
             "maxItems": 8,
             "items": {
                 "type": "array",
@@ -32,6 +34,7 @@ SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 MAX_GROUPS: Final = 40
+_MARKER = re.compile(r"\s*[(\[](\d+(?:\s*,\s*\d+)*)[)\]]")
 
 
 def prompt_hash() -> str:
@@ -61,6 +64,14 @@ def build_request(
     }
 
 
+def _strip_markers(text: str, count: int) -> str:
+    def drop(m: re.Match[str]) -> str:
+        numbers = [int(n) for n in m.group(1).split(",")]
+        return "" if all(1 <= n <= count for n in numbers) else m.group(0)
+
+    return _MARKER.sub(drop, text).strip()
+
+
 def parse_reply(reply: Mapping[str, Any], count: int) -> list[tuple[str, list[int]]]:
     try:
         choice = reply["choices"][0]
@@ -68,7 +79,10 @@ def parse_reply(reply: Mapping[str, Any], count: int) -> list[tuple[str, list[in
             raise ClaimsReplyError("truncated: reply hit max_tokens")
         body = json.loads(choice["message"]["content"])
         return [
-            (str(text), [n - 1 if 1 <= n <= count else -1 for n in map(int, numbers)])
+            (
+                _strip_markers(str(text), count),
+                [n - 1 if 1 <= n <= count else -1 for n in map(int, numbers)],
+            )
             for text, numbers in body["s"]
         ]
     except (KeyError, IndexError, TypeError, ValueError) as error:

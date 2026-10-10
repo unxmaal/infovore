@@ -72,3 +72,19 @@ def test_parse_reply_rejects_truncation() -> None:
 
 def test_parse_reply_accepts_other_finish_reasons() -> None:
     assert parse_reply(reply(sentences(["t", [1]]), finish="stop"), 1) == [("t", [0])]
+
+
+def test_schema_requires_at_least_one_sentence() -> None:
+    assert SCHEMA["properties"]["s"]["minItems"] == 1
+
+
+def test_parse_reply_strips_inline_citation_markers() -> None:
+    text = "[1] Blender runs on IRIX (5, 7, 9) and Linux [2]."
+    assert parse_reply(reply(sentences([text, [5]])), 9) == [
+        ("Blender runs on IRIX and Linux.", [4])
+    ]
+
+
+def test_parse_reply_keeps_parenthesised_numbers_that_are_not_claims() -> None:
+    text = "The Indy shipped (1993) with 2 slots (2, 12)."
+    assert parse_reply(reply(sentences([text, [2]])), 9)[0][0] == text
