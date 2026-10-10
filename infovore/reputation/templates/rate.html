@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>infovore author ratings</title>
+<style>
+  :root { color-scheme: light dark; --bg: #fff; --fg: #111; --muted: #5b6270; --border: #d9dce2;
+          --focus: #eef2ff; --accent: #1d4ed8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1115; --fg: #eef0f4; --muted: #a2a9b8; --border: #2c303a; --focus: #1b2440;
+            --accent: #7aa2ff; }
+  }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg);
+         font: 15px/1.45 system-ui, sans-serif; max-width: 900px; margin-inline: auto; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+           margin-bottom: 12px; flex-wrap: wrap; }
+  .card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+  .card.focus { background: var(--focus); border-color: var(--accent); }
+  .who { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .who b { font-size: 17px; }
+  .meta { color: var(--muted); }
+  .sample { margin: 6px 0; padding-left: 10px; border-left: 3px solid var(--border);
+            white-space: pre-wrap; word-break: break-word; font-size: 14px; }
+  .buttons { display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
+  button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border);
+           background: var(--bg); color: var(--fg); cursor: pointer; }
+  button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hint { color: var(--muted); font-size: 13px; }
+  .filters button { padding: 4px 10px; }
+</style>
+</head>
+<body>
+<header>
+  <div><b>Author ratings</b> <span id="progress" class="meta"></span></div>
+  <div class="filters">
+    <button id="unrated" class="on">unrated only</button>
+    <span class="hint">keys: 0-3 rate, j/k move</span>
+  </div>
+</header>
+<div id="list"></div>
+<script>
+const LABELS = ["0 noise", "1 chatter", "2 knows things", "3 expert"];
+let state = { authors: [] }, focus = 0, unratedOnly = true;
+
+async function load() {
+  state = await (await fetch("/api/state")).json();
+  render();
+}
+function visible() {
+  return state.authors.filter(a => !unratedOnly || a.rating === null);
+}
+function render() {
+  const rows = visible();
+  if (focus >= rows.length) focus = Math.max(0, rows.length - 1);
+  document.getElementById("progress").textContent =
+    `${state.rated} of ${state.total} rated, ${rows.length} shown`;
+  document.getElementById("unrated").className = unratedOnly ? "on" : "";
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+  rows.forEach((a, i) => {
+    const card = document.createElement("div");
+    card.className = "card" + (i === focus ? " focus" : "");
+    card.onclick = () => { focus = i; render(); };
+    const share = (a.share * 100).toFixed(1);
+    let html = `<div class="who"><b>${esc(a.name)}</b>` +
+      `<span class="meta">${a.messages.toLocaleString()} messages, ${share}%</span></div>`;
+    for (const s of a.samples) html += `<div class="sample">${esc(s)}</div>`;
+    html += `<div class="buttons">` + LABELS.map((l, r) =>
+      `<button class="${a.rating === r ? "on" : ""}" data-r="${r}">${l}</button>`).join("") +
+      `</div>`;
+    card.innerHTML = html;
+    card.querySelectorAll("button").forEach(b =>
+      b.onclick = e => { e.stopPropagation(); rate(a.author_id, +b.dataset.r); });
+    list.appendChild(card);
+  });
+  const el = list.children[focus];
+  if (el) el.scrollIntoView({ block: "nearest" });
+}
+async function rate(id, r) {
+  const res = await fetch("/api/rate", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ author_id: id, rating: r }) });
+  const body = await res.json();
+  if (!res.ok) { alert(body.error); return; }
+  state = body.state;
+  render();
+}
+function esc(s) {
+  return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+document.getElementById("unrated").onclick = () => { unratedOnly = !unratedOnly; focus = 0; render(); };
+document.addEventListener("keydown", e => {
+  const rows = visible();
+  if (e.key === "j") { focus = Math.min(focus + 1, rows.length - 1); render(); }
+  else if (e.key === "k") { focus = Math.max(focus - 1, 0); render(); }
+  else if ("0123".includes(e.key) && rows[focus]) rate(rows[focus].author_id, +e.key);
+});
+load();
+</script>
+</body>
+</html>
