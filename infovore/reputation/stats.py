@@ -113,3 +113,23 @@ def spearman(first: Sequence[float], second: Sequence[float]) -> float | None:
         return None
     cross = sum((x - mean_a) * (y - mean_b) for x, y in zip(a, b, strict=True))
     return cross / math.sqrt(spread_a * spread_b)
+
+
+def wilson(successes: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    if not n:
+        return 0.0, 1.0
+    rate = successes / n
+    centre = (rate + z * z / (2 * n)) / (1 + z * z / n)
+    margin = z * math.sqrt(rate * (1 - rate) / n + z * z / (4 * n * n)) / (1 + z * z / n)
+    return max(0.0, centre - margin), min(1.0, centre + margin)
+
+
+def permutation_p(ranked: Sequence[bool], top: int, seed: int, permutations: int) -> float:
+    observed = sum(ranked[:top])
+    rng = random.Random(seed)
+    shuffled = list(ranked)
+    extreme = 0
+    for _ in range(permutations):
+        rng.shuffle(shuffled)
+        extreme += sum(shuffled[:top]) >= observed
+    return (extreme + 1) / (permutations + 1)
