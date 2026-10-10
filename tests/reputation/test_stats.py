@@ -97,3 +97,23 @@ def test_spearman_is_a_rank_correlation() -> None:
     assert stats.spearman([1.0], [1.0]) is None
     with pytest.raises(ValueError):
         stats.spearman([1.0, 2.0], [1.0])
+
+
+def test_wilson_interval_brackets_the_rate_and_stays_in_range() -> None:
+    low, high = stats.wilson(8, 10)
+    assert low < 0.8 < high
+    assert low >= 0.0 and high <= 1.0
+    assert stats.wilson(0, 5)[0] == pytest.approx(0.0, abs=1e-12)
+    assert stats.wilson(5, 5)[1] == pytest.approx(1.0)
+    assert stats.wilson(0, 0) == (0.0, 1.0)
+
+
+def test_the_permutation_p_is_small_for_a_clean_top_and_large_for_a_poor_one() -> None:
+    clean = [True] * 5 + [False] * 45
+    poor = [False] * 5 + [True] * 45
+
+    assert stats.permutation_p(clean, 5, seed=0, permutations=500) < 0.01
+    assert stats.permutation_p(poor, 5, seed=0, permutations=500) > 0.9
+    assert stats.permutation_p(clean, 5, seed=3, permutations=50) == stats.permutation_p(
+        clean, 5, seed=3, permutations=50
+    )
