@@ -69,9 +69,9 @@ def test_accuracy_is_reported_against_the_majority_baseline() -> None:
     assert skewed == stats.Accuracy(n=4, threshold=4.0, accuracy=1.0, baseline=0.75)
 
     wrong = stats.accuracy_at(10.0, [(1.0, LORE), (2.0, LORE), (3.0, NOISE)])
+    assert wrong is not None
     assert wrong.accuracy == pytest.approx(1 / 3)
     assert wrong.baseline == pytest.approx(2 / 3)
-    assert (wrong.accuracy, wrong.baseline) == (pytest.approx(1 / 3), pytest.approx(2 / 3))
 
 
 def test_accuracy_needs_a_threshold_and_data() -> None:
