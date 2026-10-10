@@ -7,7 +7,13 @@ from typing import TYPE_CHECKING
 from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
 from infovore.db.wiki_articles import sections_for
-from infovore.wiki.build import Article, build_site, compute_stats, load_claims
+from infovore.wiki.build import (
+    DEFAULT_MIN_SECTION,
+    Article,
+    build_site,
+    compute_stats,
+    load_claims,
+)
 from infovore.wiki.tag_command import run_tag
 from infovore.wiki.write_command import run_write
 
@@ -54,6 +60,9 @@ class WikiCommand:
         build.add_argument("--out", type=Path, required=True)
         build.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        build.add_argument(
+            "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
+        )
         build.add_argument("--runs", default=None, help="comma-separated claim run ids")
         build.add_argument("--tag-run", type=int, default=None, dest="tag_run")
         build.add_argument("--article-run", type=int, default=None, dest="article_run")
@@ -75,6 +84,9 @@ class WikiCommand:
         write.add_argument("--tag-run", type=int, required=True, dest="tag_run")
         write.add_argument("--runs", default=None, help="comma-separated claim run ids")
         write.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        write.add_argument(
+            "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
+        )
         write.add_argument("--min-claims", type=int, default=10, dest="min_claims")
         write.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL")
         write.add_argument("--model", required=True, help="model alias on the server")
@@ -106,7 +118,7 @@ class WikiCommand:
             f"excluded: {excluded}",
         ]
         if args.wiki_action == "build":
-            build_site(claims, args.min_claims, args.out, articles)
+            build_site(claims, args.min_claims, args.out, articles, args.min_section)
             lines.append(f"wrote: {args.out}")
         else:
             lines += [f"  {label}: {n}" for label, n in stats.distribution().items()]
