@@ -2,11 +2,13 @@ from pathlib import Path
 
 import pytest
 
+from infovore.db.speaker_drops import record_decision
 from infovore.reputation.evidence import build_evidence
 from infovore.reputation.exchange import exchange_score, exchange_shares, score_exchanges
 from infovore.reputation.people import People
 from infovore.reputation.score import build_reputation
 from infovore.rows import Label
+from tests.claims.seed import NOW
 from tests.reputation.world import SALT, exchange, react, world
 
 PLAIN = People({}, frozenset(), {})
@@ -78,3 +80,22 @@ def test_all_of_a_persons_accounts_are_removed_together(tmp_path: Path) -> None:
 
     assert scored[eid] == pytest.approx(rep.of("p", evidence.contribution(eid)))
     assert evidence.contribution(eid)["p"]["exchanges"] == (1.0, 1.0)
+
+
+def test_a_banned_author_dropped_as_a_speaker_still_has_evidence_and_scores_the_floor(
+    tmp_path: Path,
+) -> None:
+    conn = world(tmp_path)
+    record_decision(conn, 1, "drop", NOW)
+    eid, _ = exchange(conn, [(1, "a", "x"), (2, "b", "y")], 1)
+    exchange(conn, [(2, "b", "z")], 2)
+    people = People({1: "ban"}, frozenset({"ban"}), {"ban": (1,)})
+    evidence = build_evidence(conn, people, SALT, {}, frozenset(), frozenset(), [])
+    rep = build_reputation(evidence, people)
+
+    assert "ban" in evidence.totals
+    assert exchange_shares(conn, people, [eid])[eid] == {"ban": 0.5, "2": 0.5}
+    assert score_exchanges(conn, rep, [eid])[eid] == pytest.approx(
+        0.5 * rep.floor + 0.5 * rep.of("2")
+    )
+    assert rep.of("ban") == rep.floor < rep.of("2")
