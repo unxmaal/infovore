@@ -24,6 +24,15 @@ from infovore.sift.sampling import (
     SiftAllocation,
     SiftStrategy,
 )
+from infovore.sift.seed import (
+    SEED_FLOOR,
+    SEED_TOP,
+    format_rows,
+    render_report,
+    seed_rows,
+    top_rows,
+    write_seed_queue,
+)
 from infovore.sift.serve import build_serve_app
 from infovore.sift.train import (
     DEFAULT_CONFUSION_THRESHOLD,
@@ -37,6 +46,7 @@ from infovore.sift.train import (
     train_and_store,
 )
 from infovore.triage.bayes import Metrics
+from infovore.triage.lexicon import load_lexicon
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -241,6 +251,18 @@ class SiftCommand:
             " `context` adds everything including PREV_/NEXT_/REPLYTO_ word tokens; the"
             " report's ablation compares all three on the same folds regardless of this flag",
         )
+        seed_parser = subparsers.add_parser(
+            "seed", help="rank messages by lexicon hits per 100 words as a labelling seed queue"
+        )
+        seed_parser.add_argument("--floor", type=int, default=SEED_FLOOR)
+        seed_parser.add_argument("--top", type=int, default=SEED_TOP)
+        seed_parser.add_argument("--report", action="store_true")
+        seed_parser.add_argument(
+            "--out",
+            type=str,
+            default=None,
+            help="write the top K as a fixed queue for `sift serve DIR`",
+        )
         serve_parser = subparsers.add_parser(
             "serve", help="serve a keyboard-driven browser UI for sifting a batch"
         )
@@ -283,6 +305,8 @@ class SiftCommand:
             return self._train(context, args)
         if args.sift_command == "serve":
             return self._serve(context, args)
+        if args.sift_command == "seed":
+            return self._seed(context, args)
         return self._export(context, args)
 
     def _citations(self, context: "AppContext", args: argparse.Namespace) -> int:
@@ -433,6 +457,28 @@ class SiftCommand:
             f" trash={report.trash} (source_ref={report.source_ref})\n"
             f"{_render_channel_counts(report.by_channel)}"
         )
+        return ExitCode.OK
+
+    def _seed(self, context: "AppContext", args: argparse.Namespace) -> int:
+        from infovore.cli import ExitCode
+
+        if args.floor < 1 or args.top < 1:
+            raise ConfigError("--floor and --top must be at least 1")
+        exclude = context.settings.exclude_channels
+        lexicon = load_lexicon(context.conn)
+        if args.report:
+            context.stdout.write(
+                render_report(context.conn, lexicon, exclude, args.floor, args.top)
+            )
+            return ExitCode.OK
+        best = top_rows(seed_rows(context.conn, lexicon, exclude, args.floor), args.top)
+        context.stdout.write(format_rows(best))
+        if args.out:
+            source_ref = write_seed_queue(best, Path(args.out), context.clock.now())
+            context.stdout.write(
+                f"wrote {len(best)} messages to {args.out} (source_ref={source_ref});"
+                f" serve with: infovore sift serve {args.out}\n"
+            )
         return ExitCode.OK
 
     def _serve(self, context: "AppContext", args: argparse.Namespace) -> int:

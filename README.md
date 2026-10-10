@@ -109,6 +109,7 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore relevance collisions [--tech CH] [--off CH] [--terms LIST]`: lexicon terms common in off-topic channels.
 - `infovore triage [--report] [--human-report] [--train-human] [--scorer NAME] [--scorer-version V] [--include-training] [--human-limit N] [--all-exchanges]`: rule-based triage scores, reports and the human-label classifier.
 - `infovore label [--from-runs IDS] [--exchange-id ID] [--lore | --noise]`: record lore or noise labels.
+- `infovore sift seed [--floor N] [--top K] [--report] [--out DIR]`: rank messages by lexicon hits per 100 words; `--out` writes a fixed queue for `sift serve DIR`, labelled with source_ref `sift:seed-lexicon:<date>`.
 - `infovore sift export | import | citations | train | serve`: message-level trash sifting. `export` writes an lnav batch, `import` records its labels, `serve` is a browser UI; both take `--size`, `--strategy random|uncertain|mixed`, `--seed` and `--channels`.
 - `infovore claims extract --endpoint URL --model ALIAS (--slices LIST | --ids LIST | --channels LIST) --limit N [--write] [--dry-run] [--resume] [--concurrency N] [--timeout S] [--progress-every N]`: author-redacted claim extraction with a served local model; `--limit` is required, `--dry-run` sends nothing, `--write` stores the run.
   - `--channels a,b`: current archived conversations (cascade relevant or undecided) in those channels, by exchange id; excluded channels never.
