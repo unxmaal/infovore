@@ -4,6 +4,7 @@ from typing import Final
 from infovore.claims.value import tokens
 
 SUPPORT: Final = 0.6
+MIN_TOKENS: Final = 3
 
 
 def support(sentence: str, cited: Sequence[str]) -> float:
@@ -25,6 +26,7 @@ def keep_supported(
         positions = list(dict.fromkeys(citations))
         if (
             not positions
+            or len(tokens(text)) < MIN_TOKENS
             or any(not 0 <= p < len(statements) for p in positions)
             or support(text, [statements[p] for p in positions]) < threshold
         ):
