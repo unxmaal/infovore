@@ -73,6 +73,7 @@ class Progress:
 class BatchSource:
     dir: Path
     message_ids: list[int]
+    source_ref: str | None = None
 
 
 def _opted_out_ids(conn: sqlite3.Connection, message_ids: Sequence[int]) -> frozenset[int]:
@@ -154,7 +155,9 @@ def resolve_batch(
         raise MissingManifestError(str(manifest_path))
     manifest = json.loads(manifest_path.read_text())
     message_ids = [int(value) for value in manifest["message_ids"]]
-    return BatchSource(dir=target_dir, message_ids=message_ids)
+    return BatchSource(
+        dir=target_dir, message_ids=message_ids, source_ref=manifest.get("source_ref")
+    )
 
 
 class _Action:
@@ -245,8 +248,10 @@ class ServeApp:
         batch_name: str,
         scratch_dir: Path,
         clock: Clock,
+        source_ref: str | None = None,
     ) -> None:
         self._conn = conn
+        self._source_ref = source_ref or f"sift-serve:{batch_name}"
         self._lock = threading.Lock()
         self._messages = messages
         self._by_id = {message.id: message for message in messages}
@@ -257,7 +262,7 @@ class ServeApp:
 
     @property
     def source_ref(self) -> str:
-        return f"sift-serve:{self.batch_name}"
+        return self._source_ref
 
     def messages(self) -> list[SiftBatchMessage]:
         return list(self._messages)
@@ -519,4 +524,4 @@ def build_serve_app(
         allocation=allocation,
     )
     messages = load_batch_messages(conn, batch.message_ids)
-    return ServeApp(conn, messages, batch.dir.name, scratch_dir, clock)
+    return ServeApp(conn, messages, batch.dir.name, scratch_dir, clock, batch.source_ref)
