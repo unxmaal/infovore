@@ -116,6 +116,30 @@ def test_small_co_topic_sections_fold_into_general_by_default(tmp_path: Path) ->
     assert list(sections_for(db(tmp_path), [1])["Indigo2"]) == ["General"]
 
 
+def test_failures_print_their_reason(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    env = seed(tmp_path, [("poison pill", ["Indigo2"])])
+    run([*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--concurrency", "1"], env)
+    assert "failed: Indigo2 / General: truncated" in capsys.readouterr().err
+
+
+def test_log_records_dropped_sentences_and_failures(tmp_path: Path) -> None:
+    env = seed(tmp_path, [("poison pill", ["Indigo2"])])
+    log = tmp_path / "drops.jsonl"
+    argv = [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--log", str(log)]
+    run([*argv, "--concurrency", "1"], env)
+    rows = [json.loads(line) for line in log.read_text().splitlines()]
+    assert {"topic": "Indigo2", "section": "General", "error": rows[-1]["error"]} == rows[-1]
+    assert rows[-1]["error"].startswith("truncated")
+    dropped = [r for r in rows if "reason" in r]
+    assert dropped[0] == {
+        "topic": "Indigo2",
+        "section": "With IRIX",
+        "text": INVENTED,
+        "cited": ["Indigo2 runs IRIX fast"],
+        "reason": "low_overlap",
+    }
+
+
 def test_limit_counts_topics_in_descending_claim_count(tmp_path: Path) -> None:
     extra = [(f"Octane two {w}", ["Octane"]) for w in ("alpha", "beta", "gamma", "delta")]
     env = seed(tmp_path, extra)
