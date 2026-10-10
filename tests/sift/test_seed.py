@@ -6,7 +6,12 @@ from pathlib import Path
 
 from infovore.cli import main
 from infovore.db.connection import migrate, open_database
-from infovore.rows import MessageLabel
+from infovore.db.message_labels import (
+    effective_message_labels,
+    effective_message_labels_with_source,
+    set_message_label,
+)
+from infovore.rows import LabelRegime, MessageLabel, MessageLabelSource
 from infovore.sift.sampling import SiftStrategy
 from infovore.sift.seed import (
     BUCKET_EDGES,
@@ -232,3 +237,39 @@ def test_plain_serve_app_keeps_default_source_ref(tmp_path: Path) -> None:
     conn = build(tmp_path / "t.db", [])
     app = ServeApp(conn, [], "batch9", tmp_path / "scratch", FixedClock(NOW))
     assert app.source_ref == "sift-serve:batch9"
+
+
+def test_seed_rows_skip_human_labeled(tmp_path: Path) -> None:
+    conn = build(tmp_path / "infovore.db", MESSAGES)
+    set_message_label(conn, 10, MessageLabel.KEEP, MessageLabelSource.HUMAN, "x", NOW)
+    assert 10 not in [r.id for r in seed_rows(conn, LEXICON, FOOD, 3)]
+
+
+def test_value_regime_labels_stay_out_of_training(tmp_path: Path) -> None:
+    build(tmp_path / "infovore.db", MESSAGES).close()
+    env = environment(tmp_path)
+    queue = tmp_path / "q"
+    run(["sift", "seed", "--floor", "3", "--top", "3", "--out", str(queue)], env)
+    manifest = json.loads((queue / "manifest.json").read_text())
+    assert manifest["regime"] == "value"
+    conn = open_database(env["INFOVORE_DB_PATH"])
+    app = build_serve_app(
+        conn,
+        dir_=queue,
+        new=False,
+        size=50,
+        strategy=SiftStrategy.RANDOM,
+        seed=0,
+        mix=0.5,
+        out_dir=None,
+        scratch_dir=tmp_path / "scratch",
+        clock=FixedClock(NOW),
+    )
+    mid = manifest["message_ids"][0]
+    app.label(mid, MessageLabel.TRASH)
+    sql = "SELECT regime FROM {} WHERE message_id = ?"
+    assert conn.execute(sql.format("message_labels"), (mid,)).fetchone()[0] == "value"
+    assert conn.execute(sql.format("label_events"), (mid,)).fetchone()[0] == "value"
+    assert mid not in effective_message_labels_with_source(conn)
+    assert mid not in effective_message_labels(conn)
+    assert mid in effective_message_labels_with_source(conn, frozenset({LabelRegime.VALUE}))
