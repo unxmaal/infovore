@@ -107,6 +107,8 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore relevance llm-score --endpoint URL --model NAME [--residue] [--slices LIST] [--limit N] [--write] [--dry-run]`: score exchanges with a served OpenAI-compatible model.
 - `infovore relevance mine [--tech CH] [--off CH] [--min-count N]`: candidate lexicon terms by channel log-odds.
 - `infovore relevance collisions [--tech CH] [--off CH] [--terms LIST]`: lexicon terms common in off-topic channels.
+- `infovore reputation eval [--people PATH] [--k-response N] [--k-label N] [--seed N] [--no-embed] [--json]`: read-only; per-author reputation from replies, reactions, mentions, answered questions, Eric's labels and claim reviews (never the lexicon), scored on held-out exchange labels and leave-one-out on the rest, against `relevance_embed`; needs `INFOVORE_PSEUDONYM_SALT`, and `uv run --extra embed` unless `--no-embed`. `INFOVORE_REPUTATION_PEOPLE` (or `--people`) names a private TOML file of `[[person]] id, accounts, banned` entries kept outside git.
+- `infovore reputation top [--n N]`: top reputations by pseudonym with the evidence behind each.
 - `infovore triage [--report] [--human-report] [--train-human] [--scorer NAME] [--scorer-version V] [--include-training] [--human-limit N] [--all-exchanges]`: rule-based triage scores, reports and the human-label classifier.
 - `infovore label [--from-runs IDS] [--exchange-id ID] [--lore | --noise]`: record lore or noise labels.
 - `infovore sift seed [--floor N] [--top K] [--report] [--out DIR]`: rank messages by lexicon hits per 100 words; `--out` writes a fixed queue for `sift serve DIR`, labelled with source_ref `sift:seed-lexicon:<date>`.
