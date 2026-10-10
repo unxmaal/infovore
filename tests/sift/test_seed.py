@@ -4,6 +4,8 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
 from infovore.cli import main
 from infovore.db.connection import migrate, open_database
 from infovore.db.message_labels import (
@@ -16,13 +18,16 @@ from infovore.sift.sampling import SiftStrategy
 from infovore.sift.seed import (
     BUCKET_EDGES,
     REPORT_FLOORS,
+    SEED_DEEP_SOURCE_REF_PREFIX,
     SEED_FLOOR,
     SEED_SOURCE_REF_PREFIX,
     SEED_TOP,
     SeedRow,
     format_rows,
+    parse_ranks,
     percentile,
     render_report,
+    sample_window,
     seed_rows,
     top_rows,
     write_seed_queue,
@@ -273,3 +278,55 @@ def test_value_regime_labels_stay_out_of_training(tmp_path: Path) -> None:
     assert mid not in effective_message_labels_with_source(conn)
     assert mid not in effective_message_labels(conn)
     assert mid in effective_message_labels_with_source(conn, frozenset({LabelRegime.VALUE}))
+
+
+RANKED = [SeedRow(i, "c", 5, 1, 1.0, "t") for i in range(1, 101)]
+
+
+def test_parse_ranks() -> None:
+    assert parse_ranks("5-9") == (5, 9)
+    for bad in ("5", "3-2", "0-4", "a-b", "1-2-3"):
+        with pytest.raises(ValueError):
+            parse_ranks(bad)
+
+
+def test_sample_window_seeded_and_bounded() -> None:
+    first = sample_window(RANKED, 11, 90, 10, 1)
+    assert [r.id for r in first] == [r.id for r in sample_window(RANKED, 11, 90, 10, 1)]
+    assert [r.id for r in first] != [r.id for r in sample_window(RANKED, 11, 90, 10, 2)]
+    assert len(first) == 10
+    assert all(11 <= r.id <= 90 for r in first)
+    assert [r.id for r in first] == sorted(r.id for r in first)
+    assert len(sample_window(RANKED, 95, 100, 50, 1)) == 6
+
+
+def test_write_seed_queue_deep_prefix(tmp_path: Path) -> None:
+    ref = write_seed_queue(RANKED[:2], tmp_path / "q", NOW, SEED_DEEP_SOURCE_REF_PREFIX)
+    assert ref == "sift:seed-lexicon-deep:2026-01-01"
+    manifest = json.loads((tmp_path / "q" / "manifest.json").read_text())
+    assert manifest["source_ref"] == ref and manifest["regime"] == "value"
+
+
+def test_cli_deep_sample_out_and_validation(tmp_path: Path) -> None:
+    build(tmp_path / "infovore.db", MESSAGES).close()
+    env = environment(tmp_path)
+    queue = tmp_path / "deep"
+    argv = ["sift", "seed", "--floor", "3", "--ranks", "2-5", "--sample", "2", "--seed", "1"]
+    code, out, _ = run([*argv, "--out", str(queue)], env)
+    assert code == 0
+    manifest = json.loads((queue / "manifest.json").read_text())
+    assert manifest["source_ref"].startswith(SEED_DEEP_SOURCE_REF_PREFIX)
+    assert manifest["regime"] == "value"
+    ranked = [r.id for r in seed_rows(open_database(env["INFOVORE_DB_PATH"]), LEXICON, FOOD, 3)]
+    assert len(manifest["message_ids"]) == 2
+    assert set(manifest["message_ids"]) <= set(ranked[1:5])
+    code, out2, _ = run(argv, env)
+    assert code == 0 and out2 == out.split("wrote")[0]
+    code, _, err = run(["sift", "seed", "--ranks", "9-2", "--sample", "2"], env)
+    assert code != 0 and "--ranks" in err
+    code, _, err = run(["sift", "seed", "--ranks", "1-9"], env)
+    assert code != 0 and "--sample" in err
+    code, _, err = run(["sift", "seed", "--sample", "3"], env)
+    assert code != 0 and "--ranks" in err
+    code, _, err = run(["sift", "seed", "--ranks", "1-9", "--sample", "0"], env)
+    assert code != 0 and "--sample" in err

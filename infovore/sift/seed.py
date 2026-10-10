@@ -1,5 +1,6 @@
 import json
 import math
+import random
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
@@ -16,6 +17,7 @@ SEED_FLOOR: Final = 20
 SEED_TOP: Final = 50
 SEED_REGIME: Final = LabelRegime.VALUE.value
 SEED_SOURCE_REF_PREFIX: Final = "sift:seed-lexicon:"
+SEED_DEEP_SOURCE_REF_PREFIX: Final = "sift:seed-lexicon-deep:"
 REPORT_FLOORS: Final = (5, 10, 20, 40)
 PERCENTILES: Final = (50, 75, 90, 95, 99)
 BUCKET_EDGES: Final = (1, 3, 5, 10, 20, 40, 80, 160)
@@ -77,6 +79,22 @@ def top_rows(rows: list[SeedRow], k: int) -> list[SeedRow]:
     return rows[:k]
 
 
+def parse_ranks(text: str) -> tuple[int, int]:
+    parts = text.split("-")
+    if len(parts) != 2 or not all(p.isdigit() for p in parts):
+        raise ValueError(f"expected A-B, got {text!r}")
+    start, end = int(parts[0]), int(parts[1])
+    if start < 1 or end < start:
+        raise ValueError(f"expected 1 <= A <= B, got {text!r}")
+    return start, end
+
+
+def sample_window(rows: list[SeedRow], start: int, end: int, n: int, seed: int) -> list[SeedRow]:
+    window = rows[start - 1 : end]
+    picked = random.Random(seed).sample(range(len(window)), min(n, len(window)))
+    return [window[i] for i in sorted(picked)]
+
+
 def percentile(sorted_values: list[int], pct: int) -> int:
     if not sorted_values:
         return 0
@@ -108,9 +126,11 @@ def render_report(
     return "\n".join(lines) + "\n"
 
 
-def write_seed_queue(rows: list[SeedRow], out_dir: Path, now: datetime) -> str:
+def write_seed_queue(
+    rows: list[SeedRow], out_dir: Path, now: datetime, prefix: str = SEED_SOURCE_REF_PREFIX
+) -> str:
     out_dir.mkdir(parents=True, exist_ok=True)
-    source_ref = SEED_SOURCE_REF_PREFIX + now.date().isoformat()
+    source_ref = prefix + now.date().isoformat()
     manifest = {
         "message_ids": [r.id for r in rows],
         "strategy": "seed",
