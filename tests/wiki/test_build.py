@@ -7,6 +7,7 @@ from infovore.wiki.build import (
     load_claims,
     render_index,
     render_page,
+    sections_of,
 )
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
@@ -151,3 +152,16 @@ def test_load_claims_claim_gate_drops_techless_claims(tmp_path: Path) -> None:
     claims, excluded = load_claims(conn, tech_only=True)
     assert [c.speaker for c in claims] == ["user-aaaa"] and excluded == 1
     assert len(load_claims(conn)[0]) == 2
+
+
+def test_small_co_topic_sections_fold_into_general() -> None:
+    sections = sections_of("O2", CLAIMS[:4], min_section=2)
+    assert list(sections) == ["With R12000", "General"]
+    assert [c.claim_id for c in sections["With R12000"]] == [4, 3]
+    assert [c.claim_id for c in sections["General"]] == [1, 2]
+
+
+def test_build_site_folds_small_sections(tmp_path: Path) -> None:
+    build_site(CLAIMS, 2, tmp_path, min_section=2)
+    page = (tmp_path / "o2.md").read_text()
+    assert "## With R12000" in page and "## With IRIX" not in page

@@ -16,6 +16,7 @@ from infovore.wiki.topics import Topics, load_topics, slug
 BUCKETS: Final = ((1, 1, "1"), (2, 2, "2"), (3, 4, "3-4"), (5, 9, "5-9"), (10, 24, "10-24"))
 BUCKETS_TAIL: Final = ((25, 99, "25-99"), (100, 10**9, "100+"))
 GENERAL: Final = "General"
+DEFAULT_MIN_SECTION: Final = 10
 
 
 @dataclass(frozen=True)
@@ -153,13 +154,22 @@ def _prose(
     return " ".join(parts)
 
 
-def sections_of(name: str, claims: Collection[WikiClaim]) -> dict[str, list[WikiClaim]]:
+def sections_of(
+    name: str, claims: Collection[WikiClaim], min_section: int = 1
+) -> dict[str, list[WikiClaim]]:
     cooc = Counter(t for c in claims for t in c.topics if t != name)
-    groups: dict[str, list[WikiClaim]] = {}
-    for c in _ordered(claims):
+    ordered = _ordered(claims)
+    keys = []
+    for c in ordered:
         others = [t for t in c.topics if t != name]
-        key = min(others, key=lambda t: (-cooc[t], t)) if others else GENERAL
-        groups.setdefault(key if key == GENERAL else f"With {key}", []).append(c)
+        keys.append(min(others, key=lambda t: (-cooc[t], t)) if others else GENERAL)
+    sizes = Counter(keys)
+    groups: dict[str, list[WikiClaim]] = {}
+    for c, key in zip(ordered, keys, strict=True):
+        if key == GENERAL or sizes[key] < min_section:
+            groups.setdefault(GENERAL, []).append(c)
+        else:
+            groups.setdefault(f"With {key}", []).append(c)
     return {k: groups[k] for k in sorted(groups, key=lambda k: (k == GENERAL, -len(groups[k]), k))}
 
 
@@ -168,11 +178,12 @@ def render_page(
     claims: Collection[WikiClaim],
     page_names: Collection[str],
     article: Article | None = None,
+    min_section: int = 1,
 ) -> str:
     from infovore.wiki.groups import group_claims
 
     cooc = Counter(t for c in claims for t in c.topics if t != name)
-    groups = sections_of(name, claims)
+    groups = sections_of(name, claims, min_section)
     known = {c.claim_id: c for c in claims}
     numbers: dict[int, int] = {}
     lines = [f"# {name}", "", f"Claims: {len(claims)}"]
@@ -222,13 +233,14 @@ def build_site(
     min_claims: int,
     out: Path,
     articles: Mapping[str, Article] | None = None,
+    min_section: int = 1,
 ) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
     files = {"index.md": render_index({n: len(v) for n, v in by_topic.items()})}
     for name, group in by_topic.items():
         files[f"{slug(name)}.md"] = render_page(
-            name, group, by_topic.keys(), (articles or {}).get(name)
+            name, group, by_topic.keys(), (articles or {}).get(name), min_section
         )
     for filename, text in files.items():
         (out / filename).write_text(text)

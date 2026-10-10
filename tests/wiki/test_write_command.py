@@ -75,7 +75,9 @@ def test_writes_a_general_and_a_with_section_and_drops_unsupported_sentences(
     tmp_path: Path,
 ) -> None:
     env = seed(tmp_path)
-    code, out, _ = run([*BASE, "--min-claims", "3", "--runs", "1", "--write"], env)
+    code, out, _ = run(
+        [*BASE, "--min-claims", "3", "--min-section", "1", "--runs", "1", "--write"], env
+    )
     assert code == ExitCode.OK
     lines = out.splitlines()
     assert lines[-2].startswith("sections=2 failed=0 sentences=2 dropped=2 seconds=")
@@ -90,15 +92,28 @@ def test_writes_a_general_and_a_with_section_and_drops_unsupported_sentences(
 
 def test_failed_sections_are_retried_and_written_ones_skipped_on_resume(tmp_path: Path) -> None:
     env = seed(tmp_path, [("poison pill", ["Indigo2"])])
-    code, out, _ = run([*BASE, "--min-claims", "3", "--write", "--concurrency", "1"], env)
+    code, out, _ = run(
+        [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--concurrency", "1"], env
+    )
     assert code == ExitCode.OK
     assert "sections=2 failed=1 sentences=1 dropped=1 " in out
     STATE["poison"] = False
-    code, out, _ = run([*BASE, "--min-claims", "3", "--write", "--resume"], env)
+    code, out, _ = run(
+        [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--resume"], env
+    )
     assert "sections=1 failed=0 sentences=1 dropped=1 " in out
     assert out.splitlines()[-1] == "article run 2 written"
-    code, out, _ = run([*BASE, "--min-claims", "3", "--write", "--resume"], env)
+    code, out, _ = run(
+        [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--resume"], env
+    )
     assert out == "nothing to do\n"
+
+
+def test_small_co_topic_sections_fold_into_general_by_default(tmp_path: Path) -> None:
+    env = seed(tmp_path)
+    code, _, _ = run([*BASE, "--min-claims", "3", "--runs", "1", "--write"], env)
+    assert code == ExitCode.OK
+    assert list(sections_for(db(tmp_path), [1])["Indigo2"]) == ["General"]
 
 
 def test_limit_counts_topics_in_descending_claim_count(tmp_path: Path) -> None:
@@ -123,7 +138,9 @@ def test_sigint_stops_after_the_sections_in_flight(
 
     monkeypatch.setattr(write_command, "post_for", interrupting_post)
     env = seed(tmp_path)
-    code, out, _ = run([*BASE, "--min-claims", "3", "--write", "--concurrency", "1"], env)
+    code, out, _ = run(
+        [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--concurrency", "1"], env
+    )
     assert code == 130
     assert "interrupted after 1 sections; rerun with --resume" in out
     assert len(sections_for(db(tmp_path), [1])["Indigo2"]) == 1
@@ -131,13 +148,27 @@ def test_sigint_stops_after_the_sections_in_flight(
 
 def test_progress_goes_to_stderr(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     env = seed(tmp_path)
-    run([*BASE, "--min-claims", "3", "--runs", "1", "--write", "--progress-every", "1"], env)
+    run(
+        [
+            *BASE,
+            "--min-claims",
+            "3",
+            "--min-section",
+            "1",
+            "--runs",
+            "1",
+            "--write",
+            "--progress-every",
+            "1",
+        ],
+        env,
+    )
     assert "progress: 2/2 sections" in capsys.readouterr().err
 
 
 def test_dry_run_prints_the_first_request_and_writes_nothing(tmp_path: Path) -> None:
     env = seed(tmp_path)
-    code, out, _ = run([*BASE, "--min-claims", "3"], env)
+    code, out, _ = run([*BASE, "--min-claims", "3", "--min-section", "1"], env)
     assert code == ExitCode.OK
     assert out.startswith("Topic: Indigo2\nSection: With IRIX\n\n1. Indigo2 runs IRIX fast\n")
     assert db(tmp_path).execute("SELECT COUNT(*) FROM article_runs").fetchone()[0] == 0

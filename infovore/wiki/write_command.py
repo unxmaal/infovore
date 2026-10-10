@@ -40,7 +40,9 @@ def _write_unit(post: Transport, model: str, unit: Unit) -> Written:
     return [(text, [unit.leads[i].claim_id for i in cited]) for text, cited in kept], dropped
 
 
-def _units(claims: Sequence[WikiClaim], min_claims: int, limit: int | None) -> list[Unit]:
+def _units(
+    claims: Sequence[WikiClaim], min_claims: int, min_section: int, limit: int | None
+) -> list[Unit]:
     by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
     names = sorted(by_topic, key=lambda n: (-len(by_topic[n]), n))[:limit]
     return [
@@ -50,7 +52,7 @@ def _units(claims: Sequence[WikiClaim], min_claims: int, limit: int | None) -> l
             tuple(g.lead for g in group_claims(members)[: writer.MAX_GROUPS]),
         )
         for name in names
-        for section, members in sections_of(name, by_topic[name]).items()
+        for section, members in sections_of(name, by_topic[name], min_section).items()
     ]
 
 
@@ -69,7 +71,7 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
         runs=runs,
         tag_runs=[args.tag_run],
     )
-    units = _units(claims, args.min_claims, args.limit)
+    units = _units(claims, args.min_claims, args.min_section, args.limit)
     if not args.write:
         if units:
             first = units[0]
