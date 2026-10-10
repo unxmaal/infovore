@@ -20,13 +20,13 @@ SCHEMA: dict[str, Any] = {
             "minItems": 1,
             "maxItems": 8,
             "items": {
-                "type": "array",
-                "prefixItems": [
-                    {"type": "string", "maxLength": 400},
-                    {"type": "array", "items": {"type": "integer"}, "minItems": 1},
-                ],
-                "minItems": 2,
-                "maxItems": 2,
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string", "minLength": 20, "maxLength": 400},
+                    "claims": {"type": "array", "items": {"type": "integer"}, "minItems": 1},
+                },
+                "required": ["text", "claims"],
+                "additionalProperties": False,
             },
         }
     },
@@ -42,7 +42,7 @@ def prompt_hash() -> str:
 
 
 def build_request(
-    model: str, topic: str, section: str, statements: Sequence[str], max_tokens: int = 900
+    model: str, topic: str, section: str, statements: Sequence[str], max_tokens: int = 1500
 ) -> dict[str, Any]:
     lines = [f"Topic: {topic}"]
     if section != "General":
@@ -80,10 +80,10 @@ def parse_reply(reply: Mapping[str, Any], count: int) -> list[tuple[str, list[in
         body = json.loads(choice["message"]["content"])
         return [
             (
-                _strip_markers(str(text), count),
-                [n - 1 if 1 <= n <= count else -1 for n in map(int, numbers)],
+                _strip_markers(str(item["text"]), count),
+                [n - 1 if 1 <= n <= count else -1 for n in map(int, item["claims"])],
             )
-            for text, numbers in body["s"]
+            for item in body["s"]
         ]
     except (KeyError, IndexError, TypeError, ValueError) as error:
         raise ClaimsReplyError(f"unusable reply: {error!r}") from error
