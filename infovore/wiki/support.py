@@ -1,36 +1,49 @@
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Final
 
+from infovore.claims.check import check_claim
 from infovore.claims.value import tokens
+from infovore.triage.lexicon import Lexicon
 
-SUPPORT: Final = 0.6
+FLOOR: Final = 0.25
 MIN_TOKENS: Final = 3
 
 
-def support(sentence: str, cited: Sequence[str]) -> float:
-    words = tokens(sentence)
-    if not words:
-        return 0.0
-    known = frozenset().union(*(tokens(c) for c in cited))
-    return len(words & known) / len(words)
+@dataclass(frozen=True)
+class Dropped:
+    text: str
+    cited: list[str]
+    reason: str
+
+
+def _reason(text: str, cited: list[str], lexicon: Lexicon, floor: float) -> str | None:
+    if len(tokens(text)) < MIN_TOKENS:
+        return "too_short"
+    verdict = check_claim(text, cited, lexicon, floor).verdict
+    return verdict if verdict in ("unsupported_fact", "low_overlap") else None
 
 
 def keep_supported(
     sentences: Sequence[tuple[str, Sequence[int]]],
     statements: Sequence[str],
-    threshold: float = SUPPORT,
-) -> tuple[list[tuple[str, list[int]]], int]:
+    lexicon: Lexicon,
+    floor: float = FLOOR,
+) -> tuple[list[tuple[str, list[int]]], list[Dropped]]:
     kept: list[tuple[str, list[int]]] = []
-    dropped = 0
+    dropped: list[Dropped] = []
     for text, citations in sentences:
         positions = list(dict.fromkeys(citations))
-        if (
-            not positions
-            or len(tokens(text)) < MIN_TOKENS
-            or any(not 0 <= p < len(statements) for p in positions)
-            or support(text, [statements[p] for p in positions]) < threshold
-        ):
-            dropped += 1
+        valid = [p for p in positions if 0 <= p < len(statements)]
+        cited = [statements[p] for p in valid]
+        if not positions:
+            reason: str | None = "no_citation"
+        elif len(valid) < len(positions):
+            reason = "bad_citation"
         else:
+            reason = _reason(text, cited, lexicon, floor)
+        if reason is None:
             kept.append((text, positions))
+        else:
+            dropped.append(Dropped(text, cited, reason))
     return kept, dropped

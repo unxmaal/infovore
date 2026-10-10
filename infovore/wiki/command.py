@@ -94,6 +94,7 @@ class WikiCommand:
         write.add_argument("--limit", type=int, default=None, help="number of topics")
         write.add_argument("--write", action="store_true", help="without it: print one request")
         write.add_argument("--resume", action="store_true")
+        write.add_argument("--log", type=Path, default=None, help="JSONL of drops and failures")
         write.add_argument("--progress-every", type=int, default=10, dest="progress_every")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:

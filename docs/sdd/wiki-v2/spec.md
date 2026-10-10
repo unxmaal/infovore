@@ -27,8 +27,10 @@ gate and human reviews, not on the claim check.
   claims and stores it with model id and prompt hash; every sentence must end
   with citations of the claims it rests on.
 - REQ-7: A written sentence is dropped when it cites nothing, cites an unknown
-  claim, or fewer than 60% of its content tokens appear in the claims it
-  cites. Dropped sentences are counted per section.
+  claim, has fewer than 3 content tokens, states a fact (number, version, part
+  number, model, quoted string, file name) its cited claims lack, or its
+  stemmed, lexicon-weighted overlap with them is under 0.25 (the claim check
+  applied to the sentence, #321). Dropped sentences are counted per section.
 - REQ-8: `wiki build --tag-run T --article-run A` renders stored sections as
   prose with numbered citations linking to a source list (speaker, date,
   exchange, check verdict as a label); topics without an article fall back

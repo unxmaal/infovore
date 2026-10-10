@@ -1,18 +1,21 @@
 import argparse
+import json
 import sys
 import time
 from collections.abc import Callable, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from infovore.claims.extract import ClaimsReplyError, Transport, fetch_model_id, http_get, http_post
 from infovore.config import ConfigError
 from infovore.db.wiki_articles import create_article_run, record_section, written_sections
+from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki import writer
 from infovore.wiki.build import WikiClaim, _by_topic, load_claims, sections_of
 from infovore.wiki.groups import group_claims
-from infovore.wiki.support import keep_supported
+from infovore.wiki.support import Dropped, keep_supported
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -29,15 +32,24 @@ class Unit:
     leads: tuple[WikiClaim, ...]
 
 
-Written = tuple[list[tuple[str, list[int]]], int]
+Written = tuple[list[tuple[str, list[int]]], list[Dropped]]
 
 
-def _write_unit(post: Transport, model: str, unit: Unit) -> Written:
+def _write_unit(post: Transport, model: str, lexicon: Lexicon, unit: Unit) -> Written:
     statements = [lead.statement for lead in unit.leads]
     body, _ = post(writer.build_request(model, unit.topic, unit.section, statements))
     sentences = writer.parse_reply(body, len(statements))
-    kept, dropped = keep_supported(sentences, statements)
+    kept, dropped = keep_supported(sentences, statements, lexicon)
     return [(text, [unit.leads[i].claim_id for i in cited]) for text, cited in kept], dropped
+
+
+def _log(path: Path | None, unit: Unit, rows: list[dict[str, object]]) -> None:
+    if path is not None:
+        with path.open("a") as handle:
+            for row in rows:
+                handle.write(
+                    json.dumps({"topic": unit.topic, "section": unit.section, **row}) + "\n"
+                )
 
 
 def _units(
@@ -100,6 +112,7 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
     )
     conn.commit()
     post = post_for(args.endpoint)
+    lexicon = load_lexicon(conn)
     attempted = failed = sentence_count = dropped_count = 0
     started = time.monotonic()
     stop = StopFlag()
@@ -113,7 +126,7 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
                 if item is None:
                     exhausted = True
                     break
-                pending[pool.submit(_write_unit, post, args.model, item[1])] = item[0]
+                pending[pool.submit(_write_unit, post, args.model, lexicon, item[1])] = item[0]
             if not pending:
                 break
             ready, _ = wait(pending, return_when=FIRST_COMPLETED)
@@ -122,13 +135,22 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
                 attempted += 1
                 try:
                     sentences, dropped = future.result()
-                except ClaimsReplyError:
+                except ClaimsReplyError as error:
                     failed += 1
+                    sys.stderr.write(f"failed: {unit.topic} / {unit.section}: {error}\n")
+                    _log(args.log, unit, [{"error": str(error)}])
                     continue
-                record_section(conn, article_run_id, unit.topic, unit.section, sentences, dropped)
+                record_section(
+                    conn, article_run_id, unit.topic, unit.section, sentences, len(dropped)
+                )
                 conn.commit()
+                _log(
+                    args.log,
+                    unit,
+                    [{"text": d.text, "cited": d.cited, "reason": d.reason} for d in dropped],
+                )
                 sentence_count += len(sentences)
-                dropped_count += dropped
+                dropped_count += len(dropped)
                 if attempted % args.progress_every == 0:
                     sys.stderr.write(f"progress: {attempted}/{len(units)} sections\n")
     seconds = time.monotonic() - started
