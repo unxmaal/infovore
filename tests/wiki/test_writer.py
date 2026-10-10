@@ -30,6 +30,7 @@ def test_build_request_general_has_no_section_line() -> None:
         "model": "m",
         "temperature": 0,
         "max_tokens": 1500,
+        "chat_template_kwargs": {"enable_thinking": False},
         "messages": [
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": "Topic: O2\n\n1. a\n2. b"},

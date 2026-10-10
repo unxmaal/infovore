@@ -53,6 +53,7 @@ def build_request(
         "model": model,
         "temperature": 0,
         "max_tokens": max_tokens,
+        "chat_template_kwargs": {"enable_thinking": False},
         "messages": [
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": "\n".join(lines)},
