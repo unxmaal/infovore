@@ -6,6 +6,6 @@
 - A-04: Wiki builds from runs 13 and 14 only | new prompt, sample 90% good | older runs can be added with --runs.
 - A-05: --min-claims default for pages stays 10 | current default | lower it to grow the wiki.
 - A-06: A section covers one topic plus its strongest co-topic (as today's "With X" groups), only when at least 10 claims land in it, else General (#314: open tags gave 47,002 sections, the floor gives 2,787) and at most 40 claim groups, largest first | fits eval-12b context with room for output; very large topics lose their long tail in prose but keep it in the source list | raise the cap or split sections if pages read thin.
-- A-07: REQ-7 support threshold 0.6 of sentence content tokens found in cited claims | permissive enough for paraphrase, catches invented specifics | tune on the first run's drop rate.
+- A-07: REQ-7 uses the claim check on each sentence against its cited claims, overlap floor 0.25 | trial run 4: the plain 60% token share dropped 316 sentences against 233 kept, mostly paraphrase ("utilizes", "including"); the claim check stems, weights by lexicon and checks facts | tune the floor from `wiki write --log` drops.
 - A-08: Check verdict shown as a plain label on each source line, never used to filter | Eric's reviews: the check flags 38% of good claims | revisit if OpenJev (#269) gives a better signal.
 - A-09: Tag runs and article runs get their own tables (tag_runs, claim_tags, article_runs, article_sections), append-only like claims_v2 | matches the repo's pattern | none expected.

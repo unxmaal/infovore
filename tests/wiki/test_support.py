@@ -3,6 +3,7 @@ from infovore.wiki.support import FLOOR, MIN_TOKENS, Dropped, keep_supported
 
 LEXICON = load_lexicon()
 INDIGO = "The Indigo2 uses an R10000 processor"
+CHAT = "People enjoy collecting old computers"
 
 
 def keep(
@@ -27,7 +28,7 @@ def test_invented_fact_is_dropped() -> None:
 
 
 def test_unrelated_sentence_is_dropped_for_low_overlap() -> None:
-    assert keep([("Octane has V12 graphics", [0])], [INDIGO]) == ([], ["low_overlap"])
+    assert keep([(CHAT, [0])], [INDIGO]) == ([], ["low_overlap"])
 
 
 def test_citation_problems_are_dropped_with_reasons() -> None:
@@ -39,8 +40,8 @@ def test_citation_problems_are_dropped_with_reasons() -> None:
 
 
 def test_dropped_keeps_text_and_cited_statements() -> None:
-    _, dropped = keep_supported([("Octane has V12 graphics", [0, 0])], [INDIGO], LEXICON)
-    assert dropped == [Dropped("Octane has V12 graphics", [INDIGO], "low_overlap")]
+    _, dropped = keep_supported([(CHAT, [0, 0])], [INDIGO], LEXICON)
+    assert dropped == [Dropped(CHAT, [INDIGO], "low_overlap")]
 
 
 def test_citations_are_deduplicated_and_only_cited_claims_count() -> None:
