@@ -29,7 +29,7 @@ def fake_post(endpoint: str) -> Transport:
             reply: Mapping[str, Any] = {"choices": [{"finish_reason": "length", "message": {}}]}
             return reply, 0.0
         first = re.findall(r"^1\. (.*)$", text, re.M)[0]
-        body = {"s": [[first, [1]], [INVENTED, [1]]]}
+        body = {"s": [{"text": first, "claims": [1]}, {"text": INVENTED, "claims": [1]}]}
         content = {"finish_reason": "stop", "message": {"content": json.dumps(body)}}
         return {"choices": [content]}, 0.0
 
