@@ -4,7 +4,7 @@ from pathlib import Path
 from infovore.cli import ExitCode, main
 from infovore.db.wiki_articles import create_article_run, record_section
 from infovore.db.wiki_tags import create_tag_run, record_tags
-from infovore.wiki.build import WikiClaim, load_claims, render_page
+from infovore.wiki.build import WikiClaim, load_claims, page_files, render_page
 from tests.claims.seed import NOW, db, environment
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
@@ -30,7 +30,7 @@ C = claim(3, "Indigo2 has an R4400 processor", ("Indigo2",))
 
 def test_article_page_has_prose_with_citations_and_a_source_list() -> None:
     article = {"General": [("It has an R4400 cpu.", [1]), ("It ships with IRIX.", [2])]}
-    text = render_page("Indigo2", [A, B], ["Indigo2"], article)
+    text = render_page("Indigo2", [A, B], page_files(["Indigo2"]), article)
     assert text == (
         "# Indigo2\n\nClaims: 2\n\n"
         "It has an R4400 cpu. [1] It ships with IRIX. [2]\n\n"
@@ -42,20 +42,20 @@ def test_article_page_has_prose_with_citations_and_a_source_list() -> None:
 
 def test_numbers_follow_first_citation_and_are_reused() -> None:
     article = {"General": [("One.", [2, 1]), ("Two.", [1, 2, 2]), ("Three.", [1])]}
-    text = render_page("Indigo2", [A, B], [], article)
+    text = render_page("Indigo2", [A, B], {}, article)
     assert "One. [1][2] Two. [2][1] Three. [2]" in text
     assert text.index("1. Indigo2 ships") < text.index("2. Indigo2 has")
 
 
 def test_unknown_citations_are_skipped_and_an_empty_section_falls_back() -> None:
     article = {"General": [("Ghost.", [99])]}
-    text = render_page("Indigo2", [A], [], article)
+    text = render_page("Indigo2", [A], {}, article)
     assert "Ghost" not in text and "## Sources" not in text
     assert "- Indigo2 has an R4400 cpu (user-1, exchange 11, 2026-02-01; 1 speaker(s)," in text
 
 
 def test_fallback_groups_similar_claims() -> None:
-    text = render_page("Indigo2", [A, C, B], ["Indigo2"])
+    text = render_page("Indigo2", [A, C, B], page_files(["Indigo2"]))
     assert (
         "- Indigo2 has an R4400 cpu (+1 similar) (user-1, exchange 11, 2026-02-01;"
         " 2 speaker(s), 2 conversation(s))\n" in text
@@ -71,10 +71,10 @@ def test_only_sections_without_text_fall_back_and_headings_follow_the_rule() -> 
     a = claim(1, "Indigo2 runs IRIX", ("Indigo2", "IRIX"))
     b = claim(2, "Indigo2 has an R4400 cpu", ("Indigo2",))
     article = {"With IRIX": [("It runs IRIX.", [1])]}
-    text = render_page("Indigo2", [a, b], [], article)
+    text = render_page("Indigo2", [a, b], {}, article)
     assert "## With IRIX\n\nIt runs IRIX. [1]\n" in text
     assert "## General\n\n- Indigo2 has an R4400 cpu (user-2" in text
-    single = render_page("Indigo2", [b], [], {"General": [("It has a cpu.", [2])]})
+    single = render_page("Indigo2", [b], {}, {"General": [("It has a cpu.", [2])]})
     assert "## General" not in single and "It has a cpu. [1]" in single
 
 
