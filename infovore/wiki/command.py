@@ -26,7 +26,8 @@ if TYPE_CHECKING:
 
 BACKGROUND_HELP = (
     "cosine to a Wikipedia sentence (claims novelty) at or above which a claim is established:"
-    " listed under Background with its reference instead of in the sections, and not written"
+    " left off the page and out of the writer's input; the page keeps one Background line"
+    " counting them and linking their Wikipedia articles"
 )
 
 DEFAULT_MIN_CLAIMS = 3

@@ -274,7 +274,9 @@ def test_build_site_keeps_colliding_pages_and_links_to_them(tmp_path: Path) -> N
     assert "[O2机器](o2-2.md)" in see_also
 
 
-def test_background_claims_leave_the_sections_and_list_their_reference(tmp_path: Path) -> None:
+def test_background_claims_leave_the_page_with_one_line_naming_their_reference(
+    tmp_path: Path,
+) -> None:
     conn = wiki_db(tmp_path)
     e1 = add_exchange(conn, 1, "2026-02-01")
     ids = [
@@ -304,16 +306,22 @@ def test_background_claims_leave_the_sections_and_list_their_reference(tmp_path:
     )
 
     page = render_page("O2", claims, page_files({"O2"}), background=0.8)
-    assert "## Background" in page
-    assert (
-        "- The O2 runs IRIX. ([SGI O2](https://en.wikipedia.org/wiki/SGI_O2), cosine 0.93;" in page
-    )
-    assert page.index("fan whines") < page.index("## Background") < page.index("runs IRIX.")
-    assert "## Background" not in render_page("O2", claims, page_files({"O2"}))
+    link = "[SGI O2](https://en.wikipedia.org/wiki/SGI_O2)"
+    assert f"\nBackground: 1 claim already covered by Wikipedia, see {link}.\n" in page
+    assert "runs IRIX." not in page and "## Background" not in page
+    assert page.index("Background:") < page.index("fan whines")
+    assert "Background:" not in render_page("O2", claims, page_files({"O2"}))
     site = tmp_path / "site"
     build_site(claims, 1, site, background=0.8)
-    assert "## Background" in (site / "o2.md").read_text()
+    assert "Background: 1 claim already" in (site / "o2.md").read_text()
     bare = replace(by_id[ids[0]], reference=None)
-    assert "(reference, cosine 0.93;" in render_page(
+    other = replace(by_id[ids[1]], novelty=0.9, reference="IRIX")
+    third = replace(by_id[ids[2]], novelty=0.9, reference="IRIX")
+    page = render_page("O2", [bare, other, third], page_files({"O2"}), background=0.8)
+    assert "Background: 3 claims already covered by Wikipedia, see [IRIX](" in page
+    assert "Background: 1 claim already covered by Wikipedia.\n" in render_page(
         "O2", [bare], page_files({"O2"}), background=0.8
     )
+    both = [by_id[ids[0]], other, third]
+    page = render_page("O2", both, page_files({"O2"}), background=0.8)
+    assert "see [IRIX](https://en.wikipedia.org/wiki/IRIX), [SGI O2](https" in page
