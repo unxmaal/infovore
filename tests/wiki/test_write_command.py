@@ -104,11 +104,25 @@ def test_failed_sections_are_retried_and_written_ones_skipped_on_resume(tmp_path
         [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--resume"], env
     )
     assert "sections=1 failed=0 sentences=1 dropped=1 " in out
-    assert out.splitlines()[-1] == "article run 2 written"
+    assert out.splitlines()[-1] == "article run 1 written"
+    assert len(sections_for(db(tmp_path), [1])["Indigo2"]) == 2
+    assert db(tmp_path).execute("SELECT count(*) FROM article_runs").fetchone()[0] == 1
     code, out, _ = run(
         [*BASE, "--min-claims", "3", "--min-section", "1", "--write", "--resume"], env
     )
     assert out == "nothing to do\n"
+
+
+def test_resume_without_a_matching_run_starts_a_new_one(tmp_path: Path) -> None:
+    env = seed(tmp_path)
+    run([*BASE, "--min-claims", "3", "--runs", "1", "--write"], env)
+    code, out, _ = run([*BASE, "--min-claims", "3", "--runs", "1", "--write", "--resume"], env)
+    assert code == ExitCode.OK and out == "nothing to do\n"
+    code, out, _ = run(
+        [*BASE[:-1], "m2", "--min-claims", "3", "--runs", "1", "--write", "--resume"], env
+    )
+    assert code == ExitCode.OK
+    assert out.splitlines()[-1] == "article run 2 written"
 
 
 def test_small_co_topic_sections_fold_into_general_by_default(tmp_path: Path) -> None:

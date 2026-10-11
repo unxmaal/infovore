@@ -10,7 +10,12 @@ from typing import TYPE_CHECKING
 
 from infovore.claims.extract import ClaimsReplyError, Transport, fetch_model_id, http_get, http_post
 from infovore.config import ConfigError
-from infovore.db.wiki_articles import create_article_run, record_section, written_sections
+from infovore.db.wiki_articles import (
+    create_article_run,
+    latest_article_run,
+    record_section,
+    run_sections,
+)
 from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki import writer
 from infovore.wiki.build import UNSORTED, WikiClaim, _by_topic, load_claims, part_key, sections_of
@@ -106,22 +111,27 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
             out.write("nothing to do\n")
         return 0
     model_id, _ = fetch_model_id(args.endpoint, args.model, get)
+    resumed = None
     if args.resume:
-        done = written_sections(conn, model_id, writer.prompt_hash(), args.tag_run)
+        resumed = latest_article_run(conn, model_id, writer.prompt_hash(), args.tag_run)
+    if resumed is not None:
+        done = run_sections(conn, resumed)
         units = [u for u in units if (u.topic, u.key) not in done]
     if not units:
         out.write("nothing to do\n")
         return 0
-    article_run_id = create_article_run(
-        conn,
-        endpoint=args.endpoint,
-        model_alias=args.model,
-        model_id=model_id,
-        prompt_hash=writer.prompt_hash(),
-        tag_run_id=args.tag_run,
-        now=context.clock.now(),
-    )
-    conn.commit()
+    article_run_id = resumed
+    if article_run_id is None:
+        article_run_id = create_article_run(
+            conn,
+            endpoint=args.endpoint,
+            model_alias=args.model,
+            model_id=model_id,
+            prompt_hash=writer.prompt_hash(),
+            tag_run_id=args.tag_run,
+            now=context.clock.now(),
+        )
+        conn.commit()
     post = post_for(args.endpoint)
     lexicon = load_lexicon(conn)
     attempted = failed = sentence_count = dropped_count = 0
