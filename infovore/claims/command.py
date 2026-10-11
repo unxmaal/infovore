@@ -42,6 +42,8 @@ from infovore.claims.gate import (
     run_gate_score,
 )
 from infovore.claims.httpd import DEFAULT_CLAIMS_PORT, listening_url, shutdown_all, start_all
+from infovore.claims.novelty import DEFAULT_MIN_CLAIMS as NOVELTY_MIN_CLAIMS
+from infovore.claims.novelty import run_novelty
 from infovore.claims.redact import WIDTH, Redacted, redact_conversation, require_salt
 from infovore.claims.speakers import kept_exchange_ids, run_speakers
 from infovore.claims.value import run_value, sample_ids
@@ -66,6 +68,7 @@ from infovore.db.speaker_drops import dropped_authors
 from infovore.eval.slices import slice_ids, slice_names
 from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.command import DEFAULT_MIN_CLAIMS
+from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP
 
 if TYPE_CHECKING:
     from infovore.cli import AppContext
@@ -510,6 +513,19 @@ class ClaimsCommand:
         controls.add_argument("--article-run", type=int, default=None, dest="article_run")
         controls.add_argument("--drops-log", type=Path, default=None, dest="drops_log")
         controls.add_argument("--json", action="store_true", dest="as_json")
+        novelty = sub.add_parser(
+            "novelty", help="score claims against Wikipedia text for their topics (#353)"
+        )
+        novelty.add_argument("--run", type=int, action="append", required=True)
+        novelty.add_argument("--tag-run", type=int, required=True, dest="tag_run")
+        novelty.add_argument(
+            "--min-claims", type=int, default=NOVELTY_MIN_CLAIMS, dest="min_claims"
+        )
+        novelty.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        novelty.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
+        novelty.add_argument("--fetch", action="store_true")
+        novelty.add_argument("--limit", type=int, default=None)
+        novelty.add_argument("--write", action="store_true")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.claims_action == "extract":
@@ -528,6 +544,8 @@ class ClaimsCommand:
             return run_check(context, args)
         if args.claims_action == "controls":
             return run_controls(context, args)
+        if args.claims_action == "novelty":
+            return run_novelty(context, args)
         if args.claims_action == "export-cases":
             return export_cases(context, args)
         if args.claims_action == "show":
