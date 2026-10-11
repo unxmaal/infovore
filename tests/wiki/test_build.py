@@ -1,10 +1,15 @@
 from pathlib import Path
 
 from infovore.wiki.build import (
+    UNSORTED,
+    Article,
     WikiClaim,
+    _by_topic,
+    article_parts,
     build_site,
     compute_stats,
     load_claims,
+    part_key,
     render_index,
     render_page,
     sections_of,
@@ -193,3 +198,39 @@ def test_build_site_folds_small_sections(tmp_path: Path) -> None:
     build_site(CLAIMS, 2, tmp_path, min_section=2)
     page = (tmp_path / "o2.md").read_text()
     assert "## With R12000" in page and "## With IRIX" not in page
+
+
+def test_untagged_claims_land_on_the_unsorted_page_and_count_as_on_pages() -> None:
+    orphan = WikiClaim(9, 1, "2026-01-01", "user-aaaa", "No topic at all.", frozenset())
+    claims = [*CLAIMS[:4], orphan]
+
+    assert _by_topic([orphan]) == {}
+    assert [c.claim_id for c in _by_topic([orphan], UNSORTED)[UNSORTED]] == [9]
+    stats = compute_stats(claims, 1)
+    assert stats.unassigned == 1 and UNSORTED in stats.claims_per_page
+    assert stats.on_pages == 5
+    assert compute_stats(claims, 2).on_pages == 4
+
+
+def test_article_parts_follow_numbered_continuations_without_gaps() -> None:
+    article: Article = {
+        "General": [("one", [1])],
+        "General#2": [("two", [2])],
+        "General#4": [("four", [4])],
+    }
+
+    assert article_parts(article, "General") == [("one", [1]), ("two", [2])]
+    assert article_parts(article, "Missing") == []
+    assert (part_key("General", 1), part_key("General", 3)) == ("General", "General#3")
+
+
+def test_render_page_concatenates_section_parts() -> None:
+    key = next(iter(sections_of("O2", CLAIMS[:2])))
+    article: Article = {
+        key: [("The O2 is compact.", [1])],
+        part_key(key, 2): [("It uses an R12000.", [3])],
+    }
+
+    page = render_page("O2", CLAIMS[:2], {"O2"}, article)
+
+    assert "The O2 is compact. [1] It uses an R12000. [2]" in page

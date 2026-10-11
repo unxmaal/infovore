@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 BUCKETS: Final = ((1, 1, "1"), (2, 2, "2"), (3, 4, "3-4"), (5, 9, "5-9"), (10, 24, "10-24"))
 BUCKETS_TAIL: Final = ((25, 99, "25-99"), (100, 10**9, "100+"))
 GENERAL: Final = "General"
+UNSORTED: Final = "Unsorted"
+PART_SEPARATOR: Final = "#"
 DEFAULT_MIN_SECTION: Final = 10
 
 
@@ -39,6 +41,7 @@ class Stats:
     pages: int
     unassigned: int
     claims_per_page: dict[str, int]
+    on_pages: int = 0
 
     def distribution(self) -> dict[str, int]:
         sizes = Counter(self.claims_per_page.values())
@@ -145,9 +148,13 @@ def _ordered(claims: Iterable[WikiClaim]) -> list[WikiClaim]:
     return sorted(claims, key=lambda c: (c.date, c.exchange_id, c.claim_id))
 
 
-def _by_topic(claims: Iterable[WikiClaim]) -> dict[str, list[WikiClaim]]:
+def _by_topic(
+    claims: Iterable[WikiClaim], unsorted: str | None = None
+) -> dict[str, list[WikiClaim]]:
     out: dict[str, list[WikiClaim]] = {}
     for c in _ordered(claims):
+        if not c.topics and unsorted:
+            out.setdefault(unsorted, []).append(c)
         for name in sorted(c.topics):
             out.setdefault(name, []).append(c)
     return out
@@ -181,6 +188,19 @@ def _prose(
                 numbers.setdefault(i, len(numbers) + 1)
             parts.append(f"{text} " + "".join(f"[{numbers[i]}]" for i in cited))
     return " ".join(parts)
+
+
+def part_key(section: str, part: int) -> str:
+    return section if part == 1 else f"{section}{PART_SEPARATOR}{part}"
+
+
+def article_parts(article: Article, key: str) -> list[tuple[str, Sequence[int]]]:
+    out = list(article.get(key, []))
+    part = 2
+    while part_key(key, part) in article:
+        out.extend(article[part_key(key, part)])
+        part += 1
+    return out
 
 
 def sections_of(
@@ -222,7 +242,7 @@ def render_page(
         lines.append("")
         if list(groups) != [GENERAL]:
             lines += [f"## {key}", ""]
-        prose = _prose((article or {}).get(key, []), known, numbers)
+        prose = _prose(article_parts(article or {}, key), known, numbers)
         if prose:
             lines.append(prose)
         else:
@@ -250,19 +270,20 @@ def render_index(pages: Mapping[str, int]) -> str:
 
 def compute_stats(claims: Iterable[WikiClaim], min_claims: int) -> Stats:
     claims = list(claims)
-    by_topic = _by_topic(claims)
+    by_topic = _by_topic(claims, UNSORTED)
     return Stats(
-        topics=len(by_topic),
+        topics=len(_by_topic(claims)),
         pages=sum(1 for v in by_topic.values() if len(v) >= min_claims),
         unassigned=sum(1 for c in claims if not c.topics),
         claims_per_page={n: len(v) for n, v in sorted(by_topic.items()) if len(v) >= min_claims},
+        on_pages=len({c.claim_id for v in by_topic.values() if len(v) >= min_claims for c in v}),
     )
 
 
 def page_groups(
     claims: Iterable[WikiClaim], min_claims: int, grouper: "Grouper"
 ) -> list[list["ClaimGroup"]]:
-    by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
+    by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     return [grouper(members) for members in by_topic.values()]
 
 
@@ -274,7 +295,7 @@ def build_site(
     min_section: int = 1,
     grouper: "Grouper | None" = None,
 ) -> list[str]:
-    by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
+    by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
     files = {"index.md": render_index({n: len(v) for n, v in by_topic.items()})}
     for name, group in by_topic.items():
