@@ -13,7 +13,7 @@ from infovore.config import ConfigError
 from infovore.db.wiki_articles import create_article_run, record_section, written_sections
 from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki import writer
-from infovore.wiki.build import WikiClaim, _by_topic, load_claims, sections_of
+from infovore.wiki.build import UNSORTED, WikiClaim, _by_topic, load_claims, part_key, sections_of
 from infovore.wiki.eligibility import parse_verdicts
 from infovore.wiki.groups import Grouper, group_claims, make_grouper_for
 from infovore.wiki.support import Dropped, keep_supported
@@ -31,6 +31,11 @@ class Unit:
     topic: str
     section: str
     leads: tuple[WikiClaim, ...]
+    part: int = 1
+
+    @property
+    def key(self) -> str:
+        return part_key(self.section, self.part)
 
 
 Written = tuple[list[tuple[str, list[int]]], list[Dropped]]
@@ -48,9 +53,7 @@ def _log(path: Path | None, unit: Unit, rows: list[dict[str, object]]) -> None:
     if path is not None:
         with path.open("a") as handle:
             for row in rows:
-                handle.write(
-                    json.dumps({"topic": unit.topic, "section": unit.section, **row}) + "\n"
-                )
+                handle.write(json.dumps({"topic": unit.topic, "section": unit.key, **row}) + "\n")
 
 
 def _units(
@@ -60,17 +63,18 @@ def _units(
     limit: int | None,
     grouper: Grouper = group_claims,
 ) -> list[Unit]:
-    by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
+    by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     names = sorted(by_topic, key=lambda n: (-len(by_topic[n]), n))[:limit]
-    return [
-        Unit(
-            name,
-            section,
-            tuple(g.lead for g in grouper(members)[: writer.MAX_GROUPS]),
-        )
-        for name in names
-        for section, members in sections_of(name, by_topic[name], min_section).items()
-    ]
+    units = []
+    for name in names:
+        for section, members in sections_of(name, by_topic[name], min_section).items():
+            leads = [g.lead for g in grouper(members)]
+            for start in range(0, len(leads), writer.MAX_GROUPS):
+                part = start // writer.MAX_GROUPS + 1
+                units.append(
+                    Unit(name, section, tuple(leads[start : start + writer.MAX_GROUPS]), part)
+                )
+    return units
 
 
 def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] | None) -> int:
@@ -104,7 +108,7 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
     model_id, _ = fetch_model_id(args.endpoint, args.model, get)
     if args.resume:
         done = written_sections(conn, model_id, writer.prompt_hash(), args.tag_run)
-        units = [u for u in units if (u.topic, u.section) not in done]
+        units = [u for u in units if (u.topic, u.key) not in done]
     if not units:
         out.write("nothing to do\n")
         return 0
@@ -144,12 +148,10 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
                     sentences, dropped = future.result()
                 except ClaimsReplyError as error:
                     failed += 1
-                    sys.stderr.write(f"failed: {unit.topic} / {unit.section}: {error}\n")
+                    sys.stderr.write(f"failed: {unit.topic} / {unit.key}: {error}\n")
                     _log(args.log, unit, [{"error": str(error)}])
                     continue
-                record_section(
-                    conn, article_run_id, unit.topic, unit.section, sentences, len(dropped)
-                )
+                record_section(conn, article_run_id, unit.topic, unit.key, sentences, len(dropped))
                 conn.commit()
                 _log(
                     args.log,

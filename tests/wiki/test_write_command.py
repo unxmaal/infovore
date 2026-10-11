@@ -3,7 +3,7 @@ import json
 import os
 import re
 import signal
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +13,9 @@ from infovore.claims.extract import Transport
 from infovore.cli import ExitCode, main
 from infovore.db.wiki_articles import sections_for
 from infovore.db.wiki_tags import create_tag_run, record_tags
-from infovore.wiki import write_command
+from infovore.wiki import write_command, writer
+from infovore.wiki.build import WikiClaim
+from infovore.wiki.groups import ClaimGroup, group_claims
 from tests.claims.seed import NOW, db, environment
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
@@ -212,3 +214,37 @@ def test_bad_arguments_are_config_errors(tmp_path: Path) -> None:
     assert code == ExitCode.CONFIG and "unknown run 9" in err
     code, _, err = run([*BASE, "--concurrency", "0"], env)
     assert code == ExitCode.CONFIG and "--concurrency must be between 1 and 32" in err
+
+
+def test_sections_with_more_groups_than_the_cap_are_written_in_parts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(writer, "MAX_GROUPS", 1)
+    env = seed(tmp_path)
+    code, out, _ = run([*BASE, "--min-claims", "3", "--runs", "1", "--write"], env)
+
+    assert code == ExitCode.OK
+    assert out.splitlines()[-2].startswith("sections=2 failed=0")
+    assert set(sections_for(db(tmp_path), [1])["Indigo2"]) == {"General", "General#2"}
+    code, out, _ = run([*BASE, "--min-claims", "3", "--runs", "1", "--write", "--resume"], env)
+    assert code == ExitCode.OK and "nothing to do" in out
+
+
+def test_units_carry_their_part_and_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    claims = [
+        WikiClaim(i, 1, "2026-01-01", f"user-{i}", f"fact {i} about x{i}", frozenset({"T"}))
+        for i in range(3)
+    ]
+
+    def singles(members: Sequence[WikiClaim]) -> list[ClaimGroup]:
+        return [group_claims([c])[0] for c in members]
+
+    units = write_command._units(claims, 1, 1, None, singles)
+    assert [(u.part, u.key, len(u.leads)) for u in units] == [(1, "General", 3)]
+
+    monkeypatch.setattr(writer, "MAX_GROUPS", 2)
+    units = write_command._units(claims, 1, 1, None, singles)
+    assert [(u.part, u.key, len(u.leads)) for u in units] == [
+        (1, "General", 2),
+        (2, "General#2", 1),
+    ]

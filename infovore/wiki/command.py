@@ -96,7 +96,7 @@ class WikiCommand:
         write.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
-        write.add_argument("--min-claims", type=int, default=10, dest="min_claims")
+        write.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS, dest="min_claims")
         write.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL")
         write.add_argument("--model", required=True, help="model alias on the server")
         write.add_argument("--concurrency", type=int, default=8)
@@ -127,6 +127,7 @@ class WikiCommand:
             f"pages: {stats.pages}",
             f"claims: {len(claims)}",
             f"unassigned: {stats.unassigned}",
+            f"on pages: {stats.on_pages}/{len(claims)}",
             f"excluded: {excluded}",
             f"corroboration: {summarise(page_groups(claims, args.min_claims, grouper))}",
         ]

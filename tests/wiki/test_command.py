@@ -52,6 +52,7 @@ def test_stats_reports_topics_pages_distribution_and_unassigned(tmp_path: Path) 
     assert "topics: 2" in out
     assert "pages: 1" in out
     assert "unassigned: 1" in out
+    assert "on pages: 4/6" in out
     assert "excluded: 1 (review 1)" in out
     assert "3-4: 1" in out
 
@@ -107,3 +108,12 @@ def test_grouping_embed_uses_the_embedder_and_stats_report_corroboration(
     code, out = run(["wiki", "build", "--out", str(out_dir), "--grouping", "embed"], env)
     assert code == ExitCode.OK
     assert "1 speaker(s), 1 conversation(s))" in (out_dir / "o2.md").read_text()
+
+
+def test_untagged_claims_get_an_unsorted_page(tmp_path: Path) -> None:
+    env = seeded(tmp_path)
+    out_dir = tmp_path / "site"
+    code, _ = run(["wiki", "build", "--out", str(out_dir), "--min-claims", "1"], env)
+
+    assert code == ExitCode.OK
+    assert "Nothing topical." in (out_dir / "unsorted.md").read_text()
