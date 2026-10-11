@@ -51,13 +51,19 @@ def test_unknown_citations_are_skipped_and_an_empty_section_falls_back() -> None
     article = {"General": [("Ghost.", [99])]}
     text = render_page("Indigo2", [A], [], article)
     assert "Ghost" not in text and "## Sources" not in text
-    assert "- Indigo2 has an R4400 cpu (user-1, exchange 11, 2026-02-01)" in text
+    assert "- Indigo2 has an R4400 cpu (user-1, exchange 11, 2026-02-01; 1 speaker(s)," in text
 
 
 def test_fallback_groups_similar_claims() -> None:
     text = render_page("Indigo2", [A, C, B], ["Indigo2"])
-    assert "- Indigo2 has an R4400 cpu (+1 similar) (user-1, exchange 11, 2026-02-01)\n" in text
-    assert "- Indigo2 ships with IRIX (user-2, exchange 12, 2026-02-01)\n" in text
+    assert (
+        "- Indigo2 has an R4400 cpu (+1 similar) (user-1, exchange 11, 2026-02-01;"
+        " 2 speaker(s), 2 conversation(s))\n" in text
+    )
+    assert (
+        "- Indigo2 ships with IRIX (user-2, exchange 12, 2026-02-01;"
+        " 1 speaker(s), 1 conversation(s))\n" in text
+    )
     assert "user-3" not in text
 
 

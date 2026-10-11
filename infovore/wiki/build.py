@@ -3,7 +3,7 @@ from collections import Counter
 from collections.abc import Collection, Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from infovore.claims.gate import claim_has_tech
 from infovore.claims.speakers import dropped_pairs
@@ -12,6 +12,9 @@ from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.canon import alias_names, canonical, display_names
 from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
 from infovore.wiki.topics import Topics, load_topics, slug
+
+if TYPE_CHECKING:
+    from infovore.wiki.groups import ClaimGroup, Grouper
 
 BUCKETS: Final = ((1, 1, "1"), (2, 2, "2"), (3, 4, "3-4"), (5, 9, "5-9"), (10, 24, "10-24"))
 BUCKETS_TAIL: Final = ((25, 99, "25-99"), (100, 10**9, "100+"))
@@ -150,9 +153,16 @@ def _by_topic(claims: Iterable[WikiClaim]) -> dict[str, list[WikiClaim]]:
     return out
 
 
-def _entry(c: WikiClaim, similar: int = 0) -> str:
+def _entry(g: "ClaimGroup") -> str:
+    c = g.lead
+    similar = len(g.members) - 1
     more = f" (+{similar} similar)" if similar else ""
-    return f"- {_line(c.statement)}{more} ({c.speaker}, exchange {c.exchange_id}, {c.date})"
+    first, last = g.span
+    when = first if first == last else f"{first} to {last}"
+    return (
+        f"- {_line(c.statement)}{more} ({c.speaker}, exchange {c.exchange_id}, {when};"
+        f" {len(g.speakers)} speaker(s), {len(g.exchanges)} conversation(s))"
+    )
 
 
 Article = Mapping[str, Sequence[tuple[str, Sequence[int]]]]
@@ -198,9 +208,11 @@ def render_page(
     page_names: Collection[str],
     article: Article | None = None,
     min_section: int = 1,
+    grouper: "Grouper | None" = None,
 ) -> str:
     from infovore.wiki.groups import group_claims
 
+    group = grouper or group_claims
     cooc = Counter(t for c in claims for t in c.topics if t != name)
     groups = sections_of(name, claims, min_section)
     known = {c.claim_id: c for c in claims}
@@ -214,7 +226,7 @@ def render_page(
         if prose:
             lines.append(prose)
         else:
-            lines += [_entry(g.lead, len(g.members) - 1) for g in group_claims(members)]
+            lines += [_entry(g) for g in group(members)]
     if numbers:
         lines += ["", "## Sources", ""]
         for claim_id, n in numbers.items():
@@ -247,19 +259,27 @@ def compute_stats(claims: Iterable[WikiClaim], min_claims: int) -> Stats:
     )
 
 
+def page_groups(
+    claims: Iterable[WikiClaim], min_claims: int, grouper: "Grouper"
+) -> list[list["ClaimGroup"]]:
+    by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
+    return [grouper(members) for members in by_topic.values()]
+
+
 def build_site(
     claims: Iterable[WikiClaim],
     min_claims: int,
     out: Path,
     articles: Mapping[str, Article] | None = None,
     min_section: int = 1,
+    grouper: "Grouper | None" = None,
 ) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
     files = {"index.md": render_index({n: len(v) for n, v in by_topic.items()})}
     for name, group in by_topic.items():
         files[f"{slug(name)}.md"] = render_page(
-            name, group, by_topic.keys(), (articles or {}).get(name), min_section
+            name, group, by_topic.keys(), (articles or {}).get(name), min_section, grouper
         )
     for filename, text in files.items():
         (out / filename).write_text(text)

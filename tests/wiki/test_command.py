@@ -1,6 +1,8 @@
 import io
 from pathlib import Path
 
+import pytest
+
 from infovore.cli import ExitCode, main
 from tests.claims.seed import environment
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
@@ -86,3 +88,22 @@ def test_runs_limits_stats_and_rejects_bad_ids(tmp_path: Path) -> None:
     assert code != ExitCode.OK
     code, out = run(["wiki", "stats", "--runs", "x"], env)
     assert code != ExitCode.OK
+
+
+def test_grouping_embed_uses_the_embedder_and_stats_report_corroboration(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from infovore.wiki import groups as groups_module
+    from tests.triage.test_embed import FakeEmbedder
+
+    env = seeded(tmp_path)
+    code, out = run(["wiki", "stats", "--min-claims", "3"], env)
+    assert code == ExitCode.OK
+    assert "corroboration: groups " in out and "claims in 2+ speaker groups 0/" in out
+    monkeypatch.setattr(groups_module, "load_embedder", lambda model, revision: FakeEmbedder())
+    code, out = run(["wiki", "stats", "--min-claims", "3", "--grouping", "embed"], env)
+    assert code == ExitCode.OK and "corroboration: groups " in out
+    out_dir = tmp_path / "site"
+    code, out = run(["wiki", "build", "--out", str(out_dir), "--grouping", "embed"], env)
+    assert code == ExitCode.OK
+    assert "1 speaker(s), 1 conversation(s))" in (out_dir / "o2.md").read_text()

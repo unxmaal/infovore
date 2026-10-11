@@ -13,8 +13,10 @@ from infovore.wiki.build import (
     build_site,
     compute_stats,
     load_claims,
+    page_groups,
 )
 from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP, parse_verdicts
+from infovore.wiki.groups import GROUPING_HELP, GROUPINGS, make_grouper_for, summarise
 from infovore.wiki.tag_command import run_tag
 from infovore.wiki.write_command import run_write
 
@@ -62,6 +64,7 @@ class WikiCommand:
         build.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         build.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
+        build.add_argument("--grouping", choices=GROUPINGS, default="jaccard", help=GROUPING_HELP)
         build.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
@@ -72,6 +75,7 @@ class WikiCommand:
         stats.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         stats.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
+        stats.add_argument("--grouping", choices=GROUPINGS, default="jaccard", help=GROUPING_HELP)
         stats.add_argument("--runs", default=None, help="comma-separated claim run ids")
         stats.add_argument("--tag-run", type=int, default=None, dest="tag_run")
         tag = sub.add_parser("tag", help="tag claims with the things they are about")
@@ -88,6 +92,7 @@ class WikiCommand:
         write.add_argument("--runs", default=None, help="comma-separated claim run ids")
         write.add_argument("--claim-gate", action="store_true", dest="claim_gate")
         write.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
+        write.add_argument("--grouping", choices=GROUPINGS, default="jaccard", help=GROUPING_HELP)
         write.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
@@ -116,15 +121,17 @@ class WikiCommand:
             verdicts=parse_verdicts(args.verdicts),
         )
         stats = compute_stats(claims, args.min_claims)
+        grouper = make_grouper_for(args.grouping, claims)
         lines = [
             f"topics: {stats.topics}",
             f"pages: {stats.pages}",
             f"claims: {len(claims)}",
             f"unassigned: {stats.unassigned}",
             f"excluded: {excluded}",
+            f"corroboration: {summarise(page_groups(claims, args.min_claims, grouper))}",
         ]
         if args.wiki_action == "build":
-            build_site(claims, args.min_claims, args.out, articles, args.min_section)
+            build_site(claims, args.min_claims, args.out, articles, args.min_section, grouper)
             lines.append(f"wrote: {args.out}")
         else:
             lines += [f"  {label}: {n}" for label, n in stats.distribution().items()]
