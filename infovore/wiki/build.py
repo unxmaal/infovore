@@ -1,3 +1,4 @@
+import hashlib
 import sqlite3
 from collections import Counter
 from collections.abc import Collection, Iterable, Mapping, Sequence
@@ -20,6 +21,7 @@ BUCKETS: Final = ((1, 1, "1"), (2, 2, "2"), (3, 4, "3-4"), (5, 9, "5-9"), (10, 2
 BUCKETS_TAIL: Final = ((25, 99, "25-99"), (100, 10**9, "100+"))
 GENERAL: Final = "General"
 UNSORTED: Final = "Unsorted"
+INDEX: Final = "index"
 PART_SEPARATOR: Final = "#"
 DEFAULT_MIN_SECTION: Final = 10
 
@@ -222,10 +224,24 @@ def sections_of(
     return {k: groups[k] for k in sorted(groups, key=lambda k: (k == GENERAL, -len(groups[k]), k))}
 
 
+def page_files(names: Iterable[str], weights: Mapping[str, int] | None = None) -> dict[str, str]:
+    taken = {INDEX}
+    out: dict[str, str] = {}
+    for name in sorted(names, key=lambda n: (-(weights or {}).get(n, 0), n)):
+        base = slug(name) or f"topic-{hashlib.sha1(name.encode()).hexdigest()[:8]}"
+        candidate, n = base, 1
+        while candidate in taken:
+            n += 1
+            candidate = f"{base}-{n}"
+        taken.add(candidate)
+        out[name] = f"{candidate}.md"
+    return out
+
+
 def render_page(
     name: str,
     claims: Collection[WikiClaim],
-    page_names: Collection[str],
+    files: Mapping[str, str],
     article: Article | None = None,
     min_section: int = 1,
     grouper: "Grouper | None" = None,
@@ -255,16 +271,16 @@ def render_page(
                 f"{n}. {c.statement} ({c.speaker}, {c.date}, exchange {c.exchange_id},"
                 f" check: {c.check or 'unchecked'})"
             )
-    related = sorted((t for t in cooc if t in page_names), key=lambda t: (-cooc[t], t))
+    related = sorted((t for t in cooc if t in files), key=lambda t: (-cooc[t], t))
     if related:
         lines += ["", "## See also", ""]
-        lines += [f"- [{t}]({slug(t)}.md)" for t in related]
+        lines += [f"- [{t}]({files[t]})" for t in related]
     return "\n".join(lines) + "\n"
 
 
-def render_index(pages: Mapping[str, int]) -> str:
+def render_index(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
     lines = ["# Index", ""]
-    lines += [f"- [{name}]({slug(name)}.md) ({pages[name]})" for name in sorted(pages)]
+    lines += [f"- [{name}]({files[name]}) ({pages[name]})" for name in sorted(pages)]
     return "\n".join(lines) + "\n"
 
 
@@ -297,10 +313,12 @@ def build_site(
 ) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
-    files = {"index.md": render_index({n: len(v) for n, v in by_topic.items()})}
+    sizes = {n: len(v) for n, v in by_topic.items()}
+    names = page_files(sizes, sizes)
+    files = {f"{INDEX}.md": render_index(sizes, names)}
     for name, group in by_topic.items():
-        files[f"{slug(name)}.md"] = render_page(
-            name, group, by_topic.keys(), (articles or {}).get(name), min_section, grouper
+        files[names[name]] = render_page(
+            name, group, names, (articles or {}).get(name), min_section, grouper
         )
     for filename, text in files.items():
         (out / filename).write_text(text)

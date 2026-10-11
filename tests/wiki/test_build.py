@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from infovore.wiki.build import (
@@ -9,6 +10,7 @@ from infovore.wiki.build import (
     build_site,
     compute_stats,
     load_claims,
+    page_files,
     part_key,
     render_index,
     render_page,
@@ -36,25 +38,25 @@ CLAIMS = [
 
 
 def test_golden_page() -> None:
-    page = render_page("O2", CLAIMS[:4], {"O2", "R12000", "IRIX 6.5"})
+    page = render_page("O2", CLAIMS[:4], page_files({"O2", "R12000", "IRIX 6.5"}))
     assert page == (GOLDEN / "o2.md").read_text()
 
 
 def test_page_without_cooccurrence_has_no_groups_or_see_also() -> None:
-    page = render_page("Octane", [CLAIMS[4]], {"Octane"})
+    page = render_page("Octane", [CLAIMS[4]], page_files({"Octane"}))
     assert "## " not in page
     assert "See also" not in page
     assert page.startswith("# Octane\n")
 
 
 def test_see_also_only_links_topics_with_pages() -> None:
-    page = render_page("O2", CLAIMS[:4], {"O2"})
+    page = render_page("O2", CLAIMS[:4], page_files({"O2"}))
     assert "See also" not in page
     assert "## With R12000" in page
 
 
 def test_index_lists_pages_by_name_with_counts() -> None:
-    index = render_index({"O2": 4, "IRIX 6.5": 1})
+    index = render_index({"O2": 4, "IRIX 6.5": 1}, page_files({"O2", "IRIX 6.5"}))
     assert index == "# Index\n\n- [IRIX 6.5](irix-6-5.md) (1)\n- [O2](o2.md) (4)\n"
 
 
@@ -172,7 +174,7 @@ def test_pages_carry_no_discord_links(tmp_path: Path) -> None:
     e1 = add_exchange(conn, 1, "2026-02-01")
     add_claim(conn, e1, "user-aaaa", "The O2 is quiet.")
     claims, _ = load_claims(conn)
-    page = render_page("O2", claims, {"O2"})
+    page = render_page("O2", claims, page_files({"O2"}))
     assert "discord" not in page.lower()
     assert "(user-aaaa, exchange" in page
 
@@ -231,6 +233,38 @@ def test_render_page_concatenates_section_parts() -> None:
         part_key(key, 2): [("It uses an R12000.", [3])],
     }
 
-    page = render_page("O2", CLAIMS[:2], {"O2"}, article)
+    page = render_page("O2", CLAIMS[:2], page_files({"O2"}), article)
 
     assert "The O2 is compact. [1] It uses an R12000. [2]" in page
+
+
+def test_page_files_are_unique_and_never_empty_or_index() -> None:
+    files = page_files(
+        ["O2", "O2机器", "C", "C++", "电源供应", "Index", "o2-2"],
+        {"O2": 100, "O2机器": 4, "C": 5, "C++": 9, "电源供应": 3, "Index": 1, "o2-2": 50},
+    )
+    assert files["O2"] == "o2.md" and files["o2-2"] == "o2-2.md" and files["O2机器"] == "o2-3.md"
+    assert files["C++"] == "c.md" and files["C"] == "c-2.md"
+    assert files["Index"] == "index-2.md"
+    assert re.fullmatch(r"topic-[0-9a-f]{8}\.md", files["电源供应"])
+    assert len(set(files.values())) == 7
+    assert page_files(["b", "a"]) == {"a": "a.md", "b": "b.md"}
+
+
+def test_build_site_keeps_colliding_pages_and_links_to_them(tmp_path: Path) -> None:
+    claims = [
+        claim(1, "The O2 uses an R12000.", {"O2", "R12000"}),
+        claim(2, "The O2 is quiet.", {"O2"}),
+        claim(3, "O2机器 boots.", {"O2机器", "R12000"}),
+        claim(4, "电源供应 fails.", {"电源供应", "R12000"}),
+    ]
+    written = build_site(claims, 1, tmp_path)
+    assert "o2.md" in written and "o2-2.md" in written and ".md" not in written
+    assert (tmp_path / "o2.md").read_text().startswith("# O2\n")
+    assert (tmp_path / "o2-2.md").read_text().startswith("# O2机器\n")
+    index = (tmp_path / "index.md").read_text()
+    see_also = (tmp_path / "r12000.md").read_text()
+    for text in (index, see_also):
+        for target in re.findall(r"\]\(([^)]+)\)", text):
+            assert (tmp_path / target).is_file(), target
+    assert "[O2机器](o2-2.md)" in see_also
