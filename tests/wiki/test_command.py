@@ -50,18 +50,18 @@ def test_stats_reports_topics_pages_distribution_and_unassigned(tmp_path: Path) 
     assert "topics: 2" in out
     assert "pages: 1" in out
     assert "unassigned: 1" in out
-    assert "excluded: 2 (check:uncheckable 1, review 1)" in out
+    assert "excluded: 1 (review 1)" in out
     assert "3-4: 1" in out
 
 
-def test_verdicts_any_admits_unverified_claims_and_bad_names_are_refused(tmp_path: Path) -> None:
+def test_verdicts_supported_only_excludes_uncheckable_and_bad_names_are_refused(
+    tmp_path: Path,
+) -> None:
     env = seeded(tmp_path)
-    code, out = run(["wiki", "stats", "--min-claims", "3", "--verdicts", "any"], env)
+    code, out = run(["wiki", "stats", "--min-claims", "3", "--verdicts", "supported"], env)
     assert code == ExitCode.OK
-    assert "excluded: 1 (review 1)" in out
-    code, out = run(
-        ["wiki", "stats", "--min-claims", "3", "--verdicts", "supported,uncheckable"], env
-    )
+    assert "excluded: 2 (check:uncheckable 1, review 1)" in out
+    code, out = run(["wiki", "stats", "--min-claims", "3", "--verdicts", "any"], env)
     assert code == ExitCode.OK and "excluded: 1 (review 1)" in out
     code, _ = run(["wiki", "stats", "--verdicts", "bogus"], env)
     assert code == ExitCode.CONFIG
@@ -72,7 +72,7 @@ def test_claim_gate_drops_techless_claims_from_stats_and_build(tmp_path: Path) -
     code, out = run(["wiki", "stats", "--min-claims", "3", "--claim-gate"], env)
     assert code == ExitCode.OK
     assert "unassigned: 0" in out
-    assert "excluded: 3 (check:uncheckable 1, no_tech 1, review 1)" in out
+    assert "excluded: 2 (no_tech 1, review 1)" in out
     out_dir = tmp_path / "site"
     run(["wiki", "build", "--out", str(out_dir), "--claim-gate"], env)
     assert (out_dir / "o2.md").exists()
@@ -81,7 +81,7 @@ def test_claim_gate_drops_techless_claims_from_stats_and_build(tmp_path: Path) -
 def test_runs_limits_stats_and_rejects_bad_ids(tmp_path: Path) -> None:
     env = seeded(tmp_path)
     code, out = run(["wiki", "stats", "--runs", "1"], env)
-    assert code == ExitCode.OK and "claims: 5" in out
+    assert code == ExitCode.OK and "claims: 6" in out
     code, out = run(["wiki", "stats", "--runs", "1,9"], env)
     assert code != ExitCode.OK
     code, out = run(["wiki", "stats", "--runs", "x"], env)

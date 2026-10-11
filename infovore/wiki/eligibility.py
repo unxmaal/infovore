@@ -8,7 +8,7 @@ UNCHECKED: Final = "unchecked"
 SUPPORTED: Final = frozenset({"supported"})
 ANY: Final = "any"
 KNOWN: Final = frozenset(VERDICTS) | {UNCHECKED}
-DEFAULT_VERDICTS: Final = "supported"
+DEFAULT_VERDICTS: Final = "supported,uncheckable"
 VERDICTS_HELP: Final = (
     "claim-check verdicts allowed on pages: a comma-separated subset of"
     " supported, uncheckable, unsupported_fact, low_overlap, unchecked, or 'any'"
