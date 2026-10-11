@@ -21,6 +21,7 @@ from infovore.wiki.canon import (
     summarise_merge,
 )
 from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
+from infovore.wiki.html import write_html
 from infovore.wiki.kinds import KINDS, LABELS, parents
 from infovore.wiki.topics import Topics, disambiguations, load_topics, slug, topic_redirects
 
@@ -483,6 +484,7 @@ def build_site(
     grouper: "Grouper | None" = None,
     background: float | None = None,
     nav: Navigation | None = None,
+    html: bool = False,
 ) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
@@ -523,4 +525,7 @@ def build_site(
         files[names[name]] = render_disambiguation(name, candidates, sizes, names)
     for filename, text in files.items():
         (out / filename).write_text(text)
-    return sorted(files)
+    written = sorted(files)
+    if html:
+        written += write_html(out, written, sizes, redirects, names)
+    return written

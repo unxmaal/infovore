@@ -36,6 +36,9 @@ def test_build_writes_pages_for_topics_over_the_minimum(tmp_path: Path) -> None:
     assert code == ExitCode.OK
     assert sorted(p.name for p in out_dir.iterdir()) == ["all.md", "index.md", "o2.md"]
     assert "pages: 1" in out
+    argv = ["wiki", "build", "--out", str(out_dir), "--min-claims", "3", "--html"]
+    assert run(argv, env)[0] == ExitCode.OK
+    assert (out_dir / "index.html").exists() and (out_dir / "search.json").exists()
 
 
 def test_build_default_minimum_is_three(tmp_path: Path) -> None:
