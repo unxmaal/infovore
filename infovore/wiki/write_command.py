@@ -15,7 +15,7 @@ from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki import writer
 from infovore.wiki.build import WikiClaim, _by_topic, load_claims, sections_of
 from infovore.wiki.eligibility import parse_verdicts
-from infovore.wiki.groups import group_claims
+from infovore.wiki.groups import Grouper, group_claims, make_grouper_for
 from infovore.wiki.support import Dropped, keep_supported
 
 if TYPE_CHECKING:
@@ -54,7 +54,11 @@ def _log(path: Path | None, unit: Unit, rows: list[dict[str, object]]) -> None:
 
 
 def _units(
-    claims: Sequence[WikiClaim], min_claims: int, min_section: int, limit: int | None
+    claims: Sequence[WikiClaim],
+    min_claims: int,
+    min_section: int,
+    limit: int | None,
+    grouper: Grouper = group_claims,
 ) -> list[Unit]:
     by_topic = {n: v for n, v in _by_topic(claims).items() if len(v) >= min_claims}
     names = sorted(by_topic, key=lambda n: (-len(by_topic[n]), n))[:limit]
@@ -62,7 +66,7 @@ def _units(
         Unit(
             name,
             section,
-            tuple(g.lead for g in group_claims(members)[: writer.MAX_GROUPS]),
+            tuple(g.lead for g in grouper(members)[: writer.MAX_GROUPS]),
         )
         for name in names
         for section, members in sections_of(name, by_topic[name], min_section).items()
@@ -85,7 +89,8 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
         tag_runs=[args.tag_run],
         verdicts=parse_verdicts(args.verdicts),
     )
-    units = _units(claims, args.min_claims, args.min_section, args.limit)
+    grouper = make_grouper_for(args.grouping, claims)
+    units = _units(claims, args.min_claims, args.min_section, args.limit, grouper)
     if not args.write:
         if units:
             first = units[0]

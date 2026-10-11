@@ -1,5 +1,17 @@
+import pytest
+
+from infovore.triage.embed import EMBED_BATCH
+from infovore.wiki import groups as groups_module
 from infovore.wiki.build import WikiClaim
-from infovore.wiki.groups import group_claims
+from infovore.wiki.groups import (
+    ClaimGroup,
+    cosine,
+    group_claims,
+    make_grouper,
+    make_grouper_for,
+    summarise,
+)
+from tests.triage.test_embed import FakeEmbedder
 
 INDIGO = "The Indigo2 has an R10000 processor"
 INDIGO_PARAPHRASE = "Indigo2 has the R10000 processor"
@@ -56,3 +68,85 @@ def test_a_claim_joins_the_first_matching_group() -> None:
     c = claim(3, "Indigo2 R10000 processor cache")
     groups = group_claims([a, b, c], threshold=0.6)
     assert [g.members for g in groups] == [(a, c), (b,)]
+
+
+def test_groups_sort_by_distinct_speakers_then_conversations_before_size() -> None:
+    one_voice = [
+        WikiClaim(1, 1, "2026-01-01", "user-aaaa", "Octane has V12 graphics", frozenset()),
+        WikiClaim(2, 1, "2026-01-01", "user-aaaa", "Octane has V12 graphics card", frozenset()),
+        WikiClaim(3, 1, "2026-01-01", "user-aaaa", "Octane has the V12 graphics", frozenset()),
+    ]
+    two_voices = [
+        WikiClaim(4, 2, "2026-01-03", "user-bbbb", INDIGO, frozenset()),
+        WikiClaim(5, 3, "2026-01-05", "user-cccc", INDIGO_PARAPHRASE, frozenset()),
+    ]
+    groups = group_claims([*one_voice, *two_voices])
+
+    assert [g.lead.claim_id for g in groups] == [4, 1]
+    assert (groups[0].corroboration, groups[0].exchanges, groups[0].span) == (
+        2,
+        frozenset({2, 3}),
+        ("2026-01-03", "2026-01-05"),
+    )
+    assert (groups[1].corroboration, groups[1].speakers) == (1, frozenset({"user-aaaa"}))
+
+
+def test_vectors_replace_tokens_and_must_align() -> None:
+    a, b, c = claim(1, "alpha"), claim(2, "beta"), claim(3, "gamma")
+    vectors = [[1.0, 0.0], [0.99, 0.1], [0.0, 1.0]]
+
+    groups = group_claims([a, b, c], vectors=vectors)
+
+    assert [(g.lead, g.members) for g in groups] == [(a, (a, b)), (c, (c,))]
+    assert len(group_claims([a, b, c], vectors=vectors, vector_threshold=0.999)) == 3
+    with pytest.raises(ValueError, match="one vector per claim"):
+        group_claims([a, b], vectors=vectors)
+
+
+def test_cosine_handles_zero_vectors() -> None:
+    assert cosine([0.0, 0.0], [1.0, 0.0]) == 0.0
+    assert cosine([1.0, 0.0], [1.0, 0.0]) == pytest.approx(1.0)
+
+
+def test_make_grouper_embeds_every_claim_once_in_batches() -> None:
+    embedder = FakeEmbedder()
+    claims = [claim(i, f"indigo2 claim {i}") for i in range(EMBED_BATCH + 3)]
+
+    grouper = make_grouper(embedder, claims)
+    groups = grouper(claims[:5])
+
+    assert [len(call) for call in embedder.calls] == [EMBED_BATCH, 3]
+    assert sum(len(g.members) for g in groups) == 5
+
+
+def test_make_grouper_for_picks_jaccard_or_the_embedder(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert make_grouper_for("jaccard", []) is group_claims
+    monkeypatch.setattr(groups_module, "load_embedder", lambda model, revision: FakeEmbedder())
+    grouper = make_grouper_for("embed", [claim(1, "indigo2 r10000")])
+    assert grouper is not group_claims and len(grouper([claim(1, "indigo2 r10000")])) == 1
+
+
+def test_summarise_counts_groups_by_speakers_and_corroborated_claims() -> None:
+    solo = ClaimGroup(claim(1, "a"), (claim(1, "a"),))
+    pair = ClaimGroup(
+        claim(2, "b"),
+        (claim(2, "b"), WikiClaim(3, 2, "2026-01-01", "user-bbbb", "b", frozenset())),
+    )
+    trio = ClaimGroup(
+        claim(4, "c"),
+        (
+            claim(4, "c"),
+            WikiClaim(5, 2, "2026-01-01", "user-bbbb", "c", frozenset()),
+            WikiClaim(6, 3, "2026-01-01", "user-cccc", "c", frozenset()),
+        ),
+    )
+
+    summary = summarise([[solo, pair], [trio]])
+
+    assert summary.by_speakers == {"1": 1, "2": 1, "3+": 1}
+    assert (summary.groups, summary.corroborated_claims, summary.claims) == (3, 5, 6)
+    assert str(summary) == (
+        "groups 3 (1 speaker(s) 1, 2 speaker(s) 1, 3+ speaker(s) 1);"
+        " claims in 2+ speaker groups 5/6 (83.3%)"
+    )
+    assert summarise([]).share == 0.0
