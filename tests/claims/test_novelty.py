@@ -13,6 +13,7 @@ from infovore.claims import novelty
 from infovore.claims.novelty import (
     BROAD_CANDIDATES,
     CANDIDATES,
+    DESCRIBE_BATCH,
     FOCUS_WEIGHT,
     PAUSE,
     RETRIES,
@@ -22,6 +23,7 @@ from infovore.claims.novelty import (
     co_topics,
     common_tokens,
     coverage,
+    fetch_descriptions,
     fetch_extract,
     fetch_references,
     focus,
@@ -39,7 +41,7 @@ from infovore.claims.novelty import (
     wiki_get,
 )
 from infovore.cli import ExitCode, main
-from infovore.db.novelty import Reference, novelty_for, references
+from infovore.db.novelty import Reference, novelty_for, references, store_reference
 from infovore.db.wiki_tags import create_tag_run, record_tags
 from infovore.wiki.build import WikiClaim
 from tests.claims.seed import NOW, db, environment
@@ -79,8 +81,13 @@ def params(url: str) -> dict[str, str]:
 
 
 class FakeWiki:
-    def __init__(self, search: dict[str, list[str]], pages: dict[str, str]) -> None:
-        self.search, self.pages = search, pages
+    def __init__(
+        self,
+        search: dict[str, list[str]],
+        pages: dict[str, str],
+        descriptions: dict[str, str] | None = None,
+    ) -> None:
+        self.search, self.pages, self.descriptions = search, pages, descriptions or {}
         self.urls: list[str] = []
 
     def __call__(self, url: str) -> Any:
@@ -90,10 +97,19 @@ class FakeWiki:
             hits = self.search.get(q["srsearch"], [])
             assert int(q["srlimit"]) in (CANDIDATES, BROAD_CANDIDATES)
             return {"query": {"search": [{"title": t} for t in hits]}}
+        if q["prop"] == "description":
+            pages = {
+                str(i): {"title": t, "description": self.descriptions.get(t, "")}
+                for i, t in enumerate(q["titles"].split("|"))
+            }
+            return {"query": {"pages": pages}}
         title = q["titles"]
         if title not in self.pages:
             return {"query": {"pages": {"-1": {"title": title, "missing": ""}}}}
-        return {"query": {"pages": {"7": {"title": title.upper(), "extract": self.pages[title]}}}}
+        page = {"title": title.upper(), "extract": self.pages[title]}
+        if title in self.descriptions:
+            page["description"] = self.descriptions[title]
+        return {"query": {"pages": {"7": page}}}
 
 
 def test_sentences_drop_headings_and_short_fragments() -> None:
@@ -105,9 +121,29 @@ def test_sentences_drop_headings_and_short_fragments() -> None:
 def test_search_and_extract_parse_the_api_shapes() -> None:
     wiki = FakeWiki({"Octane": ["Octane rating", "SGI Octane"]}, {"SGI Octane": OCTANE_TEXT})
     assert search_titles(wiki, "Octane") == ["Octane rating", "SGI Octane"]
-    assert fetch_extract(wiki, "SGI Octane") == ("SGI OCTANE", OCTANE_TEXT)
-    assert fetch_extract(wiki, "Nothing") == ("Nothing", "")
+    assert fetch_extract(wiki, "SGI Octane") == ("SGI OCTANE", OCTANE_TEXT, "")
+    assert fetch_extract(wiki, "Nothing") == ("Nothing", "", "")
     assert search_titles(lambda url: {}, "x") == []
+    wiki = FakeWiki({}, {"SGI Octane": OCTANE_TEXT}, {"SGI Octane": "Computer series"})
+    assert fetch_extract(wiki, "SGI Octane") == ("SGI OCTANE", OCTANE_TEXT, "Computer series")
+
+
+def test_fetch_descriptions_fills_found_references_in_batches(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    for i in range(DESCRIBE_BATCH + 1):
+        store_reference(conn, Reference(f"T{i}", f"Title {i}", "u", "text", 0.5), NOW)
+    store_reference(conn, Reference("Done", "Known", "u", "text", 0.5, "Already"), NOW)
+    store_reference(conn, Reference("None", "", "", "", 0.0), NOW)
+    wiki = FakeWiki({}, {}, {"Title 0": "Computer series", "Title 20": "MIPS microprocessor"})
+    log = io.StringIO()
+    assert fetch_descriptions(conn, wiki, log) == 2
+    assert len(wiki.urls) == 2 and params(wiki.urls[0])["titles"].count("|") == DESCRIBE_BATCH - 1
+    refs = references(conn)
+    assert refs["T0"].description == "Computer series" and refs["T20"].description.startswith(
+        "MIPS"
+    )
+    assert refs["T1"].description == "" and refs["Done"].description == "Already"
+    assert log.getvalue() == f"described 2/{DESCRIBE_BATCH + 1} references\n"
 
 
 def test_pick_reference_takes_a_fitting_direct_hit_unless_another_fits_far_better() -> None:
@@ -330,6 +366,7 @@ def test_cli_fetches_scores_and_stores(tmp_path: Path, monkeypatch: pytest.Monke
     conn = seed(tmp_path)
     conn.close()
     wiki = FakeWiki({"Octane": ["SGI Octane"]}, {"SGI Octane": OCTANE_TEXT})
+    wiki.descriptions["SGI OCTANE"] = "Computer series"
     monkeypatch.setattr(novelty, "get", wiki)
     monkeypatch.setattr(novelty, "pause", lambda s: None)
     monkeypatch.setattr(novelty, "load_embedder", lambda m, r: Vocab())
@@ -340,6 +377,8 @@ def test_cli_fetches_scores_and_stores(tmp_path: Path, monkeypatch: pytest.Monke
     )
     assert code == ExitCode.OK
     assert "fetched: 1 references\n" in out and "stored: 3 novelty rows\n" in out
+    assert "described: 1 references\n" in out
+    assert references(db(tmp_path))["Octane"].description == "Computer series"
     assert "topics: 1 with a reference article: 1" in out
     rows = novelty_for(db(tmp_path), [1, 2, 3, 4])
     assert set(rows) == {1, 2, 3}

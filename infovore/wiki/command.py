@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
+from infovore.db.novelty import descriptions
 from infovore.db.wiki_articles import sections_for
 from infovore.wiki.build import (
     DEFAULT_MIN_SECTION,
@@ -18,7 +19,9 @@ from infovore.wiki.build import (
 )
 from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP, parse_verdicts
 from infovore.wiki.groups import GROUPING_HELP, GROUPINGS, make_grouper_for, summarise
+from infovore.wiki.kinds import assign_kinds, kind_counts, summarise_kinds
 from infovore.wiki.tag_command import run_tag
+from infovore.wiki.topics import topic_kinds
 from infovore.wiki.write_command import run_write
 
 if TYPE_CHECKING:
@@ -132,6 +135,7 @@ class WikiCommand:
             background=args.background,
         )
         stats = compute_stats(claims, args.min_claims, args.background)
+        kinds = assign_kinds(stats.claims_per_page, descriptions(context.conn), topic_kinds())
         grouper = make_grouper_for(args.grouping, claims)
         lines = [
             f"topics: {stats.topics}",
@@ -141,6 +145,7 @@ class WikiCommand:
             f"on pages: {stats.on_pages}/{len(claims)}",
             f"excluded: {excluded}",
             f"merged: {merged_tags(context.conn, [args.tag_run]) if args.tag_run else 'n/a'}",
+            f"kinds: {summarise_kinds(kind_counts(kinds, stats.claims_per_page))}",
             f"background: {stats.background}"
             + (f" (cosine >= {args.background})" if args.background is not None else ""),
             f"corroboration: {summarise(page_groups(claims, args.min_claims, grouper))}",

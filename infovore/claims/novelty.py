@@ -18,6 +18,7 @@ from infovore.db.novelty import (
     Novelty,
     Reference,
     references,
+    set_descriptions,
     store_novelty,
     store_reference,
     wiki_url,
@@ -48,6 +49,7 @@ RETRIES: Final = 5
 MIN_SENTENCE: Final = 30
 COMMON_TOKENS: Final = 50
 PAUSE: Final = 0.25
+DESCRIBE_BATCH: Final = 20
 NEAREST_CHARS: Final = 300
 THRESHOLDS: Final = (0.7, 0.8, 0.9)
 SHOW: Final = 10
@@ -83,12 +85,30 @@ def search_titles(fetch: Getter, query: str, limit: int = CANDIDATES) -> list[st
     return [str(hit["title"]) for hit in body.get("query", {}).get("search", [])]
 
 
-def fetch_extract(fetch: Getter, title: str) -> tuple[str, str]:
-    body = fetch(_api(action="query", prop="extracts", explaintext=1, redirects=1, titles=title))
+def fetch_extract(fetch: Getter, title: str) -> tuple[str, str, str]:
+    props = "extracts|description"
+    body = fetch(_api(action="query", prop=props, explaintext=1, redirects=1, titles=title))
     for page in body.get("query", {}).get("pages", {}).values():
         if "missing" not in page:
-            return str(page.get("title", title)), str(page.get("extract", ""))
-    return title, ""
+            title, text = str(page.get("title", title)), str(page.get("extract", ""))
+            return title, text, str(page.get("description", ""))
+    return title, "", ""
+
+
+def fetch_descriptions(conn: Any, fetch: Getter, log: TextIO) -> int:
+    missing = [r.title for r in references(conn).values() if r.found and not r.description]
+    found: dict[str, str] = {}
+    for start in range(0, len(missing), DESCRIBE_BATCH):
+        titles = "|".join(missing[start : start + DESCRIBE_BATCH])
+        body = fetch(_api(action="query", prop="description", redirects=1, titles=titles))
+        for page in body.get("query", {}).get("pages", {}).values():
+            if page.get("description"):
+                found[str(page["title"])] = str(page["description"])
+        pause(PAUSE)
+    set_descriptions(conn, found)
+    conn.commit()
+    log.write(f"described {len(found)}/{len(missing)} references\n")
+    return len(found)
 
 
 def sentences(text: str) -> list[str]:
@@ -113,6 +133,7 @@ class Candidate:
     title: str
     text: str
     direct: bool = False
+    description: str = ""
 
 
 def coverage(text: str, co_names: Sequence[str]) -> float:
@@ -182,7 +203,8 @@ def pick_reference(
     if best is None:
         return Reference(topic, "", "", "", 0.0)
     url = wiki_url(best.title)
-    return Reference(topic, best.title, url, best.text, fits[candidates.index(best)] or 0.0)
+    found = fits[candidates.index(best)] or 0.0
+    return Reference(topic, best.title, url, best.text, found, best.description)
 
 
 def queries(topic: str, co_names: Sequence[str]) -> list[tuple[str, int]]:
@@ -214,7 +236,8 @@ def fetch_references(
             pause(PAUSE)
         candidates = []
         for title in titles:
-            candidates.append(Candidate(*fetch_extract(fetch, title), direct=title == topic))
+            found, text, description = fetch_extract(fetch, title)
+            candidates.append(Candidate(found, text, title == topic, description))
             pause(PAUSE)
         claim_tokens = frozenset().union(*(tokens(c.statement) for c in by_topic[topic]))
         store_reference(conn, pick_reference(topic, candidates, claim_tokens, co_names), now)
@@ -366,6 +389,7 @@ def run_novelty(context: "AppContext", args: argparse.Namespace) -> int:
     if args.fetch:
         n = fetch_references(conn, get, by_topic, context.clock.now(), sys.stderr, args.limit)
         context.stdout.write(f"fetched: {n} references\n")
+        context.stdout.write(f"described: {fetch_descriptions(conn, get, sys.stderr)} references\n")
     refs = {t: r for t, r in references(conn).items() if t in by_topic}
     if not any(r.found for r in refs.values()):
         context.stdout.write("no reference texts; run with --fetch\n")

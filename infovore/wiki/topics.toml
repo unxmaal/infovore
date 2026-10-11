@@ -1,173 +1,1990 @@
 # Canonical topics. aliases: literal, whole-word, case-insensitive. patterns: regexes.
+# kind: machine, cpu, graphics, os, software, part, standard, company, other. An entry with a
+# kind and no aliases or patterns only labels the topic and never tags claims.
 
 [[topic]]
 name = "Indy"
+kind = "machine"
 aliases = ["indy"]
 
 [[topic]]
 name = "Indigo"
+kind = "machine"
 aliases = ["indigo", "personal iris"]
 
 [[topic]]
 name = "Indigo2"
+kind = "machine"
 aliases = ["indigo2", "indigo 2"]
 
 [[topic]]
 name = "O2"
+kind = "machine"
 aliases = ["o2", "o2+"]
 
 [[topic]]
 name = "Octane"
+kind = "machine"
 aliases = ["octane", "octane2"]
 
 [[topic]]
 name = "Onyx"
+kind = "machine"
 aliases = ["onyx"]
 
 [[topic]]
 name = "Onyx2"
+kind = "machine"
 aliases = ["onyx2", "onyx 2"]
 
 [[topic]]
 name = "Origin 200"
+kind = "machine"
 aliases = ["origin 200", "o200"]
 
 [[topic]]
 name = "Origin 350"
+kind = "machine"
 aliases = ["origin 350", "origin350", "o350"]
 
 [[topic]]
 name = "Origin 2000"
+kind = "machine"
 aliases = ["origin 2000", "origin2000", "o2000", "o2k"]
 
 [[topic]]
 name = "Origin 3000"
+kind = "machine"
 aliases = ["origin 3000", "origin3000", "o3000", "o3k"]
 
 [[topic]]
 name = "Fuel"
+kind = "machine"
 aliases = ["fuel"]
 
 [[topic]]
 name = "Tezro"
+kind = "machine"
 aliases = ["tezro"]
 
 [[topic]]
 name = "Crimson"
+kind = "machine"
 aliases = ["crimson"]
 
 [[topic]]
 name = "Challenge"
+kind = "machine"
 aliases = ["challenge"]
 
 [[topic]]
 name = "R4000"
+kind = "cpu"
 aliases = ["r4000", "r4k"]
 
 [[topic]]
 name = "R4400"
+kind = "cpu"
 aliases = ["r4400"]
 
 [[topic]]
 name = "R5000"
+kind = "cpu"
 aliases = ["r5000", "r5k"]
 
 [[topic]]
 name = "R8000"
+kind = "cpu"
 aliases = ["r8000", "r8k"]
 
 [[topic]]
 name = "R10000"
+kind = "cpu"
 aliases = ["r10000", "r10k"]
 
 [[topic]]
 name = "R12000"
+kind = "cpu"
 aliases = ["r12000", "r12k"]
 
 [[topic]]
 name = "R14000"
+kind = "cpu"
 aliases = ["r14000", "r14k"]
 
 [[topic]]
 name = "R16000"
+kind = "cpu"
 aliases = ["r16000", "r16k"]
 
 [[topic]]
 name = "IRIX"
+kind = "os"
 patterns = ['\birix']
 
 [[topic]]
 name = "IRIX 3.3"
+kind = "os"
 patterns = ['\birix\s*3\.3(?!\d)']
 
 [[topic]]
 name = "IRIX 4.0"
+kind = "os"
 patterns = ['\birix\s*4\.0(?!\d)']
 
 [[topic]]
 name = "IRIX 5.2"
+kind = "os"
 patterns = ['\birix\s*5\.2(?!\d)']
 
 [[topic]]
 name = "IRIX 5.3"
+kind = "os"
 patterns = ['\birix\s*5\.3(?!\d)']
 
 [[topic]]
 name = "IRIX 6.2"
+kind = "os"
 patterns = ['\birix\s*6\.2(?!\d)']
 
 [[topic]]
 name = "IRIX 6.3"
+kind = "os"
 patterns = ['\birix\s*6\.3(?!\d)']
 
 [[topic]]
 name = "IRIX 6.4"
+kind = "os"
 patterns = ['\birix\s*6\.4(?!\d)']
 
 [[topic]]
 name = "IRIX 6.5"
+kind = "os"
 patterns = ['\birix\s*6\.5(?!\d)', '(?<![\d.])6\.5\.\d{1,2}[mf]?\b']
 
 [[topic]]
 name = "Linux"
+kind = "os"
 aliases = ["linux"]
 
 [[topic]]
 name = "NetBSD"
+kind = "os"
 aliases = ["netbsd"]
 
 [[topic]]
 name = "OpenBSD"
+kind = "os"
 aliases = ["openbsd"]
 
 [[topic]]
 name = "Windows NT"
+kind = "os"
 aliases = ["windows nt", "winnt"]
 
 [[topic]]
 name = "SGI"
+kind = "company"
 aliases = ["sgi", "silicon graphics"]
 
 [[topic]]
 name = "Sun"
+kind = "company"
 aliases = ["sun microsystems", "sparcstation", "ultrasparc"]
 
 [[topic]]
 name = "HP"
+kind = "company"
 aliases = ["hp-ux", "hpux", "hewlett-packard", "hewlett packard"]
 
 [[topic]]
 name = "IBM"
+kind = "company"
 aliases = ["ibm"]
 
 [[topic]]
 name = "Cray"
+kind = "company"
 aliases = ["cray"]
 
 [[topic]]
 name = "MIPS"
+kind = "cpu"
 aliases = ["mips"]
 
 [[topic]]
 name = "DEC"
+kind = "company"
 aliases = ["dec alpha", "decstation", "digital equipment"]
+
+[[topic]]
+name = "I2"
+kind = "machine"
+
+[[topic]]
+name = "G5"
+kind = "machine"
+
+[[topic]]
+name = "SS20"
+kind = "machine"
+
+[[topic]]
+name = "O300"
+kind = "machine"
+
+[[topic]]
+name = "Blade 2000"
+kind = "machine"
+
+[[topic]]
+name = "Blade 150"
+kind = "machine"
+
+[[topic]]
+name = "Blade 1000"
+kind = "machine"
+
+[[topic]]
+name = "Blade 1500"
+kind = "machine"
+
+[[topic]]
+name = "U60"
+kind = "machine"
+
+[[topic]]
+name = "U2"
+kind = "machine"
+
+[[topic]]
+name = "U5"
+kind = "machine"
+
+[[topic]]
+name = "U10"
+kind = "machine"
+
+[[topic]]
+name = "A500"
+kind = "machine"
+
+[[topic]]
+name = "A3000"
+kind = "machine"
+
+[[topic]]
+name = "DS10"
+kind = "machine"
+
+[[topic]]
+name = "DS20"
+kind = "machine"
+
+[[topic]]
+name = "zx6000"
+kind = "machine"
+
+[[topic]]
+name = "MDD"
+kind = "machine"
+
+[[topic]]
+name = "VW320"
+kind = "machine"
+
+[[topic]]
+name = "Cube"
+kind = "machine"
+
+[[topic]]
+name = "4D/60"
+kind = "machine"
+
+[[topic]]
+name = "BeBox"
+kind = "machine"
+
+[[topic]]
+name = "MicroVAX"
+kind = "machine"
+
+[[topic]]
+name = "Quadra"
+kind = "machine"
+
+[[topic]]
+name = "IIci"
+kind = "machine"
+
+[[topic]]
+name = "Wii"
+kind = "machine"
+
+[[topic]]
+name = "PS1"
+kind = "machine"
+
+[[topic]]
+name = "PS3"
+kind = "machine"
+
+[[topic]]
+name = "Nintendo 64"
+kind = "machine"
+
+[[topic]]
+name = "Challenge S"
+kind = "machine"
+
+[[topic]]
+name = "VAX"
+kind = "machine"
+
+[[topic]]
+name = "Atari ST"
+kind = "machine"
+
+[[topic]]
+name = "PowerMac G5"
+kind = "machine"
+
+[[topic]]
+name = "SPARCstation 2"
+kind = "machine"
+
+[[topic]]
+name = "SPARCstation 5"
+kind = "machine"
+
+[[topic]]
+name = "SPARCstation 10"
+kind = "machine"
+
+[[topic]]
+name = "A350"
+kind = "machine"
+
+[[topic]]
+name = "Altix"
+kind = "machine"
+
+[[topic]]
+name = "MiSTer"
+kind = "machine"
+
+[[topic]]
+name = "STe"
+kind = "machine"
+
+[[topic]]
+name = "machine models"
+kind = "machine"
+
+[[topic]]
+name = "x86"
+kind = "cpu"
+
+[[topic]]
+name = "PPC"
+kind = "cpu"
+
+[[topic]]
+name = "R3K"
+kind = "cpu"
+
+[[topic]]
+name = "R5K CPU"
+kind = "cpu"
+
+[[topic]]
+name = "R4K CPU"
+kind = "cpu"
+
+[[topic]]
+name = "R12K CPU"
+kind = "cpu"
+
+[[topic]]
+name = "HyperSPARC"
+kind = "cpu"
+
+[[topic]]
+name = "Pentium 4"
+kind = "cpu"
+
+[[topic]]
+name = "Xeon"
+kind = "cpu"
+
+[[topic]]
+name = "68040"
+kind = "cpu"
+
+[[topic]]
+name = "6502"
+kind = "cpu"
+
+[[topic]]
+name = "RM7900"
+kind = "cpu"
+
+[[topic]]
+name = "R2000"
+kind = "cpu"
+
+[[topic]]
+name = "IA64"
+kind = "cpu"
+
+[[topic]]
+name = "processors"
+kind = "cpu"
+
+[[topic]]
+name = "32-bit"
+kind = "cpu"
+
+[[topic]]
+name = "RISC"
+kind = "cpu"
+
+[[topic]]
+name = "68k"
+kind = "cpu"
+
+[[topic]]
+name = "MIPS CPUs"
+kind = "cpu"
+
+[[topic]]
+name = "MIPS3"
+kind = "cpu"
+
+[[topic]]
+name = "V6"
+kind = "graphics"
+
+[[topic]]
+name = "V8"
+kind = "graphics"
+
+[[topic]]
+name = "V10"
+kind = "graphics"
+
+[[topic]]
+name = "V12"
+kind = "graphics"
+
+[[topic]]
+name = "GPU"
+kind = "graphics"
+
+[[topic]]
+name = "XVR-1200"
+kind = "graphics"
+
+[[topic]]
+name = "XVR-100"
+kind = "graphics"
+
+[[topic]]
+name = "XVR-600"
+kind = "graphics"
+
+[[topic]]
+name = "CADduo"
+kind = "graphics"
+
+[[topic]]
+name = "IR4"
+kind = "graphics"
+
+[[topic]]
+name = "VGX"
+kind = "graphics"
+
+[[topic]]
+name = "Elan"
+kind = "graphics"
+
+[[topic]]
+name = "Entropy"
+kind = "graphics"
+
+[[topic]]
+name = "ESI"
+kind = "graphics"
+
+[[topic]]
+name = "VPro"
+kind = "graphics"
+
+[[topic]]
+name = "Odyssey"
+kind = "graphics"
+
+[[topic]]
+name = "InfiniteReality"
+kind = "graphics"
+
+[[topic]]
+name = "InfiniteReality4"
+kind = "graphics"
+
+[[topic]]
+name = "RealityEngine"
+kind = "graphics"
+
+[[topic]]
+name = "IrisVision"
+kind = "graphics"
+
+[[topic]]
+name = "Voodoo2"
+kind = "graphics"
+
+[[topic]]
+name = "Voodoo3"
+kind = "graphics"
+
+[[topic]]
+name = "graphics"
+kind = "graphics"
+
+[[topic]]
+name = "graphics board"
+kind = "graphics"
+
+[[topic]]
+name = "graphics drivers"
+kind = "graphics"
+
+[[topic]]
+name = "graphics hardware"
+kind = "graphics"
+
+[[topic]]
+name = "graphics module"
+kind = "graphics"
+
+[[topic]]
+name = "graphics subsystem"
+kind = "graphics"
+
+[[topic]]
+name = "graphics issues"
+kind = "graphics"
+
+[[topic]]
+name = "FX32"
+kind = "graphics"
+
+[[topic]]
+name = "FX GPUs"
+kind = "graphics"
+
+[[topic]]
+name = "Mental Ray"
+kind = "graphics"
+
+[[topic]]
+name = "RenderMan"
+kind = "graphics"
+
+[[topic]]
+name = "OS 9"
+kind = "os"
+
+[[topic]]
+name = "Leopard"
+kind = "os"
+
+[[topic]]
+name = "System 7"
+kind = "os"
+
+[[topic]]
+name = "Win2k"
+kind = "os"
+
+[[topic]]
+name = "SLES9"
+kind = "os"
+
+[[topic]]
+name = "SLES11"
+kind = "os"
+
+[[topic]]
+name = "RHEL"
+kind = "os"
+
+[[topic]]
+name = "Mint"
+kind = "os"
+
+[[topic]]
+name = "OSF/1"
+kind = "os"
+
+[[topic]]
+name = "VxWorks"
+kind = "os"
+
+[[topic]]
+name = "OS"
+kind = "os"
+
+[[topic]]
+name = "5.3"
+kind = "os"
+
+[[topic]]
+name = "6.5.30"
+kind = "os"
+
+[[topic]]
+name = "6.5.22"
+kind = "os"
+
+[[topic]]
+name = "6.5"
+kind = "os"
+
+[[topic]]
+name = "6.2"
+kind = "os"
+
+[[topic]]
+name = "ProPack"
+kind = "os"
+
+[[topic]]
+name = "single user mode"
+kind = "os"
+
+[[topic]]
+name = "miniroot"
+kind = "os"
+
+[[topic]]
+name = "booting"
+kind = "os"
+
+[[topic]]
+name = "X11"
+kind = "os"
+
+[[topic]]
+name = "NT"
+kind = "os"
+
+[[topic]]
+name = "Debian"
+kind = "os"
+
+[[topic]]
+name = "FreeBSD"
+kind = "os"
+
+[[topic]]
+name = "Unix"
+kind = "os"
+
+[[topic]]
+name = "Windows"
+kind = "os"
+
+[[topic]]
+name = "macOS"
+kind = "os"
+
+[[topic]]
+name = "Solaris"
+kind = "os"
+
+[[topic]]
+name = "AIX"
+kind = "os"
+
+[[topic]]
+name = "VMS"
+kind = "os"
+
+[[topic]]
+name = "A/UX"
+kind = "os"
+
+[[topic]]
+name = "Solaris 10"
+kind = "os"
+
+[[topic]]
+name = "MIPSpro"
+kind = "software"
+
+[[topic]]
+name = "Booterizer"
+kind = "software"
+
+[[topic]]
+name = "nekoware"
+kind = "software"
+
+[[topic]]
+name = "sgug-rse"
+kind = "software"
+
+[[topic]]
+name = "RSE"
+kind = "software"
+
+[[topic]]
+name = "didbs"
+kind = "software"
+
+[[topic]]
+name = "tardist"
+kind = "software"
+
+[[topic]]
+name = "gdb"
+kind = "software"
+
+[[topic]]
+name = "inst"
+kind = "software"
+
+[[topic]]
+name = "Java"
+kind = "software"
+
+[[topic]]
+name = "sash"
+kind = "software"
+
+[[topic]]
+name = "mplayer"
+kind = "software"
+
+[[topic]]
+name = "irix_ansible"
+kind = "software"
+
+[[topic]]
+name = "Reanimator"
+kind = "software"
+
+[[topic]]
+name = "distcc"
+kind = "software"
+
+[[topic]]
+name = "binutils"
+kind = "software"
+
+[[topic]]
+name = "irixports"
+kind = "software"
+
+[[topic]]
+name = "OpenSSL"
+kind = "software"
+
+[[topic]]
+name = "tdnf"
+kind = "software"
+
+[[topic]]
+name = "sgugshell"
+kind = "software"
+
+[[topic]]
+name = "tgcware"
+kind = "software"
+
+[[topic]]
+name = "CMake"
+kind = "software"
+
+[[topic]]
+name = "swmgr"
+kind = "software"
+
+[[topic]]
+name = "GLUT"
+kind = "software"
+
+[[topic]]
+name = "dbx"
+kind = "software"
+
+[[topic]]
+name = "xmms"
+kind = "software"
+
+[[topic]]
+name = "Ghidra"
+kind = "software"
+
+[[topic]]
+name = "curl"
+kind = "software"
+
+[[topic]]
+name = "rld"
+kind = "software"
+
+[[topic]]
+name = "rpmbuild"
+kind = "software"
+
+[[topic]]
+name = "EFS"
+kind = "software"
+
+[[topic]]
+name = "BIOS"
+kind = "software"
+
+[[topic]]
+name = "programs"
+kind = "software"
+
+[[topic]]
+name = "patches"
+kind = "software"
+
+[[topic]]
+name = "games"
+kind = "software"
+
+[[topic]]
+name = "Wine"
+kind = "software"
+
+[[topic]]
+name = "vi"
+kind = "software"
+
+[[topic]]
+name = "clang"
+kind = "software"
+
+[[topic]]
+name = "cc"
+kind = "software"
+
+[[topic]]
+name = "libtool"
+kind = "software"
+
+[[topic]]
+name = "mount"
+kind = "software"
+
+[[topic]]
+name = "sudo"
+kind = "software"
+
+[[topic]]
+name = "sshd"
+kind = "software"
+
+[[topic]]
+name = "ncurses"
+kind = "software"
+
+[[topic]]
+name = "GNU tar"
+kind = "software"
+
+[[topic]]
+name = "Docker"
+kind = "software"
+
+[[topic]]
+name = "Premiere"
+kind = "software"
+
+[[topic]]
+name = "VICE"
+kind = "software"
+
+[[topic]]
+name = "ClassiCube"
+kind = "software"
+
+[[topic]]
+name = "ESXi"
+kind = "software"
+
+[[topic]]
+name = "GNOME"
+kind = "software"
+
+[[topic]]
+name = "NeWS"
+kind = "software"
+
+[[topic]]
+name = "LOVE"
+kind = "software"
+
+[[topic]]
+name = "software"
+kind = "software"
+
+[[topic]]
+name = "drivers"
+kind = "software"
+
+[[topic]]
+name = "fx"
+kind = "software"
+
+[[topic]]
+name = "hinv"
+kind = "software"
+
+[[topic]]
+name = "fx command"
+kind = "software"
+
+[[topic]]
+name = "hinv command"
+kind = "software"
+
+[[topic]]
+name = "fx.64"
+kind = "software"
+
+[[topic]]
+name = "emulator"
+kind = "software"
+
+[[topic]]
+name = "emulation"
+kind = "software"
+
+[[topic]]
+name = "IDE"
+kind = "software"
+
+[[topic]]
+name = "Flame"
+kind = "software"
+
+[[topic]]
+name = "Maya"
+kind = "software"
+
+[[topic]]
+name = "Alias"
+kind = "software"
+
+[[topic]]
+name = "Softimage"
+kind = "software"
+
+[[topic]]
+name = "demos"
+kind = "software"
+
+[[topic]]
+name = "documentation"
+kind = "software"
+
+[[topic]]
+name = "manual"
+kind = "software"
+
+[[topic]]
+name = "GUI"
+kind = "software"
+
+[[topic]]
+name = "script"
+kind = "software"
+
+[[topic]]
+name = "libraries"
+kind = "software"
+
+[[topic]]
+name = "binary"
+kind = "software"
+
+[[topic]]
+name = "freeware"
+kind = "software"
+
+[[topic]]
+name = "install"
+kind = "software"
+
+[[topic]]
+name = "installation"
+kind = "software"
+
+[[topic]]
+name = "spec file"
+kind = "software"
+
+[[topic]]
+name = "setenv"
+kind = "software"
+
+[[topic]]
+name = "root"
+kind = "software"
+
+[[topic]]
+name = "/etc/passwd"
+kind = "software"
+
+[[topic]]
+name = ".bashrc"
+kind = "software"
+
+[[topic]]
+name = "mrxvt"
+kind = "software"
+
+[[topic]]
+name = "VizServer"
+kind = "software"
+
+[[topic]]
+name = "Jaleo"
+kind = "software"
+
+[[topic]]
+name = "ElectroPaint"
+kind = "software"
+
+[[topic]]
+name = "MayaMan"
+kind = "software"
+
+[[topic]]
+name = "Chimera"
+kind = "software"
+
+[[topic]]
+name = "UG"
+kind = "software"
+
+[[topic]]
+name = "MRI machines"
+kind = "software"
+
+[[topic]]
+name = "IRC"
+kind = "software"
+
+[[topic]]
+name = "Xsun"
+kind = "software"
+
+[[topic]]
+name = "GNU/Linux"
+kind = "software"
+
+[[topic]]
+name = "Mashek"
+kind = "software"
+
+[[topic]]
+name = "DCD"
+kind = "software"
+
+[[topic]]
+name = "winterm"
+kind = "software"
+
+[[topic]]
+name = "desktop"
+kind = "software"
+
+[[topic]]
+name = "AV1"
+kind = "software"
+
+[[topic]]
+name = "ELF"
+kind = "software"
+
+[[topic]]
+name = "sginet"
+kind = "software"
+
+[[topic]]
+name = "IRIXNet"
+kind = "software"
+
+[[topic]]
+name = "ZuluSCSI"
+kind = "part"
+
+[[topic]]
+name = "BlueSCSI"
+kind = "part"
+
+[[topic]]
+name = "RaSCSI"
+kind = "part"
+
+[[topic]]
+name = "SCSI2SD"
+kind = "part"
+
+[[topic]]
+name = "IP35"
+kind = "part"
+
+[[topic]]
+name = "IO9"
+kind = "part"
+
+[[topic]]
+name = "IO10"
+kind = "part"
+
+[[topic]]
+name = "IP6"
+kind = "part"
+
+[[topic]]
+name = "IP7"
+kind = "part"
+
+[[topic]]
+name = "IP28"
+kind = "part"
+
+[[topic]]
+name = "IP30"
+kind = "part"
+
+[[topic]]
+name = "L1"
+kind = "part"
+
+[[topic]]
+name = "L2 controller"
+kind = "part"
+
+[[topic]]
+name = "L2"
+kind = "part"
+
+[[topic]]
+name = "VBOB"
+kind = "part"
+
+[[topic]]
+name = "Dallas chip"
+kind = "part"
+
+[[topic]]
+name = "DM2"
+kind = "part"
+
+[[topic]]
+name = "DM10"
+kind = "part"
+
+[[topic]]
+name = "MACE"
+kind = "part"
+
+[[topic]]
+name = "floppy drive"
+kind = "part"
+
+[[topic]]
+name = "heatsink"
+kind = "part"
+
+[[topic]]
+name = "tape"
+kind = "part"
+
+[[topic]]
+name = "NIC"
+kind = "part"
+
+[[topic]]
+name = "jumpers"
+kind = "part"
+
+[[topic]]
+name = "plastics"
+kind = "part"
+
+[[topic]]
+name = "frontplane"
+kind = "part"
+
+[[topic]]
+name = "rack"
+kind = "part"
+
+[[topic]]
+name = "cache"
+kind = "part"
+
+[[topic]]
+name = "SCA drives"
+kind = "part"
+
+[[topic]]
+name = "tantalum capacitors"
+kind = "part"
+
+[[topic]]
+name = "network cards"
+kind = "part"
+
+[[topic]]
+name = "switches"
+kind = "part"
+
+[[topic]]
+name = "ASICs"
+kind = "part"
+
+[[topic]]
+name = "CPU"
+kind = "part"
+
+[[topic]]
+name = "PS/2 ports"
+kind = "part"
+
+[[topic]]
+name = "video"
+kind = "part"
+
+[[topic]]
+name = "audio"
+kind = "part"
+
+[[topic]]
+name = "screen"
+kind = "part"
+
+[[topic]]
+name = "NAS"
+kind = "part"
+
+[[topic]]
+name = "price"
+kind = "part"
+
+[[topic]]
+name = "network"
+kind = "part"
+
+[[topic]]
+name = "1600SW"
+kind = "part"
+
+[[topic]]
+name = "serial"
+kind = "standard"
+
+[[topic]]
+name = "RS232"
+kind = "standard"
+
+[[topic]]
+name = "S-Video"
+kind = "standard"
+
+[[topic]]
+name = "SDI"
+kind = "standard"
+
+[[topic]]
+name = "VLAN"
+kind = "standard"
+
+[[topic]]
+name = "MIDI"
+kind = "standard"
+
+[[topic]]
+name = "DNS"
+kind = "standard"
+
+[[topic]]
+name = "EFI"
+kind = "standard"
+
+[[topic]]
+name = "UEFI"
+kind = "standard"
+
+[[topic]]
+name = "POSIX"
+kind = "standard"
+
+[[topic]]
+name = "XDMCP"
+kind = "standard"
+
+[[topic]]
+name = "MCA"
+kind = "standard"
+
+[[topic]]
+name = "FC"
+kind = "standard"
+
+[[topic]]
+name = "Fibre Channel"
+kind = "standard"
+
+[[topic]]
+name = "gigabit Ethernet"
+kind = "standard"
+
+[[topic]]
+name = "DMA"
+kind = "standard"
+
+[[topic]]
+name = "X"
+kind = "standard"
+
+[[topic]]
+name = "standards"
+kind = "standard"
+
+[[topic]]
+name = "OBP"
+kind = "standard"
+
+[[topic]]
+name = "Motif"
+kind = "standard"
+
+[[topic]]
+name = "bootp"
+kind = "standard"
+
+[[topic]]
+name = "TFTP"
+kind = "standard"
+
+[[topic]]
+name = "FDDI"
+kind = "standard"
+
+[[topic]]
+name = "SGUG"
+kind = "company"
+
+[[topic]]
+name = "Autodesk"
+kind = "company"
+
+[[topic]]
+name = "Cisco"
+kind = "company"
+
+[[topic]]
+name = "Sony"
+kind = "company"
+
+[[topic]]
+name = "Fujitsu"
+kind = "company"
+
+[[topic]]
+name = "archive.org"
+kind = "company"
+
+[[topic]]
+name = "companies"
+kind = "company"
+
+[[topic]]
+name = "GCC"
+kind = "company"
+
+[[topic]]
+name = "ISO"
+kind = "company"
+
+[[topic]]
+name = "PC"
+kind = "machine"
+
+[[topic]]
+name = "machine"
+kind = "machine"
+
+[[topic]]
+name = "SPARCstation 1"
+kind = "machine"
+
+[[topic]]
+name = "SS5"
+kind = "machine"
+
+[[topic]]
+name = "J5600"
+kind = "machine"
+
+[[topic]]
+name = "PowerBooks"
+kind = "machine"
+
+[[topic]]
+name = "PowerMac"
+kind = "machine"
+
+[[topic]]
+name = "Netra"
+kind = "machine"
+
+[[topic]]
+name = "T1000"
+kind = "machine"
+
+[[topic]]
+name = "rx2600"
+kind = "machine"
+
+[[topic]]
+name = "QuickSilver"
+kind = "machine"
+
+[[topic]]
+name = "SPARCbook"
+kind = "machine"
+
+[[topic]]
+name = "Alpha server"
+kind = "machine"
+
+[[topic]]
+name = "LC"
+kind = "machine"
+
+[[topic]]
+name = "terminals"
+kind = "machine"
+
+[[topic]]
+name = "SGI boxes"
+kind = "machine"
+
+[[topic]]
+name = "SGI hardware"
+kind = "machine"
+
+[[topic]]
+name = "R4K Indigo"
+kind = "machine"
+
+[[topic]]
+name = "R5K Indy"
+kind = "machine"
+
+[[topic]]
+name = "R5k O2"
+kind = "machine"
+
+[[topic]]
+name = "ZX"
+kind = "machine"
+
+[[topic]]
+name = "350"
+kind = "machine"
+
+[[topic]]
+name = "Ultra64"
+kind = "machine"
+
+[[topic]]
+name = "I2I"
+kind = "machine"
+
+[[topic]]
+name = "Z80"
+kind = "cpu"
+
+[[topic]]
+name = "UltraSPARC II"
+kind = "cpu"
+
+[[topic]]
+name = "PPro"
+kind = "cpu"
+
+[[topic]]
+name = "P3"
+kind = "cpu"
+
+[[topic]]
+name = "DSP"
+kind = "cpu"
+
+[[topic]]
+name = "V12 CPU"
+kind = "cpu"
+
+[[topic]]
+name = "graphics card"
+kind = "graphics"
+
+[[topic]]
+name = "FireGL"
+kind = "graphics"
+
+[[topic]]
+name = "XVR-4000"
+kind = "graphics"
+
+[[topic]]
+name = "XGL"
+kind = "graphics"
+
+[[topic]]
+name = "Max Impact"
+kind = "graphics"
+
+[[topic]]
+name = "texture memory"
+kind = "graphics"
+
+[[topic]]
+name = "XL24"
+kind = "graphics"
+
+[[topic]]
+name = "MXI"
+kind = "graphics"
+
+[[topic]]
+name = "ATI"
+kind = "graphics"
+
+[[topic]]
+name = "rendering"
+kind = "graphics"
+
+[[topic]]
+name = "VPro graphics"
+kind = "graphics"
+
+[[topic]]
+name = "resolution"
+kind = "graphics"
+
+[[topic]]
+name = "sync on green"
+kind = "graphics"
+
+[[topic]]
+name = "SI"
+kind = "graphics"
+
+[[topic]]
+name = "MEX"
+kind = "graphics"
+
+[[topic]]
+name = "DVLink"
+kind = "graphics"
+
+[[topic]]
+name = "N-World"
+kind = "graphics"
+
+[[topic]]
+name = "QNX"
+kind = "os"
+
+[[topic]]
+name = "AmigaOS"
+kind = "os"
+
+[[topic]]
+name = "MorphOS"
+kind = "os"
+
+[[topic]]
+name = "iOS"
+kind = "os"
+
+[[topic]]
+name = "WSL"
+kind = "os"
+
+[[topic]]
+name = "OpenBSD/sgi"
+kind = "os"
+
+[[topic]]
+name = "netboot"
+kind = "os"
+
+[[topic]]
+name = "bootloader"
+kind = "os"
+
+[[topic]]
+name = "AlphaBIOS"
+kind = "os"
+
+[[topic]]
+name = "SRM"
+kind = "os"
+
+[[topic]]
+name = "OpenBoot"
+kind = "os"
+
+[[topic]]
+name = "n32"
+kind = "os"
+
+[[topic]]
+name = "Blender"
+kind = "software"
+
+[[topic]]
+name = "firmware"
+kind = "software"
+
+[[topic]]
+name = "X server"
+kind = "software"
+
+[[topic]]
+name = "bash"
+kind = "software"
+
+[[topic]]
+name = "RPM"
+kind = "software"
+
+[[topic]]
+name = "pkgsrc"
+kind = "software"
+
+[[topic]]
+name = "installer"
+kind = "software"
+
+[[topic]]
+name = "shell"
+kind = "software"
+
+[[topic]]
+name = "Mozilla"
+kind = "software"
+
+[[topic]]
+name = "csh"
+kind = "software"
+
+[[topic]]
+name = "make"
+kind = "software"
+
+[[topic]]
+name = "mkfs"
+kind = "software"
+
+[[topic]]
+name = "xlv"
+kind = "software"
+
+[[topic]]
+name = "rsync"
+kind = "software"
+
+[[topic]]
+name = "configure"
+kind = "software"
+
+[[topic]]
+name = "PuTTY"
+kind = "software"
+
+[[topic]]
+name = "Proxmox"
+kind = "software"
+
+[[topic]]
+name = "Matlab"
+kind = "software"
+
+[[topic]]
+name = "AutoCAD"
+kind = "software"
+
+[[topic]]
+name = "Pascal"
+kind = "software"
+
+[[topic]]
+name = "CAD"
+kind = "software"
+
+[[topic]]
+name = "Netware"
+kind = "software"
+
+[[topic]]
+name = "code"
+kind = "software"
+
+[[topic]]
+name = "file"
+kind = "software"
+
+[[topic]]
+name = "hostname"
+kind = "software"
+
+[[topic]]
+name = "diskperf"
+kind = "software"
+
+[[topic]]
+name = "LD_LIBRARYN32_PATH"
+kind = "software"
+
+[[topic]]
+name = "MAE"
+kind = "software"
+
+[[topic]]
+name = "Diablo"
+kind = "software"
+
+[[topic]]
+name = "partitions"
+kind = "software"
+
+[[topic]]
+name = "firewall"
+kind = "software"
+
+[[topic]]
+name = "Max"
+kind = "software"
+
+[[topic]]
+name = "P3 CPU"
+kind = "software"
+
+[[topic]]
+name = "drive"
+kind = "part"
+
+[[topic]]
+name = "CRTs"
+kind = "part"
+
+[[topic]]
+name = "CRT monitors"
+kind = "part"
+
+[[topic]]
+name = "CDROM"
+kind = "part"
+
+[[topic]]
+name = "CD drive"
+kind = "part"
+
+[[topic]]
+name = "board"
+kind = "part"
+
+[[topic]]
+name = "PS/2 keyboard"
+kind = "part"
+
+[[topic]]
+name = "connector"
+kind = "part"
+
+[[topic]]
+name = "fans"
+kind = "part"
+
+[[topic]]
+name = "adapter"
+kind = "part"
+
+[[topic]]
+name = "LEDs"
+kind = "part"
+
+[[topic]]
+name = "Model M keyboard"
+kind = "part"
+
+[[topic]]
+name = "chassis"
+kind = "part"
+
+[[topic]]
+name = "flyback"
+kind = "part"
+
+[[topic]]
+name = "parallel port"
+kind = "part"
+
+[[topic]]
+name = "resistor"
+kind = "part"
+
+[[topic]]
+name = "sound"
+kind = "part"
+
+[[topic]]
+name = "DIP switches"
+kind = "part"
+
+[[topic]]
+name = "Cherokee PSU"
+kind = "part"
+
+[[topic]]
+name = "sleds"
+kind = "part"
+
+[[topic]]
+name = "IO board"
+kind = "part"
+
+[[topic]]
+name = "IP32"
+kind = "part"
+
+[[topic]]
+name = "VRMs"
+kind = "part"
+
+[[topic]]
+name = "clock battery"
+kind = "part"
+
+[[topic]]
+name = "Gotek"
+kind = "part"
+
+[[topic]]
+name = "CD-R"
+kind = "part"
+
+[[topic]]
+name = "DVD"
+kind = "part"
+
+[[topic]]
+name = "PS/2 mouse"
+kind = "part"
+
+[[topic]]
+name = "Deoxit"
+kind = "part"
+
+[[topic]]
+name = "device"
+kind = "part"
+
+[[topic]]
+name = "ACARD"
+kind = "part"
+
+[[topic]]
+name = "ports"
+kind = "part"
+
+[[topic]]
+name = "VFO"
+kind = "part"
+
+[[topic]]
+name = "Red Rock"
+kind = "part"
+
+[[topic]]
+name = "Mouser"
+kind = "part"
+
+[[topic]]
+name = "HIPPI"
+kind = "standard"
+
+[[topic]]
+name = "Appletalk"
+kind = "standard"
+
+[[topic]]
+name = "iSCSI"
+kind = "standard"
+
+[[topic]]
+name = "WiFi"
+kind = "standard"
+
+[[topic]]
+name = "VT100"
+kind = "standard"
+
+[[topic]]
+name = "UPA"
+kind = "standard"
+
+[[topic]]
+name = "VLB"
+kind = "standard"
+
+[[topic]]
+name = "13W3"
+kind = "standard"
+
+[[topic]]
+name = "telnet"
+kind = "standard"
+
+[[topic]]
+name = "AGP"
+kind = "standard"
+
+[[topic]]
+name = "DHCP"
+kind = "standard"
+
+[[topic]]
+name = "NVMe"
+kind = "standard"
+
+[[topic]]
+name = "Glitchworks"
+kind = "company"
+
+[[topic]]
+name = "VCF"
+kind = "company"
+
+[[topic]]
+name = "Apollo"
+kind = "company"
