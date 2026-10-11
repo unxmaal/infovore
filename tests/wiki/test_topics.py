@@ -2,7 +2,8 @@ import re
 
 import pytest
 
-from infovore.wiki.topics import load_topics, slug
+from infovore.wiki.kinds import KINDS
+from infovore.wiki.topics import load_topics, slug, topic_kinds
 
 
 @pytest.mark.parametrize(
@@ -47,3 +48,17 @@ def test_duplicate_names_are_rejected() -> None:
 def test_topic_with_only_patterns_loads() -> None:
     topics = load_topics('[[topic]]\nname = "A"\npatterns = ["x+y"]\n')
     assert topics.assign("see xxy") == frozenset({"A"})
+
+
+def test_kind_only_topics_label_without_tagging() -> None:
+    text = '[[topic]]\nname = "A"\nkind = "cpu"\n[[topic]]\nname = "B"\naliases = ["b"]\n'
+    topics = load_topics(text)
+    assert topics.names == ["B"] and topics.assign("a b") == frozenset({"B"})
+    assert topic_kinds(text) == {"A": "cpu"}
+    with pytest.raises(ValueError, match="unknown kind for A"):
+        topic_kinds('[[topic]]\nname = "A"\nkind = "gadget"\n')
+    with pytest.raises(ValueError, match="duplicate topic"):
+        topic_kinds('[[topic]]\nname = "A"\nkind = "cpu"\n[[topic]]\nname = "A"\nkind = "os"\n')
+    kinds = topic_kinds()
+    assert set(load_topics().names) <= set(kinds) and set(kinds.values()) <= set(KINDS)
+    assert kinds["Octane"] == "machine" and kinds["R10000"] == "cpu" and kinds["IRIX"] == "os"

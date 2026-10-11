@@ -3,8 +3,10 @@ from pathlib import Path
 from infovore.db.novelty import (
     Novelty,
     Reference,
+    descriptions,
     novelty_for,
     references,
+    set_descriptions,
     store_novelty,
     store_reference,
 )
@@ -16,10 +18,13 @@ def test_references_replace_per_topic(tmp_path: Path) -> None:
     conn = wiki_db(tmp_path)
     store_reference(conn, Reference("Octane", "SGI Octane", "u", "text", 0.4), NOW)
     store_reference(conn, Reference("PSU", "", "", "", 0.0), NOW)
-    store_reference(conn, Reference("Octane", "Octane", "u2", "newer", 0.6), NOW)
+    store_reference(conn, Reference("Octane", "Octane", "u2", "newer", 0.6, "Fuel"), NOW)
     refs = references(conn)
-    assert refs["Octane"] == Reference("Octane", "Octane", "u2", "newer", 0.6)
+    assert refs["Octane"] == Reference("Octane", "Octane", "u2", "newer", 0.6, "Fuel")
     assert refs["Octane"].found and not refs["PSU"].found
+    set_descriptions(conn, {"Octane": "Computer series", "Nope": "x"})
+    assert references(conn)["Octane"].description == "Computer series"
+    assert descriptions(conn) == {"Octane": "Computer series"}
 
 
 def test_novelty_rows_replace_per_claim_and_read_in_chunks(tmp_path: Path) -> None:

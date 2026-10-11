@@ -56,6 +56,7 @@ def test_stats_reports_topics_pages_distribution_and_unassigned(tmp_path: Path) 
     assert "on pages: 4/6" in out
     assert "excluded: 1 (review 1)" in out
     assert "3-4: 1" in out
+    assert "kinds: machine 1 (4)\n" in out
 
 
 def test_verdicts_supported_only_excludes_uncheckable_and_bad_names_are_refused(

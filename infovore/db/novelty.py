@@ -1,6 +1,6 @@
 import sqlite3
 import urllib.parse
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Final
@@ -19,6 +19,7 @@ class Reference:
     url: str
     text: str
     match: float
+    description: str = ""
 
     @property
     def found(self) -> bool:
@@ -37,15 +38,27 @@ class Novelty:
 
 def store_reference(conn: sqlite3.Connection, ref: Reference, now: datetime) -> None:
     conn.execute(
-        "INSERT OR REPLACE INTO reference_texts (topic, title, url, text, match, fetched_at)"
-        " VALUES (?, ?, ?, ?, ?, ?)",
-        (ref.topic, ref.title, ref.url, ref.text, ref.match, now.isoformat()),
+        "INSERT OR REPLACE INTO reference_texts"
+        " (topic, title, url, text, match, fetched_at, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (ref.topic, ref.title, ref.url, ref.text, ref.match, now.isoformat(), ref.description),
     )
 
 
 def references(conn: sqlite3.Connection) -> dict[str, Reference]:
-    rows = conn.execute("SELECT topic, title, url, text, match FROM reference_texts")
+    rows = conn.execute("SELECT topic, title, url, text, match, description FROM reference_texts")
     return {row[0]: Reference(*row) for row in rows}
+
+
+def set_descriptions(conn: sqlite3.Connection, by_title: Mapping[str, str]) -> None:
+    conn.executemany(
+        "UPDATE reference_texts SET description = ? WHERE title = ?",
+        [(description, title) for title, description in by_title.items()],
+    )
+
+
+def descriptions(conn: sqlite3.Connection) -> dict[str, str]:
+    rows = conn.execute("SELECT topic, description FROM reference_texts WHERE description != ''")
+    return dict(rows)
 
 
 def store_novelty(conn: sqlite3.Connection, rows: Iterable[Novelty], now: datetime) -> None:
