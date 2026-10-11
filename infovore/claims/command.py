@@ -9,11 +9,13 @@ import threading
 import time
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from infovore.claims.check import DEFAULT_THRESHOLD, run_check, show_checks
 from infovore.claims.compare import DEFAULT_THRESHOLD as COMPARE_THRESHOLD
 from infovore.claims.compare import run_compare
+from infovore.claims.controls import DEFAULT_RECALL_SAMPLE, DEFAULT_SAMPLE, run_controls
 from infovore.claims.export_cases import export_cases
 from infovore.claims.extract import (
     MAX_TOKENS,
@@ -495,6 +497,19 @@ class ClaimsCommand:
         export.add_argument("--window-chars", type=int, default=WINDOW_CHARS, dest="window_chars")
         report = sub.add_parser("report", help="per-run trial numbers")
         report.add_argument("--run", type=int, default=None)
+        controls = sub.add_parser(
+            "controls", help="negative controls for the check and gates (#340)"
+        )
+        controls.add_argument("--run", type=int, action="append", required=True)
+        controls.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
+        controls.add_argument("--sample", type=int, default=DEFAULT_SAMPLE)
+        controls.add_argument(
+            "--recall-sample", type=int, default=DEFAULT_RECALL_SAMPLE, dest="recall_sample"
+        )
+        controls.add_argument("--seed", type=int, default=0)
+        controls.add_argument("--article-run", type=int, default=None, dest="article_run")
+        controls.add_argument("--drops-log", type=Path, default=None, dest="drops_log")
+        controls.add_argument("--json", action="store_true", dest="as_json")
 
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.claims_action == "extract":
@@ -511,6 +526,8 @@ class ClaimsCommand:
             return run_compare(context, args)
         if args.claims_action == "check":
             return run_check(context, args)
+        if args.claims_action == "controls":
+            return run_controls(context, args)
         if args.claims_action == "export-cases":
             return export_cases(context, args)
         if args.claims_action == "show":
