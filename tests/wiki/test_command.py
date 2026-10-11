@@ -136,4 +136,4 @@ def test_background_flag_counts_established_claims_in_stats(tmp_path: Path) -> N
     site = tmp_path / "site"
     argv = ["wiki", "build", "--out", str(site), "--min-claims", "1", "--background", "0.8"]
     assert run(argv, env)[0] == ExitCode.OK
-    assert "## Background" in (site / "o2.md").read_text()
+    assert "Background: 1 claim already covered" in (site / "o2.md").read_text()

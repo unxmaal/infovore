@@ -273,9 +273,14 @@ def page_files(names: Iterable[str], weights: Mapping[str, int] | None = None) -
     return out
 
 
-def _background_entry(c: WikiClaim) -> str:
-    source = f"[{c.reference}]({wiki_url(c.reference)})" if c.reference else "reference"
-    return f"- {_line(c.statement)} ({source}, cosine {c.novelty:.2f}; {c.speaker}, {c.date})"
+def _background_line(settled: Collection[WikiClaim]) -> str:
+    refs = Counter(c.reference for c in settled if c.reference)
+    noun = "claim" if len(settled) == 1 else "claims"
+    line = f"Background: {len(settled)} {noun} already covered by Wikipedia"
+    if refs:
+        titles = sorted(refs, key=lambda title: (-refs[title], title))
+        line += ", see " + ", ".join(f"[{t}]({wiki_url(t)})" for t in titles)
+    return line + "."
 
 
 def render_page(
@@ -291,12 +296,14 @@ def render_page(
 
     group = grouper or group_claims
     cooc = Counter(t for c in claims for t in c.topics if t != name)
-    settled = [c for c in _ordered(claims) if established(c, background)]
+    settled = [c for c in claims if established(c, background)]
     fresh = [c for c in claims if not established(c, background)]
     groups = sections_of(name, fresh, min_section)
     known = {c.claim_id: c for c in claims}
     numbers: dict[int, int] = {}
     lines = [f"# {name}", "", f"Claims: {len(claims)}"]
+    if settled:
+        lines.append(_background_line(settled))
     for key, members in groups.items():
         lines.append("")
         if list(groups) != [GENERAL]:
@@ -306,9 +313,6 @@ def render_page(
             lines.append(prose)
         else:
             lines += [_entry(g) for g in group(members)]
-    if settled:
-        lines += ["", "## Background", ""]
-        lines += [_background_entry(c) for c in settled]
     if numbers:
         lines += ["", "## Sources", ""]
         for claim_id, n in numbers.items():
