@@ -10,7 +10,15 @@ from infovore.claims.gate import claim_has_tech
 from infovore.claims.speakers import dropped_pairs
 from infovore.db.wiki_tags import tags_for
 from infovore.triage.lexicon import load_lexicon
-from infovore.wiki.canon import alias_names, canonical, display_names
+from infovore.wiki.canon import (
+    Merged,
+    alias_names,
+    canonical,
+    display_names,
+    merge_map,
+    spelling_counts,
+    summarise_merge,
+)
 from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
 from infovore.wiki.topics import Topics, load_topics, slug
 
@@ -135,15 +143,19 @@ def _tagged(
     conn: sqlite3.Connection, claims: list[WikiClaim], tag_runs: Sequence[int], topics: Topics
 ) -> list[WikiClaim]:
     tags = tags_for(conn, tag_runs)
-    names = {
-        **display_names(t for c in claims for t in tags.get(c.claim_id, [])),
-        **alias_names(topics),
-    }
+    used = [t for c in claims for t in tags.get(c.claim_id, [])]
+    merge = merge_map(spelling_counts(used))
+    names = {**display_names(used, merge), **alias_names(topics)}
     out = []
     for c in claims:
         keys = {canonical(t) for t in tags.get(c.claim_id, [])} - {""}
-        out.append(replace(c, topics=frozenset(names[k] for k in keys)))
+        out.append(replace(c, topics=frozenset(names[merge.get(k, k)] for k in keys)))
     return out
+
+
+def merged_tags(conn: sqlite3.Connection, tag_runs: Sequence[int]) -> Merged:
+    spellings = spelling_counts(t for names in tags_for(conn, tag_runs).values() for t in names)
+    return summarise_merge(spellings, merge_map(spellings))
 
 
 def _ordered(claims: Iterable[WikiClaim]) -> list[WikiClaim]:
