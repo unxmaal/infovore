@@ -1,7 +1,7 @@
 # Assumptions
 
 - A-01: Tagging uses eval-7b, 20 claims per request | spike: correct tags in 8.7 s per 20 on run 13 claims, cheap enough for 107k claims (~5.4k requests) | if tags are poor, swap the model; prompt hash keeps runs apart.
-- A-02: Article writing uses eval-12b | spike: eval-12b merged claims into prose with citations, eval-7b mostly copied claims one per sentence | if too slow for the 21:00 window, fall back to eval-7b or cap topics with --limit.
+- A-02: Article writing uses Ornith-1.5-35B-Q4_K_M (superseded 2026-10-10: gemma-3-12b-it, the model behind eval-12b, produced paragraph items and mash-ups in trial run 6; Ornith wrote 875 sentences on the same 146 sections with 0 failures in 7 minutes, run 7) | one slot, needs chat_template_kwargs enable_thinking false | if Ornith is unavailable, gemma-3-12b-it works with --concurrency 1 and a lower quality bar.
 - A-03: Canonical form = casefold, drop a leading vendor word (sgi, silicon graphics, sun, ibm, dec, hp, apple), drop spaces, hyphens, slashes and dots except inside version numbers | covers "Indigo 2"/"SGI Indigo2"/"indigo2" | if it merges distinct things (e.g. "Sun 3" vs "Sun3" is fine, "IRIX 6.5" vs "IRIX 65" is not), add an exception list.
 - A-04: Wiki builds from runs 13 and 14 only | new prompt, sample 90% good | older runs can be added with --runs.
 - A-05: --min-claims default for pages stays 10 | current default | lower it to grow the wiki.
