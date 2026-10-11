@@ -43,14 +43,20 @@ def record_section(
     )
 
 
-def written_sections(
+def latest_article_run(
     conn: sqlite3.Connection, model_id: str, prompt_hash: str, tag_run_id: int
-) -> set[tuple[str, str]]:
-    rows = conn.execute(
-        "SELECT s.topic, s.section FROM article_sections s"
-        " JOIN article_runs r ON r.id = s.article_run_id"
-        " WHERE r.model_id = ? AND r.prompt_hash = ? AND r.tag_run_id = ?",
+) -> int | None:
+    row = conn.execute(
+        "SELECT id FROM article_runs WHERE model_id = ? AND prompt_hash = ? AND tag_run_id = ?"
+        " ORDER BY id DESC LIMIT 1",
         (model_id, prompt_hash, tag_run_id),
+    ).fetchone()
+    return None if row is None else int(row[0])
+
+
+def run_sections(conn: sqlite3.Connection, article_run_id: int) -> set[tuple[str, str]]:
+    rows = conn.execute(
+        "SELECT topic, section FROM article_sections WHERE article_run_id = ?", (article_run_id,)
     )
     return {(topic, section) for topic, section in rows}
 

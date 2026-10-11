@@ -5,9 +5,10 @@ import pytest
 
 from infovore.db.wiki_articles import (
     create_article_run,
+    latest_article_run,
     record_section,
+    run_sections,
     sections_for,
-    written_sections,
 )
 from infovore.db.wiki_tags import create_tag_run
 from tests.claims.seed import NOW
@@ -48,17 +49,30 @@ def test_record_then_read_back(tmp_path: Path) -> None:
     assert started.fetchone()[0] == NOW.isoformat()
 
 
-def test_written_sections_filters_on_model_hash_and_tag_run(tmp_path: Path) -> None:
+def test_latest_article_run_filters_on_model_hash_and_tag_run(tmp_path: Path) -> None:
     conn = wiki_db(tmp_path)
     first, second = tag_run(conn), tag_run(conn)
-    record_section(conn, make_run(conn, first), "O2", "General", [], 0)
-    record_section(conn, make_run(conn, first, model_id="m2"), "Indy", "General", [], 0)
-    record_section(conn, make_run(conn, first, prompt_hash="h2"), "Octane", "General", [], 0)
-    record_section(conn, make_run(conn, second), "Onyx", "General", [], 0)
-    assert written_sections(conn, "m1", "h1", first) == {("O2", "General")}
-    assert written_sections(conn, "m2", "h1", first) == {("Indy", "General")}
-    assert written_sections(conn, "m1", "h2", first) == {("Octane", "General")}
-    assert written_sections(conn, "m1", "h1", second) == {("Onyx", "General")}
+    assert latest_article_run(conn, "m1", "h1", first) is None
+    a = make_run(conn, first)
+    b = make_run(conn, first, model_id="m2")
+    c = make_run(conn, first, prompt_hash="h2")
+    d = make_run(conn, second)
+    e = make_run(conn, first)
+    assert latest_article_run(conn, "m1", "h1", first) == e != a
+    assert latest_article_run(conn, "m2", "h1", first) == b
+    assert latest_article_run(conn, "m1", "h2", first) == c
+    assert latest_article_run(conn, "m1", "h1", second) == d
+
+
+def test_run_sections_reads_one_run_only(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    first = tag_run(conn)
+    a, b = make_run(conn, first), make_run(conn, first)
+    record_section(conn, a, "O2", "General", [], 0)
+    record_section(conn, b, "O2", "General#2", [], 0)
+    record_section(conn, b, "Indy", "General", [], 0)
+    assert run_sections(conn, a) == {("O2", "General")}
+    assert run_sections(conn, b) == {("O2", "General#2"), ("Indy", "General")}
 
 
 def test_later_run_wins_per_topic_and_section(tmp_path: Path) -> None:
