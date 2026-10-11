@@ -14,6 +14,7 @@ from infovore.db.wiki_articles import create_article_run, record_section, writte
 from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki import writer
 from infovore.wiki.build import WikiClaim, _by_topic, load_claims, sections_of
+from infovore.wiki.eligibility import parse_verdicts
 from infovore.wiki.groups import group_claims
 from infovore.wiki.support import Dropped, keep_supported
 
@@ -82,6 +83,7 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
         salt=context.settings.pseudonym_salt,
         runs=runs,
         tag_runs=[args.tag_run],
+        verdicts=parse_verdicts(args.verdicts),
     )
     units = _units(claims, args.min_claims, args.min_section, args.limit)
     if not args.write:

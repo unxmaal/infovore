@@ -14,6 +14,7 @@ from infovore.wiki.build import (
     compute_stats,
     load_claims,
 )
+from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP, parse_verdicts
 from infovore.wiki.tag_command import run_tag
 from infovore.wiki.write_command import run_write
 
@@ -60,6 +61,7 @@ class WikiCommand:
         build.add_argument("--out", type=Path, required=True)
         build.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         build.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        build.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
         build.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
@@ -69,6 +71,7 @@ class WikiCommand:
         stats = sub.add_parser("stats", help="topics, pages and claims per page")
         stats.add_argument("--min-claims", type=int, default=DEFAULT_MIN_CLAIMS)
         stats.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        stats.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
         stats.add_argument("--runs", default=None, help="comma-separated claim run ids")
         stats.add_argument("--tag-run", type=int, default=None, dest="tag_run")
         tag = sub.add_parser("tag", help="tag claims with the things they are about")
@@ -84,6 +87,7 @@ class WikiCommand:
         write.add_argument("--tag-run", type=int, required=True, dest="tag_run")
         write.add_argument("--runs", default=None, help="comma-separated claim run ids")
         write.add_argument("--claim-gate", action="store_true", dest="claim_gate")
+        write.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
         write.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
@@ -109,6 +113,7 @@ class WikiCommand:
             salt=context.settings.pseudonym_salt,
             runs=_runs(context.conn, args.runs),
             tag_runs=None if args.tag_run is None else [args.tag_run],
+            verdicts=parse_verdicts(args.verdicts),
         )
         stats = compute_stats(claims, args.min_claims)
         lines = [

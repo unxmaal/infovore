@@ -10,7 +10,7 @@ from infovore.claims.speakers import dropped_pairs
 from infovore.db.wiki_tags import tags_for
 from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.canon import alias_names, canonical, display_names
-from infovore.wiki.eligibility import is_publishable
+from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
 from infovore.wiki.topics import Topics, load_topics, slug
 
 BUCKETS: Final = ((1, 1, "1"), (2, 2, "2"), (3, 4, "3-4"), (5, 9, "5-9"), (10, 24, "10-24"))
@@ -55,13 +55,27 @@ def subjects(topics: Topics, statement: str) -> frozenset[str]:
     return topics.assign(_line(statement))
 
 
+@dataclass(frozen=True)
+class Excluded:
+    by_reason: dict[str, int]
+
+    @property
+    def total(self) -> int:
+        return sum(self.by_reason.values())
+
+    def __str__(self) -> str:
+        parts = ", ".join(f"{k} {v}" for k, v in sorted(self.by_reason.items()))
+        return f"{self.total}" + (f" ({parts})" if parts else "")
+
+
 def load_claims(
     conn: sqlite3.Connection,
     tech_only: bool = False,
     salt: str | None = None,
     runs: Sequence[int] | None = None,
     tag_runs: Sequence[int] | None = None,
-) -> tuple[list[WikiClaim], int]:
+    verdicts: frozenset[str] | None = None,
+) -> tuple[list[WikiClaim], Excluded]:
     topics = load_topics()
     lexicon = load_lexicon(conn) if tech_only else None
     dropped = dropped_pairs(conn, salt)
@@ -76,16 +90,21 @@ def load_claims(
         list(runs or []),
     )
     claims: dict[tuple[int, str, str], WikiClaim] = {}
-    excluded = 0
+    excluded: dict[str, int] = {}
     for row in rows:
-        if (row["exchange_id"], row["speaker"]) in dropped or not is_publishable(
-            row["review"], row["chk"]
-        ):
-            excluded += 1
-            continue
+        if (row["exchange_id"], row["speaker"]) in dropped:
+            reason: str | None = "speaker"
+        elif row["review"] in REJECTED_REVIEWS:
+            reason = "review"
+        elif not is_publishable(row["review"], row["chk"], verdicts):
+            reason = f"check:{row['chk'] or UNCHECKED}"
+        else:
+            reason = None
         statement = _line(row["statement"])
-        if lexicon and not claim_has_tech(lexicon, topics, statement):
-            excluded += 1
+        if reason is None and lexicon and not claim_has_tech(lexicon, topics, statement):
+            reason = "no_tech"
+        if reason is not None:
+            excluded[reason] = excluded.get(reason, 0) + 1
             continue
         key = (row["exchange_id"], row["speaker"], statement)
         claims.setdefault(
@@ -101,7 +120,7 @@ def load_claims(
             ),
         )
     loaded = list(claims.values())
-    return (_tagged(conn, loaded, tag_runs, topics) if tag_runs else loaded), excluded
+    return (_tagged(conn, loaded, tag_runs, topics) if tag_runs else loaded), Excluded(excluded)
 
 
 def _tagged(

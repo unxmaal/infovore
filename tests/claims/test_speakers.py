@@ -227,7 +227,7 @@ def test_wiki_ignores_dropped_speakers(tmp_path: Path) -> None:
 
     claims, excluded = load_claims(conn, salt=SALT)
 
-    assert len(claims) == 4 and excluded == 3
+    assert len(claims) == 4 and excluded.total == 3
     assert all(c.speaker != ANN for c in claims)
     with pytest.raises(ConfigError):
         load_claims(conn, salt=None)

@@ -114,7 +114,7 @@ def test_cli_builds_article_pages(tmp_path: Path) -> None:
     env = seed(tmp_path)
     site = tmp_path / "site"
     base = ["wiki", "build", "--out", str(site), "--min-claims", "1", "--tag-run", "1"]
-    code, _ = run([*base, "--article-run", "1"], env)
+    code, _ = run([*base, "--article-run", "1", "--verdicts", "any"], env)
     assert code == ExitCode.OK
     page = (site / "indigo2.md").read_text()
     assert "It has an R4400. [1]" in page and "check: low_overlap)" in page

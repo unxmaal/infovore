@@ -9,6 +9,7 @@ from infovore.wiki.build import (
     render_page,
     sections_of,
 )
+from infovore.wiki.eligibility import SUPPORTED
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
 GOLDEN = Path(__file__).parent / "golden"
@@ -68,7 +69,34 @@ def test_load_claims_applies_eligibility_and_topics(tmp_path: Path) -> None:
         ("user-dddd", "2026-02-02", e2, frozenset({"O2"})),
         ("user-eeee", "2026-02-02", e2, frozenset()),
     ]
-    assert excluded == 1
+    assert excluded.total == 1 and excluded.by_reason == {"review": 1}
+
+
+def test_load_claims_verdict_policy_excludes_unsupported_and_unchecked(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    e1 = add_exchange(conn, 1, "2026-02-01")
+    add_claim(conn, e1, "user-aaaa", "The O2 is quiet.")
+    add_claim(conn, e1, "user-bbbb", "The O2 is loud.", review="wrong")
+    add_claim(conn, e1, "user-cccc", "The O2 has 1GB.", check="unsupported_fact")
+    add_claim(conn, e1, "user-dddd", "Unchecked O2 claim.", check=None)
+    add_claim(conn, e1, "user-eeee", "Good but unverified.", review="good", check="uncheckable")
+    add_claim(conn, e1, "user-ffff", "Maybe an O2 thing.", check="uncheckable")
+
+    claims, excluded = load_claims(conn, verdicts=SUPPORTED)
+
+    assert [c.speaker for c in claims] == ["user-aaaa", "user-eeee"]
+    assert excluded.by_reason == {
+        "review": 1,
+        "check:unsupported_fact": 1,
+        "check:unchecked": 1,
+        "check:uncheckable": 1,
+    }
+    assert str(excluded) == (
+        "4 (check:uncheckable 1, check:unchecked 1, check:unsupported_fact 1, review 1)"
+    )
+    assert str(load_claims(conn, verdicts=frozenset({"supported", "uncheckable"}))[1]) == (
+        "3 (check:unchecked 1, check:unsupported_fact 1, review 1)"
+    )
 
 
 def test_load_claims_collapses_duplicates_across_runs(tmp_path: Path) -> None:
@@ -150,7 +178,7 @@ def test_load_claims_claim_gate_drops_techless_claims(tmp_path: Path) -> None:
     add_claim(conn, e1, "user-aaaa", "The O2 is quiet.")
     add_claim(conn, e1, "user-bbbb", "People are friendly.")
     claims, excluded = load_claims(conn, tech_only=True)
-    assert [c.speaker for c in claims] == ["user-aaaa"] and excluded == 1
+    assert [c.speaker for c in claims] == ["user-aaaa"] and excluded.by_reason == {"no_tech": 1}
     assert len(load_claims(conn)[0]) == 2
 
 
