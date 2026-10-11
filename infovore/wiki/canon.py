@@ -98,7 +98,9 @@ def display_names(tags: Iterable[str], merge: Mapping[str, str] | None = None) -
     spellings = spelling_counts(tags)
     merged: dict[str, Counter[str]] = {}
     for key, forms in spellings.items():
-        merged.setdefault((merge or {}).get(key, key), Counter()).update(forms)
+        target = (merge or {}).get(key, key)
+        if target not in spellings or target == key:
+            merged.setdefault(target, Counter()).update(forms)
     return {
         key: min(counts, key=lambda spelling: (-counts[spelling], spelling))
         for key, counts in merged.items()

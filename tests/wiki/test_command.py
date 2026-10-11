@@ -34,7 +34,7 @@ def test_build_writes_pages_for_topics_over_the_minimum(tmp_path: Path) -> None:
     out_dir = tmp_path / "site"
     code, out = run(["wiki", "build", "--out", str(out_dir), "--min-claims", "3"], env)
     assert code == ExitCode.OK
-    assert sorted(p.name for p in out_dir.iterdir()) == ["index.md", "o2.md"]
+    assert sorted(p.name for p in out_dir.iterdir()) == ["all.md", "index.md", "o2.md"]
     assert "pages: 1" in out
 
 

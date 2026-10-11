@@ -6,6 +6,7 @@ from infovore.db.novelty import Novelty, store_novelty
 from infovore.wiki.build import (
     UNSORTED,
     Article,
+    Navigation,
     WikiClaim,
     _by_topic,
     article_parts,
@@ -15,8 +16,11 @@ from infovore.wiki.build import (
     load_claims,
     page_files,
     part_key,
+    render_all,
+    render_disambiguation,
     render_index,
     render_page,
+    render_redirect,
     sections_of,
 )
 from infovore.wiki.eligibility import SUPPORTED
@@ -325,3 +329,89 @@ def test_background_claims_leave_the_page_with_one_line_naming_their_reference(
     both = [by_id[ids[0]], other, third]
     page = render_page("O2", both, page_files({"O2"}), background=0.8)
     assert "see [IRIX](https://en.wikipedia.org/wiki/IRIX), [SGI O2](https" in page
+
+
+def test_index_groups_by_kind_nests_children_and_links_the_all_page() -> None:
+    pages = {"O2": 10, "O2 PSU": 3, "O2 fan": 1, "IRIX": 8, "IRIX 6.5": 4, "Foo": 1, "Unsorted": 5}
+    files = page_files(pages, pages)
+    nav = Navigation(kinds={"O2": "machine", "IRIX": "os", "Foo": "cpu"}, index_min=2)
+    index = render_index(pages, files, nav)
+    assert index == (
+        "# Index\n\n6 topics, 27 claims. [All topics A-Z](all.md)\n\n"
+        "## Machines\n\n- [O2](o2.md) (10)\n  - [O2 PSU](o2-psu.md) (3)\n\n"
+        "## Operating systems\n\n- [IRIX](irix.md) (8)\n  - [IRIX 6.5](irix-6-5.md) (4)\n\n"
+        "## Unsorted\n\n- [Unsorted](unsorted.md) (5)\n"
+    )
+    assert "Unsorted" not in render_index({"O2": 1}, files, Navigation(index_min=1))
+    assert "## Other\n\n- [O2](o2.md) (1)" in render_index(
+        {"O2": 1}, files, Navigation(index_min=1)
+    )
+    assert render_all({"O2": 2, "o2 fan": 1, "6.5": 1}, page_files({"O2", "o2 fan", "6.5"})) == (
+        "# All topics\n\n3 pages. [Index](index.md)\n\n## #\n\n- [6.5](6-5.md) (1)\n\n"
+        "## O\n\n- [O2](o2.md) (2)\n- [o2 fan](o2-fan.md) (1)\n"
+    )
+
+
+def test_page_links_its_parent_subtopics_and_groups_see_also_by_kind() -> None:
+    files = page_files({"O2", "O2 PSU", "R12000", "IRIX 6.5", "IRIX", "SGI"})
+    nav = Navigation(kinds={"R12000": "cpu", "IRIX": "os", "IRIX 6.5": "os"})
+    claims = [*CLAIMS[:4], claim(9, "The O2 PSU hums.", {"O2", "O2 PSU"})]
+    page = render_page(
+        "O2", claims, files, nav=nav, parent="SGI", children={"O2 PSU": 1}, min_section=10
+    )
+    assert "Claims: 5\nPart of [SGI](sgi.md)\n" in page
+    assert "## Subtopics\n\n- [O2 PSU](o2-psu.md) (1)\n" in page
+    assert page.endswith(
+        "## See also\n\n- Processors: [R12000](r12000.md)\n"
+        "- Operating systems: [IRIX](irix.md), [IRIX 6.5](irix-6-5.md)\n"
+    )
+    assert "[SGI](sgi.md)" not in page.split("## See also")[1]
+    flat = render_page("O2", claims, files, min_section=10)
+    assert "Part of" not in flat and "Subtopics" not in flat
+    assert flat.endswith("- [IRIX](irix.md)\n- [IRIX 6.5](irix-6-5.md)\n- [O2 PSU](o2-psu.md)\n")
+
+
+def test_build_site_writes_redirects_disambiguation_and_all_pages(tmp_path: Path) -> None:
+    claims = [
+        *CLAIMS,
+        claim(6, "FC is fast.", {"Fibre Channel"}),
+        claim(7, "FC.", {"Fibre Channel"}),
+        claim(8, "The O2 PSU hums.", {"O2", "O2 PSU"}),
+    ]
+    nav = Navigation(
+        kinds={"O2": "machine"},
+        redirects={"Fiber Channel": "Fibre Channel", "Ghost": "Nowhere", "O2": "Octane"},
+        disambiguations={"Ultra": ["O2", "Nothing"], "Octane": ["O2"], "Gone": ["Nothing"]},
+        index_min=1,
+    )
+    written = build_site(claims, 1, tmp_path, nav=nav)
+    assert written == [
+        "all.md",
+        "fiber-channel.md",
+        "fibre-channel.md",
+        "index.md",
+        "irix-6-5.md",
+        "irix.md",
+        "o2-psu.md",
+        "o2.md",
+        "octane.md",
+        "r12000.md",
+        "ultra.md",
+    ]
+    assert "## Subtopics\n\n- [O2 PSU](o2-psu.md) (1)\n" in (tmp_path / "o2.md").read_text()
+    assert "Claims: 1\nPart of [O2](o2.md)\n" in (tmp_path / "o2-psu.md").read_text()
+    assert (tmp_path / "fiber-channel.md").read_text() == (
+        "# Fiber Channel\n\nSee [Fibre Channel](fibre-channel.md).\n"
+    )
+    assert (tmp_path / "ultra.md").read_text() == (
+        "# Ultra\n\nUltra may refer to:\n\n- [O2](o2.md) (5)\n- Nothing\n"
+    )
+    assert (tmp_path / "octane.md").read_text().startswith("# Octane\n\nClaims: 1\n")
+    for page in tmp_path.iterdir():
+        for target in re.findall(r"\]\(([^)]+\.md)\)", page.read_text()):
+            assert (tmp_path / target).is_file(), (page.name, target)
+    index = (tmp_path / "index.md").read_text()
+    assert "## Machines\n\n- [O2](o2.md) (5)\n  - [O2 PSU](o2-psu.md) (1)" in index
+    assert "Fiber Channel" not in index
+    assert render_redirect("A", "B", {"B": "b.md"}) == "# A\n\nSee [B](b.md).\n"
+    assert render_disambiguation("A", [], {}, {}) == "# A\n\nA may refer to:\n\n"

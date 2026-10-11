@@ -16,6 +16,7 @@ aliases = ["indigo", "personal iris"]
 name = "Indigo2"
 kind = "machine"
 aliases = ["indigo2", "indigo 2"]
+redirects = ["I2"]
 
 [[topic]]
 name = "O2"
@@ -141,11 +142,13 @@ patterns = ['\birix\s*5\.2(?!\d)']
 name = "IRIX 5.3"
 kind = "os"
 patterns = ['\birix\s*5\.3(?!\d)']
+redirects = ["5.3"]
 
 [[topic]]
 name = "IRIX 6.2"
 kind = "os"
 patterns = ['\birix\s*6\.2(?!\d)']
+redirects = ["6.2"]
 
 [[topic]]
 name = "IRIX 6.3"
@@ -161,6 +164,7 @@ patterns = ['\birix\s*6\.4(?!\d)']
 name = "IRIX 6.5"
 kind = "os"
 patterns = ['\birix\s*6\.5(?!\d)', '(?<![\d.])6\.5\.\d{1,2}[mf]?\b']
+redirects = ["6.5"]
 
 [[topic]]
 name = "Linux"
@@ -216,10 +220,6 @@ aliases = ["mips"]
 name = "DEC"
 kind = "company"
 aliases = ["dec alpha", "decstation", "digital equipment"]
-
-[[topic]]
-name = "I2"
-kind = "machine"
 
 [[topic]]
 name = "G5"
@@ -635,26 +635,6 @@ kind = "os"
 
 [[topic]]
 name = "OS"
-kind = "os"
-
-[[topic]]
-name = "5.3"
-kind = "os"
-
-[[topic]]
-name = "6.5.30"
-kind = "os"
-
-[[topic]]
-name = "6.5.22"
-kind = "os"
-
-[[topic]]
-name = "6.5"
-kind = "os"
-
-[[topic]]
-name = "6.2"
 kind = "os"
 
 [[topic]]
@@ -1342,14 +1322,6 @@ name = "MCA"
 kind = "standard"
 
 [[topic]]
-name = "FC"
-kind = "standard"
-
-[[topic]]
-name = "Fibre Channel"
-kind = "standard"
-
-[[topic]]
 name = "gigabit Ethernet"
 kind = "standard"
 
@@ -1988,3 +1960,25 @@ kind = "company"
 [[topic]]
 name = "Apollo"
 kind = "company"
+
+[[topic]]
+name = "IRIX 6.5.22"
+kind = "os"
+redirects = ["6.5.22"]
+
+[[topic]]
+name = "IRIX 6.5.30"
+kind = "os"
+redirects = ["6.5.30"]
+
+[[topic]]
+name = "Fibre Channel"
+kind = "standard"
+redirects = ["Fiber Channel", "FC"]
+
+# Names that mean more than one thing in the corpus. Claims tagged with the bare name keep
+# their other topics; the page lists the candidates.
+
+[[disambiguation]]
+name = "Ultra"
+candidates = ["Ultra 5", "Ultra64", "SCSI"]

@@ -10,18 +10,21 @@ from infovore.db.novelty import descriptions
 from infovore.db.wiki_articles import sections_for
 from infovore.wiki.build import (
     DEFAULT_MIN_SECTION,
+    INDEX_MIN,
     Article,
+    Navigation,
     build_site,
     compute_stats,
     load_claims,
     merged_tags,
     page_groups,
+    redirect_names,
 )
 from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP, parse_verdicts
 from infovore.wiki.groups import GROUPING_HELP, GROUPINGS, make_grouper_for, summarise
 from infovore.wiki.kinds import assign_kinds, kind_counts, summarise_kinds
 from infovore.wiki.tag_command import run_tag
-from infovore.wiki.topics import topic_kinds
+from infovore.wiki.topics import disambiguations, topic_kinds
 from infovore.wiki.write_command import run_write
 
 if TYPE_CHECKING:
@@ -76,6 +79,7 @@ class WikiCommand:
         build.add_argument("--verdicts", default=DEFAULT_VERDICTS, help=VERDICTS_HELP)
         build.add_argument("--grouping", choices=GROUPINGS, default="jaccard", help=GROUPING_HELP)
         build.add_argument("--background", type=float, default=None, help=BACKGROUND_HELP)
+        build.add_argument("--index-min", type=int, default=INDEX_MIN, dest="index_min")
         build.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
@@ -150,7 +154,10 @@ class WikiCommand:
             + (f" (cosine >= {args.background})" if args.background is not None else ""),
             f"corroboration: {summarise(page_groups(claims, args.min_claims, grouper))}",
         ]
+        redirects = redirect_names(context.conn, [args.tag_run]) if args.tag_run else {}
+        lines.append(f"redirects: {len(redirects)}")
         if args.wiki_action == "build":
+            nav = Navigation(kinds, redirects, disambiguations(), args.index_min)
             build_site(
                 claims,
                 args.min_claims,
@@ -159,6 +166,7 @@ class WikiCommand:
                 args.min_section,
                 grouper,
                 args.background,
+                nav,
             )
             lines.append(f"wrote: {args.out}")
         else:
