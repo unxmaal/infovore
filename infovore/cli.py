@@ -270,7 +270,6 @@ def builtin_commands() -> list[Command]:
     from infovore.extract.command import ExtractCommand
     from infovore.extract.novelty import ProbeCommand
     from infovore.extract.review import PromoteCommand, ReviewCommand
-    from infovore.reputation.command import ReputationCommand
     from infovore.run import RunCommand
     from infovore.search.command import ExportArchiveCommand, SearchCommand
     from infovore.sift.command import SiftCommand
@@ -300,7 +299,6 @@ def builtin_commands() -> list[Command]:
         LabelCommand(),
         LabelsCommand(),
         RelevanceCommand(),
-        ReputationCommand(),
         SiftCommand(),
         WordsCommand(),
         ClaimsCommand(),
