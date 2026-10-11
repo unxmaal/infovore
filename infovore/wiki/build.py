@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Final
 
 from infovore.claims.gate import claim_has_tech
 from infovore.claims.speakers import dropped_pairs
+from infovore.db.novelty import novelty_for, wiki_url
 from infovore.db.wiki_tags import tags_for
 from infovore.triage.lexicon import load_lexicon
 from infovore.wiki.canon import (
@@ -43,6 +44,12 @@ class WikiClaim:
     statement: str
     topics: frozenset[str]
     check: str | None = None
+    novelty: float | None = None
+    reference: str | None = None
+
+
+def established(claim: WikiClaim, background: float | None) -> bool:
+    return background is not None and claim.novelty is not None and claim.novelty >= background
 
 
 @dataclass(frozen=True)
@@ -52,6 +59,7 @@ class Stats:
     unassigned: int
     claims_per_page: dict[str, int]
     on_pages: int = 0
+    background: int = 0
 
     def distribution(self) -> dict[str, int]:
         sizes = Counter(self.claims_per_page.values())
@@ -91,6 +99,7 @@ def load_claims(
     runs: Sequence[int] | None = None,
     tag_runs: Sequence[int] | None = None,
     verdicts: frozenset[str] | None = None,
+    background: float | None = None,
 ) -> tuple[list[WikiClaim], Excluded]:
     topics = load_topics()
     lexicon = load_lexicon(conn) if tech_only else None
@@ -136,7 +145,21 @@ def load_claims(
             ),
         )
     loaded = list(claims.values())
-    return (_tagged(conn, loaded, tag_runs, topics) if tag_runs else loaded), Excluded(excluded)
+    if tag_runs:
+        loaded = _tagged(conn, loaded, tag_runs, topics)
+    if background is not None:
+        loaded = _with_novelty(conn, loaded)
+    return loaded, Excluded(excluded)
+
+
+def _with_novelty(conn: sqlite3.Connection, claims: list[WikiClaim]) -> list[WikiClaim]:
+    rows = novelty_for(conn, [c.claim_id for c in claims])
+    return [
+        replace(c, novelty=rows[c.claim_id].max_cosine, reference=rows[c.claim_id].reference_title)
+        if c.claim_id in rows
+        else c
+        for c in claims
+    ]
 
 
 def _tagged(
@@ -250,6 +273,11 @@ def page_files(names: Iterable[str], weights: Mapping[str, int] | None = None) -
     return out
 
 
+def _background_entry(c: WikiClaim) -> str:
+    source = f"[{c.reference}]({wiki_url(c.reference)})" if c.reference else "reference"
+    return f"- {_line(c.statement)} ({source}, cosine {c.novelty:.2f}; {c.speaker}, {c.date})"
+
+
 def render_page(
     name: str,
     claims: Collection[WikiClaim],
@@ -257,12 +285,15 @@ def render_page(
     article: Article | None = None,
     min_section: int = 1,
     grouper: "Grouper | None" = None,
+    background: float | None = None,
 ) -> str:
     from infovore.wiki.groups import group_claims
 
     group = grouper or group_claims
     cooc = Counter(t for c in claims for t in c.topics if t != name)
-    groups = sections_of(name, claims, min_section)
+    settled = [c for c in _ordered(claims) if established(c, background)]
+    fresh = [c for c in claims if not established(c, background)]
+    groups = sections_of(name, fresh, min_section)
     known = {c.claim_id: c for c in claims}
     numbers: dict[int, int] = {}
     lines = [f"# {name}", "", f"Claims: {len(claims)}"]
@@ -275,6 +306,9 @@ def render_page(
             lines.append(prose)
         else:
             lines += [_entry(g) for g in group(members)]
+    if settled:
+        lines += ["", "## Background", ""]
+        lines += [_background_entry(c) for c in settled]
     if numbers:
         lines += ["", "## Sources", ""]
         for claim_id, n in numbers.items():
@@ -296,7 +330,9 @@ def render_index(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def compute_stats(claims: Iterable[WikiClaim], min_claims: int) -> Stats:
+def compute_stats(
+    claims: Iterable[WikiClaim], min_claims: int, background: float | None = None
+) -> Stats:
     claims = list(claims)
     by_topic = _by_topic(claims, UNSORTED)
     return Stats(
@@ -305,6 +341,7 @@ def compute_stats(claims: Iterable[WikiClaim], min_claims: int) -> Stats:
         unassigned=sum(1 for c in claims if not c.topics),
         claims_per_page={n: len(v) for n, v in sorted(by_topic.items()) if len(v) >= min_claims},
         on_pages=len({c.claim_id for v in by_topic.values() if len(v) >= min_claims for c in v}),
+        background=sum(1 for c in claims if established(c, background)),
     )
 
 
@@ -322,6 +359,7 @@ def build_site(
     articles: Mapping[str, Article] | None = None,
     min_section: int = 1,
     grouper: "Grouper | None" = None,
+    background: float | None = None,
 ) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
@@ -330,7 +368,7 @@ def build_site(
     files = {f"{INDEX}.md": render_index(sizes, names)}
     for name, group in by_topic.items():
         files[names[name]] = render_page(
-            name, group, names, (articles or {}).get(name), min_section, grouper
+            name, group, names, (articles or {}).get(name), min_section, grouper, background
         )
     for filename, text in files.items():
         (out / filename).write_text(text)

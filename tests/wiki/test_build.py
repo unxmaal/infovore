@@ -1,6 +1,8 @@
 import re
+from dataclasses import replace
 from pathlib import Path
 
+from infovore.db.novelty import Novelty, store_novelty
 from infovore.wiki.build import (
     UNSORTED,
     Article,
@@ -9,6 +11,7 @@ from infovore.wiki.build import (
     article_parts,
     build_site,
     compute_stats,
+    established,
     load_claims,
     page_files,
     part_key,
@@ -17,6 +20,7 @@ from infovore.wiki.build import (
     sections_of,
 )
 from infovore.wiki.eligibility import SUPPORTED
+from tests.claims.seed import NOW
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
 GOLDEN = Path(__file__).parent / "golden"
@@ -268,3 +272,48 @@ def test_build_site_keeps_colliding_pages_and_links_to_them(tmp_path: Path) -> N
         for target in re.findall(r"\]\(([^)]+)\)", text):
             assert (tmp_path / target).is_file(), target
     assert "[O2机器](o2-2.md)" in see_also
+
+
+def test_background_claims_leave_the_sections_and_list_their_reference(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    e1 = add_exchange(conn, 1, "2026-02-01")
+    ids = [
+        add_claim(conn, e1, "user-aaaa", "The O2 runs IRIX."),
+        add_claim(conn, e1, "user-bbbb", "The O2 PSU fan whines before it fails."),
+        add_claim(conn, e1, "user-cccc", "The O2 has an R5000."),
+    ]
+    store_novelty(
+        conn,
+        [
+            Novelty(ids[0], "O2", "SGI O2", 0.93, "The O2 runs IRIX 6.3.", 1.0),
+            Novelty(ids[1], "O2", "SGI O2", 0.41, "far", 0.2),
+        ],
+        NOW,
+    )
+    conn.commit()
+    plain, _ = load_claims(conn)
+    assert all(c.novelty is None for c in plain)
+    claims, _ = load_claims(conn, background=0.8)
+    by_id = {c.claim_id: c for c in claims}
+    assert by_id[ids[0]].novelty == 0.93 and by_id[ids[0]].reference == "SGI O2"
+    assert by_id[ids[1]].novelty == 0.41 and by_id[ids[2]].novelty is None
+    assert established(by_id[ids[0]], 0.8) and not established(by_id[ids[0]], None)
+    assert not established(by_id[ids[1]], 0.8) and not established(by_id[ids[2]], 0.8)
+    assert (
+        compute_stats(claims, 1, 0.8).background == 1 and compute_stats(claims, 1).background == 0
+    )
+
+    page = render_page("O2", claims, page_files({"O2"}), background=0.8)
+    assert "## Background" in page
+    assert (
+        "- The O2 runs IRIX. ([SGI O2](https://en.wikipedia.org/wiki/SGI_O2), cosine 0.93;" in page
+    )
+    assert page.index("fan whines") < page.index("## Background") < page.index("runs IRIX.")
+    assert "## Background" not in render_page("O2", claims, page_files({"O2"}))
+    site = tmp_path / "site"
+    build_site(claims, 1, site, background=0.8)
+    assert "## Background" in (site / "o2.md").read_text()
+    bare = replace(by_id[ids[0]], reference=None)
+    assert "(reference, cosine 0.93;" in render_page(
+        "O2", [bare], page_files({"O2"}), background=0.8
+    )

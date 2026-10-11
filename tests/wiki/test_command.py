@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 
 from infovore.cli import ExitCode, main
-from tests.claims.seed import environment
+from infovore.db.novelty import Novelty, store_novelty
+from tests.claims.seed import NOW, environment
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
 
@@ -117,3 +118,22 @@ def test_untagged_claims_get_an_unsorted_page(tmp_path: Path) -> None:
 
     assert code == ExitCode.OK
     assert "Nothing topical." in (out_dir / "unsorted.md").read_text()
+
+
+def test_background_flag_counts_established_claims_in_stats(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    e1 = add_exchange(conn, 1, "2026-02-01")
+    first = add_claim(conn, e1, "user-aaaa", "The O2 runs IRIX.")
+    add_claim(conn, e1, "user-bbbb", "The O2 PSU fan whines.")
+    store_novelty(conn, [Novelty(first, "O2", "SGI O2", 0.95, "near", 1.0)], NOW)
+    conn.commit()
+    conn.close()
+    env = environment(tmp_path)
+    code, out = run(["wiki", "stats", "--min-claims", "1", "--background", "0.8"], env)
+    assert code == ExitCode.OK and "background: 1 (cosine >= 0.8)" in out
+    code, out = run(["wiki", "stats", "--min-claims", "1"], env)
+    assert code == ExitCode.OK and "background: 0\n" in out
+    site = tmp_path / "site"
+    argv = ["wiki", "build", "--out", str(site), "--min-claims", "1", "--background", "0.8"]
+    assert run(argv, env)[0] == ExitCode.OK
+    assert "## Background" in (site / "o2.md").read_text()

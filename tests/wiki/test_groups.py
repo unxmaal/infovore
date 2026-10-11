@@ -150,3 +150,10 @@ def test_summarise_counts_groups_by_speakers_and_corroborated_claims() -> None:
         " claims in 2+ speaker groups 5/6 (83.3%)"
     )
     assert summarise([]).share == 0.0
+
+
+def test_more_novel_leads_sort_first_within_a_corroboration_level() -> None:
+    known = WikiClaim(1, 1, "2026-01-01", "user-aaaa", "The O2 runs IRIX.", frozenset(), None, 0.9)
+    fresh = WikiClaim(2, 2, "2026-01-02", "user-aaaa", "The O2 fan whines.", frozenset(), None, 0.3)
+    blank = WikiClaim(3, 3, "2026-01-03", "user-aaaa", "The O2 is blue.", frozenset())
+    assert [g.lead.claim_id for g in group_claims([known, fresh, blank])] == [3, 2, 1]

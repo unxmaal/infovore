@@ -14,7 +14,14 @@ from typing import TYPE_CHECKING, Any, Final, TextIO
 from infovore.claims.value import tokens
 from infovore.config import ConfigError
 from infovore.db.claims_v2 import run_ids
-from infovore.db.novelty import Novelty, Reference, references, store_novelty, store_reference
+from infovore.db.novelty import (
+    Novelty,
+    Reference,
+    references,
+    store_novelty,
+    store_reference,
+    wiki_url,
+)
 from infovore.triage.embed import DEFAULT_MODEL, DEFAULT_REVISION, EMBED_BATCH, Embedder
 from infovore.triage.embed_backend import load_embedder
 from infovore.wiki.build import WikiClaim, _by_topic, load_claims
@@ -25,7 +32,6 @@ if TYPE_CHECKING:
     from infovore.cli import AppContext
 
 WIKI_API: Final = "https://en.wikipedia.org/w/api.php"
-WIKI_PAGE: Final = "https://en.wikipedia.org/wiki/"
 USER_AGENT: Final = "infovore/0.1 (https://github.com/unxmaal/infovore)"
 TIMEOUT: Final = 30.0
 DEFAULT_MIN_CLAIMS: Final = 20
@@ -175,7 +181,7 @@ def pick_reference(
             best = candidates[scores.index(max(scores))]
     if best is None:
         return Reference(topic, "", "", "", 0.0)
-    url = WIKI_PAGE + urllib.parse.quote(best.title.replace(" ", "_"))
+    url = wiki_url(best.title)
     return Reference(topic, best.title, url, best.text, fits[candidates.index(best)] or 0.0)
 
 

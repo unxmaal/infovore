@@ -87,6 +87,7 @@ def group_claims(
     groups.sort(
         key=lambda g: (
             -g.corroboration,
+            g.lead.novelty or 0.0,
             -len(g.exchanges),
             -len(g.members),
             g.lead.date,
