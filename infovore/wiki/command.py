@@ -81,6 +81,9 @@ class WikiCommand:
         build.add_argument("--background", type=float, default=None, help=BACKGROUND_HELP)
         build.add_argument("--index-min", type=int, default=INDEX_MIN, dest="index_min")
         build.add_argument(
+            "--html", action="store_true", help="also write .html pages and search.json"
+        )
+        build.add_argument(
             "--min-section", type=int, default=DEFAULT_MIN_SECTION, dest="min_section"
         )
         build.add_argument("--runs", default=None, help="comma-separated claim run ids")
@@ -167,6 +170,7 @@ class WikiCommand:
                 grouper,
                 args.background,
                 nav,
+                args.html,
             )
             lines.append(f"wrote: {args.out}")
         else:
