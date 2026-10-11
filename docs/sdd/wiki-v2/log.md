@@ -15,3 +15,9 @@
 - T-10: red ok, green ok; 0 local calls (hand-written, small); one test expectation fixed (display-name ties are alphabetical)
 - T-11: red ok, green ok; 0 local calls (hand-written; the T-09 local draft was unusable); record defect: Files omits infovore/wiki/build.py (shared sections_of helper) and README
 - T-12: red ok, green ok; 0 local calls (hand-written, the local slot was shared and prior drafts needed full rewrites); record defects: Files omits README and infovore/wiki/groups.py needs a lazy import in build.py (circular import via WikiClaim)
+- 2026-10-10 review: 14-reviewer premise review (KB infovore-multi-agent-premise-review-2026-10-10). Verified: 71% of claims reached the writer unsupported (is_publishable ignored claim_checks); 95% of tags are verbatim noun phrases from the statement; 80% of topics have one speaker. Reframe recorded on #142: corroboration-ranked, dated, source-linked index over search; prose only for 2+ speaker groups.
+- #337 (PR #342): --verdicts gate, default supported,uncheckable; live 62,707 claims / 1,307 pages from 95,195 / 1,966.
+- #338 (PR #343): corroboration per group (distinct speakers, exchanges, span), --grouping embed; live 12.3% of page claims corroborated by 2+ speakers (2.0% under Jaccard).
+- #339 (PR #344): Unsorted page, section parts replace the MAX_GROUPS cut, on-pages accounting, write --min-claims 3; live on pages 48,630/62,707 at min-claims 3.
+- #340 (PR #345): claims controls (shuffled citations, overlap floor, matched lexicon recall, writer drops by verdict).
+- #336 (PR #341): author reputation removed after three null results.
