@@ -153,14 +153,17 @@ class Stratum:
 
 
 _MESSAGES: Final = (
-    "SELECT em.message_id AS id, m.content AS content, em.position AS position,"
+    "SELECT DISTINCT em.message_id AS id, m.content AS content, em.position AS position,"
     " (SELECT MAX(x.position) FROM exchange_messages x WHERE x.exchange_id = em.exchange_id)"
-    " AS last, EXISTS (SELECT 1 FROM claims_v2_sources s JOIN claims_v2 c ON c.id = s.claim_id"
-    "  WHERE s.message_id = em.message_id AND c.run_id = e.run_id) AS cited"
+    " AS last"
     " FROM claim_run_exchanges e JOIN exchange_messages em ON em.exchange_id = e.exchange_id"
     " JOIN messages m ON m.id = em.message_id"
     " WHERE e.run_id IN ({marks}) AND e.outcome = 'ok' AND m.deleted_at IS NULL"
     " AND m.author_is_bot = 0 AND e.exchange_id IN ({exchanges})"
+)
+_CITED: Final = (
+    "SELECT DISTINCT s.message_id FROM claims_v2_sources s JOIN claims_v2 c ON c.id = s.claim_id"
+    " WHERE c.run_id IN ({marks})"
 )
 
 
@@ -181,6 +184,7 @@ def matched_recall(
         )
     ]
     chosen = sorted(rng.sample(exchanges, min(sample, len(exchanges))))
+    cited = {r[0] for r in conn.execute(_CITED.format(marks=marks), list(runs))}
     cells: dict[tuple[str, str], list[list[int]]] = defaultdict(lambda: [[0, 0], [0, 0]])
     for start in range(0, len(chosen), 500):
         batch = chosen[start : start + 500]
@@ -194,7 +198,7 @@ def matched_recall(
                 else "middle"
             )
             cell = cells[(_length_bucket(len(row["content"].strip())), position)][
-                1 if row["cited"] else 0
+                1 if row["id"] in cited else 0
             ]
             cell[0] += 1
             cell[1] += 1 if message_hits(lexicon, row["content"]) else 0
