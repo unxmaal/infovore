@@ -2,7 +2,7 @@ import hashlib
 import sqlite3
 from collections import Counter
 from collections.abc import Collection, Iterable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Final
 
@@ -21,7 +21,8 @@ from infovore.wiki.canon import (
     summarise_merge,
 )
 from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
-from infovore.wiki.topics import Topics, load_topics, slug
+from infovore.wiki.kinds import KINDS, LABELS, parents
+from infovore.wiki.topics import Topics, disambiguations, load_topics, slug, topic_redirects
 
 if TYPE_CHECKING:
     from infovore.wiki.groups import ClaimGroup, Grouper
@@ -31,6 +32,8 @@ BUCKETS_TAIL: Final = ((25, 99, "25-99"), (100, 10**9, "100+"))
 GENERAL: Final = "General"
 UNSORTED: Final = "Unsorted"
 INDEX: Final = "index"
+ALL: Final = "all"
+INDEX_MIN: Final = 10
 PART_SEPARATOR: Final = "#"
 DEFAULT_MIN_SECTION: Final = 10
 
@@ -46,6 +49,14 @@ class WikiClaim:
     check: str | None = None
     novelty: float | None = None
     reference: str | None = None
+
+
+@dataclass(frozen=True)
+class Navigation:
+    kinds: Mapping[str, str] = field(default_factory=dict)
+    redirects: Mapping[str, str] = field(default_factory=dict)
+    disambiguations: Mapping[str, Sequence[str]] = field(default_factory=dict)
+    index_min: int = INDEX_MIN
 
 
 def established(claim: WikiClaim, background: float | None) -> bool:
@@ -168,12 +179,26 @@ def _tagged(
     tags = tags_for(conn, tag_runs)
     used = [t for c in claims for t in tags.get(c.claim_id, [])]
     merge = merge_map(spelling_counts(used))
-    names = {**display_names(used, merge), **alias_names(topics)}
+    redirects = {canonical(v): name for v, name in topic_redirects().items()}
+    names = {**display_names(used, merge), **alias_names(topics), **redirects}
+    ambiguous = set(disambiguations())
     out = []
     for c in claims:
         keys = {canonical(t) for t in tags.get(c.claim_id, [])} - {""}
-        out.append(replace(c, topics=frozenset(names[merge.get(k, k)] for k in keys)))
+        topics_of = {names[merge.get(k, k)] for k in keys} - ambiguous
+        out.append(replace(c, topics=frozenset(topics_of)))
     return out
+
+
+def redirect_names(conn: sqlite3.Connection, tag_runs: Sequence[int]) -> dict[str, str]:
+    used = [t for names in tags_for(conn, tag_runs).values() for t in names]
+    merge = merge_map(spelling_counts(used))
+    plain = display_names(used)
+    names = {**display_names(used, merge), **alias_names(load_topics())}
+    names.update({canonical(v): t for v, t in topic_redirects().items()})
+    out = {plain[key]: names[target] for key, target in merge.items()}
+    out.update({**alias_names(load_topics()), **topic_redirects()})
+    return {variant: name for variant, name in out.items() if variant != name}
 
 
 def merged_tags(conn: sqlite3.Connection, tag_runs: Sequence[int]) -> Merged:
@@ -260,7 +285,7 @@ def sections_of(
 
 
 def page_files(names: Iterable[str], weights: Mapping[str, int] | None = None) -> dict[str, str]:
-    taken = {INDEX}
+    taken = {INDEX, ALL}
     out: dict[str, str] = {}
     for name in sorted(names, key=lambda n: (-(weights or {}).get(n, 0), n)):
         base = slug(name) or f"topic-{hashlib.sha1(name.encode()).hexdigest()[:8]}"
@@ -291,6 +316,9 @@ def render_page(
     min_section: int = 1,
     grouper: "Grouper | None" = None,
     background: float | None = None,
+    nav: Navigation | None = None,
+    parent: str | None = None,
+    children: Mapping[str, int] | None = None,
 ) -> str:
     from infovore.wiki.groups import group_claims
 
@@ -302,6 +330,8 @@ def render_page(
     known = {c.claim_id: c for c in claims}
     numbers: dict[int, int] = {}
     lines = [f"# {name}", "", f"Claims: {len(claims)}"]
+    if parent:
+        lines.append(f"Part of [{parent}]({files[parent]})")
     if settled:
         lines.append(_background_line(settled))
     for key, members in groups.items():
@@ -321,17 +351,105 @@ def render_page(
                 f"{n}. {c.statement} ({c.speaker}, {c.date}, exchange {c.exchange_id},"
                 f" check: {c.check or 'unchecked'})"
             )
-    related = sorted((t for t in cooc if t in files), key=lambda t: (-cooc[t], t))
+    if children:
+        lines += ["", "## Subtopics", ""]
+        lines += [_link(t, files, children) for t in _ranked(children)]
+    skip = set(children or {}) | {parent}
+    related = sorted((t for t in cooc if t in files and t not in skip), key=lambda t: (-cooc[t], t))
     if related:
         lines += ["", "## See also", ""]
-        lines += [f"- [{t}]({files[t]})" for t in related]
+        lines += _see_also(related, files, nav.kinds if nav else {})
     return "\n".join(lines) + "\n"
 
 
-def render_index(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
+def _ranked(sizes: Mapping[str, int]) -> list[str]:
+    return sorted(sizes, key=lambda n: (-sizes[n], n))
+
+
+def _link(name: str, files: Mapping[str, str], sizes: Mapping[str, int]) -> str:
+    return f"- [{name}]({files[name]}) ({sizes[name]})"
+
+
+def _see_also(
+    related: Sequence[str], files: Mapping[str, str], kinds: Mapping[str, str]
+) -> list[str]:
+    if not kinds:
+        return [f"- [{t}]({files[t]})" for t in related]
+    out = []
+    for kind in KINDS:
+        names = [t for t in related if kinds.get(t, KINDS[-1]) == kind]
+        if names:
+            out.append(f"- {LABELS[kind]}: " + ", ".join(f"[{t}]({files[t]})" for t in names))
+    return out
+
+
+def render_redirect(name: str, target: str, files: Mapping[str, str]) -> str:
+    return f"# {name}\n\nSee [{target}]({files[target]}).\n"
+
+
+def render_disambiguation(
+    name: str, candidates: Sequence[str], sizes: Mapping[str, int], files: Mapping[str, str]
+) -> str:
+    lines = [f"# {name}", "", f"{name} may refer to:", ""]
+    lines += [_link(c, files, sizes) if c in sizes else f"- {c}" for c in candidates]
+    return "\n".join(lines) + "\n"
+
+
+def render_all(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
+    lines = ["# All topics", "", f"{len(pages)} pages. [Index]({INDEX}.md)"]
+    letter = None
+    for name in sorted(pages, key=lambda n: (n.casefold(), n)):
+        first = name[0].upper() if name[0].isalpha() else "#"
+        if first != letter:
+            letter = first
+            lines += ["", f"## {letter}", ""]
+        lines.append(_link(name, files, pages))
+    return "\n".join(lines) + "\n"
+
+
+def render_index(
+    pages: Mapping[str, int], files: Mapping[str, str], nav: Navigation | None = None
+) -> str:
     lines = ["# Index", ""]
-    lines += [f"- [{name}]({files[name]}) ({pages[name]})" for name in sorted(pages)]
+    if nav is None:
+        lines += [_link(name, files, pages) for name in sorted(pages)]
+        return "\n".join(lines) + "\n"
+    unsorted = {n: pages[n] for n in pages if n == UNSORTED}
+    topics = {n: pages[n] for n in pages if n != UNSORTED}
+    parent = parents(topics)
+    children: dict[str, list[str]] = {}
+    for child, p in parent.items():
+        children.setdefault(p, []).append(child)
+    lines.append(f"{len(topics)} topics, {_count(topics)} claims. [All topics A-Z]({ALL}.md)")
+    shown = [n for n in _ranked(topics) if n not in parent and pages[n] >= nav.index_min]
+    for kind in KINDS:
+        names = [n for n in shown if nav.kinds.get(n, KINDS[-1]) == kind]
+        if names:
+            lines += ["", f"## {LABELS[kind]}", ""]
+            for name in names:
+                lines += _tree(name, children, pages, files, nav.index_min, 0)
+    if unsorted:
+        lines += ["", "## Unsorted", "", _link(UNSORTED, files, unsorted)]
     return "\n".join(lines) + "\n"
+
+
+def _count(pages: Mapping[str, int]) -> int:
+    return sum(pages.values())
+
+
+def _tree(
+    name: str,
+    children: Mapping[str, Sequence[str]],
+    pages: Mapping[str, int],
+    files: Mapping[str, str],
+    index_min: int,
+    depth: int,
+) -> list[str]:
+    lines = ["  " * depth + _link(name, files, pages)]
+    kids = {c: pages[c] for c in children.get(name, []) if pages[c] >= index_min}
+    for child in _ranked(kids):
+        lines += _tree(child, children, pages, files, index_min, depth + 1)
+    return lines
 
 
 def compute_stats(
@@ -364,16 +482,45 @@ def build_site(
     min_section: int = 1,
     grouper: "Grouper | None" = None,
     background: float | None = None,
+    nav: Navigation | None = None,
 ) -> list[str]:
     by_topic = {n: v for n, v in _by_topic(claims, UNSORTED).items() if len(v) >= min_claims}
     out.mkdir(parents=True, exist_ok=True)
     sizes = {n: len(v) for n, v in by_topic.items()}
-    names = page_files(sizes, sizes)
-    files = {f"{INDEX}.md": render_index(sizes, names)}
+    redirects = {v: t for v, t in (nav.redirects if nav else {}).items() if t in sizes}
+    redirects = {v: t for v, t in redirects.items() if v not in sizes}
+    pages = {n: sizes[n] for n in sizes if n != UNSORTED}
+    ambiguous = {
+        n: c
+        for n, c in (nav.disambiguations if nav else {}).items()
+        if n not in sizes and any(x in sizes for x in c)
+    }
+    extra = dict.fromkeys([*redirects, *ambiguous], 0)
+    names = page_files({**sizes, **extra}, {**sizes, **extra})
+    parent = parents(pages)
+    kids: dict[str, dict[str, int]] = {}
+    for child, p in parent.items():
+        kids.setdefault(p, {})[child] = sizes[child]
+    files = {f"{INDEX}.md": render_index(sizes, names, nav)}
+    if nav is not None:
+        files[f"{ALL}.md"] = render_all(pages, names)
     for name, group in by_topic.items():
         files[names[name]] = render_page(
-            name, group, names, (articles or {}).get(name), min_section, grouper, background
+            name,
+            group,
+            names,
+            (articles or {}).get(name),
+            min_section,
+            grouper,
+            background,
+            nav,
+            parent.get(name),
+            kids.get(name),
         )
+    for variant, target in redirects.items():
+        files[names[variant]] = render_redirect(variant, target, names)
+    for name, candidates in ambiguous.items():
+        files[names[name]] = render_disambiguation(name, candidates, sizes, names)
     for filename, text in files.items():
         (out / filename).write_text(text)
     return sorted(files)

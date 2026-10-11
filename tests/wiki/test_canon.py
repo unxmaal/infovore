@@ -138,10 +138,11 @@ def test_merge_map_resolves_chains_and_stops_on_cycles() -> None:
     assert merge_map(spelled({"Indy": 5, "as": 2, "a": 2})) == {}
 
 
-def test_display_names_fold_merged_spellings_onto_the_target() -> None:
+def test_display_names_fold_merged_keys_but_keep_the_target_spelling() -> None:
     merge = {"indys": "indy"}
-    assert display_names(["Indys", "Indys", "Indys", "Indy", "INDY"], merge) == {"indy": "Indys"}
-    assert display_names(["Indys", "Indy", "Indy"], merge) == {"indy": "Indy"}
+    assert display_names(["Indys", "Indys", "Indys", "Indy", "INDY"], merge) == {"indy": "INDY"}
+    assert display_names(["Indys", "Indy", "Indy", "INDY"], merge) == {"indy": "Indy"}
+    assert display_names(["Indys", "Indys"], merge) == {"indy": "Indys"}
 
 
 def test_summarise_merge_counts_keys_and_claim_tags() -> None:

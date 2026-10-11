@@ -25,15 +25,38 @@ def slug(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
-def _entries(text: str | None) -> list[dict[str, Any]]:
+def _load(text: str | None) -> dict[str, Any]:
     source = text if text is not None else Path(__file__).with_name("topics.toml").read_text()
-    seen: set[str] = set()
-    entries: list[dict[str, Any]] = tomllib.loads(source)["topic"]
-    for topic in entries:
-        if topic["name"] in seen:
+    data: dict[str, Any] = tomllib.loads(source)
+    data.setdefault("disambiguation", [])
+    names: set[str] = set()
+    for topic in data["topic"]:
+        if topic["name"] in names:
             raise ValueError(f"duplicate topic: {topic['name']}")
-        seen.add(topic["name"])
+        names.add(topic["name"])
+    claimed: dict[str, str] = {}
+    for topic in data["topic"]:
+        for variant in topic.get("redirects", []):
+            if variant in names or variant in claimed:
+                raise ValueError(f"redirect {variant} is already a topic or redirect")
+            claimed[variant] = topic["name"]
+    for entry in data["disambiguation"]:
+        if entry["name"] in names or entry["name"] in claimed:
+            raise ValueError(f"disambiguation {entry['name']} is already a topic or redirect")
+    return data
+
+
+def _entries(text: str | None) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = _load(text)["topic"]
     return entries
+
+
+def topic_redirects(text: str | None = None) -> dict[str, str]:
+    return {v: t["name"] for t in _entries(text) for v in t.get("redirects", [])}
+
+
+def disambiguations(text: str | None = None) -> dict[str, list[str]]:
+    return {d["name"]: list(d["candidates"]) for d in _load(text)["disambiguation"]}
 
 
 def load_topics(text: str | None = None) -> Topics:

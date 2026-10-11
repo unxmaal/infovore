@@ -3,7 +3,7 @@ from pathlib import Path
 
 from infovore.cli import ExitCode, main
 from infovore.db.wiki_tags import create_tag_run, record_tags
-from infovore.wiki.build import load_claims
+from infovore.wiki.build import load_claims, redirect_names
 from tests.claims.seed import NOW, db, environment
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
 
@@ -19,6 +19,7 @@ def seed(tmp_path: Path) -> dict[str, str]:
         add_claim(conn, exchange, "user-eeee", "Foo widget again"),
         add_claim(conn, exchange, "user-ffff", "Indigo2s and the O2 machine"),
         add_claim(conn, exchange, "user-gggg", "Indigo 2 systems and the O2"),
+        add_claim(conn, exchange, "user-hhhh", "FC on an Ultra"),
     ]
     run = create_tag_run(
         conn, endpoint="e", model_alias="m", model_id="m", prompt_hash="p", now=NOW
@@ -34,6 +35,7 @@ def seed(tmp_path: Path) -> dict[str, str]:
             ids[4]: ["foo widget", "Foo widget"],
             ids[5]: ["Indigo2s", "O2机器"],
             ids[6]: ["Indigo 2 systems", "O2"],
+            ids[7]: ["FC", "Ultra", "O2"],
         },
     )
     conn.commit()
@@ -50,6 +52,18 @@ def test_variant_tags_land_on_one_page_with_the_topics_toml_name(tmp_path: Path)
     assert by_id[3] == frozenset()
     assert by_id[4] == by_id[5] == frozenset({"Foo Widget"})
     assert by_id[6] == by_id[7] == frozenset({"Indigo2", "O2"})
+    assert by_id[8] == frozenset({"Fibre Channel", "O2"})
+    redirects = redirect_names(db(tmp_path), [1])
+    expected = {
+        "Indigo2s": "Indigo2",
+        "Indigo 2 systems": "Indigo2",
+        "O2机器": "O2",
+        "FC": "Fibre Channel",
+        "I2": "Indigo2",
+        "indy": "Indy",
+    }
+    assert {k: redirects[k] for k in expected} == expected
+    assert "Foo Widget" not in redirects and all(v != n for v, n in redirects.items())
 
 
 def test_without_a_tag_run_topics_toml_is_used(tmp_path: Path) -> None:
@@ -66,8 +80,11 @@ def test_cli_build_and_stats_take_a_tag_run(tmp_path: Path) -> None:
     assert code == ExitCode.OK
     assert "pages: 3" in out.getvalue() and "unassigned: 1" in out.getvalue()
     assert "merged: 3 keys, 3 claim-tags" in out.getvalue()
+    assert "redirects: " in out.getvalue()
     site = tmp_path / "site"
     argv = ["wiki", "build", "--out", str(site), "--min-claims", "2", "--tag-run", "1"]
     code = main(argv, environ=env, dotenv_path=None, stdout=io.StringIO(), stderr=io.StringIO())
     assert code == ExitCode.OK
     assert (site / "indigo2.md").exists() and (site / "foo-widget.md").exists()
+    assert (site / "indigo2s.md").read_text() == "# Indigo2s\n\nSee [Indigo2](indigo2.md).\n"
+    assert (site / "all.md").exists() and not (site / "ultra.md").exists()

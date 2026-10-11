@@ -3,7 +3,7 @@ import re
 import pytest
 
 from infovore.wiki.kinds import KINDS
-from infovore.wiki.topics import load_topics, slug, topic_kinds
+from infovore.wiki.topics import disambiguations, load_topics, slug, topic_kinds, topic_redirects
 
 
 @pytest.mark.parametrize(
@@ -62,3 +62,27 @@ def test_kind_only_topics_label_without_tagging() -> None:
     kinds = topic_kinds()
     assert set(load_topics().names) <= set(kinds) and set(kinds.values()) <= set(KINDS)
     assert kinds["Octane"] == "machine" and kinds["R10000"] == "cpu" and kinds["IRIX"] == "os"
+
+
+def test_redirects_and_disambiguations_load_and_are_checked() -> None:
+    text = (
+        '[[topic]]\nname = "Fibre Channel"\nkind = "standard"\n'
+        'redirects = ["FC", "Fiber Channel"]\n'
+        '[[topic]]\nname = "O2"\naliases = ["o2"]\n'
+        '[[disambiguation]]\nname = "Ultra"\ncandidates = ["O2", "SCSI"]\n'
+    )
+    assert topic_redirects(text) == {"FC": "Fibre Channel", "Fiber Channel": "Fibre Channel"}
+    assert disambiguations(text) == {"Ultra": ["O2", "SCSI"]}
+    assert load_topics(text).names == ["O2"]
+    with pytest.raises(ValueError, match="redirect O2 is already"):
+        topic_redirects('[[topic]]\nname = "O2"\n[[topic]]\nname = "B"\nredirects = ["O2"]\n')
+    with pytest.raises(ValueError, match="redirect x is already"):
+        topic_redirects(
+            '[[topic]]\nname = "A"\nredirects = ["x"]\n[[topic]]\nname = "B"\nredirects = ["x"]\n'
+        )
+    with pytest.raises(ValueError, match="disambiguation A is already"):
+        disambiguations('[[topic]]\nname = "A"\n[[disambiguation]]\nname = "A"\ncandidates = []\n')
+    assert disambiguations('[[topic]]\nname = "A"\n') == {}
+    live = topic_redirects()
+    assert live["FC"] == "Fibre Channel" and live["I2"] == "Indigo2" and live["6.5"] == "IRIX 6.5"
+    assert disambiguations()["Ultra"] == ["Ultra 5", "Ultra64", "SCSI"]
