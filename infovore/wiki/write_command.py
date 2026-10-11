@@ -18,7 +18,15 @@ from infovore.db.wiki_articles import (
 )
 from infovore.triage.lexicon import Lexicon, load_lexicon
 from infovore.wiki import writer
-from infovore.wiki.build import UNSORTED, WikiClaim, _by_topic, load_claims, part_key, sections_of
+from infovore.wiki.build import (
+    UNSORTED,
+    WikiClaim,
+    _by_topic,
+    established,
+    load_claims,
+    part_key,
+    sections_of,
+)
 from infovore.wiki.eligibility import parse_verdicts
 from infovore.wiki.groups import Grouper, group_claims, make_grouper_for
 from infovore.wiki.support import Dropped, keep_supported
@@ -97,7 +105,9 @@ def run_write(context: "AppContext", args: argparse.Namespace, runs: list[int] |
         runs=runs,
         tag_runs=[args.tag_run],
         verdicts=parse_verdicts(args.verdicts),
+        background=args.background,
     )
+    claims = [c for c in claims if not established(c, args.background)]
     grouper = make_grouper_for(args.grouping, claims)
     units = _units(claims, args.min_claims, args.min_section, args.limit, grouper)
     if not args.write:

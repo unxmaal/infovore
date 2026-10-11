@@ -1,7 +1,15 @@
 import sqlite3
+import urllib.parse
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Final
+
+WIKI_PAGE: Final = "https://en.wikipedia.org/wiki/"
+
+
+def wiki_url(title: str) -> str:
+    return WIKI_PAGE + urllib.parse.quote(title.replace(" ", "_"))
 
 
 @dataclass(frozen=True)
