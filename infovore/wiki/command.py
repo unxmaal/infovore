@@ -13,6 +13,7 @@ from infovore.wiki.build import (
     build_site,
     compute_stats,
     load_claims,
+    merged_tags,
     page_groups,
 )
 from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP, parse_verdicts
@@ -129,6 +130,7 @@ class WikiCommand:
             f"unassigned: {stats.unassigned}",
             f"on pages: {stats.on_pages}/{len(claims)}",
             f"excluded: {excluded}",
+            f"merged: {merged_tags(context.conn, [args.tag_run]) if args.tag_run else 'n/a'}",
             f"corroboration: {summarise(page_groups(claims, args.min_claims, grouper))}",
         ]
         if args.wiki_action == "build":

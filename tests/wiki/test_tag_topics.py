@@ -17,6 +17,8 @@ def seed(tmp_path: Path) -> dict[str, str]:
         add_claim(conn, exchange, "user-cccc", "Nothing tagged here"),
         add_claim(conn, exchange, "user-dddd", "Foo Widget is rare"),
         add_claim(conn, exchange, "user-eeee", "Foo widget again"),
+        add_claim(conn, exchange, "user-ffff", "Indigo2s and the O2 machine"),
+        add_claim(conn, exchange, "user-gggg", "Indigo 2 systems and the O2"),
     ]
     run = create_tag_run(
         conn, endpoint="e", model_alias="m", model_id="m", prompt_hash="p", now=NOW
@@ -30,6 +32,8 @@ def seed(tmp_path: Path) -> dict[str, str]:
             ids[2]: [],
             ids[3]: ["Foo Widget"],
             ids[4]: ["foo widget", "Foo widget"],
+            ids[5]: ["Indigo2s", "O2机器"],
+            ids[6]: ["Indigo 2 systems", "O2"],
         },
     )
     conn.commit()
@@ -45,6 +49,7 @@ def test_variant_tags_land_on_one_page_with_the_topics_toml_name(tmp_path: Path)
     assert by_id[2] == frozenset({"Indigo2", "R4400"})
     assert by_id[3] == frozenset()
     assert by_id[4] == by_id[5] == frozenset({"Foo Widget"})
+    assert by_id[6] == by_id[7] == frozenset({"Indigo2", "O2"})
 
 
 def test_without_a_tag_run_topics_toml_is_used(tmp_path: Path) -> None:
@@ -59,7 +64,8 @@ def test_cli_build_and_stats_take_a_tag_run(tmp_path: Path) -> None:
     argv = ["wiki", "stats", "--min-claims", "2", "--tag-run", "1"]
     code = main(argv, environ=env, dotenv_path=None, stdout=out, stderr=io.StringIO())
     assert code == ExitCode.OK
-    assert "pages: 2" in out.getvalue() and "unassigned: 1" in out.getvalue()
+    assert "pages: 3" in out.getvalue() and "unassigned: 1" in out.getvalue()
+    assert "merged: 3 keys, 3 claim-tags" in out.getvalue()
     site = tmp_path / "site"
     argv = ["wiki", "build", "--out", str(site), "--min-claims", "2", "--tag-run", "1"]
     code = main(argv, environ=env, dotenv_path=None, stdout=io.StringIO(), stderr=io.StringIO())
