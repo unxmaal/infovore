@@ -5,6 +5,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Final
 
+from infovore.wiki.topics import slug
+
 SEARCH: Final = "search.json"
 _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 _CITE = re.compile(r"\[(\d+)\]")
@@ -98,7 +100,7 @@ def body(markdown: str) -> str:
                 out.append(f"<h1>{inline(line[2:])}</h1>")
             elif line.startswith("## "):
                 flush()
-                out.append(f"<h2>{inline(line[3:])}</h2>")
+                out.append(f'<h2 id="{slug(line[3:])}">{inline(line[3:])}</h2>')
             elif line.strip():
                 paragraph.append(line)
             else:

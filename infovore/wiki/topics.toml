@@ -1976,6 +1976,880 @@ name = "Fibre Channel"
 kind = "standard"
 redirects = ["Fiber Channel", "FC"]
 
+# Kinds for names the Wikipedia picker never reached and the name rules cannot place (#364).
+
+[[topic]]
+name = "rx2620"
+kind = "machine"
+
+[[topic]]
+name = "beige G3"
+kind = "machine"
+
+[[topic]]
+name = "4D"
+kind = "machine"
+
+[[topic]]
+name = "4D/25"
+kind = "machine"
+
+[[topic]]
+name = "4D/50"
+kind = "machine"
+
+[[topic]]
+name = "4D/70 GT"
+kind = "machine"
+
+[[topic]]
+name = "4D/380"
+kind = "machine"
+
+[[topic]]
+name = "4D/70"
+kind = "machine"
+
+[[topic]]
+name = "4D/440"
+kind = "machine"
+
+[[topic]]
+name = "Qube"
+kind = "machine"
+
+[[topic]]
+name = "U45"
+kind = "machine"
+
+[[topic]]
+name = "Blade 100/150"
+kind = "machine"
+
+[[topic]]
+name = "Blade2K"
+kind = "machine"
+
+[[topic]]
+name = "Molar Mac"
+kind = "machine"
+
+[[topic]]
+name = "P/390"
+kind = "machine"
+
+[[topic]]
+name = "VW540"
+kind = "machine"
+
+[[topic]]
+name = "Xbox 360"
+kind = "machine"
+
+[[topic]]
+name = "Xbox"
+kind = "machine"
+
+[[topic]]
+name = "3/60"
+kind = "machine"
+
+[[topic]]
+name = "43P"
+kind = "machine"
+
+[[topic]]
+name = "5080"
+kind = "machine"
+
+[[topic]]
+name = "AlphaStation 200"
+kind = "machine"
+
+[[topic]]
+name = "Alphastation"
+kind = "machine"
+
+[[topic]]
+name = "E10k"
+kind = "machine"
+
+[[topic]]
+name = "E3000"
+kind = "machine"
+
+[[topic]]
+name = "E450"
+kind = "machine"
+
+[[topic]]
+name = "PDP"
+kind = "machine"
+
+[[topic]]
+name = "PSP"
+kind = "machine"
+
+[[topic]]
+name = "SBC"
+kind = "machine"
+
+[[topic]]
+name = "SkyWriter"
+kind = "machine"
+
+[[topic]]
+name = "SNES"
+kind = "machine"
+
+[[topic]]
+name = "SPARCStation IPC"
+kind = "machine"
+
+[[topic]]
+name = "SunBlade 2000"
+kind = "machine"
+
+[[topic]]
+name = "1200"
+kind = "machine"
+
+[[topic]]
+name = "32X"
+kind = "machine"
+
+[[topic]]
+name = "A600"
+kind = "machine"
+
+[[topic]]
+name = "Arduino"
+kind = "machine"
+
+[[topic]]
+name = "R720"
+kind = "machine"
+
+[[topic]]
+name = "U1"
+kind = "machine"
+
+[[topic]]
+name = "V880Z"
+kind = "machine"
+
+[[topic]]
+name = "V890"
+kind = "machine"
+
+[[topic]]
+name = "WeatherStar XL"
+kind = "machine"
+
+[[topic]]
+name = "286"
+kind = "cpu"
+
+[[topic]]
+name = "Merced"
+kind = "cpu"
+
+[[topic]]
+name = "T2"
+kind = "cpu"
+
+[[topic]]
+name = "Z180"
+kind = "cpu"
+
+[[topic]]
+name = "i860"
+kind = "cpu"
+
+[[topic]]
+name = "MicroSPARC"
+kind = "cpu"
+
+[[topic]]
+name = "Opteron"
+kind = "cpu"
+
+[[topic]]
+name = "RM7K"
+kind = "cpu"
+
+[[topic]]
+name = "T4"
+kind = "cpu"
+
+[[topic]]
+name = "UltraSPARC IIIi"
+kind = "cpu"
+
+[[topic]]
+name = "XVR-1000"
+kind = "graphics"
+
+[[topic]]
+name = "XVR-500"
+kind = "graphics"
+
+[[topic]]
+name = "Expert3D"
+kind = "graphics"
+
+[[topic]]
+name = "Extreme"
+kind = "graphics"
+
+[[topic]]
+name = "GTX"
+kind = "graphics"
+
+[[topic]]
+name = "IR"
+kind = "graphics"
+
+[[topic]]
+name = "IR3"
+kind = "graphics"
+
+[[topic]]
+name = "XL"
+kind = "graphics"
+
+[[topic]]
+name = "GE"
+kind = "graphics"
+
+[[topic]]
+name = "Geometry Engine"
+kind = "graphics"
+
+[[topic]]
+name = "High Impact"
+kind = "graphics"
+
+[[topic]]
+name = "Newport"
+kind = "graphics"
+
+[[topic]]
+name = "NeXTDimension"
+kind = "graphics"
+
+[[topic]]
+name = "Z buffer"
+kind = "graphics"
+
+[[topic]]
+name = "Xenix"
+kind = "os"
+
+[[topic]]
+name = "SLES"
+kind = "os"
+
+[[topic]]
+name = "SLES 10"
+kind = "os"
+
+[[topic]]
+name = "Unixware"
+kind = "os"
+
+[[topic]]
+name = "Rhapsody"
+kind = "os"
+
+[[topic]]
+name = "Android"
+kind = "os"
+
+[[topic]]
+name = "Haiku"
+kind = "os"
+
+[[topic]]
+name = "MINIX"
+kind = "os"
+
+[[topic]]
+name = "Inferno"
+kind = "os"
+
+[[topic]]
+name = "Lisp"
+kind = "software"
+
+[[topic]]
+name = "glib"
+kind = "software"
+
+[[topic]]
+name = "xfsrestore"
+kind = "software"
+
+[[topic]]
+name = "Compositor"
+kind = "software"
+
+[[topic]]
+name = "devilutionX"
+kind = "software"
+
+[[topic]]
+name = "DirectX"
+kind = "software"
+
+[[topic]]
+name = "disklabel"
+kind = "software"
+
+[[topic]]
+name = "efsextract"
+kind = "software"
+
+[[topic]]
+name = "epm"
+kind = "software"
+
+[[topic]]
+name = "Fortran"
+kind = "software"
+
+[[topic]]
+name = "freeglut"
+kind = "software"
+
+[[topic]]
+name = "fsn"
+kind = "software"
+
+[[topic]]
+name = "gmake"
+kind = "software"
+
+[[topic]]
+name = "Half-Life"
+kind = "software"
+
+[[topic]]
+name = "IDA Pro"
+kind = "software"
+
+[[topic]]
+name = "keygen"
+kind = "software"
+
+[[topic]]
+name = "ld"
+kind = "software"
+
+[[topic]]
+name = "nano"
+kind = "software"
+
+[[topic]]
+name = "Pidgin"
+kind = "software"
+
+[[topic]]
+name = "PRMan"
+kind = "software"
+
+[[topic]]
+name = "sgirc"
+kind = "software"
+
+[[topic]]
+name = "Smoke"
+kind = "software"
+
+[[topic]]
+name = "Toolchest"
+kind = "software"
+
+[[topic]]
+name = "TyrQuake"
+kind = "software"
+
+[[topic]]
+name = "vfc"
+kind = "software"
+
+[[topic]]
+name = "WHDload"
+kind = "software"
+
+[[topic]]
+name = "7-Zip"
+kind = "software"
+
+[[topic]]
+name = "Barrier"
+kind = "software"
+
+[[topic]]
+name = "BMRT"
+kind = "software"
+
+[[topic]]
+name = "BRL-CAD"
+kind = "software"
+
+[[topic]]
+name = "GRUB"
+kind = "software"
+
+[[topic]]
+name = "gtk2"
+kind = "software"
+
+[[topic]]
+name = "gxemul"
+kind = "software"
+
+[[topic]]
+name = "Homeworld"
+kind = "software"
+
+[[topic]]
+name = "IDO"
+kind = "software"
+
+[[topic]]
+name = "ifconfig"
+kind = "software"
+
+[[topic]]
+name = "JIT"
+kind = "software"
+
+[[topic]]
+name = "MaXX"
+kind = "software"
+
+[[topic]]
+name = "minicom"
+kind = "software"
+
+[[topic]]
+name = "PostScript"
+kind = "software"
+
+[[topic]]
+name = "Ruby"
+kind = "software"
+
+[[topic]]
+name = "setmon"
+kind = "software"
+
+[[topic]]
+name = "xsetmon"
+kind = "software"
+
+[[topic]]
+name = "XFCE"
+kind = "software"
+
+[[topic]]
+name = "caddy"
+kind = "software"
+
+[[topic]]
+name = "dnf"
+kind = "software"
+
+[[topic]]
+name = "FrameMaker"
+kind = "software"
+
+[[topic]]
+name = "fsck"
+kind = "software"
+
+[[topic]]
+name = "Ghostscript"
+kind = "software"
+
+[[topic]]
+name = "grep"
+kind = "software"
+
+[[topic]]
+name = "LWJGL"
+kind = "software"
+
+[[topic]]
+name = "pfSense"
+kind = "software"
+
+[[topic]]
+name = "ping"
+kind = "software"
+
+[[topic]]
+name = "PowerShell"
+kind = "software"
+
+[[topic]]
+name = "Rosetta"
+kind = "software"
+
+[[topic]]
+name = "Samba"
+kind = "software"
+
+[[topic]]
+name = "SBCL"
+kind = "software"
+
+[[topic]]
+name = "4sight"
+kind = "software"
+
+[[topic]]
+name = "amdgpu"
+kind = "software"
+
+[[topic]]
+name = "Glide"
+kind = "software"
+
+[[topic]]
+name = "GLX"
+kind = "software"
+
+[[topic]]
+name = "gzip"
+kind = "software"
+
+[[topic]]
+name = "HyperV"
+kind = "software"
+
+[[topic]]
+name = "Illustrator"
+kind = "software"
+
+[[topic]]
+name = "ImgBurn"
+kind = "software"
+
+[[topic]]
+name = "init"
+kind = "software"
+
+[[topic]]
+name = "Jot"
+kind = "software"
+
+[[topic]]
+name = "Mesa"
+kind = "software"
+
+[[topic]]
+name = "netsurf-motif"
+kind = "software"
+
+[[topic]]
+name = "OpenVPN"
+kind = "software"
+
+[[topic]]
+name = "Performer"
+kind = "software"
+
+[[topic]]
+name = "Presenter"
+kind = "software"
+
+[[topic]]
+name = "scp"
+kind = "software"
+
+[[topic]]
+name = "sed"
+kind = "software"
+
+[[topic]]
+name = "SRPM"
+kind = "software"
+
+[[topic]]
+name = "Super Mario 64"
+kind = "software"
+
+[[topic]]
+name = "swap"
+kind = "software"
+
+[[topic]]
+name = "Vulkan"
+kind = "software"
+
+[[topic]]
+name = "WinUAE"
+kind = "software"
+
+[[topic]]
+name = "XQuartz"
+kind = "software"
+
+[[topic]]
+name = "XVM"
+kind = "software"
+
+[[topic]]
+name = "partition"
+kind = "software"
+
+[[topic]]
+name = "LD_LIBRARY_PATH"
+kind = "software"
+
+[[topic]]
+name = "rpath"
+kind = "software"
+
+[[topic]]
+name = "/etc/hosts"
+kind = "software"
+
+[[topic]]
+name = "environment variables"
+kind = "software"
+
+[[topic]]
+name = "Workbench"
+kind = "software"
+
+[[topic]]
+name = "Compilertron"
+kind = "software"
+
+[[topic]]
+name = "ADB"
+kind = "standard"
+
+[[topic]]
+name = "IPv6"
+kind = "standard"
+
+[[topic]]
+name = "LVD"
+kind = "standard"
+
+[[topic]]
+name = "NFSv2"
+kind = "standard"
+
+[[topic]]
+name = "NFSv3"
+kind = "standard"
+
+[[topic]]
+name = "NUMA"
+kind = "standard"
+
+[[topic]]
+name = "RAID"
+kind = "standard"
+
+[[topic]]
+name = "SSE"
+kind = "standard"
+
+[[topic]]
+name = "NTFS"
+kind = "standard"
+
+[[topic]]
+name = "HFS"
+kind = "standard"
+
+[[topic]]
+name = "OpenLDI"
+kind = "standard"
+
+[[topic]]
+name = "CISC"
+kind = "standard"
+
+[[topic]]
+name = "SMP"
+kind = "standard"
+
+[[topic]]
+name = "SLI"
+kind = "standard"
+
+[[topic]]
+name = "TCP/IP"
+kind = "standard"
+
+[[topic]]
+name = "U320"
+kind = "standard"
+
+[[topic]]
+name = "ARC"
+kind = "standard"
+
+[[topic]]
+name = "AUI"
+kind = "standard"
+
+[[topic]]
+name = "QBUS"
+kind = "standard"
+
+[[topic]]
+name = "SSL"
+kind = "standard"
+
+[[topic]]
+name = "VRML"
+kind = "standard"
+
+[[topic]]
+name = "GBSCSI"
+kind = "standard"
+
+[[topic]]
+name = "RDP"
+kind = "standard"
+
+[[topic]]
+name = "IP address"
+kind = "standard"
+
+[[topic]]
+name = "RCP"
+kind = "standard"
+
+[[topic]]
+name = "RSP"
+kind = "standard"
+
+[[topic]]
+name = "Adobe"
+kind = "company"
+
+[[topic]]
+name = "Dallas"
+kind = "company"
+
+[[topic]]
+name = "NetApp"
+kind = "company"
+
+[[topic]]
+name = "Google"
+kind = "company"
+
+[[topic]]
+name = "Lenovo"
+kind = "company"
+
+[[topic]]
+name = "NEC"
+kind = "company"
+
+[[topic]]
+name = "Toshiba"
+kind = "company"
+
+[[topic]]
+name = "3dfx"
+kind = "company"
+
+[[topic]]
+name = "Symbolics"
+kind = "company"
+
+[[topic]]
+name = "Cobalt"
+kind = "company"
+
+[[topic]]
+name = "SCO"
+kind = "company"
+
+[[topic]]
+name = "nodeboard"
+kind = "part"
+
+[[topic]]
+name = "C-brick"
+kind = "part"
+
+[[topic]]
+name = "R-brick"
+kind = "part"
+
+[[topic]]
+name = "PiStorm"
+kind = "part"
+
+[[topic]]
+name = "Toaster"
+kind = "part"
+
+[[topic]]
+name = "DB9"
+kind = "part"
+
+[[topic]]
+name = "DM3"
+kind = "part"
+
+[[topic]]
+name = "DMediaPro"
+kind = "part"
+
+[[topic]]
+name = "IDPROM"
+kind = "part"
+
+[[topic]]
+name = "IO3B"
+kind = "part"
+
+[[topic]]
+name = "IO6G"
+kind = "part"
+
+[[topic]]
+name = "IP59"
+kind = "part"
+
+[[topic]]
+name = "SoundBlaster"
+kind = "part"
+
+[[topic]]
+name = "TRAMS"
+kind = "part"
+
+[[topic]]
+name = "Vampire"
+kind = "part"
+
+[[topic]]
+name = "UPS"
+kind = "part"
+
+[[topic]]
+name = "VideoFramer"
+kind = "part"
+
+[[topic]]
+name = "genlock"
+kind = "part"
+
 # Names that mean more than one thing in the corpus. Claims tagged with the bare name keep
 # their other topics; the page lists the candidates.
 

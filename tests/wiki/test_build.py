@@ -19,6 +19,7 @@ from infovore.wiki.build import (
     render_all,
     render_disambiguation,
     render_index,
+    render_kind,
     render_page,
     render_redirect,
     sections_of,
@@ -338,18 +339,36 @@ def test_index_groups_by_kind_nests_children_and_links_the_all_page() -> None:
     index = render_index(pages, files, nav)
     assert index == (
         "# Index\n\n6 topics, 27 claims. [All topics A-Z](all.md)\n\n"
-        "## Machines\n\n- [O2](o2.md) (10)\n  - [O2 PSU](o2-psu.md) (3)\n\n"
-        "## Operating systems\n\n- [IRIX](irix.md) (8)\n  - [IRIX 6.5](irix-6-5.md) (4)\n\n"
+        "[Machines](#machines) (1) · [Processors](#processors) (1)"
+        " · [Operating systems](#operating-systems) (1) · [Other](#other) (3)\n\n"
+        "## Machines\n\n1 page. [All machines A-Z](kind-machine.md)\n\n"
+        "- [O2](o2.md) (10)\n  - [O2 PSU](o2-psu.md) (3)\n\n"
+        "## Processors\n\n1 page. [All processors A-Z](kind-cpu.md)\n\n"
+        "## Operating systems\n\n1 page. [All operating systems A-Z](kind-os.md)\n\n"
+        "- [IRIX](irix.md) (8)\n  - [IRIX 6.5](irix-6-5.md) (4)\n\n"
+        "## Other\n\n3 pages. [All other A-Z](kind-other.md)\n\n"
         "## Unsorted\n\n- [Unsorted](unsorted.md) (5)\n"
     )
     assert "Unsorted" not in render_index({"O2": 1}, files, Navigation(index_min=1))
-    assert "## Other\n\n- [O2](o2.md) (1)" in render_index(
-        {"O2": 1}, files, Navigation(index_min=1)
+    assert "## Other\n\n1 page. [All other A-Z](kind-other.md)\n\n- [O2](o2.md) (1)" in (
+        render_index({"O2": 1}, files, Navigation(index_min=1))
     )
     assert render_all({"O2": 2, "o2 fan": 1, "6.5": 1}, page_files({"O2", "o2 fan", "6.5"})) == (
         "# All topics\n\n3 pages. [Index](index.md)\n\n## #\n\n- [6.5](6-5.md) (1)\n\n"
         "## O\n\n- [O2](o2.md) (2)\n- [o2 fan](o2-fan.md) (1)\n"
     )
+    assert render_kind("machine", {"Octane": 2, "Indy": 1}, page_files({"Octane", "Indy"})) == (
+        "# Machines\n\n2 pages, 3 claims. [Index](index.md)\n\n## I\n\n- [Indy](indy.md) (1)\n\n"
+        "## O\n\n- [Octane](octane.md) (2)\n"
+    )
+
+
+def test_index_lists_groups_and_children_alphabetically_not_by_size() -> None:
+    pages = {"Octane": 5, "Indy": 9, "O2": 20, "O2 PSU": 3, "O2 fan": 4}
+    nav = Navigation(kinds=dict.fromkeys(pages, "machine"), index_min=1)
+    index = render_index(pages, page_files(pages), nav)
+    names = re.findall(r"^ *- \[([^\]]+)\]", index, re.M)
+    assert names == ["Indy", "O2", "O2 fan", "O2 PSU", "Octane"]
 
 
 def test_page_links_its_parent_subtopics_and_groups_see_also_by_kind() -> None:
@@ -392,12 +411,19 @@ def test_build_site_writes_redirects_disambiguation_and_all_pages(tmp_path: Path
         "index.md",
         "irix-6-5.md",
         "irix.md",
+        "kind-machine.md",
+        "kind-other.md",
         "o2-psu.md",
         "o2.md",
         "octane.md",
         "r12000.md",
         "ultra.md",
     ]
+    machines = (tmp_path / "kind-machine.md").read_text()
+    assert machines.startswith(
+        "# Machines\n\n1 page, 5 claims. [Index](index.md)\n\n## O\n\n- [O2]"
+    )
+    assert "- [Fibre Channel](fibre-channel.md) (2)" in (tmp_path / "kind-other.md").read_text()
     assert "## Subtopics\n\n- [O2 PSU](o2-psu.md) (1)\n" in (tmp_path / "o2.md").read_text()
     assert "Claims: 1\nPart of [O2](o2.md)\n" in (tmp_path / "o2-psu.md").read_text()
     assert (tmp_path / "fiber-channel.md").read_text() == (
@@ -411,7 +437,10 @@ def test_build_site_writes_redirects_disambiguation_and_all_pages(tmp_path: Path
         for target in re.findall(r"\]\(([^)]+\.md)\)", page.read_text()):
             assert (tmp_path / target).is_file(), (page.name, target)
     index = (tmp_path / "index.md").read_text()
-    assert "## Machines\n\n- [O2](o2.md) (5)\n  - [O2 PSU](o2-psu.md) (1)" in index
+    assert (
+        "## Machines\n\n1 page. [All machines A-Z](kind-machine.md)\n\n"
+        "- [O2](o2.md) (5)\n  - [O2 PSU](o2-psu.md) (1)"
+    ) in index
     assert "Fiber Channel" not in index
     assert render_redirect("A", "B", {"B": "b.md"}) == "# A\n\nSee [B](b.md).\n"
     assert render_disambiguation("A", [], {}, {}) == "# A\n\nA may refer to:\n\n"

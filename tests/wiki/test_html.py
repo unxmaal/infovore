@@ -27,7 +27,7 @@ def test_body_renders_headings_paragraphs_nested_bullets_and_numbered_sources() 
     assert body(markdown) == (
         "<h1>O2</h1>\n"
         '<p>Claims: 3 Part of <a href="sgi.html">SGI</a></p>\n'
-        "<h2>With IRIX</h2>\n"
+        '<h2 id="with-irix">With IRIX</h2>\n'
         '<p>First line second line. <sup><a href="#s1">1</a></sup></p>\n'
         "<ul>\n"
         '<li><a href="o2.html">O2</a> (3)\n'
@@ -42,12 +42,12 @@ def test_body_renders_headings_paragraphs_nested_bullets_and_numbered_sources() 
         "</li>\n"
         '<li><a href="irix.html">IRIX</a> (2)\n'
         "</li></ul>\n"
-        "<h2>Sources</h2>\n"
+        '<h2 id="sources">Sources</h2>\n'
         "<ol>\n"
         '<li id="s1">The O2 runs IRIX. (user-aaaa)</li>\n'
         '<li id="s2">Second.</li>\n'
         "</ol>\n"
-        "<h2>After</h2>\n"
+        '<h2 id="after">After</h2>\n'
         "<ol>\n"
         '<li id="s1">Again.</li>\n'
         "</ol>\n"
@@ -70,7 +70,8 @@ def test_build_site_writes_html_and_search_index(tmp_path: Path) -> None:
     nav = Navigation(kinds={"O2": "machine"}, redirects={"O2s": "O2"}, index_min=1)
     written = build_site(claims, 1, tmp_path, nav=nav, html=True)
     assert "index.html" in written and "o2s.html" in written and SEARCH in written
-    assert len(written) == 2 * 9 + 1
+    assert len(written) == 2 * 11 + 1
+    assert "kind-machine.html" in written
     assert (tmp_path / "o2s.html").read_text().count('<a href="o2.html">O2</a>') == 1
     index = (tmp_path / "index.html").read_text()
     assert (
@@ -90,7 +91,9 @@ def test_build_site_writes_html_and_search_index(tmp_path: Path) -> None:
         "O2s",
     ]
     assert build_site(claims, 1, tmp_path / "md") == sorted(
-        n for n in written if n.endswith(".md") and n not in ("o2s.md", "all.md")
+        n
+        for n in written
+        if n.endswith(".md") and n not in ("o2s.md", "all.md") and "kind-" not in n
     )
 
 
