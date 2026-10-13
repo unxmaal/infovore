@@ -20,13 +20,13 @@ else
   git worktree add -q --orphan -b "$branch" "$wt"
 fi
 find "$wt" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-cp "$site"/*.html "$site"/search.json "$wt"/
+cp "$site"/*.html "$site"/*.gif "$site"/search.json "$wt"/
 touch "$wt/.nojekyll"
 (
   cd "$wt"
   git add -A
   if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
-  git commit -q -m "Publish wiki $(date -u +%Y-%m-%dT%H:%MZ): $(ls ./*.html | wc -l | tr -d ' ') pages"
+  git commit -q -m "Publish wiki $(date -u +%Y-%m-%dT%H:%MZ): $(ls ./*.html | wc -l | tr -d ' ') pages, $(ls ./*.gif | wc -l | tr -d ' ') images"
   git push -q "$remote" "HEAD:refs/heads/$branch"
   echo "pushed $(git rev-parse --short HEAD) to $remote/$branch"
 )
