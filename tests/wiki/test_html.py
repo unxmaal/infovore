@@ -57,12 +57,18 @@ def test_body_renders_headings_paragraphs_nested_bullets_and_numbered_sources() 
 
 def test_page_wraps_body_with_title_nav_and_optional_search() -> None:
     text = page("# O2 & co\n\nx\n")
-    assert text.startswith("<!doctype html>") and "<title>O2 &amp; co</title>" in text
+    assert (
+        text.startswith("<!doctype html>")
+        and "<title>O2 &amp; co - SGUG Discord Wiki</title>" in text
+    )
+    assert '<p class="site"><a href="index.html">SGUG Discord Wiki</a></p>' in text
     assert '<a href="index.html">Index</a>' in text and "<script>" not in text
     index = page("# Index\n", [{"t": "A</script>", "f": "a.html", "n": 1}])
     assert '<input id="q"' in index and '<script>var ITEMS = [{"t": "A<\\/script>"' in index
+    assert 'src="spinner.gif"' in index and 'src="spinner.gif"' not in text
     assert "})(ITEMS);" in index
-    assert "<title>Wiki</title>" in page("no heading\n")
+    assert "<title>Wiki - SGUG Discord Wiki</title>" in page("no heading\n")
+    assert "<title>SGUG Discord Wiki</title>" in index
 
 
 def test_build_site_writes_html_and_search_index(tmp_path: Path) -> None:
@@ -70,8 +76,9 @@ def test_build_site_writes_html_and_search_index(tmp_path: Path) -> None:
     nav = Navigation(kinds={"O2": "machine"}, redirects={"O2s": "O2"}, index_min=1)
     written = build_site(claims, 1, tmp_path, nav=nav, html=True)
     assert "index.html" in written and "o2s.html" in written and SEARCH in written
-    assert len(written) == 2 * 11 + 1
-    assert "kind-machine.html" in written
+    assert len(written) == 2 * 11 + 1 + 12
+    assert "kind-machine.html" in written and "counter.gif" in written
+    assert (tmp_path / "bg.gif").read_bytes().startswith(b"GIF89a")
     assert (tmp_path / "o2s.html").read_text().count('<a href="o2.html">O2</a>') == 1
     index = (tmp_path / "index.html").read_text()
     assert (
@@ -102,5 +109,8 @@ def test_write_html_and_search_entries_directly(tmp_path: Path) -> None:
     (tmp_path / "a.md").write_text("# A\n")
     files = page_files({"A"})
     written = write_html(tmp_path, ["index.md", "a.md"], {"A": 2}, {"Alpha": "A"}, files)
-    assert written == ["index.html", "a.html", SEARCH]
+    assert written[:3] == ["index.html", "a.html", SEARCH] and written[-1] == "spinner.gif"
+    page_html = (tmp_path / "a.html").read_text()
+    assert "<marquee>" in page_html and 'src="construction.gif"' in page_html
+    assert "guestbook" in page_html and "badge-netscape.gif" in page_html
     assert search_entries({}, {}, {}) == []
