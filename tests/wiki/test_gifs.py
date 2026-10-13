@@ -107,7 +107,7 @@ def test_canvas_draws_text_from_the_font() -> None:
 @pytest.mark.parametrize(
     ("data", "size", "frame_count"),
     [
-        (background(), (48, 48), 2),
+        (background(), (96, 96), 2),
         (under_construction(), (160, 40), 4),
         (spinner(), (24, 24), 8),
         (new_sticker(), (32, 16), 2),

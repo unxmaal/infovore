@@ -157,15 +157,43 @@ def encode(
 
 
 def background() -> bytes:
-    palette = (BLACK, WHITE, GREY, YELLOW, CYAN)
-    stars = [(3, 5), (17, 2), (29, 11), (9, 20), (40, 19), (22, 31), (36, 38), (6, 42), (45, 7)]
+    palette = (BLACK, WHITE, GREY, YELLOW, CYAN, DARK)
+    stars = [
+        (3, 5),
+        (17, 2),
+        (29, 11),
+        (9, 20),
+        (40, 19),
+        (22, 31),
+        (36, 38),
+        (6, 42),
+        (45, 7),
+        (61, 14),
+        (74, 3),
+        (88, 27),
+        (53, 36),
+        (69, 48),
+        (83, 57),
+        (58, 66),
+        (91, 80),
+        (12, 61),
+        (27, 74),
+        (44, 88),
+        (66, 83),
+        (2, 90),
+        (79, 93),
+        (33, 55),
+        (50, 9),
+        (95, 44),
+        (20, 95),
+    ]
     frames = []
     for phase in range(2):
-        c = Canvas(48, 48)
+        c = Canvas(96, 96)
         for i, (x, y) in enumerate(stars):
-            c.put(x, y, 1 + (i + phase) % 4)
+            c.put(x, y, 1 + (i * 7 + phase) % 5)
         frames.append(c.pixels)
-    return encode(48, 48, palette, frames, delay=70)
+    return encode(96, 96, palette, frames, delay=90)
 
 
 def under_construction() -> bytes:
