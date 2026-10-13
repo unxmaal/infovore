@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XDMCP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XDMCP</h1>
+<p>Claims: 17</p>
+<p>XDMCP is a protocol that allows X11 applications to connect to a remote X server, with the server's location specified by the DISPLAY environment variable and managed by XDMCP. <sup><a href="#s1">1</a></sup> Remote X desktop sessions require XDMCP and an X server started with the '-query' option. <sup><a href="#s2">2</a></sup> Xterminals use BOOTP to configure themselves, TFTP to obtain firmware, and XDMCP to find a login host, running X11 from there. <sup><a href="#s3">3</a></sup> XDMCP is enabled by default on IRIX, requiring no additional configuration for basic functionality. <sup><a href="#s4">4</a></sup> XDMCP has been disabled in modern Linux distributions to prevent remote X11, which is unencrypted and potentially harmful. <sup><a href="#s5">5</a></sup> XDMCP from vcxsrv works without additional configuration, and XQuartz is the option for using XDMCP on a modern Mac. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Conventional X11 applications do not require SGI graphics hardware; the X11 server's location is specified by the DISPLAY environment variable and can be managed by Xdmcp. (user-07ed, 2024-07-03, exchange 47485, check: uncheckable)</li>
+<li id="s2">Remote X desktop sessions require XDMCP and an X server with the '-query' option. (user-21b8, 2025-03-21, exchange 218842, check: uncheckable)</li>
+<li id="s3">Xterminals used BOOTP to configure themselves, TFTP to get firmware, and XDMCP to find a login host, running X11 from there. (user-cb4c, 2020-01-22, exchange 5648, check: uncheckable)</li>
+<li id="s4">XDMCP is enabled by default on IRIX, no additional configuration is needed for basic functionality. (user-22f9, 2019-01-19, exchange 148, check: uncheckable)</li>
+<li id="s5">XDMCP has been disabled in modern Linux distributions to prevent remote X11, which is unencrypted and potentially harmful. (user-cb4c, 2020-01-22, exchange 5648, check: uncheckable)</li>
+<li id="s6">XDMCP from vcxsrv works without additional configuration. (user-5397, 2022-01-09, exchange 92775, check: uncheckable)</li>
+<li id="s7">XQuartz is the option for using xdmcp on a modern-ish mac. (user-7b1c, 2022-06-18, exchange 146442, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mac.html">Mac</a>, <a href="x11-server.html">X11 server</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="x-server.html">X server</a>, <a href="x11-applications.html">X11 applications</a>, <a href="xquartz.html">XQuartz</a>
+</li>
+<li>Standards and interfaces: <a href="tftp.html">TFTP</a>, <a href="bootp.html">bootp</a>
+</li>
+<li>Other: <a href="xnest.html">Xnest</a>, <a href="39h.html">39H</a>, <a href="xdcmp.html">XDCMP</a>, <a href="xdm.html">XDM</a>, <a href="xephyr.html">Xephyr</a>, <a href="dtlogin.html">dtlogin</a>, <a href="vcxsrv.html">vcxsrv</a>
+</li></ul>
+</body>
+</html>

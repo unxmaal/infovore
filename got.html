@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GOT</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GOT</h1>
+<p>Claims: 4</p>
+<p>The MIPS linker uses a global offset table (GOT) for position-independent code. <sup><a href="#s1">1</a></sup> The MIPS addressing scheme limits indexed mode to 16k entries, each 4 bytes, because GP points to the GOT. <sup><a href="#s2">2</a></sup> The MIPS ABI requires GOT entries and small data area data to be accessible with a single instruction using a 16-bit displacement, limiting the size of .got/.sdata/.sbss to 64 KiB. <sup><a href="#s3">3</a></sup> When GOT has more than 16k entries, the toolchain fails to produce a relocation entry for um, causing init code to fail. <sup><a href="#s4">4</a></sup> This makes LTO inapposite. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The MIPS linker uses a global offset table (GOT) for position-independent code. (user-f229, 2020-09-25, exchange 11164, check: uncheckable)</li>
+<li id="s2">The MIPS addressing scheme limits indexed mode to 16k entries, each 4 bytes, due to how GP points to the GOT. (user-42cf, 2021-11-27, exchange 22728, check: supported)</li>
+<li id="s3">The MIPS ABI requires GOT entries and data in the small data area to be accessible with a single machine instruction with a 16-bit displacement, limiting the size of .got/.sdata/.sbss to 64 KiB. This makes LTO inapposite (user-22f9, 2025-01-12, exchange 52253, check: supported)</li>
+<li id="s4">The toolchain fails to produce a relocation entry for um when GOT has more than 16k entries, causing init code to fail. (user-42cf, 2021-06-08, exchange 217147, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="toolchain.html">toolchain</a>
+</li></ul>
+</body>
+</html>

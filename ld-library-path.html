@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LD_LIBRARY_PATH</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>LD_LIBRARY_PATH</h1>
+<p>Claims: 11</p>
+<p>LD_LIBRARY_PATH (and/or LD_LIBRARYN32_PATH) is an environment variable that can be set to add library paths used to specify library directories. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The order of directories in LD_LIBRARY_PATH matters, with /usr/lib32 first potentially causing older libraries to be used first. <sup><a href="#s3">3</a></sup> Setting LD_LIBRARY_PATH and LD_LIBRARYN32_PATH to /usr/lib32 and specific library paths ensures correct library resolution for 32-bit binaries. <sup><a href="#s4">4</a></sup> LD_LIBRARY_PATH is needed on IRIX to find libraries, including when ./configure does not find the ncurses library. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> LD_LIBRARY_PATH may be required when programs install to non-standard locations, and it can be set via scripts or adjusted in ELF binaries with tools like chrpath, which have limitations. <sup><a href="#s2">2</a></sup><sup><a href="#s8">8</a></sup> LD_LIBRARY_PATH can cause issues with linking curses libraries, and it can be set to run SDL games or via the crle command to modify the runpath in the executable. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">LD_LIBRARY_PATH and/or LD_LIBRARYN32_PATH can be used to specify library directories. (user-42cf, 2019-01-30, exchange 361, check: uncheckable)</li>
+<li id="s2">LD_LIBRARY_PATH is an environment variable that can be set to add library paths; scripts can be used to set it as needed; some tools like chrpath can adjust built-in paths in ELF binaries but have limitations; compiling, (user-237d, 2020-04-06, exchange 74064, check: uncheckable)</li>
+<li id="s3">The order of directories in the LD_LIBRARY_PATH matters, with /usr/lib32 first potentially causing older libraries to be used first. (user-42cf, 2019-02-03, exchange 66981, check: uncheckable)</li>
+<li id="s4">Setting `LD_LIBRARY_PATH` and `LD_LIBRARYN32_PATH` to `/usr/lib32` and specific library paths ensures correct library resolution for 32-bit binaries. (user-f229, 2019-08-18, exchange 67782, check: supported)</li>
+<li id="s5">Setting LD_LIBRARY_PATH is necessary for IRIX to find libraries, and running sgugshell.sh can manually set up library paths; reinstalling the tarball fixed the issue with 'libsudo_util.so.0' not being found. (user-07ed, 2023-02-23, exchange 70728, check: uncheckable)</li>
+<li id="s6">To run a program with dynamically linked libraries on IRIX, ensure the library path is set via LD_LIBRARY_PATH. (user-45c8, 2025-02-14, exchange 218785, check: uncheckable)</li>
+<li id="s7">LD_LIBRARY_PATH is needed if ./configure doesn't find the ncurses library. (user-9528, 2026-07-11, exchange 240903, check: uncheckable)</li>
+<li id="s8">Tgcware installs to non-standard locations, so LD_LIBRARY_PATH may be required. (user-9528, 2026-07-11, exchange 240903, check: uncheckable)</li>
+<li id="s9">The environment variables `CXX`, `LD_LIBRARY_PATH`, and `CC` can cause issues with linking curses libraries. (user-2189, 2020-02-04, exchange 68329, check: supported)</li>
+<li id="s10">To run SDL games, set the LD_LIBRARY_PATH environment variable or use the crle command to modify the runpath in the executable. (user-17cb, 2022-05-25, exchange 182125, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="ld-libraryn32-path.html">LD_LIBRARYN32_PATH</a>, <a href="cc.html">cc</a>, <a href="tgcware.html">tgcware</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="usr-lib32.html">/usr/lib32</a>, <a href="cxx.html">CXX</a>, <a href="export.html">export</a>, <a href="sgugshell-sh.html">sgugshell.sh</a>
+</li></ul>
+</body>
+</html>

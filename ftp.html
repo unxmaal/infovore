@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FTP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>FTP</h1>
+<p>Claims: 86 Background: 19 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/File_Transfer_Protocol">File Transfer Protocol</a>, <a href="https://en.wikipedia.org/wiki/Wget">Wget</a>, <a href="https://en.wikipedia.org/wiki/Network_File_System">Network File System</a>.</p>
+<h2 id="with-irix">With IRIX</h2>
+<p>IRIX runs several outdated and insecure services by default, including telnet and ftp, and FTP is installed by default on IRIX. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> IRIX can establish FTP connections between different systems, and the ftp client in IRIX is 'ftp'; it works in the console and can be used with Netscape for a visual view. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The `ftp` command is part of the stock functionality on IRIX, and Irix comes with an FTP program called FTP in the terminal. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> FTP on IRIX can be used for software installation, such as mounting CD images in Linux and FTPing the contents to the IRIX system, and can be set up using a guide from a Linux box, logging in and downloading files. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The man page for the IRIX `ftp` command is available at https://nixdoc.net/man-pages/IRIX/man1/ftp.1.html, and FTP on IRIX IRIS does not support passive mode. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="with-nfs">With NFS</h2>
+<p>Networking via FTP or NFS is quicker and easier than setting up serial ports for the Indy. <sup><a href="#s11">11</a></sup> MAME supports networking, including NFS or FTP for file transfer. <sup><a href="#s12">12</a></sup> NFS or FTP can be used to share files with a Win9x machine, but Git on IRIX is a better solution for project files. <sup><a href="#s13">13</a></sup> NFS is better than FTP for networked storage. <sup><a href="#s14">14</a></sup> NFS, FTP, or SCP can be used for SGI installs. <sup><a href="#s15">15</a></sup> FTP is useful for transferring files but not for running commands; NFS is needed for that. <sup><a href="#s16">16</a></sup> FTP, SCP, NFS, or networking in general can be used to transfer files to an SGI Octane without an external CD drive. <sup><a href="#s17">17</a></sup> NFS can be used to transfer files over the network, and FTP is another option for file transfer. <sup><a href="#s18">18</a></sup></p>
+<h2 id="general">General</h2>
+<p>FTP is a standard method for transferring files, operating similarly across Unix, BSD, Linux, and Windows systems, and is commonly used to transfer files between Unix systems. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> FTP can be used via the command line, and the command is available by default in some installations but may need to be installed on others, such as Debian. <sup><a href="#s19">19</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> FTP establishes a separate TCP connection for data and supports both ASCII and binary modes, with binary mode being necessary to avoid corruption when transferring certain files. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> FTP can be used to transfer files between various systems, including older computers without reliable USB or FireWire support, and as an alternative when NFS installation fails. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup> FTP is considered outdated, less secure than HTTPS, and is being phased out, as Firefox stopped supporting it, though it remains desired for backwards compatibility. <sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup> FTP is a file transfer protocol that can be used alongside other tools such as ftp, rcp, and sz/rz to move data between systems, including transferring files between Alpha and x86 workstations and between IRIX machines. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup><sup><a href="#s41">41</a></sup> FTP can transfer files without needing an HDD in an Indy, and can be used to access systems configured with an IP address, as well as to mount directories such as the home directory of an Indy. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> FTP works for file transfer in IRIX 6.5 because it supports passive mode, but not in IRIX 5.3, where passive connections are unsupported and manual configuration is required due to NAT and passive mode issues. <sup><a href="#s45">45</a></sup><sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup><sup><a href="#s48">48</a></sup> FTP passive mode works in IRIX 6.5 but is slow for large transfers, and FTP will not work if there is no local space to write out the whole file. <sup><a href="#s49">49</a></sup><sup><a href="#s45">45</a></sup> FTP does not support uploading folders directly, and excessive network activity, particularly with FTP, can crash the network interface, requiring a reboot to recover. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> FTP can be set up easily with a single command, and documentation and Unix resources can help with setting it up. <sup><a href="#s52">52</a></sup><sup><a href="#s53">53</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX runs several outdated and insecure services by default, including telnet and ftp. (user-22f9, 2019-02-28, exchange 809, check: uncheckable)</li>
+<li id="s2">FTP is installed by default on IRIX. (user-b1da, 2020-07-14, exchange 9588, check: uncheckable)</li>
+<li id="s3">IRIX can establish FTP connections between different systems. (user-848e, 2019-10-07, exchange 203977, check: uncheckable)</li>
+<li id="s4">The ftp client in IRIX is 'ftp'; it works in the console and can be used with Netscape for a visual view. (user-b7c4, 2020-04-24, exchange 7771, check: uncheckable)</li>
+<li id="s5">The `ftp` command is part of the stock functionality on IRIX. (user-b1da, 2021-08-02, exchange 18932, check: supported)</li>
+<li id="s6">Irix comes with an FTP program called FTP in the terminal. (user-1361, 2022-02-07, exchange 102023, check: uncheckable)</li>
+<li id="s7">For IRIX software installation, mount CD images in Linux and FTP the contents to the IRIX system for installation. (user-9849, 2021-05-19, exchange 79346, check: uncheckable)</li>
+<li id="s8">FTP on IRIX can be set up using a guide from a Linux box, logging in and downloading files. (user-8de9, 2022-02-07, exchange 221941, check: uncheckable)</li>
+<li id="s9">The man page for the IRIX `ftp` command is available at https://nixdoc.net/man-pages/IRIX/man1/ftp.1.html. (user-e4d0, 2021-08-02, exchange 18932, check: supported)</li>
+<li id="s10">FTP on IRIX IRIS does not support passive mode. (user-3e2d, 2026-04-21, exchange 226367, check: uncheckable)</li>
+<li id="s11">Using networking (ftp or nfs) is quicker and easier than setting up serial ports for the Indy. (user-7b1c, 2020-03-30, exchange 220145, check: supported)</li>
+<li id="s12">MAME supports networking, including NFS or FTP for file transfer. (user-a719, 2020-09-14, exchange 220168, check: uncheckable)</li>
+<li id="s13">NFS or FTP can be used to share files with a Win9x machine, but Git on IRIX is a better solution for project files. (user-37ee, 2020-09-28, exchange 11211, check: uncheckable)</li>
+<li id="s14">NFS is better than FTP for networked storage (user-6afa, 2022-01-15, exchange 80712, check: uncheckable)</li>
+<li id="s15">NFS, FTP, or SCP can be used for SGI installs. (user-7b1c, 2022-09-22, exchange 105042, check: uncheckable)</li>
+<li id="s16">Ftp is useful for transferring files but not for running commands; nfs is needed for that. (user-5c71, 2023-05-01, exchange 218025, check: uncheckable)</li>
+<li id="s17">ftp, scp, nfs, network in general can be used to transfer files to an SGI Octane without an external CD drive. (user-4341, 2023-08-30, exchange 223301, check: supported)</li>
+<li id="s18">NFS can be used to transfer files over the network, and FTP is another option for file transfer. (user-b7c4, 2024-06-30, exchange 93405, check: uncheckable)</li>
+<li id="s19">FTP can be used via command line for file transfer. (user-d903, 2023-08-29, exchange 84005, check: uncheckable)</li>
+<li id="s20">FTP is a common method to transfer files between Unix systems. (user-f9d4, 2020-04-24, exchange 7770, check: uncheckable)</li>
+<li id="s21">FTP operates similarly across Unix, BSD, Linux, and Windows. (user-d903, 2023-08-10, exchange 209034, check: uncheckable)</li>
+<li id="s22">ftp provides a standard means of transferring files. (user-5510, 2023-08-22, exchange 39930, check: uncheckable)</li>
+<li id="s23">I know it has ftp by default and /usr/bsd is a path from the default install. (user-b1da, 2021-03-24, exchange 204874, check: uncheckable)</li>
+<li id="s24">5.3 has ftp in the base install (user-0251, 2021-08-04, exchange 79588, check: supported)</li>
+<li id="s25">The FTP command is not recognized on Debian, but can be resolved by installing the FTP package. (user-8de9, 2022-02-12, exchange 217471, check: uncheckable)</li>
+<li id="s26">FTPing files in binary mode is necessary to avoid corruption when transferring classic Macintosh files. (user-237d, 2021-01-18, exchange 144627, check: uncheckable)</li>
+<li id="s27">FTP establishes a separate TCP connection for data, which might be the issue; try changing passive mode. (user-42cf, 2021-05-03, exchange 92717, check: uncheckable)</li>
+<li id="s28">FTP has ASCII and binary modes; use 'bin' for binary files. (user-22f9, 2022-02-07, exchange 102096, check: uncheckable)</li>
+<li id="s29">Most likely, your transmitted the files in ascii mode, try doing something like ftp with bin mode. (user-237d, 2022-02-24, exchange 217498, check: uncheckable)</li>
+<li id="s30">Tardist files can be transferred over FTP. (user-e4d0, 2021-10-03, exchange 20706, check: uncheckable)</li>
+<li id="s31">ZFS and USB/FireWire removable storage are problematic on older Solaris versions; FTP might be more reliable. (user-baf6, 2022-06-02, exchange 182239, check: uncheckable)</li>
+<li id="s32">FTP is useful for older computers without reliable USB or FireWire support. (user-baf6, 2022-06-06, exchange 233165, check: uncheckable)</li>
+<li id="s33">You can use FTP to transfer non-installer files between the boxen. (user-e4d0, 2022-07-25, exchange 104335, check: uncheckable)</li>
+<li id="s34">FTP is an easy method to transfer files to the system when NFS installation fails. (user-5510, 2023-08-11, exchange 39667, check: uncheckable)</li>
+<li id="s35">FTP is less secure and less preferred compared to HTTPS. (user-f229, 2021-07-08, exchange 18293, check: uncheckable)</li>
+<li id="s36">I'm still sad about FTP dying (user-1361, 2021-10-28, exchange 21709, check: uncheckable)</li>
+<li id="s37">Firefox stopped supporting FTP about a year ago. (user-42cf, 2021-11-24, exchange 22538, check: uncheckable)</li>
+<li id="s38">FTP is considered outdated but still desired for backwards compatibility. (user-818d, 2023-08-22, exchange 209092, check: uncheckable)</li>
+<li id="s39">ftp, rcp, sz/rz (user-d903, 2023-09-06, exchange 184393, check: uncheckable)</li>
+<li id="s40">Data transfer between Alpha and x86 workstations was done using FTP. (user-07ed, 2025-02-25, exchange 235615, check: uncheckable)</li>
+<li id="s41">NFS share or FTP can be used to transfer files to IRIX; NFS is used by the speaker for household file transfers. (user-24f0, 2024-11-30, exchange 51151, check: uncheckable)</li>
+<li id="s42">The image is configured with IP 10.0.0.2 for the PI35, and can be accessed via telnet or FTP. (user-ce6b, 2024-03-27, exchange 218348, check: supported)</li>
+<li id="s43">FTP can be used to transfer files without needing an HDD in an Indy. (user-554a, 2024-06-30, exchange 93405, check: supported)</li>
+<li id="s44">$ curlftpfs user:pass@IP_OF_INDY /mnt/indy mounts the home directory using FTP. (user-7973, 2024-12-01, exchange 211374, check: supported)</li>
+<li id="s45">FTP passive mode works in IRIX 6.5 but is slow for large transfers. (user-e4e2, 2026-04-03, exchange 220402, check: supported)</li>
+<li id="s46">FTP works for file transfer in IRIX 6.5 due to passive mode, but not in 5.3. (user-3e2d, 2026-04-03, exchange 93758, check: supported)</li>
+<li id="s47">ftp in 5.3 does not support passive connections, while ftp in 6.5 does. (user-7973, 2026-05-27, exchange 220440, check: supported)</li>
+<li id="s48">On IRIX 5.3, using FTP requires manual configuration due to NAT and passive mode issues, making it difficult for new users. (user-3e2d, 2026-06-15, exchange 220461, check: supported)</li>
+<li id="s49">FTP won't work if you don't have local space to write out the whole file. (user-07ed, 2025-01-10, exchange 52048, check: uncheckable)</li>
+<li id="s50">FTP does not support uploading folders directly. (user-b1da, 2024-09-21, exchange 85729, check: uncheckable)</li>
+<li id="s51">Excessive network activity, particularly with FTP, can crash the network interface, requiring a reboot to recover. (user-03ad, 2024-10-29, exchange 238711, check: uncheckable)</li>
+<li id="s52">Documentation and Unix resources can help with setting up FTP. (user-24f0, 2024-11-22, exchange 211317, check: uncheckable)</li>
+<li id="s53">FTP can be easily set up with a single command, making it a simpler solution for file sharing. (user-b1da, 2026-06-15, exchange 220461, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ftp-client.html">FTP client</a> (3)
+</li>
+<li><a href="ftp-server.html">FTP server</a> (12)
+</li>
+<li><a href="ftp-site.html">FTP site</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="challenge-s.html">Challenge S</a>, <a href="iris.html">IRIS</a>, <a href="indy.html">Indy</a>, <a href="octane.html">Octane</a>, <a href="weatherstar-xl.html">WeatherStar XL</a>
+</li>
+<li>Processors: <a href="x86.html">x86</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="linux.html">Linux</a>, <a href="linux-box.html">Linux box</a>, <a href="solaris.html">Solaris</a>, <a href="unix.html">Unix</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="curl.html">curl</a>, <a href="scp.html">scp</a>, <a href="wget.html">wget</a>, <a href="cd-images.html">CD images</a>, <a href="firefox.html">Firefox</a>, <a href="mame.html">MAME</a>, <a href="samba.html">Samba</a>, <a href="zfs.html">ZFS</a>, <a href="binary.html">binary</a>, <a href="dd.html">dd</a>, <a href="emulator.html">emulator</a>, <a href="rsync.html">rsync</a>, <a href="tardist-file.html">tardist file</a>
+</li>
+<li>Parts and peripherals: <a href="scsi-adapter.html">SCSI adapter</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="telnet.html">telnet</a>, <a href="rcp.html">RCP</a>, <a href="networking.html">networking</a>, <a href="nfs-share.html">NFS share</a>, <a href="tftp.html">TFTP</a>, <a href="network-interface.html">network interface</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="http.html">HTTP</a>, <a href="inperson.html">InPerson</a>, <a href="second-reality.html">Second Reality</a>, <a href="fetch.html">fetch</a>, <a href="xmodem.html">xmodem</a>
+</li></ul>
+</body>
+</html>

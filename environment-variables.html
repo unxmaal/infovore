@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>environment variables</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>environment variables</h1>
+<p>Claims: 12</p>
+<p>Environment variables can affect the build process, and export paths and environment variables can be customized for different compilers and environments. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Setting environment variables (PATH, CFLAGS, CPPFLAGS, LDFLAGS, MANPATH) is necessary for compiling software on a Sun, and compiling with GCC requires updating the Makefile and environment variables. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Creating a shell script to set environment variables and open the application can ensure the variables are set when the application is launched. <sup><a href="#s5">5</a></sup> When using 'sudo', the shell used might differ from the user's shell, leading to different environment variable sourcing. <sup><a href="#s6">6</a></sup> printenv on the Indy prom displays environment variables, and each desktop opens a terminal loading environment variables to avoid flexlm address conflicts. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Programs often set up environment variables and run startup scripts, which can affect how software packages interact. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">environment variables can affect the build process. (user-42cf, 2019-07-27, exchange 67664, check: uncheckable)</li>
+<li id="s2">Export paths and environment variables can be customized for different compilers and environments. (user-ba81, 2019-12-13, exchange 78060, check: uncheckable)</li>
+<li id="s3">Setting environment variables (PATH, CFLAGS, CPPFLAGS, LDFLAGS, MANPATH) is necessary for compiling software on a Sun. (user-03ad, 2022-11-06, exchange 239882, check: uncheckable)</li>
+<li id="s4">Compiling with GCC requires updating the Makefile and environment variables; GCC version 9.2.0 had issues with -mabi=n32. (user-8547, 2022-11-19, exchange 105669, check: supported)</li>
+<li id="s5">Creating a shell script to set environment variables and open the application can ensure the variables are set when the application is launched. (user-03ad, 2023-09-13, exchange 232109, check: uncheckable)</li>
+<li id="s6">When using 'sudo', the shell used might differ from the user's shell, leading to different environment variable sourcing. (user-7973, 2024-05-18, exchange 85107, check: uncheckable)</li>
+<li id="s7">printenv on the Indy prom displays environment variables. (user-24f0, 2024-06-17, exchange 47030, check: supported)</li>
+<li id="s8">Each desktop opens a terminal loading environment variables to avoid flexlm address conflicts, with Renderman potentially overriding other setups. (user-44d7, 2025-08-23, exchange 225351, check: uncheckable)</li>
+<li id="s9">Programs often set up environment variables and run startup scripts, which can affect how software packages interact. (user-1a5a, 2025-08-23, exchange 225349, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Graphics: <a href="renderman.html">RenderMan</a>
+</li>
+<li>Software: <a href="flexlm.html">FlexLM</a>, <a href="makefile.html">Makefile</a>, <a href="path.html">PATH</a>, <a href="application.html">application</a>, <a href="shell.html">shell</a>, <a href="shell-script.html">shell script</a>, <a href="sudo.html">sudo</a>
+</li>
+<li>Parts and peripherals: <a href="dallas-chip.html">Dallas chip</a>, <a href="indy-prom.html">Indy PROM</a>, <a href="prom.html">PROM</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="printenv.html">printenv</a>, <a href="startup-script.html">startup script</a>
+</li></ul>
+</body>
+</html>

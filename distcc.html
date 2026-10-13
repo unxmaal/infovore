@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>distcc</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>distcc</h1>
+<p>Claims: 42 Background: 16 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Distcc">Distcc</a>.</p>
+<p>distcc is a tool that distributes compilation tasks to other hosts, potentially offloading preprocessing and linking work to reduce load on the local machine, though it does not distribute configure scripts. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can be configured to start a daemon, but this is not done by default, and it works well with rpmbuild. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It can be used with the Gentoo build system, though experience with it is limited. <sup><a href="#s6">6</a></sup> It can significantly speed up compilation compared to parallel make, even with a modern laptop or old laptop as a slave, and can halve build time for GCC on a powerful machine. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> It can utilize faster CPUs, a PC, or a Talos PPC workstation for compilation, and can leverage modern external hardware for faster compile speeds. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> It can be used for cross-compilation on multiple Indys and with volunteer SGI hardware. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> It is available via a Docker image for improved performance on SGI systems, and can send compilation tasks to a Linux Docker container. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> It runs on multiple platforms including amiga, DOS, NES, Genesis, and an amiga-powered arcade machine. <sup><a href="#s16">16</a></sup> distcc relies on GCC features and cross-compiling capabilities. <sup><a href="#s17">17</a></sup> A Sunfreeware package for Solaris 2.6 is available for distcc. <sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Using a single machine with 1792 cores for compiling is not efficient; better software like distcc and ccache can achieve similar results more cost-effectively. (user-237d, 2019-03-10, exchange 216275, check: supported)</li>
+<li id="s2">distcc can be used to offload preprocessing and linking tasks to other hosts, potentially reducing load on the local machine. (user-2d09, 2020-03-12, exchange 214948, check: uncheckable)</li>
+<li id="s3">distcc distributes compilation tasks but not `configure` scripts. (user-e473, 2020-07-03, exchange 68886, check: supported)</li>
+<li id="s4">distcc works well with `rpmbuild`. (user-2d09, 2020-03-12, exchange 214948, check: supported)</li>
+<li id="s5">distcc can be configured to start a daemon, but this is not done by default. (user-2d09, 2020-03-12, exchange 214948, check: uncheckable)</li>
+<li id="s6">Distcc can be used with the Gentoo build system, though experience with it is limited. (user-42cf, 2020-04-05, exchange 7264, check: uncheckable)</li>
+<li id="s7">Distcc can significantly speed up compilation compared to parallel make, even with a modern laptop as a slave. (user-42cf, 2020-04-05, exchange 7263, check: uncheckable)</li>
+<li id="s8">Using distcc with an old laptop can significantly speed up compilation. (user-bf68, 2020-05-01, exchange 68602, check: uncheckable)</li>
+<li id="s9">Using distcc can halve the build time for GCC on a powerful machine. (user-cd7d, 2020-05-23, exchange 231223, check: uncheckable)</li>
+<li id="s10">distcc can utilize a PC or a Talos PPC workstation for compilation. (user-e872, 2020-08-12, exchange 69010, check: uncheckable)</li>
+<li id="s11">distcc can utilize faster CPUs for compilation. (user-f229, 2021-07-10, exchange 99419, check: uncheckable)</li>
+<li id="s12">Distcc can be used for cross-compiling on multiple Indys. (user-c831, 2021-03-31, exchange 217085, check: uncheckable)</li>
+<li id="s13">Distcc can be used with volunteer SGI hardware for cross-compilation. (user-2189, 2021-11-30, exchange 70031, check: uncheckable)</li>
+<li id="s14">Distcc support is available via a Docker image for improved performance on SGI systems. (user-cd7d, 2020-12-14, exchange 69144, check: uncheckable)</li>
+<li id="s15">distcc on IRIX can send compilation tasks to a Linux Docker container, but direct hardware access like graphics and SCSI commands won't work; file and network I/O is sufficient for many uses. (user-2189, 2021-11-30, exchange 215233, check: uncheckable)</li>
+<li id="s16">distcc runs on multiple platforms including amiga, DOS, NES, Genesis, and even an amiga-powered arcade machine. (user-6afa, 2022-05-16, exchange 29253, check: uncheckable)</li>
+<li id="s17">distcc relies on GCC features and cross-compiling capabilities. (user-e872, 2023-05-01, exchange 215377, check: uncheckable)</li>
+<li id="s18">Sunfreeware package for Solaris 2.6 is available for distcc. (user-9528, 2024-02-09, exchange 240238, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="origin-350.html">Origin 350</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="pc.html">PC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris-2-6.html">Solaris 2.6</a>, <a href="netboot.html">netboot</a>
+</li>
+<li>Software: <a href="compilertron.html">Compilertron</a>, <a href="rpmbuild.html">rpmbuild</a>, <a href="docker.html">Docker</a>, <a href="docker-container.html">Docker container</a>, <a href="mipspro.html">MIPSpro</a>, <a href="maya-6.html">Maya 6</a>, <a href="rse.html">RSE</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Standards and interfaces: <a href="x-forwarding.html">X forwarding</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="ccache.html">ccache</a>, <a href="cross-compilation.html">cross-compilation</a>
+</li></ul>
+</body>
+</html>

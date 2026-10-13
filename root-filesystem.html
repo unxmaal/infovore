@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>root filesystem</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>root filesystem</h1>
+<p>Claims: 7 Part of <a href="root.html">root</a></p>
+<p>The df -h output shows a root filesystem of 279G with 9.6G used, alongside an NFS mount of 5.4T with 2.0T used. <sup><a href="#s1">1</a></sup> Reseating the hard drive fixed a boot issue but led to a fatal error on the root filesystem. <sup><a href="#s2">2</a></sup> Copying a root filesystem between machines can be done by restoring its backup, which is easier than reinstalling everything. <sup><a href="#s3">3</a></sup> Diskless booting involves copying a miniroot to a swap partition and mounting it as root, requiring a kernel capable of mounting the root filesystem, with the PROM environment able to specify the root path. <sup><a href="#s4">4</a></sup> A setup with the root filesystem on a spinny disk and the rest on an NVMe drive is possible, and the root filesystem can reside on one drive while others remain unused. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The df -h output shows a root filesystem of 279G with 9.6G used, and a NFS mount of 5.4T with 2.0T used. (user-f229, 2019-10-22, exchange 220772, check: supported)</li>
+<li id="s2">Reseating the hard drive fixed the boot issue but led to a fatal error on the root filesystem. (user-bc18, 2019-12-16, exchange 4884, check: uncheckable)</li>
+<li id="s3">Copying a root filesystem from one O2 to another can be done by restoring the backup of the root filesystem, which is easier than reinstalling everything. (user-1446, 2020-09-15, exchange 11039, check: supported)</li>
+<li id="s4">Diskless booting involves copying a miniroot to a swap partition and mounting it as root; the kernel must be capable of mounting the root filesystem, and the PROM environment can specify the root path. (user-4eea, 2025-09-05, exchange 87878, check: uncheckable)</li>
+<li id="s5">A setup with the root filesystem on a spinny disk and the rest on an NVMe drive is possible. (user-e872, 2025-11-30, exchange 225724, check: uncheckable)</li>
+<li id="s6">Root filesystem on one drive, others are unused. (user-757f, 2026-03-18, exchange 122178, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="swap-partition.html">swap partition</a>
+</li>
+<li>Parts and peripherals: <a href="nvme-drive.html">NVMe drive</a>, <a href="hard-drive.html">hard drive</a>, <a href="spinny-disk.html">spinny disk</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-mount.html">NFS mount</a>
+</li>
+<li>Other: <a href="diskless-booting.html">diskless booting</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NASTRAN</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NASTRAN</h1>
+<p>Claims: 9</p>
+<p>NASTRAN, started in the 1970s, was written in FORTRAN IV and had multicore support by 2006; it may have been updated to support GPU compute, but it's unclear if this is part of the original solver. <sup><a href="#s1">1</a></sup> NASTRAN runs on Sun Solaris and allocates memory for the open core and in-memory database, with specific block sizes and I/O operations. <sup><a href="#s2">2</a></sup> The `make -j8` command is used for parallel compilation, and compiling NASTRAN on 8 CPUs is fast. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The NASTRAN solver can process small problems very quickly, typically with fewer than 100 elements. <sup><a href="#s3">3</a></sup> NASTRAN can produce graphical output by inserting `PLOT` cards into the input deck, generating `PLT2` files that can be converted into a preferred format using tools like NASPLOT. <sup><a href="#s5">5</a></sup> The plotter utility for NASTRAN was successfully built. <sup><a href="#s6">6</a></sup> To change the machine ID in NASTRAN, modify the `MACH` variable in `mds/btstrp.f`. <sup><a href="#s7">7</a></sup> NASTRAN output shows forces on a single-point constraint for a delta wing with biconvex cross section in Solaris NASTRAN. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NASTRAN, started in the 1970s, was written in FORTRAN IV and had multicore support by 2006; it may have been updated to support GPU compute, but it's unclear if this is part of the original solver. (user-b1da, 2023-11-30, exchange 42865, check: supported)</li>
+<li id="s2">NASTRAN runs on Sun Solaris and allocates memory for the open core and in-memory database, with specific block sizes and I/O operations. (user-b1da, 2024-02-18, exchange 44685, check: uncheckable)</li>
+<li id="s3">The `make -j8` command is used for parallel compilation; the NASTRAN solver can process small problems very quickly, typically with fewer than 100 elements; it lacks native post-processing utilities for its OP2 binary,而是 (user-b1da, 2024-02-18, exchange 210049, check: supported)</li>
+<li id="s4">Compiling NASTRAN on 8 CPUs is fast. (user-b1da, 2024-02-18, exchange 44690, check: supported)</li>
+<li id="s5">NASTRAN can produce graphical output by inserting `PLOT` cards into the input deck, generating `PLT2` files that can be converted into a preferred format using tools like NASPLOT. (user-b1da, 2024-02-18, exchange 210049, check: supported)</li>
+<li id="s6">The plotter utility for NASTRAN was successfully built. (user-b1da, 2024-02-19, exchange 44700, check: uncheckable)</li>
+<li id="s7">To change the machine ID in NASTRAN, modify the `MACH` variable in `mds/btstrp.f`. (user-b1da, 2024-02-19, exchange 44700, check: supported)</li>
+<li id="s8">NASTRAN output shows forces on a single-point constraint for a delta wing with biconvex cross section in Solaris NASTRAN. (user-b1da, 2024-07-02, exchange 210609, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="itanium.html">Itanium</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>
+</li>
+<li>Other: <a href="opencore.html">OpenCore</a>, <a href="patran.html">Patran</a>
+</li></ul>
+</body>
+</html>

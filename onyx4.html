@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onyx4</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Onyx4</h1>
+<p>Claims: 143 Part of <a href="onyx.html">Onyx</a> Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/SGI_Origin_3000_and_Onyx_3000">SGI Origin 3000 and Onyx 3000</a>, <a href="https://en.wikipedia.org/wiki/SGI_Tezro">SGI Tezro</a>.</p>
+<h2 id="with-iris-gl">With IRIS GL</h2>
+<p>The Onyx4 is a high-performance SGI system that uses ATI FireGL graphics cards (up to FireGL X1) and supports DVI outputs for high-resolution display, but it does not support IRIS GL. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> IRIS GL works on SGI systems with graphics cards, excluding the Onyx4, and applications such as mediarecord therefore do not work on the Onyx4. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The Onyx4 uses XFree86 and a different X Windows configuration, which leads to compatibility issues with many applications. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> A third-party IRIS GL implementation for Linux exists, but it is not from SGI. <sup><a href="#s7">7</a></sup></p>
+<h2 id="with-prism">With Prism</h2>
+<p>The Onyx4 and Prism use the same GPU, and the Onyx4 compute node can be repurposed into a Prism by replacing the graphics card. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The Onyx4 is faster and more reliable than the Prism, though the Prism has been difficult to work with. <sup><a href="#s10">10</a></sup> The only configurations with a single AGP riser were the rack Prism and Onyx4, both dual-pipe. <sup><a href="#s11">11</a></sup> The Altix 350 has FireGL X2.1 cards which are useful for Onyx4 due to Prism compatibility issues. <sup><a href="#s12">12</a></sup> Altix and Prism systems are not fully compatible with Onyx4 systems due to differences in hardware and firmware. <sup><a href="#s13">13</a></sup> My Onyx4 and Prism bricks cost the better part of a grand each. <sup><a href="#s14">14</a></sup> The CBOB can be found in different configurations, including as part of a Prism setup or with an IP badge and Onyx4 USB ports. <sup><a href="#s15">15</a></sup> Vertex buffers (VBOs) were not available on SGI V12 systems until Onyx4 (and Prism). <sup><a href="#s16">16</a></sup></p>
+<h2 id="general">General</h2>
+<p>The Onyx4 is a 4U tower that can be configured with or without a CPU, and adding a CPU requires specific setup, including XIO or Numalink for connection and reinstalling IRIX for graphics initialization. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> The Onyx4 uses ATI FireGL graphics cards, which are called graphics pipes, and has display outputs called heads. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The Onyx4 and rackmount Prism use the same AGP riser, but the Prism uses FireGL X2 or X3 cards while the Onyx4 uses ATI Pro 9700 cards. <sup><a href="#s21">21</a></sup> The FireGL X3s require a Molex power connection, and the Onyx4's AGP riser has an unpopulated header for this. <sup><a href="#s22">22</a></sup> The Onyx4 supports OpenGL 1.4, and was planned to support 2.0. <sup><a href="#s23">23</a></sup> The Onyx4 is more powerful than an Onyx350 but lacks XSGI, affecting some apps like Flame. <sup><a href="#s24">24</a></sup> The Onyx4 is a modular SGI MIPS system that can be configured with up to twelve CPUs in theory using a NUMAlink router. <sup><a href="#s25">25</a></sup> It uses AGP slots and supports ATI FireGL cards (marketed as Voyager), which make it incompatible with IRIS GL software but faster for OpenGL 1.3 geometry. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> The Onyx4 can support OpenGL Multipipe with up to four displays but only two sets of inputs, and it handles 2560x1440 resolution well at 2K but not 4K. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> It requires two bricks, one with a PCI riser for the IO9 boot device and one with AGP for the dual FireGL cards. <sup><a href="#s31">31</a></sup> The CPU brick is referred to as an O350 until a cable is installed. <sup><a href="#s32">32</a></sup> The Onyx4 is a modular SGI workstation that uses the same Chimera chassis as the Tezro rack, Origin/Onyx 350, with the graphics option being the main difference. <sup><a href="#s33">33</a></sup> It uses ATI FireGL X1 cards, which can boot an x86 machine, but the X1 BIOS from an Onyx4 freezes an x86 machine when the second card is present. <sup><a href="#s34">34</a></sup> The FireGL X1 in an Onyx4 is significantly faster than the V12 for GPU-intensive tasks. <sup><a href="#s35">35</a></sup> The Onyx4 can only use x1 cards, and the X3 won't work in it because drivers are only for FGL 9700 and two 9800 variants. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup> The Onyx4 uses the same Chimera chassis as the Tezro rack, Origin/Onyx 350, with the graphics option being the main difference. <sup><a href="#s33">33</a></sup> The Onyx4 was marketed heavily for geology oil well stuff, healthcare, and had a focus on multipipe and Vizserver; it did not sell well. <sup><a href="#s38">38</a></sup> The Onyx4 experiences issues with nvrams and snaphats during brick to brick communication, which causes a failure. <sup><a href="#s39">39</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Onyx4 is a high-performance SGI system using ATI FireGL cards, up to 12x faster than V12 Pro but incompatible with IrisGL and requiring a different X Windows configuration; it supports DVI outputs for high-resolution (user-8b3c, 2020-11-12, exchange 221119, check: supported)</li>
+<li id="s2">The Onyx4 does not support IrisGL. (user-24f0, 2023-10-17, exchange 223449, check: supported)</li>
+<li id="s3">mediarecord is an IRIS GL application and does not work on Onyx4. (user-b7c4, 2019-01-31, exchange 389, check: supported)</li>
+<li id="s4">IrisGL works on SGI systems with graphics cards, excluding the Onyx4. (user-59b9, 2020-09-18, exchange 69068, check: supported)</li>
+<li id="s5">The Onyx4 lacks IRIS GL support and uses XFree86, leading to compatibility issues with many applications. (user-59b9, 2023-05-11, exchange 208684, check: supported)</li>
+<li id="s6">The Onyx4 uses ATI FireGL X1 cards but cannot run IRISgl, lacking full 4DWM features and vector icons. (user-24f0, 2024-08-01, exchange 48009, check: supported)</li>
+<li id="s7">The Onyx4 does not support IrisGL; a third-party tool for Linux exists but not from SGI (user-59b9, 2020-11-12, exchange 221119, check: supported)</li>
+<li id="s8">The Onyx4 and Prism use the same GPU. (user-22f9, 2019-06-02, exchange 1896, check: supported)</li>
+<li id="s9">The Onyx4 compute node can be repurposed into a Prism by replacing the graphics card. (user-59b9, 2020-07-22, exchange 216329, check: supported)</li>
+<li id="s10">The Onyx4 is faster and more reliable than the Prism, though the Prism has been difficult to work with. (user-b7c4, 2020-06-19, exchange 9120, check: supported)</li>
+<li id="s11">The only configurations with a single AGP riser were the rack Prism and Onyx4, both dual-pipe. (user-b7c4, 2020-08-05, exchange 75294, check: supported)</li>
+<li id="s12">The Altix 350 has FireGL X2.1 cards which are useful for Onyx4 due to Prism compatibility issues. (user-5906, 2022-12-16, exchange 106009, check: supported)</li>
+<li id="s13">Altix and Prism systems are not fully compatible with Onyx4 systems due to differences in hardware and firmware. (user-59b9, 2023-02-27, exchange 208391, check: supported)</li>
+<li id="s14">My Onyx4 and Prism bricks cost the better part of a grand each. (user-59b9, 2024-05-09, exchange 111178, check: supported)</li>
+<li id="s15">The CBOB can be found in different configurations, including as part of a Prism setup or with an IP badge and Onyx4 USB ports. (user-5906, 2025-12-29, exchange 120370, check: supported)</li>
+<li id="s16">Vertex buffers (VBOs) were not available on SGI V12 systems until Onyx4 (and Prism). (user-5906, 2026-05-13, exchange 215996, check: supported)</li>
+<li id="s17">The Onyx4 can be configured with or without a CPU, and adding a CPU requires specific setup. XIO or Numalink is needed for connection, and reinstalling IRIX is necessary for graphics initialization. XFree86 is used with, (user-b7c4, 2020-02-13, exchange 6347, check: supported)</li>
+<li id="s18">my onyx4 is 4U so it's just a tower. (user-b7c4, 2020-01-02, exchange 5257, check: supported)</li>
+<li id="s19">Onyx4 has ATI FireGL cards called graphics pipes and display outputs called heads. (user-59b9, 2021-03-25, exchange 98630, check: supported)</li>
+<li id="s20">Onyx4s use ATI FireGL cards; Onyx350/Tezro bricks are VPro. (user-59b9, 2021-05-09, exchange 99118, check: supported)</li>
+<li id="s21">The Onyx4 and rackmount Prism use the same AGP riser, but the Prism uses FireGL X2 or X3 cards while the Onyx4 uses ATI Pro 9700 cards. (user-59b9, 2020-07-22, exchange 216329, check: supported)</li>
+<li id="s22">The FireGL X3s require a Molex power connection, and the Onyx4's AGP riser has an unpopulated header for this. (user-59b9, 2020-08-09, exchange 216343, check: supported)</li>
+<li id="s23">The Onyx4 supports OpenGL 1.4, and was planned to support 2.0. (user-b1da, 2020-09-06, exchange 204415, check: supported)</li>
+<li id="s24">An Onyx4 is more powerful than an Onyx350 but lacks XSGI, affecting some apps like Flame. (user-59b9, 2020-09-30, exchange 11281, check: supported)</li>
+<li id="s25">The Onyx4 can support up to twelve CPUs in theory with a NUMAlink router. (user-59b9, 2023-03-27, exchange 208489, check: supported)</li>
+<li id="s26">The Onyx4 uses AGP slots and supports ATI cards. (user-59b9, 2021-10-30, exchange 75691, check: supported)</li>
+<li id="s27">The Tezro uses VPro graphics on a motherboard connector, while the Onyx4 uses FireGL cards on an AGP Pro riser board, making the Onyx4 incompatible with IRIS GL software but faster for geometry with OpenGL 1.3 support. (user-59b9, 2022-02-22, exchange 26115, check: supported)</li>
+<li id="s28">SGI used the name Voyager for ATI cards in the Onyx4. (user-59b9, 2023-07-01, exchange 39003, check: supported)</li>
+<li id="s29">The Onyx4 supports OpenGL Multipipe with up to four displays but only two sets of inputs. (user-59b9, 2023-07-24, exchange 208978, check: supported)</li>
+<li id="s30">The Onyx4 can handle 2560x1440 resolution, though 4K is not supported; it performs well at 2K. (user-59b9, 2023-08-24, exchange 108475, check: supported)</li>
+<li id="s31">An Onyx4 requires two bricks, one with a PCI riser for the IO9 boot device and one with AGP for the dual firegl's. (user-b7c4, 2024-09-01, exchange 210917, check: supported)</li>
+<li id="s32">The Onyx4 is currently just the CPU brick, referred to as an O350 until a cable is installed. (user-237d, 2021-09-23, exchange 100171, check: supported)</li>
+<li id="s33">The Onyx4 uses the same Chimera chassis as the Tezro rack, Origin/Onyx 350, with the graphics option being the main difference. (user-5906, 2026-07-25, exchange 214258, check: supported)</li>
+<li id="s34">The X1 card from an Onyx4 can boot an x86 machine, but the X1 BIOS from an Onyx4 freezes an x86 machine when the second card is present; the X2 card from a Prism can boot an x86 machine with AGP Pro. (user-5906, 2025-01-10, exchange 76161, check: supported)</li>
+<li id="s35">The FireGL X1 in an Onyx4 is significantly faster than the V12 for GPU-intensive tasks. (user-b7c4, 2024-10-01, exchange 224111, check: supported)</li>
+<li id="s36">Onyx 4 can only use x1 cards. (user-24f0, 2025-01-10, exchange 76170, check: supported)</li>
+<li id="s37">The X3 won't work in the Onyx4 (drivers are only for FGL 9700 and two 9800 variants). (user-5906, 2025-01-17, exchange 76223, check: supported)</li>
+<li id="s38">The Onyx4 was marketed heavily for geology oil well stuff, healthcare, and had a focus on multipipe and Vizserver; it did not sell well. (user-24f0, 2025-06-11, exchange 57104, check: supported)</li>
+<li id="s39">The Onyx4 has issues with nvrams and snaphats during brick to brick communication, causing a failure. (user-b7c4, 2026-09-21, exchange 66682, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="onyx4-ultimatevision.html">Onyx4 UltimateVision</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="prism.html">Prism</a>, <a href="origin-350.html">Origin 350</a>, <a href="tezro.html">Tezro</a>, <a href="onyx350.html">Onyx350</a>, <a href="altix.html">Altix</a>, <a href="numalink.html">Numalink</a>, <a href="octane.html">Octane</a>, <a href="altix-350.html">Altix 350</a>, <a href="fuel.html">Fuel</a>, <a href="g-brick.html">G-brick</a>, <a href="o300.html">O300</a>, <a href="onyx2.html">Onyx2</a>, <a href="onyx3000.html">Onyx3000</a>, <a href="origin.html">Origin</a>, <a href="pi.html">PI</a>, <a href="radeon.html">Radeon</a>, <a href="tezro-rack.html">Tezro rack</a>
+</li>
+<li>Processors: <a href="x86.html">x86</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>, <a href="firegl-x1.html">FireGL X1</a>, <a href="ati.html">ATI</a>, <a href="ati-fire-gl-x1.html">ATI Fire GL X1</a>, <a href="ati-firegl.html">ATI FireGL</a>, <a href="firegl-x3.html">FireGL X3</a>, <a href="v12.html">V12</a>, <a href="firegl.html">FireGL</a>, <a href="firegl-x2.html">FireGL X2</a>, <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-software.html">IRIX software</a>, <a href="windows-10.html">Windows 10</a>
+</li>
+<li>Software: <a href="iris-gl.html">IRIS GL</a>, <a href="opengl.html">OpenGL</a>, <a href="quake-3.html">Quake 3</a>, <a href="x-server.html">X server</a>, <a href="xfree86.html">XFree86</a>, <a href="flame.html">Flame</a>, <a href="opengl-1-2.html">OpenGL 1.2</a>, <a href="opengl-1-4.html">OpenGL 1.4</a>, <a href="xsgi.html">Xsgi</a>, <a href="documentation.html">documentation</a>, <a href="firmware.html">firmware</a>, <a href="software.html">software</a>
+</li>
+<li>Parts and peripherals: <a href="agp-riser.html">AGP riser</a>, <a href="firegl-cards.html">FireGL cards</a>, <a href="ati-card.html">ATI card</a>, <a href="prom.html">PROM</a>, <a href="rack.html">rack</a>, <a href="riser.html">riser</a>, <a href="cpu.html">CPU</a>, <a href="io9.html">IO9</a>, <a href="nvram.html">NVRAM</a>, <a href="pci-riser.html">PCI riser</a>, <a href="x3-card.html">X3 card</a>, <a href="fan.html">fan</a>, <a href="power-consumption.html">power consumption</a>
+</li>
+<li>Standards and interfaces: <a href="agp.html">AGP</a>, <a href="x1.html">X1</a>, <a href="x3.html">X3</a>, <a href="dvi.html">DVI</a>, <a href="pci.html">PCI</a>, <a href="vga.html">VGA</a>, <a href="x2.html">X2</a>
+</li>
+<li>Companies: <a href="cray.html">Cray</a>, <a href="hp-ab287a.html">HP AB287A</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="audigy2.html">Audigy2</a>, <a href="buttonfly.html">ButtonFly</a>, <a href="cbob.html">CBOB</a>, <a href="dplex.html">DPLEX</a>, <a href="m-serials.html">M-serials</a>, <a href="retrotink.html">Retrotink</a>, <a href="seagate-cheetah.html">Seagate Cheetah</a>, <a href="snaphat.html">Snaphat</a>, <a href="ultimate-vision.html">Ultimate Vision</a>, <a href="voyager.html">Voyager</a>, <a href="color-depth.html">color depth</a>, <a href="compatibility.html">compatibility</a>, <a href="multipipe.html">multipipe</a>, <a href="startup-script.html">startup script</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLX</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GLX</h1>
+<p>Claims: 10 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>GLX is the X server library that supports glx, the standard for forwarded OpenGL, while GLU is the math utility library. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> GLX distinguishes two states, indirect state and direct state, and chooses visuals, sometimes not optimally. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> GLX over network is built into the protocol and just works for old GL programs but may choke with modern 3D programs, and it is suitable for static display but not interactive use due to potential latency. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> With an X server running on a GL-capable system, remote OpenGL over GLX works great, but localhost:0.0 forces GLX through TCP instead of direct rendering. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> GLX did not exist until IRIX 4; X in IRIX 3 was optional until 3.1G; 4sight fused NeWS with older mex GL windows baked into the kernel. <sup><a href="#s9">9</a></sup> Xephyr does not support GLX, which is required for running OpenGL applications from an SGI box. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">It supports glx which is the standard for forwarded GL. (user-6afa, 2022-09-14, exchange 207667, check: uncheckable)</li>
+<li id="s2">GLX is the Xserver library and GLU is the math utility library. (user-b1da, 2024-05-31, exchange 111453, check: uncheckable)</li>
+<li id="s3">GLX distinguishes two 'states': indirect state and direct state. (user-c831, 2024-12-03, exchange 51272, check: supported)</li>
+<li id="s4">GLX chooses visuals, sometimes not optimally. (user-6afa, 2024-12-17, exchange 215613, check: uncheckable)</li>
+<li id="s5">glX is suitable for static display but not interactive use due to potential latency. (user-6afa, 2021-04-11, exchange 16467, check: uncheckable)</li>
+<li id="s6">GLX over network is built into the protocol and just works for old GL programs but may choke with modern 3D programs. (user-21b8, 2025-03-21, exchange 218842, check: supported)</li>
+<li id="s7">localhost:0.0 forces GLX through TCP instead of direct rendering. (user-21b8, 2023-03-18, exchange 215375, check: supported)</li>
+<li id="s8">With an X server running on a GL-capable system, remote OpenGL over GLX works great. (user-21b8, 2024-02-08, exchange 209999, check: uncheckable)</li>
+<li id="s9">GLX did not exist until IRIX 4; X in IRIX 3 was optional until 3.1G; 4sight fused NeWS with older mex GL Windows baked into the kernel. (user-56d4, 2024-06-20, exchange 189188, check: supported)</li>
+<li id="s10">Xephyr does not support GLX, which is required for running OpenGL applications from an SGI box. (user-7973, 2024-07-05, exchange 85364, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-3.html">IRIX 3</a>, <a href="irix-4.html">IRIX 4</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="opengl-applications.html">OpenGL applications</a>, <a href="x-server.html">X server</a>
+</li>
+<li>Parts and peripherals: <a href="network.html">network</a>
+</li>
+<li>Other: <a href="glu.html">GLU</a>, <a href="tcp.html">TCP</a>, <a href="xephyr.html">Xephyr</a>
+</li></ul>
+</body>
+</html>

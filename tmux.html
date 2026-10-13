@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tmux</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>tmux</h1>
+<p>Claims: 8</p>
+<p>tmux does not work on IRIX for various reasons, though xfstt was built and the fonts look ugly. <sup><a href="#s1">1</a></sup> tmux 2.1 compiled but does not work as expected. <sup><a href="#s2">2</a></sup> tmux segfaults on IRIX due to three root causes, all fixed: SIGCLD storm, delterm unresolvable, and bad symlink in libm.so. <sup><a href="#s3">3</a></sup> Porting a terminal multiplexer like tmux to IRIX and older UNIXen requires utf-8 support. <sup><a href="#s4">4</a></sup> tmux can be controlled over a socket using a text protocol. <sup><a href="#s5">5</a></sup> To run tmux on IRIX, set the default shell to /usr/sgug/bin/bash and ensure the PATH includes /usr/people/edodd/apps/bin. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">tmux won't work on IRIX for various reasons, but xfstt was built and the fonts look ugly. (user-637b, 2019-01-16, exchange 203651, check: uncheckable)</li>
+<li id="s2">tmux 2.1 compiled but does not work as expected. (user-8547, 2019-02-10, exchange 67036, check: supported)</li>
+<li id="s3">tmux segfaults on IRIX due to three root causes, all fixed: SIGCLD storm, delterm unresolvable, and bad symlink in libm.so. (user-2189, 2026-03-04, exchange 215912, check: supported)</li>
+<li id="s4">Porting a terminal multiplexer like tmux to Irix and older UNIXen requires utf-8 support. (user-22f9, 2025-01-14, exchange 235587, check: supported)</li>
+<li id="s5">tmux can be controlled over a socket using a text protocol. (user-fa69, 2022-09-28, exchange 207733, check: uncheckable)</li>
+<li id="s6">To run tmux on IRIX, set the default shell to /usr/sgug/bin/bash and ensure the PATH includes /usr/people/edodd/apps/bin. (user-2189, 2026-03-06, exchange 215917, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-2.html">IRIX 6.2</a>
+</li>
+<li>Software: <a href="path.html">PATH</a>, <a href="bash.html">bash</a>
+</li>
+<li>Companies: <a href="sco.html">SCO</a>
+</li></ul>
+</body>
+</html>

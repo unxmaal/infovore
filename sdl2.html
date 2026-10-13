@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDL2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SDL2</h1>
+<p>Claims: 53 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Simple_DirectMedia_Layer">Simple DirectMedia Layer</a>.</p>
+<p>SDL2 is a library that adds accelerated 2D rendering and handles audio, and it is used for sound and controls in sm64ex. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> SDL2 is available from nekoware and SGUG RSE, repositories of software for IRIX, and there is a nekoware port for IRIX. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> SDL2 can be made to work on IRIX with a bit of work, possibly involving adding back IRIX-specific details like dynamic library loading, and requires aconf/config hacking to support IRIX as a target. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The makefile for SDL2 in nekoware may require OS type detection for IRIX, and adding IRIX support could be simple or challenging, depending on the existing code. <sup><a href="#s9">9</a></sup> There is work in progress on an SDL2 port, but it is not ready yet, and the SDL2 patches are merged to the wipnonautomated branch, but are not yet available in a usable form. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> SDL2 can be compiled manually but faced circular dependency issues, and recompiling SDL2 with the unsetenv fix can encounter a strings.h error. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> A patch for SDL2 can cause an O2 to reboot, and SpaceCadetPinball compiled on IRIX with SDL2 but segfaults due to missing RANDR extension. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> The SDL2 implementation in user-42cf's setup is more stable and allows changing display settings without shutting down the game. <sup><a href="#s16">16</a></sup> The SDL2 package is available in the online repo and can be installed via tdnf, with version 2.0.12 mentioned. <sup><a href="#s17">17</a></sup> The SGUG-RSE SDL2 version is 2.0.12 with patches and builds without errors with --enable-video-opengl. <sup><a href="#s18">18</a></sup> The SDL2 package may require the khrplatform patch, which is part of a mesa GL package. <sup><a href="#s19">19</a></sup> The SGUG-RSE SDL2 does not support GL, so games such as wipEout and Homeworld require compiling your own SDL2 with GL enabled. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> A test GL app works with SDL2 when compiled with the specified X11 linking changes, and the drmadison SDL2 rpm with working GL support is functional. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> SDL2 should not pass invalid attributes to XCreateWindow, which can cause a BadMatch error, and the build system uses pkg-config so editing SDL2's .pc file and setting flags according to the test program's proper flags could help. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> Chocolate Doom uses SDL2 with GL for blitting but can still be pixellated, and the SGI port offers a point-and-click install. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> In SDL2, the keyboard works without adjustment on an O2. <sup><a href="#s29">29</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SDL2 adds accelerated 2D rendering. (user-42cf, 2021-04-09, exchange 215108, check: supported)</li>
+<li id="s2">SDL2 handles audio similarly across different SGI machines, though some implementations may vary. (user-42cf, 2023-11-08, exchange 215426, check: uncheckable)</li>
+<li id="s3">SDL2 is used for sound and controls in sm64ex, and an alternative could be implemented if SDL2 is too much to port. (user-e473, 2020-07-05, exchange 216956, check: uncheckable)</li>
+<li id="s4">SDL2 has a nekoware port for IRIX. (user-22f9, 2019-11-26, exchange 4371, check: uncheckable)</li>
+<li id="s5">SDL2 is available from SGUG RSE, a repository of software for IRIX. (user-6c80, 2024-11-26, exchange 50933, check: uncheckable)</li>
+<li id="s6">SDL2 is ported to IRIX, but the installation process is not specified. (user-701c, 2024-11-26, exchange 50925, check: uncheckable)</li>
+<li id="s7">SDL2 can be made to work on Irix with a bit of work, possibly involving adding back Irix-specific details like dynamic library loading, and might take a few man weeks to fully implement. (user-9b9c, 2019-03-05, exchange 67101, check: uncheckable)</li>
+<li id="s8">SDL2 requires aconf/config hacking to support IRIX as a target. (user-f229, 2020-01-10, exchange 5402, check: uncheckable)</li>
+<li id="s9">The makefile for SDL2 in nekoware may require OS type detection for IRIX, and adding IRIX support could be simple or challenging, depending on the existing code. (user-17cb, 2021-06-26, exchange 215165, check: uncheckable)</li>
+<li id="s10">There's work in progress on an SDL2 port, but it's not ready yet. (user-e872, 2021-03-13, exchange 215098, check: uncheckable)</li>
+<li id="s11">SDL2 patches are merged to the `wipnonautomated` branch, but are not yet available in a usable form. (user-b1da, 2021-04-16, exchange 16634, check: supported)</li>
+<li id="s12">SDL2 can be compiled manually but faced circular dependency issues. (user-5510, 2023-08-08, exchange 240084, check: uncheckable)</li>
+<li id="s13">Recompiling SDL2 with the unsetenv fix can encounter a strings.h error. (user-8547, 2019-07-31, exchange 67680, check: uncheckable)</li>
+<li id="s14">A patch for SDL2 can cause an O2 to reboot. (user-8547, 2019-07-20, exchange 67570, check: supported)</li>
+<li id="s15">SpaceCadetPinball compiled on IRIX with SDL2 but segfaults due to missing RANDR extension. (user-7973, 2021-10-14, exchange 217265, check: uncheckable)</li>
+<li id="s16">The SDL2 implementation in user-42cf's setup is more stable and allows changing display settings without shutting down the game. (user-8547, 2019-07-31, exchange 67676, check: uncheckable)</li>
+<li id="s17">The SDL2 package is available in the online repo and can be installed via tdnf, version 2.0.12 is mentioned. (user-7973, 2026-06-14, exchange 216028, check: supported)</li>
+<li id="s18">The SGUG-RSE SDL2 version is 2.0.12 with patches and builds without errors with --enable-video-opengl. (user-7973, 2025-10-05, exchange 215823, check: supported)</li>
+<li id="s19">The SDL2 package may require the khrplatform patch, which is part of a mesa GL package. (user-7973, 2025-10-06, exchange 215826, check: uncheckable)</li>
+<li id="s20">The game wipEout can be downloaded and run on IRIX using SDL2 with GL support, which is not supported by the SDL2 from the SGUG-RSE repo. (user-7973, 2026-03-11, exchange 219554, check: uncheckable)</li>
+<li id="s21">the game can do full screen, but our SGUG-RSE SDL2 library can't; you have to compile your own SDL2 with GL and fix the fullscreen issue (user-7973, 2026-05-11, exchange 215994, check: uncheckable)</li>
+<li id="s22">Homeworld requires SDL2 with GL enabled; performance on O2 is uncertain. (user-7973, 2026-02-14, exchange 62163, check: supported)</li>
+<li id="s23">A test GL app works with SDL2 when compiled with the specified X11 linking changes. (user-7973, 2025-10-05, exchange 215824, check: uncheckable)</li>
+<li id="s24">The drmadison SDL2 rpm with working GL support is functional. (user-7973, 2025-10-05, exchange 215823, check: uncheckable)</li>
+<li id="s25">The lack of libGLcore in ldd's output could be suspicious but the build system uses pkg-config, so editing SDL2's `.pc` file and setting flags according to the test program's proper flags could help. `dlopen` stuff might (user-8780, 2025-10-07, exchange 215828, check: supported)</li>
+<li id="s26">SDL2 should not pass invalid attributes to XCreateWindow, which can cause a BadMatch error; debugging involves checking the X protocol for valid arguments and testing each suspect value in SDL2's code. (user-21b8, 2025-11-12, exchange 72850, check: uncheckable)</li>
+<li id="s27">choco-doom uses SDL2 with GL for blitting but can still be pixellated. (user-3e2d, 2026-01-19, exchange 215877, check: uncheckable)</li>
+<li id="s28">The Chocolate Doom port for SGI uses SDL 2 and offers a point-and-click install. (user-3e2d, 2026-05-18, exchange 90763, check: supported)</li>
+<li id="s29">In SDL2, the keyboard works without adjustment on an O2. (user-7973, 2025-11-15, exchange 219242, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="aix.html">AIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>
+</li>
+<li>Software: <a href="gl.html">GL</a>, <a href="sdl1.html">SDL1</a>, <a href="gl-support.html">GL support</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="homeworld.html">Homeworld</a>, <a href="glquake.html">GLQuake</a>, <a href="makefile.html">Makefile</a>, <a href="opengl.html">OpenGL</a>, <a href="rse.html">RSE</a>, <a href="sdl1-2.html">SDL1.2</a>, <a href="tyrquake.html">TyrQuake</a>, <a href="ioquake3.html">ioquake3</a>, <a href="nekoware.html">nekoware</a>, <a href="tardist.html">tardist</a>, <a href="tdnf.html">tdnf</a>
+</li>
+<li>Standards and interfaces: <a href="x-protocol.html">X protocol</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="homeworld-sdl.html">Homeworld-SDL</a>, <a href="milkytracker.html">MilkyTracker</a>, <a href="openrct2.html">OpenRCT2</a>, <a href="sm64.html">SM64</a>, <a href="vnc.html">VNC</a>, <a href="wipeout.html">Wipeout</a>, <a href="xcreatewindow.html">XCreateWindow</a>, <a href="chocolate-doom.html">chocolate-doom</a>, <a href="drmadison.html">drmadison</a>, <a href="g.html">g++</a>, <a href="libglcore.html">libGLcore</a>, <a href="pkg-config.html">pkg-config</a>, <a href="q2pro.html">q2pro</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VCAM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VCAM</h1>
+<p>Claims: 3</p>
+<p>Linear regulators in a VCAM can fail, causing voltages to exceed twice their intended value, and may need to be replaced. <sup><a href="#s1">1</a></sup> The Onyx1 has known issues with the VCAM, which has a 12V regulator that tends to fail, followed by power converters and the PSU. <sup><a href="#s2">2</a></sup> The VCAM and power converters can be DIY fixed, but the PSU is complex and challenging to repair. <sup><a href="#s2">2</a></sup> The VCAM on the Onyx's IO4 is the only place with -12VDC, and troubleshooting involves checking the Diagnostics Roadmap and power system, where the system controller's monitoring system can fail. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Linear regulators in a VCAM can fail, causing voltages to be over 2x what they should be, and may need to be replaced. (user-b1da, 2021-09-14, exchange 100062, check: supported)</li>
+<li id="s2">The Onyx1 has known issues with the VCAM, which has a 12v regulator that tends to fail, followed by power converters and the PSU. The VCAM and power converters can be DIY fixed, but the PSU is complex and challenging to修 (user-22f9, 2023-08-26, exchange 108497, check: supported)</li>
+<li id="s3">The VCAM on the Onyx's IO4 is the only place with -12VDC, and troubleshooting involves checking the Diagnostics Roadmap and power system, where the system controller's monitoring system can fail. (user-86e1, 2024-07-18, exchange 224018, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx1.html">Onyx1</a>
+</li></ul>
+</body>
+</html>

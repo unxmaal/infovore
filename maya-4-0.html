@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maya 4.0</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Maya 4.0</h1>
+<p>Claims: 12 Part of <a href="maya.html">Maya</a></p>
+<p>Maya 4.0 can use Renderman through Mayaman on IRIX, which requires setup of ENV variables and starting lmgrd in the entropy/etc directory before sourcing mayaman.env and launching Maya from the same terminal. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Mayaman version of Entropy works on an IRIX Octane with dual 400 MHz CPUs, and Maya 4.0 with Mayaman and Entropy or BMRT can run early Renderman on an Octane. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The official Renderman Artist Tools did not run in Maya 4.0 on IRIX, though RAT 5.0 in Maya 4.0 works but requires manual steps to start the license server. <sup><a href="#s3">3</a></sup><sup><a href="#s5">5</a></sup> RAT 5.0 for Maya 4.0 can be run on Windows XP but not licensed on IRIX, and Pixard-Crypt can modify license.dat files to indicate expiration status, though its exact use and compatibility with RAT 5.5 for Maya 4.0 on IRIX is unclear. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Maya 4.0 is the latest version needed for most features, with Maya 5.0 for IK rigging and 6.5 for Bonus Tools and Marking Menu workflows. <sup><a href="#s8">8</a></sup> Maya 4.0 had fur and nCloth, but fluid effects were added in 4.5, and Maya 4.0 and later have the feature of holding W, E, or R for gimble switching. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Renderman can be used in Irix with MayaMan in Maya 4.0, requiring setup of ENV variables. (user-44d7, 2024-01-08, exchange 84509, check: supported)</li>
+<li id="s2">To run Mayaman in Maya 4.0 or 4.5, start lmgrd in the entropy/etc directory, then source mayaman.env in the Mayaman directory, and launch Maya from the same terminal. (user-44d7, 2025-09-06, exchange 87966, check: supported)</li>
+<li id="s3">The Mayaman version of Entropy works on an IRIX Octane with dual 400 MHz CPUs for rendering, but the official Renderman Artist Tools did not run in Maya 4.0 on IRIX. (user-44d7, 2024-12-26, exchange 86161, check: supported)</li>
+<li id="s4">Maya 4.0 with Mayaman and Entropy or BMRT can run early Renderman on an Octane. Maya 7.0 with Renderman Studio 1.0 can run on Xp64 or Windows 7. Renderman Artist Tools only runs in Maya 3.0, 3.5, or 4.0. (user-44d7, 2024-12-26, exchange 86162, check: supported)</li>
+<li id="s5">RAT 5.0 in Maya 4.0 works but requires manual steps to start the license server. (user-44d7, 2025-10-27, exchange 219203, check: supported)</li>
+<li id="s6">Pixard-Crypt can modify license.dat files to indicate expiration status, though its exact use and compatibility with Rat 5.5 for Maya 4.0 on IRIX is unclear. (user-44d7, 2025-10-20, exchange 219193, check: supported)</li>
+<li id="s7">Rat 5.0 for Maya 4.0 can be run on Windows XP but not licensed on Irix. (user-44d7, 2026-08-22, exchange 219989, check: supported)</li>
+<li id="s8">Maya 4.0 is the latest version needed for most features, with Maya 5.0 for IK rigging and 6.5 for Bonus Tools and Marking Menu workflows. (user-44d7, 2025-09-04, exchange 87868, check: supported)</li>
+<li id="s9">Maya 4.0 had fur and nCloth but fluid effects were added in 4.5. (user-44d7, 2026-08-22, exchange 219989, check: supported)</li>
+<li id="s10">Maya 4.0 and later have the feature of holding W, E, or R for gimble switching. (user-44d7, 2026-08-25, exchange 220002, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="license-server.html">license server</a>
+</li>
+<li>Graphics: <a href="renderman.html">RenderMan</a>, <a href="entropy.html">Entropy</a>, <a href="renderman-artist-tools.html">Renderman Artist Tools</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="windows-xp.html">Windows XP</a>
+</li>
+<li>Software: <a href="maya-4-5.html">Maya 4.5</a>, <a href="mayaman.html">MayaMan</a>, <a href="maya-2-5.html">Maya 2.5</a>, <a href="maya-6-5.html">Maya 6.5</a>
+</li>
+<li>Other: <a href="inventor.html">Inventor</a>, <a href="rat-5-5.html">RAT 5.5</a>, <a href="license-dat.html">license.dat</a>, <a href="lmgrd.html">lmgrd</a>
+</li></ul>
+</body>
+</html>

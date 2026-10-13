@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9600 baud</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>9600 baud</h1>
+<p>Claims: 6</p>
+<p>9600 baud is sufficient for text services and is very safe, while higher rates like 115200 baud are faster but more sensitive to line conditions and hardware. <sup><a href="#s1">1</a></sup> 9600 baud can vary between systems due to different clock chip implementations, leading to potential lock-on issues. <sup><a href="#s2">2</a></sup> The Netra LOM is serial-only and starts up at 9600 baud, and 12800 baud did not work. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> To connect to an SGI via USB, plug in the dongle, which creates a /dev entry like /dev/tty.usbserialfoo, then use `screen /dev/tty.usbserialfoo 9600` to start a session at 9600 baud and ctrl-a k to exit. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">9600 baud is sufficient for text services and is very safe, while 115200 baud is faster but more sensitive to line conditions and hardware. (user-c831, 2019-11-23, exchange 4329, check: supported)</li>
+<li id="s2">9600 baud can vary between systems due to different clock chip implementations, leading to potential lock-on issues. (user-231e, 2026-01-12, exchange 242328, check: supported)</li>
+<li id="s3">The Netra LOM is serial-only and starts up at 9600 baud. (user-07ed, 2023-06-03, exchange 183955, check: supported)</li>
+<li id="s4">The command `screen /dev/ttyS0 9600` establishes serial communication at 9600 baud, and 12800 baud did not work. (user-22f9, 2023-12-14, exchange 240205, check: supported)</li>
+<li id="s5">To connect to an SGI via USB, plug in the dongle, which creates a /dev entry like /dev/tty.usbserialfoo. Use `screen /dev/tty.usbserialfoo 9600` to start a session at 9600 baud, and ctrl-a k to exit. (user-07ed, 2024-12-24, exchange 113272, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Standards and interfaces: <a href="usb.html">USB</a>, <a href="serial-communication.html">serial communication</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

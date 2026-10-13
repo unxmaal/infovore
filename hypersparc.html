@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HyperSPARC</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>HyperSPARC</h1>
+<p>Claims: 27 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/HyperSPARC">HyperSPARC</a>.</p>
+<p>HyperSPARC is a SPARC processor that is not supported by certain systems, which instead support SuperSPARC CPUs with large caches that offer better performance than HyperSPARC CPUs despite having less MHz. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> HyperSPARC requires an updated boot PROM, and mixing SuperSPARC and HyperSPARC modules can cause failures during OBP startup depending on which is the boot CPU, requiring a patched PROM for further progress. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Mixing SuperSPARC and HyperSPARC modules can be done physically but may require an OS that can handle separate drivers for each CPU, and the PROM may block configurations that are physically compatible but may not boot or run reliably. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> NetBSD crashes when booting with mixed speed or cache size HyperSPARC modules but works with mixed speeds or cache sizes of the same type. <sup><a href="#s7">7</a></sup> A 200 MHz HyperSPARC is dual issue while UltraSPARC is quad issue, and HyperSPARC is 60% faster than UltraSPARC for compression but only 5% faster for decompression. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SS20 supports SuperSPARC CPUs with large caches, which offer better performance than HyperSPARC CPUs despite having less MHz. (user-237d, 2020-06-15, exchange 97071, check: uncheckable)</li>
+<li id="s2">TurboSPARC and HyperSPARC are not supported. (user-7b1c, 2022-07-06, exchange 30908, check: uncheckable)</li>
+<li id="s3">For HyperSPARC, an updated boot prom is needed. (user-03ad, 2023-06-18, exchange 184062, check: uncheckable)</li>
+<li id="s4">Mixing a SuperSPARC with a hyperSPARC results in failures during OBP startup, depending on which is the boot CPU; a patched PROM is needed for further progress. (user-08fb, 2024-10-20, exchange 185505, check: uncheckable)</li>
+<li id="s5">Mixing SuperSPARC and HyperSPARC modules can be done physically but may require an OS that can handle separate drivers for each CPU. (user-08fb, 2025-02-19, exchange 240512, check: uncheckable)</li>
+<li id="s6">The PROM may block configurations of mixed SuperSPARC and HyperSPARC modules that are physically compatible but may not boot or run reliably. (user-08fb, 2025-02-19, exchange 240512, check: uncheckable)</li>
+<li id="s7">NetBSD would crash when booting with mixed speed or cache size hyperSPARC modules but worked with mixed speeds or cache sizes of the same type. (user-08fb, 2025-02-23, exchange 240514, check: uncheckable)</li>
+<li id="s8">200Mhz hyperSPARC is dual issue while UltraSPARC is quad issue. (user-08fb, 2025-02-23, exchange 240514, check: supported)</li>
+<li id="s9">hyperSPARC is 60% faster than UltraSPARC for compression but only 5% faster for decompression. (user-08fb, 2025-02-23, exchange 240514, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ss20.html">SS20</a>, <a href="sparcstation-20.html">SPARCstation 20</a>, <a href="ss10.html">SS10</a>, <a href="zx.html">ZX</a>
+</li>
+<li>Processors: <a href="supersparc.html">SuperSPARC</a>, <a href="supersparc-ii.html">SuperSPARC II</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>, <a href="nextstep.html">NeXTSTEP</a>, <a href="netbsd.html">NetBSD</a>
+</li>
+<li>Standards and interfaces: <a href="obp.html">OBP</a>
+</li>
+<li>Companies: <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="sm71.html">SM71</a>, <a href="turbo-gx.html">Turbo GX+</a>, <a href="turbosparc.html">TurboSPARC</a>
+</li></ul>
+</body>
+</html>

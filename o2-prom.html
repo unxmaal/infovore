@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O2 PROM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>O2 PROM</h1>
+<p>Claims: 10 Part of <a href="o2.html">O2</a></p>
+<p>The O2 PROM supports R4x00 CPUs and references R4K machines, indicating commonality with later models. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It sets CPU configuration parameters such as bus speed, core speed, and cache details, and can be flashed externally via USB or serial, configuring the system regardless of power state. <sup><a href="#s3">3</a></sup> The O2 PROM has multiple versions, with the latest being 4.18 and earlier versions found in IRIX 6.3 overlays. <sup><a href="#s4">4</a></sup> SGI's IRIX source code includes O2 PROM source, available up to version 6.5.7. <sup><a href="#s5">5</a></sup> A toolchain exists to dump and reassemble O2 PROM contents, and it can be analyzed using Ghidra to verify details. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> It compares the CPU COP0 COUNT register to the CRIME fixed 66 MHz CRM_TIME base register, and the math can be wrong for some CPUs. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O2 PROM supports R4x00 CPUs, possibly used during bringup or considered but canceled as too niche. (user-86e1, 2024-11-28, exchange 112935, check: supported)</li>
+<li id="s2">The O2 PROM references R4K machines, indicating some commonality with later models. (user-c799, 2025-01-28, exchange 211816, check: supported)</li>
+<li id="s3">The O2 PROM sets CPU configuration parameters like bus speed, core speed, and cache details; it can be flashed externally via USB or serial and configures the system regardless of power state. (user-757f, 2026-01-22, exchange 225989, check: supported)</li>
+<li id="s4">The O2 PROM has multiple versions, with the latest being 4.18; earlier versions are in IRIX 6.3 overlays. (user-c799, 2024-12-07, exchange 86037, check: supported)</li>
+<li id="s5">SGI's IRIX source code includes O2 PROM source, available up to version 6.5.7. (user-3e2d, 2025-12-17, exchange 120088, check: supported)</li>
+<li id="s6">The O2 PROM can be analyzed using Ghidra to verify details. (user-c799, 2026-01-10, exchange 89327, check: supported)</li>
+<li id="s7">there is a toolchain to dump and reassemble O2 PROM contents. (user-757f, 2026-04-28, exchange 122844, check: supported)</li>
+<li id="s8">For the O2 PROM, it compares the CPU COP0 COUNT register to the CRIME fixed 66 MHz CRM_TIME base register, and the math can be wrong for some CPUs. (user-8780, 2026-04-25, exchange 226386, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="r4000.html">R4000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="ghidra.html">Ghidra</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="6-5-7.html">6.5.7</a>
+</li></ul>
+</body>
+</html>

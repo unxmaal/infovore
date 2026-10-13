@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS/2 keyboard</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PS/2 keyboard</h1>
+<p>Claims: 35 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/PS/2_port">PS/2 port</a>.</p>
+<p>The USB keyboard and mouse spec includes backwards compatibility with PS/2, and adapters connecting them are 'dumb' wired straight through. <sup><a href="#s1">1</a></sup> PS/2 keyboards and mice are cheaper options, but may not look as nice. <sup><a href="#s2">2</a></sup> Some SGI systems require a PS/2 keyboard to boot properly: the O2 uses a PS/2 keyboard and mouse, the Indigo2 requires a PS/2 keyboard and mouse to boot properly, and the Octane requires a PS/2 keyboard to force graphics boot. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Booting with a PS/2 keyboard resolved a diagnostics failure, and plugging in a PS/2 keyboard may cause the machine to halt without one connected. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Some PS/2 keyboards may not work with certain systems: an Indigo2 may not boot if a particular PS/2 keyboard is plugged in, plugging a PS/2 keyboard into an Indigo1 may cause issues, and an O350 with an SGI PS/2 keyboard fails to be detected in the PROM but works in the OS. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The PS/2 keyboard for SGI systems has a non-standard layout, with the ~ key placed to the left of the space bar, and a Compaq keyboard is an OEM rebadged version of the same PS/2 keyboard SGI used. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> PS/2 keyboards have several variants of the protocol, and an old Fujitsu PS/2 keyboard works great, while a granite SGI keyboard works solid for the I2. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The USB keyboard and mouse spec includes backwards compatibility with PS/2. The above adapters are 'dumb' wired straight through. (user-8b3c, 2019-08-04, exchange 220748, check: supported)</li>
+<li id="s2">The PS2 keyboard and mouse are cheaper options, but may not look as nice. (user-cade, 2021-01-26, exchange 14171, check: uncheckable)</li>
+<li id="s3">The Octane requires a PS/2 keyboard to force graphics boot, but you can also boot without and start X in the startup scripts. (user-f229, 2019-08-11, exchange 77907, check: supported)</li>
+<li id="s4">The O2 uses standard VGA, PS/2 mouse, and PS/2 keyboard. (user-b7c4, 2020-04-26, exchange 7834, check: supported)</li>
+<li id="s5">The Indigo2 requires a PS/2 keyboard and mouse to boot properly. (user-94cb, 2022-04-17, exchange 103261, check: supported)</li>
+<li id="s6">Booting with a PS/2 keyboard resolved the diagnostics failure. (user-616d, 2024-10-26, exchange 50057, check: supported)</li>
+<li id="s7">Yeah plug in a PS/2 keyboard. It'll jingle but halt without one connected. (user-e4e2, 2026-06-24, exchange 226624, check: supported)</li>
+<li id="s8">Plugging a PS/2 keyboard into an Indigo1 may cause issues. (user-8547, 2022-03-05, exchange 222066, check: supported)</li>
+<li id="s9">The Indigo2 may not boot if a particular PS/2 keyboard is plugged in. (user-8547, 2022-04-17, exchange 103261, check: supported)</li>
+<li id="s10">An O350 with an SGI PS/2 keyboard fails to be detected in the PROM but works in the OS, and this issue appeared suddenly. (user-24f0, 2025-01-13, exchange 224400, check: supported)</li>
+<li id="s11">The ps/2 keyboard for SGI systems has a non-standard layout, with the ~ key placed to the left of the space bar. (user-b1da, 2022-02-03, exchange 168342, check: supported)</li>
+<li id="s12">A Compaq keyboard is an OEM rebadged version of the same PS/2 keyboard SGI used. (user-56d4, 2022-05-06, exchange 222234, check: supported)</li>
+<li id="s13">PS/2 keyboards have several variants of the protocol; an old Fujitsu PS/2 keyboard works great, and a granite SGI keyboard works solid for the I2. (user-e4e2, 2026-04-27, exchange 243935, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="indigo.html">Indigo</a>, <a href="indigo1.html">Indigo1</a>, <a href="origin-350.html">Origin 350</a>, <a href="tftp-server.html">TFTP server</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="os.html">OS</a>
+</li>
+<li>Parts and peripherals: <a href="ps-2-mouse.html">PS/2 mouse</a>, <a href="kvm.html">KVM</a>, <a href="ps-2-mice.html">PS/2 mice</a>, <a href="prom.html">PROM</a>, <a href="usb-keyboard.html">USB keyboard</a>, <a href="usb-mouse.html">USB mouse</a>, <a href="keyboard.html">keyboard</a>
+</li>
+<li>Standards and interfaces: <a href="vga.html">VGA</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

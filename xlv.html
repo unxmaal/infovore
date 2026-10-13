@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xlv</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>xlv</h1>
+<p>Claims: 16</p>
+<p>xlv is a command-line software RAID utility on IRIX, and xvm is its GUI successor that adds a graphical interface and can set up RAID volumes on remote hosts; both tools can coexist on the same system. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> XLV is the older volume management system on IRIX, replaced by XVM, and RAID in IRIX required licensed software such as XLV or XVM. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The XLV supports SCSI drives in a stripe configuration, and XLV on Sun systems was similar to Veritas software in functionality. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> XVM can be used to import XLV volumes. <sup><a href="#s8">8</a></sup> xlv setups for /usr can use separate disks or logical volumes, but xlv requires licenses, and you can mount /usr on an xlv while using a different disk for the swap partition. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> To grow the root file system onto another disk, you can use xlv to create a logical volume, unmount the root, make the new disk a volume, remount, and grow the filesystem, a process that requires a miniroot or another IRIX. <sup><a href="#s11">11</a></sup> To extend a volume with XFS, you need to use xlv or clone the disk and rebuild the volume header, and xfsdump and xfsrestore preserve attributes and are recommended for copying data between disks. <sup><a href="#s12">12</a></sup> xlv should be on one of the base 6.5 CDs, and on newer IRIX, xvm should also be installed after installing from original CDs and overlays. <sup><a href="#s13">13</a></sup><sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">xlv is a command-line software raid utility, and xvm is an upgrade that adds a GUI; both can coexist on the same system. (user-8547, 2019-07-15, exchange 2506, check: uncheckable)</li>
+<li id="s2">xlv and xvm are similar RAID tools; xvm offers a GUI and can set up RAID volumes on remote hosts. (user-8547, 2023-02-24, exchange 106640, check: uncheckable)</li>
+<li id="s3">On newer IRIX, xvm is the GUI successor to xlv and should also be installed after installing from original CDs and overlays. (user-8547, 2023-05-26, exchange 107768, check: uncheckable)</li>
+<li id="s4">XLV is the old volume management on IRIX, replaced by XVM. (user-5c71, 2021-11-08, exchange 217292, check: uncheckable)</li>
+<li id="s5">RAID in IRIX required licensed software like XLV or XVM. (user-7538, 2023-02-24, exchange 106639, check: uncheckable)</li>
+<li id="s6">The XLV supports SCSI drives in a stripe configuration. (user-6afa, 2021-03-12, exchange 15479, check: uncheckable)</li>
+<li id="s7">XLV on Sun systems was similar to Veritas software in functionality. (user-8547, 2023-01-01, exchange 106160, check: uncheckable)</li>
+<li id="s8">XVM can be used to import XLV volumes. (user-22f9, 2025-02-18, exchange 86688, check: uncheckable)</li>
+<li id="s9">Xlv setups for /usr can be done with separate disks or logical volumes, but xlv requires licenses. (user-8547, 2022-01-08, exchange 217401, check: uncheckable)</li>
+<li id="s10">You can mount /usr on an xlv and use a different disk for the swap partition. (user-b1da, 2024-12-10, exchange 218637, check: uncheckable)</li>
+<li id="s11">To grow the root file system onto another disk, you can use xlv to create a logical volume, unmount the root, make the new disk a volume, remount, and grow the filesystem. This process requires a miniroot or another IRIX (user-5c71, 2022-01-07, exchange 217398, check: uncheckable)</li>
+<li id="s12">To extend a volume with XFS, you need to use xlv or clone the disk and rebuild the volume header; xfsdump and xfsrestore preserve attributes and are recommended for copying data between disks. (user-9860, 2021-11-04, exchange 217280, check: uncheckable)</li>
+<li id="s13">xlv should be on one of the base 6.5 CD's. (user-8547, 2021-11-08, exchange 217291, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="xvm.html">XVM</a>, <a href="xfs.html">XFS</a>, <a href="swap-partition.html">swap partition</a>, <a href="xfsdump.html">xfsdump</a>, <a href="xfsrestore.html">xfsrestore</a>
+</li>
+<li>Parts and peripherals: <a href="scsi-drive.html">SCSI drive</a>, <a href="disk.html">disk</a>
+</li>
+<li>Standards and interfaces: <a href="raid.html">RAID</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="30.html">.30</a>, <a href="veritas.html">Veritas</a>, <a href="logical-volume.html">logical volume</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIPSpro</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MIPSpro</h1>
+<p>Claims: 178 Background: 7 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Open64">Open64</a>, <a href="https://en.wikipedia.org/wiki/CMake">CMake</a>, <a href="https://en.wikipedia.org/wiki/Distcc">Distcc</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>.</p>
+<h2 id="with-gcc">With GCC</h2>
+<p>GCC and MIPSpro do not mix well together, and mixing their object code can cause link-time failures. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> GCC is generally easier to port with, its bugs get fixed, and it produces faster and smaller binaries for modern code, while MIPSpro can improve performance for certain applications. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Performance comparisons vary, with some benchmarks favoring GCC, others favoring MIPSpro in floating point, and some showing no difference. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> GCC is preferred for porting due to widespread compatibility, while MIPSpro is used for retro demo engine stuff and C++98. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> MIPSpro was SGI's own compiler, and modern usage has transitioned to GCC and now to clang/LLVM. <sup><a href="#s15">15</a></sup> Fceux is an NES emulator that can run on IRIX using either MIPSpro or GCC. <sup><a href="#s16">16</a></sup> Building with MIPSpro can fail due to memory corruption issues during PNG loading, while building with GCC works but requires modifying the GNUmakefile to link with -laudio and -lpthread. <sup><a href="#s17">17</a></sup> It has been a long time since anyone built anything on IRIX, GCC, or MIPSpro. <sup><a href="#s18">18</a></sup></p>
+<h2 id="with-irix">With IRIX</h2>
+<p>MIPSpro is used to compile a variety of software on IRIX, including GNU grep, prboom, Dosbox, Quake, SDL-based projects, HomeworldSDL-IRIX, OpenJDK 8, and ag. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> Building with MIPSpro on IRIX can require workarounds such as defining _XOPEN_SOURCE=500, adding a pragma pack, autoreconfiguring configure and makefiles, and applying patches. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s28">28</a></sup><sup><a href="#s25">25</a></sup> MIPSpro is one of the only exceptions to the rule that almost nothing gets installed into /opt on IRIX. <sup><a href="#s29">29</a></sup> SGI (now HPE) does not offer MIPSpro and IRIX licenses for hobbyists due to the small market size. <sup><a href="#s30">30</a></sup></p>
+<h2 id="general">General</h2>
+<p>MIPSpro is an older SGI compiler that supports C89 and is fast but may lack full C99 support. <sup><a href="#s31">31</a></sup> It supports many C99 features, though some constructs can cause it to crash, and it supports C++99. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> The MIPSpro environment includes specific flags and library paths for compiling MIPS-based software. <sup><a href="#s34">34</a></sup> The mipspro and GNU toolchains do not get along well for certain checks, and some fixes for libc and headers can be enabled via CFLAGS to improve compatibility. <sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup> MIPSpro has a license nag screen that can be fixed with a wiki page. <sup><a href="#s37">37</a></sup> MIPSpro is Silicon Graphics' commercial compiler suite for IRIX development, available alongside GCC binaries. <sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> The compiler was K&amp;R before becoming ANSI C, then stopped at C99, which was not widely supported as MIPSpro ended development. <sup><a href="#s40">40</a></sup><sup><a href="#s41">41</a></sup> MIPSpro is not faster, better, or more efficient than modern GCC, and its optimization can randomly break things, such as in the bash bug where $(command) tries to execute ommand instead of command. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup> It has issues with certain var-arg macros and optimization flags, its error messages can be unhelpful, and reducing optimization levels can resolve some problems. <sup><a href="#s44">44</a></sup><sup><a href="#s45">45</a></sup> MIPSpro supports C99 and C++03, and c99 mode can be turned on for compatibility with newer C99 features and standards. <sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> The only version probably worth using is 7.4.4, with 7.3 requiring 1.2 and 7.4 requiring 1.3. <sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup> MIPSpro is a compiler suite that was distributed on SGI hardware and supported at least C95 and possibly C99. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> It includes a debugger (dbx) and a C frontend that is required for compiling. <sup><a href="#s52">52</a></sup><sup><a href="#s53">53</a></sup><sup><a href="#s54">54</a></sup> It supports 64-bit code compilation via the N64 flag, though later versions dropped N64 support. <sup><a href="#s55">55</a></sup> It offers OpenMP pragmas, including support for older OpenMP versions. <sup><a href="#s56">56</a></sup><sup><a href="#s57">57</a></sup> SGI licenses MIPSpro through FLEXlm, using the same vendor daemon and keygen as other SGI products. <sup><a href="#s58">58</a></sup> MIPSpro can be used on IRIX and potentially on Linux via QEMU MIPS user mode. <sup><a href="#s59">59</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">GCC and MipsPro cannot mix object code for C++ on Irix. (user-9b9c, 2019-03-15, exchange 67124, check: uncheckable)</li>
+<li id="s2">The differences in long double size between GCC and MIPSpro can cause link-time failures when mixing compiled code. (user-42cf, 2019-05-24, exchange 67218, check: uncheckable)</li>
+<li id="s3">Building a package on IRIX with GCC and MIPSPro can fail due to differences in name mangling, exceptions, optimisations, and DWARF info interpretations. (user-2d09, 2020-04-01, exchange 7184, check: uncheckable)</li>
+<li id="s4">You can't mix and match tools like GCC and MIPSpro; building with GCC may cause issues with MIPSpro dependencies. (user-2189, 2020-05-03, exchange 7989, check: uncheckable)</li>
+<li id="s5">gcc and mipspro do not mix well together. (user-e872, 2021-09-16, exchange 69924, check: uncheckable)</li>
+<li id="s6">GCC produces faster and smaller binaries than MIPSPro for modern code, as shown by clear benchmarks. (user-2189, 2020-05-03, exchange 7988, check: uncheckable)</li>
+<li id="s7">GCC is easier to port with and its bugs get fixed, while MIPSPro's do not. (user-2189, 2020-05-03, exchange 7988, check: uncheckable)</li>
+<li id="s8">building NetSurf with GCC is generally easier than patching for MIPSPro (user-d903, 2020-06-18, exchange 9100, check: uncheckable)</li>
+<li id="s9">I actually compiled lamer with both mipspro and gcc - I saw no performance increase/decrease with either (user-8547, 2021-12-19, exchange 70164, check: uncheckable)</li>
+<li id="s10">The `coremark` benchmark compiled with `-Ofast` on an Octane using gcc gets ~1500 score, while using MIPSpro gets 1200. (user-42cf, 2022-01-17, exchange 24787, check: supported)</li>
+<li id="s11">gcc and mipspro had similar performance, with mipspro slightly better in floating point and gcc better in integer workloads. (user-21b8, 2023-06-02, exchange 215393, check: uncheckable)</li>
+<li id="s12">mipspro is not faster than GCC in most synthetic benchmarks. (user-42cf, 2023-08-11, exchange 209040, check: uncheckable)</li>
+<li id="s13">MIPSpro and C++98 are used for retro demo engine stuff, with GCC preferred for porting due to widespread compatibility. (user-b4f4, 2019-07-04, exchange 67327, check: supported)</li>
+<li id="s14">MIPSpro supports C++98 with some extras, while the latest GCC follows the current standard. (user-8547, 2022-09-22, exchange 217715, check: supported)</li>
+<li id="s15">MIPSpro was SGI's own compiler, and IDEs were not common in the past; now we use modern GCC and are transitioning to clang/LLVM. (user-6afa, 2023-01-19, exchange 70678, check: uncheckable)</li>
+<li id="s16">Fceux is an NES emulator that can run on IRIX using MIPSPro or GCC. (user-22f9, 2025-02-21, exchange 218809, check: uncheckable)</li>
+<li id="s17">Building with mipspro can fail due to memory corruption issues during PNG loading, while building with gcc works but requires modifying the GNUmakefile to link with -laudio and -lpthread. (user-21b8, 2025-07-18, exchange 215770, check: uncheckable)</li>
+<li id="s18">It has been a long time since I built anything on IRIX, GCC, or MIPSpro. (user-231e, 2026-04-26, exchange 215981, check: uncheckable)</li>
+<li id="s19">Compiling GNU grep 3.3 with MIPSpro on IRIX requires defining _XOPEN_SOURCE=500 to include timespec_t and avoid errors. (user-8547, 2019-02-05, exchange 67000, check: supported)</li>
+<li id="s20">Packing issues with animdef_t required a pragma pack to fix MIPSpro build for prboom on IRIX. (user-8547, 2019-03-10, exchange 203721, check: uncheckable)</li>
+<li id="s21">The MipsPro build of Dosbox does not parse strings correctly, while the GCC build works. (user-8547, 2019-03-15, exchange 67124, check: uncheckable)</li>
+<li id="s22">Compiling Quake 3.21 with MIPSPro on IRIX fails due to issues introduced in 3.20, while 3.19 compiles but does not run. (user-22f9, 2023-10-16, exchange 209399, check: supported)</li>
+<li id="s23">Nekoware is used for fixing and building software with MIPSpro on IRIX. (user-22f9, 2025-04-11, exchange 115982, check: uncheckable)</li>
+<li id="s24">ag can be an option for recursive grep on IRIX, requiring only pcre as a non-stock runtime dependency and buildable with MIPSpro. (user-42cf, 2025-04-29, exchange 218909, check: uncheckable)</li>
+<li id="s25">Cloning SDL repos, applying patches, creating config and makefiles, and recompiling classics like Quake for IRIX can create static libraries using Mipspro. (user-3e2d, 2026-01-12, exchange 215866, check: uncheckable)</li>
+<li id="s26">Can build HomeworldSDL-IRIX on IRIX using mipspro and a custom makefile. (user-3e2d, 2026-01-19, exchange 215876, check: uncheckable)</li>
+<li id="s27">OpenJDK 8 can be built on MIPSPro for IRIX. (user-56d4, 2023-02-16, exchange 215372, check: supported)</li>
+<li id="s28">autoreconfiguring and regenerating configure and makefiles might be necessary when building with mipspro on IRIX. (user-2d09, 2019-07-05, exchange 67337, check: uncheckable)</li>
+<li id="s29">Almost nothing gets installed into /opt on IRIX; MIPSpro is one of the only exceptions. (user-8547, 2023-04-15, exchange 217988, check: uncheckable)</li>
+<li id="s30">SGI (now HPE) does not offer MIPSpro and IRIX licenses for hobbyists due to the small market size. (user-6afa, 2021-03-15, exchange 217068, check: uncheckable)</li>
+<li id="s31">MIPSpro is an older SGI compiler that supports C89 and is fast but may lack full C99 support. (user-42cf, 2019-07-12, exchange 2460, check: uncheckable)</li>
+<li id="s32">mipspro supports many C99 features but some constructs can cause it to crash. (user-42cf, 2019-02-02, exchange 203672, check: uncheckable)</li>
+<li id="s33">MIPSPro supports C++99. (user-b1da, 2019-11-25, exchange 76997, check: supported)</li>
+<li id="s34">The MIPSpro environment includes specific flags and library paths for compiling MIPS-based software. (user-8547, 2019-02-19, exchange 67087, check: uncheckable)</li>
+<li id="s35">The mipspro and GNU toolchains do not get along well for certain checks. (user-8547, 2019-05-26, exchange 1801, check: uncheckable)</li>
+<li id="s36">Some fixes for libc and headers can be enabled via CFLAGS, improving compatibility with tools like MIPSpro. Uninstall procedures should leave the system unchanged. Autoconf scripts can use environment variables to set, e (user-2d09, 2019-06-23, exchange 67273, check: uncheckable)</li>
+<li id="s37">MIPSpro has a license nag screen that can be fixed with a wiki page. (user-392f, 2019-04-21, exchange 214750, check: uncheckable)</li>
+<li id="s38">Mipspro is SGI's compilers suite. (user-e4d0, 2023-05-15, exchange 107642, check: uncheckable)</li>
+<li id="s39">MIPSPro is a commercial C compiler that can be used for IRIX development, and GCC binaries are also available. (user-b1da, 2021-04-16, exchange 16667, check: uncheckable)</li>
+<li id="s40">MIPSpro compiler was K&amp;R before becoming ANSI C, then stopped at C99. (user-8547, 2022-11-15, exchange 82411, check: uncheckable)</li>
+<li id="s41">c99 was not widely supported when mipspro was ending development. (user-d903, 2021-10-18, exchange 79977, check: uncheckable)</li>
+<li id="s42">MIPSPro is not faster, better, or more efficient than modern GCC. (user-2189, 2020-04-29, exchange 96744, check: uncheckable)</li>
+<li id="s43">MIPSpro optimization can randomly break things, such as in the `bash` bug where `$(command)` tries to execute `ommand` instead of `command`. (user-42cf, 2022-01-17, exchange 24787, check: supported)</li>
+<li id="s44">MIPSPro has issues with certain var-arg macros and optimization flags, and its error messages can be unhelpful. (user-6afa, 2020-06-29, exchange 68849, check: uncheckable)</li>
+<li id="s45">MIPSpro optimization can cause issues that are resolved by reducing optimization levels. (user-42cf, 2022-01-17, exchange 24787, check: uncheckable)</li>
+<li id="s46">the non-java portions of the JDK can be built with MIPSPro, which supports C99 and C++03. (user-56d4, 2023-02-19, exchange 215373, check: supported)</li>
+<li id="s47">turn on c99 mode in mipspro for compatibility with newer c99 features and standards (user-9860, 2021-10-18, exchange 79976, check: uncheckable)</li>
+<li id="s48">the only MIPSpro you probably really want is 7.4.4 (user-42cf, 2021-05-08, exchange 69608, check: supported)</li>
+<li id="s49">mipspro 7.3 requires 1.2, 7.4 requires 1.3. (user-e4d0, 2023-05-15, exchange 223113, check: supported)</li>
+<li id="s50">MIPSPro was expensive on SGI hardware. (user-baf6, 2023-08-02, exchange 39450, check: uncheckable)</li>
+<li id="s51">MIPSpro supports at least C99 and possibly C95. (user-8547, 2024-05-13, exchange 218394, check: uncheckable)</li>
+<li id="s52">dbx is part of the mipspro release being installed. (user-c831, 2023-10-04, exchange 215415, check: uncheckable)</li>
+<li id="s53">MIPSPro has a debugger. (user-ae4b, 2025-06-06, exchange 218981, check: uncheckable)</li>
+<li id="s54">The C frontend for MIPSPro is needed for compiling. (user-21b8, 2025-07-10, exchange 219001, check: uncheckable)</li>
+<li id="s55">MIPSpro has a compiler flag N64 for 64-bit code on MIPS architecture; later versions do not support N64 compilation. (user-24f0, 2023-12-26, exchange 218254, check: supported)</li>
+<li id="s56">MIPSpro has similar pragmas for OpenMP. (user-86e1, 2024-01-31, exchange 209959, check: uncheckable)</li>
+<li id="s57">MIPSPro supports old OpenMP. (user-22f9, 2025-02-25, exchange 72011, check: uncheckable)</li>
+<li id="s58">SGI licenses with FLEXlm use the same vendor daemon and licenses can be generated with the same keygen used for MIPSpro compilers. (user-86e1, 2024-03-23, exchange 218344, check: uncheckable)</li>
+<li id="s59">MIPSPro can be used on IRIX and potentially on Linux via QEMU MIPS user mode. (user-3e2d, 2026-08-28, exchange 73823, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="mipspro-7-2.html">MIPSpro 7.2</a> (3)
+</li>
+<li><a href="mipspro-7-4.html">MIPSpro 7.4</a> (10)
+</li>
+<li><a href="mipspro-c-compiler.html">MIPSpro C Compiler</a> (3)
+</li>
+<li><a href="mipspro-compiler.html">MIPSpro compiler</a> (14)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="mips-iii.html">MIPS III</a>, <a href="mips-iv.html">MIPS IV</a>, <a href="mips3.html">MIPS3</a>, <a href="mips4.html">MIPS4</a>, <a href="r12000.html">R12000</a>, <a href="r3k.html">R3K</a>, <a href="r5k-cpu.html">R5K CPU</a>
+</li>
+<li>Graphics: <a href="si.html">SI</a>, <a href="rendering.html">rendering</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="os-version.html">OS version</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-development.html">IRIX development</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="c99.html">C99</a>, <a href="dosbox.html">DOSBox</a>, <a href="didbs.html">didbs</a>, <a href="bash-5-0.html">Bash 5.0</a>, <a href="c.html">C++</a>, <a href="makefile.html">Makefile</a>, <a href="cmake.html">CMake</a>, <a href="ghostscript.html">Ghostscript</a>, <a href="n64.html">N64</a>, <a href="netsurf.html">Netsurf</a>, <a href="bash.html">bash</a>, <a href="dbx.html">dbx</a>, <a href="nekoware.html">nekoware</a>, <a href="swmgr.html">swmgr</a>, <a href="c-2.html">C</a>, <a href="c89.html">C89</a>, <a href="dev-libraries.html">Dev Libraries</a>, <a href="flexlm.html">FlexLM</a>, <a href="gcc-compiler.html">GCC compiler</a>, <a href="glut.html">GLUT</a>, <a href="gnu-extensions.html">GNU extensions</a>, <a href="gnu-make.html">GNU make</a>, <a href="ide.html">IDE</a>, <a href="ido.html">IDO</a>, <a href="mame.html">MAME</a>, <a href="mplayer-1-4.html">MPlayer 1.4</a>, <a href="nekoware-gcc.html">Nekoware GCC</a>, <a href="openssl.html">OpenSSL</a>, <a href="quake.html">Quake</a>, <a href="rpm.html">RPM</a>, <a href="boot-process.html">boot process</a>, <a href="cc.html">cc</a>, <a href="clang.html">clang</a>, <a href="compiler.html">compiler</a>, <a href="configure.html">configure</a>, <a href="demos.html">demos</a>, <a href="distcc.html">distcc</a>, <a href="git.html">git</a>, <a href="inst.html">inst</a>, <a href="irixports.html">irixports</a>, <a href="ld.html">ld</a>, <a href="license.html">license</a>, <a href="license-file.html">license file</a>, <a href="sgirc.html">sgirc</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgi.html">SGI</a>, <a href="sgug-gcc.html">sgug gcc</a>, <a href="gcc-8-5.html">GCC 8.5</a>, <a href="sgug.html">SGUG</a>, <a href="gcc-3-4-6.html">gcc 3.4.6</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>, <a href="gcc-9-2.html">gcc 9.2</a>
+</li>
+<li>Other: <a href="optimization.html">optimization</a>, <a href="c-98.html">C++98</a>, <a href="open64.html">Open64</a>, <a href="warcraft2.html">Warcraft2</a>, <a href="libc.html">libc</a>, <a href="booter.html">Booter</a>, <a href="clisp.html">CLISP</a>, <a href="coremark.html">CoreMark</a>, <a href="dfrd.html">DFRD</a>, <a href="foundation.html">Foundation</a>, <a href="gnu.html">GNU</a>, <a href="nspr.html">NSPR</a>, <a href="openjdk-8.html">OpenJDK 8</a>, <a href="openmp.html">OpenMP</a>, <a href="png.html">PNG</a>, <a href="prboom.html">PrBoom</a>, <a href="tcl.html">Tcl</a>, <a href="debugger.html">debugger</a>, <a href="deeprunner.html">deeprunner</a>, <a href="development-foundation.html">development foundation</a>, <a href="distribution.html">distribution</a>, <a href="g.html">g++</a>, <a href="header.html">header</a>, <a href="header-file.html">header file</a>, <a href="libsodium.html">libsodium</a>, <a href="mbedtls.html">mbedtls</a>, <a href="spacenavd.html">spacenavd</a>, <a href="tarball.html">tarball</a>
+</li></ul>
+</body>
+</html>

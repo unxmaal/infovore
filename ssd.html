@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SSD</h1>
+<p>Claims: 101 Background: 24 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Solid-state_drive">Solid-state drive</a>, <a href="https://en.wikipedia.org/wiki/IMac_G3">IMac G3</a>, <a href="https://en.wikipedia.org/wiki/SCSI">SCSI</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>SSDs can offer faster disk read and write speeds than traditional spinning-head disks, including better performance than Maxtor Ultra 320 and U320 15K drives for random writes (9.74 MB/sec versus 1.24 MB/sec) and for compiling. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> However, SSDs are not always faster: they can be outperformed by high-capacity HDDs for the first 256MB of sequential data, are not faster than fast spinning disks for sequential I/O when the SCSI bus is the limiting factor, and can run slower than HDDs under IRIX 6.5.22. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> SSD performance depends on the workload and interface, with SCSI-to-SSD converters allowing connection to older SCSI busses but at high cost and with speed limitations, and boot time improvements depending on file system structure. <sup><a href="#s6">6</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> SSDs can boot on various systems, including IRIX, and support multibooting via partitions and USB drives, though some configurations fail to boot, such as an SSD on an IP35 SAS adapter. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> SSDs are used in many machines to improve general speed and usability, though they do not improve SGI emulation performance, and some systems have IDE bus capacity limits such as a 120GB maximum for the Cube. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> SSD reliability and economics vary, with vendors caught swapping NAND types, consumer drives not recommended over enterprise drives, costs potentially too high, and read-only operation theoretically avoiding write wear. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> SSDs offer significantly higher IOPS than HDDs, with drives like the Samsung EVO 860 reaching 60,000 IOPS compared to an HDD's 100-200 IOPS. <sup><a href="#s22">22</a></sup> This higher IOPS can improve performance in various systems, including faster compile speeds on an O2, better responsiveness on older hardware like a Sun Blade 150 or Power Mac G4, and improved virtual memory speeds. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> SSDs can be used on an O2, which has a 40MB SCSI controller that can use an SSD, though it is not very useful. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> An O2 can run 24/7 with an SSD. <sup><a href="#s28">28</a></sup> SSDs can reduce power consumption compared to spinning disks and may improve cooling, though typical 2.5" SATA SSDs do not get very hot during operation. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> Performance improvements depend on the SATA level, and some SSDs may come up at half speed due to compatibility issues or be limited by SATA bandwidth. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> SSDs can be connected to older systems through various adapters, including IDE-to-SATA, SATA-to-SCSI, and M.2 SATA to IDE adapters. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup> Some SSDs, such as certain Hitachi and NetApp branded drives, may lack the ability to set sector size and require careful low-level formatting. <sup><a href="#s37">37</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">An O2 with an SSD can achieve higher disk read and write speeds compared to a traditional spinning head disk. (user-8547, 2019-05-31, exchange 1845, check: supported)</li>
+<li id="s2">The O2's random write speed for an SSD is 9.74 MB/sec, compared to 1.24 MB/sec for a U320 15K disk. (user-8547, 2019-05-31, exchange 1846, check: supported)</li>
+<li id="s3">An SSD can provide better performance than a Maxtor Ultra 320 drive for an SGI. (user-8b3c, 2019-11-27, exchange 95851, check: supported)</li>
+<li id="s4">An SSD is faster than an HDD for compiling. (user-6afa, 2020-07-19, exchange 9750, check: uncheckable)</li>
+<li id="s5">A cheap SSD can be outperformed by a high-capacity HDD with no cache for the first 256MB of sequential data. (user-b1da, 2020-05-09, exchange 220938, check: supported)</li>
+<li id="s6">An SSD is not faster than a fast spinning disk for sequential I/O due to the SCSI bus being the limiting factor. (user-9860, 2021-12-20, exchange 101306, check: uncheckable)</li>
+<li id="s7">IRIX 6.5.22 runs slower on SSD than HDD. (user-8547, 2022-02-10, exchange 102239, check: supported)</li>
+<li id="s8">SSD upgrades can significantly improve SCSI bus performance and random IO capabilities. (user-bc5d, 2022-03-19, exchange 222095, check: uncheckable)</li>
+<li id="s9">The boot time improvement from an SSD depends on the file system structure, with small files leading to faster boot times. (user-8547, 2022-03-20, exchange 222096, check: uncheckable)</li>
+<li id="s10">SCSI to SSD converters allow connecting SSDs to older SCSI busses, but they are expensive and have speed limitations. (user-8547, 2022-10-20, exchange 105396, check: uncheckable)</li>
+<li id="s11">Connecting a SSD to a SAS-adapter supported by an IP35 will not boot the system; the system HD must be connected to the onboard SCSI-adapter. (user-bf68, 2019-06-26, exchange 2217, check: uncheckable)</li>
+<li id="s12">An original CD-ROM can be used to boot and install on a new SSD in the same machine. (user-f229, 2021-03-30, exchange 231440, check: uncheckable)</li>
+<li id="s13">Multibooting off the same SSD with various partitions and USB flash drives mounting fine are confirmed. (user-22f9, 2021-04-07, exchange 144942, check: uncheckable)</li>
+<li id="s14">IRIX can boot from a SSD. (user-8547, 2022-10-20, exchange 222602, check: uncheckable)</li>
+<li id="s15">The largest SSD on the IDE bus for the Cube is 120GB. (user-17cb, 2020-05-18, exchange 143843, check: supported)</li>
+<li id="s16">An SSD improves general speed but not SGI emulation performance. (user-580a, 2020-08-02, exchange 10252, check: uncheckable)</li>
+<li id="s17">An SSD upgrade can make an old Dell AIO with a GTX 680 and a 3770K usable. (user-b7c4, 2022-03-16, exchange 206679, check: supported)</li>
+<li id="s18">SSD vendors have been caught swapping TLC NAND for QLC NAND. (user-8547, 2022-01-03, exchange 24108, check: uncheckable)</li>
+<li id="s19">Consumer SSDs are not recommended; enterprise drives are better options. (user-b1da, 2022-01-03, exchange 24108, check: uncheckable)</li>
+<li id="s20">An SSD running read-only is theoretically not subject to wear from writes. (user-6afa, 2022-02-19, exchange 233964, check: uncheckable)</li>
+<li id="s21">SSD will cost too much. (user-8547, 2022-02-22, exchange 26125, check: uncheckable)</li>
+<li id="s22">An HDD typically offers 100-200 IOPS, while an SSD like the Samsung evo 860 can reach 60,000 IOPS. (user-15a0, 2022-12-11, exchange 105913, check: supported)</li>
+<li id="s23">An SSD can significantly improve compile speeds on an O2 due to higher IOPS compared to an HDD. (user-15a0, 2022-12-11, exchange 105913, check: supported)</li>
+<li id="s24">An SSD can significantly improve the responsiveness of older hardware like a Sun Blade 150 or Power Mac G4, especially in app start times and swap seek latency. (user-7b1c, 2023-02-27, exchange 106662, check: supported)</li>
+<li id="s25">An SSD improves virtual memory speeds. (user-1a5a, 2025-01-14, exchange 52478, check: uncheckable)</li>
+<li id="s26">An SSD can be used on an O2, though it is not very useful. (user-e872, 2023-05-30, exchange 107791, check: supported)</li>
+<li id="s27">The O2 has a 40MB SCSI controller that can use an SSD. (user-e872, 2025-11-14, exchange 225689, check: supported)</li>
+<li id="s28">An O2 can run 24/7 with an SSD. (user-8547, 2022-12-14, exchange 222724, check: supported)</li>
+<li id="s29">Using an SSD can reduce power consumption compared to a spinning disk. (user-59df, 2024-04-07, exchange 232214, check: uncheckable)</li>
+<li id="s30">Replacing the HDD with an SSD could improve cooling, though typical 2.5" SATA SSDs do not get very hot during operation. (user-6e7b, 2026-02-16, exchange 232901, check: supported)</li>
+<li id="s31">Some SSDs may come up at half speed due to compatibility issues. (user-d903, 2022-12-11, exchange 105913, check: uncheckable)</li>
+<li id="s32">An SSD will be much faster of course, but my experience is that it depends on the SATA level what kind of improvement you will see. (user-7538, 2023-02-25, exchange 222877, check: uncheckable)</li>
+<li id="s33">an SSD's performance improved slightly after updating the LSI firmware but is still limited by SATA bandwidth. (user-3e2d, 2025-06-04, exchange 117183, check: uncheckable)</li>
+<li id="s34">M.2 SATA to IDE adapters work; unsure if the system can access that much storage. (user-0251, 2024-02-21, exchange 234297, check: uncheckable)</li>
+<li id="s35">Modern SSDs can be connected to a SCSI bus via a series of SCSI adapters. (user-22f9, 2024-12-30, exchange 224348, check: uncheckable)</li>
+<li id="s36">IDE-&gt;SATA is a good adapter, especially with an SSD. (user-07ed, 2025-03-18, exchange 238807, check: uncheckable)</li>
+<li id="s37">Hitachi and NetApp branded SSDs sometimes lack the ability to set sector size, requiring careful low-level formatting; FC disks can be very cheap, and some older NetApp drives also show 520B/sector. (user-86e1, 2024-08-27, exchange 224071, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="blade-150.html">Blade 150</a>, <a href="altix.html">Altix</a>, <a href="blade-2000.html">Blade 2000</a>, <a href="cube.html">Cube</a>, <a href="fuel.html">Fuel</a>, <a href="g3.html">G3</a>, <a href="g4-mini.html">G4 Mini</a>, <a href="macbook.html">MacBook</a>, <a href="origin-300.html">Origin 300</a>, <a href="se.html">SE</a>, <a href="imac-g3.html">iMac G3</a>
+</li>
+<li>Processors: <a href="r12000.html">R12000</a>
+</li>
+<li>Graphics: <a href="gtx-680.html">GTX 680</a>, <a href="xvr-600.html">XVR-600</a>, <a href="graphics-options.html">graphics options</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="xp.html">XP</a>, <a href="netboot.html">netboot</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>, <a href="ide-to-sata-converter.html">IDE to SATA converter</a>, <a href="sas.html">SAS</a>, <a href="zfs.html">ZFS</a>
+</li>
+<li>Parts and peripherals: <a href="hdd.html">HDD</a>, <a href="ram.html">RAM</a>, <a href="cdrom.html">CDROM</a>, <a href="spinning-disk.html">spinning disk</a>, <a href="cpu.html">CPU</a>, <a href="fc-disks.html">FC disks</a>, <a href="ide-drive.html">IDE drive</a>, <a href="ide-to-sata-adapter.html">IDE to SATA adapter</a>, <a href="ip35.html">IP35</a>, <a href="power-mac-g4.html">Power Mac G4</a>, <a href="red-rock.html">Red Rock</a>, <a href="sata-controller.html">SATA controller</a>, <a href="scsi-controller.html">SCSI controller</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="usb-flash-drive.html">USB flash drive</a>, <a href="cache.html">cache</a>, <a href="enterprise-drives.html">enterprise drives</a>, <a href="performance.html">performance</a>, <a href="power-consumption.html">power consumption</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="scsi-bus.html">SCSI bus</a>, <a href="efi.html">EFI</a>, <a href="lvd.html">LVD</a>, <a href="ntfs.html">NTFS</a>, <a href="pci.html">PCI</a>, <a href="pci-x.html">PCI-X</a>, <a href="raid-0.html">RAID 0</a>, <a href="sata.html">SATA</a>, <a href="scsi-interface.html">SCSI interface</a>, <a href="gigabit-ethernet.html">gigabit Ethernet</a>
+</li>
+<li>Companies: <a href="netapp.html">NetApp</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="samsung.html">Samsung</a>, <a href="chulo.html">Chulo</a>, <a href="fc-al.html">FC-AL</a>, <a href="mbr.html">MBR</a>, <a href="nand.html">NAND</a>, <a href="trim.html">TRIM</a>, <a href="compiling.html">compiling</a>, <a href="heat.html">heat</a>, <a href="noise.html">noise</a>, <a href="reballing.html">reballing</a>, <a href="shoehorn.html">shoehorn</a>, <a href="tabs.html">tabs</a>
+</li></ul>
+</body>
+</html>

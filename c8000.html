@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C8000</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>C8000</h1>
+<p>Claims: 37</p>
+<p>The HP C8000 is a high-end workstation that uses the zx1 chipset and 8800/8900 CPU, and is the only workstation to do so. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It is a PA-RISC machine rather than an Itanium machine, though it can accept an Itanium CPU. <sup><a href="#s4">4</a></sup><sup><a href="#s3">3</a></sup> The C8000 uses Itanium-style AGP cards and cannot use classic HP9000 cards, and it does not support AGP. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The C8000 has issues with its power supply, graphics card, IDE and SCSI controllers. <sup><a href="#s7">7</a></sup> It can run FireGL X3 GPUs, but they may have issues with heat and support. <sup><a href="#s8">8</a></sup> The C8000 can accept IDE hard drives on the primary controller, but may have issues booting with an IDE hard drive connected. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> It can use a SCSI bus but has issues with SCA disks. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The C8000 has issues with SGI_PARTITION support in Linux, which is related to the Linux kernel rather than the disk itself. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the c8000 is the only workstation with the 8800/8900 CPU and zx1 chipset. (user-f9d4, 2020-06-10, exchange 160845, check: supported)</li>
+<li id="s2">The C8000 is a high-end SGI system with a dual-core CPU. (user-0251, 2022-03-11, exchange 206655, check: uncheckable)</li>
+<li id="s3">The C8000 is a PA-RISC machine, not Itanium; it includes a single dual-core PA-8800 CPU running at 1.0 GHz and comes without a hard drive; HP-UX 11iv3 is not officially supported but reportedly works, with possible 2D-ac (user-3e3c, 2021-02-24, exchange 204791, check: supported)</li>
+<li id="s4">The C8000 can take an Itanium CPU. (user-711b, 2020-12-28, exchange 216377, check: uncheckable)</li>
+<li id="s5">The C8000 uses Itanium-style AGP cards and cannot use classic HP9000 cards. (user-03ad, 2024-08-26, exchange 210864, check: uncheckable)</li>
+<li id="s6">The C8000 did not support AGP. (user-f9d4, 2019-12-25, exchange 5083, check: uncheckable)</li>
+<li id="s7">The C8000 has issues with its power supply, graphics card, IDE and SCSI controllers. (user-3e3c, 2021-03-08, exchange 15256, check: uncheckable)</li>
+<li id="s8">The C8000 can run FireGL X3 GPUs, but they may have issues with heat and support. (user-f9d4, 2020-01-17, exchange 5502, check: uncheckable)</li>
+<li id="s9">The C8000 can accept IDE hard drives on the primary controller. (user-3e3c, 2021-03-09, exchange 15292, check: uncheckable)</li>
+<li id="s10">The C8000 has issues booting with an IDE hard drive connected, but not when the hard drive is on the same IDE controller as the CD drive. (user-3e3c, 2021-02-25, exchange 15022, check: uncheckable)</li>
+<li id="s11">The HP C8000 workstation can use a SCSI bus but has issues with SCA disks; a 9GB 68-pin drive works but is too small. (user-9528, 2023-03-22, exchange 222937, check: supported)</li>
+<li id="s12">The C8000 may have issues with SCSI drives. (user-24f9, 2021-03-09, exchange 15292, check: uncheckable)</li>
+<li id="s13">The C8000 has issues with SGI_PARTITION support in Linux; it may require imaging the disk for data recovery if the system doesn't boot. The issue is known to be related to the Linux kernel rather than the disk itself. If (user-1446, 2020-09-07, exchange 204416, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="tezro.html">Tezro</a>, <a href="zx6000.html">zx6000</a>, <a href="prism.html">Prism</a>, <a href="zx2000.html">ZX2000</a>
+</li>
+<li>Processors: <a href="itanium.html">Itanium</a>, <a href="pa-risc.html">PA-RISC</a>
+</li>
+<li>Graphics: <a href="ati-firegl.html">ATI FireGL</a>, <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="gl-driver.html">GL driver</a>, <a href="perl.html">Perl</a>, <a href="boot-manager.html">boot manager</a>, <a href="pkgsrc.html">pkgsrc</a>
+</li>
+<li>Parts and peripherals: <a href="agp-card.html">AGP card</a>, <a href="ide-hard-drives.html">IDE hard drives</a>, <a href="psu.html">PSU</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="disk-image.html">disk image</a>, <a href="power-supply.html">power supply</a>
+</li>
+<li>Standards and interfaces: <a href="agp.html">AGP</a>, <a href="sca.html">SCA</a>, <a href="scsi.html">SCSI</a>, <a href="scsi-hdd.html">SCSI HDD</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="atx.html">ATX</a>, <a href="rp3440.html">RP3440</a>, <a href="hp-ux-11i-v3.html">hp-ux 11i v3</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>su</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>su</h1>
+<p>Claims: 4</p>
+<p>su switches to root privileges and can be used to run commands as root, such as creating and chowning /usr/didbs, untarring didbs.tar there, and installing Nekoware packages. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> sudo changes the environment and runs fewer commands with root privileges compared to su, and can be configured to not prompt for a password. <sup><a href="#s3">3</a></sup> Switching to root with su instead of sudo might resolve library loading issues for sginet -u. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX installation requires `su` to create and chown /usr/didbs, then untar didbs.tar there. (user-f229, 2020-01-01, exchange 77049, check: supported)</li>
+<li id="s2">To install Nekoware packages, run commands as root using *su*. (user-59b9, 2023-10-11, exchange 41412, check: uncheckable)</li>
+<li id="s3">sudo changes the environment and runs fewer commands with root privileges compared to su, and can be configured to not prompt for a password. (user-9860, 2022-01-19, exchange 215280, check: uncheckable)</li>
+<li id="s4">Switching to root with 'su' instead of 'sudo' might resolve library loading issues for 'sginet -u'. (user-fa69, 2026-09-06, exchange 73853, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-installation.html">IRIX installation</a>
+</li>
+<li>Software: <a href="sudo.html">sudo</a>, <a href="nekoware-packages.html">Nekoware packages</a>, <a href="sginet.html">sginet</a>
+</li>
+<li>Other: <a href="password.html">password</a>
+</li></ul>
+</body>
+</html>

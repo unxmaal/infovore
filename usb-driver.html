@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USB driver</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>USB driver</h1>
+<p>Claims: 7 Part of <a href="usb.html">USB</a></p>
+<p>The USB driver code is now in the public domain. <sup><a href="#s1">1</a></sup> To build the USB driver, you need mips 7.4 gcc, bash, and a 64-bit or 32-bit kernel, and the driver crashes the kernel if something goes wrong. <sup><a href="#s2">2</a></sup> The driver enumerates USB devices but doesn't perform other functions. <sup><a href="#s2">2</a></sup> To make progress on a USB driver, start by getting it to build reliably and fix errors one by one, committing changes. <sup><a href="#s3">3</a></sup> Writing a USB driver for IRIX requires implementing the entire USB stack and exposing block devices. <sup><a href="#s4">4</a></sup> The USB driver supports the xfs file system and allows reading and writing to USB sticks, but the fat32 driver from user-3e2d does not mount fat32 USB sticks. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The USB driver code is now in the public domain. (user-e4d0, 2021-03-10, exchange 215096, check: uncheckable)</li>
+<li id="s2">To build the USB driver, you need mips 7.4 gcc, bash, and a 64-bit or 32-bit kernel. The driver crashes the kernel if something goes wrong. It enumerates USB devices but doesn't perform other functions. (user-5c71, 2021-03-28, exchange 69289, check: supported)</li>
+<li id="s3">To make progress on a USB driver, start by getting it to build reliably and fix errors one by one, committing changes. (user-cd7d, 2021-04-02, exchange 69311, check: uncheckable)</li>
+<li id="s4">Writing a USB driver for IRIX requires implementing the entire USB stack and exposing block devices. (user-3e2d, 2025-01-22, exchange 211755, check: uncheckable)</li>
+<li id="s5">The USB driver supports xfs file system and allows reading and writing to USB sticks, but the fat32 driver from user-3e2d does not mount fat32 USB sticks. (user-7973, 2026-06-13, exchange 219797, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="xfs-file-system.html">XFS file system</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>
+</li>
+<li>Parts and peripherals: <a href="usb-mouse.html">USB mouse</a>
+</li>
+<li>Other: <a href="hp-ux-11-23.html">HP-UX 11.23</a>
+</li></ul>
+</body>
+</html>

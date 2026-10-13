@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SD card</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SD card</h1>
+<p>Claims: 52 Background: 5 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SD_card">SD card</a>.</p>
+<p>SD cards can be used as SCSI devices in various setups, though they may produce random read/write errors possibly due to the card or filesystem issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Random access on an SD card can be much faster than from spinning rust, even on a bad card, and performance can be improved with a class 10 or better card. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> SD cards can be imaged and restored easily in Linux, and dd can be used to write an IRIX disk image to an SD card if the card is formatted correctly and the image is in the correct format. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Formatting the SD card can resolve various issues, including fragmentation, error patterns, and performance problems, though some images may not be compatible with all SD cards. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> SD cards can be used to boot systems, run different IRIX versions, and clone installations, though benchmarks show ZuluSCSI with an SD card can be slower than the original HDD. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> SD cards are less durable than physical drives, and some setups, such as the gotek firmware, only support partition-based images and may fail POST with certain cards. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Random read/write errors occur on a SCSI2SD setup, possibly due to SD card or filesystem issues. (user-d903, 2020-06-06, exchange 233040, check: uncheckable)</li>
+<li id="s2">If no SD card is inserted, the drive can be accessed over USB as mass storage, though this has not been tested. (user-7973, 2025-03-29, exchange 224811, check: uncheckable)</li>
+<li id="s3">Random access from spinning rust can't saturate the SCSI bus, but random access on an SD card can be much faster, even on a bad card. (user-237d, 2020-11-15, exchange 97862, check: uncheckable)</li>
+<li id="s4">SD card performance can be improved with a class 10 or better card. (user-8de9, 2025-04-05, exchange 55763, check: supported)</li>
+<li id="s5">SD cards can be imaged and restored easily in Linux. (user-8de9, 2022-09-06, exchange 82013, check: uncheckable)</li>
+<li id="s6">dd can be used to write an IRIX disk image to an SD card if the card is formatted correctly and the image is in the correct format. (user-ae91, 2024-05-17, exchange 111297, check: uncheckable)</li>
+<li id="s7">SCSI errors can be fixed by using a different brand of SD card or an external floppy drive. (user-03ad, 2023-09-26, exchange 220306, check: uncheckable)</li>
+<li id="s8">Reformatting the SD card using Windows might resolve the Morse code error pattern. (user-22f9, 2023-12-11, exchange 43077, check: uncheckable)</li>
+<li id="s9">Formatting the SD card using the official tool and overwriting the entire drive should resolve fragmentation issues. (user-17cb, 2025-10-13, exchange 60005, check: uncheckable)</li>
+<li id="s10">Formatting an SD card can significantly improve performance on an Indy; the image HD1_Irix_6.5_Indy5k_PROTO_512.hda.gz may not be compatible with all SD cards. (user-583a, 2025-11-13, exchange 225686, check: supported)</li>
+<li id="s11">The SD card boots the system. (user-5e15, 2024-05-17, exchange 111300, check: uncheckable)</li>
+<li id="s12">ZuluSCSI with an SD card can be used for running different IRIX versions, but benchmarks show it's slower than the original HDD. (user-eea9, 2022-10-26, exchange 217754, check: uncheckable)</li>
+<li id="s13">To clone an IRIX installation from a HDD to an SD card using zuluscsi, both the HDD and zuluscsi are connected to the SCSI bus of the SGI machine in initiator mode, and zuluscsi images the found drive to an SD card. (user-7973, 2025-03-29, exchange 224811, check: uncheckable)</li>
+<li id="s14">The default gotek firmware only supports partition-based images, requiring formatting a USB drive to a single 1.44MB floppy size and writing floppy images one at a time; 4GB SD and CF cards fail POST, reverting to a DOS- (user-6afa, 2021-07-13, exchange 156477, check: supported)</li>
+<li id="s15">The SD card is less durable than a physical drive, and SATA to SCSI adaptors are expensive or not widely available. (user-4eea, 2025-09-01, exchange 118290, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sd-card-adapter.html">SD card adapter</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iifx.html">IIfx</a>, <a href="mac.html">Mac</a>, <a href="o2.html">O2</a>, <a href="pc.html">PC</a>, <a href="pi.html">PI</a>, <a href="filesystem.html">filesystem</a>, <a href="machine.html">machine</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="a-ux.html">A/UX</a>, <a href="irix-installation.html">IRIX installation</a>, <a href="irix-version.html">IRIX version</a>, <a href="linux.html">Linux</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="cf-card.html">CF card</a>, <a href="fpga.html">FPGA</a>, <a href="mame.html">MAME</a>, <a href="dd.html">dd</a>, <a href="fx.html">fx</a>, <a href="rsync.html">rsync</a>, <a href="tar.html">tar</a>
+</li>
+<li>Parts and peripherals: <a href="zuluscsi.html">ZuluSCSI</a>, <a href="bluescsi.html">BlueSCSI</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="300gb-sca-drive.html">300GB SCA drive</a>, <a href="cpu.html">CPU</a>, <a href="ide-disks.html">IDE disks</a>, <a href="lvd-disks.html">LVD disks</a>, <a href="sca-disks.html">SCA disks</a>, <a href="scsi-to-sd-adapters.html">SCSI-to-SD adapters</a>, <a href="usb-drive.html">USB drive</a>, <a href="usb-flash-drive.html">USB flash drive</a>, <a href="zip-drive.html">Zip drive</a>, <a href="floppy-disk.html">floppy disk</a>, <a href="hard-drive.html">hard drive</a>, <a href="thumb-drive.html">thumb drive</a>
+</li>
+<li>Standards and interfaces: <a href="bluescsi-v2.html">BlueSCSI V2</a>, <a href="nvme.html">NVMe</a>, <a href="scsi.html">SCSI</a>, <a href="scsi-device.html">SCSI device</a>, <a href="scsi-error.html">SCSI error</a>, <a href="usb.html">USB</a>, <a href="usb-stick.html">USB stick</a>
+</li>
+<li>Other: <a href="rpi.html">RPi</a>, <a href="sd2scsi.html">SD2SCSI</a>, <a href="exfat.html">exFAT</a>, <a href="ipod.html">iPod</a>, <a href="image.html">image</a>, <a href="image-file.html">image file</a>
+</li></ul>
+</body>
+</html>

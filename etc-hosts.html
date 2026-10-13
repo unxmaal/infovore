@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/etc/hosts</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/etc/hosts</h1>
+<p>Claims: 12</p>
+<p>On IRIX systems, /etc/hosts is a file that must be correctly configured with the machine's IP and hostname, alongside /etc/sys_id, to establish network access and avoid losing networking when the system name is changed. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> On HP-UX, /etc/hosts is a directory rather than a file, and it may contain junk that resolves the hostname to an invalid IP address, which can prevent CDE from starting on HP-UX 11.31. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> On Solaris, adding an entry for the hostname in /etc/hosts, along with setting up DNS, can resolve hostname errors. <sup><a href="#s6">6</a></sup> For network booting, the Ethernet address and corresponding hostname must be added to /etc/ethers and /etc/hosts, respectively, as with the Sun E450. <sup><a href="#s7">7</a></sup> The hostname should have an entry in /etc/hosts to resolve object server issues, with /etc/resolv.d configured to prioritize /etc/hosts for resolution order. <sup><a href="#s8">8</a></sup> Network connections in /etc/hosts can be edited using vi. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To set up an IRIX Octane for network access, ensure /etc/hosts and /etc/sys_id are correctly configured with the Octane's IP and hostname, then restart the network service. (user-2189, 2019-09-08, exchange 76837, check: supported)</li>
+<li id="s2">#&lt;Name&gt; refers to system names used in console commands, such as those created by EZSetup; changing the system name requires updating `etc/sys_id` and `etc/hosts` to avoid losing networking. (user-45c8, 2019-09-25, exchange 203961, check: supported)</li>
+<li id="s3">Setting a domain name in /etc/hosts can be left blank or set to 'lan' for IRIX networking. (user-9219, 2025-10-10, exchange 59950, check: uncheckable)</li>
+<li id="s4">/etc/hosts is a directory on hp-ux, not a file. (user-d903, 2020-06-01, exchange 8710, check: uncheckable)</li>
+<li id="s5">CDE may fail to start on HP-UX 11.31 if there is junk in /etc/hosts resolving the hostname to an invalid IP address. (user-1867, 2026-04-18, exchange 235964, check: supported)</li>
+<li id="s6">Setting up DNS and adding an entry for the hostname in /etc/hosts can resolve hostname errors in Solaris. (user-7b1c, 2022-04-19, exchange 239603, check: uncheckable)</li>
+<li id="s7">To configure an IP for a Sun E450 over network boot, add the Ethernet address to /etc/ethers and the corresponding hostname to /etc/hosts. (user-9528, 2023-09-21, exchange 218188, check: uncheckable)</li>
+<li id="s8">/etc/hosts should have an entry for the hostname to resolve object server issues; configure /etc/resolv.d to prioritize /etc/hosts and set resolution order; guides available at http://www.sgistuff.net/software/tipstricks (user-9219, 2025-10-20, exchange 88447, check: uncheckable)</li>
+<li id="s9">To edit network connections in /etc/hosts, use vi. To unmount disks, edit /etc/fstab. (user-24f0, 2024-10-14, exchange 49805, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="e450.html">E450</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-octane.html">IRIX Octane</a>, <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="booterizer-tool.html">booterizer tool</a>, <a href="hostname.html">hostname</a>
+</li>
+<li>Standards and interfaces: <a href="dns.html">DNS</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>
+</li>
+<li>Other: <a href="etc-sys-id.html">/etc/sys_id</a>, <a href="etc-fstab.html">/etc/fstab</a>, <a href="etc-resolv-conf.html">/etc/resolv.conf</a>, <a href="hp-ux-11-31.html">HP-UX 11.31</a>
+</li></ul>
+</body>
+</html>

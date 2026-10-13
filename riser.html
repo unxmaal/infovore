@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>riser</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>riser</h1>
+<p>Claims: 13</p>
+<p>The O2 riser contains a 1-wire CPU and its card edge connector is likely for the IO9, probably containing PCI slots, with no large chips on the riser itself. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> An O2 may complain and break stuff when booting into IRIX without a riser, which can be mitigated by creating a 'S25licset' file in /etc/rc2.d with the necessary variables. <sup><a href="#s3">3</a></sup> The X1s and X3s cards require SGI-specific firmware to communicate with the custom riser and may not work with non-SGI firmware. <sup><a href="#s4">4</a></sup> The riser for the Indigo² includes the power button, and a taller riser may be needed since the 5K riser doesn't account for the extra heat sink room. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The interface board at the back is the same as in the Onyx4, where an AGP or PCI riser determines the node type, and swapping the riser turns an expansion brick into a graphics brick. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The riser is a dumb adapter for SCSI using a 68-pin SCSI connector, and the 320 has a SCSI controller card and a bracket for the riser but lacks the additional connector for drives underneath. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">On the O2 riser, the CPU is a 1-wire device. (user-22f9, 2019-02-21, exchange 691, check: supported)</li>
+<li id="s2">The card edge connector on the riser is likely for the IO9 and probably contains PCI slots. There are no large chips on the riser itself. (user-8b3c, 2020-02-04, exchange 6024, check: uncheckable)</li>
+<li id="s3">An O2 may complain and break stuff when booting into IRIX without a riser, which can be mitigated by creating a 'S25licset' file in /etc/rc2.d with the necessary variables. (user-bc18, 2019-06-18, exchange 95281, check: supported)</li>
+<li id="s4">The X1s and X3s cards require SGI-specific firmware to communicate with the custom riser and may not work with non-SGI firmware. (user-59b9, 2020-08-27, exchange 75328, check: uncheckable)</li>
+<li id="s5">The riser for the Indigo² includes the power button. (user-e4d0, 2023-10-26, exchange 223468, check: uncheckable)</li>
+<li id="s6">you need a taller riser since the 5K riser doesn't account for the extra heat sink room or something (user-f190, 2026-01-01, exchange 225858, check: supported)</li>
+<li id="s7">The interface board at the back is the same as in the Onyx4, where an AGP or PCI riser determines the node type. (user-5906, 2026-04-20, exchange 216620, check: supported)</li>
+<li id="s8">In Onyx4, swapping the riser turns an expansion brick into a graphics brick. (user-5906, 2026-07-08, exchange 76638, check: supported)</li>
+<li id="s9">The riser is a dumb adapter for SCSI, and it uses a 68-pin SCSI connector. (user-d5ee, 2026-05-21, exchange 239130, check: supported)</li>
+<li id="s10">The 320 has a SCSI controller card and a bracket for the riser, but it lacks the additional connector for drives underneath. (user-0bb7, 2026-05-21, exchange 239130, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="riser-board.html">riser board</a> (5)
+</li>
+<li><a href="riser-card.html">riser card</a> (6)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="onyx4.html">Onyx4</a>, <a href="320.html">320</a>, <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="cpu.html">CPU</a>, <a href="scsi-connector.html">SCSI connector</a>, <a href="card-edge-connector.html">card edge connector</a>
+</li>
+<li>Standards and interfaces: <a href="agp.html">AGP</a>, <a href="pci.html">PCI</a>, <a href="x1.html">X1</a>, <a href="x3.html">X3</a>
+</li>
+<li>Other: <a href="slot.html">slot</a>
+</li></ul>
+</body>
+</html>

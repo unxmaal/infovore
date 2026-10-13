@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RM7900</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RM7900</h1>
+<p>Claims: 18</p>
+<p>The RM7900 is a MIPS CPU based on the E9000 core, offering pin-compatible upgrades from 5000 and 7000 core products. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It is pin-compatible with the RM7000 but has a different core architecture and lacks L3 cache pins, so it is not a fully drop-in replacement. <sup><a href="#s3">3</a></sup> The RM7900 has external cache, unlike the RM7965, which lacks L3 cache and is not pin compatible with the RM7900. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The O2's ip32PROM requires specific CPU chip registers and data values to boot, with different requirements for the RM7900 compared to the RM7000, so the system PROM must be patched for RM7900 compatibility. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The O2 can run with the RM7900 at 1 GHz, but this is challenging without significant effort, and Verilog models for the O2 and RM7900 are needed for accurate emulation. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The RM7900 was used in high-end networking gear, while the RM7065 was used in industrial equipment, and both chips are rare and expensive on eBay. <sup><a href="#s10">10</a></sup> The only reliable source for RM7900 chips is the Momentum Ocelot-C SBC, though some compact PCI single board computers and Galileo Technology evaluation boards also used RM7900 CPUs. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The RM7900 uses the E9000 core and offers pin-compatible upgrades from 5000 and 7000 core products. (user-f763, 2026-02-07, exchange 62016, check: supported)</li>
+<li id="s2">The RM7900 CPU is based on the E9000 core. (user-757f, 2026-02-17, exchange 121544, check: uncheckable)</li>
+<li id="s3">The RM7900 is pin-compatible with the RM7000 but has different core architecture and lacks L3 cache pins, making it not fully drop-in replacement. (user-757f, 2026-02-07, exchange 62016, check: uncheckable)</li>
+<li id="s4">The RM7965 is not pin compatible with the RM7900 and lacks L3 cache. (user-f763, 2026-01-25, exchange 226012, check: uncheckable)</li>
+<li id="s5">The RM7900 CPU has external cache, unlike the RM7965. (user-757f, 2026-02-17, exchange 121542, check: uncheckable)</li>
+<li id="s6">The O2's ip32PROM requires specific CPU chip registers and data values to boot correctly, with different requirements for RM7900 compared to RM7000 chips, necessitating modifications for RM7900 compatibility. (user-8547, 2022-04-12, exchange 103161, check: supported)</li>
+<li id="s7">The RM7900 requires patching the system PROM to work. (user-757f, 2026-03-31, exchange 122359, check: uncheckable)</li>
+<li id="s8">Verilog models for the O2 and RM7900 are needed for accurate emulation. (user-4f7c, 2026-03-06, exchange 62488, check: supported)</li>
+<li id="s9">The O2 can run with RM7900 at 1 GHz, but it's challenging without significant effort. (user-757f, 2026-03-06, exchange 121811, check: supported)</li>
+<li id="s10">RM7900 was used in high-end networking gear, while RM7065 was used in industrial equipment; these chips are rare and expensive on eBay. (user-f763, 2026-01-25, exchange 121170, check: uncheckable)</li>
+<li id="s11">The only reliable source for RM7900 chips is the Momentum Ocelot-C SBC. (user-2a3c, 2026-02-07, exchange 62016, check: uncheckable)</li>
+<li id="s12">Some compact PCI single board computers used RM7900 CPUs. (user-2a3c, 2026-02-10, exchange 226075, check: uncheckable)</li>
+<li id="s13">Galileo Technology made evaluation boards with RM7900 CPUs. (user-2a3c, 2026-02-10, exchange 226075, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="rm7900-cpus.html">RM7900 CPUs</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="rm7000.html">RM7000</a>
+</li>
+<li>Processors: <a href="rm7965.html">RM7965</a>, <a href="rm5271.html">RM5271</a>
+</li>
+<li>Parts and peripherals: <a href="ip32-prom.html">IP32 PROM</a>, <a href="prom-chip.html">PROM chip</a>
+</li>
+<li>Other: <a href="sr71010a.html">SR71010A</a>
+</li></ul>
+</body>
+</html>

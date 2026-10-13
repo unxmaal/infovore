@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tar file</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>tar file</h1>
+<p>Claims: 13 Part of <a href="tar.html">tar</a></p>
+<p>A tar file can be exported from WSL2 and reimported to a separate partition, though this requires the partition to be the main system drive due to warnings. <sup><a href="#s1">1</a></sup> Tar files can be extracted from tape dumps using 'dd' to produce a .tar file for safer handling. <sup><a href="#s2">2</a></sup> A block length mismatch error during tar extraction suggests possible corruption or an issue with the tape dump. <sup><a href="#s3">3</a></sup> The O2 can extract a tar file at 5 MB/s. <sup><a href="#s4">4</a></sup> An ISO is an archive copy that ensures all content is included, unlike a .tar file which may lack some files or have modifications. <sup><a href="#s5">5</a></sup> Tar files can be written directly to a floppy drive on HPUX and then read back to transfer files. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">WSL2 can be exported to a tar file and reimported to a separate partition, but it requires the partition to be the main system drive due to warnings. (user-d903, 2020-06-15, exchange 9060, check: uncheckable)</li>
+<li id="s2">DAT drives can be extracted using 'dd' to produce a .tar file for safer handling. (user-6c80, 2024-02-12, exchange 210019, check: uncheckable)</li>
+<li id="s3">The error message indicates a block length mismatch when extracting a tar file, suggesting a possible corruption or issue with the tape dump. (user-ce6b, 2023-01-08, exchange 217867, check: uncheckable)</li>
+<li id="s4">The O2 can extract a tar file at 5 MB/s. (user-5217, 2024-06-12, exchange 46785, check: supported)</li>
+<li id="s5">An ISO is an archive copy that ensures all content is included, unlike a .tar file which may lack some files or have modifications. (user-86e1, 2024-07-10, exchange 210639, check: uncheckable)</li>
+<li id="s6">To transfer files to a floppy drive on HPUX, one can write a tar file directly to the floppy and then read it back. (user-07ed, 2026-08-28, exchange 165713, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="linux.html">Linux</a>, <a href="unix.html">Unix</a>, <a href="wsl2.html">WSL2</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="imgburn.html">ImgBurn</a>, <a href="mame.html">MAME</a>, <a href="dd.html">dd</a>, <a href="partition.html">partition</a>
+</li>
+<li>Parts and peripherals: <a href="dat-drive.html">DAT drive</a>, <a href="disk.html">disk</a>, <a href="floppy-drive.html">floppy drive</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>, <a href="hp.html">HP</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTK3</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GTK3</h1>
+<p>Claims: 20 Background: 5 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/GTK">GTK</a>, <a href="https://en.wikipedia.org/wiki/NetSurf">NetSurf</a>, <a href="https://en.wikipedia.org/wiki/Emacs">Emacs</a>.</p>
+<p>GTK3 is a GUI toolkit that can be built and packaged for SGI/IRIX hardware, where it is already working on SGI equipment. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> GTK3 is software rendered by default on SGI hardware and does not ask for 24bit color depth by default, though it can support hardware rendering. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The likely bottleneck for GTK3 acceleration on SGI hardware is libxrender, which handles text shaping and is not part of the SGI X server, limiting its performance. <sup><a href="#s6">6</a></sup> GTK2 is faster than GTK3, though there is no proof, and GTK2 and GTK3 have limitations on lower-end hardware while QT4 provides good performance. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> libpurple needs gtk3, and elementary-calculator requires gtk3 on IRIX. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> GTK3 can be used as a GUI for emacs, though Motif generally runs better, and netsurf supports multiple frontends including GTK2 and GTK3. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> netsurf can be launched using the motif version if the GTK3 version is not found, and ir8 is the first WebKit-based browser for IRIX, built on GTK3 and WebKitGTK. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> export GTK_CSD=0 disables custom client side decorations for GTK3 windows unless the app has custom buttons. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">gtk3 was built and the RPMs were written in RSE. (user-2189, 2020-09-21, exchange 69081, check: uncheckable)</li>
+<li id="s2">GTK3 is already working on SGI equipment. (user-cd7d, 2020-12-16, exchange 12941, check: uncheckable)</li>
+<li id="s3">sgug gtk3 does not ask for 24bit color depth by default. (user-e872, 2022-11-30, exchange 217803, check: supported)</li>
+<li id="s4">sgug gtk3 is software rendered. (user-6afa, 2022-11-30, exchange 217803, check: uncheckable)</li>
+<li id="s5">gtk3 can support hardware rendering. (user-b1da, 2022-11-30, exchange 217803, check: uncheckable)</li>
+<li id="s6">libxrender is the likely bottleneck for GTK3 acceleration on SGI hardware, as it handles text shaping and is not part of the SGI X server, limiting its performance. Building an OpenGL backend for Cairo could potentially, (user-22f9, 2025-02-21, exchange 215651, check: uncheckable)</li>
+<li id="s7">gtk2 is faster than gtk3, but there is no proof. (user-42cf, 2021-05-02, exchange 69589, check: uncheckable)</li>
+<li id="s8">QT4 provides good performance, while GTK2 and GTK3 have limitations on lower-end hardware; RSE improves GTK3 performance but still has issues. (user-22f9, 2025-01-13, exchange 52323, check: uncheckable)</li>
+<li id="s9">libpurple needs gtk3. (user-b7c4, 2020-01-19, exchange 5556, check: uncheckable)</li>
+<li id="s10">elementary-calculator requires gtk3 on IRIX; a fix for gtk3 is on the wipnonautomated branch for rse. (user-2189, 2020-11-24, exchange 69117, check: uncheckable)</li>
+<li id="s11">emacs can be compiled with Motif or GTK3 as the GUI, with Motif generally running better. (user-e872, 2021-02-28, exchange 215091, check: uncheckable)</li>
+<li id="s12">netsurf supports multiple frontends including RiscOS, GTK2, GTK3, raw framebuffer, and a motif front end which is being developed and may be shippable. (user-6afa, 2021-08-09, exchange 19099, check: uncheckable)</li>
+<li id="s13">Netsurf can be launched using the motif version if the GTK3 version is not found. (user-24f0, 2022-10-01, exchange 217730, check: uncheckable)</li>
+<li id="s14">ir8 Browser is the first WebKit-based browser for IRIX, built on GTK3 and WebKitGTK with full HTTP rendering support. (user-83aa, 2026-03-31, exchange 219620, check: uncheckable)</li>
+<li id="s15">export GTK_CSD=0 disables custom client side decorations for GTK3 windows unless the app has custom buttons, and the Great-IMD-evo theme provides modern 4dwm style widgets for GTK2 and GTK3 with consistent colors and按钮事件 (user-e872, 2021-05-08, exchange 215153, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="risc-os.html">RISC OS</a>
+</li>
+<li>Software: <a href="gtk2.html">gtk2</a>, <a href="netsurf.html">Netsurf</a>, <a href="emacs.html">emacs</a>, <a href="pidgin.html">Pidgin</a>, <a href="rse.html">RSE</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>
+</li>
+<li>Companies: <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="qt4.html">Qt4</a>, <a href="webkit.html">WebKit</a>, <a href="libpurple.html">libpurple</a>
+</li></ul>
+</body>
+</html>

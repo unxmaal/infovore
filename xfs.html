@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XFS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XFS</h1>
+<p>Claims: 139 Background: 68 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/ZFS">ZFS</a>, <a href="https://en.wikipedia.org/wiki/Autodesk_Maya">Autodesk Maya</a>, <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>XFS can handle large hard drives and files exceeding 8 GB, supporting up to 1 TB on 32-bit systems and unlimited sizes on 64-bit systems, though the 1 TB limit is due to PROM limitations rather than XFS itself. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> XFS supports timestamps from December 1901 to July 2486, a feature not enabled by default for backwards compatibility. <sup><a href="#s4">4</a></sup> XFS was adopted on Linux, providing robust filesystem features that made Linux more viable for business use, and it remains the default root filesystem on some enterprise distributions such as RedHat. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> XFS is not multi-writer by itself but was one of the first filesystems with clustering support, and it is considered good for performance. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> XFS can be mounted on Linux and WSL1, and it can be tagged as xfs in GPT/MBR partitions or SGI disklabels using fdisk. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> XFS can format DVD-RAM discs as XFS, UDF, or EFS on IRIX 6.5.22 and up, and xfsdump and xfsrestore preserve attributes for copying data between disks. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> XFS is limited by the disk label format to 32-bit sector values, and some software behaves oddly with XFS, causing demo failures. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> XFS is a filesystem developed by SGI, and it was ported to Linux from IRIX along with some clustering software, Maya, and Discreet software. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> XFS is supported in IRIX 6.5.22, which can handle up to about 8 exbibytes with XFS. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> XFS is typically formatted with 4k block sizes. <sup><a href="#s24">24</a></sup> Red Hat uses XFS and LVM instead of btrfs, and RH 7.x used XFS in production. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> Redhat uses clustered XFS, which may lose some legacy support but is favored by commercial software. <sup><a href="#s27">27</a></sup> XFS will not be dropped from Linux as it is one of the best file systems for the Linux kernel. <sup><a href="#s28">28</a></sup> XFS has issues with large disk sizes on specific Intel CPUs from Sandybridge and earlier, and the Gentoo distribution kernel project often fixes bugs, such as those related to SandyBridge and XFS inode sizes. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> XFS support was removed in 10-CURRENT because it lacked the required locking improvements to keep up with VFS changes, making it a read-only hack for data migration. <sup><a href="#s31">31</a></sup> XFS can handle large amounts of storage. <sup><a href="#s32">32</a></sup> Formatting time is not significant with XFS or modern Linux filesystems. <sup><a href="#s33">33</a></sup> XFS changes the on-disk format, so disks formatted in IRIX 6.5 may not mount in IRIX 6.2, and the miniroot of the original install CDROM cannot read the installed system disk. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> To clone an XFS drive on an Octane2, use fx to repartition and format, then xfsdump and xfsrestore to copy the data, and manually transfer header files. <sup><a href="#s36">36</a></sup> XFS on LVM can be backed up with xfsdump. <sup><a href="#s37">37</a></sup> Rendering to XFS is possible if the disk is fast enough, though XFS is the raw Jaleo format. <sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">XFS can handle more than 8 GB, with 32 GB cards in Indigo2 and Indy being sufficient. (user-59b9, 2020-09-27, exchange 11177, check: supported)</li>
+<li id="s2">XFS does not have a 1TB file system limit; the limit is due to PROM limitations. (user-8547, 2021-08-26, exchange 19693, check: supported)</li>
+<li id="s3">The IRIX filesystems have limits on file and filesystem sizes, with EFS maxing at about 8 GB and XFS supporting up to 1 TB on 32-bit systems and unlimited on 64-bit systems. (user-f229, 2021-08-31, exchange 99907, check: supported)</li>
+<li id="s4">XFS supports timestamps until the year 2486, allowing a range from December 1901 to July 2486, but the feature is not enabled by default for backwards compatibility. (user-0251, 2020-10-19, exchange 11655, check: supported)</li>
+<li id="s5">XFS is still the default root filesystem on some enterprise distributions. (user-d903, 2020-11-13, exchange 78807, check: uncheckable)</li>
+<li id="s6">XFS is used by RedHat. (user-1361, 2021-09-18, exchange 20173, check: uncheckable)</li>
+<li id="s7">XFS was adopted on Linux, leading to bug reports with SGI, making Linux more viable for business use with robust filesystem features. (user-07ed, 2021-10-05, exchange 221588, check: uncheckable)</li>
+<li id="s8">XFS in Linux was crucial for adopting Linux at work. (user-07ed, 2022-04-29, exchange 103457, check: uncheckable)</li>
+<li id="s9">XFS is not multi-writer by itself. (user-07ed, 2021-09-30, exchange 100259, check: uncheckable)</li>
+<li id="s10">XFS was one of the first filesystems with clustering support. (user-9860, 2022-01-03, exchange 24104, check: uncheckable)</li>
+<li id="s11">XFS is for performance what ZFS is for reliability. (user-baf6, 2022-06-02, exchange 29655, check: uncheckable)</li>
+<li id="s12">The command to mount an XFS image is `sudo mount -t xfs xfs.img /mnt/xfsimage`. (user-1361, 2020-07-23, exchange 9885, check: supported)</li>
+<li id="s13">modern linux understands XFS just fine, so once you've got the original drive hooked to a PC it's fine and dandy to back stuff up that way (user-b7c4, 2020-06-09, exchange 8921, check: uncheckable)</li>
+<li id="s14">WSL1 runs a POSIX layer provided by the NT kernel, allowing it to run an ext4 or XFS filesystem. (user-1361, 2020-06-15, exchange 9058, check: uncheckable)</li>
+<li id="s15">fdisk can create a GPT/MBR partition that is tagged as xfs for SGI disklabels. (user-9860, 2021-11-01, exchange 221651, check: uncheckable)</li>
+<li id="s16">IRIX 6.5.22 and up includes DVD-RAM support for formatting discs as XFS, UDF, or EFS with a format utility or command line functions. (user-22f9, 2021-08-25, exchange 205464, check: supported)</li>
+<li id="s17">To extend a volume with XFS, you need to use xlv or clone the disk and rebuild the volume header; xfsdump and xfsrestore preserve attributes and are recommended for copying data between disks. (user-9860, 2021-11-04, exchange 217280, check: uncheckable)</li>
+<li id="s18">Some software behaves oddly with XFS, causing demo CD failures. (user-b7c4, 2020-02-14, exchange 78176, check: uncheckable)</li>
+<li id="s19">XFS supports huge filesystems but is limited by the disk label format to 32-bit sector values. (user-6afa, 2022-01-27, exchange 206322, check: supported)</li>
+<li id="s20">SGI developed XFS, OpenGL, and many graphics technologies that were later sold to Microsoft. (user-8547, 2022-09-27, exchange 32975, check: uncheckable)</li>
+<li id="s21">XFS and some clustering software, as well as Maya and Discreet software, were ported to Linux from IRIX. (user-e872, 2022-09-28, exchange 32997, check: uncheckable)</li>
+<li id="s22">XFS is supported in IRIX 6.5.22. (user-818d, 2023-09-26, exchange 220305, check: supported)</li>
+<li id="s23">IRIX 6.5 supports up to about 8 exbibytes with XFS. (user-2a3c, 2025-02-09, exchange 114643, check: supported)</li>
+<li id="s24">XFS is typically formatted with 4k block sizes. (user-8547, 2023-01-12, exchange 106272, check: supported)</li>
+<li id="s25">Red Hat uses XFS and LVM instead of btrfs. (user-e872, 2022-06-28, exchange 30538, check: uncheckable)</li>
+<li id="s26">RH 7.x used XFS in production. (user-07ed, 2023-08-11, exchange 39675, check: supported)</li>
+<li id="s27">Redhat uses clustered XFS, which may lose some legacy support but is favored by commercial software. (user-1629, 2024-11-21, exchange 211301, check: uncheckable)</li>
+<li id="s28">XFS will not be dropped from Linux as it is one of the best file systems for the Linux kernel. (user-22f9, 2025-01-17, exchange 52869, check: uncheckable)</li>
+<li id="s29">The Gentoo distribution kernel project often fixes bugs, such as those related to SandyBridge and XFS inode sizes. (user-22f9, 2024-03-15, exchange 45165, check: uncheckable)</li>
+<li id="s30">XFS has issues with large disk sizes on specific Intel CPUs from Sandybridge and earlier. (user-22f9, 2024-04-06, exchange 45487, check: uncheckable)</li>
+<li id="s31">XFS support was removed in 10-CURRENT because it lacked the required locking improvements to keep up with VFS changes, making it a read-only hack for data migration. (user-22f9, 2024-03-29, exchange 110852, check: supported)</li>
+<li id="s32">XFS can handle a lot of storage. (user-22f9, 2025-04-20, exchange 212389, check: uncheckable)</li>
+<li id="s33">Formatting time is not significant with XFS or modern Linux filesystems. (user-07ed, 2025-05-23, exchange 212525, check: uncheckable)</li>
+<li id="s34">XFS changes the on-disk format, making the miniroot of the original install CDROM unable to read the installed system disk. (user-1a5a, 2026-04-28, exchange 243938, check: uncheckable)</li>
+<li id="s35">XFS disks formatted in IRIX 6.5 may not mount in IRIX 6.2 due to format changes. (user-17cb, 2026-05-15, exchange 90743, check: supported)</li>
+<li id="s36">To clone an XFS drive on an Octane2, use fx to repartition and format, then xfsdump and xfsrestore to copy the data, and manually transfer header files. (user-ba5b, 2025-12-26, exchange 225830, check: supported)</li>
+<li id="s37">XFS on LVM can be backed up with xfsdump. (user-6c80, 2026-07-19, exchange 64576, check: uncheckable)</li>
+<li id="s38">Rendering to XFS is possible if the disk is fast enough. (user-4847, 2026-09-01, exchange 66092, check: uncheckable)</li>
+<li id="s39">You'll probably want to make a 'movie' and not an xfs (which is the raw Jaleo format). (user-4847, 2026-09-01, exchange 214550, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="xfs-directory-structure-v2.html">XFS directory structure v2</a> (3)
+</li>
+<li><a href="xfs-file-system.html">XFS file system</a> (17)
+</li>
+<li><a href="xfs-partition.html">XFS partition</a> (7)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="filesystem.html">filesystem</a>, <a href="irix-file-system.html">IRIX file system</a>, <a href="indigo2-impact.html">Indigo2 Impact</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="iris-performer.html">IRIS Performer</a>, <a href="indigo2.html">Indigo2</a>, <a href="mac.html">Mac</a>
+</li>
+<li>Processors: <a href="r5000.html">R5000</a>, <a href="200-mhz-r4400.html">200 mhz R4400</a>, <a href="intel-cpus.html">Intel CPUs</a>, <a href="itanium.html">Itanium</a>, <a href="r3k-indigo.html">R3K Indigo</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-5.html">IRIX 6.5.5</a>, <a href="bsd.html">BSD</a>, <a href="debian.html">Debian</a>, <a href="fedora.html">Fedora</a>, <a href="gentoo.html">Gentoo</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-xfs.html">IRIX XFS</a>, <a href="irix64.html">IRIX64</a>, <a href="nt-kernel.html">NT kernel</a>, <a href="wsl1.html">WSL1</a>, <a href="kernel.html">kernel</a>, <a href="kernel-version.html">kernel version</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="zfs.html">ZFS</a>, <a href="jaleo.html">Jaleo</a>, <a href="opengl.html">OpenGL</a>, <a href="disklabel.html">disklabel</a>, <a href="diskperf.html">diskperf</a>, <a href="xfsdump.html">xfsdump</a>, <a href="coff.html">COFF</a>, <a href="maya.html">Maya</a>, <a href="fx.html">fx</a>, <a href="mount.html">mount</a>, <a href="xfsrestore.html">xfsrestore</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="300-gb-drive.html">300 GB drive</a>, <a href="cdrom.html">CDROM</a>, <a href="cpu.html">CPU</a>, <a href="sca-drive.html">SCA drive</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="memory.html">memory</a>
+</li>
+<li>Standards and interfaces: <a href="arcs.html">ARCS</a>, <a href="nfs.html">NFS</a>, <a href="raid.html">RAID</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="red-hat.html">Red Hat</a>, <a href="discreet-software.html">Discreet software</a>, <a href="sco.html">SCO</a>
+</li>
+<li>Other: <a href="btrfs.html">Btrfs</a>, <a href="2-mb-cache.html">2 MB cache</a>, <a href="jfs.html">JFS</a>, <a href="lvm.html">LVM</a>, <a href="directory-structure-v2.html">directory structure V2</a>, <a href="ext4.html">ext4</a>, <a href="6-3.html">6.3</a>, <a href="6-x.html">6.x</a>, <a href="64mb.html">64MB</a>, <a href="dvd-ram.html">DVD-RAM</a>, <a href="fat16.html">FAT16</a>, <a href="fat32.html">FAT32</a>, <a href="fuse.html">FUSE</a>, <a href="sunblade.html">SunBlade</a>, <a href="udf.html">UDF</a>, <a href="fdisk.html">fdisk</a>, <a href="sw-config.html">sw_config</a>, <a href="v1-inodes.html">v1 inodes</a>
+</li></ul>
+</body>
+</html>

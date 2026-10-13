@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VM</h1>
+<p>Claims: 30 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/VM_%28operating_system%29">VM (operating system)</a>.</p>
+<p>A VM can be customized to run IRIX, and running `vagrant provision` repeatedly ensures the VM has the crosscompiler and IRIX headers installed in /opt/gcc and /opt/binutils. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The VM setup is complete hardware-wise, but there are issues with the OS install process. <sup><a href="#s3">3</a></sup> Provisioning fails with a playbook missing error even though the VM can access the internet and download files, and the DHCP server configuration is missing a subnet declaration and the VM can't resolve its own hostname. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The S3 mirror for booterizer should work if networking is properly set up on the VM; otherwise, 'vagrant provision' or 'vagrant destroy' followed by 'vagrant provision' can fix it. <sup><a href="#s6">6</a></sup> You don't really need a lot of RAM to run the VM, just make sure that a fair bit of that RAM is free, and you also probably want a lot of disk space free, ~20GB. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> At least 16GB of storage is recommended for the VM. <sup><a href="#s9">9</a></sup> You can't overclock a VM. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Running `vagrant provision` repeatedly ensures the VM has the crosscompiler and Irix headers installed in /opt/gcc and /opt/binutils. (user-9b9c, 2019-03-03, exchange 877, check: supported)</li>
+<li id="s2">A VM can be customized to run IRIX. (user-580a, 2021-03-31, exchange 16041, check: uncheckable)</li>
+<li id="s3">The VM setup is complete hardware-wise, but there are issues with the OS install process. (user-b7c4, 2020-04-20, exchange 7660, check: uncheckable)</li>
+<li id="s4">Provisioning fails with a playbook missing error even though the VM can access the internet and download files. (user-d903, 2019-07-31, exchange 216655, check: uncheckable)</li>
+<li id="s5">The DHCP server configuration is missing a subnet declaration and the VM can't resolve its own hostname. (user-b1da, 2022-01-31, exchange 25297, check: uncheckable)</li>
+<li id="s6">The S3 mirror for booterizer should work if networking is properly set up on the VM; otherwise, 'vagrant provision' or 'vagrant destroy' followed by 'vagrant provision' can fix it. (user-2189, 2019-07-24, exchange 76799, check: uncheckable)</li>
+<li id="s7">You don't really need a lot of RAM to run the VM, just make sure that a fair bit of that RAM is free. (user-1446, 2020-01-10, exchange 77061, check: uncheckable)</li>
+<li id="s8">You also probably want a lot of disk space free, ~20GB. (user-1446, 2020-01-10, exchange 77061, check: supported)</li>
+<li id="s9">At least 16GB of storage is recommended for the VM. (user-be12, 2021-05-01, exchange 69579, check: supported)</li>
+<li id="s10">You can't overclock a VM. (user-1361, 2020-07-17, exchange 9670, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="dhcp-server.html">DHCP server</a>, <a href="indigo.html">Indigo</a>, <a href="pi.html">PI</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-headers.html">IRIX headers</a>, <a href="linux.html">Linux</a>, <a href="nt.html">NT</a>, <a href="os.html">OS</a>, <a href="os-2.html">OS/2</a>, <a href="wsl.html">WSL</a>
+</li>
+<li>Software: <a href="vagrant.html">Vagrant</a>, <a href="esxi.html">ESXi</a>, <a href="cross-compiler.html">cross-compiler</a>, <a href="installer.html">installer</a>
+</li>
+<li>Parts and peripherals: <a href="nvidia-card.html">NVIDIA card</a>, <a href="quadro-card.html">Quadro card</a>
+</li>
+<li>Standards and interfaces: <a href="dns.html">DNS</a>, <a href="nfs.html">NFS</a>, <a href="tcp-ip.html">TCP/IP</a>, <a href="vlan.html">VLAN</a>, <a href="web-interface.html">web interface</a>
+</li>
+<li>Other: <a href="folding-home.html">Folding@Home</a>, <a href="freedos.html">FreeDOS</a>, <a href="sna.html">SNA</a>
+</li></ul>
+</body>
+</html>

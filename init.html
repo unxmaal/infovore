@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>init</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>init</h1>
+<p>Claims: 10 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Systemd">Systemd</a>.</p>
+<p>Init 0 performs a soft shutdown, while init 6 reboots the system. <sup><a href="#s1">1</a></sup> Init may be needed between multiple boot tries to clear 'not enough free memory' issues. <sup><a href="#s2">2</a></sup> Init works well without the need for systemd, and is a MIPS4 binary. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> PROM commands like 'init' can restart the PROM and rescan the SCSI interface. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Init 0 performs a soft shutdown and init 6 reboots the system. (user-b7c4, 2022-04-30, exchange 103482, check: supported)</li>
+<li id="s2">Init may be needed between multiple boot tries to clear 'not enough free memory' issues. (user-22f9, 2023-12-22, exchange 209764, check: uncheckable)</li>
+<li id="s3">Init works well without the need for systemd. (user-24f0, 2024-10-15, exchange 49850, check: uncheckable)</li>
+<li id="s4">init is a MIPS4 binary on mine (user-7b5f, 2026-09-11, exchange 220684, check: uncheckable)</li>
+<li id="s5">PROM commands like 'init' can restart the PROM and rescan the SCSI interface. (user-e4e2, 2026-08-19, exchange 226907, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="init-script.html">init script</a> (8)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips4-binary.html">MIPS4 binary</a>
+</li>
+<li>Operating systems: <a href="gentoo.html">Gentoo</a>, <a href="solaris-10.html">Solaris 10</a>
+</li>
+<li>Parts and peripherals: <a href="systemd.html">systemd</a>, <a href="prom.html">PROM</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-interface.html">SCSI interface</a>
+</li>
+<li>Other: <a href="busybox.html">busybox</a>
+</li></ul>
+</body>
+</html>

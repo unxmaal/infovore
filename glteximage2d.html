@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>glTexImage2D</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>glTexImage2D</h1>
+<p>Claims: 3</p>
+<p>glTexImage2D can be used to update texture data without allocating a new texture object, or ideally glTexSubImage2D can be used for this purpose. <sup><a href="#s1">1</a></sup> glGetError() should be called before glTexImage2D to clear any previous error codes. <sup><a href="#s2">2</a></sup> A broken AI-generated code was fixed by changing glTexImage2D to glTexImage2D followed by glTexSubImage2D. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">you have to glTexImage2D or ideally glTexSubImage2D to update texture data without allocating a new texture object (user-6afa, 2023-10-13, exchange 209387, check: uncheckable)</li>
+<li id="s2">glGetError() should be called before glTexImage2D to clear any previous error codes. (user-6afa, 2023-10-14, exchange 209391, check: uncheckable)</li>
+<li id="s3">We fixed a broken AI-generated code by changing glTexImage2D to glTexImage2D followed by glTexSubImage2D. (user-6afa, 2026-02-09, exchange 213660, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Other: <a href="gltexsubimage2d.html">glTexSubImage2D</a>
+</li></ul>
+</body>
+</html>

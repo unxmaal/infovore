@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSE GCC</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RSE GCC</h1>
+<p>Claims: 3 Part of <a href="rse.html">RSE</a></p>
+<p>The RSE GCC requires a shim library. <sup><a href="#s1">1</a></sup> When building GL things with RSE GCC, sometimes you need to link with -lGLcore instead of -lGL. <sup><a href="#s2">2</a></sup> RSE GCC produces n32 (and n64, if you build it that way) binaries; the package build takes roughly double the time for n32/n64 and already takes more than a day on a fast octane; n64 binaries can work but building them <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The RSE GCC requires a shim library. (user-b1da, 2021-04-10, exchange 215110, check: uncheckable)</li>
+<li id="s2">When building GL things with RSE GCC, sometimes you need to link with -lGLcore instead of -lGL. (user-6afa, 2021-06-27, exchange 69691, check: uncheckable)</li>
+<li id="s3">rse gcc produces n32 (and n64, if you build it that way) binaries; the package build takes roughly double the time for n32/n64 and already takes more than a day on a fast octane; n64 binaries can work but building them ' (user-42cf, 2023-11-30, exchange 42838, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="n32.html">n32</a>
+</li>
+<li>Software: <a href="n64.html">N64</a>
+</li></ul>
+</body>
+</html>

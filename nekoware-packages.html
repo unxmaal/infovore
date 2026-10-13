@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nekoware packages</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Nekoware packages</h1>
+<p>Claims: 6 Part of <a href="nekoware.html">nekoware</a></p>
+<p>Nekoware packages are commonly installed using an installer, and the installation process requires running commands as root using *su*. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> A script called nekodeps.pl must be edited to point at the repository for installing Nekoware packages. <sup><a href="#s3">3</a></sup> One approach involves using a shell script to untar Nekoware packages into a separate folder and pointing swmgr at that folder to auto-resolve dependencies. <sup><a href="#s4">4</a></sup> A backup of Nekoware packages shared by user-8547 with Raion contained directories such as contrib, mips3, and obsolete. <sup><a href="#s5">5</a></sup> curl or wget for IRIX 5.3 may be found in old Nekoware packages or on CDROMs, but accessing them requires resolving dependencies. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The installer is commonly used for installing Nekoware packages. (user-59b9, 2023-10-11, exchange 41413, check: uncheckable)</li>
+<li id="s2">To install Nekoware packages, run commands as root using *su*. (user-59b9, 2023-10-11, exchange 41412, check: uncheckable)</li>
+<li id="s3">There is a nekodeps.pl script that needs to be edited to point at the repository for installing nekoware packages. (user-d903, 2020-07-12, exchange 78523, check: uncheckable)</li>
+<li id="s4">I used a shell script to untar nekoware packages into a separate folder, then pointed swmgr at that to auto-resolve dependencies. (user-2d40, 2020-07-12, exchange 78523, check: uncheckable)</li>
+<li id="s5">user-8547 shared a backup of Nekoware packages with Raion, containing dirs like contrib, mips3, and obsolete. (user-8547, 2022-09-21, exchange 32792, check: uncheckable)</li>
+<li id="s6">curl or wget for IRIX 5.3 might be in old nekoware packages or on CDROMs, but accessing them requires resolving dependencies. (user-1fc3, 2023-05-29, exchange 220276, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips3.html">MIPS3</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>
+</li>
+<li>Software: <a href="curl.html">curl</a>, <a href="installer.html">installer</a>, <a href="shell-script.html">shell script</a>, <a href="swmgr.html">swmgr</a>, <a href="wget.html">wget</a>
+</li>
+<li>Other: <a href="su.html">su</a>
+</li></ul>
+</body>
+</html>

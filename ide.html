@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDE</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IDE</h1>
+<p>Claims: 62 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">Integrated development environment</a>, <a href="https://en.wikipedia.org/wiki/SATA">SATA</a>, <a href="https://en.wikipedia.org/wiki/Windows_2000">Windows 2000</a>.</p>
+<h2 id="with-scsi">With SCSI</h2>
+<p>SCSI was generally considered better than IDE, offering superior performance and lower CPU usage, though IDE was cheaper for PCs because its interface card was merely an electrical connection while SCSI required an ISA bridge on other systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> IDE matched or surpassed SCSI for transfer speeds in the 486 era with UDMA standards, but SCSI was faster than IDE in the P3 era. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> SCSI supported CD-ROMs natively, unlike IDE which required special extensions, and IDE was more CPU-bound for I/O operations, making it unsuitable for server environments except in very low-budget scenarios. <sup><a href="#s7">7</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> SCSI was easy to use in the 80s/90s by checking IDs and termination, while IDE required checking jumpers but did not need termination. <sup><a href="#s8">8</a></sup> Converting from SCSI to IDE to SATA involves an inexpensive adapter, though the transition is described as unnecessarily complex. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> SAS is to SCSI what SATA is to IDE, sharing a similar protocol but using serial rather than parallel connections. <sup><a href="#s11">11</a></sup> The Blade 2000 cannot handle base IDE, but its Fibre Channel and SCSI are capable, and on IP35, the IO9 has both SCSI and IDE controllers. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="general">General</h2>
+<p>IDE is a bus interface that is similar to ISA and functions essentially as a hack to attach a disk semi-directly to the bus. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> 486 DX4 motherboards have built-in IDE, and i386-based G4 laptops used IDE rather than SATA. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> IDE performance can vary widely depending on the adapter, similar to how SCSI performance varies, and a SCSI controller with on-board BIOS can be slightly faster than IDE with the right controllers. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> IDE is used for optical drives on laptop-form-factor SGI machines, where no drives in that form factor were SCSI, and it is compatible with indigo, Indy, and indigo2. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> IDE is platform specific, and IDE versions for IP platforms can be missing from media that should support them. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> The IDE controller on the machine does not properly detect devices when they are on the secondary slot. <sup><a href="#s24">24</a></sup> UNIX can be used as an IDE with a terminal and text editor like vim. <sup><a href="#s25">25</a></sup> Tandem NonStop's development environment likely used a rebadged SGI IDE. <sup><a href="#s26">26</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SCSI was definitely better than IDE. (user-d903, 2020-08-29, exchange 233863, check: uncheckable)</li>
+<li id="s2">IDE was cheaper for PCs because the interface card was just an electrical connection, while on other systems it required an ISA bridge, making SCSI a better choice for performance. (user-d903, 2020-11-30, exchange 231336, check: uncheckable)</li>
+<li id="s3">IDE was more CPU-bound for I/O operations compared to SCSI. (user-42cf, 2021-05-09, exchange 180742, check: uncheckable)</li>
+<li id="s4">SCSI outperformed IDE in terms of CPU usage and responsiveness, with SCSI causing minimal iowait compared to IDE, making IDE unsuitable for server environments except for very low-budget scenarios. (user-42cf, 2021-05-13, exchange 239367, check: uncheckable)</li>
+<li id="s5">IDE surpassed or matched SCSI for transfer speeds in the 486 era with UDMA standards. (user-c831, 2021-05-09, exchange 180742, check: supported)</li>
+<li id="s6">SCSI was faster than IDE in the P3 era. (user-d903, 2021-05-09, exchange 180742, check: uncheckable)</li>
+<li id="s7">SCSI supported CD-ROMs natively, unlike IDE which required special extensions. (user-c831, 2021-05-09, exchange 180742, check: uncheckable)</li>
+<li id="s8">SCSI was easy to use in the 80s/90s by checking IDs and termination; IDE required checking jumpers but didn't need termination. (user-d903, 2022-07-26, exchange 104359, check: supported)</li>
+<li id="s9">Converting from SCSI to IDE to SATA involves an inexpensive adapter. (user-9860, 2021-11-14, exchange 100905, check: uncheckable)</li>
+<li id="s10">The transition from SCSI to IDE to SATA is unnecessarily complex. (user-9860, 2021-11-14, exchange 100905, check: uncheckable)</li>
+<li id="s11">SAS is to SCSI what SATA is to IDE. Same (similar?) protocol, but serial rather than parallel. (user-86e1, 2024-06-26, exchange 210568, check: uncheckable)</li>
+<li id="s12">The Blade 2000 cannot handle base IDE, but its Fibre Channel and SCSI are capable. (user-7b1c, 2022-07-12, exchange 239782, check: supported)</li>
+<li id="s13">On IP35, the IO9 has SCSI &amp; IDE controllers. SCSI controllers are 0/1, and the IDE controller is 2 (user-e4d0, 2026-03-28, exchange 215938, check: supported)</li>
+<li id="s14">IDE is not that different from ISA (user-7b1c, 2020-04-08, exchange 7314, check: uncheckable)</li>
+<li id="s15">IDE is basically a hack to dangle a disk semi-directly from the bus (user-7b1c, 2020-04-08, exchange 7314, check: uncheckable)</li>
+<li id="s16">486 DX4 motherboards have built-in IDE. (user-cd83, 2020-04-07, exchange 7294, check: supported)</li>
+<li id="s17">i386-based G4 laptops used IDE, not SATA. (user-c831, 2020-06-27, exchange 144001, check: uncheckable)</li>
+<li id="s18">A SCSI controller with on-board BIOS is needed for booting HDDs, and it can be slightly faster than IDE with the right controllers. (user-2f22, 2020-08-07, exchange 233853, check: uncheckable)</li>
+<li id="s19">IDE performance can vary widely depending on the adapter, similar to how SCSI performance varies. (user-d903, 2020-11-18, exchange 97885, check: uncheckable)</li>
+<li id="s20">IDE is used for the optical drive on a laptop form factor SGI where no drives in that form factor were SCSI. (user-8b3c, 2021-07-10, exchange 99416, check: uncheckable)</li>
+<li id="s21">The IDE is compatible with indigo, Indy, and indigo2 on disc1 of O2 and Octane with .22 and .30 firmware. (user-e4d0, 2024-03-22, exchange 45299, check: supported)</li>
+<li id="s22">IDE versions for IP platforms can be missing from media that should support them. (user-b1da, 2024-06-09, exchange 215509, check: uncheckable)</li>
+<li id="s23">the IDE is platform specific (user-2a3c, 2025-09-27, exchange 225490, check: uncheckable)</li>
+<li id="s24">The IDE controller on the machine does not properly detect devices when they are on the secondary slot. (user-ec52, 2024-11-18, exchange 240417, check: uncheckable)</li>
+<li id="s25">UNIX can be used as an IDE with a terminal and text editor like vim. (user-21b8, 2025-11-24, exchange 219274, check: uncheckable)</li>
+<li id="s26">Tandem NonStop's development environment likely used a rebadged SGI IDE. (user-07ed, 2026-02-09, exchange 89671, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ide-cable.html">IDE cable</a> (4)
+</li>
+<li><a href="ide-cd-rom.html">IDE CD-ROM</a> (3)
+</li>
+<li><a href="ide-controller.html">IDE controller</a> (15)
+</li>
+<li><a href="ide-disks.html">IDE disks</a> (3)
+</li>
+<li><a href="ide-drive.html">IDE drive</a> (12)
+</li>
+<li><a href="ide-hard-drives.html">IDE hard drives</a> (4)
+</li>
+<li><a href="ide-interface-board.html">IDE interface board</a> (5)
+</li>
+<li><a href="ide-to-sata-adapter.html">IDE to SATA adapter</a> (4)
+</li>
+<li><a href="ide-to-sata-converter.html">IDE to SATA converter</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="blade-2000.html">Blade 2000</a>, <a href="impact.html">Impact</a>, <a href="indigo.html">Indigo</a>, <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="ultra-5.html">Ultra 5</a>
+</li>
+<li>Graphics: <a href="odyssey-diagnostics.html">Odyssey diagnostics</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="nextstep.html">NeXTSTEP</a>, <a href="unix.html">Unix</a>, <a href="windows-2000.html">Windows 2000</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="cf-card.html">CF card</a>, <a href="irc-client.html">IRC client</a>, <a href="mipspro.html">MIPSpro</a>, <a href="sas.html">SAS</a>, <a href="fx.html">fx</a>, <a href="inst.html">inst</a>, <a href="sash.html">sash</a>, <a href="vim.html">vim</a>
+</li>
+<li>Parts and peripherals: <a href="acard.html">ACARD</a>, <a href="acard-adapter.html">ACARD adapter</a>, <a href="cdrom.html">CDROM</a>, <a href="ethernet-cable.html">Ethernet cable</a>, <a href="io9.html">IO9</a>, <a href="ip35.html">IP35</a>, <a href="prom.html">PROM</a>, <a href="prom-monitor.html">PROM monitor</a>, <a href="scsi-controller.html">SCSI controller</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="ssd.html">SSD</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="disk.html">disk</a>, <a href="optical-drive.html">optical drive</a>, <a href="serial-console.html">serial console</a>, <a href="system-disk.html">system disk</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="sata.html">SATA</a>, <a href="firewire.html">Firewire</a>, <a href="fibre-channel.html">Fibre Channel</a>, <a href="isa.html">ISA</a>, <a href="sata-ssd.html">SATA SSD</a>, <a href="serial-number.html">serial number</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="1500.html">1500</a>, <a href="2500.html">2500</a>, <a href="cf.html">CF</a>, <a href="diagnostics.html">diagnostics</a>
+</li></ul>
+</body>
+</html>

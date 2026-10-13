@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIS</h1>
+<p>Claims: 164 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_IRIS">SGI IRIS</a>, <a href="https://en.wikipedia.org/wiki/SGI_Indigo">SGI Indigo</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>The Iris is a deskside, fast 3D graphics workstation with homemade construction. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Iris runs on System V, and the PI is a MIPS-based Iris model, while there are few known 68k-based Iris systems, with only a handful in collectors' hands. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The SCSI2SD works on Indigo1 and Iris, and an MFM emulator is needed for an Iris due to its drive pickiness. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The fixed disk on an Iris is ESDI off the storage card and cannot boot from 9-track, and the machine requires at least 10MB of storage. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The VideoFramer is a VME card inside the IRIS, and the Iris uses parallel and heatsinked 74 series logic. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> A personal Iris power supply is complex and may contain fuses, and blown bypass capacitors can cause system failures. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Professional and Personal IRIS, and Crimson systems may have capacitor issues, and every personal IRIS has rust along the expansion port slot, likely due to adhesive holding black plastic strips on. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The game targets IRIS for graphics rendering, as the Indy does not support OGL, and will use an OGL renderer for newer SGI machines if IRIS is not supported. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The IRIS was released in 1988 and was the first SGI system available for general purchase without a department grant. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> The IRIS could render 3D objects in 1983. <sup><a href="#s19">19</a></sup> The IRISes run Unisys Unix on m68k processors with specialized graphics hardware. <sup><a href="#s20">20</a></sup> The IRIS can generate multiple video modes, including 30/60 Hz interlaced normal RGB and NTSC composite video, depending on the PROM set installed in the DC4 board. <sup><a href="#s21">21</a></sup> The IRIS File can hold up to five SCSI devices and was designed to extend the SCSI bus of the IRIS. <sup><a href="#s22">22</a></sup> Schematics for some IRIS boards are available, but not for the GF2. <sup><a href="#s23">23</a></sup> The IRIS uses a -12V rail for components like the system fan, which operates between 7 and 18 volts and is not driven by the same 12V bus as other system components; insufficient voltage can lead to overheating. <sup><a href="#s24">24</a></sup> IRIS is a MIPS CPU emulator that supports network emulation, including DHCP, netbooting over ethernet, and NAT to allow multiple instances to communicate. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> It emulates MIPS CPUs with software interpreters and JIT compilation, achieving performance close to hardware, and supports serial ports via local sockets. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> IRIS can run OpenBSD and NetBSD to user on serial console, run OpenBSD from an IP22 kernel with a custom loader, and run a local NFS server on custom ports. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> It can be run in headless mode with command-line options, supports --headless, --noaudio, and port forwarding, and has default settings for easier initial setup. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup> IRIS is multithreaded and feels responsive due to offloading rendering and other tasks to separate threads. <sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup> It tops out at 160 MIPS, caps around 50 MHz on some machines, and emulates MIPS4 ISA R5K at around 150 MIPS. <sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> IRIS is available on the Mac App Store. <sup><a href="#s40">40</a></sup> IRIS is a project aimed at creating a reasonably working SGI machine for fun, with command-line and GUI wrappers for IRIX available via cargo. <sup><a href="#s41">41</a></sup><sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup> IRIS is a MIPS emulator that runs instructions as fast as possible rather than being cycle-accurate, and it runs faster than MAME on more high-spec machines. <sup><a href="#s44">44</a></sup><sup><a href="#s45">45</a></sup> The latest release of IRIS, available via GitHub or from source, is recommended for best performance. <sup><a href="#s46">46</a></sup> IRIS has a dual-threaded architecture for register processing, rendering, and VBLANK handling, with memory accesses mostly atomic. <sup><a href="#s47">47</a></sup> A JIT has been added to IRIS and needs testing, requiring about 4 fast cores plus a few more for JIT to run many parallel compiles. <sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup> IRIS runs on a Raspberry Pi 5 at 40 MIPS, and a build for kms/libinput is needed to boot directly to an IRIX login. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> The goal of IRIS includes speeding up the CPU to enable O2 PROM hacking, considering CRM graphics in compute shaders, and fixing outstanding bugs in Iris IP22, with bug fixes prioritized before new features. <sup><a href="#s52">52</a></sup> IRIS has CI for sgug. <sup><a href="#s53">53</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Iris is deskside. (user-2d40, 2020-05-08, exchange 8195, check: uncheckable)</li>
+<li id="s2">The Iris is a fast 3D graphics workstation with homemade construction. (user-cd83, 2023-11-16, exchange 241128, check: supported)</li>
+<li id="s3">The Iris runs on System V. (user-cd83, 2024-02-26, exchange 44844, check: uncheckable)</li>
+<li id="s4">The PI is a MIPS-based Iris model, and there are few known 68k-based Iris systems, with only a handful in collectors' hands. (user-0251, 2020-07-17, exchange 9652, check: supported)</li>
+<li id="s5">The SCSI2SD works on Indigo1 and Iris. (user-f229, 2019-03-28, exchange 1186, check: uncheckable)</li>
+<li id="s6">An MFM emulator is needed for an Iris due to its drive pickiness. (user-cd83, 2023-09-15, exchange 241090, check: uncheckable)</li>
+<li id="s7">The fixed disk on an Iris is ESDI off the storage card and cannot boot from 9-track. (user-cd83, 2024-02-07, exchange 241165, check: supported)</li>
+<li id="s8">An Iris requires at least 10MB of storage. (user-cd83, 2024-01-25, exchange 44093, check: supported)</li>
+<li id="s9">The VideoFramer is a VME card inside the IRIS. (user-86e1, 2023-04-28, exchange 188498, check: uncheckable)</li>
+<li id="s10">The Iris uses parallel and heatsinked 74 series logic. (user-cd83, 2023-11-16, exchange 241128, check: supported)</li>
+<li id="s11">A personal Iris power supply is complex and may contain fuses. (user-22f9, 2019-06-09, exchange 1976, check: supported)</li>
+<li id="s12">Blown bypass capacitors can cause system failures; user-56d4 had 5 blown caps in their IRIS. (user-56d4, 2023-08-24, exchange 39956, check: supported)</li>
+<li id="s13">Professional and Personal IRIS, and Crimson systems may have capacitor issues. (user-8de9, 2022-10-04, exchange 222561, check: supported)</li>
+<li id="s14">Every personal IRIS has rust along the expansion port slot, likely due to adhesive holding black plastic strips on. (user-56d4, 2023-02-07, exchange 188477, check: supported)</li>
+<li id="s15">The game targets IRIS for graphics rendering, as the Indy does not support OGL. (user-cade, 2020-09-18, exchange 69067, check: supported)</li>
+<li id="s16">The game will use an OGL renderer for newer SGI machines if IRIS is not supported. (user-cade, 2020-09-18, exchange 69067, check: uncheckable)</li>
+<li id="s17">The IRIS was released in 1988 and has early 4D iris design. (user-24f0, 2025-02-08, exchange 211944, check: supported)</li>
+<li id="s18">The IRIS was the first SGI system available for general purchase without a department grant. (user-1a5a, 2025-09-25, exchange 118788, check: uncheckable)</li>
+<li id="s19">The IRIS could render 3D objects in 1983. (user-56d4, 2025-02-01, exchange 220348, check: supported)</li>
+<li id="s20">The IRISes run Unisys Unix on m68k processors with specialized graphics hardware. (user-56d4, 2024-02-27, exchange 241172, check: uncheckable)</li>
+<li id="s21">the IRIS can generate multiple video modes, including 30/60 Hz interlaced normal RGB and NTSC composite video, depending on the PROM set installed in the DC4 board. (user-a079, 2024-03-11, exchange 210134, check: supported)</li>
+<li id="s22">The IRIS File can hold up to five SCSI devices, either four full-height or three full-height and two half-height, and was designed to extend the SCSI bus of the IRIS. (user-2d40, 2024-10-10, exchange 112399, check: supported)</li>
+<li id="s23">Schematics for some IRIS boards are available, but not for the GF2. (user-a079, 2024-02-27, exchange 241172, check: uncheckable)</li>
+<li id="s24">The IRIS uses a -12V rail for components like the system fan, which operates between 7 and 18 volts and is not driven by the same 12V bus as other system components; insufficient voltage can lead to overheating duringCPU (user-56d4, 2024-04-04, exchange 223822, check: supported)</li>
+<li id="s25">iris supports network emulation, including DHCP. (user-3e2d, 2026-04-02, exchange 220400, check: uncheckable)</li>
+<li id="s26">iris can netboot over ethernet. (user-3e2d, 2026-04-05, exchange 73456, check: uncheckable)</li>
+<li id="s27">IRIS uses NAT for networking, allowing multiple instances to communicate. (user-3e2d, 2026-04-21, exchange 226367, check: uncheckable)</li>
+<li id="s28">iris serial ports are emulated via local sockets. (user-3e2d, 2026-04-02, exchange 220400, check: uncheckable)</li>
+<li id="s29">Iris emulates MIPS CPUs with software interpreters and JIT compilation, achieving performance close to hardware, especially for Rex3 graphics acceleration. (user-3e2d, 2026-07-08, exchange 94233, check: uncheckable)</li>
+<li id="s30">IRIS can run OpenBSD from an IP22 kernel with a custom loader. (user-3e2d, 2026-04-21, exchange 226367, check: uncheckable)</li>
+<li id="s31">NetBSD and OpenBSD can boot to user on serial console on Iris. (user-3e2d, 2026-06-22, exchange 220479, check: uncheckable)</li>
+<li id="s32">Iris now supports --headless, --noaudio, and port forwarding. (user-e872, 2026-04-05, exchange 215964, check: uncheckable)</li>
+<li id="s33">Iris has default settings for easier initial setup. (user-3e2d, 2026-05-22, exchange 220435, check: uncheckable)</li>
+<li id="s34">IRIS can be run in headless mode with specific command-line options for OpenBSD/SGI images. (user-6e7b, 2026-06-16, exchange 94059, check: uncheckable)</li>
+<li id="s35">IRIS feels responsive due to offloading rendering and other tasks to separate threads. (user-3e2d, 2026-04-21, exchange 226367, check: uncheckable)</li>
+<li id="s36">IRIS is multithreaded but requires at least 2.5 MIPS for a basic interactive experience, which current optimization efforts cannot achieve. (user-3e2d, 2026-07-13, exchange 216635, check: supported)</li>
+<li id="s37">IRIS caps out around 50 MHz on some machines. (user-e4e2, 2026-04-05, exchange 220403, check: supported)</li>
+<li id="s38">IRIS tops at 160 MIPS. (user-3e2d, 2026-07-15, exchange 220527, check: supported)</li>
+<li id="s39">Iris emulates MIPS4 ISA R5K at around 150 MIPS and will not get faster by emulating another MIPS4 CPU like R10K. (user-3e2d, 2026-07-20, exchange 220547, check: supported)</li>
+<li id="s40">IRIS is available on the Mac App Store. (user-8220, 2026-07-01, exchange 94171, check: uncheckable)</li>
+<li id="s41">The goal of Iris is to have a reasonably working SGI machine for fun. (user-3e2d, 2026-07-20, exchange 220547, check: uncheckable)</li>
+<li id="s42">Iris is a command-line and GUI wrapper for IRIX, with command-line builds available via cargo. (user-3e2d, 2026-08-03, exchange 220595, check: uncheckable)</li>
+<li id="s43">It's IRIS https://github.com/techomancer/iris (user-e4fd, 2026-08-30, exchange 220009, check: uncheckable)</li>
+<li id="s44">An emulator like iris or qemu runs MIPS instructions as fast as possible, not necessarily cycle-accurate. (user-3e2d, 2026-08-26, exchange 220659, check: uncheckable)</li>
+<li id="s45">IRIS runs faster than MAME on more high-spec machines. (user-3e2d, 2026-09-02, exchange 220673, check: uncheckable)</li>
+<li id="s46">The latest release of Iris, available via GitHub or from source, is recommended for best performance. (user-3e2d, 2026-09-12, exchange 214634, check: uncheckable)</li>
+<li id="s47">Iris has a dual-threaded architecture for register processing, rendering, and VBLANK handling, with memory accesses mostly atomic. (user-3e2d, 2026-08-01, exchange 94586, check: uncheckable)</li>
+<li id="s48">A JIT has been added to Iris this weekend and needs testing. (user-3e2d, 2026-08-09, exchange 94802, check: uncheckable)</li>
+<li id="s49">For Iris, you need about 4 fast cores, and a few more for JIT to run many parallel compiles. (user-3e2d, 2026-08-26, exchange 220660, check: supported)</li>
+<li id="s50">iris on a raspberry pi 5 runs at 40 MIPS, which is 2/3 of a desktop version with j2wp enabled. (user-3e2d, 2026-09-09, exchange 220682, check: supported)</li>
+<li id="s51">an iris build for kms/libinput is needed to boot a raspberry pi directly to irix login. (user-3e2d, 2026-09-09, exchange 220682, check: uncheckable)</li>
+<li id="s52">working on speeding up Iris CPU to enable O2 PROM hacking; considering CRM graphics in compute shader; fixing outstanding bugs in Iris IP22; prioritizing bug fixes before new features; scalable approach uncertain for KON (user-3e2d, 2026-07-20, exchange 94417, check: supported)</li>
+<li id="s53">Iris has CI for sgug. (user-3e2d, 2026-08-08, exchange 219936, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="iris-1000.html">IRIS 1000</a> (6)
+</li>
+<li><a href="iris-1400.html">IRIS 1400</a> (8)
+</li>
+<li><a href="iris-2000.html">IRIS 2000</a> (3)
+</li>
+<li><a href="iris-3000.html">IRIS 3000</a> (4)
+</li>
+<li><a href="iris-3130.html">IRIS 3130</a> (5)
+</li>
+<li><a href="iris-4d.html">Iris 4D</a> (4)
+</li>
+<li><a href="iris-4d-35.html">IRIS 4D/35</a> (3)
+</li>
+<li><a href="iris-68k.html">IRIS 68k</a> (4)
+</li>
+<li><a href="iris-development-option.html">iris development option</a> (4)
+</li>
+<li><a href="iris-emulator.html">IRIS emulator</a> (6)
+</li>
+<li><a href="iris-gl.html">IRIS GL</a> (71)
+</li>
+<li><a href="iris-indigo.html">Iris Indigo</a> (22)
+</li>
+<li><a href="iris-keyboard.html">Iris keyboard</a> (3)
+</li>
+<li><a href="iris-models.html">IRIS models</a> (3)
+</li>
+<li><a href="iris-performer.html">IRIS Performer</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="crimson.html">Crimson</a>, <a href="octane.html">Octane</a>, <a href="4d-series.html">4D series</a>, <a href="indigo1.html">Indigo1</a>, <a href="onyx.html">Onyx</a>, <a href="system-v.html">System V</a>, <a href="challenge.html">Challenge</a>, <a href="fuel.html">Fuel</a>, <a href="gl2.html">GL2</a>, <a href="i2i.html">I2I</a>, <a href="ip22.html">IP22</a>, <a href="indycam.html">Indycam</a>, <a href="onyx2.html">Onyx2</a>, <a href="pi.html">PI</a>, <a href="powerseries.html">PowerSeries</a>, <a href="professional-iris.html">Professional IRIS</a>, <a href="r10k-cpu.html">R10K CPU</a>, <a href="raspberry-pi.html">Raspberry Pi</a>, <a href="raspberry-pi-5.html">Raspberry Pi 5</a>, <a href="vw320.html">VW320</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="68k.html">68k</a>, <a href="mips-cpu.html">MIPS CPU</a>, <a href="mips-instructions.html">MIPS instructions</a>, <a href="pa-risc.html">PA-RISC</a>, <a href="r3k-indigo.html">R3K Indigo</a>, <a href="r4000.html">R4000</a>
+</li>
+<li>Graphics: <a href="gtx.html">GTX</a>, <a href="mex.html">MEX</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="openbsd.html">OpenBSD</a>, <a href="irix-3.html">IRIX 3</a>, <a href="irix-4.html">IRIX 4</a>, <a href="irix-5-x.html">IRIX 5.x</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="linux.html">Linux</a>, <a href="netbsd.html">NetBSD</a>, <a href="openbsd-sgi.html">OpenBSD/sgi</a>, <a href="windows-11.html">Windows 11</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="qemu.html">QEMU</a>, <a href="game.html">game</a>, <a href="flame-4.html">Flame 4</a>, <a href="ido.html">IDO</a>, <a href="mfm-emulator.html">MFM emulator</a>, <a href="n64.html">N64</a>, <a href="rust.html">Rust</a>, <a href="scsi-emulator.html">SCSI emulator</a>, <a href="softwindows95.html">SoftWindows95</a>, <a href="xz.html">XZ</a>, <a href="boot-chime.html">boot chime</a>, <a href="desktop.html">desktop</a>, <a href="sash.html">sash</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="12v-rail.html">-12V rail</a>, <a href="cpu.html">CPU</a>, <a href="cpu-board.html">CPU board</a>, <a href="fddi-adapter.html">FDDI adapter</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="videoframer.html">VideoFramer</a>, <a href="cache.html">cache</a>, <a href="network-emulation.html">network emulation</a>, <a href="parallel-port.html">parallel port</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="ftp.html">FTP</a>, <a href="nfs.html">NFS</a>, <a href="scsi-device.html">SCSI device</a>, <a href="ssh.html">SSH</a>, <a href="vme.html">VME</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="ibm.html">IBM</a>, <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="66mhz.html">66mhz</a>, <a href="gf2.html">GF2</a>, <a href="ip4.html">IP4</a>, <a href="personal.html">Personal</a>, <a href="4d-80.html">4D/80</a>, <a href="bp4.html">BP4</a>, <a href="esdi.html">ESDI</a>, <a href="gio32.html">GIO32</a>, <a href="mips-irix.html">MIPS/IRIX</a>, <a href="nat.html">NAT</a>, <a href="ogl.html">OGL</a>, <a href="pcap.html">PCAP</a>, <a href="readme.html">README</a>, <a href="syslog.html">SYSLOG</a>, <a href="tlb.html">TLB</a>, <a href="awkeygen.html">awkeygen</a>, <a href="flight-simulator.html">flight simulator</a>, <a href="headless.html">headless</a>, <a href="m68k.html">m68k</a>
+</li></ul>
+</body>
+</html>

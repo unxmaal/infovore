@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SATA</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SATA</h1>
+<p>Claims: 47 Background: 14 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SATA">SATA</a>, <a href="https://en.wikipedia.org/wiki/NVM_Express">NVM Express</a>, <a href="https://en.wikipedia.org/wiki/PCI-X">PCI-X</a>.</p>
+<p>SATA is a serial storage interface that is electrically different from but command-set compatible with SCSI and ATA (PATA/IDE), and it is commonly supported through SCSI-class drivers in Linux because SCSI is a command set protocol. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> SATA is generally slower than SCSI and PCI, with a SATA1 link being slower than a pATA interface that integrates a SATA-to-pATA chip. <sup><a href="#s6">6</a></sup><sup><a href="#s1">1</a></sup> SAS cards generally can also do SATA, though old SAS cards could not, and SAS-1-speed PERCS do not support SATA drives without a disk interposer. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Converting between SCSI, IDE, and SATA involves inexpensive adapters, though the transition from SCSI to IDE to SATA is described as unnecessarily complex. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> SATA is considered useful on systems such as the Ultra 45, and can be used for VM storage while NVMe is used for OS storage. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SCSI is faster than SATA. (user-b7c4, 2020-01-31, exchange 5816, check: uncheckable)</li>
+<li id="s2">Linux uses the SCSI class for many SATA and USB devices because SCSI is a command set protocol. (user-31d7, 2020-03-22, exchange 6981, check: uncheckable)</li>
+<li id="s3">PCI-X is 64-bit and higher speed than 32-bit PCI, while PCIe is completely different electrically but still bridged by cheap adapter cards, similar to how SATA is to PATA (parallel ATA or IDE). (user-d903, 2020-11-30, exchange 231335, check: supported)</li>
+<li id="s4">IDE is almost as hard as SCSI to implement. (user-9860, 2021-11-14, exchange 100905, check: uncheckable)</li>
+<li id="s5">SATA is similar to SCSI but uses a different electrical layer. (user-9860, 2021-11-17, exchange 205921, check: uncheckable)</li>
+<li id="s6">Our project uses a pATA interface and integrates a sATA to pATA chip, making it slower than a SATA1 link. (user-22f9, 2019-05-15, exchange 1705, check: uncheckable)</li>
+<li id="s7">SAS cards generally can also do SATA. (user-b1da, 2019-11-27, exchange 95853, check: uncheckable)</li>
+<li id="s8">Old SAS cards could not do SATA. (user-b1da, 2019-11-27, exchange 95853, check: uncheckable)</li>
+<li id="s9">PERCS are SAS-1 speed max and don't support SATA drives without a disk interposer. (user-b1da, 2020-12-17, exchange 98058, check: supported)</li>
+<li id="s10">Converting from SCSI to IDE to SATA involves an inexpensive adapter. (user-9860, 2021-11-14, exchange 100905, check: uncheckable)</li>
+<li id="s11">The transition from SCSI to IDE to SATA is unnecessarily complex. (user-9860, 2021-11-14, exchange 100905, check: uncheckable)</li>
+<li id="s12">SATA is really nice to have on the Ultra 45. (user-8de9, 2025-01-12, exchange 224396, check: supported)</li>
+<li id="s13">nvme can be used for OS storage, SATA for VM storage. (user-cd83, 2026-09-22, exchange 66711, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sata-card.html">SATA card</a> (5)
+</li>
+<li><a href="sata-controller.html">SATA controller</a> (5)
+</li>
+<li><a href="sata-disks.html">SATA disks</a> (5)
+</li>
+<li><a href="sata-drive.html">SATA drive</a> (3)
+</li>
+<li><a href="sata-drives.html">SATA drives</a> (13)
+</li>
+<li><a href="sata-pci-card.html">SATA PCI card</a> (3)
+</li>
+<li><a href="sata-port.html">SATA port</a> (4)
+</li>
+<li><a href="sata-ssd.html">SATA SSD</a> (17)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ultra-45.html">Ultra 45</a>, <a href="fuel.html">Fuel</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="unix-kernel.html">Unix kernel</a>, <a href="macos.html">macOS</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="sas.html">SAS</a>, <a href="ide.html">IDE</a>
+</li>
+<li>Parts and peripherals: <a href="sas-cards.html">SAS cards</a>, <a href="300gb-sca-drive.html">300GB SCA drive</a>, <a href="acard.html">ACARD</a>, <a href="fc-backplane.html">FC backplane</a>, <a href="hdd.html">HDD</a>, <a href="ide-cable.html">IDE cable</a>, <a href="prom.html">PROM</a>, <a href="ram.html">RAM</a>, <a href="sca-connector.html">SCA connector</a>, <a href="ssd.html">SSD</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="nvme.html">NVMe</a>, <a href="pcie.html">PCIe</a>, <a href="pci.html">PCI</a>, <a href="pci-x.html">PCI-X</a>, <a href="sca.html">SCA</a>, <a href="u320-scsi.html">U320 SCSI</a>, <a href="usb-devices.html">USB devices</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="pata.html">PATA</a>, <a href="100-mhz.html">100 MHz</a>, <a href="ata133.html">ATA133</a>, <a href="gbe.html">GBE</a>, <a href="jbod.html">JBOD</a>, <a href="ultrascsi.html">UltraSCSI</a>, <a href="wide-scsi.html">wide SCSI</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raspberry Pi</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Raspberry Pi</h1>
+<p>Claims: 66 Background: 13 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Raspberry_Pi">Raspberry Pi</a>, <a href="https://en.wikipedia.org/wiki/Amiga">Amiga</a>, <a href="https://en.wikipedia.org/wiki/Gentoo_Linux">Gentoo Linux</a>, <a href="https://en.wikipedia.org/wiki/Quake_II">Quake II</a>.</p>
+<p>The Raspberry Pi is a small single-board computer that uses SD cards for booting and has limited RAM and a limited GPU. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It has 27 GPIO pins and no built-in RTC chip, so it cannot function without internet connectivity due to the lack of a battery-backed RTC. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> To write an image to a Raspberry Pi, use dd on Unix or balenaEtcher and Win32DiskImager on Windows. <sup><a href="#s7">7</a></sup> Booterizer is a tool for creating bootable images for the Raspberry Pi with minimal user input, and it can run IRIX with a 10GB image that can be downloaded. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Booterizer can configure network settings for the Raspberry Pi to connect to an SGI over Ethernet, using 192.168.1.x which may require additional static routes. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> RaSCSI is a SCSI drive emulator that uses a Raspberry Pi, which is cheaper than a SCSI2SD and can also emulate a SCSI Ethernet adapter for classic Macs and a SCSI display adapter for video output. <sup><a href="#s12">12</a></sup> The Raspberry Pi can be used for a variety of purposes, including as an instant camera with motion installed, as a proxy server for IRIX, and to improve security and privacy for home automation. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> The Raspberry Pi is a British, ARM-based device considered a modern continuation of the BBC microcomputer series, and it can run Acorn's Risc OS. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> It can emulate MIPS and VAX machines, though the MIPS emulation in MAME is buggy and uses more CPU than necessary. <sup><a href="#s18">18</a></sup> The Raspberry Pi can program hardware, competing with the J-Link, and its RP2040 runs fast with the latest firmware and proper setup. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> It can serve as a versatile server without NAT using wired Ethernet and a switch setup. <sup><a href="#s21">21</a></sup> It can be used to install IRIX on SGI systems, with methods including a booterizer and the Reanimator tool, and it can run Reanimator headless. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> Network installs can be done with a Raspberry Pi server running rarpd and ftpd on an isolated network, and using pre-made OS images simplifies the process. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> Installing IRIX is complex, but a Raspberry Pi can be used with the Reanimator guide for a straightforward process. <sup><a href="#s28">28</a></sup> The Pocket Reform offers CPU cards for various architectures, including Raspberry Pi, in a compact form factor. <sup><a href="#s29">29</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Raspberry Pi is used for small stuff and has SD cards for booting. (user-e872, 2020-06-01, exchange 8711, check: uncheckable)</li>
+<li id="s2">The Raspberry Pi has limited RAM. (user-c383, 2021-11-24, exchange 205953, check: uncheckable)</li>
+<li id="s3">The Raspberry Pi's GPU is limited in gaming tasks, especially with multipass and alpha blending. (user-6afa, 2021-07-10, exchange 18327, check: uncheckable)</li>
+<li id="s4">The Raspberry Pi has 27 GPIO pins which are insufficient for driving an LCD. (user-1361, 2021-03-24, exchange 15812, check: supported)</li>
+<li id="s5">Raspberry Pi(s) do not have a built-in RTC chip. (user-b1da, 2020-07-31, exchange 10177, check: uncheckable)</li>
+<li id="s6">Raspberry Pi(s) without internet connectivity cannot function due to lack of a battery-backed RTC. (user-b7c4, 2020-07-31, exchange 10177, check: uncheckable)</li>
+<li id="s7">To write an image to a Raspberry Pi, use dd on Unix or balenaEtcher and Win32DiskImager on Windows. (user-7b1c, 2020-03-13, exchange 77095, check: uncheckable)</li>
+<li id="s8">Booterizer is a tool for creating bootable images for Raspberry Pi, requiring minimal user input. (user-2189, 2020-03-14, exchange 77099, check: uncheckable)</li>
+<li id="s9">Booterizer is a tool to run IRIX on a Raspberry Pi, with a 10GB image that can be downloaded and an option to use a switch or direct connection. (user-2189, 2020-07-25, exchange 77250, check: supported)</li>
+<li id="s10">booterizer can be used to configure network settings for a Raspberry Pi to connect to an Octane over Ethernet. (user-e872, 2020-06-09, exchange 77198, check: supported)</li>
+<li id="s11">The network configuration for Booterizer must use 192.168.1.x for the SGI and Raspberry Pi connection, which may require additional static routes if the default network is different. (user-3663, 2021-06-14, exchange 216735, check: supported)</li>
+<li id="s12">RaSCSI is a SCSI drive emulator that uses a Raspberry Pi, which is cheaper than a SCSI2SD and can also emulate a SCSI Ethernet adapter for classic Macs and a SCSI display adapter for video output. (user-6afa, 2022-02-26, exchange 206542, check: uncheckable)</li>
+<li id="s13">A Raspberry Pi can be used as an instant camera with `motion` installed. (user-cd7d, 2020-06-01, exchange 8711, check: supported)</li>
+<li id="s14">A Raspberry Pi can act as a proxy server for IRIX 6.2 by running a local 'bastion host' that handles modern TLS/IMAPS/POP and old IMAP/POP protocols. (user-e872, 2021-09-06, exchange 205507, check: supported)</li>
+<li id="s15">A Raspberry Pi running a local network via protocols like Zigbee or LoRaWAN can improve security and privacy for home automation. (user-e872, 2021-08-06, exchange 19013, check: uncheckable)</li>
+<li id="s16">The Raspberry Pi is a legitimate modern continuation of the BBC microcomputer series due to its British roots and ARM architecture. (user-e872, 2022-05-30, exchange 233162, check: uncheckable)</li>
+<li id="s17">Raspberry Pi can run Acorn's Risc OS. (user-e872, 2025-04-28, exchange 224981, check: uncheckable)</li>
+<li id="s18">The Raspberry Pi can emulate MIPSen and VAXen, though the MIPS emulation in MAME is buggy and uses more CPU than necessary. (user-7b1c, 2022-05-17, exchange 29270, check: uncheckable)</li>
+<li id="s19">The Raspberry Pi can program hardware, competing with the J-Link. (user-5510, 2022-07-29, exchange 31508, check: uncheckable)</li>
+<li id="s20">The RP2040 on a Raspberry Pi runs fast with the latest firmware and proper setup. (user-22f9, 2025-01-02, exchange 224356, check: uncheckable)</li>
+<li id="s21">A Raspberry Pi can serve as a versatile server without NAT, using wired Ethernet and a switch setup. (user-d5ee, 2023-05-03, exchange 37765, check: uncheckable)</li>
+<li id="s22">You can network install IRIX using a Raspberry Pi with Booterizer, which is surprisingly simple. (user-2a24, 2022-07-26, exchange 222383, check: uncheckable)</li>
+<li id="s23">There are multiple methods to install IRIX, including using a Raspberry Pi with a booterizer. (user-24f0, 2024-09-04, exchange 48961, check: uncheckable)</li>
+<li id="s24">The Raspberry Pi can run Reanimator headless. (user-1a5a, 2025-04-30, exchange 56274, check: uncheckable)</li>
+<li id="s25">Reanimator is a RaspberryPi-based tool for installing operating systems on most SGI systems. (user-74cb, 2026-07-15, exchange 91210, check: uncheckable)</li>
+<li id="s26">The network install is easier if set up, but using a Raspberry Pi with pre-made OS images simplifies the process. (user-baf6, 2023-05-15, exchange 107644, check: uncheckable)</li>
+<li id="s27">The SPARCstation runs well on an isolated network with a Raspberry Pi server running rarpd and ftpd. (user-d5ee, 2023-06-07, exchange 240054, check: uncheckable)</li>
+<li id="s28">Installing IRIX is complex, but a Raspberry Pi can be used with the Reanimator guide for a straightforward process. (user-1a5a, 2026-08-02, exchange 219907, check: uncheckable)</li>
+<li id="s29">The Pocket Reform offers CPU cards for various architectures, including RISC-V, NXP, and Raspberry Pi, in a compact form factor. (user-5906, 2023-01-11, exchange 165998, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="raspberry-pi-3.html">Raspberry Pi 3</a> (5)
+</li>
+<li><a href="raspberry-pi-4.html">Raspberry Pi 4</a> (7)
+</li>
+<li><a href="raspberry-pi-5.html">Raspberry Pi 5</a> (3)
+</li>
+<li><a href="raspberry-pi-cm4.html">Raspberry Pi CM4</a> (3)
+</li>
+<li><a href="raspberry-pi-zero.html">Raspberry Pi Zero</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="amiga.html">Amiga</a>, <a href="rtc.html">RTC</a>, <a href="iris.html">IRIS</a>, <a href="o2.html">O2</a>, <a href="origin-200.html">Origin 200</a>, <a href="r4k-indigo.html">R4K Indigo</a>
+</li>
+<li>Processors: <a href="68000.html">68000</a>, <a href="risc-v.html">RISC-V</a>
+</li>
+<li>Graphics: <a href="gpu.html">GPU</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="risc-os.html">RISC OS</a>, <a href="gentoo.html">Gentoo</a>, <a href="irix-3-x.html">IRIX 3.x</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="reanimator.html">Reanimator</a>, <a href="ansible-playbook.html">Ansible playbook</a>, <a href="mame.html">MAME</a>, <a href="qemu.html">QEMU</a>, <a href="quake2.html">Quake2</a>, <a href="vagrant.html">Vagrant</a>, <a href="ansible.html">ansible</a>, <a href="dd.html">dd</a>, <a href="efs2tar.html">efs2tar</a>, <a href="server.html">server</a>
+</li>
+<li>Parts and peripherals: <a href="rascsi.html">RaSCSI</a>, <a href="ram.html">RAM</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="ups.html">UPS</a>, <a href="usb-drive.html">USB drive</a>, <a href="systemd.html">systemd</a>, <a href="video.html">video</a>
+</li>
+<li>Standards and interfaces: <a href="rs232.html">RS232</a>, <a href="nfs.html">NFS</a>, <a href="x68000.html">x68000</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="cray-2.html">Cray 2</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="booter.html">Booter</a>, <a href="hpc.html">HPC</a>, <a href="j-link.html">J-Link</a>, <a href="nat.html">NAT</a>, <a href="nxp.html">NXP</a>, <a href="openttd.html">OpenTTD</a>, <a href="rp2040.html">RP2040</a>, <a href="vaxen.html">VAXen</a>, <a href="accelerator.html">accelerator</a>, <a href="case.html">case</a>, <a href="rarpd.html">rarpd</a>
+</li></ul>
+</body>
+</html>

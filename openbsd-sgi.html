@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenBSD/sgi</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>OpenBSD/sgi</h1>
+<p>Claims: 16</p>
+<p>OpenBSD/sgi is officially discontinued since 2021, though it runs in 64-bit mode and boots multi-user on supported systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> OpenBSD/sgi 7.0-7.4 works on IP22, IP27, IP28, IP30, and IP32 with specific CPU types, while OpenBSD/sgi 7.9 works on Octane2, Indigo², and R4600 Indy. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> All graphics options but the IP27 Kona frame buffer should be supported, on which the kernel will be limited to serial console operation. <sup><a href="#s2">2</a></sup> The IP28 has issues with OpenBSD/sgi, and it detects 256 MiB of RAM when only 128 MiB are configured, causing GIO timeouts. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The OpenBSD/sgi network boot process uses DHCP for IP assignment, TFTP for the boot image, and Bootparamd for file system and swap partition information. <sup><a href="#s7">7</a></sup> The OpenBSD/sgi driver for the wd33c93a SCSI controller has a bug where it does not clear low bits of TLB entries for 16k pages, causing confusion in the tlbmap layer. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">OpenBSD/sgi is officially gone since 2021. (user-6e7b, 2024-03-24, exchange 240279, check: supported)</li>
+<li id="s2">OpenBSD/sgi runs in 64 bit mode and boots multi-user on supported systems. All graphics options but the IP27 Kona frame buffer should be supported. On such setups, the kernel will be limited to serial console operation. (user-6e7b, 2024-10-13, exchange 166198, check: supported)</li>
+<li id="s3">OpenBSD/sgi 7.0 - 7.4 works on IP22, IP27, IP28, IP30, and IP32 with specific CPU types. (user-6e7b, 2023-11-30, exchange 209657, check: supported)</li>
+<li id="s4">OpenBSD/sgi 7.9 works on Octane2, Indigo², R4600 Indy, but userland programs crash on R4400 Indy; O2 and Origin200s are still being tested. (user-6e7b, 2026-05-09, exchange 90667, check: supported)</li>
+<li id="s5">The IP28 has issues with OpenBSD/sgi. (user-6e7b, 2023-11-01, exchange 209483, check: uncheckable)</li>
+<li id="s6">OpenBSD/SGI detects 256 MiB of RAM when only 128 MiB are configured, causing GIO timeouts. (user-6e7b, 2026-06-16, exchange 94059, check: supported)</li>
+<li id="s7">The OpenBSD/sgi network boot process uses DHCP for IP assignment, TFTP for the boot image, and Bootparamd for file system and swap partition information. (user-6e7b, 2024-03-24, exchange 45311, check: uncheckable)</li>
+<li id="s8">The OpenBSD/sgi driver for the wd33c93a SCSI controller has a bug where it does not clear low bits of TLB entries for 16k pages, causing confusion in the tlbmap layer. (user-3e2d, 2026-06-20, exchange 220474, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ip22.html">IP22</a>, <a href="iris.html">IRIS</a>, <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="octane.html">Octane</a>, <a href="origin-350.html">Origin 350</a>
+</li>
+<li>Parts and peripherals: <a href="ip28.html">IP28</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="tftp.html">TFTP</a>
+</li>
+<li>Other: <a href="ip27.html">IP27</a>, <a href="r4600sc.html">R4600SC</a>
+</li></ul>
+</body>
+</html>

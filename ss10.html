@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SS10</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SS10</h1>
+<p>Claims: 65 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SPARCstation_10">SPARCstation 10</a>.</p>
+<h2 id="with-ss20">With SS20</h2>
+<p>The SS10 has 3 fans facing the CPUs, while the SS20 has no fans, but both require two 501-2840 Fan Cards. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Uncached SuperSPARC modules run at the speed of the Mbus; SS10 has a 40MHz Mbus, SS20 has its Mbus run at 50MHz. <sup><a href="#s3">3</a></sup> SS10 motherboard jumpers configure the SuperSPARC module to run at either 40MHz or 36MHz (newer model) or 40MHz or 33MHz (model 20); 40MHz is the recommended setting unless using very old modules. <sup><a href="#s4">4</a></sup> An SS10 or SS20 does not have SBus connectors on the left side. <sup><a href="#s5">5</a></sup> zulu pre-2040 works inside an SS20 but may not be recommended for disk use; a ZuluSCSI v1.2 is fine in an SS10. <sup><a href="#s6">6</a></sup> ZuluSCSI maxes out Fast SCSI-II in SS10 and 20; 10k rpm disks won't exceed controller limits. <sup><a href="#s7">7</a></sup> If you want a machine from that generation, get an SS10 or SS20. <sup><a href="#s8">8</a></sup> Overheating issues are common with Sparc systems, especially with SS10/20 and SS1000 in max config; running 4-cpu SS10 is possible but not recommended. <sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>The SS10 is a Sun workstation that generally runs in good condition, with some clones having different specifications. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The system uses Ross CPU modules, with SM50 modules running at 40MHz due to Mbus clock limitations while SM51 and SM41 modules run asynchronously at higher speeds. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> It supports SCSI-2 fast/narrow storage, including external CD-ROM drives, though RaSCSI can cause SCSI bus parity errors and boot failures. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> The SS10 uses a custom Crystal chip for sound and modem functionality, and can play MP3s comfortably. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The PSUs for the SS2 and SS10 are completely different. <sup><a href="#s21">21</a></sup> Only a few 24bit framebuffers are worth having for an SS10: Fujitsu AG10 and some Rasterflex/Rasterops cards. <sup><a href="#s22">22</a></sup> The cable for the multiport serial card on an SS10 has a gender that is opposite to the Sun cable. <sup><a href="#s23">23</a></sup> Solaris 2.6 works on Ultra 5 and SS10, but later versions of 2.8 remove XGL which is needed; 2.8 installs without issues on Ultra 5. <sup><a href="#s24">24</a></sup> The SS10 is expensive to run but has not had hardware failures and is fully operational. <sup><a href="#s25">25</a></sup> The SS10 is in the same room as servers used for research and classes. <sup><a href="#s26">26</a></sup> The last surviving manuals for the SS10 were physical copies in the office of the last Themis support engineer, who scanned them. <sup><a href="#s27">27</a></sup> J0201 is the lowest memory DIMM in a SS10. <sup><a href="#s28">28</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SS10 has 3 fans facing the CPUs, while the SS20 has no fans. (user-8de9, 2022-09-19, exchange 182976, check: supported)</li>
+<li id="s2">The SS10 and SS20 require two 501-2840 Fan Cards. (user-03ad, 2022-10-01, exchange 239855, check: supported)</li>
+<li id="s3">Uncached SuperSPARC modules run at the speed of the Mbus; SS10 has a 40MHz Mbus, SS20 has its Mbus run at 50MHz. (user-03ad, 2023-06-15, exchange 240060, check: supported)</li>
+<li id="s4">SS10 motherboard jumpers configure the SuperSPARC module to run at either 40MHz or 36MHz (newer model) or 40MHz or 33MHz (model 20); 40MHz is the recommended setting unless using very old modules. (user-03ad, 2023-06-15, exchange 240060, check: supported)</li>
+<li id="s5">An SS10 or SS20 does not have SBus connectors on the left side (user-03ad, 2023-09-02, exchange 184347, check: uncheckable)</li>
+<li id="s6">zulu pre-2040 works inside an SS20 but may not be recommended for disk use; a ZuluSCSI v1.2 is fine in an SS10. (user-24f9, 2024-04-03, exchange 185080, check: supported)</li>
+<li id="s7">ZuluSCSI maxes out Fast SCSI-II in SS10 and 20; 10k rpm disks won't exceed controller limits. (user-03ad, 2024-04-03, exchange 185080, check: supported)</li>
+<li id="s8">if you want a machine from that generation, get an SS10 or SS20. (user-03ad, 2024-05-27, exchange 223932, check: uncheckable)</li>
+<li id="s9">Overheating issues are common with Sparc systems, especially with SS10/20 and SS1000 in max config; running 4-cpus SS10 is possible but not recommended. (user-03ad, 2024-10-02, exchange 240366, check: supported)</li>
+<li id="s10">The SS10 and older SPARCstations are in much better shape generally. (user-03ad, 2022-06-25, exchange 239734, check: uncheckable)</li>
+<li id="s11">Some SS10 clones may have different specifications. (user-0251, 2023-06-15, exchange 184028, check: uncheckable)</li>
+<li id="s12">The SS10 runs SM50 modules at 40MHz due to Mbus clock limitations, while SM51 and SM41 modules run asynchronously and can operate at higher speeds. (user-03ad, 2023-06-18, exchange 240066, check: supported)</li>
+<li id="s13">Dual SM41 or SM51 modules in an SS10 provide a good configuration, while dual SM50 modules in an SS20 are sufficient. (user-03ad, 2023-06-18, exchange 240066, check: uncheckable)</li>
+<li id="s14">An SS10 with 60MHz cached SM modules runs smoothly. (user-d5ee, 2023-06-18, exchange 240066, check: supported)</li>
+<li id="s15">The SS10 can use an external SCSI CD-ROM drive. (user-04a3, 2021-03-18, exchange 204851, check: uncheckable)</li>
+<li id="s16">SS10 is SCSI-2 I think. Fast/narrow. (user-95db, 2022-07-03, exchange 239752, check: supported)</li>
+<li id="s17">RaSCSI can cause hardware failures on SS10's SCSI bus due to a metal part pressing on a 5V trace, leading to SCSI bus parity errors and inability to boot from the internal hard drive. (user-b98d, 2022-09-24, exchange 239850, check: supported)</li>
+<li id="s18">The SS10 uses the DBRI chip for audio, not the Crystal chip. (user-03ad, 2025-06-10, exchange 240596, check: uncheckable)</li>
+<li id="s19">The SS10 has a custom Crystal chip for sound and modem functionality. (user-07ed, 2025-06-10, exchange 240595, check: uncheckable)</li>
+<li id="s20">The SS10 can play MP3s comfortably, while an LX might struggle. (user-03ad, 2025-06-10, exchange 240595, check: uncheckable)</li>
+<li id="s21">The PSUs for SS2 and SS10 are completely different. (user-03ad, 2022-07-07, exchange 182613, check: uncheckable)</li>
+<li id="s22">Only a few 24bit framebuffers are worth having for an SS10: Fujitsu AG10 and some Rasterflex/Rasterops cards. (user-03ad, 2025-10-06, exchange 240693, check: supported)</li>
+<li id="s23">The cable for the multiport serial card on an SS10 has a gender that is opposite to the Sun cable. (user-616d, 2025-11-17, exchange 179281, check: uncheckable)</li>
+<li id="s24">Solaris 2.6 works on Ultra 5 and SS10, but later versions of 2.8 remove XGL which is needed; 2.8 installs without issues on Ultra 5. (user-d5ee, 2025-12-15, exchange 240742, check: supported)</li>
+<li id="s25">The SS10 is expensive to run but has not had hardware failures and is fully operational. (user-0bb7, 2025-12-31, exchange 240755, check: uncheckable)</li>
+<li id="s26">The SS10 is in the same room as servers used for research and classes. (user-0bb7, 2025-12-31, exchange 240755, check: uncheckable)</li>
+<li id="s27">The last surviving manuals for the SS10 were physical copies in the office of the last Themis support engineer, who scanned them. (user-08fb, 2026-04-06, exchange 187467, check: uncheckable)</li>
+<li id="s28">J0201 is the lowest memory DIMM in a SS10. (user-08fb, 2026-04-11, exchange 240859, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ss20.html">SS20</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="zx.html">ZX</a>, <a href="cpu-module.html">CPU module</a>, <a href="mac.html">Mac</a>, <a href="u1.html">U1</a>
+</li>
+<li>Processors: <a href="supersparc-modules.html">SuperSPARC modules</a>, <a href="hypersparc.html">HyperSPARC</a>, <a href="sparc.html">SPARC</a>
+</li>
+<li>Graphics: <a href="xgl.html">XGL</a>
+</li>
+<li>Operating systems: <a href="solaris-2-6.html">Solaris 2.6</a>, <a href="solaris-2-8.html">Solaris 2.8</a>, <a href="solaris-7.html">Solaris 7</a>, <a href="sunos-4-1-1.html">SunOS 4.1.1</a>, <a href="sunos-4-1-3.html">SunOS 4.1.3</a>
+</li>
+<li>Software: <a href="zulu.html">Zulu</a>, <a href="boot-issues.html">boot issues</a>
+</li>
+<li>Parts and peripherals: <a href="bluescsi.html">BlueSCSI</a>, <a href="nvram-chip.html">NVRAM chip</a>, <a href="rascsi.html">RaSCSI</a>, <a href="scsi-connector.html">SCSI connector</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="cable.html">cable</a>, <a href="capacitor.html">capacitor</a>, <a href="clock-battery.html">clock battery</a>, <a href="hard-drive.html">hard drive</a>, <a href="keyboard.html">keyboard</a>, <a href="monitor.html">monitor</a>, <a href="multiport-serial-card.html">multiport serial card</a>, <a href="null-modem-cable.html">null modem cable</a>, <a href="serial-cable.html">serial cable</a>
+</li>
+<li>Standards and interfaces: <a href="openstep.html">OPENSTEP</a>, <a href="sbus.html">SBus</a>, <a href="scsi-bus.html">SCSI bus</a>, <a href="scsi2.html">SCSI2</a>
+</li>
+<li>Companies: <a href="glitchworks.html">Glitchworks</a>, <a href="sun.html">Sun</a>, <a href="sun-lunchbox.html">Sun Lunchbox</a>, <a href="sun4m.html">sun4m</a>
+</li>
+<li>Other: <a href="mbus.html">Mbus</a>, <a href="sm50.html">SM50</a>, <a href="2-6.html">2.6</a>, <a href="24-bit-color.html">24-bit color</a>, <a href="lx.html">LX</a>, <a href="ss1000.html">SS1000</a>, <a href="ss2.html">SS2</a>, <a href="themis.html">Themis</a>, <a href="turbozx.html">TurboZX</a>, <a href="cg12.html">cg12</a>, <a href="crystal.html">crystal</a>, <a href="pizza-box.html">pizza box</a>
+</li></ul>
+</body>
+</html>

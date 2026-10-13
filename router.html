@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>router</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>router</h1>
+<p>Claims: 30 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Router_%28computing%29">Router (computing)</a>.</p>
+<p>A router is a networking device that may contain dual 450 MHz PPC750 processors and can be the cause of network connectivity problems, including when a device cannot be seen by the router or reach the internet. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The O350 has only external bays, with 2 per brick except for the router, and supports only one router, as two routers halt boot with an invalid configuration. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> An O2000 NUMA system can show different hub and router counts depending on its configuration, and each router brick requires 4 bricks. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> An Onyx2 rackmount configuration consists of an Onyx2 brick with an O2K for compute, and linking it to other systems requires a router, which an Onyx2 deskside lacks. <sup><a href="#s8">8</a></sup> A router can improve Numalink speed but is not necessary for connections, and it connects to L2 or L3 controllers over USB rather than L1. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The router has an internal USB hub for connecting bricks, and SGI provided external hubs for bricks without built-in USB. <sup><a href="#s11">11</a></sup> You can send commands to bricks you are not physically connected to using a router, but it works for some ports (odd numbered ones), and you can use '* version' to see which bricks respond. <sup><a href="#s12">12</a></sup> A router's connected devices list can show assigned IPs, and the L1 can be accessed via a serial link to enter router comms mode, allowing flashing the L1 without booting into IRIX. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O2 can't be seen by the router or the Ubuntu notebook and can't go on the internet. (user-5fa2, 2019-10-09, exchange 203983, check: supported)</li>
+<li id="s2">The router or modem may be the issue causing network connectivity problems. (user-f9d4, 2020-12-31, exchange 75531, check: uncheckable)</li>
+<li id="s3">The board has dual 450 MHz PPC750 processors and is likely a router or similar networking device. (user-d41d, 2026-06-21, exchange 239173, check: supported)</li>
+<li id="s4">O350 only has External bays, 2 per Brick (Except Router) (user-8b3c, 2020-02-03, exchange 204130, check: supported)</li>
+<li id="s5">The O350 supports M serial numbers and only one router; two routers halt boot with invalid config. (user-e4d0, 2024-09-01, exchange 210919, check: supported)</li>
+<li id="s6">An O2000 NUMA system can show different hub and router counts depending on the configuration. (user-f229, 2021-05-03, exchange 17176, check: supported)</li>
+<li id="s7">Each router brick requires 4 bricks, and the router's internal wiring is unknown. (user-24f0, 2025-03-12, exchange 216546, check: supported)</li>
+<li id="s8">An Onyx2 rackmount configuration is an Onyx2 brick with an O2K for compute, and linking it to other systems requires a router, which an Onyx2 deskside lacks. (user-86e1, 2024-03-05, exchange 223748, check: supported)</li>
+<li id="s9">A router can improve Numalink speed but is not necessary for connections. (user-24f0, 2025-03-12, exchange 216546, check: uncheckable)</li>
+<li id="s10">The router connects to L2 or L3 over USB, not L1, and L2 can see all connected bricks but not vice versa. (user-b1da, 2026-02-13, exchange 226085, check: uncheckable)</li>
+<li id="s11">The router has an internal USB hub for connecting bricks, and SGI provided external hubs for bricks without built-in USB. (user-b1da, 2026-02-13, exchange 226085, check: uncheckable)</li>
+<li id="s12">You can send commands to bricks you're not physically connected to using a router, but it works for some ports (odd numbered ones) and you can use '* version' to see which bricks respond. (user-9860, 2022-04-22, exchange 220231, check: uncheckable)</li>
+<li id="s13">A router's connected devices list can show assigned IPs. (user-24f0, 2024-06-17, exchange 47032, check: uncheckable)</li>
+<li id="s14">The L1 can be accessed via a serial link sending \\(x00\\ then \\(x18\\, expecting a \\(x18\\ in response, to enter router comms mode; this allows flashing the L1 without booting into IRIX. (user-9860, 2021-11-23, exchange 217315, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="router-boards.html">router boards</a> (6)
+</li>
+<li><a href="router-brick.html">router brick</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="onyx2-deskside.html">Onyx2 deskside</a>, <a href="origin-2000.html">Origin 2000</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="l1.html">L1</a>, <a href="l2.html">L2</a>, <a href="brick.html">brick</a>, <a href="c-brick.html">C-brick</a>, <a href="backplane.html">backplane</a>, <a href="modem.html">modem</a>, <a href="nodeboard.html">nodeboard</a>, <a href="numalink-cable.html">numalink cable</a>
+</li>
+<li>Standards and interfaces: <a href="ip-address.html">IP address</a>, <a href="usb-hub.html">USB hub</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="l3.html">L3</a>, <a href="host.html">host</a>, <a href="password.html">password</a>
+</li></ul>
+</body>
+</html>

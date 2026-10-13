@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI2SD v6</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI2SD v6</h1>
+<p>Claims: 20 Part of <a href="scsi2sd.html">SCSI2SD</a> Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Indy">SGI Indy</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>The SCSI2SD v6 is the fastest available SCSI emulator, though hardware revisions are needed for further speed improvements, and it is faster than rascsi, which is slower due to lack of synchronous transfer support. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It can perform better than conventional 10k and 15k RPM disks on a Fast SCSI (10MB/s) bus, except for sequential write, and the quality of the SD card is very important to overall performance. <sup><a href="#s3">3</a></sup> The SCSI2SD v6 adapter improves performance over v5, which supported wide SCSI; v6 enhanced support to up to seven devices. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The SCSI2SD v6 works well on a variety of systems, including the A3000, SGI Indy, Indigo1, Indigo2, Onyx2, DEC 3000s, Challenge S, O2, and older Macs such as the Quadra. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> It can be used as a SCSI network adapter and supports various SCSI devices including CD-ROM, ZIP drives, and hard drives. <sup><a href="#s12">12</a></sup> A v6 SCSI2SD card requires an 80pin SCA-&gt;50pin adapter and a 50pin ribbon cable. <sup><a href="#s13">13</a></sup> The SCSI2SD v6 is expensive, and incompatible chips may cause errors and double PANICs on the Octane2. <sup><a href="#s14">14</a></sup><sup><a href="#s10">10</a></sup> The firmware for the SCSI2SD v6 on the 840av causes disk corruption on write with newer versions, but the older v6.5.2 works fine, and the author is working on fixing it. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">scsi2sd V6 is the fastest, rascsi is slower due to lack of synchronous transfer support. (user-95db, 2021-11-14, exchange 100908, check: uncheckable)</li>
+<li id="s2">SCSI2SD v6 is the fastest available SCSI emulator, but hardware revisions are needed for further speed improvements. (user-95db, 2022-05-19, exchange 103848, check: uncheckable)</li>
+<li id="s3">SCSI2SD v6 can perform better than conventional 10k and 15k RPM disks on a Fast SCSI (10MB/S) bus, except for sequential write, and the quality of the SD card is very important to overall performance. (user-22f9, 2020-11-18, exchange 97885, check: supported)</li>
+<li id="s4">The SCSI2SD v6 adapter improves performance over v5. (user-6afa, 2020-06-26, exchange 9233, check: uncheckable)</li>
+<li id="s5">SCSI2SD V5 had support for wide SCSI, V6 enhanced it to support up to seven devices, and all versions of ZuluSCSI have supported wide SCSI. (user-1fc3, 2025-09-03, exchange 118334, check: supported)</li>
+<li id="s6">the scsi2sd v6 cards work nicely on A3000, SGI PI, Indigo1, Dec 3000s, and older Macs. (user-f229, 2020-07-01, exchange 220996, check: supported)</li>
+<li id="s7">The SCSI2SD v6 for an Indy works well for a SCSI2SD, achieving similar speeds to Callahan's reports. (user-5397, 2020-11-05, exchange 204491, check: supported)</li>
+<li id="s8">SCSI2SD v6 works fine in my Indy, Indigo2, and Onyx2. (user-95db, 2021-10-14, exchange 21072, check: supported)</li>
+<li id="s9">I use a scsi2sd v6 in my Indy and Challenge S. (user-6afa, 2023-05-03, exchange 223049, check: supported)</li>
+<li id="s10">The scsi2sd v6 works in both the Indy and Challenge S but is expensive; GBscsi2 is a good alternative. (user-6afa, 2024-09-07, exchange 112089, check: supported)</li>
+<li id="s11">An O2 can run with a SCSI2SD v6. (user-6afa, 2024-09-18, exchange 210983, check: supported)</li>
+<li id="s12">The SCSI2SD V6 can be used as a SCSI network adapter and supports various SCSI devices including CD-ROM, ZIP drives, and hard drives. (user-1361, 2021-11-16, exchange 22176, check: uncheckable)</li>
+<li id="s13">a v6 scsi2sd card requires an 80pin SCA-&gt;50pin adapter and a 50pin ribbon cable. (user-6afa, 2020-07-01, exchange 220996, check: supported)</li>
+<li id="s14">The Octane2 with a SCSI2SD V6 using an incompatible chip may encounter errors and eventually double PANICs. (user-bc5d, 2019-10-21, exchange 220770, check: supported)</li>
+<li id="s15">the firmware for the scsi2sd v6 on the 840av causes disk corruption on write with newer versions, but the older v6.5.2 works fine; the author is working on fixing it. (user-17cb, 2020-01-05, exchange 143555, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="challenge-s.html">Challenge S</a>, <a href="a3000.html">A3000</a>, <a href="indigo.html">Indigo</a>, <a href="indigo1.html">Indigo1</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="onyx2.html">Onyx2</a>, <a href="pi.html">PI</a>
+</li>
+<li>Operating systems: <a href="irix-4-0-5.html">IRIX 4.0.5</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="rascsi.html">RaSCSI</a>, <a href="scsi2sd-v5.html">SCSI2SD V5</a>, <a href="zuluscsi.html">ZuluSCSI</a>
+</li></ul>
+</body>
+</html>

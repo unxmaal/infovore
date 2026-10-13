@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hexdump</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>hexdump</h1>
+<p>Claims: 7</p>
+<p>The `efs` module is used to loopback mount archive files; it has an ELF header at offset 0x200 and can be analyzed with `file`, `hexdump`, and `readelf` commands. <sup><a href="#s1">1</a></sup> hexdump can be used to display the binary format of executable files. <sup><a href="#s2">2</a></sup> The newer version of hexdump can be found on GitHub. <sup><a href="#s3">3</a></sup> IRIX lacks a built-in hexdump; one can compile hexedit from GitHub. <sup><a href="#s4">4</a></sup> IRIX can use 'od -x' as an alternative to hexdump. <sup><a href="#s5">5</a></sup> 'od' dumps in octal; use '-x' for hex words, but offsets remain octal; hexdump dumps in hex bytes, requiring byteswap on non-native platforms. <sup><a href="#s6">6</a></sup> The hexdump command on IRIX lacks the -v option, but the output difference compared to Linux is the same. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the `efs` module is used to loopback mount archive files; it has an ELF header at offset 0x200 and can be analyzed with `file`, `hexdump`, and `readelf` commands. (user-42cf, 2019-01-04, exchange 47, check: supported)</li>
+<li id="s2">hexdump can be used to display the binary format of executable files. (user-8547, 2024-04-05, exchange 71138, check: uncheckable)</li>
+<li id="s3">The newer version of hexdump can be found on GitHub. (user-8547, 2024-04-05, exchange 71138, check: uncheckable)</li>
+<li id="s4">IRIX lacks a built-in hexdump; one can compile hexedit from GitHub. (user-1446, 2020-09-16, exchange 215058, check: uncheckable)</li>
+<li id="s5">IRIX can use 'od -x' as an alternative to hexdump. (user-86e1, 2024-04-03, exchange 71133, check: uncheckable)</li>
+<li id="s6">'od' dumps in octal; use '-x' for hex words, but offsets remain octal; hexdump dumps in hex bytes, requiring byteswap on non-native platforms. (user-86e1, 2024-04-04, exchange 71137, check: uncheckable)</li>
+<li id="s7">The hexdump command on IRIX lacks the -v option, but the output difference compared to Linux is the same. (user-7973, 2025-07-31, exchange 72603, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="file.html">file</a>
+</li></ul>
+</body>
+</html>

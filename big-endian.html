@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>big endian</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>big endian</h1>
+<p>Claims: 21 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Endianness">Endianness</a>.</p>
+<p>Big-endian is a historical choice that is less intuitive than little endian, which makes accessing integers of different sizes from the same memory location simpler. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> On a big endian system, a 16-bit load from address 0x0 gives 0xAABB, while on a little endian system it gives 0x0011. <sup><a href="#s3">3</a></sup> Big endian is better for multimedia and 16-bit audio samples from 32-bit recordings because it avoids bit shifts, while little endian may require them. <sup><a href="#s4">4</a></sup> The issue with big endian code on a little endian CPU involves potential cache conflicts, but swapping the byte order resolves it. <sup><a href="#s5">5</a></sup> Bus errors indicate unhandled big endian or unaligned access issues, especially in binary data. <sup><a href="#s6">6</a></sup> The RM7000C CPU is set to big endian by default, but can be configured to little endian. <sup><a href="#s7">7</a></sup> Gentoo still supports big endian for PPC64, while RHEL and CentOS no longer support big endian releases. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Big-endian is less intuitive and more of a historical choice. (user-e04c, 2020-09-21, exchange 11098, check: uncheckable)</li>
+<li id="s2">Little endian makes accessing different sizes of integers from the same memory location simpler compared to big endian, which requires additional steps. (user-6afa, 2020-09-21, exchange 11100, check: uncheckable)</li>
+<li id="s3">On a big endian system, a 16-bit load from address 0x0 gives 0xAABB, while on a little endian system it gives 0x0011. (user-e04c, 2020-09-21, exchange 11099, check: supported)</li>
+<li id="s4">Big endian is better for multimedia and 16-bit audio samples from 32-bit recordings because it avoids bit shifts, while little endian may require them. (user-c383, 2020-12-24, exchange 204583, check: supported)</li>
+<li id="s5">The issue with big endian code on a little endian CPU involves potential cache conflicts, but swapping the byte order resolves it. (user-5510, 2023-11-18, exchange 42313, check: uncheckable)</li>
+<li id="s6">Bus errors indicate unhandled big endian or unaligned access issues, especially in binary data. (user-3e2d, 2025-02-11, exchange 218778, check: uncheckable)</li>
+<li id="s7">The RM7000C CPU is set to BigEndian by default, but can be configured to LittleEndian. (user-c799, 2026-01-24, exchange 121131, check: uncheckable)</li>
+<li id="s8">Gentoo still supports PPC64 big endian. (user-24f9, 2019-12-18, exchange 4927, check: uncheckable)</li>
+<li id="s9">RHEL and CentOS no longer support big endian releases. (user-b1da, 2020-12-08, exchange 12680, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Processors: <a href="ppc64.html">PPC64</a>, <a href="rm7000c-cpu.html">RM7000C CPU</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="nt.html">NT</a>, <a href="rhel.html">RHEL</a>
+</li>
+<li>Software: <a href="sdl.html">SDL</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Standards and interfaces: <a href="little-endian.html">little endian</a>, <a href="bus-error.html">bus error</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="centos.html">CentOS</a>, <a href="goldsrc.html">GoldSrc</a>, <a href="unreal.html">Unreal</a>, <a href="llama2-c.html">llama2.c</a>
+</li></ul>
+</body>
+</html>

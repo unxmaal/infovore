@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netsurf</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Netsurf</h1>
+<p>Claims: 62 Background: 17 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/NetSurf">NetSurf</a>.</p>
+<p>NetSurf is a browser written entirely in C that is designed for portability and is used on retro machines, supporting modern CSS and encryption. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It supports multiple frontends, including RiscOS, GTK2, GTK3, a raw framebuffer, and a Motif front-end that is being developed and is expected to be shippable soon. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> It runs on older hardware such as the Amiga 600 V2, a Falcon 060, and SGI systems, where it can be used with a Motif-based front-end to create a fast modern browser. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> On IRIX it requires GTK2 or GTK3 and depends on toolkits and SSL libraries, and it can be compiled with GCC or, for IRIX 5.3, with MIPSPro. <sup><a href="#s5">5</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> It is still being developed, with ongoing porting work and issues related to glib, and a patch for IRIX introduces bugs. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> A setback on IRIX is a bug in the printf functions that causes snprintf to a null pointer to fail, which is used by NetSurf to determine malloc size. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> Netsurf is a browser available for IRIX. <sup><a href="#s20">20</a></sup> IRIX has netsurf, dillo, and lynx. <sup><a href="#s21">21</a></sup> Netsurf can be installed from the sgug-rse repository; updating metadata may be necessary. <sup><a href="#s22">22</a></sup> Netsurf can be built for SGI with a 'slow ass' or 'cute &amp; quick' interface. <sup><a href="#s23">23</a></sup> Netsurf's Motif port uses GL and has makefile hacks to work around RSE issues, but should otherwise port cleanly. <sup><a href="#s24">24</a></sup> Netsurf can be launched using the motif version if the GTK3 version is not found. <sup><a href="#s25">25</a></sup> Netsurf and Netsurf-Motif give console errors when launched, indicating issues with GTK3-Motif and RANDR, respectively. <sup><a href="#s26">26</a></sup> Netsurf requires netsurf-gtk2 or netsurf-gtk3 to launch, not netsurf-gtk3 as the desktop icon suggests. <sup><a href="#s27">27</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Netsurf is a limited but usable browser for simple needs (user-42cf, 2019-01-02, exchange 66925, check: uncheckable)</li>
+<li id="s2">Netsurf is a modern browser designed for portability, specifically used on retro machines (user-17cb, 2019-06-29, exchange 2255, check: uncheckable)</li>
+<li id="s3">NetSurf is entirely written in C. (user-c383, 2020-02-07, exchange 6217, check: uncheckable)</li>
+<li id="s4">Netsurf supports modern CSS and encryption. (user-2189, 2020-12-27, exchange 69155, check: uncheckable)</li>
+<li id="s5">netsurf and dillo are minimal browsers that depend on toolkits and SSL libraries. (user-42cf, 2020-04-27, exchange 68577, check: uncheckable)</li>
+<li id="s6">netsurf supports multiple frontends including RiscOS, GTK2, GTK3, raw framebuffer, and a motif front end which is being developed and may be shippable. (user-6afa, 2021-08-09, exchange 19099, check: uncheckable)</li>
+<li id="s7">a motif front end for netsurf is being developed and is expected to be shippable soon. (user-6afa, 2021-08-09, exchange 19099, check: uncheckable)</li>
+<li id="s8">NetSurf runs on an Amiga 600 V2. (user-42cf, 2019-06-23, exchange 67274, check: supported)</li>
+<li id="s9">NetSurf is a capable browser that runs on a Falcon 060. (user-e0a4, 2019-06-23, exchange 67274, check: supported)</li>
+<li id="s10">Netsurf is a rendering engine that can be used with a Motif-based front-end to create a fast modern browser for SGI systems. (user-17cb, 2019-11-12, exchange 216854, check: uncheckable)</li>
+<li id="s11">Netsurf runs well on old hardware, using minimal RAM for multiple tabs. (user-be12, 2021-07-10, exchange 215176, check: uncheckable)</li>
+<li id="s12">Netsurf requires GTK2 or GTK3 on IRIX. (user-42cf, 2020-05-02, exchange 78293, check: uncheckable)</li>
+<li id="s13">netsurf is compiled for IRIX 6.5 and runs on older machines like the Challenge. (user-6afa, 2021-08-09, exchange 19099, check: supported)</li>
+<li id="s14">compiling netsurf with mipspro instead of gcc may be necessary for IRIX 5.3. (user-6afa, 2021-08-09, exchange 19099, check: supported)</li>
+<li id="s15">netsurf is still being developed with issues with glib. (user-637b, 2019-12-09, exchange 4743, check: uncheckable)</li>
+<li id="s16">There's porting work on making netsurf work right now (user-d903, 2020-05-10, exchange 78327, check: uncheckable)</li>
+<li id="s17">The patch for Netsurf on IRIX introduces bugs. (user-2189, 2020-08-03, exchange 68988, check: uncheckable)</li>
+<li id="s18">fixing snprintf issues in netsurf and its libraries will make it work like the Linux version. (user-42cf, 2020-07-12, exchange 215031, check: uncheckable)</li>
+<li id="s19">The `printf` functions on IRIX have a bug that causes issues with `snprintf` to a null pointer, which is used by Netsurf to determine malloc size; this works on most systems but fails on IRIX. (user-42cf, 2021-05-30, exchange 69661, check: supported)</li>
+<li id="s20">Netsurf is a browser available for IRIX. (user-7973, 2024-09-14, exchange 210972, check: uncheckable)</li>
+<li id="s21">IRIX has netsurf, dillo, and lynx. (user-56d4, 2024-04-27, exchange 210291, check: uncheckable)</li>
+<li id="s22">netsurf can be installed from the sgug-rse repository; updating metadata may be necessary. (user-281e, 2023-10-29, exchange 209470, check: uncheckable)</li>
+<li id="s23">Netsurf can be built for SGI with a 'slow ass' or 'cute &amp; quick' interface. (user-e872, 2022-09-02, exchange 217679, check: uncheckable)</li>
+<li id="s24">Netsurf's Motif port uses GL and has makefile hacks to work around RSE issues, but should otherwise port cleanly. (user-6afa, 2022-09-02, exchange 217679, check: uncheckable)</li>
+<li id="s25">Netsurf can be launched using the motif version if the GTK3 version is not found. (user-24f0, 2022-10-01, exchange 217730, check: uncheckable)</li>
+<li id="s26">Netsurf and Netsurf-Motif give console errors when launched, indicating issues with GTK3-Motif and RANDR, respectively. (user-8de9, 2022-01-28, exchange 80814, check: uncheckable)</li>
+<li id="s27">Netsurf requires netsurf-gtk2 or netsurf-gtk3 to launch, not netsurf-gtk3 as the desktop icon suggests. (user-8de9, 2022-02-12, exchange 80992, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="netsurf-browser.html">Netsurf browser</a> (6)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="challenge.html">Challenge</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Graphics: <a href="8-bit-graphics.html">8-bit graphics</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="risc-os.html">RISC OS</a>, <a href="void-linux.html">Void Linux</a>, <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="gtk2.html">gtk2</a>, <a href="dillo.html">Dillo</a>, <a href="gtk3.html">GTK3</a>, <a href="sgugshell.html">sgugshell</a>, <a href="firefox.html">Firefox</a>, <a href="mipspro.html">MIPSpro</a>, <a href="rse.html">RSE</a>, <a href="glib.html">glib</a>, <a href="gl.html">GL</a>, <a href="mame.html">MAME</a>, <a href="mplayer-1-4.html">MPlayer 1.4</a>, <a href="pidgin.html">Pidgin</a>, <a href="make.html">make</a>, <a href="netsurf-motif.html">netsurf-motif</a>, <a href="python3.html">python3</a>
+</li>
+<li>Parts and peripherals: <a href="dimm.html">DIMM</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>, <a href="sgi-forum.html">SGI forum</a>
+</li>
+<li>Other: <a href="css.html">CSS</a>, <a href="lynx.html">Lynx</a>, <a href="browservice.html">browservice</a>, <a href="iconv.html">iconv</a>
+</li></ul>
+</body>
+</html>

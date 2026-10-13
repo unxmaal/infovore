@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.profile</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>.profile</h1>
+<p>Claims: 8</p>
+<ul>
+<li>shell startup scripts can be added by creating a .bash_profile or .profile in the user's home directory. (user-42cf, exchange 202, 2019-01-23; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Login shells run .profile and non login shells run .bashrc; sourcing .bashrc from .profile ensures it runs for both. (user-6afa, exchange 69028, 2020-08-21; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Adding a 'stty rows 25 cols 80' line to .login, .profile, or .cshrc sets terminal size, and setting TERM, MANPATH, EDITOR, BROWSER in these files configures the environment. (user-c831, exchange 98671, 2021-04-02; 1 speaker(s), 1 conversation(s))
+</li>
+<li>yes. and you need to reload .profile like with . .profile or restarting the shell (user-d5ee, exchange 240353, 2024-08-10; 1 speaker(s), 1 conversation(s))
+</li>
+<li>.cshrc is a configuration file for the C shell; .login is a login script that does various things; .profile is run if the shell is /bin/sh or possibly bash. (user-6dfb, exchange 50729, 2024-11-21; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Check .profile, .bashrc, or .cshrc to set PATH, and modify the current shell session to test the change. (user-21b8, exchange 215548, 2024-08-15; 1 speaker(s), 1 conversation(s))
+</li>
+<li>MacPorts adds paths to .profile, but they are not reflected in $PATH when using zsh; moving the export command to .zshrc fixes it. (user-17cb, exchange 144640, 2021-01-19; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Running bash as a shell wipes the environment, but sourcing .profile or running bash -l fixes it. (user-f229, exchange 80928, 2022-02-09; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bashrc.html">.bashrc</a>, <a href="path.html">PATH</a>, <a href="bash.html">bash</a>
+</li>
+<li>Other: <a href="cshrc.html">.cshrc</a>, <a href="login.html">.login</a>, <a href="bash-profile.html">.bash_profile</a>, <a href="macports.html">MacPorts</a>, <a href="term.html">TERM</a>, <a href="zsh.html">zsh</a>
+</li></ul>
+</body>
+</html>

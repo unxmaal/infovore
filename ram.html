@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RAM</h1>
+<p>Claims: 312 Background: 9 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Random-access_memory">Random-access memory</a>, <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>, <a href="https://en.wikipedia.org/wiki/Central_processing_unit">Central processing unit</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/Programmable_ROM">Programmable ROM</a>.</p>
+<h2 id="with-o2">With O2</h2>
+<p>The O2 is a simple system built around a CPU and RAM, with no graphics issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The O2 uses an R5k CPU and proprietary RAM, with 128 MB modules being common and kits available inexpensively on eBay for $20 to $30. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The O2 can support up to 1 GB of RAM, though 128 MB is the largest module available and 1 GB can be finicky. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The O2 likes paired RAM with bank A holding the largest SIMs, and PCI mapping exposes up to 1 GB of RAM in the upper 4 GB of address space. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Dual O2 and Octane configurations are possible, with RAM that can be sourced from various SGI machines. <sup><a href="#s12">12</a></sup> The O2 may require RAM to be reseated or tried in different configurations before it powers on, and issues may point to a CPU problem or IM1 failure. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="with-octane">With Octane</h2>
+<p>The SGI Octane can support up to 8 GiB of RAM, though it is unlikely to reach that amount, and it maxes out at 2 GB with high-density RAM before it can be upgraded further. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> An Octane can support a gig of RAM, be upgraded to 3 GB, and use up to 4 GB with proprietary sticks. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Octane RAM is different from O2000 RAM, which is compatible with the O200 and Onyx2. <sup><a href="#s21">21</a></sup> Stacked RAM is possible in an Octane but is not common. <sup><a href="#s22">22</a></sup> An Octane with dual R14K CPUs at 600 MHz, V12 graphics, and 2 GB RAM costs around 600 Euros, and 2 GB of RAM is enough for an Octane2. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> The Octane may hang and show a blinking red LED on the lightbar due to issues with the RAM or the XIO connectors, and its CPU board can be challenging to remove, with RAM issues causing it to get stuck. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup></p>
+<h2 id="with-cpu">With CPU</h2>
+<p>The differences between Sun Lunchboxes are primarily in CPU and RAM type, with some models having Ethernet jacks instead of AUI. <sup><a href="#s27">27</a></sup> The system is currently without RAM and CPU, effectively having 0 MHz CPU and 0 GB RAM, and the 0 CPU configuration has no RAM and no HEART. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> The CPU and RAM were loose, and the CPU was unscrewed. <sup><a href="#s30">30</a></sup> Reseating RAM and CPU can resolve lockups and other issues, and reseating the CPU and RAM may not resolve all issues, in which case inspecting the board for dead custom chips is a next step. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> Replacing the CPU, RAM, NVRAM, etc. was necessary to get an SGI working, and replacing the CPU, RAM, NVRAM, and components like the CGA and battery backplane did not resolve the idle hang issue. <sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup> The U2 improved significantly over the U1 with better CPU options, more RAM, faster disks, and 24-bit accelerated graphics without sacrificing a RAM slot. <sup><a href="#s35">35</a></sup> The first-gen RS/6000s shipped with a default RAM size of 16MB and ran at approximately 25MHz. <sup><a href="#s36">36</a></sup></p>
+<h2 id="with-indigo2">With Indigo2</h2>
+<ul>
+<li>The bigger Indigos used non-standard 100pin RAM, while the smaller models used more standard RAM. (user-03ad, exchange 162257, 2022-09-16; 1 speaker(s), 1 conversation(s))
+</li>
+<li>My I2 is currently set up as a 200MHz R4400, extreme GFX, 256MB of RAM (user-b1da, exchange 215349, 2022-12-06; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The Indy has 32 MB of RAM and is expensive for its specifications. (user-8de9, exchange 222558, 2022-10-04; 1 speaker(s), 1 conversation(s))
+</li>
+<li>An i2 can run with as little as 64 MB of RAM. (user-8de9, exchange 113962, 2025-01-28; 1 speaker(s), 1 conversation(s))
+</li>
+<li>An Indy2 was unstable with Linux/OpenBSD until some RAM was removed. (user-bba0, exchange 49038, 2024-09-08; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The tag RAM (Index RAM) on the R8000 in the Indigo2 is square and located under heatsinks, sensitive to static discharge. (user-59df, exchange 16665, 2021-04-16; 1 speaker(s), 1 conversation(s))
+</li>
+<li>An Indigo2 may experience kernel panics after a cold boot, related to RAM. (user-cd83, exchange 204388, 2020-08-10; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The Indigo2 High/Max Impact comes with 1 MB of RAM and cannot perform 24-bit texturing. (user-1a5a, exchange 125654, 2026-09-14; 1 speaker(s), 1 conversation(s))
+</li>
+<li>there's an Indigo2 IMPACT near me I think I could probably get for $80. It's missing RAM and only has like one of the 3 boards for the Impact GPU. (user-b1da, exchange 5188, 2019-12-29; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The two banks of 4MB RAM are known to have a bug. (user-cd83, exchange 63749, 2026-06-01; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The Indigo2 had future-like specs in 1994, including 200 MHz R4400 CPU, 256 MB RAM, and a 32 GB disk. (user-56d4, exchange 208248, 2023-01-23; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="general">General</h2>
+<p>Reseating and cleaning RAM can resolve system issues, and bad or dirty RAM could cause a lack of chime during power-up. <sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup> The RAM came in a bag and seems fine, and it seemed to detect the RAM okay when installed. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup> The errors might indicate faulty RAM. <sup><a href="#s41">41</a></sup> Installing RAM should be done from one side to the next to avoid difficulty, and the RAM is easy and not proprietary. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup> Resetting RAM and checking for tin or gold edges can help with RAM issues, and tin RAM can have issues, so try emptying one bank and moving to the other if only one bank is populated. <sup><a href="#s44">44</a></sup><sup><a href="#s45">45</a></sup> The O300 can take up to 4GB of RAM in the 4 slots. <sup><a href="#s46">46</a></sup> The original Xbox can only access up to 128 MB of RAM, even when upgraded from the stock 64 MB. <sup><a href="#s47">47</a></sup> Some games can use the expansion pak to get more RAM, but most do not, and one game crashes with it installed. <sup><a href="#s48">48</a></sup> RAM can come from different manufacturers, and some units have more RAM than others. <sup><a href="#s49">49</a></sup> Some systems have limited RAM, such as the ZX Spectrum with 16 KB, the 2600 with 128 bytes, and the Raspberry Pi, while others can reach 128 MB in the late 486 to early Pentium era. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup><sup><a href="#s52">52</a></sup><sup><a href="#s53">53</a></sup> RAM can be a performance limiter, as seen with the sgug porting project, iPods, and ZFS on U2 with 2 GB. <sup><a href="#s54">54</a></sup><sup><a href="#s55">55</a></sup><sup><a href="#s56">56</a></sup> RAM issues can arise from overheating, static discharge, or bad DIMM slots, and may be resolved by reseating the RAM. <sup><a href="#s57">57</a></sup><sup><a href="#s58">58</a></sup><sup><a href="#s59">59</a></sup><sup><a href="#s60">60</a></sup> Some RAM can be cloned or sourced from third parties, such as eBay or by reverse engineering the design. <sup><a href="#s61">61</a></sup><sup><a href="#s62">62</a></sup> Some systems use proprietary or hard-to-find RAM, such as the Indy, which requires specific types and brands, and the 4D systems, whose RAM can fail but is fixable with difficulty. <sup><a href="#s63">63</a></sup><sup><a href="#s64">64</a></sup> Maximum RAM capacities vary by model, with the SGI 1000 series supporting up to 4GB, the U2 taking up to 2GB, the Blade 100 up to 2GB, the Qube up to 256MB, and the 11/780 up to 128MB. <sup><a href="#s65">65</a></sup><sup><a href="#s66">66</a></sup><sup><a href="#s67">67</a></sup><sup><a href="#s68">68</a></sup><sup><a href="#s69">69</a></sup> Installation can be challenging, as with the U2, where RAM must be installed in quads and the riser card is difficult to fit, and single bad DIMMs can be hard to diagnose. <sup><a href="#s70">70</a></sup><sup><a href="#s71">71</a></sup><sup><a href="#s72">72</a></sup> Compatibility is not always straightforward, since Sun-branded RAM generally works in Ultra2 systems with some exceptions, mismatched RAM compatibility is unknown for the IP12, and loose or faulty RAM can cause problems. <sup><a href="#s73">73</a></sup><sup><a href="#s74">74</a></sup><sup><a href="#s75">75</a></sup><sup><a href="#s76">76</a></sup> Memory can also be reported as bad even when absent, as with the SGI IP35, or flagged with checksum errors, and non-standard RAM was used in larger Indigos. <sup><a href="#s77">77</a></sup><sup><a href="#s78">78</a></sup><sup><a href="#s79">79</a></sup> RAM is used by the bootloader, which loads into it mostly, while the PROM executes from ROM and uses RAM only for an execution stack. <sup><a href="#s80">80</a></sup><sup><a href="#s81">81</a></sup> Storage and sometimes RAM can be extra chips on the mainboard. <sup><a href="#s82">82</a></sup> The Altix 3000 series can handle up to 512 processors and 2 TB of RAM, and the IBM POWER 750 has dual POWER 7 processors and 128GB of RAM per processor. <sup><a href="#s83">83</a></sup><sup><a href="#s84">84</a></sup> The Indigo2 had future-like specs in 1994, including a 200 MHz R4400 CPU and 256 MB of RAM, and the Enterprise 25000 has double the CPUs and RAM of the V890. <sup><a href="#s85">85</a></sup><sup><a href="#s86">86</a></sup> The Fuel could only support up to 8GB of RAM, and an Octane can use up to 5 GB of RAM for specific workloads like rendering. <sup><a href="#s87">87</a></sup><sup><a href="#s88">88</a></sup> The DL380 G2 has 6 GiB of RAM capacity and two PIII-S processors running at 1.4 GHz each. <sup><a href="#s89">89</a></sup> Failed RAM can cause garbage over serial, and an Indy with a red light might have bad RAM. <sup><a href="#s90">90</a></sup><sup><a href="#s91">91</a></sup> Some pairs of RAM may not work in certain slots and can cause the system to stop booting completely, and some RAM pairs that should have worked did not, leading to system failures. <sup><a href="#s92">92</a></sup><sup><a href="#s93">93</a></sup> The PI can support up to 128MB of RAM, more than an Indigo R3K, and double-stacked RAM was common in some Indigo models. <sup><a href="#s94">94</a></sup><sup><a href="#s95">95</a></sup> The 166 MHz model can max out at 128 megabytes of RAM. <sup><a href="#s96">96</a></sup> The C3XXX, JXXXX, and other Astro-based machines use special HP RAM with a maximum of 1GB per stick, and 2GB sticks won't work. <sup><a href="#s97">97</a></sup> The special RAM used in these machines is the same as in some HP superdome systems and costs about 12 USD per 512MB module. <sup><a href="#s98">98</a></sup> The datasheet for the RAM can be ambiguous, with both unbuffered and ECC specifications. <sup><a href="#s99">99</a></sup> RAM is QFP, not BGA, and can be repaired with a soldering iron or a hot air pencil for small components. <sup><a href="#s100">100</a></sup> Reseating RAM can make an Amiga boot reliably, though modernish RAM modules may still cause issues. <sup><a href="#s101">101</a></sup> The Centris 650 can be upgraded with 2x32MB RAM and 2x256K VRAM, but its internal HD lacks TCP/IP and FTP, making it difficult to transfer files. <sup><a href="#s102">102</a></sup> The SPARC E3000 with all RAM slots filled can achieve 8-way interleaving, significantly improving performance. <sup><a href="#s103">103</a></sup> The RAM from the Ultra 5 has ECC and a different bit-width than other RAM, as indicated by the labels. <sup><a href="#s104">104</a></sup> The Sparcbook 3000TX is the fastest and can go up to 256MB RAM. <sup><a href="#s105">105</a></sup> Swapping the working RAM from an Indy into another machine allows it to boot up. <sup><a href="#s106">106</a></sup> The VW540 can use MIPS CPUs and has a maximum of 8-16GB RAM. <sup><a href="#s107">107</a></sup> Removing all drives and reseating the RAM may allow the system to give a startup chime, indicating some level of functionality; no startup chime suggests a more serious issue. <sup><a href="#s108">108</a></sup> RAM for an Indy can be gambled on to max out the system. <sup><a href="#s109">109</a></sup> Most budget machines from that era had 128-512MB RAM, and high-end systems varied widely. <sup><a href="#s110">110</a></sup> Different systems use different RAM configurations, with some cards containing multiple types of RAM. <sup><a href="#s111">111</a></sup><sup><a href="#s112">112</a></sup> Several systems have maximum RAM limits, such as 128MB for Director edition Macs, 384MB for Purple and Teal I2 and Indigo2 Max, and 512MB for a system limited by physical constraints. <sup><a href="#s113">113</a></sup><sup><a href="#s114">114</a></sup><sup><a href="#s115">115</a></sup><sup><a href="#s116">116</a></sup> Some RAM is proprietary, making upgrades difficult, and certain cards may be limited to 32MB with resistors and a Dallas EEPROM chip. <sup><a href="#s117">117</a></sup><sup><a href="#s112">112</a></sup> The Origin series may have a maximum RAM per stick limit. <sup><a href="#s118">118</a></sup> OS 9 has a memory limit of 1.5 GB, and no software on OS 9 can use more than 1.5 GB of RAM. <sup><a href="#s119">119</a></sup> Hardware from SGI can have issues with disk storage, power supply units, and RAM, and fans can also die. <sup><a href="#s120">120</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O2 is simple with just CPU and RAM, no graphics issues. (user-f229, 2019-06-16, exchange 2076, check: supported)</li>
+<li id="s2">The O2 uses a CPU and has RAM. (user-95db, 2023-03-05, exchange 36501, check: supported)</li>
+<li id="s3">The O2 requires special RAM despite being designed to be PC-like, with prices on eBay ranging from $20 to $30 for 64MB to 128MB. (user-848e, 2019-09-16, exchange 3530, check: supported)</li>
+<li id="s4">Most O2 and later SGIs are RAM limited, often using proprietary RAM, with 128 MB being a common limit for running systems efficiently. (user-56d4, 2022-03-29, exchange 206746, check: supported)</li>
+<li id="s5">Inexpensive O2 RAM kits can be purchased on eBay. (user-eea9, 2022-12-14, exchange 105970, check: supported)</li>
+<li id="s6">The O2 takes an R5k CPU; it has issues with RAM and DVD drives. (user-5510, 2023-08-22, exchange 39894, check: supported)</li>
+<li id="s7">The O2 can support up to 1 GB of RAM, with 128 MB being the largest module available. (user-6afa, 2020-07-08, exchange 97207, check: supported)</li>
+<li id="s8">An O2 can run with 512MB of RAM, though 1GB seems finicky. (user-8ec8, 2026-08-03, exchange 202540, check: supported)</li>
+<li id="s9">The O2 microprocessor can only support up to 1GB of RAM due to address space limitations; increasing RAM would require changes to the microprocessor, operating system, or using a 64-bit kernel and mapping DMA through the (user-3e2d, 2026-08-15, exchange 91704, check: supported)</li>
+<li id="s10">The O2 likes paired RAM, with bank A having the largest SIMs. (user-0251, 2020-11-16, exchange 97866, check: supported)</li>
+<li id="s11">On the O2, PCI mapping exposes up to 1GB of RAM in the upper 4GB of address space, with 1GB straight through and 1GB byteswapped. (user-3e2d, 2025-12-28, exchange 225844, check: supported)</li>
+<li id="s12">Dual O2 and Octane configurations are possible; O2 and Octane RAM can be sourced from various SGIs. (user-6d41, 2020-01-15, exchange 5471, check: supported)</li>
+<li id="s13">The RAM issue on the O2 points to a CPU problem. (user-1361, 2020-12-28, exchange 13191, check: supported)</li>
+<li id="s14">The system may have an IM1 failure and only detects 8 MB of RAM. (user-a079, 2023-12-02, exchange 209671, check: supported)</li>
+<li id="s15">The O2 may require RAM to be reseated or tried in different configurations before it powers on. (user-9219, 2025-07-13, exchange 57623, check: supported)</li>
+<li id="s16">An Octane can support up to 8 GiB of RAM, though it is unlikely to reach that amount. (user-e872, 2020-07-28, exchange 10108, check: supported)</li>
+<li id="s17">The Octane maxes out at 2gb with high density RAM, and can be upgraded further. (user-3e2d, 2025-05-31, exchange 212559, check: supported)</li>
+<li id="s18">An Octane can support a gig of RAM. (user-8de9, 2022-02-07, exchange 221939, check: supported)</li>
+<li id="s19">An Octane can be upgraded to 3 GB of RAM. (user-ec52, 2026-07-31, exchange 226790, check: supported)</li>
+<li id="s20">The Octane can use an adapter board to replace its power supply, which is often dead, and can have up to 4GB of RAM with proprietary sticks. (user-b7c4, 2024-04-20, exchange 210260, check: supported)</li>
+<li id="s21">Octane RAM is different from O2000 RAM; O2000 RAM is compatible with O200 and Onyx2. (user-bf68, 2021-03-20, exchange 98607, check: supported)</li>
+<li id="s22">Stacked RAM is possible in an Octane but is not common. (user-e4e2, 2026-07-31, exchange 226790, check: supported)</li>
+<li id="s23">An Octane with dual R14K CPUs at 600 MHz, V12 graphics, and 2GB RAM costs around 600 Euros. (user-59df, 2019-10-13, exchange 95594, check: supported)</li>
+<li id="s24">2GB of RAM is enough for an Octane2. (user-24f0, 2024-08-17, exchange 210825, check: supported)</li>
+<li id="s25">The Octane may hang and have a blinking red LED on the lightbar due to issues with RAM or the XIO connectors. (user-5fa2, 2021-09-20, exchange 221540, check: supported)</li>
+<li id="s26">An Octane's CPU board can be challenging to remove; RAM issues can cause it to get stuck. (user-25b9, 2024-04-28, exchange 223864, check: supported)</li>
+<li id="s27">The differences between Sun Lunchboxes are primarily in CPU and RAM type, with some models having Ethernet jacks instead of AUI. (user-b7c4, 2019-08-04, exchange 2883, check: uncheckable)</li>
+<li id="s28">The system is currently without RAM and CPU, effectively having 0 MHz CPU and 0 GB RAM. (user-5510, 2022-05-10, exchange 29027, check: supported)</li>
+<li id="s29">The 0 CPU configuration has no RAM and no HEART. (user-4f7c, 2025-06-21, exchange 57197, check: supported)</li>
+<li id="s30">The CPU and RAM were loose, and the CPU was unscrewed. (user-e4e2, 2026-06-19, exchange 226599, check: uncheckable)</li>
+<li id="s31">Reseating RAM and CPU can resolve lockups and other issues. (user-94cb, 2022-05-10, exchange 222240, check: uncheckable)</li>
+<li id="s32">Reseating the CPU and RAM may not resolve all issues; inspecting the board for dead custom chips is a next step. (user-7b9e, 2024-04-14, exchange 210235, check: uncheckable)</li>
+<li id="s33">Replacing the CPU, RAM, NVRAM, etc. was necessary to get my SGI working. (user-1361, 2022-04-12, exchange 27999, check: uncheckable)</li>
+<li id="s34">Replacing the DC-DC board, RAM, CPU, and components like the CGA and battery backplane did not resolve the idle hang issue. (user-3e2d, 2025-05-10, exchange 159394, check: uncheckable)</li>
+<li id="s35">The U2 improved significantly over the U1 with better CPU options, more RAM, faster disks, and 24-bit accelerated graphics without sacrificing a RAM slot. (user-7b1c, 2022-05-15, exchange 239625, check: supported)</li>
+<li id="s36">The first-gen RS/6000s shipped with a default RAM size of 16MB and ran at approximately 25MHz. (user-07ed, 2024-01-16, exchange 209855, check: supported)</li>
+<li id="s37">Reseating and cleaning RAM can resolve system issues. (user-281e, 2023-09-08, exchange 209194, check: uncheckable)</li>
+<li id="s38">Bad or dirty RAM could cause a lack of chime during power-up. (user-a079, 2019-06-03, exchange 95264, check: uncheckable)</li>
+<li id="s39">The RAM came in a bag and seems fine. (user-24f0, 2022-10-03, exchange 222556, check: uncheckable)</li>
+<li id="s40">Mine seemed to detect the RAM okay when I installed it. (user-59b9, 2020-05-29, exchange 96943, check: uncheckable)</li>
+<li id="s41">The errors might indicate faulty RAM. (user-22f9, 2019-01-22, exchange 176, check: uncheckable)</li>
+<li id="s42">Installing RAM should be done from one side to the next to avoid difficulty. (user-a1ac, 2019-07-15, exchange 95353, check: uncheckable)</li>
+<li id="s43">the ram is easy, it's not proprietary (user-b7c4, 2019-12-29, exchange 5188, check: uncheckable)</li>
+<li id="s44">Resetting RAM and checking for tin or gold edges can help with RAM issues. (user-edea, 2019-09-16, exchange 3535, check: uncheckable)</li>
+<li id="s45">Tin RAM can have issues, try emptying one bank and moving to the other if only one bank is populated. (user-edea, 2019-09-16, exchange 3535, check: uncheckable)</li>
+<li id="s46">the O300 can take up to 4GB RAM in the 4 slots (user-bf68, 2019-03-02, exchange 859, check: supported)</li>
+<li id="s47">The original Xbox can only access up to 128 MB of RAM, even when upgraded from the stock 64 MB. (user-db13, 2019-07-20, exchange 227106, check: supported)</li>
+<li id="s48">Some games can use the expansion pak to get more ram, but most do not; one game crashes with it installed. (user-8b3c, 2019-07-18, exchange 227103, check: uncheckable)</li>
+<li id="s49">The Indigo can have RAM from different manufacturers; this one has more RAM than a Control Data branded unit. (user-30be, 2020-08-24, exchange 10748, check: supported)</li>
+<li id="s50">The ZX Spectrum has 16 KB of RAM, a cheap Z80 CPU, and a minimalistic keyboard. (user-1361, 2020-11-03, exchange 11974, check: supported)</li>
+<li id="s51">The 2600 has a 6507 CPU with 128 bytes of RAM. (user-1361, 2021-06-26, exchange 18113, check: supported)</li>
+<li id="s52">Late 486 early Pentium era could get to 128MB of RAM. (user-c831, 2021-02-15, exchange 204761, check: supported)</li>
+<li id="s53">The Raspberry Pi has limited RAM. (user-c383, 2021-11-24, exchange 205953, check: uncheckable)</li>
+<li id="s54">The sgug porting project is limited by RAM constraints. (user-e872, 2020-10-25, exchange 204479, check: uncheckable)</li>
+<li id="s55">The RAM is the real limiter for iPods, with the interface bottlenecks regardless of storage type. (user-b1da, 2021-06-29, exchange 231511, check: uncheckable)</li>
+<li id="s56">2GB RAM is insufficient for ZFS on U2. (user-7b1c, 2021-05-09, exchange 180741, check: supported)</li>
+<li id="s57">Overheating can cause RAM issues; adding fans can help. (user-e872, 2021-02-25, exchange 231411, check: uncheckable)</li>
+<li id="s58">The tag RAM (Index RAM) on the R8000 in the Indigo2 is square and located under heatsinks, sensitive to static discharge. (user-59df, 2021-04-16, exchange 16665, check: supported)</li>
+<li id="s59">The Ultra 5 has 2 bad DIMM slots that don't show up in the system, limiting usable RAM to 256MB. (user-95db, 2021-09-15, exchange 239401, check: supported)</li>
+<li id="s60">Removing and reseating RAM might resolve a RED State Exception. (user-9528, 2021-03-12, exchange 204834, check: uncheckable)</li>
+<li id="s61">RAM for the Altix 350 can be sourced from eBay for approximately $5 per stick. (user-59b9, 2020-08-29, exchange 216351, check: supported)</li>
+<li id="s62">SGI RAM can be cloned by reverse engineering the design and having boards made by a manufacturer like PCMWay. (user-c831, 2021-03-17, exchange 15587, check: uncheckable)</li>
+<li id="s63">Indy requires specific RAM types and brands; check eBay for working parts. (user-6afa, 2021-12-02, exchange 206000, check: supported)</li>
+<li id="s64">The 4D systems have RAM that can die, but it's fixable though not easy. (user-8de9, 2022-02-07, exchange 206373, check: supported)</li>
+<li id="s65">The SGI 1000 series machines can have up to 4 P3 CPUs and 4GB RAM. (user-9528, 2022-02-09, exchange 102212, check: supported)</li>
+<li id="s66">The 11/780 can take up to 128MB of RAM, with a theoretical limit higher but no controllers made for it. (user-b1da, 2022-02-27, exchange 26559, check: supported)</li>
+<li id="s67">Blade 100 can use up to 2 GB of RAM, but may require thorough testing due to potential issues with individual memory modules. (user-baf6, 2022-05-25, exchange 182123, check: supported)</li>
+<li id="s68">The U2 can take up to 2GB of RAM, dual disks, and has 4 SBus slots. (user-7b1c, 2022-06-10, exchange 239700, check: supported)</li>
+<li id="s69">The Qube has a maximum of 256MB of RAM. (user-5510, 2022-08-17, exchange 207544, check: supported)</li>
+<li id="s70">The RAM for U2/30/60 systems is the same and can be found, though the riser card installation is difficult. (user-7b1c, 2022-02-10, exchange 181417, check: supported)</li>
+<li id="s71">In the Ultra2, RAM must be installed in quads; this information is readily available. (user-7b1c, 2022-02-22, exchange 239530, check: uncheckable)</li>
+<li id="s72">An Ultra 2 with a single bad DIMM can be difficult to diagnose (user-7b1c, 2022-05-25, exchange 182122, check: supported)</li>
+<li id="s73">Sun RAM with a Sun Logo and that physically fits will work for Sun Ultra2 systems (there are some exceptions). (user-237d, 2022-02-22, exchange 239528, check: uncheckable)</li>
+<li id="s74">The IP12 accepts mismatched RAM or must all be the same? The exact compatibility is unknown from the conversation. (user-8de9, 2022-03-03, exchange 241021, check: uncheckable)</li>
+<li id="s75">Check for loose RAM. (user-7b1c, 2022-02-24, exchange 181519, check: uncheckable)</li>
+<li id="s76">Bad RAM or RAM connection can cause issues with a Mac video card. (user-6afa, 2022-10-08, exchange 147067, check: uncheckable)</li>
+<li id="s77">The SGI IP35 reports bad RAM even when no sticks are present. (user-6afa, 2022-03-19, exchange 102934, check: uncheckable)</li>
+<li id="s78">The UltraSPARC-IIi 2-2 module has 256 MB of RAM in bank 2 and none in bank 0, and reports a configuration checksum error. (user-7151, 2022-06-18, exchange 239717, check: supported)</li>
+<li id="s79">The bigger Indigos used non-standard 100pin RAM, while the smaller models used more standard RAM. (user-03ad, 2022-09-16, exchange 162257, check: supported)</li>
+<li id="s80">The bootloader loads into RAM mostly. (user-5510, 2022-11-03, exchange 33723, check: uncheckable)</li>
+<li id="s81">The PROM executes from ROM, using RAM only for an execution stack. (user-cdcd, 2023-08-13, exchange 223249, check: uncheckable)</li>
+<li id="s82">Storage and sometimes RAM can be extra chips on the mainboard. (user-e872, 2023-01-12, exchange 231971, check: uncheckable)</li>
+<li id="s83">The Altix 3000 series can handle up to 512 processors and 2 TB of RAM. (user-59b9, 2023-10-07, exchange 209357, check: supported)</li>
+<li id="s84">The IBM POWER 750 has dual POWER 7 processors and 128GB of RAM per processor. (user-37bb, 2023-07-07, exchange 177249, check: supported)</li>
+<li id="s85">The Indigo2 had future-like specs in 1994, including 200 MHz R4400 CPU, 256 MB RAM, and a 32 GB disk. (user-56d4, 2023-01-23, exchange 208248, check: supported)</li>
+<li id="s86">The Enterprise 25000 has double the CPUs and RAM of the V890. (user-5510, 2022-12-10, exchange 34640, check: supported)</li>
+<li id="s87">The Fuel could only support up to 8GB RAM. (user-5510, 2023-05-13, exchange 37954, check: supported)</li>
+<li id="s88">An Octane can use up to 5 GB of RAM for specific workloads like rendering, though typical usage is much lower; some users have hit limits. (user-6afa, 2024-04-16, exchange 45623, check: supported)</li>
+<li id="s89">The DL380 G2 has 6 GiB of RAM capacity and two PIII-S processors running at 1.4 GHz each. (user-6e7b, 2024-01-10, exchange 109880, check: supported)</li>
+<li id="s90">Failed RAM can cause garbage over serial. (user-0251, 2023-11-30, exchange 42834, check: uncheckable)</li>
+<li id="s91">An Indy with a red light might have bad RAM. (user-20a3, 2023-07-14, exchange 223207, check: supported)</li>
+<li id="s92">Some pairs of RAM may not work in certain slots and can cause the system to stop booting completely. (user-2d40, 2023-07-14, exchange 232072, check: uncheckable)</li>
+<li id="s93">Some RAM pairs that should have worked did not, leading to system failures. (user-d903, 2023-07-14, exchange 232072, check: uncheckable)</li>
+<li id="s94">The PI can support up to 128MB of RAM, more than an Indigo R3K. (user-86e1, 2024-06-15, exchange 241214, check: supported)</li>
+<li id="s95">Double stacked RAM was common in some Indigo models. (user-2a3c, 2024-08-23, exchange 210852, check: supported)</li>
+<li id="s96">The 166 MHz model can max out at 128 megabytes of RAM. (user-d166, 2025-04-02, exchange 163954, check: supported)</li>
+<li id="s97">The C3XXX, JXXXX, and other Astro-based machines use special HP RAM with a maximum of 1GB per stick. 2GB sticks won't work. (user-03ad, 2024-10-14, exchange 224154, check: supported)</li>
+<li id="s98">The special RAM used in these machines is the same as in some HP superdome systems and costs about 12 USD per 512MB module. (user-f973, 2024-10-14, exchange 224154, check: supported)</li>
+<li id="s99">The datasheet for the RAM can be ambiguous, with both unbuffered and ECC specifications. (user-6e7b, 2024-10-07, exchange 235477, check: uncheckable)</li>
+<li id="s100">RAM is QFP, not BGA. It can be repaired with a soldering iron or a hot air pencil for small components. (user-22f9, 2025-01-30, exchange 114013, check: uncheckable)</li>
+<li id="s101">Reseating RAM can make an Amiga boot reliably; modernish RAM modules may still cause issues. (user-e872, 2025-02-03, exchange 153439, check: uncheckable)</li>
+<li id="s102">The Centris 650 can be upgraded with 2x32MB RAM and 2x256K VRAM, but its internal HD lacks TCP/IP and FTP, making it difficult to transfer files. (user-d5ee, 2024-07-23, exchange 148934, check: supported)</li>
+<li id="s103">The SPARC E3000 with all RAM slots filled can achieve 8-way interleaving, significantly improving performance. (user-6e7b, 2025-05-30, exchange 240588, check: supported)</li>
+<li id="s104">The RAM from the Ultra 5 has ECC and a different bit-width than other RAM, as indicated by the labels. (user-07ed, 2025-05-30, exchange 238878, check: supported)</li>
+<li id="s105">The Sparcbook 3000TX is the fastest and can go up to 256MB RAM. (user-3e2d, 2025-06-21, exchange 186418, check: supported)</li>
+<li id="s106">Swapped the working RAM from an Indy into another machine and it boots up. (user-20a3, 2025-06-28, exchange 117490, check: supported)</li>
+<li id="s107">The VW540 can use MIPS CPUs and has a maximum of 8-16GB RAM. (user-3ec5, 2025-07-06, exchange 57493, check: supported)</li>
+<li id="s108">Removing all drives and reseating the RAM may allow the system to give a startup chime, indicating some level of functionality; no startup chime suggests a more serious issue. (user-59df, 2025-07-19, exchange 117739, check: uncheckable)</li>
+<li id="s109">RAM for an Indy can be gambled on to max out the system. (user-86e1, 2025-08-03, exchange 58137, check: supported)</li>
+<li id="s110">Most budget machines from that era had 128-512MB RAM, and high-end systems varied widely. (user-c831, 2025-08-06, exchange 58207, check: supported)</li>
+<li id="s111">The card had different types of RAM. (user-07ed, 2026-06-05, exchange 239148, check: uncheckable)</li>
+<li id="s112">V10 and V12 cards can have different RAM configurations, with V12 cards often having more RAM but sometimes limited to 32MB with resistors and a Dallas EEPROM chip. (user-24f0, 2026-07-22, exchange 226732, check: supported)</li>
+<li id="s113">The Director edition Macs shipped with 32MB RAM and could be upgraded to 128MB. (user-ae91, 2026-06-22, exchange 91050, check: supported)</li>
+<li id="s114">Purple I2 non-impact and Teal I2 can max out at 384MB with 8x32 RAM. (user-e4e2, 2026-07-21, exchange 226725, check: supported)</li>
+<li id="s115">An Indigo2 Max can handle 384MB of RAM, which was a significant amount in 1992. (user-f190, 2026-07-28, exchange 232993, check: supported)</li>
+<li id="s116">This system can only support up to 512MB of RAM due to physical constraints, which is sufficient for XP. (user-59df, 2026-09-03, exchange 160678, check: supported)</li>
+<li id="s117">The RAM is a funny config. It's proprietary, so adding more at this stage would be a nuisance. You'd have to buy 2GB to add 1.5. (user-e4e2, 2026-07-21, exchange 202260, check: supported)</li>
+<li id="s118">The Origin series may have a maximum RAM per stick limit. (user-4f7c, 2026-07-27, exchange 226776, check: supported)</li>
+<li id="s119">OS 9 has a memory limit of 1.5 GB and no software on OS 9 can use more than 1.5 GB of RAM. (user-1a5a, 2026-07-28, exchange 232992, check: supported)</li>
+<li id="s120">Hardware from SGI can have issues with disk storage, power supply units, and RAM. Fans can also die. (user-4f7c, 2026-07-18, exchange 124142, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ram-board.html">RAM board</a> (3)
+</li>
+<li><a href="ram-bracket.html">RAM bracket</a> (3)
+</li>
+<li><a href="ram-chips.html">RAM chips</a> (7)
+</li>
+<li><a href="ram-contacts.html">RAM contacts</a> (4)
+</li>
+<li><a href="ram-expansion.html">RAM expansion</a> (4)
+</li>
+<li><a href="ram-ics.html">RAM ICs</a> (5)
+</li>
+<li><a href="ram-issue.html">RAM issue</a> (4)
+</li>
+<li><a href="ram-modules.html">RAM modules</a> (9)
+</li>
+<li><a href="ram-slots.html">RAM slots</a> (10)
+</li>
+<li><a href="ram-sticks.html">RAM sticks</a> (8)
+</li>
+<li><a href="ram-upgrade.html">RAM upgrade</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="u2.html">U2</a>, <a href="ultra-2.html">Ultra 2</a>, <a href="amiga.html">Amiga</a>, <a href="fuel.html">Fuel</a>, <a href="iifx.html">IIfx</a>, <a href="ipx.html">IPX</a>, <a href="iris.html">IRIS</a>, <a href="indigo.html">Indigo</a>, <a href="onyx2.html">Onyx2</a>, <a href="pi.html">PI</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="4d.html">4D</a>, <a href="altix-350.html">Altix 350</a>, <a href="blade-100.html">Blade 100</a>, <a href="ip12.html">IP12</a>, <a href="ipc.html">IPC</a>, <a href="impact.html">Impact</a>, <a href="indigo-model.html">Indigo model</a>, <a href="indycam.html">Indycam</a>, <a href="netra.html">Netra</a>, <a href="o300.html">O300</a>, <a href="octane1.html">Octane1</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="origin-350.html">Origin 350</a>, <a href="qube.html">Qube</a>, <a href="r10k-cpu.html">R10K CPU</a>, <a href="rs-6000.html">RS/6000</a>, <a href="rtc.html">RTC</a>, <a href="raspberry-pi.html">Raspberry Pi</a>, <a href="se-30.html">SE/30</a>, <a href="sparcclassic.html">SPARCclassic</a>, <a href="st.html">ST</a>, <a href="tezro.html">Tezro</a>, <a href="u1.html">U1</a>, <a href="ultra-45.html">Ultra 45</a>, <a href="vw540.html">VW540</a>, <a href="xbox.html">Xbox</a>, <a href="zx-spectrum.html">ZX Spectrum</a>, <a href="imac.html">iMac</a>
+</li>
+<li>Processors: <a href="processor.html">processor</a>, <a href="r4400.html">R4400</a>, <a href="ultrasparc-iiii.html">UltraSPARC IIIi</a>, <a href="286.html">286</a>, <a href="cpu-speed.html">CPU speed</a>, <a href="indigo-r3k.html">Indigo R3K</a>, <a href="mips-cpu.html">MIPS CPU</a>, <a href="powerpc-processor.html">PowerPC processor</a>, <a href="r12000.html">R12000</a>, <a href="r14k-cpu.html">R14k CPU</a>, <a href="r3k-indigo.html">R3K Indigo</a>, <a href="r4000.html">R4000</a>, <a href="r5k-cpu.html">R5K CPU</a>, <a href="r8000.html">R8000</a>, <a href="sparc.html">SPARC</a>, <a href="xeon-processors.html">Xeon processors</a>, <a href="z80-cpu.html">Z80 CPU</a>, <a href="processor-board.html">processor board</a>
+</li>
+<li>Graphics: <a href="v10.html">V10</a>, <a href="v12.html">V12</a>, <a href="graphics-card.html">graphics card</a>, <a href="24-bit-graphics.html">24-bit graphics</a>, <a href="cadduo.html">CADduo</a>, <a href="gfx.html">GFX</a>, <a href="v12-graphics.html">V12 graphics</a>, <a href="graphics-options.html">graphics options</a>
+</li>
+<li>Operating systems: <a href="aix.html">AIX</a>, <a href="irix.html">IRIX</a>, <a href="solaris.html">Solaris</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="nt.html">NT</a>, <a href="os-9.html">OS 9</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="sunos-4.html">SunOS 4</a>, <a href="tru64.html">Tru64</a>, <a href="xp.html">XP</a>, <a href="bootloader.html">bootloader</a>
+</li>
+<li>Software: <a href="7-zip.html">7-Zip</a>, <a href="cde.html">CDE</a>, <a href="proe.html">ProE</a>, <a href="quake-1.html">Quake 1</a>, <a href="sas.html">SAS</a>, <a href="zfs.html">ZFS</a>, <a href="hinv.html">hinv</a>, <a href="installer.html">installer</a>, <a href="mkfs.html">mkfs</a>, <a href="server.html">server</a>, <a href="swap.html">swap</a>, <a href="toolchain.html">toolchain</a>
+</li>
+<li>Parts and peripherals: <a href="cpu.html">CPU</a>, <a href="prom.html">PROM</a>, <a href="ssd.html">SSD</a>, <a href="power-supply.html">power supply</a>, <a href="nvram.html">NVRAM</a>, <a href="rom.html">ROM</a>, <a href="drive.html">drive</a>, <a href="sound.html">sound</a>, <a href="cdrom.html">CDROM</a>, <a href="cpu-board.html">CPU board</a>, <a href="dimm-slot.html">DIMM slot</a>, <a href="dvd-drive.html">DVD drive</a>, <a href="firewire-card.html">FireWire card</a>, <a href="ip35.html">IP35</a>, <a href="ip7-board.html">IP7 board</a>, <a href="mouser.html">Mouser</a>, <a href="pci-riser.html">PCI riser</a>, <a href="simm.html">SIMM</a>, <a href="simm-slots.html">SIMM slots</a>, <a href="vram.html">VRAM</a>, <a href="xio-connector.html">XIO connector</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="adapter-board.html">adapter board</a>, <a href="battery.html">battery</a>, <a href="card.html">card</a>, <a href="disk.html">disk</a>, <a href="disk-i-o.html">disk I/O</a>, <a href="fan.html">fan</a>, <a href="floppy.html">floppy</a>, <a href="floppy-drive.html">floppy drive</a>, <a href="mainboard.html">mainboard</a>, <a href="memory-test.html">memory test</a>, <a href="monitor.html">monitor</a>, <a href="motherboard.html">motherboard</a>, <a href="nodeboard.html">nodeboard</a>, <a href="performance.html">performance</a>, <a href="power-supply-unit.html">power supply unit</a>, <a href="screen.html">screen</a>, <a href="system-disk.html">system disk</a>, <a href="video.html">video</a>, <a href="video-card.html">video card</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="sata.html">SATA</a>, <a href="sbus-slot.html">SBus slot</a>, <a href="serial.html">serial</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sun.html">Sun</a>, <a href="gcc.html">GCC</a>, <a href="hp.html">HP</a>, <a href="sgug.html">SGUG</a>, <a href="sun-lunchbox.html">Sun Lunchbox</a>, <a href="sun-studio.html">Sun Studio</a>, <a href="ebay.html">eBay</a>
+</li>
+<li>Other: <a href="ecc.html">ECC</a>, <a href="fromjapan.html">FromJapan</a>, <a href="sam.html">SAM</a>, <a href="11-780.html">11/780</a>, <a href="2gb.html">2GB</a>, <a href="4-mb.html">4 MB</a>, <a href="4gb.html">4GB</a>, <a href="540.html">540</a>, <a href="9000-380.html">9000/380</a>, <a href="aek-ii.html">AEK II</a>, <a href="centris-650.html">Centris 650</a>, <a href="gr1-2.html">GR1.2</a>, <a href="jlc.html">JLC</a>, <a href="kingston.html">Kingston</a>, <a href="mega-st.html">Mega ST</a>, <a href="office.html">Office</a>, <a href="piii.html">PIII</a>, <a href="pismo.html">Pismo</a>, <a href="pro.html">Pro</a>, <a href="r4600sc.html">R4600SC</a>, <a href="red-state-exception.html">RED State Exception</a>, <a href="sendmail.html">Sendmail</a>, <a href="superdome.html">Superdome</a>, <a href="teal-i2.html">Teal I2</a>, <a href="vs2000.html">VS2000</a>, <a href="xvr-2500.html">XVR-2500</a>, <a href="a-series.html">a-Series</a>, <a href="chime.html">chime</a>, <a href="components.html">components</a>, <a href="core.html">core</a>, <a href="ipod.html">iPod</a>, <a href="llama2.html">llama2</a>, <a href="lmhostid.html">lmhostid</a>, <a href="logo.html">logo</a>, <a href="overheating.html">overheating</a>, <a href="secondary-cache.html">secondary cache</a>, <a href="storage.html">storage</a>, <a href="texturing.html">texturing</a>, <a href="time.html">time</a>
+</li></ul>
+</body>
+</html>

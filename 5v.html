@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5V</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>5V</h1>
+<p>Claims: 9</p>
+<p>SAS or SATA controllers for the Ultra 10 must be 5V and 33MHz/32bit PCI, since it does not support PCI-X or higher voltage controllers. <sup><a href="#s1">1</a></sup> The Indy uses 72pin DIMM RAM at 5V with parity, while mid-'90s Power Macs and PC Compatibility Cards take 5V, 168-pin, FPM/EDO DIMMs. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> A MIPS-based Cobalt RaQ uses a PSU providing both 12V and 5V, with the bottom system board converting 12V to 5V; a missing load on 12V can cause issues such as resets during kernel loading. <sup><a href="#s4">4</a></sup> One PSU provides four isolated outputs—twice 12V and twice 5V—with terminals 1, 4, and 5 connected to common ground, making terminal 2 provide -5V and terminal 6 provide -12V. <sup><a href="#s5">5</a></sup> Compute logic runs on 5V, hard disks on +12V, and the fan tray on -12V in a PowerSeries PSU. <sup><a href="#s6">6</a></sup> A PCI adapter supports 3.3V and 5V, 64-bit PCI at 33/66MHz and PCI-X at 66/100/133MHz, with a bridge converting to x4 PCIe Gen 1. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SAS or SATA controllers for Ultra 10 must be 5V and 33MHz/32bit PCI, as it does not support PCI-X or higher voltage controllers. (user-237d, 2020-12-05, exchange 239273, check: supported)</li>
+<li id="s2">The Indy uses 72pin DIMM RAM at 5V with parity. (user-0251, 2021-08-22, exchange 99792, check: supported)</li>
+<li id="s3">The mid-'90s Power Macs and PC Compatibility Cards take 5V, 168-pin, FPM/EDO DIMMs. (user-baf6, 2022-05-25, exchange 182124, check: supported)</li>
+<li id="s4">MIPS-based Cobalt RaQs use a PSU that provides both 12 V and 5 V, with the bottom system board converting 12 V to 5 V; missing load on 12 V can cause issues like resets during kernel loading. (user-6e7b, 2023-12-29, exchange 240218, check: supported)</li>
+<li id="s5">This PSU provides 4 isolated outputs: twice 12V and twice 5V. Terminals 1, 4, and 5 connect to common ground, making terminal 2 provide -5V and terminal 6 provide -12V. (user-86e1, 2023-10-18, exchange 109229, check: supported)</li>
+<li id="s6">This is a PowerSeries PSU. Compute logic runs on 5V, hard disks on +12V, and the fan tray on -12V. The fan tray likely runs from -12V to ensure a load, and the IRIS 3K might be similar. (user-86e1, 2023-10-18, exchange 109229, check: supported)</li>
+<li id="s7">This PCI adapter supports 3.3V and 5V, 64-bit PCI at 33/66MHz and PCI-X at 66/100/133MHz, with a bridge converting to x4 PCIe Gen 1. (user-757f, 2026-01-08, exchange 225884, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="ultra-10.html">Ultra 10</a>
+</li>
+<li>Parts and peripherals: <a href="psu.html">PSU</a>, <a href="pc-compatibility-card.html">PC Compatibility Card</a>
+</li>
+<li>Companies: <a href="cobalt-raq.html">Cobalt RAQ</a>
+</li>
+<li>Other: <a href="12v.html">12V</a>, <a href="64-bit-pci.html">64-bit PCI</a>, <a href="parity.html">parity</a>
+</li></ul>
+</body>
+</html>

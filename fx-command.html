@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fx command</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>fx command</h1>
+<p>Claims: 9 Part of <a href="fx.html">fx</a></p>
+<p>The `fx` command can automatically label, format, and layout the disk for IRIX, and it can format a drive for use with SGI systems, including a provision command within `fx` that can automatically set up the drive. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The `fx` command only re-partitions and does not handle filesystems; `mkfs` is needed to create a new filesystem. <sup><a href="#s3">3</a></sup> To use the `fx` command for formatting, one should accept all defaults. <sup><a href="#s4">4</a></sup> In LOVE, the `fx` command does not require formatting partitions; instead, create labels and boot into the installer. <sup><a href="#s5">5</a></sup> The IRIX `fx` command indicates the disk is partitioned and suggests it may have bad blocks, despite the capacity appearing correct, and the disk reports no bad blocks after an exercise. <sup><a href="#s6">6</a></sup> The `dsk` command is not recognized, but is what the `fx` command is attempting to access; the drive may be incompatible or faulty. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The `fx` command can automatically label, format, and layout the disk for IRIX. (user-37ee, 2020-08-30, exchange 78664, check: supported)</li>
+<li id="s2">The fx command can format a drive for use with SGI systems, and there is a provision command within fx that can automatically set up the drive. (user-6884, 2023-09-26, exchange 41032, check: uncheckable)</li>
+<li id="s3">The fx command only re-partitions and does not handle filesystems; mkfs is needed to create a new filesystem. (user-b1da, 2021-10-25, exchange 21561, check: uncheckable)</li>
+<li id="s4">To use the fx command for formatting, one should accept all defaults. (user-c831, 2023-09-26, exchange 41032, check: uncheckable)</li>
+<li id="s5">The fx command in LOVE does not require formatting partitions; instead, create labels and boot into the installer. (user-17cb, 2024-03-07, exchange 84743, check: uncheckable)</li>
+<li id="s6">The IRIX fx command indicates the disk is partitioned and suggests it may have bad blocks, despite the capacity appearing correct, and the disk reports no bad blocks after an exercise. (user-4f7c, 2025-07-14, exchange 117667, check: uncheckable)</li>
+<li id="s7">The 'dsk' command is not recognized, but is what the fx command is attempting to access; the drive may be incompatible or faulty. (user-4f7c, 2026-07-18, exchange 219861, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="filesystem.html">filesystem</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="mkfs.html">mkfs</a>, <a href="love.html">LOVE</a>
+</li>
+<li>Other: <a href="badblock.html">badblock</a>
+</li></ul>
+</body>
+</html>

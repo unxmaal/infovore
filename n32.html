@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>n32</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>n32</h1>
+<p>Claims: 15</p>
+<p>N32 is a 64-bit software variant for IRIX, and IRIX 6.x introduced the o32 ABI to distinguish it from the n32 and n64 ABIs. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> N32 and O32 are also described as 32-bit nomenclatures in MIPSpro, and configure scripts for IRIX expect mipspro ld with -n32 rather than GNU ld. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> N32 binaries are compiled for MIPS-4, and the 'file' utility can identify the ABI version of an executable such as N32 on MIPS, which was supported by newer IRIX versions. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> N32 seemed the best for binary sizes on machines with more than 4GB of RAM, but provides no benefit with less than 4GB of RAM. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> IRIX 6.2 with N32 allows 64-bit register operations but has limited 256MB of RAM, leading to confusion about true 64-bit support. <sup><a href="#s9">9</a></sup> The older IP19 could run IRIX 5.3, so the o32 vs. n32 distinction was relevant then, and N64 is available for both N32 and 64-bit kernels on the R4400 in the IP19 Onyx and Challenge. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">N32 is a 64-bit software variant for IRIX. (user-6afa, 2022-04-18, exchange 92899, check: supported)</li>
+<li id="s2">IRIX 6.x introduced the o32 ABI to distinguish it from n32 and n64 ABIs. (user-d903, 2023-01-31, exchange 70693, check: supported)</li>
+<li id="s3">configure scripts for IRIX expect mipspro ld with -n32, not GNU ld. (user-2189, 2019-07-05, exchange 67337, check: uncheckable)</li>
+<li id="s4">N32 and O32 are other 32-bit nomenclatures in MIPSpro. (user-56d4, 2023-12-26, exchange 218254, check: supported)</li>
+<li id="s5">N32 binaries are compiled for MIPS-4 if you look at the string. (user-b1da, 2024-11-28, exchange 211348, check: supported)</li>
+<li id="s6">The 'file' utility can identify the ABI version of an executable, such as N32 on MIPS, which was supported by newer IRIX versions. (user-21b8, 2025-12-31, exchange 219370, check: uncheckable)</li>
+<li id="s7">n32 seemed the best for binary sizes on machines with &gt; 4GB RAM. (user-2d09, 2019-10-05, exchange 68004, check: supported)</li>
+<li id="s8">n32 provides no benefit with less than 4GB of RAM. (user-03ad, 2026-04-02, exchange 73390, check: supported)</li>
+<li id="s9">IRIX 6.2 with N32 allows 64-bit register operations but has limited 256MB RAM, leading to confusion about true 64-bit support. (user-86e1, 2026-04-02, exchange 215954, check: supported)</li>
+<li id="s10">The older IP19 could run IRIX 5.3, so the o32 vs. n32 distinction was relevant then. (user-03ad, 2022-06-14, exchange 30006, check: supported)</li>
+<li id="s11">N64 is available for both N32 and 64-bit kernels on R4400 in IP19 Onyx and Challenge. (user-03ad, 2026-04-02, exchange 215954, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="n32-abi.html">n32 ABI</a> (4)
+</li>
+<li><a href="n32-binary.html">N32 binary</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="mips4.html">MIPS4</a>, <a href="r4400.html">R4400</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-6-x.html">IRIX 6.x</a>
+</li>
+<li>Software: <a href="n64.html">N64</a>, <a href="rse-gcc.html">RSE GCC</a>, <a href="file.html">file</a>
+</li>
+<li>Other: <a href="o32.html">o32</a>, <a href="dhrystone.html">Dhrystone</a>, <a href="ip19.html">IP19</a>
+</li></ul>
+</body>
+</html>

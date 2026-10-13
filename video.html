@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>video</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>video</h1>
+<p>Claims: 28</p>
+<p>Several machines fail to display video due to hardware faults: the I2 cannot output video due to potential riser board issues, the Pismo boots with a chime but no video due to RAM issues, an Ultra 5 with a dead NVRAM may produce POST beep codes but fail to display video with garbage serial output, and a lack of both video and serial output suggests something more serious. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Other machines simply cannot use video: the octane2, the Xserve Cluster Node option, and some machines that require specific conditions, such as old UNIX boxes that may not display video over a KVM due to USB requirements. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Video issues can be diagnosed by disconnecting video and keyboard/mouse and using a null modem cable for serial debugging, and some problems persist even after reflashing the PROM. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Video output can be routed through various ports and methods: the DB15 connector is used for video on older Macs, the O2 can display video on its composite video output via a Raspberry Pi backend, and IRIX installation may require console connection before video works over DVI to analog VGA. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Some machines allocate card slots for video, such as the Indigo and Indigo 2, which have two video card slots each, while others, like the IBM 76i, work well with VLB video. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The I2 can boot over serial but not output video due to potential riser board issues. (user-b7c4, 2019-01-18, exchange 133, check: uncheckable)</li>
+<li id="s2">Pismo boots with chime but no video due to RAM issues. (user-2189, 2020-02-19, exchange 231165, check: uncheckable)</li>
+<li id="s3">An Ultra 5 with a dead NVRAM might produce POST beep codes but fail to display video, with a serial port showing garbage output. (user-56d4, 2023-04-04, exchange 240002, check: supported)</li>
+<li id="s4">if you don't get video and don't get serial, it sounds like something more serious (user-616d, 2024-10-06, exchange 163268, check: uncheckable)</li>
+<li id="s5">The octane2 cannot use video. (user-b7c4, 2019-10-11, exchange 95582, check: supported)</li>
+<li id="s6">Old UNIX boxes are picky about mice and may not display video over a KVM due to USB requirements; Itanics can show errors like the zx6000. (user-f9d4, 2020-01-19, exchange 5559, check: uncheckable)</li>
+<li id="s7">The Cluster Node option of the Xserve did not include video. (user-07ed, 2022-03-17, exchange 231676, check: uncheckable)</li>
+<li id="s8">Disconnecting video and keyboard/mouse, and using a null modem cable for serial debugging can help diagnose issues. (user-6afa, 2021-04-27, exchange 16973, check: uncheckable)</li>
+<li id="s9">reflashed PROM, but still don't have video; trying a different monitor; Solid Impact cards identified by hinv as 'Solid Impact'; seeing 'write error: 0' when installing IRIX; ZuluSCSI-related issue; disk arriving to test (user-c6b9, 2025-04-18, exchange 224909, check: supported)</li>
+<li id="s10">The DB15 connector on the frontplane of some SGI machines is a common port used for joysticks, MIDI on PCs, and video on older Macs. (user-cd83, 2020-05-04, exchange 8047, check: uncheckable)</li>
+<li id="s11">The O2 can play videos using a Raspberry Pi as a backend, with the video displayed on the O2's composite video output. (user-6afa, 2020-07-26, exchange 10036, check: supported)</li>
+<li id="s12">IRIX installation on Zulusca has parity errors when using DVI to analog VGA, but works over console then video works. (user-3e2d, 2026-09-03, exchange 226974, check: uncheckable)</li>
+<li id="s13">Indigos have four card slots, two for video. (user-616d, 2025-09-02, exchange 58834, check: supported)</li>
+<li id="s14">IBM 76i works well with VLB disk and video. (user-d5ee, 2026-06-29, exchange 234763, check: supported)</li>
+<li id="s15">The DDRs on an Indigo 2 held 30 seconds of video. (user-4847, 2026-07-09, exchange 219842, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="video-board.html">video board</a> (7)
+</li>
+<li><a href="video-capture.html">video capture</a> (7)
+</li>
+<li><a href="video-editing.html">video editing</a> (4)
+</li>
+<li><a href="video-format.html">video format</a> (3)
+</li>
+<li><a href="video-issues.html">video issues</a> (4)
+</li>
+<li><a href="video-mode.html">video mode</a> (5)
+</li>
+<li><a href="video-output.html">video output</a> (17)
+</li>
+<li><a href="video-playback.html">video playback</a> (4)
+</li>
+<li><a href="video-port.html">video port</a> (3)
+</li>
+<li><a href="video-recording.html">video recording</a> (3)
+</li>
+<li><a href="video-signal.html">video signal</a> (3)
+</li>
+<li><a href="video-toaster.html">Video Toaster</a> (15)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="indigo2.html">Indigo2</a>, <a href="indigo.html">Indigo</a>, <a href="octane.html">Octane</a>, <a href="raspberry-pi.html">Raspberry Pi</a>, <a href="sbc.html">SBC</a>, <a href="solid-impact.html">Solid Impact</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="xserve.html">Xserve</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="code.html">code</a>, <a href="console.html">console</a>, <a href="hinv.html">hinv</a>
+</li>
+<li>Parts and peripherals: <a href="db15-connector.html">DB15 connector</a>, <a href="kvm.html">KVM</a>, <a href="nic.html">NIC</a>, <a href="nvram.html">NVRAM</a>, <a href="ram.html">RAM</a>, <a href="cable.html">cable</a>, <a href="mice.html">mice</a>, <a href="riser-board.html">riser board</a>, <a href="sound.html">sound</a>
+</li>
+<li>Standards and interfaces: <a href="serial.html">serial</a>, <a href="midi.html">MIDI</a>, <a href="scsi.html">SCSI</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Other: <a href="mjpeg.html">MJPEG</a>, <a href="net.html">.NET</a>, <a href="76i.html">76i</a>, <a href="ddr.html">DDR</a>, <a href="mp3.html">MP3</a>, <a href="pismo.html">Pismo</a>, <a href="chime.html">chime</a>, <a href="documents.html">documents</a>, <a href="joystick.html">joystick</a>, <a href="keyboard-mouse.html">keyboard/mouse</a>, <a href="phone.html">phone</a>
+</li></ul>
+</body>
+</html>

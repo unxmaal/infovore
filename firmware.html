@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>firmware</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>firmware</h1>
+<p>Claims: 88 Background: 5 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Firmware">Firmware</a>, <a href="https://en.wikipedia.org/wiki/BIOS">BIOS</a>, <a href="https://en.wikipedia.org/wiki/PlayStation_2">PlayStation 2</a>, <a href="https://en.wikipedia.org/wiki/Silicon_Graphics">Silicon Graphics</a>.</p>
+<p>Some systems, such as the PS1, PS2, and Alpha workstations, contain firmware in their BIOS or PROM, and certain add-in hardware is supported by allowing the PROM to load firmware from the hardware rather than hardcoding it. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> SGI developed its own firmware for some systems, and specific cards such as the X1s and X3s require SGI-specific firmware to communicate with the custom riser, often failing to work with non-SGI firmware. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Firmware can be updated to improve performance, fix stability issues, or enable new features, but updates can sometimes cause problems such as disc corruption, system lockups, or boot failures. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Firmware can be implemented independently of the OS, allowing for tasks such as secure erase or the use of standard DIMMs as NVDIMMs in case of power failure. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> Firmware updates can be performed using various tools and methods, including flashing via a floppy, using a custom harness, or modifying stock firmware by inserting strings at specific addresses. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> Firmware and microcode are typically undocumented, similar to proprietary drivers. <sup><a href="#s18">18</a></sup> Firmware can be reflashed. <sup><a href="#s19">19</a></sup> Updating firmware can improve saving features and booting speed. <sup><a href="#s20">20</a></sup> Firmware can be dumped, and some Alpha firmware source is publicly available under open (but not open source) terms. <sup><a href="#s21">21</a></sup> Firmware can be modified to allow other rebadged avocent SIPs to connect, though this requires the latest firmware and explicit IP Fragmentation per port. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> The latest firmware for Indigos includes fixes for SCSI2 issues. <sup><a href="#s24">24</a></sup> The firmware which is modded is on a separate memory chip from the eMMC, which holds the Wii U Menu, other software titles and user data. <sup><a href="#s25">25</a></sup> SGI firmware (070-xxxx-yyy) is needed for the board, as a generic 4211 might not work in IRIX. <sup><a href="#s26">26</a></sup> X3 units can be flashed with SGI firmware, and new ones can still be obtained from eBay, though they come with HP firmware but will boot and the Prism can flash them. <sup><a href="#s27">27</a></sup> The newest firmware for the ZULUSCSI can display status over USB and can sequentially image multiple drives. <sup><a href="#s28">28</a></sup> A specific router with the firmware to support it is probably required for larger IP53/IP59 hardware. <sup><a href="#s29">29</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The PS1 and PS2 have firmware and a Unix-based OS in their BIOS. (user-22f9, 2020-07-25, exchange 10025, check: uncheckable)</li>
+<li id="s2">Some add-in hardware was supported by allowing the PROM to load firmware from the hardware, not all being hardcoded into the PROM. (user-cdcd, 2020-09-26, exchange 221071, check: uncheckable)</li>
+<li id="s3">FTP contains firmware for Alpha workstations, including versions 6.9 and 7.1. (user-f9d4, 2021-01-06, exchange 13559, check: supported)</li>
+<li id="s4">The X1s and X3s cards require SGI-specific firmware to communicate with the custom riser and may not work with non-SGI firmware. (user-59b9, 2020-08-27, exchange 75328, check: uncheckable)</li>
+<li id="s5">SGI had its own firmware for some systems. (user-1361, 2021-01-06, exchange 13563, check: uncheckable)</li>
+<li id="s6">the firmware for the scsi2sd v6 on the 840av causes disk corruption on write with newer versions, but the older v6.5.2 works fine; the author is working on fixing it. (user-17cb, 2020-01-05, exchange 143555, check: supported)</li>
+<li id="s7">Upgrading firmware can corrupt disc and partition tables on certain hosts, but may improve speed. (user-17cb, 2020-01-05, exchange 143556, check: uncheckable)</li>
+<li id="s8">The FireGL X1s with HP firmware do not work in the Prism brick; the system locks up when trying to load the EFI. (user-59b9, 2020-09-18, exchange 75377, check: uncheckable)</li>
+<li id="s9">X3s with HP firmware will not boot with SLES9, while the same cards with SGI firmware work; installing SLES9 from scratch with HP cards may be attempted. (user-59b9, 2020-09-18, exchange 75378, check: uncheckable)</li>
+<li id="s10">Updating firmware can help with RAM detection issues. (user-22f9, 2021-03-19, exchange 231428, check: uncheckable)</li>
+<li id="s11">Upgrading the firmware on the DVD drive is necessary to boot from DVDs. (user-d903, 2022-03-11, exchange 239560, check: uncheckable)</li>
+<li id="s12">The Tezro with D3-S4610 shows improved SCSI stability with updated firmware; 3 warm reboots had one timeout. The fix made a difference but wasn't perfect. The machine boots cold with some SCSI timeouts. The drive can be (user-15a0, 2022-11-16, exchange 105652, check: supported)</li>
+<li id="s13">Secure erase is firmware-implemented and can be done independently of the OS, useful for flash disks that may not fully erase. (user-c831, 2021-04-19, exchange 16743, check: uncheckable)</li>
+<li id="s14">The firmware can use a portion of standard DIMMs as NVDIMMs and transfer data to a dedicated NVMe SSD in case of power failure. (user-ce5a, 2021-06-06, exchange 17781, check: uncheckable)</li>
+<li id="s15">The display requires a firmware floppy to function, and it hangs at the 'Starting CPU' step as described in the manual. (user-3c10, 2020-07-30, exchange 175266, check: uncheckable)</li>
+<li id="s16">The Gotek had bad firmware out of the box and required a custom harness to flash it, which would crash halfway through. (user-b7c4, 2021-06-06, exchange 17769, check: uncheckable)</li>
+<li id="s17">The provided C file modifies the stock firmware by inserting strings at specific addresses. (user-37bb, 2022-04-28, exchange 206933, check: uncheckable)</li>
+<li id="s18">Firmware and microcode are typically undocumented, similar to proprietary drivers. (user-c831, 2023-06-09, exchange 208831, check: uncheckable)</li>
+<li id="s19">Firmware can be reflashed. (user-9528, 2023-07-22, exchange 216471, check: uncheckable)</li>
+<li id="s20">updating firmware can improve saving features and booting speed. (user-b4f4, 2024-07-05, exchange 234361, check: uncheckable)</li>
+<li id="s21">Some Alpha firmware source is publicly available under surprisingly open (but not open source) terms. (user-e532, 2025-03-20, exchange 235633, check: uncheckable)</li>
+<li id="s22">There’s a good blog article somewhere on hacking the firmware to allow other rebadged avocent SIPs to connect (user-f190, 2025-12-27, exchange 213458, check: uncheckable)</li>
+<li id="s23">It does fix the problem but requires the latest firmware and explicit IP Fragmentation per port. (user-616d, 2026-03-09, exchange 242347, check: uncheckable)</li>
+<li id="s24">The latest firmware for Indigos includes fixes for SCSI2 issues. (user-17cb, 2026-05-09, exchange 226446, check: uncheckable)</li>
+<li id="s25">The firmware which you mod is on a separate memory chip from the eMMC, the eMMC holds the Wii U Menu, other software titles and user data (user-f763, 2026-07-21, exchange 241921, check: uncheckable)</li>
+<li id="s26">SGI firmware (070-xxxx-yyy) is needed for the board, a generic 4211 might not work in IRIX (user-86e1, 2026-07-21, exchange 214228, check: supported)</li>
+<li id="s27">X3 flashed with SGI firmware. You can still get new ones from eBay (with HP f/w but they’ll boot and the Prism can flash them). (user-5906, 2026-07-30, exchange 244253, check: uncheckable)</li>
+<li id="s28">The newest firmware for the ZULUSCSI can display status over USB, and it can sequentially image multiple drives. (user-616d, 2026-08-13, exchange 226867, check: uncheckable)</li>
+<li id="s29">A specific router with the firmware to support it is probably required for larger IP53/IP59 hardware. (user-b1da, 2026-08-20, exchange 125033, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="firmware-image.html">firmware image</a> (3)
+</li>
+<li><a href="firmware-update.html">firmware update</a> (9)
+</li>
+<li><a href="firmware-version.html">firmware version</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="g5.html">G5</a>, <a href="indigo.html">Indigo</a>, <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="onyx350.html">Onyx350</a>, <a href="onyx4.html">Onyx4</a>, <a href="origin-350.html">Origin 350</a>, <a href="ps1.html">PS1</a>, <a href="powermac.html">PowerMac</a>, <a href="tezro.html">Tezro</a>, <a href="vw320.html">VW320</a>, <a href="machine.html">machine</a>, <a href="rackmount.html">rackmount</a>
+</li>
+<li>Graphics: <a href="firegl-x1.html">FireGL X1</a>, <a href="graphics.html">graphics</a>
+</li>
+<li>Operating systems: <a href="alphabios.html">AlphaBIOS</a>, <a href="irix.html">IRIX</a>, <a href="os.html">OS</a>, <a href="sles9.html">SLES9</a>, <a href="win2k.html">Win2k</a>, <a href="windows-2000-pro.html">Windows 2000 Pro</a>, <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="github.html">GitHub</a>, <a href="ps2.html">PS2</a>, <a href="driver.html">driver</a>, <a href="microcode.html">microcode</a>, <a href="partition-table.html">partition table</a>
+</li>
+<li>Parts and peripherals: <a href="zuluscsi.html">ZuluSCSI</a>, <a href="dat-drive.html">DAT drive</a>, <a href="dimm.html">DIMM</a>, <a href="dvd-drive.html">DVD drive</a>, <a href="eprom.html">EPROM</a>, <a href="gotek.html">Gotek</a>, <a href="ide-controller.html">IDE controller</a>, <a href="io10.html">IO10</a>, <a href="prom.html">PROM</a>, <a href="prism-brick.html">Prism brick</a>, <a href="scsi2sd-v6.html">SCSI2SD v6</a>, <a href="vrm.html">VRM</a>, <a href="zuluscsi-blaster.html">ZuluSCSI Blaster</a>, <a href="card.html">card</a>, <a href="connector.html">connector</a>, <a href="drive.html">drive</a>, <a href="floppy.html">floppy</a>, <a href="riser.html">riser</a>, <a href="router.html">router</a>, <a href="video-card.html">video card</a>
+</li>
+<li>Standards and interfaces: <a href="x3.html">X3</a>, <a href="x1.html">X1</a>, <a href="efi.html">EFI</a>, <a href="gbscsi.html">GBSCSI</a>, <a href="nvme.html">NVMe</a>, <a href="nvme-ssd.html">NVMe SSD</a>, <a href="pci-card.html">PCI card</a>, <a href="uefi.html">UEFI</a>, <a href="usb.html">USB</a>, <a href="serial-communication.html">serial communication</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="dec.html">DEC</a>, <a href="cisco-switch.html">Cisco switch</a>, <a href="sgi-disc.html">SGI disc</a>, <a href="sun.html">Sun</a>, <a href="ebay.html">eBay</a>
+</li>
+<li>Other: <a href="7-1.html">7.1</a>, <a href="9800-pro.html">9800 Pro</a>, <a href="aa3000.html">AA3000+</a>, <a href="atiflash.html">ATIFlash</a>, <a href="bfg9060.html">BFG9060</a>, <a href="bitsavers.html">Bitsavers</a>, <a href="enp10.html">ENP10</a>, <a href="ev5.html">EV5</a>, <a href="gr1-2.html">GR1.2</a>, <a href="gr1-5.html">GR1.5</a>, <a href="hp-ux-11i.html">HP-UX 11i</a>, <a href="mips-irix.html">MIPS/IRIX</a>, <a href="palcode.html">PALcode</a>, <a href="qlogic-chips.html">Qlogic chips</a>, <a href="resdmac.html">ReSDMAC</a>, <a href="hardware-raid.html">hardware RAID</a>, <a href="host.html">host</a>, <a href="update.html">update</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX install</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX install</h1>
+<p>Claims: 14 Part of <a href="irix.html">IRIX</a></p>
+<p>The hostname can be changed at any time, but it is safer to install the base IRIX OS first and add additional software such as demos afterward, since installing extras during the initial install might cause issues. <sup><a href="#s1">1</a></sup> The SGI forums provide a guide for manually setting up an IRIX install. <sup><a href="#s2">2</a></sup> A missing patch can cause a machine to splash to a black screen during an IRIX install, which can be resolved by applying the patch. <sup><a href="#s3">3</a></sup> Every IRIX install can mount NFS shares as part of the base installation. <sup><a href="#s4">4</a></sup> A Seagate drive with a newer IRIX install from an Indy will not let the user wipe the drive, and the fx version of the installer has issues creating a filesystem, stopping at 4190 blocks and making unusual noise. <sup><a href="#s5">5</a></sup> The IRIX install can be checked with diagnostics from the PROM. <sup><a href="#s6">6</a></sup> A fatal error and compilation terminated indicate that the compiler failed to find necessary headers, suggesting an incomplete IRIX install without development libraries. <sup><a href="#s7">7</a></sup> The IRIX install includes the IDE diagnostics, which can be run from the hard disk or install media. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The hostname can be changed at any time, but installing additional software like demos during the initial IRIX install might cause issues; it's safer to install the base OS first, then add extras. (user-d903, 2019-11-23, exchange 216681, check: uncheckable)</li>
+<li id="s2">The SGI forums have a guide for manually setting up an IRIX install. (user-a446, 2020-09-27, exchange 11198, check: uncheckable)</li>
+<li id="s3">A missing patch can cause a machine to splash to a black screen during an IRIX install, which can be resolved by applying the patch. (user-e4d0, 2021-04-27, exchange 16969, check: uncheckable)</li>
+<li id="s4">Every single irix install I've ever done can mount NFS shares as part of base installation (user-f229, 2022-03-20, exchange 206701, check: uncheckable)</li>
+<li id="s5">The Seagate drive with a newer IRIX install from an Indy won't let the user wipe the drive, and the fx version of the installer seems to have issues creating a filesystem, stopping at 4190 blocks and making unusual noise (user-8de9, 2022-04-01, exchange 241033, check: supported)</li>
+<li id="s6">The IRIX install can be checked with diagnostics from the PROM. (user-22f9, 2023-10-10, exchange 41385, check: uncheckable)</li>
+<li id="s7">fatal error and compilation terminated indicate that the compiler failed to find necessary headers, suggesting an incomplete IRIX install without development libraries. (user-07ed, 2024-03-19, exchange 218336, check: uncheckable)</li>
+<li id="s8">The IRIX install includes the IDE diagnostics, which can be run from the hard disk or install media. (user-e4d0, 2024-11-15, exchange 112783, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Software: <a href="development-libraries.html">development libraries</a>, <a href="hostname.html">hostname</a>, <a href="patch.html">patch</a>
+</li>
+<li>Parts and peripherals: <a href="nvram.html">NVRAM</a>, <a href="prom.html">PROM</a>, <a href="seagate-drive.html">Seagate drive</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CHD</h1>
+<p>Claims: 7 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/MAME">MAME</a>.</p>
+<p>CHD is MAME's block-compressed drive format, used by the disk image. <sup><a href="#s1">1</a></sup> To use an ISO as a bootable image on IRIX, it must be renamed to ISO or converted to a CHD. <sup><a href="#s2">2</a></sup> Adding a new file to MAME's softlist requires dumping it to BIN+CUE (preferably MODE1/2352), converting it to CHD using chdman, and using the SHA1 to create a new XML entry. <sup><a href="#s3">3</a></sup> Adding Alias3 (PowerAnimator3) or Maya to MAME involves creating CHDs and adding XML entries, with MAME64 validating the softlist. <sup><a href="#s4">4</a></sup> A BSD-licensed version of full CHD support is being developed in Rust, with some performance impact on one codec. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">CHD, MAME's block-compressed drive format is used by the disk image. (user-2223, 2019-02-23, exchange 92258, check: uncheckable)</li>
+<li id="s2">To use an ISO as a bootable image on IRIX, rename it to ISO or create a CHD. (user-3663, 2020-01-12, exchange 92450, check: uncheckable)</li>
+<li id="s3">To add a new file to MAME's softlist, it must be dumped to BIN+CUE (preferably MODE1/2352), converted to CHD using chdman, and the SHA1 is used to create a new XML entry. (user-3663, 2020-09-13, exchange 220167, check: supported)</li>
+<li id="s4">For adding Alias3 (PowerAnimator3) or Maya to MAME, it involves creating CHDs and adding XML entries, with MAME64 validating the softlist. (user-3663, 2020-09-13, exchange 220167, check: uncheckable)</li>
+<li id="s5">A BSD-licensed version of full CHD support is being developed in Rust, with some performance impact on one codec. (user-c986, 2026-06-20, exchange 220475, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="chd-files.html">CHD files</a> (6)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="os-version.html">OS version</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="alias-3.html">Alias 3</a>, <a href="maya.html">Maya</a>, <a href="rust.html">Rust</a>
+</li>
+<li>Other: <a href="sha1.html">SHA1</a>
+</li></ul>
+</body>
+</html>

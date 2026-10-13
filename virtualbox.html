@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VirtualBox</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VirtualBox</h1>
+<p>Claims: 46 Background: 8 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/VirtualBox">VirtualBox</a>.</p>
+<p>VirtualBox is open source software that emulates Intel-based systems, so it cannot run operating systems using other architectures such as IRIX or the SPARC and HPPA versions of certain systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> VirtualBox is available for Windows, Mac, and Mac/ARM64, and can be installed using Chocolatey on Windows or brew cask on macOS. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> VirtualBox supports bridged networking, which may require the correct network card and disabling firewalls, and can boot from a second disk. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> VirtualBox can emulate a Soundblaster 16 and the VESA driver works in it for OPENSTEP, but its ATA driver does not support ATA33 or later or SATA. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> VirtualBox can run various operating systems, including SCO OpenServer, OS X El Capitan at native resolution, DOS, PC DOS 2000, and Maya 4.5 on Windows XP. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> VirtualBox can convert VHDs to .img or .iso, and can use Hyper-V when it is enabled on the host, which can cause memory issues in VMs. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> VirtualBox has known issues, including kernel module problems that can cause SSH failures, networking problems in containers, and failures to start VMs with exit code 1. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> VirtualBox is a virtualization platform that can emulate x86 PC hardware, allowing software such as an L3 controller to run under it with some configuration. <sup><a href="#s27">27</a></sup> It can run IRIX on an Indigo by setting the host PC's network configuration to match the Indigo's defaults and bridging the virtual network interface. <sup><a href="#s28">28</a></sup> An Octane can connect to a Windows XP VM via bridged networking by configuring the VM in VirtualBox and setting a static IP on the host PC's network interface. <sup><a href="#s29">29</a></sup> VirtualBox supports USB passthrough for flash mode. <sup><a href="#s30">30</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">VirtualBox is open source. (user-580a, 2020-08-02, exchange 10253, check: uncheckable)</li>
+<li id="s2">VirtualBox emulates Intel-based systems; anything before Tiger won't work due to architecture. (user-9c31, 2020-09-11, exchange 92591, check: uncheckable)</li>
+<li id="s3">IRIX cannot run on Virtualbox as they are fundamentally different architectures. (user-e04c, 2020-04-23, exchange 220149, check: uncheckable)</li>
+<li id="s4">VirtualBox cannot emulate IRIX due to its architecture. (user-22f9, 2020-09-11, exchange 92590, check: uncheckable)</li>
+<li id="s5">You can use Previous or Virtualbox to run the x86 version of it, and pcem is another option; some emulators may not support the SPARC or HPPA versions of it. (user-7b1c, 2023-04-30, exchange 37703, check: uncheckable)</li>
+<li id="s6">To install software on Windows, use Chocolatey (choco) to install Git and VirtualBox. (user-f229, 2019-01-03, exchange 76716, check: uncheckable)</li>
+<li id="s7">Using brew cask for Vagrant, VirtualBox, and Ansible works without versioning issues on macOS 10.13. (user-d903, 2019-10-01, exchange 3715, check: supported)</li>
+<li id="s8">Virtualbox for Mac/ARM64 is available. (user-7b1c, 2023-02-17, exchange 231993, check: uncheckable)</li>
+<li id="s9">Bridged networking in VirtualBox requires the correct network card, and disabling firewalls may be necessary for network connectivity. (user-22f9, 2019-02-27, exchange 803, check: uncheckable)</li>
+<li id="s10">Virtualbox supports bridged mode, and KVM/Qemu does too, though it's more complex to set up. (user-7b1c, 2022-09-22, exchange 32805, check: uncheckable)</li>
+<li id="s11">virtualbox can boot from a second disk. (user-c831, 2023-01-24, exchange 82897, check: uncheckable)</li>
+<li id="s12">VirtualBox can emulate a Soundblaster 16 for OPENSTEP. (user-7b1c, 2020-02-27, exchange 231174, check: supported)</li>
+<li id="s13">The VESA driver works in VirtualBox for OPENSTEP. (user-7b1c, 2020-02-27, exchange 231174, check: uncheckable)</li>
+<li id="s14">The ATA driver in VirtualBox for OPENSTEP doesn't support ATA33 or later or SATA. (user-7b1c, 2020-02-27, exchange 231174, check: uncheckable)</li>
+<li id="s15">sco openserver runs in virtualbox (user-a74c, 2020-04-02, exchange 74049, check: uncheckable)</li>
+<li id="s16">OS X El Capitan can run in native resolution on VirtualBox (user-22f9, 2020-07-25, exchange 10016, check: uncheckable)</li>
+<li id="s17">Installing DOS on a CF card can be challenging due to partitioning and formatting issues, but using a Windows 10 PC with VirtualBox can bypass these problems. (user-b4f4, 2021-03-18, exchange 233885, check: supported)</li>
+<li id="s18">4.52 boots in Virtualbox but not in VMWare Workstation. (user-7b1c, 2022-09-28, exchange 33014, check: supported)</li>
+<li id="s19">PC DOS 2000 can run most DOS software in VirtualBox with Pentium Pro-era hardware. (user-15a0, 2022-11-11, exchange 222632, check: supported)</li>
+<li id="s20">Maya 4.5 runs in VirtualBox on Windows XP with OpenGL acceleration. (user-580a, 2021-04-15, exchange 16571, check: supported)</li>
+<li id="s21">Virtualbox can convert VHDs to .img or .iso, which can be written to a CF card with Etcher. (user-37bb, 2021-07-25, exchange 217171, check: uncheckable)</li>
+<li id="s22">VirtualBox can use Hyper-V when it's enabled on the host, which can cause memory issues in VMs. (user-8307, 2021-07-13, exchange 205242, check: uncheckable)</li>
+<li id="s23">VirtualBox has to use Hyper-V to access hardware virtualization features when Hyper-V is enabled. (user-ba81, 2021-07-13, exchange 205242, check: uncheckable)</li>
+<li id="s24">VirtualBox kernel module issues can cause SSH failures. (user-5510, 2023-08-10, exchange 209035, check: uncheckable)</li>
+<li id="s25">Virtualbox might fuck up the networking in containers, unlike a normal L2 switch, due to ipforwarding not being enabled on the base host. (user-b1da, 2022-02-22, exchange 26124, check: uncheckable)</li>
+<li id="s26">VirtualBox failed to start a VM with exit code 1. (user-17cb, 2019-12-31, exchange 77037, check: supported)</li>
+<li id="s27">The L3 controller can be emulated using x86 PC hardware and its software can run under VMware or Virtual Box with some configuration. (user-27ce, 2024-04-18, exchange 45668, check: uncheckable)</li>
+<li id="s28">Reanimator can be used to run IRIX on an Indigo with VirtualBox by setting the host PC's network configuration to match the Indigo's defaults and bridging the virtual network interface. (user-986f, 2024-11-21, exchange 50678, check: supported)</li>
+<li id="s29">An Octane can connect to a Windows XP VM via bridged networking by configuring the VM in VirtualBox and setting a static IP on the host PC's network interface. (user-986f, 2025-10-30, exchange 88508, check: supported)</li>
+<li id="s30">The Windows Phone emulator runs on KVM/Qemu but not on Virtualbox, which supports USB passthrough for flash mode. (user-b4f4, 2025-08-06, exchange 234591, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Processors: <a href="pentium-pro.html">Pentium Pro</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="windows-xp.html">Windows XP</a>, <a href="windows.html">Windows</a>, <a href="aix.html">AIX</a>, <a href="dos.html">DOS</a>, <a href="pc-dos-2000.html">PC DOS 2000</a>, <a href="tiger.html">Tiger</a>, <a href="windows-10.html">Windows 10</a>, <a href="windows-98.html">Windows 98</a>, <a href="kernel-module.html">kernel module</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="vagrant.html">Vagrant</a>, <a href="hyperv.html">HyperV</a>, <a href="booterizer.html">Booterizer</a>, <a href="cf-card.html">CF card</a>, <a href="maya-4-5.html">Maya 4.5</a>, <a href="reanimator.html">Reanimator</a>, <a href="vesa-driver.html">VESA driver</a>, <a href="ansible.html">ansible</a>, <a href="firewall.html">firewall</a>, <a href="git.html">git</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="l3-controller.html">L3 controller</a>, <a href="network-card.html">network card</a>
+</li>
+<li>Standards and interfaces: <a href="openstep.html">OPENSTEP</a>, <a href="ssh.html">SSH</a>, <a href="bootp.html">bootp</a>
+</li>
+<li>Companies: <a href="vmware.html">VMware</a>, <a href="iso.html">ISO</a>, <a href="red-hat.html">Red Hat</a>, <a href="sco-openserver.html">SCO Openserver</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="kvm-qemu.html">KVM/Qemu</a>, <a href="img.html">.img</a>, <a href="pcem.html">pcem</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VLAN</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VLAN</h1>
+<p>Claims: 17</p>
+<p>A VLAN can be used to isolate IoT devices, limiting their network access to DNS/NTP only. <sup><a href="#s1">1</a></sup> Each VLAN gets its own /24 (and /64). <sup><a href="#s2">2</a></sup> A layer 3 switch can bridge between VLANs if the devices use TCP/IP. <sup><a href="#s3">3</a></sup> WLAN and VLAN are separate for the alarm system. <sup><a href="#s4">4</a></sup> The Indigo manages to communicate with the VM running on the VLAN without NAT. <sup><a href="#s5">5</a></sup> A tagged interface to a host is only needed if you want multiple VLANs or a trunk on the interface; otherwise the switch can untag it. <sup><a href="#s6">6</a></sup> You can run one VLAN at MTU 1500 for normal usage with the default route, and another at MTU 9000 for things like NFS, letting the switch handle the segregation. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">A separate VLAN for IoT devices limits their network access to DNS/NTP. (user-7b1c, 2022-08-24, exchange 32264, check: uncheckable)</li>
+<li id="s2">Each VLAN gets its own /24 (and /64). (user-7b1c, 2022-09-14, exchange 207666, check: supported)</li>
+<li id="s3">A layer 3 switch can bridge between 'main' VLAN and IOT VLAN if the devices use TCP/IP. (user-d5ee, 2025-07-08, exchange 242290, check: supported)</li>
+<li id="s4">WLAN and VLAN are separate for the alarm system. (user-d5ee, 2025-07-08, exchange 242290, check: uncheckable)</li>
+<li id="s5">The Indigo manages to communicate with the VM running on the VLAN without NAT. (user-7973, 2025-09-26, exchange 216808, check: supported)</li>
+<li id="s6">Why run a tagged interface to the IRIX host unless you want to have multiple VLANs or a trunk on the interface? Otherwise just let the switch untag it (user-86e1, 2026-08-28, exchange 226948, check: uncheckable)</li>
+<li id="s7">One vlan at mtu 1500 for normal usage, default route goes here. another at 9000 for things like NFS. Let the switch handle the segregation (user-07ed, 2026-08-28, exchange 226948, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>, <a href="indigo2.html">Indigo2</a>, <a href="ubuntu-server.html">Ubuntu Server</a>
+</li>
+<li>Graphics: <a href="8-bit-graphics.html">8-bit graphics</a>
+</li>
+<li>Operating systems: <a href="debian.html">Debian</a>, <a href="irix.html">IRIX</a>, <a href="vm.html">VM</a>
+</li>
+<li>Software: <a href="firewall.html">firewall</a>
+</li>
+<li>Parts and peripherals: <a href="controller.html">controller</a>, <a href="port.html">port</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet-interface.html">Ethernet interface</a>
+</li>
+<li>Other: <a href="switch.html">switch</a>, <a href="lan.html">LAN</a>, <a href="target.html">TARGET</a>, <a href="unifi.html">UniFi</a>, <a href="subnet.html">subnet</a>
+</li></ul>
+</body>
+</html>

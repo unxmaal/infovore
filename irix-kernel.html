@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX kernel</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX kernel</h1>
+<p>Claims: 13 Part of <a href="irix.html">IRIX</a></p>
+<p>The IRIX kernel has contributions from SGI and AT&amp;T, with some Sun code in NFS. <sup><a href="#s1">1</a></sup> The IRIX kernel can be rebuilt, and miniroots are necessary for unsupported platforms, with rebuilding for an unsupported platform involving transferring kernel bits from a supported system. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The IRIX kernel can be loaded from a TFTP server, an old Zulu, or a CD with EFS filesystem. <sup><a href="#s4">4</a></sup> The IRIX kernel disables PS2 ports on IO6 unless a media daughter card is present. <sup><a href="#s5">5</a></sup> The IRIX kernel has a brain-dead way to find SCSI controllers, requiring a hack for NVMe controllers; typically, systems look at /hw/scsi_ctlr instead of /hw/ql/2. <sup><a href="#s6">6</a></sup> You would need a PCI bridge driver and PCI layer compiled into the IRIX kernel. <sup><a href="#s7">7</a></sup> Porting amdgpu to IRIX kernel would require adding new kernel API to Mesa and possibly writing a queue server and memory allocator. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IRIX kernel has contributions from SGI and AT&amp;T, with some Sun code in NFS. (user-22f9, 2025-04-11, exchange 224876, check: uncheckable)</li>
+<li id="s2">The IRIX kernel can be rebuilt, and miniroots are necessary for unsupported platforms. (user-b4f4, 2020-05-30, exchange 78413, check: uncheckable)</li>
+<li id="s3">Rebuilding the IRIX kernel for an unsupported platform involves transferring kernel bits from a supported system. (user-b4f4, 2020-05-30, exchange 78413, check: uncheckable)</li>
+<li id="s4">The IRIX kernel can be loaded from a TFTP server, an old Zulu, or a CD with EFS filesystem. (user-7973, 2025-11-25, exchange 219278, check: uncheckable)</li>
+<li id="s5">The IRIX kernel disables PS2 ports on IO6 unless a media daughter card is present. (user-86e1, 2025-08-15, exchange 225328, check: uncheckable)</li>
+<li id="s6">The IRIX kernel has a brain-dead way to find SCSI controllers, requiring a hack for NVMe controllers; typically, systems look at /hw/scsi_ctlr instead of /hw/ql/2. (user-3e2d, 2026-01-04, exchange 72918, check: supported)</li>
+<li id="s7">You would need a PCI bridge driver and PCI layer compiled into the IRIX kernel. (user-2a3c, 2026-03-18, exchange 226243, check: uncheckable)</li>
+<li id="s8">Porting amdgpu to IRIX kernel would require adding new kernel API to Mesa and possibly writing a queue server and memory allocator. (user-3e2d, 2026-04-01, exchange 215950, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="tftp-server.html">TFTP server</a>
+</li>
+<li>Operating systems: <a href="unix-kernel.html">Unix kernel</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="mesa.html">Mesa</a>, <a href="amdgpu.html">amdgpu</a>
+</li>
+<li>Parts and peripherals: <a href="ps-2-port.html">PS/2 port</a>, <a href="scsi-controller.html">SCSI controller</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="at-t.html">AT&amp;T</a>, <a href="io6.html">IO6</a>
+</li></ul>
+</body>
+</html>

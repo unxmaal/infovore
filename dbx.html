@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dbx</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>dbx</h1>
+<p>Claims: 26 Background: 8 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Dbx_%28debugger%29">Dbx (debugger)</a>.</p>
+<p>dbx is the native debugger for MIPS and the debugger for IRIX, serving as the SGI equivalent of gdb. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It is a source-level debugger that can print a backtrace, debug threads, and inspect core files, sometimes providing more useful information than gdb for backtracing in IRIX core files. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> dbx is part of the mipspro release and can be used for general-purpose debugging alongside tools like ogldebug. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> However, dbx has significant limitations: it can debug C but not C++ with name mangling, has problems with gcc binaries, and may not load files or generate the info it understands. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> It is considered an inferior debugger compared to gdb, which can handle both symbol mangling schemes, and it faces issues with pthreads, version mismatches, and identifying certain processors. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">dbx is the native debugger for MIPS. (user-8547, 2019-03-15, exchange 67126, check: uncheckable)</li>
+<li id="s2">The debugger for IRIX is dbx. (user-0de0, 2025-04-12, exchange 87030, check: uncheckable)</li>
+<li id="s3">dbx is the SGI equivalent of gdb and can print a backtrace for debugging. (user-42cf, 2019-02-03, exchange 66987, check: uncheckable)</li>
+<li id="s4">dbx is a source-level debugger that allows the user to trace the execution of a given object-file as well as a pool of arbitrary processes. (user-1361, 2020-12-20, exchange 13018, check: uncheckable)</li>
+<li id="s5">dbx can provide more useful information than gdb for backtracing in IRIX core files. (user-9860, 2021-12-18, exchange 80495, check: uncheckable)</li>
+<li id="s6">dbx can provide a stacktrace from a core file. (user-6afa, 2022-02-13, exchange 25760, check: uncheckable)</li>
+<li id="s7">dbx is part of the mipspro release being installed. (user-c831, 2023-10-04, exchange 215415, check: uncheckable)</li>
+<li id="s8">OpenGL debugging tools include ogldebug for OpenGL programming errors and dbx for general-purpose debugging. (user-c831, 2023-10-07, exchange 209352, check: uncheckable)</li>
+<li id="s9">dbx can debug C but not C++ with name mangling. (user-42cf, 2021-04-29, exchange 69572, check: uncheckable)</li>
+<li id="s10">`dbx` has issues with gcc binaries due to symbol table differences; it prefers llvm binaries but still has limitations. (user-9860, 2023-10-08, exchange 41349, check: supported)</li>
+<li id="s11">llvm may not generate info that dbx understands due to struct population issues. (user-9860, 2023-10-20, exchange 209431, check: uncheckable)</li>
+<li id="s12">dbx won't load the file. (user-7973, 2024-08-14, exchange 71504, check: uncheckable)</li>
+<li id="s13">dbx is an inferior debugger compared to sgug gdb, which has a minor bug but is still preferable; the great ancient compiler and g++ have different symbol mangling but gdb can handle both. (user-42cf, 2023-07-04, exchange 39075, check: uncheckable)</li>
+<li id="s14">version mismatch can cause issues when installing dbx. (user-d903, 2023-10-04, exchange 215415, check: uncheckable)</li>
+<li id="s15">GDB has issues with pthreads and other things built with GCC; dbx has problems with GCC-built programs. (user-6afa, 2024-08-14, exchange 215547, check: uncheckable)</li>
+<li id="s16">DBX cannot identify an RM7000C in an O2 and assumes an R4k. (user-757f, 2026-05-19, exchange 216013, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="r4000.html">R4000</a>, <a href="rm7000c.html">RM7000C</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="gdb.html">gdb</a>, <a href="llvm.html">LLVM</a>, <a href="mipspro.html">MIPSpro</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="core.html">core</a>, <a href="g.html">g++</a>
+</li></ul>
+</body>
+</html>

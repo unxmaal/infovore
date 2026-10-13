@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ncurses</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ncurses</h1>
+<p>Claims: 17</p>
+<p>ncurses is a library that provides text window-based user interfaces and a promptable command line, and it is a distinct library from curses (the term 'ncursed' is a joke). <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Building ncurses often requires manual configuration: the package's Makefile needs include and library paths set manually, and using both -I/usr/people/dillera/.local/include and -I/usr/people/dillera/.local/include/curses causes issues that are resolved with -DUSE_NCURSES_H and the correct path. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The build script includes &lt;curses/ncurses.h&gt;, but the ncurses headers are located in &lt;ncurses.h&gt;, which causes compilation errors. <sup><a href="#s5">5</a></sup> Wide character support (for Unicode wide characters) can be enabled with --enable-widec during configure, though this wide support is not available on IRIX. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> ncurses is used by several applications: qodem and weechat require wide character support, mutt can link against ncurses instead of ncursesw to avoid seg faults or bus errors, and the ncurses CLI mastodon client on IRIX is called nanotodon. <sup><a href="#s6">6</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Building git with Didbs depends on ncurses along with diffutils, grep, bash, openssl, curl, tk, and expat, and the sgug-rse toolchain includes ncurses and other pre-built packages to simplify builds without conflicts with didbs. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> ncurses may not be well-supported in winterm, aterm, or other terminals and may need to be avoided in CLI projects; weechat requires proper UTF-8 support to render box-drawing characters, and aterm and mrxvt issues are related to font configuration. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> Calling delwin() when leaving an info panel in a ncurses application can cause a segfault upon re-opening the panel, an issue resolved in version V20240713-2134. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">ncurses is a different library from curses; 'ncursed' is a joke. (user-6afa, 2020-07-30, exchange 10140, check: uncheckable)</li>
+<li id="s2">The iSeries has a text window-based UI like ncurses and a promptable command line. Its OS integrates a database and the RPG language is easy to learn for database operations. (user-22f9, 2019-07-28, exchange 203866, check: uncheckable)</li>
+<li id="s3">The package's Makefile requires manually setting include and library paths for ncurses. (user-f229, 2019-06-30, exchange 67314, check: uncheckable)</li>
+<li id="s4">Building with both -I/usr/people/dillera/.local/include and -I/usr/people/dillera/.local/include/curses causes issues, and using -DUSE_NCURSES_H with the correct path resolves it for ncurses headers. (user-f229, 2019-06-30, exchange 67315, check: uncheckable)</li>
+<li id="s5">The build script includes &lt;curses/ncurses.h&gt; but the ncurses headers are in &lt;ncurses.h&gt;, causing compilation errors. (user-f229, 2019-06-30, exchange 67313, check: uncheckable)</li>
+<li id="s6">ncurses wide support is needed for qodem and can be enabled with --enable-widec during configure. (user-2189, 2019-08-16, exchange 67754, check: uncheckable)</li>
+<li id="s7">ncurses with wide character support can be built using --enable-widec. (user-8547, 2019-08-16, exchange 67754, check: uncheckable)</li>
+<li id="s8">ncurses wide support is for Unicode wide characters, which IRIX does not support. (user-ba81, 2019-08-16, exchange 67754, check: uncheckable)</li>
+<li id="s9">Mutt can link against ncurses instead of ncursesw to avoid seg faults or bus errors. (user-6afa, 2020-07-02, exchange 215021, check: uncheckable)</li>
+<li id="s10">The ncurses CLI mastodon client on IRIX is called nanotodon. (user-7973, 2024-07-25, exchange 218478, check: uncheckable)</li>
+<li id="s11">The dependencies for building git with Didbs include diffutils, grep, ncurses, bash, openssl, curl, tk, and expat. (user-2d09, 2019-09-30, exchange 67968, check: uncheckable)</li>
+<li id="s12">The sgug-rse toolchain is built to first look in /usr/sgug and has ncurses and other pre-built packages, making it easier to build things without conflicts with didbs. (user-42cf, 2020-02-25, exchange 6576, check: uncheckable)</li>
+<li id="s13">ncurses is not well-supported in winterm, aterm, or other terminals, and may need to be avoided in CLI projects. (user-7973, 2024-05-11, exchange 215490, check: uncheckable)</li>
+<li id="s14">Weechat uses ncurses and requires proper UTF-8 support to render box-drawing characters correctly; aterm and mrxvt issues are related to font configuration. (user-17cb, 2026-02-15, exchange 73134, check: supported)</li>
+<li id="s15">Calling `delwin()` when leaving an info panel in a ncurses application can cause a segfault upon re-opening the panel, but this issue is resolved in version V20240713-2134. (user-7973, 2024-07-13, exchange 85414, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="aterm.html">aterm</a>, <a href="bash.html">bash</a>, <a href="didbs.html">didbs</a>, <a href="grep.html">grep</a>, <a href="mrxvt.html">mrxvt</a>, <a href="programs.html">programs</a>, <a href="sginet.html">sginet</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="winterm.html">winterm</a>
+</li>
+<li>Other: <a href="gnu.html">GNU</a>, <a href="weechat.html">Weechat</a>, <a href="fc31.html">fc31</a>, <a href="header.html">header</a>, <a href="iseries.html">iSeries</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gcc 8.2.0</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>gcc 8.2.0</h1>
+<p>Claims: 14 Part of <a href="gcc.html">GCC</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/FFmpeg">FFmpeg</a>.</p>
+<p>GCC 8.2.0 can compile C and C++ on IRIX 6.5, and a crosscompiler setup for IRIX is available with GCC 8.2.0 together with binutils including a linker. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> irixports allows choosing between GCC 4.7.4 and 8.2.0 with a gccversion variable, bootstrapped for both versions, and the pkgsrc bootstrap process works with a plain installation of GCC 8.2.0, requiring only the CC and CXX environment variables to be set to point to the gcc and g++ executables. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> GCC 8.2.0 has known failures with C++, but the amount of failing C++ tests is less than expected, and it prints colorful error messages. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> GCC 8.2.0 has issues with NaN and INFINITY, even with -std=c99, producing non-helpful error messages, and with -Werror it generates many warnings with older source. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> When compiling xz with GCC 8.2.0, the configure script might pick up a local definition of getopt_long from a header file, leading to compilation errors. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">gcc 8.2.0 can compile C and C++ on IRIX 6.5. (user-42cf, 2019-01-06, exchange 61, check: supported)</li>
+<li id="s2">Compilertron is a vagrant crosscompiler setup for IRIX, and GCC 8.2.0 with binutils including a linker is available. (user-ba81, 2019-01-29, exchange 203664, check: supported)</li>
+<li id="s3">The pkgsrc bootstrap process works with a plain installation of gcc 8.2.0, requiring only CC and CXX environment variables set to point to the gcc and g++ executables. (user-42cf, 2019-02-07, exchange 67010, check: supported)</li>
+<li id="s4">irixports now allows choosing between gcc 4.7.4 and 8.2.0 with a gccversion variable, bootstrapped for both versions. (user-ba81, 2019-06-17, exchange 214762, check: supported)</li>
+<li id="s5">The amount of failing C++ tests in GCC 8.2.0 is less than expected. (user-42cf, 2019-01-09, exchange 203644, check: supported)</li>
+<li id="s6">8.2.0 of GCC has known failures with C++ but prints colorful error messages. (user-42cf, 2019-01-23, exchange 198, check: supported)</li>
+<li id="s7">GCC 8.2.0 has issues with NaN and INFINITY, even with -std=c99, producing non-helpful error messages. (user-637b, 2019-03-17, exchange 1054, check: supported)</li>
+<li id="s8">gcc 8.2.0 with -Werror generates many warnings with older source. (user-42cf, 2019-07-16, exchange 67502, check: supported)</li>
+<li id="s9">when compiling xz with gcc 8.2.0, the configure script might pick up a local definition of `getopt_long` from a header file, leading to compilation errors. (user-2d09, 2019-09-05, exchange 67848, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="binutils.html">binutils</a>, <a href="bash-5-0.html">Bash 5.0</a>, <a href="compilertron.html">Compilertron</a>, <a href="mipspro.html">MIPSpro</a>, <a href="bash.html">bash</a>, <a href="configure-script.html">configure script</a>, <a href="ffmpeg.html">ffmpeg</a>, <a href="irixports.html">irixports</a>, <a href="pkgsrc.html">pkgsrc</a>
+</li>
+<li>Companies: <a href="gcc-4-7-4.html">gcc 4.7.4</a>
+</li>
+<li>Other: <a href="imagemagick.html">ImageMagick</a>, <a href="getopt-long.html">getopt_long</a>, <a href="mips-sgi-irix6-5.html">mips-sgi-irix6.5</a>, <a href="mkheaders.html">mkheaders</a>
+</li></ul>
+</body>
+</html>

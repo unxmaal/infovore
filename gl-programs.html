@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GL programs</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GL programs</h1>
+<p>Claims: 5 Part of <a href="gl.html">GL</a></p>
+<p>GL programs require the GLX extension to function. <sup><a href="#s1">1</a></sup> They can use pixel shaders to peg the GPU, even with GL 1.x through extensions, and complex geometry or many fullscreen quads can also stress it. <sup><a href="#s2">2</a></sup> GL programs that do texturing fall back to software routines if the underlying hardware can't do it, as is the case with XZ without TRAMs. <sup><a href="#s3">3</a></sup> Examples of emboss bump mapping and other graphics techniques can be found in GL programs and experiments. <sup><a href="#s4">4</a></sup> There are issues building GL programs against RSE right now, and it is something that still needs to be solved. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">GL programs require the GLX extension to function. (user-21b8, 2025-10-27, exchange 225615, check: uncheckable)</li>
+<li id="s2">GL programs can use pixel shaders to peg the GPU, even with GL 1.x through extensions; complex geometry or many fullscreen quads can also stress it. (user-21b8, 2024-02-17, exchange 71025, check: supported)</li>
+<li id="s3">GL programs that do texturing fall back to software routines if the underlying hardware can't do it, as is the case with XZ without TRAMs. (user-231e, 2026-04-13, exchange 200833, check: uncheckable)</li>
+<li id="s4">Examples of emboss bump mapping and other graphics techniques can be found in GL programs and experiments. (user-21b8, 2026-09-24, exchange 236181, check: uncheckable)</li>
+<li id="s5">there are issues building GL programs against RSE right now - it's something we need to solve still (user-6afa, 2021-12-12, exchange 215244, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Graphics: <a href="gpu.html">GPU</a>
+</li>
+<li>Software: <a href="rse.html">RSE</a>
+</li>
+<li>Other: <a href="texturing.html">texturing</a>
+</li></ul>
+</body>
+</html>

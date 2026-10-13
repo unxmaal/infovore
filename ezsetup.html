@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EZsetup</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>EZsetup</h1>
+<p>Claims: 5</p>
+<p>Deleting desktop templates on an Indy may require using EZSetup to change the machine name. <sup><a href="#s1">1</a></sup> EZsetup can add accounts when it errors out, even if the file is there and empty. <sup><a href="#s2">2</a></sup> EZsetup limits user passwords to 6-8 characters, while the `passwd` utility allows setting passwords to over 8 characters. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> You can rsh into an o350 to kill a hung ezsetup. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Deleting desktop templates on an Indy may require using EZSetup to change the machine name. (user-45c8, 2019-09-24, exchange 3617, check: supported)</li>
+<li id="s2">EZsetup can add accounts when it errors out, even if the file is there and empty. (user-b1da, 2020-04-24, exchange 7776, check: uncheckable)</li>
+<li id="s3">EZsetup limits user passwords to 6-8 characters, but `passwd` allows longer passwords. (user-b1da, 2020-04-25, exchange 7816, check: supported)</li>
+<li id="s4">The `passwd` utility allows setting passwords to over 8 characters, while EZsetup has a limit. (user-1446, 2020-08-18, exchange 233858, check: supported)</li>
+<li id="s5">can rsh into an o350 to kill a hung ezsetup (user-9860, 2021-09-03, exchange 221497, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="origin-350.html">Origin 350</a>
+</li>
+<li>Software: <a href="rsh.html">rsh</a>
+</li>
+<li>Other: <a href="passwd.html">passwd</a>
+</li></ul>
+</body>
+</html>

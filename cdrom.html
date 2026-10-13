@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CDROM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CDROM</h1>
+<p>Claims: 91 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<p>A CD-ROM can be used to boot and install software, either as an ISO image or as a SCSI disk, and the boot command varies based on the drive configuration and SCSI ID. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The CD-ROM must be assigned a SCSI ID, with ID 6 recommended for OBP to find it, and non-standard IDs may require manual configuration. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Boot issues can arise from a faulty or poorly connected CD-ROM, including problems with the SCSI cable, terminator, or dirty connectors, and a blank screen after installation may indicate the system cannot find the disk. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Some machines lack internal space for a CD-ROM and require an external SCSI model, while older drives cannot read CD-RWs due to their reflective layer. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The CD-ROM setup is often non-stock and picky with CD-Rs, especially those burnt at high speed, and CD-ROMs from that era may be broken due to leaking capacitors. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Boot commands for SGI machines can target a CD-ROM directly, using paths such as scsi(0)cdrompartitionbootecoff or scsicdrompartitionbootecoff depending on the SCSI channel and partition. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> Bootable CD-ROMs must support 512kb/sector, and SCSI emulators such as Zulu's CDROM emulation can be used for SGIs. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Installations of IRIX, A/UX, and ULTRIX can be performed using a CD-ROM, sometimes over a serial console, and ULTRIX installations may require setting the manufacturer/device name to fake the CD-ROM. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> The O2 has a built-in CD-ROM at SCSI ID 4, with a default SCSI ID of four unless physically changed, but it often does not function properly, with issues including a cracked cog on the tray mechanism and a bezel that does not close correctly. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> The CD-ROM can be swapped on a running system by ejecting it, and it may show up multiple times in hinv under different IDs. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> Other SGI models vary in CD-ROM support: the IO9 connector above the SCSI port may be for a SCSI backplane and CD-ROM, the 4D/50 does not recognize a CD-ROM through its PROM, and the charcoal reissue included CD-ROM, DVD-ROM, and tape drives. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> Tape can restore IRIX installations but is limited to IRIX versions earlier than 6.2 for booting, and XFS changes the on-disk format so the miniroot of the original install CD-ROM cannot read the installed system disk. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> Network installation is generally faster than CD-ROM, though netbooting may not always be better, and SCSI termination may need to be disabled. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">4D-series machines can boot from a compatible CD-ROM as if it were a SCSI disk. (user-b1da, 2022-08-12, exchange 222430, check: supported)</li>
+<li id="s2">The CD-ROM is recognized on the SCSI bus when booting with 'boot cdrom' or 'boot disk3', but booting '3' attempts to access a network file, indicating the image is an ISO rather than a Sun disk image. (user-b1da, 2022-10-02, exchange 183056, check: supported)</li>
+<li id="s3">The boot command for IRIX from CDROM is `scsi(1)cdrom(4)partition(8)bootecoff scsi(1)cdrom(4)partition(0)/bsd.rd.IP22`, which may vary based on drive configuration. (user-6e7b, 2023-11-30, exchange 42872, check: supported)</li>
+<li id="s4">cdrom is an alias pointing directly to the optical drive, requiring manual configuration for non-standard SCSI IDs. (user-7b1c, 2022-06-24, exchange 182486, check: uncheckable)</li>
+<li id="s5">Setting the cdrom to SCSI ID 6 and booting from it works best. (user-03ad, 2022-10-02, exchange 183055, check: supported)</li>
+<li id="s6">Set the cdrom ID to 6 for OBP to find it. (user-9528, 2022-10-02, exchange 183055, check: supported)</li>
+<li id="s7">The CD-ROM and HDD are not detected with a SCSI cable, and autodetection of IDs works on startup but throws register errors, suggesting poor contact or a faulty cable. (user-1361, 2021-12-13, exchange 235031, check: uncheckable)</li>
+<li id="s8">The Octane2 can see a disk and a CD-ROM, but the CD-ROM is detected by luck due to potential termination issues. (user-e872, 2022-02-02, exchange 101824, check: supported)</li>
+<li id="s9">The CDROM causes boot issues on an Octane with a DAT and an internal drive, but not with just the DAT. (user-d41d, 2022-12-09, exchange 222708, check: supported)</li>
+<li id="s10">The Indigo2 had dirt in its connectors causing CDROM issues; cleaning and reseating connectors improved reliability. (user-281e, 2023-11-23, exchange 209616, check: supported)</li>
+<li id="s11">If a Mac system doesn't boot after installing a CDROM and shows a blank screen, it likely means the system can't find the disk, and one should check IDE settings or perform a PRAM reset. (user-03ad, 2022-11-09, exchange 231932, check: uncheckable)</li>
+<li id="s12">The Indigo does not have internal space for a CD-ROM; typically, an external SCSI CD-ROM was used. (user-d903, 2021-12-13, exchange 206062, check: supported)</li>
+<li id="s13">CD-RW don't work in older drives because the reflective layer is different and reflects less light at the wavelengths the CD-ROM requires. (user-3663, 2020-09-14, exchange 78720, check: uncheckable)</li>
+<li id="s14">The CD-ROM setup is not stock, and the drive is picky with CD-Rs, especially those burnt at high speed. (user-b4f4, 2020-09-14, exchange 78718, check: uncheckable)</li>
+<li id="s15">CD-ROMs from that era are broken due to surface mount and low profile caps leaking. (user-a079, 2023-09-09, exchange 209204, check: uncheckable)</li>
+<li id="s16">boot -f scsi(0)cdrom(2)partition(8)bootecoff attempts to boot from cdrom (user-e4d0, 2023-12-22, exchange 43332, check: supported)</li>
+<li id="s17">The Indy's external and internal SCSI ports might be on separate channels; booting from a CD-ROM can be done using `scsi(1)cdrom(2)partition(8)bootecoff` or similar paths depending on the channel and partition; diskless盘 (user-6e7b, 2023-12-22, exchange 43330, check: supported)</li>
+<li id="s18">user-a079 has used ISO installs through Zulu's CDROM emulation for SGIs with no issues. (user-a079, 2024-05-09, exchange 210341, check: uncheckable)</li>
+<li id="s19">It needs a cdrom to boot that does 512kb/sector. (user-03ad, 2024-11-14, exchange 112761, check: supported)</li>
+<li id="s20">You can use a CDROM directly without issues; SCSI emulators can also be used; hard disks can be run off it like on Mac; ECC errors may require RAM replacement. (user-17cb, 2024-09-24, exchange 224100, check: uncheckable)</li>
+<li id="s21">Installing A/UX can be done using floppies and CD-ROM. (user-03ad, 2024-12-18, exchange 232436, check: uncheckable)</li>
+<li id="s22">Installing Irix can be done over a serial console with a CD-ROM. (user-22f9, 2025-01-05, exchange 113457, check: uncheckable)</li>
+<li id="s23">User-45c8 is using SASH and FX from CDROM to install IRIX. (user-45c8, 2025-05-28, exchange 212545, check: uncheckable)</li>
+<li id="s24">For ULTRIX installation on CD-ROM, one can use a Zulu or similar device and set the manufacturer/device name to fake it. (user-07ed, 2025-10-14, exchange 164590, check: uncheckable)</li>
+<li id="s25">The O2 has a built-in CD-ROM, but it often does not function properly and the bezel does not close correctly. (user-1a5a, 2025-01-15, exchange 224406, check: supported)</li>
+<li id="s26">The CDROM on the O2 is ID4. (user-3e2d, 2025-05-28, exchange 56858, check: supported)</li>
+<li id="s27">The CDROM on the O2 with an R10000 CPU and 128MB RAM doesn't work due to a cracked cog on the tray/mechanism lift unit. (user-231e, 2025-12-19, exchange 225794, check: supported)</li>
+<li id="s28">O2 has preassigned SCSI IDs, with the CD-ROM often fixed; the default SCSI ID is four unless physically changed. (user-1a5a, 2026-01-10, exchange 120695, check: supported)</li>
+<li id="s29">The CD-ROM is showing up three times in the hinv under different IDs. (user-2a3c, 2025-08-02, exchange 58090, check: supported)</li>
+<li id="s30">cdrom can be swapped on a running system by ejecting and listing multiple CDs in iris.toml. (user-3e2d, 2026-04-05, exchange 73452, check: uncheckable)</li>
+<li id="s31">The IO9's connector above the SCSI port is likely for a SCSI backplane and CD-ROM, and may require jumper settings for configuration. (user-e4d0, 2024-01-17, exchange 109962, check: uncheckable)</li>
+<li id="s32">The 4D/50 lacks a tape drive capstan, a CDROM is unrecognized by its PROM, and it does not have a VME network card. (user-86e1, 2025-07-14, exchange 189802, check: supported)</li>
+<li id="s33">SGI's charcoal reissue included CD ROM, DVD ROM, and tape drives. (user-2a3c, 2026-09-22, exchange 244492, check: uncheckable)</li>
+<li id="s34">Tape can be used to restore IRIX installations but not to boot versions earlier than 6.2 on IP28. It's limited to IRIX &lt; 6.2 for booting from CDROM. (user-bba0, 2024-08-01, exchange 210750, check: supported)</li>
+<li id="s35">XFS changes the on-disk format, making the miniroot of the original install CDROM unable to read the installed system disk. (user-1a5a, 2026-04-28, exchange 243938, check: uncheckable)</li>
+<li id="s36">A steady network install is generally faster than CDROM, provided the network setup is not overly complex. (user-07ed, 2024-06-01, exchange 46395, check: uncheckable)</li>
+<li id="s37">Netbooting may not work better than booting from CDROM. (user-03ad, 2024-10-13, exchange 235483, check: uncheckable)</li>
+<li id="s38">The CDROM has termination disabled. (user-7243, 2025-12-01, exchange 119880, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="indigo.html">Indigo</a>, <a href="486.html">486</a>, <a href="4d-series.html">4D series</a>, <a href="4d-50.html">4D/50</a>, <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="mac.html">Mac</a>, <a href="nextstation.html">NeXTstation</a>, <a href="pi.html">PI</a>, <a href="sparcstation-5.html">SPARCstation 5</a>, <a href="ultra-60.html">Ultra 60</a>, <a href="classic-mac.html">classic Mac</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="a-ux.html">A/UX</a>, <a href="dos.html">DOS</a>, <a href="irix-installation.html">IRIX installation</a>, <a href="openbsd.html">OpenBSD</a>, <a href="solaris-2-6.html">Solaris 2.6</a>, <a href="ultrix.html">Ultrix</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="zulu.html">Zulu</a>, <a href="sash.html">sash</a>, <a href="cd.html">CD</a>, <a href="cf-card.html">CF card</a>, <a href="dreamcast.html">Dreamcast</a>, <a href="ide.html">IDE</a>, <a href="love.html">LOVE</a>, <a href="mame.html">MAME</a>, <a href="scsi-emulator.html">SCSI emulator</a>, <a href="xfs.html">XFS</a>, <a href="boot.html">boot</a>, <a href="install-cd.html">install CD</a>, <a href="installer.html">installer</a>, <a href="nedit.html">nedit</a>, <a href="software.html">software</a>, <a href="tar.html">tar</a>
+</li>
+<li>Parts and peripherals: <a href="floppy.html">floppy</a>, <a href="prom.html">PROM</a>, <a href="disk.html">disk</a>, <a href="hdd.html">HDD</a>, <a href="ssd.html">SSD</a>, <a href="hard-disk.html">hard disk</a>, <a href="cd-r.html">CD-R</a>, <a href="io9.html">IO9</a>, <a href="ip28.html">IP28</a>, <a href="pci-riser.html">PCI riser</a>, <a href="ram.html">RAM</a>, <a href="sata-controller.html">SATA controller</a>, <a href="scsi-backplane.html">SCSI backplane</a>, <a href="scsi-cable.html">SCSI cable</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="connector.html">connector</a>, <a href="external-scsi-port.html">external SCSI port</a>, <a href="network-card.html">network card</a>, <a href="network-install.html">network install</a>, <a href="serial-console.html">serial console</a>, <a href="sound-card.html">sound card</a>, <a href="tape.html">tape</a>, <a href="tape-drive.html">tape drive</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-id.html">SCSI ID</a>, <a href="obp.html">OBP</a>, <a href="scsi.html">SCSI</a>, <a href="scsi-bus.html">SCSI bus</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>, <a href="ibm-microdrive.html">IBM Microdrive</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="dat.html">DAT</a>, <a href="10mb-ethernet.html">10Mb Ethernet</a>, <a href="cd-rw.html">CD-RW</a>, <a href="charcoal.html">Charcoal</a>, <a href="ecc-errors.html">ECC errors</a>, <a href="era.html">ERA</a>, <a href="esdi.html">ESDI</a>, <a href="xtide-bios.html">XTIDE BIOS</a>, <a href="configuration-file.html">configuration file</a>, <a href="copy-protection.html">copy protection</a>, <a href="documents.html">documents</a>, <a href="eject.html">eject</a>, <a href="skins.html">skins</a>
+</li></ul>
+</body>
+</html>

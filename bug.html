@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bug</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>bug</h1>
+<p>Claims: 10</p>
+<p>Kernels newer than 4.14 have a bug where PCI devices do not work. <sup><a href="#s1">1</a></sup> The bug occurs when an application requests a 24-bit buffer but the system returns an 8-bit buffer, leading to data corruption. <sup><a href="#s2">2</a></sup> A simple OpenGL program can reproduce a bug by toggling between starting long polygons from Z=-0.01 and Z=0; the Z=value is shown top-left. <sup><a href="#s3">3</a></sup> A working set exists but is unusable due to a bug. <sup><a href="#s4">4</a></sup> Xsgi has a bug in WRMASK generation that affects real hardware; an ugly workaround fixes it. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Kernels newer than 4.14 have a bug where PCI devices do not work. (user-1446, 2020-07-30, exchange 75283, check: supported)</li>
+<li id="s2">The bug occurs when an application requests a 24-bit buffer but the system returns an 8-bit buffer, leading to data corruption. (user-b1da, 2022-11-30, exchange 217802, check: supported)</li>
+<li id="s3">A simple OpenGL program can reproduce a bug by toggling between starting long polygons from Z=-0.01 and Z=0; the Z=value is shown top-left. (user-21b8, 2024-04-18, exchange 215467, check: supported)</li>
+<li id="s4">A working set exists but is unusable due to a bug. (user-cd83, 2026-07-27, exchange 124430, check: uncheckable)</li>
+<li id="s5">Xsgi has a bug in WRMASK generation that affects real hardware; an ugly workaround fixes it. (user-3e2d, 2026-07-31, exchange 94565, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="x-server.html">X server</a>, <a href="xsgi.html">Xsgi</a>, <a href="patch.html">patch</a>
+</li>
+<li>Parts and peripherals: <a href="systemd.html">systemd</a>
+</li>
+<li>Standards and interfaces: <a href="pci-devices.html">PCI devices</a>, <a href="x-client.html">X client</a>
+</li>
+<li>Other: <a href="complexity.html">complexity</a>
+</li></ul>
+</body>
+</html>

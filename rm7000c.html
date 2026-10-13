@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RM7000C</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RM7000C</h1>
+<p>Claims: 12</p>
+<p>The RM7000 kept data registers the same as the 5200, while the RM7000C added support for 64MB of L3 cache. <sup><a href="#s1">1</a></sup> The RM7000C has a 512kB cache that sits on the SysAD bus and cannot run as fast as the CPU. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The RM7000C has more cache lines than the RM7000/A/B, which SGI cards are not wired for, making compatible cache ICs difficult to find. <sup><a href="#s4">4</a></sup> The RM7000C works with primary, secondary and tertiary caches enabled. <sup><a href="#s5">5</a></sup> FPGA was used on the first revisions of the RM7000C, while later SGI branded ASICs were used. <sup><a href="#s6">6</a></sup> RM7000C CPUs with specific markings are fake and reballed parts, which might actually be RM7000, RM7000A, or RM7000B; they are not genuine and were likely removed from old boards and relabeled. <sup><a href="#s7">7</a></sup> The RM7000C is a chip that was likely pulled rather than remarked. <sup><a href="#s8">8</a></sup> DBX cannot identify an RM7000C in an O2 and assumes an R4k. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The RM7000 kept data registers the same as the 5200, while the RM7000C added support for 64MB of L3 cache. (user-f763, 2024-12-03, exchange 211390, check: supported)</li>
+<li id="s2">The RM7000C cache sits on the SysAD bus and can't run as fast as the CPU. (user-757f, 2026-01-25, exchange 121141, check: uncheckable)</li>
+<li id="s3">The RM7000C has a 512kB cache. (user-757f, 2026-03-06, exchange 226176, check: supported)</li>
+<li id="s4">The RM7000C has more cache lines than the RM7000/A/B, which SGI cards are not wired for; finding compatible cache ICs is difficult. (user-f763, 2026-02-10, exchange 62105, check: uncheckable)</li>
+<li id="s5">the RM7000C works with primary, secondary and tertiary caches enabled (user-757f, 2026-03-15, exchange 226228, check: uncheckable)</li>
+<li id="s6">FPGA was used on the first revisions of the RM7000C, later SGI branded ASICs were used. (user-757f, 2026-01-25, exchange 121141, check: uncheckable)</li>
+<li id="s7">RM7000C CPUs with specific markings are fake and reballed parts, which might actually be RM7000, RM7000A, or RM7000B; they are not genuine and were likely removed from old boards and relabeled. (user-757f, 2026-02-10, exchange 213669, check: uncheckable)</li>
+<li id="s8">The RM7000C is a chip that was likely pulled rather than remarked. (user-f763, 2026-04-15, exchange 122637, check: uncheckable)</li>
+<li id="s9">DBX cannot identify an RM7000C in an O2 and assumes an R4k. (user-757f, 2026-05-19, exchange 216013, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="rm7000c-cpu.html">RM7000C CPU</a> (3)
+</li>
+<li><a href="rm7000c-mod.html">RM7000C mod</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="rm7000.html">RM7000</a>, <a href="machine-models.html">machine models</a>
+</li>
+<li>Processors: <a href="r12000.html">R12000</a>, <a href="r4000.html">R4000</a>, <a href="rm7000a.html">RM7000A</a>
+</li>
+<li>Software: <a href="fpga.html">FPGA</a>, <a href="dbx.html">dbx</a>
+</li>
+<li>Parts and peripherals: <a href="cache.html">cache</a>, <a href="asic.html">ASIC</a>, <a href="card.html">card</a>
+</li>
+<li>Standards and interfaces: <a href="sysad-bus.html">sysad bus</a>
+</li></ul>
+</body>
+</html>

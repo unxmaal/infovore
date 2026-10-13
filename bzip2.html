@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bzip2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>bzip2</h1>
+<p>Claims: 9</p>
+<p>bzip2 is a software package that installs along with symbolic links for bunzip2 and bzcat, with a wrapper script pointing to the installed bzip2. <sup><a href="#s1">1</a></sup> It can be compiled with -mabi=n32 using an assembler in the PATH, such as /opt/local/binutils/bin/as. <sup><a href="#s2">2</a></sup> Compilation time varies by machine, taking 9 minutes on an O2 with R10K and 2 minutes on an O300, though it still may not install properly. <sup><a href="#s3">3</a></sup> The O2 requires bzip2 for Ansible provisioning but lacks it, and CDs are unavailable. <sup><a href="#s4">4</a></sup> Nekoware mirrors contain a newer version of bzip2 that can be installed with 'inst' or 'swmgr'. <sup><a href="#s5">5</a></sup> bzip2 is included in misc-5.3-files.iso alongside unzip, nedit, gimp, and netscape. <sup><a href="#s6">6</a></sup> A bzip2 process has been observed consuming 100% CPU after disabling IPsec. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The script installs bzip2 and creates symbolic links for bunzip2 and bzcat; the wrapper script points to the installed bzip2. (user-2189, 2019-04-11, exchange 1341, check: uncheckable)</li>
+<li id="s2">To compile bzip2 with -mabi=n32, use the appropriate assembler and ensure it's in the PATH; /opt/local/binutils/bin/as works. (user-f229, 2019-05-07, exchange 1612, check: uncheckable)</li>
+<li id="s3">bzip2 compilation time varies by machine: 9 minutes on an O2 with R10K and 2 minutes on an O300. Still, it doesn't install properly. (user-2189, 2019-05-17, exchange 1716, check: supported)</li>
+<li id="s4">The O2 requires bzip2 for Ansible provisioning but lacks it, and CDs are unavailable. (user-5fa2, 2019-10-10, exchange 3821, check: supported)</li>
+<li id="s5">Nekoware mirrors contain a newer version of bzip2 that can be installed with 'inst' or 'swmgr'. (user-d903, 2019-10-10, exchange 3821, check: uncheckable)</li>
+<li id="s6">misc-5.3-files.iso contains unzip, nedit, bzip2, gimp, netscape (user-8547, 2021-08-04, exchange 79588, check: supported)</li>
+<li id="s7">bzip2 process is consuming 100% CPU after disabling IPsec. (user-cd7d, 2021-12-18, exchange 23576, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="o300.html">O300</a>
+</li>
+<li>Software: <a href="ansible.html">ansible</a>, <a href="libtool.html">libtool</a>, <a href="nedit.html">nedit</a>, <a href="nekoware.html">nekoware</a>
+</li>
+<li>Other: <a href="unzip.html">unzip</a>
+</li></ul>
+</body>
+</html>

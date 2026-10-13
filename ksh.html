@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ksh</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ksh</h1>
+<p>Claims: 8</p>
+<p>ksh is preinstalled on many commercial UNIX systems and serves as the default shell for new users and for old application compatibility. <sup><a href="#s1">1</a></sup> ksh supports shell history, which can be configured via the HISTFILE variable, and arrow keys can be enabled with `set -o emacs`. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> In ksh, the equivalent command to export for setting environment variables is setenv. <sup><a href="#s4">4</a></sup> On IRIX 6.5.30, /sbin/sh is ksh88 in bourne compatibility mode, which behaves differently from ksh and rksh when invoked as sh; setting _XPG to 1 fixes the issue, and mksh is being used as an alternative. <sup><a href="#s5">5</a></sup> An alternative shell like ksh can be used for configure scripts to work around issues with /bin/sh. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">ksh is the default shell for new users and old application compatibility. (user-8547, 2022-10-01, exchange 33117, check: uncheckable)</li>
+<li id="s2">OpenBSD's X isn't setuid by default for security reasons, and can be run with xenodm; HISTFILE can be set for shell history in ksh. (user-ba81, 2019-06-01, exchange 1867, check: uncheckable)</li>
+<li id="s3">ksh is preinstalled on many commercial unices and supports shell history. `set -o emacs` to get arrow keys. (user-237d, 2022-09-19, exchange 82075, check: supported)</li>
+<li id="s4">ksh is the shell you are using, and the equivalent command to export is setenv for setting environment variables in ksh; bash and zsh support export; csh uses set; winterm can run any shell, and you can change the shell; (user-4292, 2022-11-12, exchange 82388, check: uncheckable)</li>
+<li id="s5">/sbin/sh on IRIX 6.5.30 is ksh88 in bourne compatibility mode, which behaves differently from ksh and rksh when invoked as sh; setting _XPG to 1 fixes the issue; mksh is being used as an alternative. (user-ba81, 2019-03-04, exchange 203710, check: supported)</li>
+<li id="s6">You can use an alternative shell like ksh for configure scripts to work around issues with /bin/sh. (user-ba81, 2023-06-22, exchange 162807, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ksh88.html">ksh88</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="openbsd.html">OpenBSD</a>, <a href="unix.html">Unix</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>, <a href="cde.html">CDE</a>, <a href="setenv.html">setenv</a>
+</li>
+<li>Standards and interfaces: <a href="x.html">X</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="bin-sh.html">/bin/sh</a>, <a href="command-line.html">command line</a>, <a href="zsh.html">zsh</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIOS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>BIOS</h1>
+<p>Claims: 59 Background: 10 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/BIOS">BIOS</a>.</p>
+<p>The BIOS is loaded by a pointer set by the hardware, and originally it was mapped to an address and accessed directly rather than copied into RAM. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Early systems shadowed the BIOS to RAM, and the BIOS on the original PC is 8 KB. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The BIOS is regular code accessed through interrupts, while PALcode has special behaviors accessed via a dedicated instruction opcode range. <sup><a href="#s5">5</a></sup> UEFI is a specification for firmware that replaces BIOS. <sup><a href="#s6">6</a></sup> BIOS updates can be problematic, resetting RAID configuration, requiring rebuilding the boot loader, or failing to resolve issues if the hardware itself is malfunctioning. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> BIOS updates can resolve fan control issues on the ThinkCentre M800. <sup><a href="#s11">11</a></sup> The SGI BIOS for the Prism can be extracted using FLASHROM. <sup><a href="#s12">12</a></sup> The BIOS on some SGI machines can be extended to 64KB, allowing the addition of XTIDE support, which removes the limitation to patching the HDD table and 512MB. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The BIOS on SGI cards can boot an Intel PC with the jumper removed. <sup><a href="#s15">15</a></sup> The BIOS on SGI cards has a video modes table that differs from x86 variants. <sup><a href="#s16">16</a></sup> The system struggled to determine the BIOS structure. <sup><a href="#s17">17</a></sup> When a BIOS initializes, it first checks the first 64k and then switches to protected mode to see the rest. <sup><a href="#s18">18</a></sup> The BIOS allows for disk caching. <sup><a href="#s19">19</a></sup> The BIOS might stop assigning IRQs after too many bridges. <sup><a href="#s20">20</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The BIOS is loaded by a pointer set by the hardware. (user-1361, 2020-04-07, exchange 7299, check: uncheckable)</li>
+<li id="s2">Originally, the BIOS was mapped to an address and accessed directly, not copied into RAM. (user-d903, 2020-04-07, exchange 7299, check: uncheckable)</li>
+<li id="s3">Early systems shadowed the BIOS to RAM. (user-9305, 2021-04-01, exchange 16126, check: uncheckable)</li>
+<li id="s4">The BIOS on the original PC is 8 KB. (user-1361, 2020-04-07, exchange 7301, check: supported)</li>
+<li id="s5">The BIOS is regular code accessed through interrupts, while PALcode has special behaviors accessed via a dedicated instruction opcode range. (user-2047, 2021-09-26, exchange 161262, check: uncheckable)</li>
+<li id="s6">UEFI is a specification for firmware that replaces BIOS. (user-b179, 2022-09-13, exchange 234120, check: uncheckable)</li>
+<li id="s7">A firmware update tool in BIOS can be problematic, as it was for the speaker's mainboard. (user-cd7d, 2019-01-29, exchange 346, check: uncheckable)</li>
+<li id="s8">BIOS updates can reset RAID configuration, causing boot issues. (user-1361, 2020-06-27, exchange 9241, check: uncheckable)</li>
+<li id="s9">BIOS updates can require rebuilding the boot loader. (user-d903, 2020-06-27, exchange 9241, check: uncheckable)</li>
+<li id="s10">Flashing the BIOS does not resolve issues if the hardware itself is malfunctioning. (user-6e7b, 2023-11-28, exchange 240189, check: uncheckable)</li>
+<li id="s11">Updating the BIOS can resolve fan control issues on the ThinkCentre M800. (user-b4f4, 2022-01-25, exchange 233955, check: uncheckable)</li>
+<li id="s12">The SGI BIOS for the Prism can be extracted using FLASHROM. (user-5906, 2025-01-10, exchange 76162, check: uncheckable)</li>
+<li id="s13">The BIOS can be extended to full 64kb and XTIDE added instead of patching HDD table. (user-3e2d, 2025-05-28, exchange 212552, check: supported)</li>
+<li id="s14">The BIOS on some SGI machines can be extended to 64KB, allowing the addition of XTIDE support, which removes the limitation to patching the HDD table and 512MB. (user-3e2d, 2025-05-30, exchange 56915, check: supported)</li>
+<li id="s15">The BIOS on SGI cards can boot an Intel PC with the jumper removed. (user-5906, 2026-07-25, exchange 64747, check: uncheckable)</li>
+<li id="s16">The BIOS on SGI cards has a video modes table that differs from x86 variants. (user-8780, 2026-07-25, exchange 64747, check: uncheckable)</li>
+<li id="s17">The system struggled to determine the BIOS structure. (user-74b8, 2026-08-08, exchange 65358, check: uncheckable)</li>
+<li id="s18">When a BIOS initializes, it first checks the first 64k and then switches to protected mode to see the rest. (user-22f9, 2025-03-02, exchange 242144, check: supported)</li>
+<li id="s19">The BIOS allows for disk caching. (user-59df, 2026-06-29, exchange 160313, check: uncheckable)</li>
+<li id="s20">The BIOS might stop assigning IRQs after too many bridges. (user-757f, 2026-01-13, exchange 225929, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="bios-update.html">BIOS update</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sbc.html">SBC</a>, <a href="dell-server.html">Dell server</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="p-390.html">P/390</a>, <a href="prism.html">Prism</a>, <a href="ultra-45.html">Ultra 45</a>
+</li>
+<li>Processors: <a href="x86.html">x86</a>
+</li>
+<li>Graphics: <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="bootloader.html">bootloader</a>, <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>, <a href="ps2.html">PS2</a>, <a href="installer.html">installer</a>, <a href="manual.html">manual</a>
+</li>
+<li>Parts and peripherals: <a href="microcontroller.html">microcontroller</a>, <a href="72-pin-simms.html">72-pin SIMMs</a>, <a href="nvram.html">NVRAM</a>, <a href="raid-card.html">RAID card</a>, <a href="vrm.html">VRM</a>, <a href="backplane.html">backplane</a>, <a href="card.html">card</a>, <a href="drive.html">drive</a>, <a href="floppy.html">floppy</a>
+</li>
+<li>Standards and interfaces: <a href="uefi.html">UEFI</a>, <a href="raid.html">RAID</a>, <a href="networking.html">networking</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="clover.html">Clover</a>, <a href="gridcase.html">Gridcase</a>, <a href="mbr.html">MBR</a>, <a href="mmsc.html">MMSC</a>, <a href="palcode.html">PALcode</a>, <a href="warp-3.html">Warp 3</a>, <a href="xtide.html">XTIDE</a>, <a href="flashrom.html">flashrom</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>telnet</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>telnet</h1>
+<p>Claims: 36 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Telnet">Telnet</a>, <a href="https://en.wikipedia.org/wiki/Secure_Shell">Secure Shell</a>.</p>
+<p>Telnet is a protocol used to access terminal sessions remotely, and it relies on more than just TCP—it uses a specific protocol of its own. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Telnet is commonly used as an alternative to SSH, alongside services like RSH, and can be used to log in to machines, mount NFS shares, and transfer files via FTP. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Telnet is built-in on many systems and can be used to access a wide range of hardware, from old DECstations and Atari systems to modern serial servers and power management boxes. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Telnet is often enabled by default on systems like IRIX, which runs several outdated and insecure services, and it can be exploited through brute forcing or targeted attacks. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> Telnet can be affected by network and DNS issues, and it may lock up or drop connections, though it can still work over Ethernet when properly configured. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> Telnet is not suitable for all transport purposes, such as MCP transport, because it is an interactive terminal protocol that could corrupt other data streams. <sup><a href="#s24">24</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Telnet is just for access to the terminal. (user-0251, 2019-10-10, exchange 76886, check: uncheckable)</li>
+<li id="s2">Telnet uses a specific protocol beyond just TCP. (user-9860, 2021-11-12, exchange 221688, check: uncheckable)</li>
+<li id="s3">There are multiple methods to transfer files, including telnet, ftp, xmodem, and ymodem. (user-a6eb, 2021-03-09, exchange 15325, check: uncheckable)</li>
+<li id="s4">RSH or telnet can be used as alternatives to SSH. (user-c831, 2023-04-27, exchange 37660, check: uncheckable)</li>
+<li id="s5">Alternative services like telnet or rsh can be used instead of the specific service that requires more resources. (user-6e7b, 2024-03-25, exchange 185015, check: uncheckable)</li>
+<li id="s6">Their system is accessible via telnet. (user-7151, 2025-09-17, exchange 238981, check: uncheckable)</li>
+<li id="s7">One can telnet into an SGI machine from home using a secure network like Tailscale to access SGI software without opening insecure services. (user-f190, 2026-01-16, exchange 213535, check: uncheckable)</li>
+<li id="s8">The DECstation 3000 had 32MB RAM and could support a few dozen users simultaneously running pine and pico via telnet. (user-07ed, 2023-10-25, exchange 216179, check: supported)</li>
+<li id="s9">It lets you have remote serial ports over ethernet; out of the box, you can set it up with a web interface to telnet into the 4 serial ports; it also has windows drivers to let you use them as com ports. (user-d5ee, 2024-07-15, exchange 242095, check: supported)</li>
+<li id="s10">Telnet is built-in. (user-07ed, 2024-11-14, exchange 211256, check: uncheckable)</li>
+<li id="s11">The app connects to the L2 System Controller box via telnet and has an Angular UI. (user-7973, 2026-02-14, exchange 226087, check: uncheckable)</li>
+<li id="s12">A remote power management system uses SNMP to control PDUs and telnet to L1 for power actions. (user-f190, 2026-04-28, exchange 90525, check: uncheckable)</li>
+<li id="s13">The serial console can be connected via telnet to a serial server exposing the serial console. (user-2a3c, 2026-06-05, exchange 90901, check: uncheckable)</li>
+<li id="s14">a newly-installed IRIX 6.5.30 has telnet available to root with no password (user-2189, 2019-01-08, exchange 76731, check: supported)</li>
+<li id="s15">IRIX runs several outdated and insecure services by default, including telnet and ftp. (user-22f9, 2019-02-28, exchange 809, check: uncheckable)</li>
+<li id="s16">Telnet is not commonly passed by default firewalls, making it less likely to be exploited by automated bots, but still vulnerable to targeted attacks. (user-2189, 2020-03-27, exchange 7047, check: uncheckable)</li>
+<li id="s17">Brute forcing an old Linux box with telnet can be difficult; consider checking for other services like HTTP which might be easier to crack. (user-22f9, 2023-10-18, exchange 209413, check: uncheckable)</li>
+<li id="s18">The system responds to ping but not telnet, suggesting network issues or firewall problems. (user-637b, 2019-12-04, exchange 4549, check: uncheckable)</li>
+<li id="s19">Telnet requires DNS to resolve URLs, and setting /etc/resolv.conf to public DNS servers like 8.8.8.8 can fix the issue. (user-1446, 2020-05-02, exchange 7975, check: supported)</li>
+<li id="s20">On IRIX 5.3, telnet works with public DNS servers but requires correct /etc/resolv.conf configuration. (user-1446, 2020-05-02, exchange 7975, check: supported)</li>
+<li id="s21">telnet should work over ethernet... unless you turned it off (user-bc18, 2021-08-19, exchange 19434, check: uncheckable)</li>
+<li id="s22">Telnet may lock up and drop the connection. (user-b1da, 2022-09-14, exchange 32660, check: uncheckable)</li>
+<li id="s23">From the box, it cannot ping external addresses like 8.8.8.8, even though telnet works; routing issues may be involved. (user-ebdc, 2025-07-25, exchange 219022, check: supported)</li>
+<li id="s24">Telnet is not suitable for MCP transport because it is an interactive terminal protocol and would corrupt the JSON-RPC stream. (user-2a3c, 2026-06-06, exchange 219782, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="weatherstar-xl.html">WeatherStar XL</a>, <a href="machine.html">machine</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="ping.html">ping</a>, <a href="rsh.html">rsh</a>, <a href="ansible.html">ansible</a>
+</li>
+<li>Parts and peripherals: <a href="ethernet-card.html">Ethernet card</a>, <a href="l1.html">L1</a>, <a href="serial-console.html">serial console</a>
+</li>
+<li>Standards and interfaces: <a href="ftp.html">FTP</a>, <a href="ssh.html">SSH</a>, <a href="ethernet.html">Ethernet</a>, <a href="dns.html">DNS</a>, <a href="nfs.html">NFS</a>, <a href="usb-peripherals.html">USB peripherals</a>, <a href="web-interface.html">web interface</a>
+</li>
+<li>Other: <a href="etc-ioconfig-conf.html">/etc/ioconfig.conf</a>, <a href="etc-resolv-conf.html">/etc/resolv.conf</a>, <a href="decstation-3000.html">DECstation 3000</a>, <a href="fujinet.html">FujiNet</a>, <a href="http.html">HTTP</a>, <a href="neko.html">Neko</a>, <a href="pdu.html">PDU</a>, <a href="pico.html">Pico</a>, <a href="pine.html">Pine</a>, <a href="xmodem.html">xmodem</a>
+</li></ul>
+</body>
+</html>

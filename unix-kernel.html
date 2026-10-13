@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unix kernel</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Unix kernel</h1>
+<p>Claims: 8 Part of <a href="unix.html">Unix</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SATA">SATA</a>.</p>
+<p>The Unix kernel must be loaded from somewhere before booting, and it can be started from SCSI and handed over to SATA or loaded over the network. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Loading 'unix' over the network loads drivers to access the disks on a PCI-X SATA card. <sup><a href="#s3">3</a></sup> The IRIX kernel does not share code with the regular Unix kernel, though older Unixes had shared libraries for low-level routines like terminal I/O and simple drivers, which reduced code duplication over time. <sup><a href="#s4">4</a></sup> A Unix kernel for Z80 machines with 64kb RAM uses the upper 32kb for itself and swaps the lower 32kb to disk during task switches, making it thrash. <sup><a href="#s5">5</a></sup> The MachTen 2.3 ISO contains Unix files, including a Unix kernel, but the 68k version runs more 'real' Unix as it takes over the Mac rather than running as a process. <sup><a href="#s6">6</a></sup> Rebooting from a backed-up Unix kernel allows the system to reconfigure itself during boot, leaving a new unix.install behind, but the apps may not work correctly. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You can start a miniroot from SCSI and hand it over to SATA; the Unix kernel can be loaded over the network. (user-7973, 2023-02-17, exchange 222859, check: uncheckable)</li>
+<li id="s2">The Unix kernel must be loaded from somewhere before booting. (user-7973, 2026-04-10, exchange 122530, check: uncheckable)</li>
+<li id="s3">Loading 'unix' over network loads drivers to access the disks on a PCI-X SATA card. (user-7973, 2023-02-17, exchange 222859, check: uncheckable)</li>
+<li id="s4">The IRIX kernel does not share code with the regular Unix kernel, but older Unixes had shared libraries for low-level routines like terminal I/O and simple drivers, which reduced code duplication over time. (user-237d, 2020-05-21, exchange 78387, check: uncheckable)</li>
+<li id="s5">A Unix kernel for Z80 machines with 64kb RAM uses the upper 32kb for itself and swaps the lower 32kb to disk during task switches, making it thrash. (user-f8e4, 2021-01-31, exchange 14384, check: supported)</li>
+<li id="s6">The MachTen 2.3 ISO contains Unix files, including a Unix kernel, but the 68k version runs more 'real' Unix as it takes over the Mac rather than running as a process. (user-03ad, 2023-10-15, exchange 148045, check: supported)</li>
+<li id="s7">Rebooting from a backed-up Unix kernel allows the system to reconfigure itself during boot, leaving a new unix.install behind, but the apps may not work correctly. (user-e4d0, 2024-09-28, exchange 218562, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="z80.html">Z80</a>
+</li>
+<li>Operating systems: <a href="irix-kernel.html">IRIX kernel</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Standards and interfaces: <a href="sata.html">SATA</a>, <a href="scsi.html">SCSI</a>
+</li></ul>
+</body>
+</html>

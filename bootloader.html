@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bootloader</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>bootloader</h1>
+<p>Claims: 14 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/BIOS">BIOS</a>.</p>
+<p>A bootloader loads into RAM and then loads the kernel, which can be done using NFS. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Bootloaders can be customized or rebuilt, for example in response to BIOS updates or for hardware system updates. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Bootloaders can be used to boot from various media, including floppies, CDs, and hard drives, and can handle different partition schemes such as HPFS. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Bootloaders can bypass ROM-imposed kernel size limits and allow non-100% correct CPU emulation. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Bootloaders can encounter problems, such as failing to recognize the hard drive after an OS install, misconfiguring during filesystem installation, or failing to boot due to insufficient swap space. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The bootloader loads into RAM mostly. (user-5510, 2022-11-03, exchange 33723, check: uncheckable)</li>
+<li id="s2">The bootloader loads the kernel with NFS. (user-42cf, 2023-06-07, exchange 240054, check: uncheckable)</li>
+<li id="s3">BIOS updates can require rebuilding the boot loader. (user-d903, 2020-06-27, exchange 9241, check: uncheckable)</li>
+<li id="s4">Reversed engineered a customized bootloader for hardware system updates. (user-95db, 2022-01-07, exchange 24355, check: uncheckable)</li>
+<li id="s5">To boot from a CD-drive, a bootloader like the one from the floppy drive was used, and the CD-drive was hotswapped while the bootloader was in memory, requiring a rescan. (user-b4f4, 2023-08-02, exchange 177286, check: uncheckable)</li>
+<li id="s6">Boot Loader can handle HPFS partition schemes by booting from CD and using a partitioner. (user-22f9, 2023-11-12, exchange 158147, check: uncheckable)</li>
+<li id="s7">A bootloader can be used to bypass ROM-imposed kernel size limits. (user-7ded, 2026-06-03, exchange 244518, check: uncheckable)</li>
+<li id="s8">OS flexibility allows for non-100% correct CPU emulation, with some self-tests potentially breaking but fixable. (user-3663, 2020-04-01, exchange 220147, check: supported)</li>
+<li id="s9">The boot loader does not recognize the hard drive after installing the OS. (user-b179, 2022-08-17, exchange 32079, check: uncheckable)</li>
+<li id="s10">When installing an old filesystem, an SGI machine may read the data incorrectly and misconfigure the boot loader; a fresh reinstall after wiping the disk usually fixes it. (user-f229, 2020-04-24, exchange 7780, check: uncheckable)</li>
+<li id="s11">The boot process of SCO Unix System V/386 starts with a bootloader that, when given the 'ENTER' key, attempts to boot from the first floppy disk using a specific configuration, but may fail due to insufficient swap space (user-2f22, 2021-03-14, exchange 74140, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="amiga.html">Amiga</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Operating systems: <a href="unix.html">Unix</a>, <a href="vms.html">VMS</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="cd.html">CD</a>, <a href="whdload.html">WHDload</a>, <a href="emulation.html">emulation</a>
+</li>
+<li>Parts and peripherals: <a href="cd-drive.html">CD drive</a>, <a href="cpu.html">CPU</a>, <a href="ram.html">RAM</a>, <a href="floppy-disk.html">floppy disk</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="uefi.html">UEFI</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="clover.html">Clover</a>, <a href="partitioner.html">partitioner</a>
+</li></ul>
+</body>
+</html>

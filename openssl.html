@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenSSL</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>OpenSSL</h1>
+<p>Claims: 32 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Heartbleed">Heartbleed</a>, <a href="https://en.wikipedia.org/wiki/OpenSSH">OpenSSH</a>.</p>
+<p>OpenSSL is a widely used cryptographic library that can be used as an alternative to nss/nspr in rpm. <sup><a href="#s1">1</a></sup> OpenSSL can be compiled on a variety of platforms, though the process is not always straightforward. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Building OpenSSL on IRIX can involve several issues, including 'Arg list too long' errors, library not found errors, and problems with irixports and RSE. <sup><a href="#s3">3</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> OpenSSL is often built alongside other tools such as OpenSSH, curl, bash, and GCC. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> didbs releases include OpenSSL and OpenSSH, though they lack date/timestamp and version info for dependencies. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s10">10</a></sup> Newer versions of OpenSSL can resolve SSL/TLS errors in some applications. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> Older versions of OpenSSL can cause problems, such as preventing connections to modern services. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">rpm can use openssl instead of nss/nspr (user-f229, 2019-09-30, exchange 214860, check: uncheckable)</li>
+<li id="s2">OpenSSL compiles flawlessly on Indy. (user-637b, 2019-05-12, exchange 1669, check: supported)</li>
+<li id="s3">Compiling openssl can cause issues; SGI 7.9 is compiled against OnRex's version. (user-b4f4, 2019-08-20, exchange 214828, check: supported)</li>
+<li id="s4">compiling openssl on an HP PA-RISC 1.1 can be difficult. (user-ab99, 2023-02-01, exchange 35756, check: supported)</li>
+<li id="s5">building openssl with `irix64-mips4-gcc` requires increasing `ncargs` using `systune ncargs 131072` to avoid 'Arg list too long' errors. (user-f229, 2019-11-05, exchange 214880, check: supported)</li>
+<li id="s6">irixports has issues with openssl, requiring modifications or a different approach. (user-d903, 2019-11-07, exchange 214883, check: uncheckable)</li>
+<li id="s7">when building OpenSSL on IRIX, relinking with the required rpath can fix library not found errors; makefile modifications can achieve this without a full clean build. (user-c831, 2020-02-14, exchange 204143, check: uncheckable)</li>
+<li id="s8">OpenSSL issues persist in rse, affecting git and sshd, requiring a fix. (user-f229, 2020-06-18, exchange 68735, check: uncheckable)</li>
+<li id="s9">Building Git on IRIX without RSE is difficult and can involve issues with OpenSSL and curl. (user-ae4b, 2025-04-30, exchange 56263, check: uncheckable)</li>
+<li id="s10">Didbs includes both OpenSSL and OpenSSH. (user-2189, 2019-12-22, exchange 68229, check: uncheckable)</li>
+<li id="s11">I compiled OpenSSL, OpenSSH, binutils, bash, GCC, and some other stuff. (user-5510, 2023-08-04, exchange 39503, check: uncheckable)</li>
+<li id="s12">didbs releases lack date/timestamp and version info for dependencies, requiring full rebuilds when updating packages like openssl. Distributing the .installed tree could help, but git clones might still force a fullbuild (user-2d09, 2019-10-07, exchange 68016, check: uncheckable)</li>
+<li id="s13">We're using recent openssl libraries in didbs. (user-d903, 2019-11-07, exchange 68105, check: uncheckable)</li>
+<li id="s14">last didbs release was openssl 1.1.1a, next release will be 1.1.1d. (user-2d09, 2019-11-07, exchange 68105, check: supported)</li>
+<li id="s15">xephem 4.1.0 requires sslv23_client_method, indicating compatibility issues with older OpenSSL versions. (user-a4dd, 2023-02-20, exchange 83026, check: supported)</li>
+<li id="s16">ClassiCube's SSL/TLS error can be resolved by using a newer OpenSSL, as suggested by sgug-rse. (user-23f2, 2025-05-10, exchange 56471, check: uncheckable)</li>
+<li id="s17">Firefox3 won't compile with the latest OpenSSL; you need to get to Firefox 20 before you get TLS 1.2 support, and it's not trivial to add it in to an older Firefox release. (user-22f9, 2019-02-09, exchange 522, check: supported)</li>
+<li id="s18">Neko Pidgin uses an old version of OpenSSL and gnutls, preventing connection to modern services and is also buggy; libpurple in nekoware is the source of these issues. (user-e0a4, 2020-01-18, exchange 68285, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Processors: <a href="pentium-d-945.html">Pentium D 945</a>, <a href="r2000.html">R2000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-21.html">IRIX 6.5.21</a>, <a href="solaris-10.html">Solaris 10</a>
+</li>
+<li>Software: <a href="openssh.html">OpenSSH</a>, <a href="curl.html">curl</a>, <a href="classicube.html">ClassiCube</a>, <a href="rpm.html">RPM</a>, <a href="bash.html">bash</a>, <a href="tardist.html">tardist</a>, <a href="firefox-3.html">Firefox 3</a>, <a href="mipspro.html">MIPSpro</a>, <a href="rse.html">RSE</a>, <a href="binutils.html">binutils</a>, <a href="didbs.html">didbs</a>, <a href="git.html">git</a>, <a href="irixports.html">irixports</a>, <a href="nekoware.html">nekoware</a>, <a href="sgugshell.html">sgugshell</a>, <a href="sshd.html">sshd</a>
+</li>
+<li>Other: <a href="7130m.html">7130M</a>, <a href="systune.html">Systune</a>, <a href="checksum.html">checksum</a>, <a href="gnutls.html">gnutls</a>, <a href="libpurple.html">libpurple</a>, <a href="optlocal.html">optlocal</a>, <a href="xsginet-globe.html">xSGINet-globe</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GFXBOARD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GFXBOARD</h1>
+<p>Claims: 6</p>
+<p>The GFXBOARD=MGRAS option should be placed as the first argument to the inst command, like 'inst -m GFXBOARD=MGRAS -f /cdrom/dist'. <sup><a href="#s1">1</a></sup> inst files can have GFXBOARD or MGRAS restrictions that can be overridden with -m GFXBOARD= or -m MGRAS= options or by modifying the files with sed, and a ruby inst clone is available for Linux at https://github.com/irixxxx/. <sup><a href="#s2">2</a></sup> The installation process for demos can be bypassed using the -m GFXBOARD= option with the inst command. <sup><a href="#s3">3</a></sup> Unplugging the GFX board resolves the issue, indicating it's a graphics board problem. <sup><a href="#s4">4</a></sup> Mekton requires correct GFXBOARD entries in demos.idb for proper functioning; missing entries cause texture problems, and VPro's fallback to RealityEngine breaks texture rendering in older software. <sup><a href="#s5">5</a></sup> The user's Indigo 2 with IRIX 6.5.22 does not have the correct GFX board to run the Buttonfly demo from the 'Silicon Graphics General and Platform Demos 6.5.12' disc set. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The -m GFXBOARD=MGRAS option should be placed as the first argument to the inst command, like 'inst -m GFXBOARD=MGRAS -f /cdrom/dist'. (user-59b9, 2020-01-01, exchange 5241, check: uncheckable)</li>
+<li id="s2">inst files can have GFXBOARD or MGRAS restrictions that can be overridden with -m GFXBOARD= or -m MGRAS= options or by modifying the files with sed. A ruby inst clone is available for Linux at https://github.com/irixxxx/ (user-9860, 2021-10-24, exchange 217274, check: uncheckable)</li>
+<li id="s3">The installation process for demos can be bypassed using the -m GFXBOARD= option with the inst command. (user-59b9, 2023-01-23, exchange 82886, check: uncheckable)</li>
+<li id="s4">Unplugging the GFX board resolves the issue, indicating it's a graphics board problem. (user-b1da, 2023-05-23, exchange 223135, check: uncheckable)</li>
+<li id="s5">Mekton requires correct `GFXBOARD` entries in `demos.idb` for proper functioning; missing entries cause texture problems, and VPro's fallback to RealityEngine breaks texture rendering in older software. (user-baf6, 2023-08-19, exchange 83945, check: supported)</li>
+<li id="s6">The user's Indigo 2 with IRIX 6.5.22 does not have the correct GFX board to run the Buttonfly demo from the 'Silicon Graphics General and Platform Demos 6.5.12' disc set. (user-818d, 2024-06-15, exchange 218443, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="mgras.html">MGRAS</a>
+</li>
+<li>Graphics: <a href="realityengine.html">RealityEngine</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-22.html">IRIX 6.5.22</a>
+</li>
+<li>Software: <a href="inst.html">inst</a>, <a href="inst-command.html">inst command</a>, <a href="sed.html">sed</a>
+</li>
+<li>Other: <a href="mekton.html">Mekton</a>
+</li></ul>
+</body>
+</html>

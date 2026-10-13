@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bash</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>bash</h1>
+<p>Claims: 82 Background: 21 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash (Unix shell)</a>, <a href="https://en.wikipedia.org/wiki/FFmpeg">FFmpeg</a>, <a href="https://en.wikipedia.org/wiki/Tcsh">Tcsh</a>.</p>
+<p>Bash can be installed from /usr/nekoware/bin/bash, /opt/local/bin/bash, or by linking the bash binary, and it can also be built from source using a script that spawns mksh to download and install it. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> To set bash as the default shell for a user, edit the user's entry in /etc/passwd and change the last field to the path of bash, then log out and back in, and you should also add the path to bash to /etc/shells, which lists acceptable shells. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Bash provides command line completion and command history through the up arrow, along with tab-complete and a functional backspace, and switching from csh to bash is seamless and won't affect important system stuff. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Bash is a good choice for a shell, and bash versions are mostly the same for casual users. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> The .bashrc file is used by bash to set up configurations every time a new window is opened, and setting PATH in bash uses 'export PATH=/whatever/path'. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> Bash 5.0 requires minor adjustments to compile and run, and building bash on IRIX is possible. <sup><a href="#s18">18</a></sup><sup><a href="#s5">5</a></sup> Bash does not load bashrc when using winterm due to a specific loading mechanism, and bash needs libgcc in LD_LIBRARY_PATH for .bash_profile to work. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> GNU readline can be annoying in bash, especially with screen, requiring custom bindings to improve usability. <sup><a href="#s21">21</a></sup> bash is a shell that supports features such as command history search, arrow key history, and tab completion, which the built-in shell does not. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> It is used for scripting and can be built on a wide range of systems, with conversion rules existing for all dependencies up to bash 5.2. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> It is generally fine, but vintage machines may require specific considerations, as bash has limited compatibility with machines older than SVR4 and 4.3BSD and ports may not exist for all vintage operating systems such as A/UX. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> Early bash versions can be slow on some systems, and MIPSpro optimization can randomly break things. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> It is available on various platforms, including Solaris 10, which includes an older version in /usr/bin/bash, and it has been built for IRIX systems. <sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> Some users prefer bash over PowerShell due to its familiarity and perceived simplicity, and it is a good alternative to /bin/sh for those preferring something other than mksh. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Bash can be installed from /usr/nekoware/bin/bash. (user-b1da, 2019-11-27, exchange 4394, check: uncheckable)</li>
+<li id="s2">To run mkheaders, edit it to replace references to bash with the local path to bash, as the package is cross-compiled and the location of bash is unknown at compiletime. (user-42cf, 2019-01-23, exchange 203, check: uncheckable)</li>
+<li id="s3">The optlocal package contains a variety of tools such as OpenSSL, curl, bash, and others, which can be compiled manually but are handy to have precompiled. (user-ba81, 2019-07-06, exchange 67342, check: uncheckable)</li>
+<li id="s4">Untarring didbs and linking the bash binary can install bash without compiling it. (user-d903, 2019-11-27, exchange 4393, check: uncheckable)</li>
+<li id="s5">Building bash on IRIX is possible and can be done using a script that spawns mksh, which then downloads and installs bash. (user-f229, 2019-07-16, exchange 2533, check: uncheckable)</li>
+<li id="s6">To set bash as the default shell for a user, edit the user's entry in /etc/passwd and change the last field to the path of bash, then log out and back in. (user-b7c4, 2019-11-27, exchange 4394, check: uncheckable)</li>
+<li id="s7">bash is set as the default shell in /etc/passwd. (user-b1da, 2020-08-04, exchange 160914, check: uncheckable)</li>
+<li id="s8">You should add the path to bash to /etc/shells. (user-ba81, 2019-12-13, exchange 78060, check: uncheckable)</li>
+<li id="s9">/etc/shells lists acceptable shells; bash can be added there. (user-17cb, 2020-01-01, exchange 77051, check: uncheckable)</li>
+<li id="s10">bash and tcsh provide command line completion and command history through the up arrow. (user-8547, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s11">bash adds incredible features like tab-complete and a functional backspace (user-b7c4, 2019-11-27, exchange 4390, check: uncheckable)</li>
+<li id="s12">tcsh is difficult to use without bash because of its lack of command history and backspace functionality. (user-f229, 2019-11-27, exchange 4392, check: uncheckable)</li>
+<li id="s13">switching from csh to bash is seamless and won't affect important system stuff. (user-b7c4, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s14">Bash is a good choice for a shell. (user-b7c4, 2019-12-13, exchange 78059, check: uncheckable)</li>
+<li id="s15">Bash versions are mostly the same for casual users. (user-22f9, 2019-06-20, exchange 67257, check: uncheckable)</li>
+<li id="s16">The .bashrc file is used by bash to set up configurations every time a new window is opened. (user-f229, 2019-07-16, exchange 2533, check: uncheckable)</li>
+<li id="s17">setting PATH in csh uses 'setenv PATH /whatever/path' and in bash uses 'export PATH=/whatever/path'. (user-8547, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s18">Bash 5.0 requires minor adjustments to compile and run, with version 5.0.0(1)-release. (user-42cf, 2019-01-23, exchange 195, check: supported)</li>
+<li id="s19">Bash does not load bashrc when using winterm due to a specific loading mechanism. (user-888b, 2019-03-01, exchange 834, check: uncheckable)</li>
+<li id="s20">bash needs libgcc in LD_LIBRARY_PATH for .bash_profile to work. (user-637b, 2020-01-05, exchange 5332, check: uncheckable)</li>
+<li id="s21">GNU readline can be annoying in bash, especially with screen, requiring custom bindings to improve usability. (user-ba81, 2020-04-09, exchange 7340, check: uncheckable)</li>
+<li id="s22">The built-in shell does not support repeating commands or arrow keys; bash does. (user-6afa, 2022-09-18, exchange 217699, check: uncheckable)</li>
+<li id="s23">With Bash, you can search the command history using a key combination. (user-b4f4, 2025-02-15, exchange 86664, check: uncheckable)</li>
+<li id="s24">bash has everything expected and can be built on anything. (user-42cf, 2022-02-14, exchange 81067, check: uncheckable)</li>
+<li id="s25">bash is the first thing to install on a new system. (user-6afa, 2022-10-01, exchange 33117, check: uncheckable)</li>
+<li id="s26">Bash is used for scripting and was learned by the speaker long ago. (user-b4f4, 2025-02-15, exchange 86661, check: uncheckable)</li>
+<li id="s27">Conversion rules exist for all dependencies up to bash 5.2. (user-2189, 2026-02-05, exchange 73094, check: supported)</li>
+<li id="s28">Bash is generally fine, but vintage machines may require specific considerations. (user-07ed, 2022-09-19, exchange 82079, check: uncheckable)</li>
+<li id="s29">Bash has limited compatibility with machines older than SVR4 and 4.3BSD. (user-7b1c, 2022-09-19, exchange 82079, check: supported)</li>
+<li id="s30">Bash ports may not exist for all vintage operating systems, such as A/UX. (user-7b1c, 2022-09-19, exchange 82079, check: uncheckable)</li>
+<li id="s31">MIPSpro optimization can randomly break things, such as in the `bash` bug where `$(command)` tries to execute `ommand` instead of `command`. (user-42cf, 2022-01-17, exchange 24787, check: supported)</li>
+<li id="s32">Early bash versions can be slow on some systems. (user-07ed, 2022-09-19, exchange 82079, check: uncheckable)</li>
+<li id="s33">Solaris 10 includes an older bash in `/usr/bin/bash`. (user-7b1c, 2022-07-02, exchange 239749, check: supported)</li>
+<li id="s34">The system supports bash. (user-a079, 2023-08-24, exchange 40055, check: uncheckable)</li>
+<li id="s35">bash has been built for IRIX 4.0.5. (user-9528, 2025-10-27, exchange 189969, check: supported)</li>
+<li id="s36">Bash is preferred over PowerShell by some users due to its familiarity and perceived simplicity. (user-1361, 2022-03-12, exchange 27162, check: uncheckable)</li>
+<li id="s37">mksh is a good alternative to /bin/sh for those preferring something other than bash. (user-03ad, 2022-09-18, exchange 217699, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="bash-5-0.html">Bash 5.0</a> (3)
+</li>
+<li><a href="bash-script.html">bash script</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="atari-tt.html">Atari TT</a>, <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="68k.html">68k</a>, <a href="mips3.html">MIPS3</a>, <a href="r5000.html">R5000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-4-0-5.html">IRIX 4.0.5</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="a-ux.html">A/UX</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="solaris-10.html">Solaris 10</a>
+</li>
+<li>Software: <a href="tcsh.html">tcsh</a>, <a href="csh.html">csh</a>, <a href="etc-passwd.html">/etc/passwd</a>, <a href="nekoware.html">nekoware</a>, <a href="bashrc.html">.bashrc</a>, <a href="mipspro.html">MIPSpro</a>, <a href="openssl.html">OpenSSL</a>, <a href="path.html">PATH</a>, <a href="didbs.html">didbs</a>, <a href="cde.html">CDE</a>, <a href="openssh.html">OpenSSH</a>, <a href="perl.html">Perl</a>, <a href="powershell.html">PowerShell</a>, <a href="usb-driver.html">USB driver</a>, <a href="binutils.html">binutils</a>, <a href="curl.html">curl</a>, <a href="dnf.html">dnf</a>, <a href="emacs.html">emacs</a>, <a href="ffmpeg.html">ffmpeg</a>, <a href="freeware.html">freeware</a>, <a href="grep.html">grep</a>, <a href="gzip.html">gzip</a>, <a href="ncurses.html">ncurses</a>, <a href="setenv.html">setenv</a>, <a href="shell.html">shell</a>
+</li>
+<li>Parts and peripherals: <a href="screen.html">screen</a>
+</li>
+<li>Standards and interfaces: <a href="xterm.html">xterm</a>
+</li>
+<li>Companies: <a href="apple.html">Apple</a>, <a href="gcc.html">GCC</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>
+</li>
+<li>Other: <a href="mksh.html">mksh</a>, <a href="ksh.html">ksh</a>, <a href="zsh.html">zsh</a>, <a href="login.html">.login</a>, <a href="profile.html">.profile</a>, <a href="bin-sh.html">/bin/sh</a>, <a href="term.html">TERM</a>, <a href="dash.html">dash</a>, <a href="export.html">export</a>, <a href="gtar.html">gtar</a>, <a href="irssi.html">irssi</a>, <a href="libgcc.html">libgcc</a>, <a href="mkheaders.html">mkheaders</a>, <a href="neofetch.html">neofetch</a>, <a href="optlocal.html">optlocal</a>, <a href="tmux.html">tmux</a>, <a href="yum.html">yum</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IOP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IOP</h1>
+<p>Claims: 5</p>
+<p>The IOP was a separate component dedicated to handling disks. <sup><a href="#s1">1</a></sup> The IOP is the m68k board running the RTOS, and it was made optional on some workstations due to cost. <sup><a href="#s2">2</a></sup> The IOP handled channel interface and IO. <sup><a href="#s3">3</a></sup> Intercepting register reads/writes requires calling a function, which cannot be parallelized by the IOP due to the need to predict CPU actions. <sup><a href="#s4">4</a></sup> Virtualized peripheral register access via page faults would degrade performance significantly, though the R4k core in the IOP could potentially help mitigate this issue. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IOP was its own thing to handle disks. (user-b1da, 2024-01-29, exchange 209942, check: uncheckable)</li>
+<li id="s2">The IOP is the m68k board running the RTOS, and it was made optional on some workstations due to cost. (user-b1da, 2025-01-30, exchange 114033, check: uncheckable)</li>
+<li id="s3">The IOP handled channel interface and IO. (user-b1da, 2025-09-07, exchange 213021, check: uncheckable)</li>
+<li id="s4">Intercepting register reads/writes requires calling a function, which cannot be parallelized by the IOP due to the need to predict CPU actions. (user-3e2d, 2026-07-08, exchange 94241, check: uncheckable)</li>
+<li id="s5">Virtualized peripheral register access via page faults would degrade performance significantly; the R4k core in the IOP could potentially help mitigate this issue. (user-3e2d, 2026-07-08, exchange 94240, check: supported)</li>
+</ol>
+</body>
+</html>

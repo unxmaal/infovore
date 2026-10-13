@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VPro</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VPro</h1>
+<p>Claims: 150 Background: 17 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>, <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>, <a href="https://en.wikipedia.org/wiki/Video_games_and_Linux">Video games and Linux</a>.</p>
+<h2 id="with-octane">With Octane</h2>
+<p>The VPRO is an ultimate graphics system available for the Octane and ip35, and it is a logical upgrade path from V8, though it is less mature than the Impact solution, which is more reliable but runs very hot. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Upgrading an Octane to VPro turns it into an Octane2, which has Xbow 1.4, a later power supply, and a later 'heart' board for 8GiB support, while the upgrade itself requires patching the OS to 6.5.30. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The Octane2 came with a 1.4 backplane and VPro, while late Octane1 models could also use 1.4 backplanes but came with MGRAS, and a 2x400 MHz Octane2 with VPro usually has a V10 CPU. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> VPro, Octane, Tezro, O350, and Onyx2 use VBOB, and the Octane and Tezro/Fuel share a common lineage but have different graphics solutions. <sup><a href="#s9">9</a></sup><sup><a href="#s3">3</a></sup> The VPro lacks the needed interface for the Octane personal video board, and some Octane demos will not install on VPro and only on Impact, requiring overriding. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Swapping VPro and Impact graphics on Octanes requires a kernel rebuild but still boots via serial console, and the console may spam error messages during the demo. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The main port of the VPro goes into analogue mode during boot, so DCD outputs can enable two-head mode on an Octane, but the 13w3 connector on an Octane's VPro is somewhat unreliable and may require wiggling to make proper contact. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> The red light on an Octane2 with VPro turns off after tests pass, and an Octane V12 with dual VPro carrier can start up but has graphical glitches early in the PROM. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup></p>
+<h2 id="with-origin-350">With Origin 350</h2>
+<ul>
+<li>Transferring a HDD from a Tezro to an O350 should allow the O350 to boot, assuming the O350 has a VPro. (+1 similar) (user-8547, exchange 222942, 2023-03-24; 2 speaker(s), 1 conversation(s))
+</li>
+<li>VPro can be installed in an O350. (+1 similar) (user-ba81, exchange 8295, 2020-05-11 to 2022-03-20; 2 speaker(s), 2 conversation(s))
+</li>
+<li>A VPro or DM3 card is required to convert a P serial to another type in an O350. Without these, attempts to change the serial may fail. (user-9860, exchange 221735, 2021-12-05; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Andrej Bukošek is letting me borrow an O350 with VPro for replication. (user-5906, exchange 211941, 2025-02-08; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Tezro rackmounts are similar to O350s with VPro. (user-ba81, exchange 8295, 2020-05-11; 1 speaker(s), 1 conversation(s))
+</li>
+<li>By 2006, upgraded Vpros might have been intended for Fuel/Tezro/O350/etc. (user-2a3c, exchange 122071, 2026-03-14; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The Origin 350 is compatible only with VPro or IR4 PCI graphics cards. (user-9849, exchange 108321, 2023-08-15; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The Origin 350 can be equipped with VPro or Radeon video, making it an Onyx350 or Onyx4 respectively. (user-b7c4, exchange 3836, 2019-10-11; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="general">General</h2>
+<p>VPro can be installed in an Origin 350, where it makes the machine an Onyx350, and it can also be installed in a Tezro. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> VPro sits on the XBridge in the Fuel, and MXI/MXE and all VPro boards can drive 1920x1200 resolution. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> VPro machines have acceleration options, and SGI VPro can render to a different buffer using OpenGL functions like glXCreatePbuffer. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> Some things do not play nice with VPro, requiring MXE, and a few IMPACT demos will not run on VPro. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> The VPro splits its video RAM between the software and the framebuffer, and can control the amount of VRAM allocated for the framebuffer and textures. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> The DCD card is a rare daughtercard for the VPro that can enable dual head, and it is difficult to find and expensive. <sup><a href="#s29">29</a></sup> The Origin 350 is compatible only with VPro or IR4 PCI graphics cards. <sup><a href="#s30">30</a></sup> The VPro has driver bugs, especially with Quake3 rendering, which do not appear on MGRAS hardware, and some software is still not compatible with VPro. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> The VPro chokes when a polygon's Z coordinate is exactly 0, showing the polygon only when the coordinate is slightly above or below 0. <sup><a href="#s33">33</a></sup> VPro systems use microcode, and some VPro features, like fragment lighting, have optimized code paths. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> VPro is great for ported software, but IRIX-native software tends to run better on IMPACT/MGRAS. <sup><a href="#s36">36</a></sup> The first generation of vPro consists of the v6 and V8, while the v10 and v12 are the second generation with twice the performance. <sup><a href="#s37">37</a></sup> SGI hardware did not support OpenGL 1.3, providing at most 1.2 for vPro. <sup><a href="#s38">38</a></sup> The VPro is a single-chip, fixed-function architecture similar to contemporary Nvidia graphics cards, and supports VBOs through GL_ARB_vertex_buffer_object for efficient storage of vertex data in GPU-accessible SDRAM. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup> The VPro has design flaws affecting OpenGL programs, and its performance issues were difficult to work around. <sup><a href="#s41">41</a></sup><sup><a href="#s42">42</a></sup> The VPro worked well for CAD software, but some software was only certified for MXE, not VPro. <sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> The VPro has DVI ports, which appeared after the Octane2, and Onyx4 and VPro both use DVI. <sup><a href="#s45">45</a></sup><sup><a href="#s46">46</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The VPRO (Octane and ip35) and Voyager (Onyx4) are ultimate graphics systems. (user-cd83, 2020-05-13, exchange 220942, check: supported)</li>
+<li id="s2">Octane can do dual CPU; VPro requires special sauce; V8 is a logical upgrade path; V12 is expensive; V6 and V10 may not support 1080p with all bits enabled (user-b7c4, 2020-02-10, exchange 96329, check: supported)</li>
+<li id="s3">Octane and Tezro/Fuel share a common lineage but have different graphics solutions, with Vpro being cost-effective but less mature, while Impact is more reliable but runs very hot. (user-2a3c, 2025-04-25, exchange 224963, check: supported)</li>
+<li id="s4">The VPRO upgrade turns an Octane into an Octane2. (user-8547, 2023-04-20, exchange 37456, check: supported)</li>
+<li id="s5">An Octane2 has Xbow 1.4, a later power supply, VPro, and a later 'heart' board for 8GiB support. (user-e872, 2021-02-17, exchange 14829, check: supported)</li>
+<li id="s6">Upgrading an Octane from SE to VPro requires patching the OS to 6.5.30. (user-baf6, 2022-09-22, exchange 222526, check: supported)</li>
+<li id="s7">The Octane2 came with a 1.4 backplane and VPro, while late Octane1 models could also use 1.4 backplanes but came with MGRAS. (user-b7c4, 2023-04-18, exchange 240013, check: supported)</li>
+<li id="s8">2x400 MHz Octane2 with VPro usually has a V10 CPU. (user-6d0a, 2025-02-05, exchange 114486, check: supported)</li>
+<li id="s9">VPro, Octane, Tezro, O350, and Onyx2 use VBOB. (user-e4d0, 2023-03-25, exchange 217974, check: supported)</li>
+<li id="s10">the VPro lacks the needed interface for the octane personal video board (user-9849, 2021-04-19, exchange 16760, check: supported)</li>
+<li id="s11">Some Octane demos will not install on VPro and only on Impact, requiring overriding. (user-1171, 2021-10-03, exchange 100296, check: supported)</li>
+<li id="s12">Swapping VPro and Impact graphics on Octanes requires a kernel rebuild but still boots via serial console. (user-e872, 2021-11-05, exchange 100779, check: uncheckable)</li>
+<li id="s13">The Octane can run the VPro system and the console may spam error messages during the demo. (user-4292, 2022-11-12, exchange 82393, check: supported)</li>
+<li id="s14">The main port of the VPro goes into analogue mode during boot, so DCD outputs can enable two-head mode on an Octane. (user-e872, 2024-05-26, exchange 111387, check: supported)</li>
+<li id="s15">The 13w3 connector on an Octane's VPro is somewhat unreliable and may require wiggling to make proper contact. (user-b1da, 2025-01-09, exchange 211552, check: supported)</li>
+<li id="s16">The red light on an Octane2 with VPro turns off after tests pass. (user-e872, 2022-04-14, exchange 103207, check: supported)</li>
+<li id="s17">An Octane V12 with dual VPro carrier can start up but has graphical glitches early in the PROM. (user-22f9, 2025-01-30, exchange 114006, check: supported)</li>
+<li id="s18">The Origin 350 can be equipped with VPro or Radeon video, making it an Onyx350 or Onyx4 respectively. (user-b7c4, 2019-10-11, exchange 3836, check: supported)</li>
+<li id="s19">VPro can be installed in an O350. (user-ba81, 2020-05-11, exchange 8295, check: supported)</li>
+<li id="s20">An Onyx350 with VPro is just a Tezro. (user-8547, 2023-01-12, exchange 106280, check: supported)</li>
+<li id="s21">The X talk slot on the Fuel is not a PCI slot; VPro sits on the XBridge. (user-ba81, 2019-12-08, exchange 4705, check: supported)</li>
+<li id="s22">MXI/MXE and all Vpro boards can drive 1920x1200 resolution. (user-7b1c, 2022-04-30, exchange 103487, check: uncheckable)</li>
+<li id="s23">VPro machines have acceleration options, and the O2 has the ICE engine for basic SIMD-like operations. (user-e872, 2021-12-15, exchange 215247, check: supported)</li>
+<li id="s24">SGI VPro can render to a different buffer using OpenGL functions like glXCreatePbuffer. (user-b1da, 2022-06-16, exchange 207187, check: uncheckable)</li>
+<li id="s25">Some IMPACT demos won't run on VPro. (user-b1da, 2021-10-25, exchange 217275, check: uncheckable)</li>
+<li id="s26">A few things don't play nice with VPro, requiring MXE; 32MB VRAM isn't enough for DCD. (user-7b1c, 2022-06-02, exchange 103959, check: supported)</li>
+<li id="s27">Vpro splits its video RAM between the software and the framebuffer. (user-baf6, 2023-06-07, exchange 208801, check: uncheckable)</li>
+<li id="s28">The VPro can control the amount of VRAM allocated for the framebuffer and textures. (user-281e, 2025-03-18, exchange 215672, check: uncheckable)</li>
+<li id="s29">The DCD card is a rare daughtercard for the vpro that can enable dual head; it is difficult to find and expensive. (user-cd83, 2023-01-19, exchange 208234, check: uncheckable)</li>
+<li id="s30">The Origin 350 is compatible only with VPro or IR4 PCI graphics cards. (user-9849, 2023-08-15, exchange 108321, check: supported)</li>
+<li id="s31">The Vpro has driver bugs, especially with Quake3 rendering, which don't appear on Mardigras hardware. (user-17cb, 2023-06-01, exchange 70806, check: uncheckable)</li>
+<li id="s32">Some software is still not compatible with VPro. (user-baf6, 2023-08-16, exchange 108349, check: uncheckable)</li>
+<li id="s33">The VPro chokes when a polygon's Z coordinate is exactly 0, showing the polygon only when the coordinate is slightly above or below 0. (user-21b8, 2023-06-01, exchange 70805, check: supported)</li>
+<li id="s34">IMPACT and VPro systems use microcode. (user-baf6, 2023-06-09, exchange 208830, check: uncheckable)</li>
+<li id="s35">Some VPro features, like fragment lighting, have optimized code paths. (user-21b8, 2024-04-17, exchange 71162, check: uncheckable)</li>
+<li id="s36">VPro is great for ported software but IRIX-native software tends to run better on IMPACT/MGRAS. (user-6afa, 2023-08-23, exchange 108462, check: uncheckable)</li>
+<li id="s37">The v6 and V8 are the first generation of vPro, while the v10 and v12 are the second generation with twice the performance. (user-24f0, 2025-08-24, exchange 118121, check: uncheckable)</li>
+<li id="s38">SGI hardware did not support OpenGL 1.3 in hardware, at most 1.2 for vpro. (user-4f7c, 2025-08-21, exchange 118051, check: supported)</li>
+<li id="s39">VPro supports VBOs through GL_ARB_vertex_buffer_object, allowing efficient storage of vertex data in GPU-accessible SDRAM. (user-17cb, 2026-05-14, exchange 215998, check: uncheckable)</li>
+<li id="s40">The Vpro is a fresh architecture with little in common, but still fixed function, single chip, similar to contemporary Nvidia graphics cards. (user-2a3c, 2026-08-03, exchange 94679, check: uncheckable)</li>
+<li id="s41">The VPro had design flaws affecting OpenGL programs. (user-6c80, 2025-11-04, exchange 60333, check: uncheckable)</li>
+<li id="s42">The VPro's performance issues were difficult to work around. (user-17cb, 2025-11-04, exchange 60333, check: uncheckable)</li>
+<li id="s43">The VPro worked well for CAD software. (user-b1da, 2025-11-04, exchange 60333, check: uncheckable)</li>
+<li id="s44">Some software was only certified for MXE, not VPro. (user-616d, 2026-01-05, exchange 120471, check: uncheckable)</li>
+<li id="s45">The Vpro had DVI ports after the Octane2. (user-1a5a, 2026-07-19, exchange 124158, check: supported)</li>
+<li id="s46">Onyx4 and VPro both use DVI. (user-cd83, 2026-08-18, exchange 214452, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="vpro-card.html">VPro card</a> (8)
+</li>
+<li><a href="vpro-gpu.html">VPro GPU</a> (4)
+</li>
+<li><a href="vpro-graphics.html">VPro graphics</a> (15)
+</li>
+<li><a href="vpro-octane.html">VPro Octane</a> (6)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="origin-350.html">Origin 350</a>, <a href="o2.html">O2</a>, <a href="tezro.html">Tezro</a>, <a href="mgras.html">MGRAS</a>, <a href="impact.html">Impact</a>, <a href="mxe.html">MXE</a>, <a href="onyx4.html">Onyx4</a>, <a href="onyx350.html">Onyx350</a>, <a href="fuel.html">Fuel</a>, <a href="onyx2.html">Onyx2</a>, <a href="se.html">SE</a>, <a href="onyx.html">Onyx</a>, <a href="tram.html">TRAM</a>, <a href="xbow.html">Xbow</a>, <a href="bebox.html">BeBox</a>, <a href="impact-octane.html">Impact Octane</a>, <a href="numalink.html">Numalink</a>, <a href="octane-1-5.html">Octane 1.5</a>, <a href="onyx2-demos.html">Onyx2 demos</a>, <a href="origin-2k.html">Origin 2K</a>, <a href="origin-300.html">Origin 300</a>, <a href="radeon.html">Radeon</a>, <a href="sgi-hardware.html">SGI hardware</a>, <a href="tezro-rackmount.html">Tezro rackmount</a>, <a href="xbow-1-2.html">XBOW 1.2</a>, <a href="xio.html">XIO</a>, <a href="xbow-1-3.html">Xbow 1.3</a>, <a href="xbow-1-4.html">Xbow 1.4</a>
+</li>
+<li>Processors: <a href="603e-cpu.html">603e CPU</a>, <a href="v10-cpu.html">V10 CPU</a>
+</li>
+<li>Graphics: <a href="v12.html">V12</a>, <a href="v10.html">V10</a>, <a href="firegl.html">FireGL</a>, <a href="graphics.html">graphics</a>, <a href="ati-firegl.html">ATI FireGL</a>, <a href="esi.html">ESI</a>, <a href="v6.html">V6</a>, <a href="v8.html">V8</a>, <a href="voodoo2.html">Voodoo2</a>, <a href="voodoo2-sli.html">Voodoo2 SLI</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="freebsd.html">FreeBSD</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="opengl-1-2.html">OpenGL 1.2</a>, <a href="opengl-1-1.html">OpenGL 1.1</a>, <a href="opengl.html">OpenGL</a>, <a href="quake.html">Quake</a>, <a href="quake-3.html">Quake 3</a>, <a href="booterizer.html">Booterizer</a>, <a href="dcd.html">DCD</a>, <a href="quicktransit.html">QuickTransit</a>, <a href="sdl.html">SDL</a>, <a href="vizserver.html">VizServer</a>, <a href="freeware.html">freeware</a>, <a href="setenv.html">setenv</a>
+</li>
+<li>Parts and peripherals: <a href="dvi-port.html">DVI port</a>, <a href="dm2.html">DM2</a>, <a href="fan.html">fan</a>, <a href="13w3-port.html">13W3 port</a>, <a href="cherokee-psu.html">Cherokee PSU</a>, <a href="dm3.html">DM3</a>, <a href="hdd.html">HDD</a>, <a href="ip35.html">IP35</a>, <a href="ip59.html">IP59</a>, <a href="prom-hinv.html">PROM hinv</a>, <a href="quake-port.html">Quake port</a>, <a href="vbob.html">VBOB</a>, <a href="drive.html">drive</a>, <a href="mainboard.html">mainboard</a>, <a href="power-supply.html">power supply</a>, <a href="screen.html">screen</a>
+</li>
+<li>Standards and interfaces: <a href="agp.html">AGP</a>, <a href="agp-pro.html">AGP Pro</a>, <a href="pci-express.html">PCI Express</a>, <a href="x.html">X</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="nvidia.html">Nvidia</a>
+</li>
+<li>Other: <a href="voyager.html">Voyager</a>, <a href="blower.html">blower</a>, <a href="320-540.html">320/540</a>, <a href="darkplaces.html">Darkplaces</a>, <a href="emxi.html">EMXI</a>, <a href="lantern.html">Lantern</a>, <a href="mardigras.html">Mardigras</a>, <a href="multilink.html">MultiLink</a>, <a href="pvo.html">PVO</a>, <a href="q3a.html">Q3A</a>, <a href="sgiquake.html">SGIQuake</a>, <a href="scorched3d.html">Scorched3D</a>, <a href="backup.html">backup</a>, <a href="ccache.html">ccache</a>, <a href="dithering.html">dithering</a>, <a href="error-message.html">error message</a>, <a href="multipipe.html">multipipe</a>, <a href="multitexturing.html">multitexturing</a>
+</li></ul>
+</body>
+</html>

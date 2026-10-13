@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bootp</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>bootp</h1>
+<p>Claims: 42 Background: 13 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bootstrap_Protocol">Bootstrap Protocol</a>.</p>
+<p>BOOTP works by matching a client's exact MAC (network hardware) address to a specific IP address, which it deduces from the client's network hardware address, /etc/bootptab, or /etc/ethers and /etc/hosts files. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It uses a broadcast domain to forward packets, similar to DHCP. <sup><a href="#s3">3</a></sup> BOOTP is not NAT-friendly and can cause issues with convenient network setups, and people often face problems with existing DHCP servers not supporting BOOTP. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It can be used to boot from a network via the boot command, PROM, or the command monitor, and the MAC address may need to be obtained from the network, switch, or a bootp server logfile. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Xterminals used BOOTP to configure themselves, TFTP to get firmware, and XDMCP to find a login host. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">bootp works by matching the exact MAC to a specific IP address; it's not like DNS or hosts files. (user-f229, 2020-06-06, exchange 216708, check: uncheckable)</li>
+<li id="s2">bootp responds only to a client if it can deduce the client's Internet address from its network hardware address, /etc/bootptab, or /etc/ethers and /etc/hosts files. (user-c9fb, 2021-11-16, exchange 77480, check: uncheckable)</li>
+<li id="s3">bootp is similar to DHCP, where it uses a broadcast domain to forward packets. (user-c986, 2026-08-03, exchange 220594, check: uncheckable)</li>
+<li id="s4">People often face issues with existing DHCP servers not supporting bootp. (user-07ed, 2024-03-22, exchange 210176, check: uncheckable)</li>
+<li id="s5">Bootp is not NAT-friendly and can cause issues with convenient network setups. (user-986f, 2025-09-25, exchange 216807, check: uncheckable)</li>
+<li id="s6">The boot command can be used to boot from a network using bootp. (user-f229, 2019-09-15, exchange 216660, check: uncheckable)</li>
+<li id="s7">Prom can be configured to bootp, and the ethernet address can be obtained from the bootp logfile. (user-f229, 2019-09-23, exchange 3614, check: uncheckable)</li>
+<li id="s8">Bootp can be used from the command monitor to boot the system, but the MAC address may need to be obtained from the network or switch. (user-6e2b, 2021-11-03, exchange 21812, check: uncheckable)</li>
+<li id="s9">Xterminals used BOOTP to configure themselves, TFTP to get firmware, and XDMCP to find a login host, running X11 from there. (user-cb4c, 2020-01-22, exchange 5648, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="dhcp-server.html">DHCP server</a>, <a href="indigo.html">Indigo</a>, <a href="octane.html">Octane</a>, <a href="tftp-server.html">TFTP server</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="debian.html">Debian</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="rsh.html">rsh</a>, <a href="docker.html">Docker</a>, <a href="love.html">LOVE</a>, <a href="virtualbox.html">VirtualBox</a>, <a href="boot-command.html">boot command</a>, <a href="booterizer-tool.html">booterizer tool</a>, <a href="fx-64.html">fx.64</a>, <a href="ping.html">ping</a>
+</li>
+<li>Parts and peripherals: <a href="prom-update.html">PROM update</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="tftp.html">TFTP</a>, <a href="ethernet-address.html">Ethernet address</a>, <a href="ip-address.html">IP address</a>, <a href="xdmcp.html">XDMCP</a>, <a href="standard.html">standard</a>
+</li>
+<li>Other: <a href="fx-arcs.html">fx.ARCS</a>, <a href="rhosts.html">.rhosts</a>, <a href="dina.html">DINA</a>, <a href="client.html">client</a>, <a href="netaddr.html">netaddr</a>
+</li></ul>
+</body>
+</html>

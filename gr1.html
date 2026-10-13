@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GR1</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GR1</h1>
+<p>Claims: 5</p>
+<p>GR1, LG1, and Newport graphics have partial emulation, while Eclipse graphics are close to working. <sup><a href="#s1">1</a></sup> 4d/20 and 4d/25 work well in serial console mode, but the GR1 graphics pipeline gets stuck when X launches. <sup><a href="#s2">2</a></sup> The OS gfx boot uploads new code to the GR1, which fails to perform a DMA operation. <sup><a href="#s3">3</a></sup> The GR1 emulation in MAME will not be accurate enough to generate such timing output. <sup><a href="#s4">4</a></sup> The best technical information about GR1 is the IrisVision docs from bitsavers. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">GR1, LG1, and Newport graphics have partial emulation, but Eclipse graphics are close to working. (user-a719, 2023-06-08, exchange 220277, check: uncheckable)</li>
+<li id="s2">4d/20 and 4d/25 work well in serial console mode, but gr1 graphics pipeline gets stuck when X launches. (user-a719, 2023-06-08, exchange 220277, check: supported)</li>
+<li id="s3">The OS gfx boot uploads new code to the gr1, which fails to do a DMA operation. (user-a719, 2025-11-01, exchange 220379, check: uncheckable)</li>
+<li id="s4">The GR1 emulation in MAME won't be accurate enough to generate such timing output. For signals that are actually represented as discrete things (rather than 'implied' during a read or write or similar), the best you can (user-b1da, 2023-06-21, exchange 223180, check: uncheckable)</li>
+<li id="s5">The best technical information about gr1 is the IrisVision docs from bitsavers. (user-a719, 2025-11-01, exchange 220379, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="4d-20.html">4D/20</a>, <a href="4d-25.html">4D/25</a>
+</li>
+<li>Graphics: <a href="irisvision.html">IrisVision</a>, <a href="newport.html">Newport</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>
+</li>
+<li>Standards and interfaces: <a href="dma-operation.html">DMA operation</a>
+</li>
+<li>Other: <a href="eclipse.html">Eclipse</a>
+</li></ul>
+</body>
+</html>

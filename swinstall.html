@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>swinstall</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>swinstall</h1>
+<p>Claims: 6</p>
+<p>swinstall is a tool used to install software packages on HP-UX systems. To install a package, you download the depot file, gunzip it, and run `swinstall -s /full/path/to/file.depot` as root, where `$PWD` can be used as a shortcut for the current directory. The recommended way to install .depot files is `swinstall -s /path/to/file.depot`, and you can also install depots using commands such as `sw - <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To install a package, download the depot file, gunzip it, and run `swinstall -s /full/path/to/file.depot` as root; `$PWD` can be used as a shortcut. (user-b1da, 2020-07-20, exchange 9757, check: supported)</li>
+<li id="s2">swinstall requires a catalog to install software from a directory. (user-637b, 2020-07-21, exchange 9825, check: uncheckable)</li>
+<li id="s3">swinstall requires specific flags in /etc/exports to work with HP-UX and NFS servers. (user-637b, 2020-07-25, exchange 10018, check: uncheckable)</li>
+<li id="s4">`swinstall` menu rendering issues vary between devices. (user-b1da, 2020-08-02, exchange 10276, check: supported)</li>
+<li id="s5">you should be able to install depots using `swinstall` e.g. `swinstall -i -s /full/path/to/depot/depot_name.depot` (user-ba81, 2021-11-13, exchange 22028, check: supported)</li>
+<li id="s6">swinstall -s /path/to/file.depot is the recommended way to install .depot files. (user-03ad, 2024-06-17, exchange 235439, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="nfs-server.html">NFS server</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>
+</li>
+<li>Other: <a href="depot-file.html">depot file</a>
+</li></ul>
+</body>
+</html>

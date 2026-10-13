@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>printenv</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>printenv</h1>
+<p>Claims: 9</p>
+<p>The printenv command displays the current environment settings, while setenv changes them. <sup><a href="#s1">1</a></sup> printenv shows environment variables including timezone, console settings, and disk partition information. <sup><a href="#s2">2</a></sup> On the Indy PROM, printenv displays environment variables. <sup><a href="#s3">3</a></sup> printenv can be used to find the MAC address and to preserve PROM settings, which are then reset with resetenv. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The 'printenv' command shows current environment settings; 'setenv' changes them. (user-9528, 2020-10-13, exchange 11455, check: uncheckable)</li>
+<li id="s2">printenv shows environment variables including timezone, console settings, and disk partition information. (user-9151, 2026-06-29, exchange 123884, check: uncheckable)</li>
+<li id="s3">printenv on the Indy prom displays environment variables. (user-24f0, 2024-06-17, exchange 47030, check: supported)</li>
+<li id="s4">To find the MAC, use ifconfig or printenv. (user-37ee, 2021-02-28, exchange 15067, check: uncheckable)</li>
+<li id="s5">To preserve PROM settings, one should print them with 'printenv' and reset them with 'resetenv'. (user-8547, 2022-02-23, exchange 26283, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mac.html">Mac</a>
+</li>
+<li>Software: <a href="setenv.html">setenv</a>, <a href="environment-variables.html">environment variables</a>, <a href="ifconfig.html">ifconfig</a>
+</li>
+<li>Parts and peripherals: <a href="indy-prom.html">Indy PROM</a>, <a href="prom-settings.html">PROM settings</a>
+</li>
+<li>Other: <a href="resetenv.html">resetenv</a>
+</li></ul>
+</body>
+</html>

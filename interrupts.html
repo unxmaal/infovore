@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>interrupts</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>interrupts</h1>
+<p>Claims: 4</p>
+<p>In privilege mode 3, interrupts are always enabled for modes 4+ and always disabled for modes 2-, with handling cascading down to lower modes if not handled. <sup><a href="#s1">1</a></sup> Writing code without memory protection and masking interrupts can lead to immediate crashes due to overwriting interrupt vectors or code, but running it in ROM avoids these issues. <sup><a href="#s2">2</a></sup> IP32 PCI drivers override interrupt levels, and setting them to specific values does not work; interrupt handlers are not called despite enabling interrupts. <sup><a href="#s3">3</a></sup> Polling can be slower for smaller chunks but is comparable to interrupts for larger chunks, and it avoids a fault issue. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">In privilege mode 3, interrupts are always enabled for modes 4+ and always disabled for modes 2-, with handling cascading down to lower modes if not handled. (user-6afa, 2021-07-23, exchange 205285, check: supported)</li>
+<li id="s2">Writing code without memory protection and masking interrupts can lead to immediate crashes due to overwriting interrupt vectors or code, but running it in ROM avoids these issues. (user-21b8, 2022-08-21, exchange 236126, check: uncheckable)</li>
+<li id="s3">IP32 PCI drivers override interrupt levels, and setting them to specific values does not work; interrupt handlers are not called despite enabling interrupts. (user-3e2d, 2025-11-02, exchange 219209, check: uncheckable)</li>
+<li id="s4">Polling can be slower for smaller chunks but is comparable to interrupts for larger chunks, and it avoids a fault issue. (user-757f, 2026-05-27, exchange 123270, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="driver.html">driver</a>
+</li>
+<li>Parts and peripherals: <a href="rom.html">ROM</a>, <a href="memory-protection.html">memory protection</a>
+</li></ul>
+</body>
+</html>

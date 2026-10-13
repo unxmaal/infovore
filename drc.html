@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRC</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>DRC</h1>
+<p>Claims: 7</p>
+<p>Networking was working both pre-DRC and after 0.241, but not in versions before 0.228. A gfx regression in 0.213 prevents drawing grid in Softimage; use 0.212 instead. For non-DRC with networking, use 0.240. <sup><a href="#s1">1</a></sup> IRIX 6.5 can now boot consistently in DRC emulation, though stability requires further testing. <sup><a href="#s2">2</a></sup> Running Irix 5.3 with DRC using an AMD 5800X processor increases mame benchmark speed by 81.76% to 54.55% without DRC, offering a 50% speedup. <sup><a href="#s3">3</a></sup> Disabling the DRC during IRIX 5.3 installation can avoid annoying issues. <sup><a href="#s4">4</a></sup> The TLB in the mips3 and drc code is slightly less complete/accurate than that in r4000.cpp; the r4000.cpp code can run Windows NT whereas the mips3 code cannot. <sup><a href="#s5">5</a></sup> Signed comparisons for branch instructions should be validated before merging code changes. <sup><a href="#s6">6</a></sup> the DRC has diverged quite a bit from the one that was in there for arm64be; will put some more cycles into it. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Networking was working both pre-DRC and after 0.241, but not in versions before 0.228. A gfx regression in 0.213 prevents drawing grid in Softimage; use 0.212 instead. For non-DRC with networking, use 0.240. DRC was in 0 (user-ce6b, 2022-12-28, exchange 220247, check: supported)</li>
+<li id="s2">IRIX 6.5 can now boot consistently in DRC emulation, though stability requires further testing. (user-ce6b, 2023-04-28, exchange 93142, check: supported)</li>
+<li id="s3">Running Irix 5.3 with DRC using an AMD 5800X processor increases mame benchmark speed by 81.76% to 54.55% without DRC, offering a 50% speedup. (user-ce6b, 2023-04-30, exchange 220272, check: supported)</li>
+<li id="s4">Disabling the DRC during IRIX 5.3 installation can avoid annoying issues. (user-1085, 2025-11-13, exchange 220381, check: supported)</li>
+<li id="s5">The TLB in the mips3 and drc code is slightly less complete/accurate than that in r4000.cpp; the r4000.cpp code can run Windows NT whereas the mips3 code cannot. (user-a719, 2026-01-19, exchange 93687, check: supported)</li>
+<li id="s6">Signed comparisons for branch instructions should be validated before merging code changes. (user-231e, 2026-04-28, exchange 220413, check: uncheckable)</li>
+<li id="s7">the DRC has diverged quite a bit from the one that was in there for arm64be; will put some more cycles into it. (user-a7cb, 2026-08-08, exchange 94779, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="mips3.html">MIPS3</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="windows-nt.html">Windows NT</a>
+</li>
+<li>Software: <a href="installation.html">installation</a>
+</li>
+<li>Standards and interfaces: <a href="networking.html">networking</a>
+</li>
+<li>Other: <a href="r4000-cpp.html">r4000.cpp</a>
+</li></ul>
+</body>
+</html>

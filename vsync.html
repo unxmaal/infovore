@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vsync</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>vsync</h1>
+<p>Claims: 9 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>Double buffering can cause flickering in OpenGL rendering without explicit vsync support, and this flicker can also occur on older systems like IRIX, though it can still work without vsync on modern systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Without double buffering there is no buffer to sync, so disabling double buffering can eliminate vsync-related flicker. <sup><a href="#s3">3</a></sup> Disabling vsync can be done with -single or environment variables on modern systems, but not with glXSwapIntervalSGI on IRIX. <sup><a href="#s4">4</a></sup> Vsync makes the graphics card wait for sync or lower the FPS to match the display's refresh rate, even if it is capable of rendering at a higher rate. <sup><a href="#s5">5</a></sup> G-Sync reduces latency compared to VSync for modern gaming. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Double buffering issues can cause flickering in OpenGL rendering without explicit vsync support, and adjusting the swap interval can affect rendering output. (user-b1da, 2021-05-14, exchange 17356, check: uncheckable)</li>
+<li id="s2">On modern systems, double buffering can still work without vsync, but on older systems like IRIX, it can cause flicker. (user-22f9, 2023-10-30, exchange 41905, check: uncheckable)</li>
+<li id="s3">Without double buffering, there is no buffer to vsync, so disabling double buffering can eliminate vsync-related flicker. (user-b1da, 2023-10-30, exchange 41905, check: uncheckable)</li>
+<li id="s4">Disabling vsync can be done with -single or environment variables on modern systems, but not with glXSwapIntervalSGI on IRIX. (user-21b8, 2025-05-02, exchange 72280, check: uncheckable)</li>
+<li id="s5">Vsync makes the graphics card wait for sync or lower FPS to match the display's refresh rate, even if it's capable of rendering at a higher rate. (user-17cb, 2026-05-21, exchange 216021, check: uncheckable)</li>
+<li id="s6">G-Sync reduces latency compared to VSync for modern gaming. (user-24f0, 2026-05-21, exchange 73725, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>
+</li>
+<li>Other: <a href="double-buffering.html">double buffering</a>, <a href="decouple-swapbuf.html">DECOUPLE_SWAPBUF</a>, <a href="fp.html">FP</a>, <a href="flickering.html">flickering</a>, <a href="gldrawpixels.html">glDrawPixels</a>
+</li></ul>
+</body>
+</html>

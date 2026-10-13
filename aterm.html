@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aterm</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>aterm</h1>
+<p>Claims: 23</p>
+<p>aterm is a terminal emulator used on SGI systems. <sup><a href="#s1">1</a></sup> It can have a transparent background, though the sgug aterm does not support this feature. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The 'fake' transparency option works with certain command options in aterm, and it can be enabled by recompiling with a patch. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> aterm requires specific fonts ('k14') to function, and missing these fonts causes the program to fail. <sup><a href="#s6">6</a></sup> Compiling aterm may resolve font issues, and it requires the xorg-x11-fonts-misc package to resolve font errors. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> aterm works fine with ncurses apps, while other terminals mess them up, but ncurses is not well-supported in winterm, aterm, or other terminals. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> It checks the SHELL environment variable, falls back to getpwuid, and uses /bin/sh if the shell is not set, with /bin/bash as the last resort. <sup><a href="#s11">11</a></sup> If aterm fails to start, it may be due to environment or PATH setup, or conflicts with nekoware dependencies. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">aterm is used on SGI systems (user-3916, 2025-05-10, exchange 218946, check: uncheckable)</li>
+<li id="s2">Aterm can have a transparent background. (user-07ed, 2023-03-17, exchange 83176, check: uncheckable)</li>
+<li id="s3">The sgug aterm does not support transparent background. (user-17cb, 2024-03-09, exchange 71075, check: uncheckable)</li>
+<li id="s4">The 'fake' transparency option works with certain command options in aterm; if it fails, the user can upload a modified binary. (user-7973, 2024-03-09, exchange 71076, check: uncheckable)</li>
+<li id="s5">aterm can be recompiled with a patch to enable fake transparency, which works on at least one Octane2. (user-7973, 2024-03-11, exchange 215452, check: supported)</li>
+<li id="s6">aterm requires specific fonts ('k14') to function; missing these fonts causes the program to fail. (user-8547, 2022-12-11, exchange 105913, check: uncheckable)</li>
+<li id="s7">Compiling aterm may resolve font issues when it doesn't respect the -fn option. (user-17cb, 2020-06-16, exchange 68715, check: uncheckable)</li>
+<li id="s8">aterm requires the xorg-x11-fonts-misc package to resolve font errors, and may also need /bin/bash if it closes immediately after starting. (user-7973, 2025-11-06, exchange 88585, check: uncheckable)</li>
+<li id="s9">aterm works fine with ncurses apps, while other terminals mess them up. (user-7973, 2024-05-09, exchange 215488, check: uncheckable)</li>
+<li id="s10">ncurses is not well-supported in winterm, aterm, or other terminals, and may need to be avoided in CLI projects. (user-7973, 2024-05-11, exchange 215490, check: uncheckable)</li>
+<li id="s11">aterm checks the SHELL environment variable, falls back to getpwuid, and uses /bin/sh if the shell is not set, with /bin/bash as the last resort. (user-21b8, 2024-05-23, exchange 215500, check: uncheckable)</li>
+<li id="s12">aterm may fail due to environment or PATH setup, or conflicts with nekoware dependencies. (user-17cb, 2024-03-12, exchange 215453, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Software: <a href="winterm.html">winterm</a>, <a href="mrxvt.html">mrxvt</a>, <a href="ncurses.html">ncurses</a>, <a href="nekoware.html">nekoware</a>, <a href="shell.html">shell</a>
+</li>
+<li>Companies: <a href="sgug.html">SGUG</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="bin-bash.html">/bin/bash</a>, <a href="cshrc.html">.cshrc</a>, <a href="bin-sh.html">/bin/sh</a>, <a href="mc.html">MC</a>, <a href="stty.html">stty</a>
+</li></ul>
+</body>
+</html>

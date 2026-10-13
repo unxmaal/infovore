@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fx</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>fx</h1>
+<p>Claims: 54</p>
+<p>fx is a tool used to partition and set the partition map on SGI disks. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The fx command only labels the drive and creates a disklabel rather than a filesystem, so mkfs must be used to create a filesystem. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> fx always performs low-level formatting, which is why it is not recommended for formatting and should never be used to format a drive. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The auto command in fx performs a butterfly test and disk initialization, though it is not required for installation and can be skipped. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> fx was mainly designed for SCSI and ESDI drives. <sup><a href="#s9">9</a></sup> The FX, along with the Series E, EX, MPX100, Risc PC, Risc PC Plus, MVME160X, 260X, 360X, 460X, Atlas, Ultra, and Ultra Plus, runs AIX. <sup><a href="#s10">10</a></sup> fx can be run from PROM or an IRIX install on an Octane2, and booted from a CD using 'boot -f dkscsash' then 'boot -f dksc/stand/fx.ARCS -x'. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Running fx from the OS shell works, but 'ls dksc' fails with an EFS read error, while running it from the SCSI disk caused a panic. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The 'format' feature of FX tries to perform a low-level format which can cause issues, and SCSI drives should not be formatted with FX. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> Partitioning the drive in FX can bypass the hard disk image file on the SD card and write directly to the SD card in RAW mode, which results in no logs. <sup><a href="#s17">17</a></sup> fx can be used to clone an XFS drive on an Octane2 by repartitioning and formatting, then using xfsdump and xfsrestore to copy the data and manually transferring header files, and Irix can be installed from a hard drive using sash and fx, partitioning, and copying miniroot. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You partition with FX. (user-f229, 2020-04-24, exchange 7778, check: uncheckable)</li>
+<li id="s2">running fx is necessary to set the partition map. (user-d903, 2019-09-04, exchange 76822, check: uncheckable)</li>
+<li id="s3">The 'fx' command does not erase data; it only labels the drive. (user-f229, 2020-02-18, exchange 216887, check: uncheckable)</li>
+<li id="s4">Use `mkfs` to create a new filesystem instead of `fx` which creates a disklabel, not filesystems. (user-b1da, 2022-05-27, exchange 217589, check: supported)</li>
+<li id="s5">fx always does low-level formatting, which is why it's not recommended for formatting. (user-d903, 2020-02-17, exchange 78181, check: uncheckable)</li>
+<li id="s6">Never format a drive using FX; it will low-level the drive and take a long time. (user-24f0, 2025-05-23, exchange 212526, check: uncheckable)</li>
+<li id="s7">The auto command in fx performs a butterfly test and disk initialization, taking hours. (user-2d40, 2020-04-19, exchange 7610, check: uncheckable)</li>
+<li id="s8">The 'auto' function in 'fx' is not required for installation and can be skipped. (user-7973, 2023-10-09, exchange 209362, check: uncheckable)</li>
+<li id="s9">Fx was mainly for scsi and esdi. (user-24f0, 2024-11-21, exchange 50688, check: uncheckable)</li>
+<li id="s10">The Series E, EX, and FX, MPX100, Risc PC, Risc PC Plus, MVME160X, 260X, 360X, 460X, Atlas, Ultra, and Ultra Plus run AIX. (user-237d, 2026-04-07, exchange 240853, check: supported)</li>
+<li id="s11">You can run fx from PROM or an IRIX install on an Octane2. (user-e4e2, 2026-08-19, exchange 226908, check: supported)</li>
+<li id="s12">To boot fx from a CD, use 'boot -f dksc(1,3,8)sash' then 'boot -f dksc(1,3,7)/stand/fx.ARCS -x'. (user-e4e2, 2026-08-19, exchange 226908, check: supported)</li>
+<li id="s13">Running `fx` from the OS shell works, but `ls dksc(1,2,7)` fails with an EFS read error. (user-c986, 2026-08-19, exchange 125004, check: supported)</li>
+<li id="s14">Running fx from the SCSI disk caused a panic. (user-c986, 2026-08-19, exchange 125006, check: uncheckable)</li>
+<li id="s15">The 'format' feature of FX tries to perform a low-level format which can cause issues. (user-24f0, 2025-05-28, exchange 212545, check: uncheckable)</li>
+<li id="s16">SCSI drives should not be formatted with FX. (user-24f0, 2025-05-23, exchange 212525, check: uncheckable)</li>
+<li id="s17">Partitioning the drive in FX can bypass the hard disk image file on the SD card and write directly to the SD card in RAW mode, which results in no logs. (user-17cb, 2025-06-16, exchange 225167, check: uncheckable)</li>
+<li id="s18">To clone an XFS drive on an Octane2, use fx to repartition and format, then xfsdump and xfsrestore to copy the data, and manually transfer header files. (user-ba5b, 2025-12-26, exchange 225830, check: supported)</li>
+<li id="s19">Irix can be installed from a hard drive using sash and fx, partitioning, and copying miniroot. (user-3e2d, 2025-09-18, exchange 225454, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="fx-command.html">fx command</a> (9)
+</li>
+<li><a href="fx-gpu.html">FX GPU</a> (3)
+</li>
+<li><a href="fx-64.html">fx.64</a> (4)
+</li>
+<li><a href="fx32.html">FX32</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="ip12.html">IP12</a>, <a href="indigo.html">Indigo</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="pentium-3.html">Pentium 3</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-4-0-5.html">IRIX 4.0.5</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-installation.html">IRIX installation</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="sash.html">sash</a>, <a href="mkfs.html">mkfs</a>, <a href="booterizer.html">Booterizer</a>, <a href="cd.html">CD</a>, <a href="ide.html">IDE</a>, <a href="sd-card.html">SD card</a>, <a href="xfs.html">XFS</a>, <a href="hinv.html">hinv</a>, <a href="inst.html">inst</a>, <a href="install.html">install</a>, <a href="installer.html">installer</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="disk.html">disk</a>, <a href="ip7-powerseries.html">IP7 PowerSeries</a>, <a href="mo-disk.html">MO disk</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="disk-image.html">disk image</a>, <a href="drive.html">drive</a>, <a href="hard-drive.html">hard drive</a>, <a href="network-boot.html">network boot</a>, <a href="system-disk.html">system disk</a>
+</li>
+<li>Standards and interfaces: <a href="ip-address.html">IP address</a>, <a href="scsi.html">SCSI</a>, <a href="scsi-device.html">SCSI device</a>
+</li>
+<li>Companies: <a href="sgi-box.html">SGI box</a>
+</li>
+<li>Other: <a href="esdi.html">ESDI</a>, <a href="command.html">command</a>, <a href="label.html">label</a>, <a href="par.html">par</a>, <a href="tftpd.html">tftpd</a>, <a href="zero-out.html">zero out</a>
+</li></ul>
+</body>
+</html>

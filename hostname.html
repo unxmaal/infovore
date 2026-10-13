@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hostname</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>hostname</h1>
+<p>Claims: 15</p>
+<p>Setting the hostname is required to enable networking in the admin menu, and it is not assigned until the system is booted into IRIX, with hostnames not used at the IP and MAC address level. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The hostname can be changed at any time, but changing it after a fresh install or later can break software, cause issues with the desktop or home folder setup, and cause IRIX to throw hostname errors and inetd crashes even when the hostname looks fine and setting it up again does not help. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> To change the hostname, update /etc/sys_id, /etc/hosts, and /etc/resolv.conf, then reboot, and sanity checking /etc/sys_id and ensuring the hostname is correct can help with networking issues. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Connecting to the network or configuring local hostnames to 127.0.0.1 and/or ::1 can help with these issues, and FlexLM might function better with the correct host name. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Examples of hostnames include octane, housefire, Cuddles, and fuzzies. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Setting the hostname is required to enable networking in the admin menu. (user-2189, 2019-09-07, exchange 76830, check: uncheckable)</li>
+<li id="s2">A hostname is not assigned until the system is booted into IRIX, and hostnames are not used at the IP and MAC address level. (user-d903, 2022-10-01, exchange 216780, check: uncheckable)</li>
+<li id="s3">Changing the hostname after a fresh install doesn't cause issues, but doing it later can break software. (user-b7c4, 2019-11-22, exchange 76979, check: uncheckable)</li>
+<li id="s4">The hostname can be changed at any time, but installing additional software like demos during the initial IRIX install might cause issues; it's safer to install the base OS first, then add extras. (user-d903, 2019-11-23, exchange 216681, check: uncheckable)</li>
+<li id="s5">IRIX can throw hostname errors and inetd crashes even if the hostname looks fine, and setting it up again doesn't help. (user-5510, 2023-08-29, exchange 209130, check: uncheckable)</li>
+<li id="s6">Changing the hostname caused issues with the desktop or home folder setup. (user-17cb, 2026-03-19, exchange 90062, check: uncheckable)</li>
+<li id="s7">Sanity checking etc/sys_id and ensuring the hostname is correct can help with networking issues. (user-b7c4, 2020-12-10, exchange 12771, check: uncheckable)</li>
+<li id="s8">To change the hostname, update /etc/sys_id, /etc/hosts, and /etc/resolv.conf, then reboot. (user-231e, 2026-05-15, exchange 90745, check: uncheckable)</li>
+<li id="s9">Connecting to the network or configuring local hostnames to 127.0.0.1 and/or ::1 can help with these issues. (user-7b1c, 2022-03-07, exchange 239555, check: supported)</li>
+<li id="s10">FlexLM might function better with the correct host name. (user-1a5a, 2023-08-14, exchange 209045, check: uncheckable)</li>
+<li id="s11">hostname would be octane (user-22f9, 2020-06-07, exchange 8882, check: supported)</li>
+<li id="s12">A quad hypersparc has the hostname `housefire`. (user-37bb, 2024-02-09, exchange 240238, check: supported)</li>
+<li id="s13">Cuddles is the hostname for one machine, possibly changing the other to fuzzies. (user-a079, 2024-06-08, exchange 111533, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-install.html">IRIX install</a>
+</li>
+<li>Software: <a href="etc-hosts.html">/etc/hosts</a>, <a href="flexlm.html">FlexLM</a>, <a href="software.html">software</a>
+</li>
+<li>Standards and interfaces: <a href="x.html">X</a>
+</li>
+<li>Other: <a href="etc-sys-id.html">/etc/sys_id</a>, <a href="etc-resolv-conf.html">/etc/resolv.conf</a>, <a href="admin-menu.html">admin menu</a>, <a href="inetd.html">inetd</a>
+</li></ul>
+</body>
+</html>

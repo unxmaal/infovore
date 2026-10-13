@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fsck</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>fsck</h1>
+<p>Claims: 11</p>
+<p>fsck is a tool used to check and repair file systems, entered at the ok prompt. <sup><a href="#s1">1</a></sup> It does not check the disk itself. <sup><a href="#s2">2</a></sup> Running fsck might repair a corrupt disk, fixing minor issues, but it can actively worsen more severe problems. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It can be used to fix issues such as Jumpstart for Solaris 7 after a power outage. <sup><a href="#s5">5</a></sup> The final field in /etc/fstab controls boot-time behavior: a value of 0 prevents forcing an fsck at boot, while any non-zero value forces one. <sup><a href="#s6">6</a></sup> A/UX has issues with partitions larger than 2GB due to fsck problems, even in QEMU. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">fsck is entered at the ok prompt to check and repair file systems. (user-9528, 2022-02-19, exchange 181468, check: uncheckable)</li>
+<li id="s2">fsck does not check the disk. (user-37ee, 2020-12-20, exchange 13046, check: uncheckable)</li>
+<li id="s3">fsck might fix minor horkage but can actively screw things up with more severe issues. (user-7b1c, 2022-05-24, exchange 222279, check: uncheckable)</li>
+<li id="s4">Running fsck might repair a corrupt disk. (user-c986, 2026-06-01, exchange 220453, check: uncheckable)</li>
+<li id="s5">Jumpstart for Solaris 7 can be fixed by addressing the file system with fsck after a power outage. (user-9528, 2022-01-12, exchange 239487, check: supported)</li>
+<li id="s6">Setting the final field in /etc/fstab to 0 prevents the system from forcing an fsck at boot if the filesystem is messed up, while any non-zero value forces an fsck. (user-f229, 2022-02-03, exchange 80865, check: supported)</li>
+<li id="s7">A/UX has issues with partitions larger than 2GB due to fsck problems, even in QEMU. (user-95db, 2022-11-23, exchange 34128, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="a-ux.html">A/UX</a>, <a href="mint.html">Mint</a>
+</li>
+<li>Software: <a href="qemu.html">QEMU</a>, <a href="boot.html">boot</a>
+</li>
+<li>Other: <a href="initramfs.html">initramfs</a>, <a href="noac.html">noac</a>
+</li></ul>
+</body>
+</html>

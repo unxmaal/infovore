@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIPSpro compiler</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MIPSpro compiler</h1>
+<p>Claims: 14 Part of <a href="mipspro.html">MIPSpro</a> Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>The compiler has multiple optimizer bugs and crashes (segfaults) on certain C99 constructs, such as in-place defined linked lists, which can be worked around by defining inner parts separately before the problematic scope. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It works best with -O1 optimization, as higher levels can cause issues. <sup><a href="#s3">3</a></sup> It can be used to compile MIPS assembly, and a version that works with IRIX 5.3 is needed for this purpose. <sup><a href="#s4">4</a></sup> The MIPSpro compiler for IRIX 6.5.30 can be installed manually to avoid conflicts by skipping certain steps and checking specific patches, and Hello World works with C and C++ but demos require further configuration. <sup><a href="#s5">5</a></sup> It is not compatible with all tools, as gmake produces a 'missing separator' error when used with it, and openjpeg 2.3.0 has a 9% test suite pass rate with the MIPSpro compiler but a 99% pass rate with GCC. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The MIPS Pro compiler can segfault on certain C99 constructs, like in-place defined linked lists, which can be worked around by defining inner parts separately before the problematic scope. This issue is not common and a (user-42cf, 2019-02-03, exchange 66985, check: uncheckable)</li>
+<li id="s2">The MIPSPro compiler has multiple optimizer bugs and crashes on certain C99 constructs, but its compilation speed is better than GCC for the MIPS architecture. (user-42cf, 2020-04-01, exchange 7178, check: uncheckable)</li>
+<li id="s3">The MIPSpro compiler works best with -O1 optimization and higher levels can cause issues. (user-2d09, 2019-07-18, exchange 67533, check: uncheckable)</li>
+<li id="s4">A version of the MIPSpro compiler that works with IRIX 5.3 is needed to compile MIPS assembly. (user-22f9, 2020-02-11, exchange 204140, check: supported)</li>
+<li id="s5">The MIPSPro compiler for IRIX 6.5.30 can be installed manually to avoid conflicts by skipping certain steps and checking specific patches. Hello world works with C and C++ but demos require further configuration. The vsy (user-22f9, 2023-10-15, exchange 41543, check: supported)</li>
+<li id="s6">openjpeg 2.3.0 has a 9% test suite pass rate with MIPSpro compiler, but a 99% pass rate with gcc. (user-8547, 2019-02-21, exchange 67090, check: supported)</li>
+<li id="s7">gmake produces a 'missing separator' error when used with mipspro compiler. (user-8547, 2019-07-15, exchange 214787, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="mips-architecture.html">MIPS architecture</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="n64-sdk.html">N64 SDK</a>, <a href="curl.html">curl</a>, <a href="emulator.html">emulator</a>, <a href="gmake.html">gmake</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li></ul>
+</body>
+</html>

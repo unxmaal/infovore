@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kernel</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>kernel</h1>
+<p>Claims: 67 Background: 7 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Kernel_%28operating_system%29">Kernel (operating system)</a>, <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>.</p>
+<p>A kernel is binary code loaded at an offset, where the instruction pointer jumps there. <sup><a href="#s1">1</a></sup> The kernel is primarily compiled with MIPSPro, with GCC used for a small portion. <sup><a href="#s2">2</a></sup> Compiling the kernel can take days, as the kernel compile on the G4PB itself took 1.5 days. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> A kernel with a working set of 64K is considered heavy. <sup><a href="#s5">5</a></sup> The kernel might have oopsed, and it can detect issues with time or date. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The kernel on AIX is located at /unix, which is a symbolic link to the appropriate kernel file depending on the system configuration. <sup><a href="#s8">8</a></sup> The kernel is the core component that must be correctly configured and loaded for a system to boot, though it can be a tedious task to set up, especially for older hardware. <sup><a href="#s9">9</a></sup> Correct sash and kernel versions are crucial, as some install media may lack a kernel for a given platform. <sup><a href="#s10">10</a></sup> Formatting and repartitioning the drive is necessary to load the correct kernel, otherwise it panics. <sup><a href="#s11">11</a></sup> The PROM only needs the kernel in a format it can understand to boot, whether via TFTP or a tiny XFS SCSI partition. <sup><a href="#s12">12</a></sup> The kernel name is bsd, not boot. <sup><a href="#s13">13</a></sup> The kernel determines IP addresses via RARP on SGI machines, as evidenced by entries in /etc/ethers on DNS, DHCP, and Bootparams servers. <sup><a href="#s14">14</a></sup> Several systems require recompiling the kernel: Irix recompiles its kernel for each unique hardware set, A/UX requires recompiling after installation, and enabling NFSv2 and v3 requires recompiling the kernel. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> The SGI kernel sources include 1980s era code with some ANSI rewritten sections. <sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">A kernel is binary code loaded at an offset and the instruction pointer jumps there. (user-9860, 2021-10-25, exchange 21575, check: uncheckable)</li>
+<li id="s2">The kernel is primarily compiled with MIPSPro, with GCC used for a small portion. (user-5c71, 2021-03-29, exchange 69294, check: uncheckable)</li>
+<li id="s3">Compiling the kernel can take days. (user-0251, 2022-06-15, exchange 30036, check: uncheckable)</li>
+<li id="s4">the kernel compile on the G4PB itself took 1.5 days (user-0251, 2019-12-21, exchange 4986, check: supported)</li>
+<li id="s5">A kernel with a working set of 64K is considered heavy. (user-3ff5, 2020-12-02, exchange 233872, check: supported)</li>
+<li id="s6">The kernel might have oopsed. (user-f8e4, 2020-12-20, exchange 13048, check: uncheckable)</li>
+<li id="s7">The kernel detects issues with time or date. (user-ff99, 2022-02-08, exchange 102160, check: uncheckable)</li>
+<li id="s8">The kernel on AIX is located at /unix, which is a symbolic link to the appropriate kernel file depending on the system configuration. (user-07ed, 2021-07-21, exchange 238147, check: uncheckable)</li>
+<li id="s9">The kernel is a glorified memcpy pipeline and can be a tedious task to set up, especially for older hardware. (user-22f9, 2024-11-20, exchange 50605, check: uncheckable)</li>
+<li id="s10">Correct sash and kernel versions are crucial; some install media may lack kernel for a platform. (user-03ad, 2024-06-09, exchange 215509, check: uncheckable)</li>
+<li id="s11">Formatting and repartitioning the drive is necessary to load the correct kernel, otherwise it kernel panics; using reanimator to mount ISOs fails for EFS files. (user-511a, 2024-11-17, exchange 112811, check: uncheckable)</li>
+<li id="s12">The PROM only needs the kernel in a format it can understand to boot, whether via TFTP or a tiny XFS SCSI partition like zuluscsi/etc. (user-f190, 2026-03-05, exchange 226162, check: uncheckable)</li>
+<li id="s13">The kernel name is bsd, not boot. (user-6e7b, 2026-06-17, exchange 220466, check: uncheckable)</li>
+<li id="s14">The kernel determines IP addresses via RARP on SGI machines, as evidenced by entries in `/etc/ethers` on DNS, DHCP, and Bootparams servers. (user-6e7b, 2026-04-26, exchange 90498, check: supported)</li>
+<li id="s15">Irix recompiles its kernel for each unique hardware set. (user-e872, 2024-11-29, exchange 211358, check: uncheckable)</li>
+<li id="s16">A/UX requires recompiling the kernel after installation. (user-e872, 2024-12-18, exchange 232436, check: uncheckable)</li>
+<li id="s17">To enable NFSv2 and v3, you need to recompile the kernel. v3 is usually default. (user-9528, 2025-10-19, exchange 219192, check: uncheckable)</li>
+<li id="s18">The SGI kernel sources include 1980s era code with some ANSI rewritten sections. (user-22f9, 2025-01-25, exchange 53328, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="kernel-module.html">kernel module</a> (6)
+</li>
+<li><a href="kernel-panic.html">kernel panic</a> (10)
+</li>
+<li><a href="kernel-version.html">kernel version</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>
+</li>
+<li>Graphics: <a href="mex.html">MEX</a>, <a href="graphics.html">graphics</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="aix.html">AIX</a>, <a href="bsd.html">BSD</a>, <a href="a-ux.html">A/UX</a>, <a href="debian-6.html">Debian 6</a>, <a href="debian-7.html">Debian 7</a>, <a href="gentoo.html">Gentoo</a>, <a href="nt.html">NT</a>, <a href="os-2.html">OS/2</a>, <a href="unix.html">Unix</a>, <a href="booting.html">booting</a>, <a href="bootloader.html">bootloader</a>
+</li>
+<li>Software: <a href="sash.html">sash</a>, <a href="grub2.html">Grub2</a>, <a href="mipspro.html">MIPSpro</a>, <a href="max.html">Max</a>, <a href="proe.html">ProE</a>, <a href="qemu.html">QEMU</a>, <a href="reanimator.html">Reanimator</a>, <a href="xfs.html">XFS</a>, <a href="zulu.html">Zulu</a>, <a href="boot.html">boot</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="xorg.html">Xorg</a>, <a href="drive.html">drive</a>, <a href="cd-drive.html">CD drive</a>, <a href="hdd.html">HDD</a>, <a href="sd-card-adapter.html">SD card adapter</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="mainboard.html">mainboard</a>
+</li>
+<li>Standards and interfaces: <a href="x.html">X</a>, <a href="ip-address.html">IP address</a>, <a href="nfs.html">NFS</a>, <a href="nfsv2.html">NFSv2</a>, <a href="nfsv3.html">NFSv3</a>, <a href="pci-card.html">PCI card</a>, <a href="scsi.html">SCSI</a>, <a href="tftp.html">TFTP</a>, <a href="bootp.html">bootp</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="cobalt-3000.html">Cobalt 3000</a>, <a href="cobalt-5000.html">Cobalt 5000</a>, <a href="gcc.html">GCC</a>, <a href="iso.html">ISO</a>
+</li>
+<li>Other: <a href="initramfs.html">initramfs</a>, <a href="bin.html">.bin</a>, <a href="sbin.html">/sbin</a>, <a href="4d1.html">4D1</a>, <a href="id.html">ID</a>, <a href="rarp.html">RARP</a>, <a href="sysv.html">SysV</a>, <a href="systune.html">Systune</a>, <a href="overlay.html">overlay</a>, <a href="platform.html">platform</a>, <a href="source.html">source</a>
+</li></ul>
+</body>
+</html>

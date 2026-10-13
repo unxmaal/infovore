@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIX</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>AIX</h1>
+<p>Claims: 170 Background: 29 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IBM_AIX">IBM AIX</a>, <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>, <a href="https://en.wikipedia.org/wiki/A/UX">A/UX</a>, <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/Oracle_Solaris">Oracle Solaris</a>, <a href="https://en.wikipedia.org/wiki/VirtualBox">VirtualBox</a>.</p>
+<h2 id="with-solaris">With Solaris</h2>
+<p>AIX, Solaris, HP-UX, and IRIX are all hybrid Unix systems that are not 'pure' SysV or BSD. <sup><a href="#s1">1</a></sup> AIX is more challenging than Solaris, and it seems to be missing weird pieces the way Solaris and IRIX are not. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> AIX, Solaris, and IRIX could run on non-special hardware, and all major Unix workstations including these were 64-bit capable by 1999. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Swapping over NFS was supported by Solaris and AIX, along with SunOS, IRIX, Ultrix, and HP-UX. <sup><a href="#s7">7</a></sup> AIX and Solaris are among the Unix versions used for various software, and both are still offered with certifications by IBM and Sun respectively as the last two commercial Unix vendors. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="general">General</h2>
+<p>AIX is one of the surviving commercial UNIX systems, still actively supported with IBM still producing POWER chips. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> AIX runs on IBM hardware, including pSeries, Power5, Power6, and System i machines. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> AIX can also be run on non-IBM hardware, such as PowerPC systems like the Q950, ANS, Talos II, and Motorola AT boards, as well as on PS/2 systems requiring a 386 or better. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> AIX can be run in a VM on x86 PCs or via QEMU, but only with a serial console. <sup><a href="#s20">20</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s21">21</a></sup> AIX has its own kernel located at /unix, with userland derived from BSD, and it still ships an X server. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> AIX is reliable but difficult to use, with a menu-based system called smit or smitty for installing packages. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> AIX is a version of UNIX that is tightly integrated with the hardware and is managed through CLI-based utilities such as smitty, which provides terminal and text console administration and can output commands. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> AIX runs on PowerPC and Power chips, and on modern POWER hardware it requires PowerVM, which allows it to coexist with Linux. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> IBM is still developing AIX and has released version 7.3, which includes the pigz command and zlibNX library for Power9 and Power10 servers. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> AIX can also be run on IA-64 hardware, and there is a software emulator for the 5080 with references to AIX and Windows versions. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> AIX was written in PL/I. <sup><a href="#s36">36</a></sup> AIX is a Unix operating system that continues to be supported by IBM, even as most other commercial Unix systems have declined. <sup><a href="#s37">37</a></sup> AIX has its own first-party package management, including first-party RPM packages, as well as open-source Bulle/Atos packages. <sup><a href="#s38">38</a></sup> AIX has long-standing support for GCC, with version 13.2 remaining supported on 5.3L, and PowerPC support is still present in GCC versions. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup> AIX provides first-party support for most things important enough to have on the system, and building software on 5L should not be too difficult. <sup><a href="#s41">41</a></sup> AIX includes the SMIT tool, which can display the commands it is running, and offers smitty as part of its interface. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup> AIX is noted for its install process, package management, and robust disk and filesystem features. <sup><a href="#s43">43</a></sup> AIX has very nice device enumeration. <sup><a href="#s44">44</a></sup> AIX `ld` and `ar` require specific flags to work correctly. <sup><a href="#s45">45</a></sup> AIX is a Unix operating system that runs on IBM's RISC hardware and POWER processors, and it requires this IBM hardware for use. <sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> AIX is not based on sysIII/sysV, and it uses rpm for package management. <sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup> AIX can be installed from a CD, which IBM made easy, and it can also be installed from an empty hard drive using a BlueSCSI emulator to emulate the CD drive in about 30 minutes. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> AIX can import volume groups using the System Management Interface Tool (SMIT), even for complex setups involving multiple disks and volume groups. <sup><a href="#s52">52</a></sup> AIX backups use mksysb, which can be done with alt_disk, and for backing up an AIX disk, install it on a system with alt_disk support, then use mksysb to create a bootable backup. <sup><a href="#s53">53</a></sup><sup><a href="#s54">54</a></sup> AIX allows resetting the root password via a secure method if the hardware is recent; otherwise, booting from a CD is an alternative. <sup><a href="#s55">55</a></sup> Setting IPs is straightforward on AIX with Mobaxterm or xming. <sup><a href="#s56">56</a></sup> AFS provides centralized file sharing and user control similar to Windows AD Domain on AIX. <sup><a href="#s57">57</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">There's no 'pure' SysV or BSD left; AIX, HP-UX, and Solaris are their own hybrid beasts. (user-7b1c, 2022-05-07, exchange 235139, check: uncheckable)</li>
+<li id="s2">In the 2000s, it was easier to run random OSS on Solaris than on IRIX or AIX. (user-e473, 2020-07-06, exchange 68911, check: supported)</li>
+<li id="s3">AIX is more challenging than Solaris. (user-e4d0, 2021-08-01, exchange 175541, check: uncheckable)</li>
+<li id="s4">Irix and Solaris both seem to be at least reasonably complete, and aren't missing weird pieces the way AIX seems to be. (user-7b1c, 2022-05-27, exchange 217589, check: uncheckable)</li>
+<li id="s5">HP-UX, AIX, Solaris, and IRIX could run on non-special hardware, though IRIX's UI design language might have evolved differently if it had continued. (user-56d4, 2022-09-28, exchange 32994, check: uncheckable)</li>
+<li id="s6">All major Unix workstations including Solaris, HP-UX, AIX, and IRIX were 64-bit capable by 1999, unlike PCs and Macs. (user-03ad, 2026-03-16, exchange 219574, check: supported)</li>
+<li id="s7">Swapping over NFS was supported by SunOS, Solaris, AIX, IRIX, Ultrix, and HP-UX. (user-237d, 2022-06-24, exchange 182480, check: uncheckable)</li>
+<li id="s8">Solaris and AIX were among the Unix versions used, and there were plans to port parts of Office to Unix but it never came to fruition. (user-7b1c, 2022-10-15, exchange 222595, check: uncheckable)</li>
+<li id="s9">Some software existed on SunOS &amp; Solaris, and AIX. (user-9860, 2023-02-23, exchange 217929, check: uncheckable)</li>
+<li id="s10">Oracle still offers certifications for Solaris, as does IBM for AIX--the last two men standing as far as commercial Unix is concerned. (user-54cd, 2024-05-25, exchange 46293, check: supported)</li>
+<li id="s11">AIX is one of the surviving commercial UNIX systems. (user-22f9, 2019-04-20, exchange 1438, check: uncheckable)</li>
+<li id="s12">AIX is still actively supported and IBM is still producing POWER chips as well (user-b1da, 2020-07-19, exchange 9745, check: uncheckable)</li>
+<li id="s13">Modern AIX runs on IBM System i. (user-b7c4, 2020-02-06, exchange 6112, check: uncheckable)</li>
+<li id="s14">pSeries can run AIX. (user-b1da, 2021-07-12, exchange 18394, check: uncheckable)</li>
+<li id="s15">The Q950 is an Apple Network Server that runs AIX. (user-2189, 2019-02-08, exchange 484, check: uncheckable)</li>
+<li id="s16">The ANS is a PowerPC that runs AIX. (user-237d, 2022-02-06, exchange 231613, check: uncheckable)</li>
+<li id="s17">To run AIX on non-IBM hardware, you can use QEMU on a Talos II, but only with a serial console. (user-42cf, 2019-07-02, exchange 2304, check: uncheckable)</li>
+<li id="s18">a motorola AT board with a powerpc 604 runs NT 4.0, AIX, or a specific version of Solaris (user-27eb, 2019-11-15, exchange 4222, check: supported)</li>
+<li id="s19">AIX runs on PS/2, requiring a 386 or better; later patches allow it on non-PS/2 systems but are less exciting. (user-ba81, 2019-11-24, exchange 95805, check: supported)</li>
+<li id="s20">AIX can be run in a VM on x86 PC, but only with serial console. (user-ba81, 2019-07-02, exchange 2305, check: uncheckable)</li>
+<li id="s21">QEMU can boot HP-UX, AIX, and Linux for their respective CPUs. (user-f9d4, 2019-09-07, exchange 3381, check: uncheckable)</li>
+<li id="s22">AIX still ships an X server. (user-585b, 2019-11-06, exchange 4103, check: uncheckable)</li>
+<li id="s23">AIX has its own completely unrelated to anything kernel while the userland is from BSD. (user-237d, 2020-04-13, exchange 236105, check: uncheckable)</li>
+<li id="s24">The kernel on AIX is located at /unix, which is a symbolic link to the appropriate kernel file depending on the system configuration. (user-07ed, 2021-07-21, exchange 238147, check: uncheckable)</li>
+<li id="s25">AIX is reliable but difficult to use. (user-b4c0, 2020-07-04, exchange 9399, check: uncheckable)</li>
+<li id="s26">smit or smitty is a menu-based system for installing packages on AIX, printing commands for manual later use. (user-42cf, 2020-07-24, exchange 74088, check: uncheckable)</li>
+<li id="s27">AIX is a version of UNIX more integrated with hardware, with CLI-based management utilities. (user-b1da, 2022-04-25, exchange 28440, check: uncheckable)</li>
+<li id="s28">AIX provides smitty for terminal and text console administration, unlike IRIX. (user-03ad, 2023-05-06, exchange 238517, check: uncheckable)</li>
+<li id="s29">RS/6000 era AIX has a peculiar command interface called SMIT that can output commands. (user-07ed, 2023-08-22, exchange 209090, check: supported)</li>
+<li id="s30">AIX and os/400 run on PowerPC and Power chips, and can coexist with Linux on POWER hardware using PowerVM hypervisor. (user-b1da, 2022-03-16, exchange 206680, check: supported)</li>
+<li id="s31">AIX requires PowerVM to run on modern Power hardware, even if not exposed to the user, and can coexist with Linux in PowerVM. (user-b1da, 2022-07-14, exchange 207378, check: uncheckable)</li>
+<li id="s32">IBM is still developing AIX and has released version 7.3. (user-b1da, 2022-03-17, exchange 27297, check: supported)</li>
+<li id="s33">AIX 7.3 includes the pigz command and zlibNX library for Power9 and Power10 servers. (user-e872, 2022-03-28, exchange 27636, check: supported)</li>
+<li id="s34">AIX can be run on IA-64 hardware; an HP rx4610 ia64 is available on eBay for $10,000; a Compaq ProLiant DL590/64 ia64 is also available for $250. (user-1867, 2022-08-10, exchange 216455, check: supported)</li>
+<li id="s35">There is a software emulator for the 5080, with references to AIX and Windows versions, and a floppy version for AIX/RT 2.2.1. (user-5926, 2023-02-21, exchange 217926, check: supported)</li>
+<li id="s36">AIX was written in PL/I. (user-a9f8, 2023-04-19, exchange 238506, check: uncheckable)</li>
+<li id="s37">Most commercial Unix systems have declined, but AIX continues to be supported by IBM. (user-03ad, 2024-05-23, exchange 215501, check: uncheckable)</li>
+<li id="s38">AIX has its own first party RPM packages; there were also open source Bulle/Atos packages. (user-b1da, 2023-10-25, exchange 41748, check: uncheckable)</li>
+<li id="s39">AIX PowerPC support is still present in GCC versions. (user-5510, 2023-10-25, exchange 41750, check: uncheckable)</li>
+<li id="s40">AIX has long support for GCC, with 13.2 not being unsupported on 5.3L. (user-5510, 2023-11-22, exchange 42567, check: supported)</li>
+<li id="s41">IBM still provides first party support for most things important enough to have on AIX; building it on 5L shouldn't be too bad. (user-b1da, 2023-10-25, exchange 41754, check: supported)</li>
+<li id="s42">IBM's SMIT tool in AIX can display the commands it's running when you're unsure. (user-07ed, 2023-08-22, exchange 209090, check: uncheckable)</li>
+<li id="s43">AIX has a nice install process, great package management, smitty and very robust disk and FS features compared to Linux, making current Linux look like a fiasco. (user-f229, 2023-11-22, exchange 209602, check: uncheckable)</li>
+<li id="s44">AIX has very nice device enumeration. (user-f229, 2023-11-22, exchange 209602, check: uncheckable)</li>
+<li id="s45">AIX `ld` and `ar` require specific flags to work correctly. (user-5510, 2023-11-22, exchange 238605, check: supported)</li>
+<li id="s46">AIX runs on POWER processors. (user-1a5a, 2026-01-03, exchange 61177, check: uncheckable)</li>
+<li id="s47">AIX requires IBM’s RISC hardware for use. (user-0bb7, 2026-03-27, exchange 226265, check: uncheckable)</li>
+<li id="s48">AIX is not based on sysIII/sysV. (user-7151, 2025-09-16, exchange 238975, check: uncheckable)</li>
+<li id="s49">AIX uses rpm for package management. (user-0bb7, 2026-01-30, exchange 89575, check: uncheckable)</li>
+<li id="s50">AIX can be installed from an empty hard drive using a BlueSCSI emulator to emulate the CD drive in about 30 minutes. (user-0bb7, 2025-09-16, exchange 179082, check: supported)</li>
+<li id="s51">AIX can be installed via CD, which IBM made easy. (user-0bb7, 2025-12-05, exchange 179324, check: uncheckable)</li>
+<li id="s52">AIX can import volume groups using the System Management Interface Tool (SMIT), even for complex setups involving multiple disks and volume groups. (user-7151, 2025-10-08, exchange 238996, check: uncheckable)</li>
+<li id="s53">AIX backups use mksysb, which can be done with alt_disk. (user-41e0, 2025-12-05, exchange 179322, check: uncheckable)</li>
+<li id="s54">For backing up an AIX disk, install it on a system with alt_disk support, then use mksysb to create a bootable backup. (user-0bb7, 2025-12-05, exchange 179322, check: uncheckable)</li>
+<li id="s55">AIX allows resetting the root password via a secure method if the hardware is recent; otherwise, booting from a CD is an alternative. (user-07ed, 2025-09-17, exchange 238981, check: uncheckable)</li>
+<li id="s56">Setting IPs is straightforward on AIX with Mobaxterm or xming. (user-0bb7, 2025-09-17, exchange 179108, check: uncheckable)</li>
+<li id="s57">AFS provides centralized file sharing and user control similar to Windows AD Domain on AIX. (user-41e0, 2025-12-05, exchange 239035, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="aix-1-3.html">AIX 1.3</a> (3)
+</li>
+<li><a href="aix-3.html">AIX 3</a> (3)
+</li>
+<li><a href="aix-3-x.html">AIX 3.x</a> (4)
+</li>
+<li><a href="aix-4.html">AIX 4</a> (3)
+</li>
+<li><a href="aix-4-1-5.html">AIX 4.1.5</a> (6)
+</li>
+<li><a href="aix-4-3.html">AIX 4.3</a> (5)
+</li>
+<li><a href="aix-4-3-3.html">AIX 4.3.3</a> (6)
+</li>
+<li><a href="aix-5-1.html">AIX 5.1</a> (9)
+</li>
+<li><a href="aix-5-3.html">AIX 5.3</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="rs-6000.html">RS/6000</a>, <a href="5080.html">5080</a>, <a href="as-400.html">AS/400</a>, <a href="p-390.html">P/390</a>, <a href="workstation.html">workstation</a>
+</li>
+<li>Processors: <a href="powerpc.html">PowerPC</a>, <a href="386-cpu.html">386 CPU</a>, <a href="ia64.html">IA64</a>, <a href="power-cpu.html">POWER CPU</a>, <a href="power-processors.html">POWER processors</a>, <a href="power9.html">POWER9</a>, <a href="sparc-solaris.html">SPARC Solaris</a>
+</li>
+<li>Graphics: <a href="xvr-1200.html">XVR-1200</a>, <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>, <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="bsd.html">BSD</a>, <a href="nt.html">NT</a>, <a href="os-400.html">OS/400</a>, <a href="sunos.html">SunOS</a>, <a href="unix.html">Unix</a>, <a href="kernel.html">kernel</a>, <a href="a-ux.html">A/UX</a>, <a href="irix-6-x.html">IRIX 6.x</a>, <a href="nt-4-0.html">NT 4.0</a>, <a href="os.html">OS</a>, <a href="osf-1.html">OSF/1</a>, <a href="system-7.html">System 7</a>, <a href="vms.html">VMS</a>, <a href="windows.html">Windows</a>, <a href="commercial-unix.html">commercial UNIX</a>, <a href="macos.html">macOS</a>, <a href="macos-10-5.html">macOS 10.5</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="catia.html">CATIA</a>, <a href="qemu.html">QEMU</a>, <a href="catia-v5.html">CATIA V5</a>, <a href="catia-v4.html">CATIA v4</a>, <a href="opengl.html">OpenGL</a>, <a href="cd-images.html">CD images</a>, <a href="hp-surestore-magneto-optical-library.html">HP SureStore magneto-optical library</a>, <a href="pro-engineer.html">Pro/ENGINEER</a>, <a href="rpm.html">RPM</a>, <a href="rpm-package.html">RPM package</a>, <a href="sdl1.html">SDL1</a>, <a href="sdl2.html">SDL2</a>, <a href="softwindows.html">SoftWindows</a>, <a href="virtualbox.html">VirtualBox</a>, <a href="ld.html">ld</a>, <a href="package.html">package</a>, <a href="server.html">server</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="power-chip.html">power chip</a>, <a href="irisvision-card.html">IrisVision card</a>, <a href="mca-card.html">MCA card</a>, <a href="power.html">POWER</a>, <a href="power10.html">POWER10</a>, <a href="power5.html">POWER5</a>, <a href="power6.html">POWER6</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="tape-drive.html">tape drive</a>
+</li>
+<li>Standards and interfaces: <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="ibm.html">IBM</a>, <a href="apple.html">Apple</a>, <a href="gcc.html">GCC</a>, <a href="sun.html">Sun</a>, <a href="hp-rx4610.html">HP rx4610</a>, <a href="ibm-i.html">IBM i</a>, <a href="oracle.html">Oracle</a>, <a href="sco.html">SCO</a>
+</li>
+<li>Other: <a href="smit.html">SMIT</a>, <a href="user-56d4.html">user-56d4</a>, <a href="3-x-kernel.html">3.x kernel</a>, <a href="ar.html">AR</a>, <a href="apache.html">Apache</a>, <a href="gxt6500p.html">GXT6500P</a>, <a href="ip.html">IP</a>, <a href="osf.html">OSF</a>, <a href="office.html">Office</a>, <a href="phigs.html">PHIGS</a>, <a href="powervm.html">PowerVM</a>, <a href="pro-e-v16.html">Pro/E v16</a>, <a href="q950.html">Q950</a>, <a href="talos-ii.html">Talos II</a>, <a href="wp.html">WP</a>, <a href="wordperfect.html">WordPerfect</a>, <a href="distribution.html">distribution</a>, <a href="iseries.html">iSeries</a>, <a href="mono.html">mono</a>, <a href="uptime.html">uptime</a>
+</li></ul>
+</body>
+</html>

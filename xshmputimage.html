@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XShmPutImage</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XShmPutImage</h1>
+<p>Claims: 6 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>XShmPutImage is an X11 function used to display graphical data in X via local shared memory, with XPutImage available as a fallback. <sup><a href="#s1">1</a></sup> It can fill a buffer directly, which can be faster than XPutPixel, especially for large images. <sup><a href="#s2">2</a></sup> On SGI hardware, using XShmPutImage is less efficient than DMA to video RAM. <sup><a href="#s3">3</a></sup> Rendering into a 16-bit 565 framebuffer on SGI hardware requires an extra pixel-format conversion step when using OpenGL glDrawPixels, which is faster than XShmPutImage. <sup><a href="#s4">4</a></sup> Using OpenGL and glDrawPixels can significantly outperform X11's XShmPutImage on the Indigo2 Elan, especially for blitting operations. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To display graphical data in X, use XshmPutImage for local shared memory or XPutImage as a fallback. (user-21b8, 2024-12-03, exchange 215596, check: uncheckable)</li>
+<li id="s2">XShmPutImage can be used to fill a buffer directly, which can be faster than XPutPixel, especially for large images. (user-aac7, 2024-12-05, exchange 215602, check: uncheckable)</li>
+<li id="s3">Running the PS1 port on an SGI would require at least 640x480 resolution and would need to go through XshmPutImage, which is not as efficient as DMA to video RAM. (user-21b8, 2024-07-31, exchange 215532, check: uncheckable)</li>
+<li id="s4">Rendering into a 16-bit 565 framebuffer on SGI hardware requires an extra pixel-format conversion step when using OpenGL glDrawPixels, which is faster than XShmPutImage. (user-21b8, 2025-08-31, exchange 127045, check: supported)</li>
+<li id="s5">Using OpenGL and `glDrawPixels` can significantly outperform X11's `XShmPutImage` on the Indigo2 Elan, especially for blitting operations, but other methods like textured quads and triangles are less effective on this硬件. (user-21b8, 2025-05-02, exchange 72278, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Operating systems: <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="xputpixel.html">XPutPixel</a>, <a href="gldrawpixels.html">glDrawPixels</a>, <a href="version.html">version</a>
+</li></ul>
+</body>
+</html>

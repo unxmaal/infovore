@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>epm</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>epm</h1>
+<p>Claims: 13</p>
+<p>EPM is a Python script that acts as a frontend to IRIX packaging tools, which are cumbersome to use directly, and it generates software and patch distributions in various formats from a list of files. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> epm can produce tardists, which are IRIX-compatible distributions, and irixports with epm can build and package software into tardist, with spec.py handling package specifications. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> epm only works on IRIX, though spec.py and epm are tools that run on Linux, and compiling epm for IRIX generated warnings but completed without error. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> epm is simple, small, and flexible, and has not failed the speaker yet, unlike pkgsrc, which has not succeeded for the speaker. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> epm doesn't handle dependencies properly and can't identify them for the user, so automating swpkg is smarter than using epm for dependency management. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">EPM is a tool that generates software and patch distributions in various formats from a list of files. (user-2189, 2019-02-03, exchange 450, check: uncheckable)</li>
+<li id="s2">epm is a Python script that acts as a frontend to IRIX packaging tools, which are cumbersome to use directly. (user-42cf, 2020-02-19, exchange 68432, check: uncheckable)</li>
+<li id="s3">epm can produce tardists, which are IRIX-compatible distributions. (user-2189, 2019-02-03, exchange 66988, check: uncheckable)</li>
+<li id="s4">irixports with epm can build and package software into tardist, with spec.py handling package specifications. (user-2189, 2019-11-07, exchange 214883, check: uncheckable)</li>
+<li id="s5">epm only works on IRIX. (user-2189, 2019-05-23, exchange 1773, check: uncheckable)</li>
+<li id="s6">Compiling epm for Irix generated warnings but completed without error. (user-bf68, 2019-05-24, exchange 214759, check: uncheckable)</li>
+<li id="s7">spec.py and epm are tools; they run on Linux. (user-42cf, 2019-07-12, exchange 214781, check: uncheckable)</li>
+<li id="s8">epm, the tool after irixports, is simple, small, and flexible, and has not failed the speaker yet. (user-2189, 2019-07-24, exchange 214803, check: uncheckable)</li>
+<li id="s9">pkgsrc, unlike epm, has not succeeded for the speaker. (user-2189, 2019-07-24, exchange 214803, check: uncheckable)</li>
+<li id="s10">epm doesn't handle dependencies properly and can't identify them for the user. (user-22f9, 2019-04-11, exchange 1340, check: uncheckable)</li>
+<li id="s11">automating swpkg is smarter than using epm for dependency management. (user-22f9, 2019-04-11, exchange 1340, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="irixports.html">irixports</a>, <a href="tardist.html">tardist</a>, <a href="pkgsrc.html">pkgsrc</a>
+</li></ul>
+</body>
+</html>

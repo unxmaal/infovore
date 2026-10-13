@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>script</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>script</h1>
+<p>Claims: 20</p>
+<p>Scripts can be installed manually and enable services, such as openSSD on bootup, which requires manual installation of the script and key generation and uploads keys to putin.com by default. <sup><a href="#s1">1</a></sup> Scripts can resolve technical issues, such as renaming ld and creating a script to transform -Wl,-R to +b, or renaming files based on a sed expression with options for dry run and interactive confirmation. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Scripts can clone drives, including running './clone 2' as root for a SCSI ID 2 disk, cloning XFS drives by labeling and partitioning the new disk, and existing scripts may be lost with better ones encouraged. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The first line of a script should point to a modern shell like ksh, bash, or zsh. <sup><a href="#s7">7</a></sup> Scripts can automatically extract tar.gz files into folders and keep the originals, though they delete the tar.gz files by default. <sup><a href="#s8">8</a></sup> The script function is present in the latest shipping version of ep, but the default script is embedded as an ASCII string in the binary, having previously been included separately. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The original ElectroPaint software used a script from the original interface with sliders and other controls, older versions had more complex or different scripts, and ElectroPaint can still call external scripts. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Scripts can manage the glass console without needing to replace batteries frequently, recover files from a damaged DLT tape by reading 512-byte sectors and filling gaps with zeros (a slow method), and remove sgidev_bridge, replacing it with the nick of the person typing via NFS and WeeChat. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">openSSD on 'bootup' requires manual installation of script and key generation; it enables the service and uploads keys to putin.com by default. (user-f229, 2020-08-22, exchange 215051, check: uncheckable)</li>
+<li id="s2">Renaming ld and creating a script to transform -Wl,-R to +b can resolve the issue. (user-3e3c, 2021-02-28, exchange 15067, check: uncheckable)</li>
+<li id="s3">The script renames files based on a sed expression, with options for dry run and interactive confirmation. (user-237d, 2022-01-20, exchange 217426, check: uncheckable)</li>
+<li id="s4">There is a script to clone a drive, assuming the new disk will be SCSI ID 2, you can run './clone 2' as root, and change the script for different IDs. (user-5c71, 2022-01-12, exchange 217404, check: supported)</li>
+<li id="s5">A script for cloning disks exists but may be lost, and better scripts are encouraged. (user-8547, 2022-10-24, exchange 105434, check: uncheckable)</li>
+<li id="s6">To clone an XFS drive, label and partition the new disk, then run a script that may require changing the block size for certain drives. (user-7973, 2025-12-26, exchange 225830, check: uncheckable)</li>
+<li id="s7">The first line of the script should point to a modern shell like ksh, bash, or zsh. (user-237d, 2022-01-20, exchange 217426, check: uncheckable)</li>
+<li id="s8">A script can automatically extract tar.gz files into folders and keep the originals, though it deletes the tar.gz files by default. (user-6dfb, 2024-12-15, exchange 218647, check: uncheckable)</li>
+<li id="s9">The script function is still present in the latest shipping version of ep, but the default script is embedded as an ASCII string in the binary. (user-2a3c, 2026-05-18, exchange 90764, check: uncheckable)</li>
+<li id="s10">The script used to be included separately but was later embedded in the ElectroPaint binary. (user-2a3c, 2026-05-23, exchange 214001, check: uncheckable)</li>
+<li id="s11">The original ElectroPaint software used a script from the original interface with sliders and other controls. (user-2a3c, 2026-05-23, exchange 214001, check: uncheckable)</li>
+<li id="s12">Older versions of ElectroPaint had more complex or different scripts. (user-2a3c, 2026-05-23, exchange 214001, check: uncheckable)</li>
+<li id="s13">ElectroPaint can still call external scripts. (user-2a3c, 2026-05-23, exchange 214001, check: uncheckable)</li>
+<li id="s14">A script can be used to manage the glass console without needing to replace batteries frequently. (user-6e7b, 2026-05-29, exchange 240887, check: uncheckable)</li>
+<li id="s15">To recover files from a damaged DLT tape, a script read 512-byte sectors, identified new files by headers, and filled gaps with zeros; this method worked but was slow. (user-e4e2, 2026-08-11, exchange 91606, check: supported)</li>
+<li id="s16">The script removes `sgidev_bridge` and replaces it with the nick of the person typing; it can be easily added to a machine using NFS to place it on the HDD, then pasted into WeeChat. (user-17cb, 2026-08-28, exchange 91889, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="electropaint.html">ElectroPaint</a>, <a href="rpm-package.html">RPM package</a>, <a href="ld.html">ld</a>
+</li>
+<li>Parts and peripherals: <a href="disk.html">disk</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li>
+<li>Other: <a href="etc.html">/etc</a>, <a href="weechat.html">Weechat</a>, <a href="clone.html">clone</a>
+</li></ul>
+</body>
+</html>

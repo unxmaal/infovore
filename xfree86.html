@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XFree86</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XFree86</h1>
+<p>Claims: 26 Background: 7 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/XFree86">XFree86</a>, <a href="https://en.wikipedia.org/wiki/Xsgi">Xsgi</a>, <a href="https://en.wikipedia.org/wiki/Xterm">Xterm</a>.</p>
+<p>XFree86 existed before Linux and was used for ATI card drivers on SGI systems, and the SGI X implementation is based on X11R6, with some models using XFree86 from around 2000. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> XFree86's license change led to most development effort moving to X.Org, causing XFree86 to become less active, though most of the drivers were still in XFree86. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> XFree86 is used on various SGI systems, including the Onyx4, which uses XFree86 and lacks IRIS GL support, leading to compatibility issues with many applications. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> XFree86 has support for some Impact variants, and users were able to drive a display with a GeForce4 MX440 in an Origin 200 through XFree86. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Radeon cards require binary patches to XFree86 and have hardcoded paths in the executable, and there are issues with the XFree86 server for graphics hardware paths, which are hardcoded. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> DG/UX had support for standard GPUs like the ATI 3D Rage Pro through XFree86, and the PCI Rage XL can run XFree86 at 640x480 but has timing issues and uses the vesa driver. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> To force XFree86 to start without a mouse, set `AllowMouseOpenFail true` in the configuration. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SGI X implementation is based on X11R6, with some models using XFree86 from around 2000. (user-42cf, 2019-07-21, exchange 214798, check: supported)</li>
+<li id="s2">XFree86 existed before Linux and was used for ATI card drivers on SGI systems. (user-c831, 2025-02-05, exchange 216544, check: uncheckable)</li>
+<li id="s3">XFree86's license change led to most development effort moving to X.Org, causing XFree86 to become less active. (user-b1da, 2021-01-17, exchange 13889, check: uncheckable)</li>
+<li id="s4">Most of the drivers were still in XFree86. (user-b1da, 2023-05-19, exchange 208715, check: uncheckable)</li>
+<li id="s5">The XFree86 tarball from Onyx4s includes /usr/X11R6 and /etc/X11/XF86Config-4. (user-ba81, 2021-04-11, exchange 98735, check: supported)</li>
+<li id="s6">The Onyx4 lacks IRIS GL support and uses XFree86, leading to compatibility issues with many applications. (user-59b9, 2023-05-11, exchange 208684, check: supported)</li>
+<li id="s7">Xfree86 has support for some Impact variants (user-b7c4, 2019-05-09, exchange 1637, check: uncheckable)</li>
+<li id="s8">Users were able to drive a display with a GeForce4 MX440 in an Origin 200 through Xfree86. (user-9528, 2021-04-02, exchange 79145, check: supported)</li>
+<li id="s9">Radeon cards require binary patches to XFree86 and have hardcoded paths in the executable. (user-ba81, 2021-04-11, exchange 98735, check: uncheckable)</li>
+<li id="s10">There are issues with the XFree86 server for graphics hardware paths, which are hardcoded. (user-b1da, 2021-07-21, exchange 18620, check: uncheckable)</li>
+<li id="s11">DG/UX had support for standard GPUs like the ATI 3D Rage Pro through XFree86. (user-7b1c, 2022-05-12, exchange 156993, check: supported)</li>
+<li id="s12">The PCI Rage XL can run XFree86 at 640x480 but has timing issues and uses the vesa driver. (user-7ded, 2026-04-19, exchange 216618, check: uncheckable)</li>
+<li id="s13">To force XFree86 to start without a mouse, set `AllowMouseOpenFail true` in the configuration. (user-237d, 2021-01-08, exchange 216396, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx4.html">Onyx4</a>, <a href="origin-200.html">Origin 200</a>, <a href="impact.html">Impact</a>, <a href="se.html">SE</a>, <a href="vax.html">VAX</a>
+</li>
+<li>Graphics: <a href="prism-graphics-brick.html">Prism graphics brick</a>
+</li>
+<li>Software: <a href="xsgi.html">Xsgi</a>, <a href="xsun.html">Xsun</a>, <a href="gl.html">GL</a>, <a href="iris-gl.html">IRIS GL</a>, <a href="opengl.html">OpenGL</a>, <a href="qemu.html">QEMU</a>, <a href="vesa-driver.html">VESA driver</a>
+</li>
+<li>Parts and peripherals: <a href="xorg.html">Xorg</a>, <a href="nvidia-card.html">NVIDIA card</a>
+</li>
+<li>Standards and interfaces: <a href="x.html">X</a>, <a href="xterm.html">xterm</a>
+</li>
+<li>Other: <a href="dg-ux.html">DG/UX</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>command</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>command</h1>
+<p>Claims: 8</p>
+<p>The syntax to send a command to a specific brick is `&lt;brick id&gt;: &lt;command&gt;`, for example `001c01-L1&gt;001v02: dsp 1 test`, and the space between the colon and command can be tricky. <sup><a href="#s1">1</a></sup> Some commands may not be valid in a given install, such as `xfs_fsr`. <sup><a href="#s2">2</a></sup> `tar -tf &lt;filename&gt;` lists the contents of a file without extracting it. <sup><a href="#s3">3</a></sup> SCSI commands can be sent, as seen in messages reporting `Sending SCSI command` sequences. <sup><a href="#s4">4</a></sup> Using caps lock as control on Linux and command on Mac can help with learning new keyboard bindings. <sup><a href="#s5">5</a></sup> A stand fx can encounter an aborted command due to a message reject error and a warning about failing to open the scsi device. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The syntax to send a command to a specific brick is `&lt;brick id&gt;: &lt;command&gt;`, for example `001c01-L1&gt;001v02: dsp 1 test`. The space between colon and command can be tricky. (user-b7c4, 2019-06-17, exchange 95280, check: supported)</li>
+<li id="s2">xfs_fsr isnt a valid command in my install... hmm, yeah probs a recovery env thing. (user-bc18, 2021-08-19, exchange 19434, check: uncheckable)</li>
+<li id="s3">tar -tf &lt;filename&gt; lists contents without extracting. (user-ab99, 2021-08-26, exchange 205468, check: uncheckable)</li>
+<li id="s4">/dev/scsi/sc0d4l0: Sending SCSI command: d2 00 00 00 00 00 00 00 00 00; Number of files in /shared directory: 3; Sending SCSI command: da 00 00 00 00 00 00 00 00 00; Sending SCSI command: d7 00 00 00 00 00 00 00 00 00; # (user-bba0, 2024-06-19, exchange 47086, check: supported)</li>
+<li id="s5">Using caps lock as control on Linux and command on Mac can help with learning new keyboard bindings. (user-e872, 2024-07-10, exchange 210639, check: uncheckable)</li>
+<li id="s6">The stand fx encounters an aborted command due to a message reject error and a warning about failing to open the scsi device. (user-4f7c, 2025-07-14, exchange 117670, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="command-line.html">command line</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-installation.html">IRIX installation</a>
+</li>
+<li>Software: <a href="fx.html">fx</a>, <a href="tar.html">tar</a>
+</li>
+<li>Parts and peripherals: <a href="brick.html">brick</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="scsi-device.html">SCSI device</a>
+</li>
+<li>Other: <a href="caps-lock.html">caps lock</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weechat</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Weechat</h1>
+<p>Claims: 5</p>
+<p>The Mogrix TDNF is a separate entity from the SGUG TDNF, with its own repository file location, and Weechat installation requires adding the /opt/mogrix-apps/bin directory to the PATH and adjusting permissions to allow user read. <sup><a href="#s1">1</a></sup> The Weechat configuration file is located at ~/.config/weechat/weechat.conf. <sup><a href="#s2">2</a></sup> Weechat uses ncurses and requires proper UTF-8 support to render box-drawing characters correctly; aterm and mrxvt issues are related to font configuration. <sup><a href="#s3">3</a></sup> Deleting the .config/weechat directory and reinstalling WeeChat may not resolve issues with unresolvable symbols in plugins. <sup><a href="#s4">4</a></sup> The script removes sgidev_bridge and replaces it with the nick of the person typing; it can be easily added to a machine using NFS to place it on the HDD, then pasted into WeeChat. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Mogrix TDNF is a separate entity from the SGUG TDNF, with its own repository file location. Weechat installation requires adding the /opt/mogrix-apps/bin directory to the PATH and adjusting permissions to allow user读 (user-17cb, 2026-02-12, exchange 215898, check: uncheckable)</li>
+<li id="s2">The Weechat configuration file is located at ~/.config/weechat/weechat.conf. (user-2189, 2026-02-14, exchange 73126, check: uncheckable)</li>
+<li id="s3">Weechat uses ncurses and requires proper UTF-8 support to render box-drawing characters correctly; aterm and mrxvt issues are related to font configuration. (user-17cb, 2026-02-15, exchange 73134, check: supported)</li>
+<li id="s4">Deleting the .config/weechat directory and reinstalling WeeChat may not resolve issues with unresolvable symbols in plugins. (user-17cb, 2026-02-14, exchange 73127, check: uncheckable)</li>
+<li id="s5">The script removes `sgidev_bridge` and replaces it with the nick of the person typing; it can be easily added to a machine using NFS to place it on the HDD, then pasted into WeeChat. (user-17cb, 2026-08-28, exchange 91889, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="ncurses.html">ncurses</a>, <a href="script.html">script</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li></ul>
+</body>
+</html>

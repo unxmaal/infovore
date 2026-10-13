@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOSBox</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>DOSBox</h1>
+<p>Claims: 25 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/DOSBox">DOSBox</a>.</p>
+<p>DOSBox is an emulator that emulates the CPU, sound and graphic cards, and other peripherals of a PC, all at the same time, with the speed of an emulated DOS application being adjustable. <sup><a href="#s1">1</a></sup> DOSBox can be run natively on Irix and on the O2 using a MIPSPro port, though it may not run well on the O2 due to its JIT not being optimized. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The MIPSPro build of DOSBox has issues with some programs, such as crashing with 'Exit to error: Illegal CallBack Called' when loading Warcraft2, while the GCC build works fine. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> On MIPS, there is less hardware acceleration of graphics and sound compared to the x86 version, which uses SSE and MMX optimizations, making DOSBox slower on MIPS than on a modern PC or even a P3. <sup><a href="#s9">9</a></sup> DOSBox may not run well on the O2, and it is much slower than SoftWindows for running games, though Warcraft2 runs well in DOSBox on a Tezro. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> DOSBox is available in the `wipnonautomated` branch of the repo but no RPMs are provided yet, and building from source is required for the latest version. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">DOSBox emulates the CPU, sound and graphic cards, and other peripherals of a PC, all at the same time, and the speed of an emulated DOS application depends on how many instructions can be emulated, which is adjustable (c (user-6afa, 2021-05-13, exchange 205051, check: uncheckable)</li>
+<li id="s2">Bochs is an x86 and x86_64 emulator. QEMU does not work on Irix, but Bochs is better for this purpose. Go is a GC-based language with memory leaks in goroutines, but it's improving. Dosbox works on Irix. SBCL can be port (user-9b9c, 2019-03-03, exchange 864, check: uncheckable)</li>
+<li id="s3">The O2 can run DOSBox with a MIPSPro port. (user-637b, 2019-06-16, exchange 2079, check: supported)</li>
+<li id="s4">DOSBox may not run well on the O2 due to its JIT not being optimized. (user-1446, 2020-12-13, exchange 12850, check: supported)</li>
+<li id="s5">On IRIX, DOSBox can be run natively, and games like Diablo can be played without emulation. (user-7973, 2024-08-07, exchange 210770, check: uncheckable)</li>
+<li id="s6">The MipsPro build of Dosbox does not parse strings correctly, while the GCC build works. (user-8547, 2019-03-15, exchange 67124, check: uncheckable)</li>
+<li id="s7">The MIPSPro build of DOSBox crashes with 'Exit to error: Illegal CallBack Called' when loading a Warcraft2 game, while the GCC build works fine. (user-8547, 2019-03-20, exchange 203733, check: uncheckable)</li>
+<li id="s8">The dosbox mipspro build has issues with some programs like Warcraft2, while the gcc build works fine. (user-8547, 2019-07-13, exchange 67461, check: uncheckable)</li>
+<li id="s9">On MIPS, there is less hardware acceleration of graphics and sound compared to the x86 version of DOSBox, which uses SSE, MMX optimizations, making it slower on MIPS than on a modern PC or even a P3 (user-c831, 2021-05-13, exchange 205051, check: uncheckable)</li>
+<li id="s10">SoftWindows can run Tomb Raider but it is unplayable; DosBox is too slow for most games without a Tezro or a 1 GHz version. (user-8547, 2023-04-26, exchange 218008, check: supported)</li>
+<li id="s11">DOSBox is not decent on an O2. (user-8547, 2025-09-08, exchange 88045, check: supported)</li>
+<li id="s12">Warcraft2 runs well in DOSBox on a Tezro. (user-8547, 2025-09-08, exchange 88045, check: supported)</li>
+<li id="s13">Dosbox is available in the `wipnonautomated` branch of the repo but no RPMs are provided yet. (user-6afa, 2021-05-12, exchange 17316, check: supported)</li>
+<li id="s14">Building Dosbox from source is required for the latest version. (user-b1da, 2021-05-12, exchange 17316, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="dos-games.html">DOS games</a>
+</li>
+<li>Software: <a href="mipspro.html">MIPSpro</a>, <a href="c.html">C++</a>, <a href="softwindows.html">SoftWindows</a>, <a href="cf-card.html">CF card</a>, <a href="diablo.html">Diablo</a>, <a href="qemu.html">QEMU</a>, <a href="softwindows2.html">SoftWindows2</a>, <a href="gdb.html">gdb</a>, <a href="nekoware.html">nekoware</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="tdnf.html">tdnf</a>
+</li>
+<li>Companies: <a href="gcc-4-7-4.html">gcc 4.7.4</a>
+</li>
+<li>Other: <a href="warcraft2.html">Warcraft2</a>, <a href="bochs.html">Bochs</a>, <a href="tomb-raider.html">Tomb Raider</a>
+</li></ul>
+</body>
+</html>

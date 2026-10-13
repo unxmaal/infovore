@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Docker</h1>
+<p>Claims: 17</p>
+<p>Docker is a form of OS-level virtualization similar to Solaris zones, functioning as a kernel-level process jail with a layered filesystem, and it is not meant to be a VM but can work at a small scale. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It is better to run one process per container, such as a separate container for the web server and app. <sup><a href="#s2">2</a></sup> Docker can run on any system that supports it, enabling tasks such as running Genera (an emulator for Symbolics Lisp Machines) and performing hand computation tasks on an IRIX box. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Docker is not available on IRIX, but distcc can be set up with a Docker container for the compiler to compile on IRIX. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The DGX from Nvidia provides a minimal Linux install and certified Docker instances. <sup><a href="#s8">8</a></sup> socat behaves differently when run inside Docker compared to outside, specifically sending RST packets inside and FIN packets outside, and missing data frames. <sup><a href="#s9">9</a></sup> Bootp would not work with Docker's networking stack, and the same issue occurs when using host-only networking mode with Docker. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Setting a Docker container's network mode to host can allow bootstrapping SGI from it, and the SGI-L2-Docker project provides a way to run L2 software in a Docker container. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Solaris zones can run Linux and underpin Docker. OpenVZ is commonly used for virtualization. (user-22f9, 2019-02-22, exchange 699, check: uncheckable)</li>
+<li id="s2">Docker is a kernel-level process jail and a layered filesystem; it is not meant to be a VM but can work at a small scale. It is better to have one process per container, like a separate container for the web server, app, (user-2189, 2019-05-29, exchange 1828, check: uncheckable)</li>
+<li id="s3">Docker is a form of os-level virtualization similar to Solaris zones, focusing on the repository system. (user-42cf, 2019-05-29, exchange 1827, check: uncheckable)</li>
+<li id="s4">Genera is an emulator for Symbolics Lisp Machines, accessible via Docker. (user-888b, 2019-03-20, exchange 1101, check: uncheckable)</li>
+<li id="s5">this container can run on any system that supports docker and perform hand computation tasks on an IRIX box. (user-2189, 2020-02-20, exchange 6470, check: uncheckable)</li>
+<li id="s6">To compile on IRIX, set up distcc with a Docker container for the compiler and configure the compiler paths accordingly. (user-2189, 2020-09-12, exchange 215053, check: uncheckable)</li>
+<li id="s7">Docker is not available on Irix. (user-22f9, 2025-03-19, exchange 86852, check: uncheckable)</li>
+<li id="s8">The DGX from Nvidia provides a minimal Linux install and certified Docker instances. (user-e872, 2022-09-27, exchange 207725, check: uncheckable)</li>
+<li id="s9">socat behaves differently when run inside Docker compared to outside, specifically sending RST packets inside and FIN packets outside, and missing data frames. (user-cd7d, 2023-10-17, exchange 209407, check: uncheckable)</li>
+<li id="s10">Bootp wouldn’t work with Docker’s networking stack. (user-2189, 2025-05-05, exchange 216798, check: uncheckable)</li>
+<li id="s11">Same issue when using host only networking mode with Docker. (user-986f, 2025-05-05, exchange 216798, check: uncheckable)</li>
+<li id="s12">Setting a Docker container's network mode to host can allow bootstrapping SGI from it. (user-2189, 2025-05-06, exchange 216800, check: uncheckable)</li>
+<li id="s13">The SGI-L2-Docker project provides a way to run L2 software in a Docker container. (user-f190, 2026-04-29, exchange 243940, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="docker-container.html">Docker container</a> (7)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="arm.html">ARM</a>
+</li>
+<li>Processors: <a href="x86.html">x86</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="irix-box.html">IRIX box</a>
+</li>
+<li>Software: <a href="qemu.html">QEMU</a>, <a href="distcc.html">distcc</a>
+</li>
+<li>Standards and interfaces: <a href="bootp.html">bootp</a>
+</li>
+<li>Companies: <a href="nvidia.html">Nvidia</a>, <a href="symbolics-lisp.html">Symbolics Lisp</a>
+</li>
+<li>Other: <a href="dgx.html">DGX</a>, <a href="genera.html">Genera</a>, <a href="openvz.html">OpenVZ</a>
+</li></ul>
+</body>
+</html>

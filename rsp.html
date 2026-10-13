@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RSP</h1>
+<p>Claims: 12</p>
+<p>The RSP is a MIPS 4300 processor, specifically a MIPS III variant with 8-lane 16-bit vector capabilities as a coprocessor, a design similar in concept to the CRM graphics of the O2. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The RSP and ICE are 95% identical, with the main differences being that ICE includes 8-bit and 16-bit versions of instructions, has larger instruction memory, and access to all of RAM. <sup><a href="#s4">4</a></sup> The N64 GPU consists of the RSP and RDP chips, using custom display list calls, with the RSP using RSP-encoded data for display lists (DL) flushed to the RSP every frame as a GFX task. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The RSP is partly responsible for sound on the N64, and the O2 architecture is more optimal with separate chips. <sup><a href="#s7">7</a></sup> The RCP likely does not have debug features, but the RSP has some debug bits in the Status Register $c4. <sup><a href="#s8">8</a></sup> Some N64 documents, like RSP and RDP manuals, are publicly available for hardware understanding, and ion64 can now DMA in and out of RSP and control the RSP/MSP. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The RSP is a MIPS 4300 processor. (user-6afa, 2020-07-20, exchange 9772, check: supported)</li>
+<li id="s2">The MIPS architecture typically includes only an FPU, but the Nintendo 64's RSP is a MIPS III variant with 8-lane 16-bit vector capabilities as a coprocessor. (user-22f9, 2021-01-04, exchange 13468, check: supported)</li>
+<li id="s3">The N64 has an RSP similar in concept to the CRM graphics of the O2. (user-8b3c, 2019-07-17, exchange 2591, check: supported)</li>
+<li id="s4">The RSP and ICE are 95% identical; the main difference is ICE includes 8-bit and 16-bit versions of instructions, has larger instruction memory, and access to all of RAM. (user-8b3c, 2020-07-20, exchange 9780, check: supported)</li>
+<li id="s5">The N64 GPU consists of RSP and RDP chips, using custom display list calls. (user-cdae, 2024-08-29, exchange 48819, check: uncheckable)</li>
+<li id="s6">The N64 uses RSP encoded data for display lists (DL) which are flushed to the RSP every frame as a GFX task; a PC port could emulate RSP code but a true native port would replace models with OpenGL equivalents. (user-cdae, 2019-06-29, exchange 67304, check: uncheckable)</li>
+<li id="s7">The RSP is partly responsible for sound on the N64 and the O2 architecture is more optimal with separate chips. (user-4f7c, 2025-10-05, exchange 88308, check: supported)</li>
+<li id="s8">The RCP likely does not have debug features, but the RSP has some debug bits in the Status Register $c4. (user-8b3c, 2020-08-08, exchange 97334, check: uncheckable)</li>
+<li id="s9">Some N64 documents, like RSP and RDP manuals, are publicly available for hardware understanding. (user-8b3c, 2022-10-07, exchange 227232, check: uncheckable)</li>
+<li id="s10">ion64 can now DMA in and out of RSP and control the RSP/MSP. (user-8780, 2025-10-14, exchange 72808, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2-architecture.html">O2 architecture</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Graphics: <a href="gpu.html">GPU</a>
+</li>
+<li>Software: <a href="n64.html">N64</a>, <a href="opengl.html">OpenGL</a>
+</li>
+<li>Standards and interfaces: <a href="rdp.html">RDP</a>, <a href="rcp.html">RCP</a>
+</li>
+<li>Other: <a href="ice.html">ICE</a>, <a href="msp.html">MSP</a>
+</li></ul>
+</body>
+</html>

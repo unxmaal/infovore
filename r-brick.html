@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R-brick</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>R-brick</h1>
+<p>Claims: 13</p>
+<p>The R-brick is used with L-serials and requires 48V, whereas the Numalink router used with M-serials runs on 110/240V. <sup><a href="#s1">1</a></sup> The R-brick requires serial number changes for use with O300s/O350s, and can be configured to support M-serials with a documented procedure involving a Dallas chip from a Fuel. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Updating firmware on an R-brick requires a RHEL7 VM and specific tools. <sup><a href="#s4">4</a></sup> The R-brick's L1 can be brought up and the router type can be changed using `help`, but it requires a security key. <sup><a href="#s5">5</a></sup> It is possible to change an R-brick from a 6-port to an 8-port configuration, but it may require downgrading firmware and could result in errors or 'carnage'. <sup><a href="#s6">6</a></sup> Beyond two C-Bricks, each additional C-Brick requires an R-Brick per rack. <sup><a href="#s7">7</a></sup> An Origin 350s with R-brick can run Debian 13 and control multiple nodes via NUMALINK. <sup><a href="#s8">8</a></sup> The serial or Ethernet port on the R-brick motherboard does not work. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Numalink router (M-serials) runs on 110/240V, while the R-brick (L-serials) needs 48V. (user-bf68, 2021-08-13, exchange 19232, check: supported)</li>
+<li id="s2">The R-brick requires serial number changes for use with O300s/O350s. (user-22f9, 2019-03-07, exchange 923, check: uncheckable)</li>
+<li id="s3">The R-brick can be configured to support M-serials with a documented procedure involving a Dallas chip from a Fuel. (user-bf68, 2021-08-13, exchange 19232, check: supported)</li>
+<li id="s4">Updating firmware on an r-brick requires a RHEL7 VM and specific tools. (user-9860, 2021-11-24, exchange 217316, check: uncheckable)</li>
+<li id="s5">The R-brick’s L1 can be brought up and the router type can be changed using `help`, but it requires a security key. (user-5906, 2026-08-08, exchange 124703, check: supported)</li>
+<li id="s6">It's possible to change an R-brick from a 6-port to an 8-port configuration, but it may require downgrading firmware and could result in errors or 'carnage'. (user-5906, 2026-08-08, exchange 226840, check: supported)</li>
+<li id="s7">Beyond two C-Bricks, each additional C-Brick requires an R-Brick per rack. (user-1629, 2024-11-24, exchange 224237, check: supported)</li>
+<li id="s8">An Origin 350s with R-brick can run Debian 13 and control multiple nodes via NUMALINK. (user-ba5b, 2026-07-23, exchange 124299, check: supported)</li>
+<li id="s9">The serial or Ethernet port on the R brick motherboard does not work. (user-24f0, 2026-02-13, exchange 226086, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="fuel.html">Fuel</a>, <a href="g-brick.html">G-brick</a>, <a href="numalink-router.html">Numalink router</a>, <a href="o2-psu.html">O2 PSU</a>, <a href="o300.html">O300</a>, <a href="origin-3400.html">Origin 3400</a>
+</li>
+<li>Operating systems: <a href="debian-13.html">Debian 13</a>
+</li>
+<li>Parts and peripherals: <a href="c-brick.html">C-brick</a>, <a href="dallas-chip.html">Dallas chip</a>, <a href="l1.html">L1</a>
+</li>
+<li>Other: <a href="m-serials.html">M-serials</a>, <a href="i-brick.html">I-Brick</a>, <a href="l3.html">L3</a>
+</li></ul>
+</body>
+</html>

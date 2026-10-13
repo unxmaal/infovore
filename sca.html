@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCA</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCA</h1>
+<p>Claims: 33</p>
+<p>SCA is a standardized connector type that combines power and data in a single connector and supports daisy chaining SCSI disks. <sup><a href="#s1">1</a></sup> SCA makes it easy to plug in a new drive and, on IRIX, provided hotswap functionality. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> SCA is a wide SCSI connector used in the O2, Octane, and O2K, while the Sparcstation 20 uses regular SCA. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The I2 system uses a drive tray/sled connector that is similar to SCA but incompatible with SCA drives. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The Indigo2 uses narrow SCSI with a 50-pin backplane connector that is not SCA, so an SCA disk cannot be connected directly. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The O2 uses a connector compatible with SCA, but force-fitting a device into an SCA slot does not guarantee it will work. <sup><a href="#s11">11</a></sup> SCA drives are preferred for higher capacity. <sup><a href="#s12">12</a></sup> SCA is not necessarily faster, as UW SCSI runs at the same speed as the 68-pin version. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SCA is a standardized cable type for I/O cards, meaning power and data in one connector and daisy chaining SCSI disks. (user-b7c4, 2020-01-16, exchange 5484, check: uncheckable)</li>
+<li id="s2">SCA makes it easy to plug in a new drive. (user-f229, 2021-04-19, exchange 16742, check: uncheckable)</li>
+<li id="s3">IRIX lacks loopback mounts, but SCA provided hotswap functionality. (user-7b1c, 2022-11-12, exchange 217777, check: uncheckable)</li>
+<li id="s4">The O2 and Octane use wide SCA, while the Sparcstation 20 uses regular SCA. (user-616d, 2026-05-11, exchange 213956, check: supported)</li>
+<li id="s5">SCA is a wide SCSI connector used in O2, Octane, and O2K, but SCA disks do not fit in Indigo2 sleds. (user-86e1, 2026-08-20, exchange 244355, check: supported)</li>
+<li id="s6">The I2 system uses a connector similar to SCA but adapts it to a standard 50-pin connector for drive sleds. (user-b7c4, 2020-10-10, exchange 204459, check: supported)</li>
+<li id="s7">The i2 drive tray connector is similar to SCA but incompatible. (user-3e2d, 2026-05-19, exchange 226484, check: uncheckable)</li>
+<li id="s8">The indigo2 drive sled connector is laid out opposite of SCA, and genders are swapped, making it incompatible with SCA drives. (user-cd83, 2026-07-24, exchange 124341, check: supported)</li>
+<li id="s9">The Indigo2 has a 50-pin connector on the backplane that isn't SCA; you can't directly connect an SCA disk to the backplane. (user-0251, 2023-11-08, exchange 42071, check: supported)</li>
+<li id="s10">The Indigo2 uses narrow SCSI, unlike SCA which is wide. (user-86e1, 2024-12-21, exchange 113249, check: supported)</li>
+<li id="s11">The O2 uses a connector compatible with SCA, but force-fitting a device into an SCA slot does not guarantee it will work. (user-757f, 2026-02-05, exchange 226064, check: supported)</li>
+<li id="s12">SCA drives are preferred for higher capacity. (user-616d, 2026-07-25, exchange 124358, check: uncheckable)</li>
+<li id="s13">SCA isn't necessarily faster; UW is UW, so it will be same speed as 68pin version. (user-616d, 2025-09-03, exchange 225385, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sca-adapter.html">SCA adapter</a> (17)
+</li>
+<li><a href="sca-bus.html">SCA bus</a> (3)
+</li>
+<li><a href="sca-connector.html">SCA connector</a> (19)
+</li>
+<li><a href="sca-disks.html">SCA disks</a> (10)
+</li>
+<li><a href="sca-hard-drive.html">SCA hard drive</a> (4)
+</li>
+<li><a href="sca-scsi.html">SCA SCSI</a> (5)
+</li>
+<li><a href="sca80.html">SCA80</a> (8)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="c8000.html">C8000</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="sparcstation-20.html">SPARCstation 20</a>
+</li>
+<li>Software: <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="zuluscsi.html">ZuluSCSI</a>, <a href="36gb-drive.html">36GB drive</a>, <a href="50-pin-drives.html">50 pin drives</a>, <a href="50-pin-adapter.html">50-pin adapter</a>, <a href="50-pin-connector.html">50-pin connector</a>, <a href="bluescsi.html">BlueSCSI</a>, <a href="hdd.html">HDD</a>, <a href="scsi-backplane.html">SCSI backplane</a>, <a href="adapter.html">adapter</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="sata.html">SATA</a>, <a href="u320.html">U320</a>
+</li>
+<li>Other: <a href="50-pin.html">50 pin</a>, <a href="hd50.html">HD50</a>, <a href="hd68.html">HD68</a>, <a href="m-2.html">M.2</a>, <a href="narrow-scsi.html">narrow SCSI</a>
+</li></ul>
+</body>
+</html>

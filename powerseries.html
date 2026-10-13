@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PowerSeries</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PowerSeries</h1>
+<p>Claims: 55 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Capacitor">Capacitor</a>, <a href="https://en.wikipedia.org/wiki/Power_supply_unit_%28computer%29">Power supply unit (computer)</a>.</p>
+<h2 id="with-crimson">With Crimson</h2>
+<ul>
+<li>The PowerSeries has a more crowded internal layout compared to the Crimson, with limited space and no dedicated airflow. (user-86e1, exchange 241124, 2023-11-08; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Crimson is essentially the last iteration of the PowerSeries and can be upgraded from it. (user-ec52, exchange 225028, 2025-05-06; 1 speaker(s), 1 conversation(s))
+</li>
+<li>A fan tray for a RealityEngine is needed for a single tower PowerSeries or Crimson, specifically the later version. (user-86e1, exchange 243822, 2026-04-01; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Graphics boards and IO boards in Crimson and other PowerSeries systems require addresses 0xb0000000 to 0xbbffffff to function correctly. (user-cdcd, exchange 241118, 2023-10-28; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The Onyx deskside with a single blower is quieter than a PowerSeries with a fan tray and a Crimson with 12 fans is very loud. (user-b7c4, exchange 59491, 2025-09-22; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The PowerOne SPM5ADAELBS180 PSU from a PowerSeries can be used in a Crimson after swapping the wiring harness, but a different harness is required for startup. (user-86e1, exchange 241324, 2025-05-20; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The mini-DIN6 to DB9 or DB15 cable is compatible with PowerSeries and Crimson systems, and the DB9 version is likely the 'onyx' keyboard which looks grey but is actually beige. (user-86e1, exchange 199358, 2026-01-04; 1 speaker(s), 1 conversation(s))
+</li>
+<li>POWER Series systems can use RE graphics and think they're Crimson due to identical backplane hardware. (user-b7c4, exchange 7959, 2020-05-01; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The PowerSeries or Crimson uses a separate power inlet receptacle, allowing for voltage selection at the PSU via bridged terminals '1' and '2', with 230VAC indicated by opening terminals. Changing one receptacle does not (user-86e1, exchange 241436, 2026-03-20; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Professional IRIS uses VME as system bus; PowerSeries / Crimson use PowerPath but have VME compatibility through a bridge. (user-86e1, exchange 189127, 2024-05-27; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="general">General</h2>
+<p>The PowerSeries is an SGI machine that took an R3K 40 MHz CPU and used a proprietary bus called PowerPath, with some VME slots for expansion cards. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The PowerSeries and Personal Iris use the same sleds, and the same exact PSU is used in their PowerSeries. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The Pro Iris and Power Series use DA15 connectors, and the PowerSeries uses a proprietary bus (PowerPath) with some VME slots for expansion cards. <sup><a href="#s5">5</a></sup><sup><a href="#s2">2</a></sup> The PowerSeries run hot and have brittle solder after 30 years, and their modular PSUs have a backplane with control logic and an aux voltage regulator that powers the fan. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The PowerSeries is robust, with most issues related to graphics, particularly RealityEngine and VGX boards. <sup><a href="#s8">8</a></sup> The PowerSeries can be upgraded with an IP17 board to become an R4000-50, also known as a 4D/510. <sup><a href="#s9">9</a></sup> The Crimson is essentially the last iteration of the PowerSeries and can be upgraded from it. <sup><a href="#s10">10</a></sup> PowerSeries is a 4D/440 VGX that originally had one CPU board, labeled as a 4D/420. <sup><a href="#s11">11</a></sup> Skywriter was a tall rack brown PowerSeries with versions called Predator, which could have up to 8 CPUs and one graphics pipe, while the SkyWriter had dual VGXT graphics pipes and space for 4 CPUs. <sup><a href="#s12">12</a></sup> A PowerSeries can run on a 15A circuit at 110VAC but is safer on 20A, while a tall rack 4D/380 requires 200-240VAC and 30A. <sup><a href="#s13">13</a></sup> The PSU for a tall rack PowerSeries, like a SkyWriter or 4D/380, has triple modules, a 5V@250A module, cannot run on 110VAC, is 'always on', and doesn't respond to the power switch. <sup><a href="#s14">14</a></sup> The PowerSeries or Crimson uses a separate power inlet receptacle, allowing for voltage selection at the PSU via bridged terminals '1' and '2', with 230VAC indicated by opening terminals. <sup><a href="#s15">15</a></sup> DMediaPro was used for single frame I/O on PowerSeries, Personal IRIS, and Indigo. <sup><a href="#s16">16</a></sup> Documentation errors exist, including mixing up PowerSeries and Professional IRIS. <sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the PowerSeries takes an R3K 40 MHz CPU (user-c9fb, 2021-06-30, exchange 205201, check: supported)</li>
+<li id="s2">PowerSeries uses a proprietary bus (PowerPath) and has some VME slots for expansion cards; Professional IRIS is completely VME based. (user-86e1, 2023-04-20, exchange 222994, check: uncheckable)</li>
+<li id="s3">PowerSeries and Personal Iris use the same sleds. (user-f229, 2021-10-31, exchange 221646, check: supported)</li>
+<li id="s4">The same exact PSU is used in their PowerSeries. (user-f229, 2022-08-17, exchange 207545, check: uncheckable)</li>
+<li id="s5">The Pro Iris and Power Series use DA15 connectors. (user-c9fb, 2022-03-11, exchange 27121, check: uncheckable)</li>
+<li id="s6">PowerSeries run hot and have brittle solder after 30 years. (user-86e1, 2025-09-05, exchange 58973, check: supported)</li>
+<li id="s7">Modular PSUs in PowerSeries systems have a backplane with control logic and an aux voltage regulator that powers the fan; if the aux voltage regulator fails, the PSU fan stops, leading to PSU failure. (user-86e1, 2025-10-10, exchange 241407, check: uncheckable)</li>
+<li id="s8">The PowerSeries is robust, with most issues related to graphics, particularly RealityEngine and VGX boards, especially RM4/5 and DG2 for RealityEngine, and GT/GTX with RM boards. A power supply refresh and fan tray check (user-86e1, 2025-05-06, exchange 225027, check: supported)</li>
+<li id="s9">A PowerSeries with an IP17 upgrade becomes an R4000-50, also known as a 4D/510. (user-86e1, 2025-05-06, exchange 225028, check: supported)</li>
+<li id="s10">Crimson is essentially the last iteration of the PowerSeries and can be upgraded from it. (user-ec52, 2025-05-06, exchange 225028, check: supported)</li>
+<li id="s11">PowerSeries is a 4D/440 VGX that originally had one CPU board, labeled as a 4D/420. (user-86e1, 2025-12-31, exchange 199286, check: supported)</li>
+<li id="s12">Skywriter (the system) was a tall rack brown PowerSeries with versions called Predator, which could have up to 8 CPUs and one graphics pipe, while the SkyWriter had dual VGXT graphics pipes and space for 4 CPUs, with the (user-86e1, 2026-03-20, exchange 219583, check: supported)</li>
+<li id="s13">A PowerSeries can run on a 15A circuit at 110VAC but is safer on 20A, while a tall rack 4D/380 requires 200-240VAC and 30A. Deskside models might use a NEMA L5-20 plug. (user-86e1, 2026-03-04, exchange 190089, check: supported)</li>
+<li id="s14">The PSU for a tall rack PowerSeries, like a SkyWriter or 4D/380, has triple modules, a 5V@250A module, and cannot run on 110VAC; it is 'always on' and doesn't respond to the power switch. (user-86e1, 2026-03-30, exchange 243814, check: supported)</li>
+<li id="s15">The PowerSeries or Crimson uses a separate power inlet receptacle, allowing for voltage selection at the PSU via bridged terminals '1' and '2', with 230VAC indicated by opening terminals. Changing one receptacle does not (user-86e1, 2026-03-20, exchange 241436, check: supported)</li>
+<li id="s16">DMediaPro was used for single frame I/O on PowerSeries, Personal IRIS, and Indigo. (user-86e1, 2026-01-14, exchange 225945, check: supported)</li>
+<li id="s17">Documentation errors exist, including mixing up PowerSeries and Professional IRIS. (user-86e1, 2026-08-20, exchange 244355, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="powerseries-chassis.html">PowerSeries chassis</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="crimson.html">Crimson</a>, <a href="indigo.html">Indigo</a>, <a href="professional-iris.html">Professional IRIS</a>, <a href="skywriter.html">SkyWriter</a>, <a href="4d-380.html">4D/380</a>, <a href="onyx.html">Onyx</a>, <a href="4d-20.html">4D/20</a>, <a href="4d-440.html">4D/440</a>, <a href="4d-60.html">4D/60</a>, <a href="4d-70-gt.html">4D/70 GT</a>, <a href="iris.html">IRIS</a>, <a href="onyx-deskside.html">Onyx deskside</a>, <a href="onyx2.html">Onyx2</a>, <a href="pi.html">PI</a>, <a href="deskside.html">deskside</a>
+</li>
+<li>Processors: <a href="r4000.html">R4000</a>
+</li>
+<li>Graphics: <a href="realityengine.html">RealityEngine</a>, <a href="gtx.html">GTX</a>, <a href="graphics-board.html">graphics board</a>
+</li>
+<li>Operating systems: <a href="irix-4-x.html">IRIX 4.x</a>, <a href="plan-9.html">Plan 9</a>
+</li>
+<li>Parts and peripherals: <a href="psu.html">PSU</a>, <a href="dmediapro.html">DMediaPro</a>, <a href="gtx-boards.html">GTX boards</a>, <a href="io-board.html">IO board</a>, <a href="backplane.html">backplane</a>, <a href="capacitor.html">capacitor</a>, <a href="fan-tray.html">fan tray</a>, <a href="modem.html">modem</a>, <a href="tantalum-capacitor.html">tantalum capacitor</a>
+</li>
+<li>Standards and interfaces: <a href="smp.html">SMP</a>, <a href="vme-bus.html">VME bus</a>, <a href="vme-slot.html">VME slot</a>, <a href="protocol.html">protocol</a>
+</li>
+<li>Other: <a href="4d-85.html">4D/85</a>, <a href="4-x.html">4.x</a>, <a href="4d-420.html">4D/420</a>, <a href="bga.html">BGA</a>, <a href="diehard2.html">Diehard2</a>, <a href="personal.html">Personal</a>, <a href="predator.html">Predator</a>, <a href="sirius.html">Sirius</a>, <a href="tt.html">TT</a>
+</li></ul>
+</body>
+</html>

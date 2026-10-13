@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barrier</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Barrier</h1>
+<p>Claims: 12</p>
+<p>Barrier is a modern fork of the last open-source Synergy release, included in SGUG-RSE, and serves as a compatible alternative to Synergy2 for desktop setups. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It works well for combining two Linux boxes and SGI gear across multiple monitors, works with the SGUG Barrier client, and works with Teleffect. <sup><a href="#s2">2</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Barrier has been forked to Input-Leap by its active maintainers and still works with the SGUG Barrier client. <sup><a href="#s5">5</a></sup> It can be used to trap out to OF on both IRIX and Solaris by sending a break on the serial console, though the exact escape sequence for a break is unknown. <sup><a href="#s6">6</a></sup> To set up Barrier on IRIX, ensure barrierc connects manually, store the SSH fingerprint, add the command to /usr/lib/X11/xdm/Xlogin, and setenv nogfxkbd 1 to allow starting without keyboard and mouse. <sup><a href="#s7">7</a></sup> Barrier for ppc is not possible at the moment; it was ported to the X environment but not to IRIX. <sup><a href="#s8">8</a></sup> Barrier works great but does not support Wayland, introduces some CPU overhead (more noticeable with intense mouse movement), and has a bug with mice having many buttons, though buttons 1/2/3 and scroll (4/5) work. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Barrier is a modern alternative to Synergy2 for desktop setup compatibility. (user-f229, 2022-02-07, exchange 25472, check: uncheckable)</li>
+<li id="s2">Barrier, a fork of synergy included in SGUG-RSE, works well for combining two Linux boxes and SGI gear across multiple monitors. (user-7973, 2023-02-17, exchange 217919, check: supported)</li>
+<li id="s3">Barrier is a fork from the last OSS synergy release and works together with it. (user-e872, 2025-01-03, exchange 218669, check: uncheckable)</li>
+<li id="s4">Barrier from SGUG-RSE works for Teleffect. (user-56d4, 2023-02-18, exchange 217923, check: uncheckable)</li>
+<li id="s5">Barrier has been forked to Input-Leap by the active maintainers of Barrier and still works with the SGUG Barrier client. (user-17cb, 2024-11-09, exchange 71685, check: uncheckable)</li>
+<li id="s6">Barrier can be used to trap out to OF on both IRIX and Solaris by sending a break on the serial console, and the exact escape sequence for a break is unknown. (user-7b1c, 2022-09-14, exchange 222497, check: uncheckable)</li>
+<li id="s7">To set up Barrier on IRIX, ensure barrierc connects manually, store the SSH fingerprint, and add the command to /usr/lib/X11/xdm/Xlogin. Also, setenv nogfxkbd 1 to allow starting without keyboard and mouse. (user-7973, 2025-10-21, exchange 219194, check: supported)</li>
+<li id="s8">Barrier for ppc is not possible at the moment; it was ported to X environment but not to IRIX. (user-17cb, 2023-06-09, exchange 218084, check: uncheckable)</li>
+<li id="s9">Barrier 2.3.3 has a bug with mice having many buttons, but buttons 1/2/3 and scroll (4/5) work. (user-e872, 2021-12-03, exchange 70058, check: supported)</li>
+<li id="s10">Barrier introduces some CPU overhead, more noticeable with intense mouse movement. (user-e872, 2023-06-09, exchange 218083, check: uncheckable)</li>
+<li id="s11">barrier works great but does not support wayland. (user-7973, 2025-01-03, exchange 218671, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="ppc.html">PPC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux-box.html">Linux box</a>, <a href="solaris.html">Solaris</a>, <a href="solaris-11-3.html">Solaris 11.3</a>
+</li>
+<li>Software: <a href="synergy.html">Synergy</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Parts and peripherals: <a href="wayland.html">Wayland</a>, <a href="mice.html">mice</a>
+</li>
+<li>Standards and interfaces: <a href="ssh.html">SSH</a>
+</li>
+<li>Other: <a href="input-leap.html">Input-Leap</a>, <a href="t3-1.html">T3-1</a>
+</li></ul>
+</body>
+</html>

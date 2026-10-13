@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>buffer</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>buffer</h1>
+<p>Claims: 5</p>
+<p>The Swap Ready signal synchronizes graphics heads so they change buffers simultaneously, which is useful for systems with multiple graphics heads, potentially on rendering clusters or Onyx machines. <sup><a href="#s1">1</a></sup> For an 8-bit system, a buffer and a hot swap voltage controller can manage hot swapping, with software handling on the OS side. <sup><a href="#s2">2</a></sup> To handle endianness, the buffer is loaded and then, for each accessor, the binary data is copied and byteswapped during the copy process, though on certain systems only specific data within a buffer is byteswapped when printed manually. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Plotting to a buffer by iterating a pointer can be more efficient than using XPutPixel repeatedly. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Swap Ready signal synchronizes graphics heads to ensure they change buffers simultaneously, useful for systems with multiple graphics heads, potentially on rendering clusters or Onyx machines. (user-b7c4, 2019-12-11, exchange 95930, check: supported)</li>
+<li id="s2">For an 8-bit system, a buffer and a hot swap voltage controller can manage hot swapping, with software handling on the OS side. (user-5510, 2022-06-29, exchange 30561, check: supported)</li>
+<li id="s3">To handle endianness, load the buffer, then for each accessor, copy and byteswap the binary data during the copy process. (user-6afa, 2023-10-07, exchange 209352, check: uncheckable)</li>
+<li id="s4">On certain systems, only specific data within a buffer is byteswapped when printed manually. (user-b1da, 2023-10-08, exchange 41345, check: uncheckable)</li>
+<li id="s5">Plotting to a buffer by iterating a pointer can be more efficient than using XPutPixel repeatedly. (user-21b8, 2024-12-05, exchange 215602, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Standards and interfaces: <a href="endianness.html">endianness</a>
+</li>
+<li>Other: <a href="8-bit.html">8-bit</a>, <a href="xputpixel.html">XPutPixel</a>
+</li></ul>
+</body>
+</html>

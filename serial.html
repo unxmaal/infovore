@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>serial</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>serial</h1>
+<p>Claims: 48 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Video_Graphics_Array">Video Graphics Array</a>.</p>
+<p>Serial ports are used for firmware access, booting, and console use on various systems, though they may not output video due to hardware issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Serial communication can be configured with specific settings, such as 38400/8/N/1 with RTS/CTS flow control or 9600 8N1. <sup><a href="#s3">3</a></sup><sup><a href="#s6">6</a></sup> Serial can be used for installation, debugging, and transferring programs, but setup can be challenging and may require specific configuration. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Serial and SCSI controllers do not interfere with each other, and serial is compatible with certain devices. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Failed RAM or hardware issues can cause problems with serial communication, and nothing may show up on serial. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> MIDI on IRIX is used via serial, and someone was recently selling MIDI adapters on eBay. <sup><a href="#s17">17</a></sup> A FPGA could implement legacy genlock compatibility and provide serial, parallel, and joystick/mouse ports. <sup><a href="#s18">18</a></sup> The ROM limit for kernel size via serial is 4MB. <sup><a href="#s19">19</a></sup> The Origin 350 can use multiple L2 modules and a Tezro L1 on serial for toggling between systems. <sup><a href="#s20">20</a></sup> Basic decoding should be spit out to serial for diagnostics. <sup><a href="#s21">21</a></sup> RAD + dual serial (the original that came with tezro) and also replacement quad usb 2.0, they all work in other slots. <sup><a href="#s22">22</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The I2 can boot over serial but not output video due to potential riser board issues. (user-b7c4, 2019-01-18, exchange 133, check: uncheckable)</li>
+<li id="s2">For an Origin without a graphics adapter, serial is sufficient for console use; additional functionality requires the OS to be up and X to be exported. (user-8560, 2019-11-10, exchange 95677, check: supported)</li>
+<li id="s3">The Fuel has a DB9 serial port on the inside and uses serial for firmware access with settings of 38400/8/N/1 and RTS/CTS flowcontrol. (user-b7c4, 2020-02-01, exchange 75048, check: supported)</li>
+<li id="s4">Accessing the L1 via serial is common. (user-6afa, 2022-04-21, exchange 220230, check: uncheckable)</li>
+<li id="s5">It can boot standalone over serial. (user-cd83, 2023-10-13, exchange 223430, check: uncheckable)</li>
+<li id="s6">Using serial for CD installation involves unplugging the mouse and keyboard and connecting a null modem cable with settings 9600 8N1. (user-b7c4, 2020-08-23, exchange 78627, check: supported)</li>
+<li id="s7">POD mode is a debugging feature in the PROM that allows hardware debugging over serial. (user-b7c4, 2020-01-16, exchange 216282, check: uncheckable)</li>
+<li id="s8">Development for PS1 consoles can be done using emulators and transferring programs over serial or parallel, or burning them to discs. (user-4c09, 2020-10-05, exchange 156265, check: uncheckable)</li>
+<li id="s9">Can operate the machine via serial for installation. (user-5510, 2023-07-01, exchange 39008, check: uncheckable)</li>
+<li id="s10">Setting up serial on a modern Linux box requires specific configuration. (user-22f9, 2023-11-26, exchange 42700, check: uncheckable)</li>
+<li id="s11">Setting up serial can be challenging, especially for diagnostics. (user-22f9, 2023-11-27, exchange 42725, check: uncheckable)</li>
+<li id="s12">Serial and SCSI controllers do not interfere with each other. (user-b7c4, 2020-08-23, exchange 78627, check: uncheckable)</li>
+<li id="s13">apple serial is compatible (user-24f0, 2025-01-30, exchange 211834, check: uncheckable)</li>
+<li id="s14">Nothing shows up on serial. (user-9305, 2021-04-28, exchange 205012, check: uncheckable)</li>
+<li id="s15">Failed RAM can cause garbage over serial. (user-0251, 2023-11-30, exchange 42834, check: uncheckable)</li>
+<li id="s16">if you don't get video and don't get serial, it sounds like something more serious (user-616d, 2024-10-06, exchange 163268, check: uncheckable)</li>
+<li id="s17">MIDI on IRIX is used via serial, and someone was recently selling MIDI adapters on eBay. (user-3e2d, 2025-12-19, exchange 120163, check: uncheckable)</li>
+<li id="s18">A FPGA could implement legacy genlock compatibility and provide serial, parallel, and joystick/mouse ports. (user-e872, 2026-04-07, exchange 233486, check: uncheckable)</li>
+<li id="s19">The ROM limit for kernel size via serial is 4MB. (user-7ded, 2026-06-03, exchange 244518, check: supported)</li>
+<li id="s20">The Origin 350 can use multiple L2 modules and a Tezro L1 on serial for toggling between systems. (user-86e1, 2026-08-25, exchange 125084, check: supported)</li>
+<li id="s21">Basic decoding should be spit out to serial for diagnostics. (user-07ed, 2026-08-28, exchange 239208, check: uncheckable)</li>
+<li id="s22">RAD + dual serial (the original that came with tezro) and also replacement quad usb 2.0, they all work in other slots (user-3e2d, 2026-09-05, exchange 226990, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="serial-adapter.html">serial adapter</a> (4)
+</li>
+<li><a href="serial-cable.html">serial cable</a> (14)
+</li>
+<li><a href="serial-communication.html">serial communication</a> (11)
+</li>
+<li><a href="serial-connection.html">serial connection</a> (10)
+</li>
+<li><a href="serial-console.html">serial console</a> (39)
+</li>
+<li><a href="serial-interface.html">serial interface</a> (4)
+</li>
+<li><a href="serial-number.html">serial number</a> (15)
+</li>
+<li><a href="serial-output.html">serial output</a> (3)
+</li>
+<li><a href="serial-printers.html">serial printers</a> (3)
+</li>
+<li><a href="serial-terminal.html">serial terminal</a> (14)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="amiga.html">Amiga</a>, <a href="fuel.html">Fuel</a>, <a href="indigo2-impact.html">Indigo2 Impact</a>, <a href="o300.html">O300</a>, <a href="origin.html">Origin</a>, <a href="origin-350.html">Origin 350</a>, <a href="ps1.html">PS1</a>, <a href="ultra-5.html">Ultra 5</a>
+</li>
+<li>Processors: <a href="r12000.html">R12000</a>, <a href="dual-cpu.html">dual CPU</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="nt4.html">NT4</a>, <a href="os.html">OS</a>
+</li>
+<li>Software: <a href="fpga.html">FPGA</a>, <a href="dcd.html">DCD</a>, <a href="x-server.html">X server</a>, <a href="boot.html">boot</a>, <a href="emulator.html">emulator</a>
+</li>
+<li>Parts and peripherals: <a href="l1.html">L1</a>, <a href="prom.html">PROM</a>, <a href="monitor.html">monitor</a>, <a href="video.html">video</a>, <a href="c-brick.html">C-brick</a>, <a href="idprom.html">IDPROM</a>, <a href="l2.html">L2</a>, <a href="nvram.html">NVRAM</a>, <a href="ram.html">RAM</a>, <a href="rom.html">ROM</a>, <a href="command-monitor.html">command monitor</a>, <a href="floppy.html">floppy</a>, <a href="keyboard.html">keyboard</a>, <a href="mouse.html">mouse</a>, <a href="null-modem-cable.html">null modem cable</a>, <a href="riser-board.html">riser board</a>
+</li>
+<li>Standards and interfaces: <a href="usb.html">USB</a>, <a href="scsi.html">SCSI</a>, <a href="dvi.html">DVI</a>, <a href="midi.html">MIDI</a>, <a href="vga.html">VGA</a>, <a href="x.html">X</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="parallel.html">parallel</a>, <a href="adf.html">ADF</a>, <a href="cpld.html">CPLD</a>, <a href="db15.html">DB15</a>, <a href="joybus.html">Joybus</a>, <a href="rad.html">RAD</a>, <a href="node.html">node</a>
+</li></ul>
+</body>
+</html>

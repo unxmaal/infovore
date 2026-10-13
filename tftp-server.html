@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TFTP server</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>TFTP server</h1>
+<p>Claims: 10 Part of <a href="tftp.html">TFTP</a></p>
+<p>TFTP servers are used to provide boot images for various SGI systems, including booting a Linux VM via PXE by configuring the TFTP server and setting the PROM to the Linux box's IP. <sup><a href="#s1">1</a></sup> Booting into the installer from the TFTP server works initially but then networking is lost inside the installer or Booterizer crashes. <sup><a href="#s2">2</a></sup> When installing IRIX 6.5.30 using booterizer, setting 'setenv srvaddr {IP of TFTP}' ensures the SGI box knows where to find the TFTP server; otherwise, it may try to contact a server with a blank IP/hostname. <sup><a href="#s3">3</a></sup> The XP214 uses PS/2 keyboards and mice, which are easy to set up with a TFTP server for the boot image; DHCP/BOOTP is optional. <sup><a href="#s4">4</a></sup> bootp() can specify the IP or hostname of the TFTP server, and if omitted, it broadcasts to find a responding server. <sup><a href="#s5">5</a></sup> The Indy uses a network configuration with a TFTP server for booting, and the kernel expects SGI hardware. <sup><a href="#s6">6</a></sup> The Octane would need a router to reach the TFTP server's IP address. <sup><a href="#s7">7</a></sup> To boot from a SATA drive, the kernel must be loaded from another drive first, using a TFTP server for example. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">PXE can boot a Linux VM by configuring the TFTP server and setting the PROM to the Linux box's IP. (user-b7c4, 2020-04-20, exchange 7659, check: uncheckable)</li>
+<li id="s2">Booting into the installer from the TFTP server works initially but then networking is lost inside the installer or Booterizer crashes. (user-8999, 2020-10-01, exchange 11299, check: uncheckable)</li>
+<li id="s3">When installing IRIX 6.5.30 using booterizer, setting 'setenv srvaddr {IP of TFTP}' ensures the SGI box knows where to find the TFTP server; otherwise, it may try to contact a server with a blank IP/hostname. (user-7973, 2021-08-08, exchange 217198, check: supported)</li>
+<li id="s4">The XP214 uses PS/2 keyboards and mice, which are easy to set up with a TFTP server for the boot image; DHCP/BOOTP is optional. (user-237d, 2021-10-06, exchange 74198, check: supported)</li>
+<li id="s5">bootp() can specify the IP or hostname of the TFTP server, and if omitted, it broadcasts to find a responding server. (user-c9fb, 2021-11-16, exchange 77481, check: uncheckable)</li>
+<li id="s6">The Indy uses a network configuration with a TFTP server for booting, and the kernel expects SGI hardware. (user-22f9, 2024-03-24, exchange 210183, check: supported)</li>
+<li id="s7">The Octane would need a router to reach the TFTP server's IP address. (user-6e7b, 2024-03-24, exchange 210183, check: supported)</li>
+<li id="s8">To boot from a SATA drive, the kernel must be loaded from another drive first, using a TFTP server for example. (user-7973, 2025-04-03, exchange 224838, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="octane.html">Octane</a>, <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-kernel.html">IRIX kernel</a>, <a href="linux-vm.html">Linux VM</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>
+</li>
+<li>Parts and peripherals: <a href="nvme-drive.html">NVMe drive</a>, <a href="ps-2-keyboard.html">PS/2 keyboard</a>, <a href="ps-2-mice.html">PS/2 mice</a>
+</li>
+<li>Standards and interfaces: <a href="ip-address.html">IP address</a>, <a href="bootp.html">bootp</a>
+</li>
+<li>Other: <a href="pxe.html">PXE</a>
+</li></ul>
+</body>
+</html>

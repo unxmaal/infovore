@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perl</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Perl</h1>
+<p>Claims: 25 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Perl">Perl</a>.</p>
+<p>Perl is a programming language that can provide universal regex and replacement capabilities similar to sed, and is considered better for replacing shell, awk, and sed, though its flexible syntax can lead to dirty code. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Perl is commonly used in system administration, with examples including fixing CGI scripts, editing /etc/passwd, and potentially running Munin with RRDTool. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Perl is used to build other software, as wget requires it to build its manpage and test suite, and Qt lists Perl among its minimum system requirements. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Perl has notoriously poor build systems, and building it can be time-consuming, taking 22 to 28 hours on older hardware such as a Sun IPC under RedHat 4.2. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Building Perl can encounter various problems, including failures on broken compilers/shells, hangs during the miniperl stage, memory issues during brk/sbrk operations, and compiler-specific issues such as endless loops. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Multiple Perl versions are available on some systems, such as 5.8.8 from /opt and 5.10.2 from /usr/local, and Perl binaries are available for platforms like IRIX. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">sed can be used for line editing but may require non-POSIX extensions for full functionality; Perl can provide similar functionality with universal regex and replacement capabilities. (user-ba81, 2019-03-04, exchange 880, check: uncheckable)</li>
+<li id="s2">Perl is better for replacing shell, awk, and sed, and has a flexible syntax but can lead to dirty code. (user-22f9, 2019-03-14, exchange 1022, check: uncheckable)</li>
+<li id="s3">I worked as a sysadmin and fixed CGI scripts, then focused on Perl. (user-42cf, 2019-07-09, exchange 67389, check: uncheckable)</li>
+<li id="s4">Perl can be used to edit /etc/passwd. (user-9860, 2021-10-20, exchange 21304, check: uncheckable)</li>
+<li id="s5">Munin could potentially be run with RRDTool and a lot of Perl. (user-f229, 2019-10-06, exchange 68013, check: uncheckable)</li>
+<li id="s6">wget requires Perl to build its manpage and test suite. (user-b1da, 2020-08-02, exchange 10289, check: uncheckable)</li>
+<li id="s7">The minimum system requirements for Qt include Git, Perl, Python, and a working C++ compiler. (user-b7c4, 2019-07-09, exchange 67404, check: uncheckable)</li>
+<li id="s8">Perl, Python, and Ruby have notoriously poor build systems. (user-42cf, 2020-01-01, exchange 68241, check: uncheckable)</li>
+<li id="s9">Building Perl on a Sun IPC running Redhat 4.2 took 22 hours. (user-07ed, 2021-10-06, exchange 205675, check: supported)</li>
+<li id="s10">Compiling Perl on a Sun IPC took 28 hours using a 667MB external disk. (user-07ed, 2022-03-18, exchange 27387, check: supported)</li>
+<li id="s11">Compiling Perl on a SparcStation IPC under RedHat 4.2 took 28 hours. (user-07ed, 2022-11-03, exchange 239876, check: supported)</li>
+<li id="s12">Perl's configure script may fail on broken compilers/shells, requiring workarounds. (user-03ad, 2024-05-05, exchange 210330, check: uncheckable)</li>
+<li id="s13">Building Perl with pkgsrc on their system hangs during miniperl stage, and attempts to use GCC or HP ANSIC encounter dependency issues. (user-3e3c, 2021-02-28, exchange 15062, check: uncheckable)</li>
+<li id="s14">Perl can run out of logical swap space during brk/sbrk operations and may be killed to resolve a memory deadlock; adding swap space can help. (user-f229, 2019-10-06, exchange 68012, check: uncheckable)</li>
+<li id="s15">Merijn's gcc-4.6.1 generates Perl that endlessly loops and binaries it generates could not be debugged with the included GDB. (user-3e3c, 2021-03-03, exchange 15112, check: supported)</li>
+<li id="s16">Perl 5.8.8 from /opt and 5.10.2 from /usr/local are available. (user-3e3c, 2021-02-28, exchange 15067, check: supported)</li>
+<li id="s17">rxvt-unicode binaries are available for IRIX, requiring perl in /usr/local/bin and installing in /opt/local. (user-637b, 2019-01-16, exchange 117, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ipc.html">IPC</a>, <a href="c8000.html">C8000</a>, <a href="sparcstation-ipc.html">SPARCStation IPC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="python.html">Python</a>, <a href="pkgsrc.html">pkgsrc</a>, <a href="booterizer.html">Booterizer</a>, <a href="ruby.html">Ruby</a>, <a href="bash.html">bash</a>, <a href="configure-script.html">configure script</a>, <a href="didbs.html">didbs</a>, <a href="gdb.html">gdb</a>, <a href="git.html">git</a>, <a href="sed.html">sed</a>, <a href="wget.html">wget</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="redhat-4-2.html">RedHat 4.2</a>, <a href="lavarand.html">Lavarand</a>, <a href="qt.html">Qt</a>, <a href="svg.html">SVG</a>, <a href="g.html">g++</a>, <a href="sysadmin.html">sysadmin</a>
+</li></ul>
+</body>
+</html>

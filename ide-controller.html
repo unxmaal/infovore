@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDE controller</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IDE controller</h1>
+<p>Claims: 15 Part of <a href="ide.html">IDE</a></p>
+<p>The DS10L only works on NT4 in arc with 2.5 SCSI hdds and an IDE controller, in addition to a heat limitation. <sup><a href="#s1">1</a></sup> An LS120 drive can be connected to an IDE controller without an FDC. <sup><a href="#s2">2</a></sup> The IDE controller on the Ultra 5/10 is problematic, so a SCSI controller is recommended for better performance. <sup><a href="#s3">3</a></sup> The Blade 100/150 has a PCB dividing the drive bay area from the PCI card/mobo area, requiring tricky cable routing. <sup><a href="#s4">4</a></sup> The Blade 100/150 has a newer, better IDE controller compared to older models, though not as bad as the U5/10. <sup><a href="#s5">5</a></sup> The U5 has a crappy IDE controller and network card. <sup><a href="#s6">6</a></sup> The Blade 100 has OBP version 4 and an improved IDE controller. <sup><a href="#s7">7</a></sup> A Disk On Module IDE flash drive in a Netra seems good but has the same IDE controller as the U5/10. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The DS10L has a limitation besides heat: it only works on NT4 in arc with 2.5 SCSI hdds and IDE controller. (user-f9d4, 2020-01-02, exchange 96102, check: supported)</li>
+<li id="s2">An LS120 drive can be connected to an IDE controller without an FDC. (user-f9d4, 2020-02-16, exchange 6399, check: uncheckable)</li>
+<li id="s3">The IDE controller on the Ultra 5/10 is problematic, so a SCSI controller is recommended for better performance. (user-03ad, 2022-05-31, exchange 239669, check: supported)</li>
+<li id="s4">The Blade 100/150 has a PCB dividing the drive bay area from the PCI card/mobo area, requiring tricky cable routing. (user-baf6, 2022-05-31, exchange 239670, check: supported)</li>
+<li id="s5">The Blade 100/150 has a newer, better IDE controller compared to older models, though not as bad as U5/10. (user-03ad, 2022-05-31, exchange 239670, check: supported)</li>
+<li id="s6">The U5 has a crappy IDE controller and network card. (user-237d, 2022-09-23, exchange 235241, check: uncheckable)</li>
+<li id="s7">The Blade 100 has OBP version 4 and an improved IDE controller. (user-03ad, 2023-10-09, exchange 240168, check: supported)</li>
+<li id="s8">A Disk On Module IDE flash drive in a Netra seems good but has the same IDE controller as U5/10. (user-07ed, 2023-10-09, exchange 240168, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="blade-100.html">Blade 100</a>, <a href="blade-100-150.html">Blade 100/150</a>, <a href="u5.html">U5</a>, <a href="netra.html">Netra</a>, <a href="u10.html">U10</a>
+</li>
+<li>Operating systems: <a href="nt4.html">NT4</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="ide-drive.html">IDE drive</a>, <a href="scsi-controller.html">SCSI controller</a>, <a href="network-card.html">network card</a>
+</li>
+<li>Other: <a href="ds10l.html">DS10L</a>, <a href="ultra-5-10.html">Ultra 5/10</a>
+</li></ul>
+</body>
+</html>

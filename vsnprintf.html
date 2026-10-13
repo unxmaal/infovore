@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vsnprintf</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>vsnprintf</h1>
+<p>Claims: 5</p>
+<p>IRIX's vsnprintf returns the number of characters actually written instead of the buffer size needed, which is incorrect. <sup><a href="#s1">1</a></sup> Solaris 2.5.1 includes vsnprintf, but the function is not included in the system libc of some Solaris versions, as indicated by the stdio.h header file while the linker error suggests it is missing. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> To resolve the issue, include the vsnprintf source file directly in the build process without making it a library. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX's `vsnprintf` returns the number of characters actually written instead of the buffer size needed, which is incorrect. (user-6c80, 2024-05-09, exchange 215489, check: supported)</li>
+<li id="s2">Solaris 2.5.1 includes vsNprintf, but using glibc requires setting up the path and compiling with its headers. (user-7151, 2024-08-09, exchange 153270, check: supported)</li>
+<li id="s3">The vsnprintf function is not included in the system libc of some Solaris versions. (user-b1da, 2024-08-10, exchange 185345, check: uncheckable)</li>
+<li id="s4">The stdio.h header file indicates that vsnprintf should exist in the library, but the linker error suggests it is missing, implying the library does not include vsnprintf. (user-d5ee, 2024-08-10, exchange 185342, check: uncheckable)</li>
+<li id="s5">To resolve the issue, include the vsnprintf source file directly in the build process without making it a library. (user-b1da, 2024-08-10, exchange 185342, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris.html">Solaris</a>, <a href="solaris-2-5-1.html">Solaris 2.5.1</a>
+</li>
+<li>Standards and interfaces: <a href="glibc.html">glibc</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flickering</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>flickering</h1>
+<p>Claims: 3 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>Flickering in OpenGL rendering can be caused by double buffering issues that arise without explicit vsync support, and adjusting the swap interval can affect the rendering output. <sup><a href="#s1">1</a></sup> The flickering occurs regardless of render type settings, but is less intense at 30fps. <sup><a href="#s2">2</a></sup> The flickering is due to a single buffered visual being selected, which might also lead to unsupported texture formats and empty textures. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Double buffering issues can cause flickering in OpenGL rendering without explicit vsync support, and adjusting the swap interval can affect rendering output. (user-b1da, 2021-05-14, exchange 17356, check: uncheckable)</li>
+<li id="s2">Flickering occurs regardless of render type settings, but is less intense at 30fps. (user-95db, 2023-04-18, exchange 83360, check: supported)</li>
+<li id="s3">The flickering is due to a single buffered visual being selected, which might also lead to unsupported texture formats and empty textures. (user-6afa, 2024-12-17, exchange 215612, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="opengl.html">OpenGL</a>
+</li>
+<li>Other: <a href="double-buffering.html">double buffering</a>, <a href="vsync.html">vsync</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onyx1</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Onyx1</h1>
+<p>Claims: 29 Part of <a href="onyx.html">Onyx</a></p>
+<p>The Onyx1 was an early SGI system, used for early N64 development and reporting 2 WD33C95A SCSI chips via `hinv`, though the IO4 PCB actually has 6 WD33C95A chips and 6 external connectors. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It was the last SGI to use the SGI bus, the IRIS port, and the proprietary keyboard, sharing the same keyboard port as the Indigo1 and Personal IRIS 4D/30/35. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The Onyx1 uses HVD, supports 4D systems up to Onyx1 with serial #2 to #4 available in DE9 and DIN8 connectors, and has network cards behind a bulkhead panel requiring special cables to connect to the Sirius VO2 board, which lacks smart modules and cannot be connected to VME cards directly. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Known issues include the VCAM, which has a 12v regulator that tends to fail, followed by power converters and the PSU, which can be DIY fixed but is complex and challenging to repair. <sup><a href="#s11">11</a></sup> Prices range from $200 to $1000, with PSU rebuilds often needed, and NetBSD has not been reported to boot on an Onyx1. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The Onyx1 with Reality Engine graphics is a specific configuration for collecting SGI systems, and Flame 4 is an IRIX application requiring an Onyx1 for full functionality, which may run on IRIX 6.5. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Early N64 development was done on Onyx1 (user-b7c4, 2019-08-20, exchange 3115, check: uncheckable)</li>
+<li id="s2">Onyx 1 reports 2 WD33C95A SCSI chips via `hinv`, but the IO4 PCB has 6 WD33C95A chips and 6 external connectors. (user-8b3c, 2021-06-20, exchange 99371, check: supported)</li>
+<li id="s3">Only Indigo1 and Onyx1 and anything older need a proprietary keyboard; the fake PS/2 connector on Indigo1 and late Personal IRIS lacks a second one for a mouse. (user-8de9, 2022-03-09, exchange 222074, check: supported)</li>
+<li id="s4">Indigo 1 and Onyx 1 were the last machines to use the SGI bus. (user-1a5a, 2024-09-05, exchange 224079, check: supported)</li>
+<li id="s5">The Onyx1 was the last SGI to use the IRIS port. (user-24f0, 2024-11-14, exchange 50401, check: uncheckable)</li>
+<li id="s6">The Onyx1 uses the same keyboard port as the Indigo1 and Personal IRIS 4D/30/35, while the Onyx2+ uses PS/2. (user-8de9, 2022-06-22, exchange 207252, check: supported)</li>
+<li id="s7">Onyx1 uses HVD. (user-22f9, 2025-02-17, exchange 54389, check: uncheckable)</li>
+<li id="s8">Onyx1 supports 4D systems up to Onyx1, with serial #2 to #4 available in DE9 and DIN8 connectors, the latter including power for 3D goggles and potentially buttons &amp; dials. (user-86e1, 2024-07-04, exchange 111738, check: supported)</li>
+<li id="s9">The ONYX1 has network cards behind a bulkhead panel that requires special cables to connect to the Sirius VO2 board. (user-86e1, 2025-05-14, exchange 225050, check: uncheckable)</li>
+<li id="s10">The bulkhead panel on the ONYX1 does not have smart modules and cannot be connected to VME cards directly. (user-86e1, 2025-05-14, exchange 225050, check: uncheckable)</li>
+<li id="s11">The Onyx1 has known issues with the VCAM, which has a 12v regulator that tends to fail, followed by power converters and the PSU. The VCAM and power converters can be DIY fixed, but the PSU is complex and challenging to修 (user-22f9, 2023-08-26, exchange 108497, check: supported)</li>
+<li id="s12">Onyx1 prices range from $200 to $1000, with PSU rebuilds often needed. (user-f229, 2021-11-05, exchange 100758, check: supported)</li>
+<li id="s13">NetBSD has not been reported to boot on an Onyx1. (user-231e, 2026-05-06, exchange 201283, check: uncheckable)</li>
+<li id="s14">The Onyx1 with Reality Engine graphics is a specific configuration for collecting SGI systems. (user-848e, 2020-10-25, exchange 204479, check: uncheckable)</li>
+<li id="s15">Flame 4 is an IRIX application requiring an Onyx1 for full functionality, and may run on IRIX 6.5. (user-ce6b, 2025-07-23, exchange 143353, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx2.html">Onyx2</a>, <a href="indigo1.html">Indigo1</a>, <a href="crimson.html">Crimson</a>, <a href="indigo.html">Indigo</a>, <a href="4d.html">4D</a>, <a href="challenge-l.html">Challenge L</a>, <a href="o2.html">O2</a>, <a href="onyx350.html">Onyx350</a>, <a href="origin-2100.html">Origin 2100</a>, <a href="r5k-o2.html">R5k O2</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Graphics: <a href="ir-graphics.html">IR graphics</a>, <a href="realityengine.html">RealityEngine</a>, <a href="xl.html">XL</a>
+</li>
+<li>Operating systems: <a href="irix-6-5.html">IRIX 6.5</a>, <a href="netbsd.html">NetBSD</a>
+</li>
+<li>Software: <a href="flame-4.html">Flame 4</a>
+</li>
+<li>Parts and peripherals: <a href="vme-card.html">VME card</a>, <a href="network-card.html">network card</a>
+</li>
+<li>Standards and interfaces: <a href="hvd.html">HVD</a>
+</li>
+<li>Other: <a href="reality-engine-2.html">Reality Engine 2</a>, <a href="twin-tower.html">Twin Tower</a>, <a href="vcam.html">VCAM</a>
+</li></ul>
+</body>
+</html>

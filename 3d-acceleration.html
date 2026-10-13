@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D acceleration</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>3D acceleration</h1>
+<p>Claims: 6 Part of <a href="3d.html">3D</a></p>
+<p>XSun does not expose 3D components on PGX32 and XVR-100 as 3D acceleration, treating them as 2D accelerated framebuffers. <sup><a href="#s1">1</a></sup> The machine has basic 2D acceleration suitable for general desktop use, but 3D acceleration is not functional. <sup><a href="#s2">2</a></sup> Some GPU drivers work but have poor 3D acceleration. <sup><a href="#s3">3</a></sup> The Newport driver lacks some 3D acceleration features, requiring pixel-by-pixel feeding for textures and Z buffers, and it has a 16-entry FIFO limitation; it needs kernel module support for DMA and interrupt handling. <sup><a href="#s4">4</a></sup> For general desktop usage, 3D acceleration is not necessary, so hardware emulation does not provide a speed advantage in the Irix emulator. <sup><a href="#s5">5</a></sup> 3D acceleration over PCI would significantly increase the usefulness of the Altix bricks. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">XSun does not expose 3D components on PGX32 and XVR-100 as 3D acceleration, treating them as 2D accelerated framebuffers. (user-7b1c, 2020-03-29, exchange 7068, check: supported)</li>
+<li id="s2">The machine has basic 2D acceleration suitable for general desktop use, but 3D acceleration is not functional. (user-59b9, 2021-07-26, exchange 75665, check: supported)</li>
+<li id="s3">Some GPU drivers work but have poor 3D acceleration. (user-9528, 2022-04-12, exchange 161788, check: supported)</li>
+<li id="s4">the Newport driver lacks some 3D acceleration features, requiring pixel-by-pixel feeding for textures and Z buffers, and it has a 16-entry FIFO limitation; it needs kernel module support for DMA and interrupt handling; x (user-3e2d, 2025-12-16, exchange 219338, check: supported)</li>
+<li id="s5">For general desktop usage, 3D acceleration is not necessary, so hardware emulation does not provide a speed advantage in the Irix emulator. (user-6afa, 2021-03-31, exchange 16049, check: supported)</li>
+<li id="s6">3D acceleration over PCI would significantly increase the usefulness of the Altix bricks. (user-59b9, 2020-09-23, exchange 216361, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Graphics: <a href="gpu-drivers.html">GPU drivers</a>, <a href="xvr-100.html">XVR-100</a>
+</li>
+<li>Software: <a href="irix-emulator.html">IRIX emulator</a>, <a href="xsun.html">Xsun</a>
+</li>
+<li>Standards and interfaces: <a href="dma.html">DMA</a>
+</li>
+<li>Other: <a href="pgx32.html">PGX32</a>
+</li></ul>
+</body>
+</html>

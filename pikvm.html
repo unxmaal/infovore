@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PiKVM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PiKVM</h1>
+<p>Claims: 9</p>
+<p>PiKVM v4 takes HDMI input for video and uses a single USB-C to USB-A connection as a joint USB keyboard and mouse output to the computer, along with an 8P8C port for ATX power/reset switches and LED status. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> PiKVM hardware can support up to 1920x1200x60Hz, but older models may be limited to 1920x1200x24Hz. <sup><a href="#s3">3</a></sup> A Fuel can be connected to a PiKVM using DVI-to-HDMI converters, and the Belkin Omniview might be an option for a PiKVM to Tezro/Fuel connection. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> PiKVM sends a UDP stream of pointer data to the SGI machine, which then moves the mouse, and a C program running on IRIX takes these UDP messages to move the mouse but does not handle clicks. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> There is a hack to make a Tezro mouse work with PiKVM via IRIX UDP, and one user achieved full absolute mouse control via PiKVM with 1920x1200 60fps by upgrading to a 4 CPU with custom hackery. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The v4 revision of the PiKVM takes HDMI input for video and a single USB-C to USB-A as a joint USB keyboard and mouse output to the computer. (user-baf6, 2023-08-23, exchange 223280, check: uncheckable)</li>
+<li id="s2">There's also an 8P8C port for ATX power/reset switches and LED status. (user-baf6, 2023-08-23, exchange 223280, check: uncheckable)</li>
+<li id="s3">PikVM hardware can support up to 1920x1200x60Hz, but older models may be limited to 1920x1200x24Hz. (user-1171, 2025-01-04, exchange 51889, check: uncheckable)</li>
+<li id="s4">The Belkin Omniview might be an option for PiKVM to Tezro/Fuel connection. (user-15a0, 2022-09-08, exchange 104848, check: supported)</li>
+<li id="s5">A Fuel can be connected to a PiKVM using DVI-to-HDMI converters. (user-e872, 2022-09-08, exchange 104847, check: supported)</li>
+<li id="s6">A C program running on IRIX takes UDP messages from PikVM and moves the mouse; it does not handle clicks. (user-1171, 2025-02-21, exchange 86745, check: uncheckable)</li>
+<li id="s7">The PikVM sends a UDP stream of pointer data to the SGI machine, which then moves the mouse. (user-1171, 2026-08-03, exchange 124586, check: uncheckable)</li>
+<li id="s8">I upped it to a 4 CPU and got it working with piKVM using some custom hackery; it provides full absolute mouse control via piKVM on it with 1920x1200 60fps from anywhere. (user-1171, 2026-08-02, exchange 91437, check: supported)</li>
+<li id="s9">There is a hack to make a Tezro mouse work with PikVM via IRIX UDP. (user-1171, 2026-08-02, exchange 91474, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Parts and peripherals: <a href="mouse.html">mouse</a>
+</li>
+<li>Other: <a href="udp.html">UDP</a>
+</li></ul>
+</body>
+</html>

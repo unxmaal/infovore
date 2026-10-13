@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Altix</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Altix</h1>
+<p>Claims: 112 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Altix">SGI Altix</a>, <a href="https://en.wikipedia.org/wiki/QuickTransit">QuickTransit</a>.</p>
+<p>The Altix is an Intel Itanium (IA-64) system that is more common than Prisms, and Altix machines can run IA-64 versions of Windows. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The Altix uses NUMALink, with white NUMALink cables that can yellow over time due to an unknown process, and it requires a base compute module and NUMALink for system boot. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The Altix has an IDE DVD drive, and an IDE to SATA adapter could be used for it. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The Altix has a SATA backplane, and the Numalink Think backplanes are compatible with Altix and Rack Tezros backplanes. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The IO10 is the boot controller board for the Altix, and it is similar to the IO9 but uses SATA instead of SCSI. <sup><a href="#s10">10</a></sup> The Altix can run IA-64 versions of Windows, and VMs allow for easy setup of specialized environments like SLES11 for an Altix install server. <sup><a href="#s2">2</a></sup><sup><a href="#s11">11</a></sup> The overall Altix experience is poor, with kernels 4.19 and up not booting and earlier 4.X kernels possibly failing due to ATI card issues. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The Altix maps graphics memory in an unusual way that causes driver issues and crashes with 3D acceleration, and Debian may fare better with the radeon driver. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> The Altix was an Itanium server, while the Prism was a workstation. <sup><a href="#s16">16</a></sup> The original Altix was the rack Prism, which is technically also an Altix because it does not run independently, similar to an Onyx4. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> Altix systems can run various Linux distributions, with SLES or RHEL recommended, and IA64 Linux works on them. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Some versions of SLES IA64 were supported by the Linux kernel for Altix, but Altix support code was removed from the kernel about two years ago, making it compatible with most IA64 distributions. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> The Altix is a blade server with multiple CPUs, disks, and PCI slots, and it uses a bootloader to load the kernel, possibly ELILO. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> Graphics on the Altix are limited to AGP, and it can use PCI cards for 2D acceleration, though FireGL cards require custom firmware and may not work with the EFI console. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> 2D graphics worked well on an Altix with a card supported by the Debian radeon driver, but 3D was more challenging, and the Altix is unstable with GeForce GPUs, requiring a 3.3v PCI graphics card. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> QuickTransit 1.2 was the final version for SGI Altix in 2006, bundled with SGI ProPack and SUSE Linux Enterprise Server for Itanium systems, and it works on SLES on an Altix but not on RHEL, possibly due to processor incompatibility. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> The Altix and O350 share design elements but are distinct machines. <sup><a href="#s31">31</a></sup> The Altix machine has 4 CPUs, with only 3 ever used, two pegged at 100% and one fluctuating between 80% and 100%. <sup><a href="#s32">32</a></sup> The small Altix configurations run in a circle. <sup><a href="#s33">33</a></sup> The Altix was used for running the information system database at the university 20 years ago. <sup><a href="#s34">34</a></sup> A ready-to-go T2-26.6 ISO for Altix with PCI-E GPU support is available. <sup><a href="#s35">35</a></sup> Prism graphics support is being developed for modern Linux on SGI Altix. <sup><a href="#s36">36</a></sup> The Prism graphics brick has a different interface board than a basic Altix, but it's not necessary to make a graphics brick. <sup><a href="#s37">37</a></sup> The driver disables DMA, and it's unclear if DMA ever worked on the Altix. <sup><a href="#s38">38</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Altix machines are more common than Prisms. (user-59b9, 2020-07-30, exchange 75283, check: uncheckable)</li>
+<li id="s2">The Altix systems can run IA-64 versions of Windows. (user-b1da, 2020-08-01, exchange 10205, check: supported)</li>
+<li id="s3">On the Altix (Intel Itanium), MIPSpro compilers were replaced by gcc. (user-bc5d, 2019-11-26, exchange 4370, check: uncheckable)</li>
+<li id="s4">The Altix system uses white NUMAlink cables that can yellow over time due to an unknown process. (user-b1da, 2020-02-02, exchange 5877, check: uncheckable)</li>
+<li id="s5">The Onyx4 and altix require a base compute module and NUMALink for system boot, with no AGP slots available for PCI devices. (user-59b9, 2020-08-05, exchange 75298, check: supported)</li>
+<li id="s6">The Altix has an IDE DVD drive. (user-59b9, 2020-08-30, exchange 216352, check: uncheckable)</li>
+<li id="s7">An IDE to SATA adapter could be used for the Altix's IDE drive. (user-1446, 2020-08-30, exchange 216352, check: uncheckable)</li>
+<li id="s8">The Altix has a SATA backplane. (user-f229, 2020-05-05, exchange 8097, check: uncheckable)</li>
+<li id="s9">The Numalink Think backplanes are compatible with Altix and Rack Tezros backplanes. (user-2189, 2019-06-02, exchange 1894, check: uncheckable)</li>
+<li id="s10">The IO10 is the boot controller board for the altix, and it's rare; it's similar to the IO9 but uses SATA instead of SCSI. (user-b7c4, 2020-03-03, exchange 96453, check: uncheckable)</li>
+<li id="s11">Using VMs allows for easy setup of specialized environments like SLES11 for an Altix install server. (user-1446, 2020-08-02, exchange 10287, check: uncheckable)</li>
+<li id="s12">The overall Altix experience is poor. (user-1446, 2020-07-26, exchange 216333, check: uncheckable)</li>
+<li id="s13">Kernels 4.19 and up do not boot on the Altix; earlier 4.X kernels may still fail due to ATI card issues. (user-1446, 2020-07-26, exchange 216334, check: supported)</li>
+<li id="s14">The Altix maps graphics memory in an unusual way that causes driver issues and crashes with 3D acceleration. (user-59b9, 2020-12-09, exchange 12736, check: supported)</li>
+<li id="s15">Debian may fare better with the radeon driver on the Altix. (user-59b9, 2020-09-23, exchange 216361, check: uncheckable)</li>
+<li id="s16">The Altix was an Itanium server; the Prism was the workstation. (user-1361, 2022-02-26, exchange 26471, check: uncheckable)</li>
+<li id="s17">The original altix was the rack prism. (user-e4d0, 2022-11-24, exchange 105733, check: uncheckable)</li>
+<li id="s18">The rackmount Prism is technically also an Altix because it doesn't run independently, similar to an Onyx4. (user-59b9, 2023-02-27, exchange 36419, check: supported)</li>
+<li id="s19">Altix systems can run various Linux distributions, with SLES or RHEL being recommended. (user-1446, 2022-03-28, exchange 27638, check: uncheckable)</li>
+<li id="s20">IA64 Linux works on Altix systems. (user-b1da, 2023-02-27, exchange 208391, check: uncheckable)</li>
+<li id="s21">Some versions of SLES IA64 were supported by the Linux kernel for Altix. (user-b1da, 2023-02-27, exchange 208391, check: uncheckable)</li>
+<li id="s22">Altix support code was removed from the kernel about two years ago, making it compatible with most IA64 distributions. (user-b1da, 2023-02-27, exchange 208390, check: supported)</li>
+<li id="s23">The Altix is a blade server with multiple CPUs, disks, and PCI slots. (user-2a3c, 2025-05-21, exchange 116991, check: uncheckable)</li>
+<li id="s24">The Altix uses a bootloader to load the kernel, possibly ELILO. (user-6e7b, 2024-09-21, exchange 76093, check: uncheckable)</li>
+<li id="s25">AGP is the only option for graphics on the altix. (user-9528, 2021-10-30, exchange 75691, check: uncheckable)</li>
+<li id="s26">The Altix can use PCI cards for 2D acceleration, but FireGL cards require custom firmware and may not work with the EFI console. (user-59b9, 2023-07-20, exchange 216467, check: supported)</li>
+<li id="s27">2D graphics worked well on an Altix with a card supported by the Debian *radeon* driver, but 3D was more challenging. (user-59b9, 2025-03-29, exchange 76326, check: supported)</li>
+<li id="s28">The Altix is unstable with GeForce GPUs; it enters POST failure and newer kernels don't boot with it. A 3.3v PCI graphics card is needed. (user-0f65, 2025-03-28, exchange 76322, check: supported)</li>
+<li id="s29">QuickTransit 1.2 was the final version for SGI Altix in 2006, bundled with SGI ProPack and SUSE Linux Enterprise Server for Itanium systems. (user-bf68, 2026-03-01, exchange 76471, check: supported)</li>
+<li id="s30">QuickTransit has worked on SLES on an Altix but not on RHEL, possibly due to processor incompatibility. (user-9528, 2022-01-20, exchange 216421, check: uncheckable)</li>
+<li id="s31">The Altix and O350 share design elements but are distinct machines. (user-cd83, 2026-07-16, exchange 124114, check: supported)</li>
+<li id="s32">The Altix machine has 4 CPUs, with only 3 ever used, two pegged at 100% and one fluctuating between 80% and 100%. (user-0f65, 2026-07-13, exchange 216635, check: supported)</li>
+<li id="s33">The small Altix configurations run in a circle. (user-5906, 2026-08-10, exchange 124752, check: uncheckable)</li>
+<li id="s34">The Altix was used for running the information system database at the university 20 years ago. (user-1867, 2026-09-01, exchange 216645, check: supported)</li>
+<li id="s35">A ready-to-go T2-26.6 ISO for Altix with PCI-E GPU support is available. (user-0f65, 2026-06-27, exchange 76633, check: supported)</li>
+<li id="s36">Prism graphics support is being developed for modern Linux on SGI Altix. (user-0f65, 2026-07-26, exchange 244224, check: uncheckable)</li>
+<li id="s37">The Prism graphics brick has a different interface board than a basic Altix, but it's not necessary to make a graphics brick. (user-24f0, 2026-07-08, exchange 216634, check: uncheckable)</li>
+<li id="s38">The driver disables DMA, and it's unclear if DMA ever worked on the Altix. (user-ce51, 2026-08-02, exchange 214329, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="altix-3000.html">altix 3000</a> (4)
+</li>
+<li><a href="altix-330.html">Altix 330</a> (8)
+</li>
+<li><a href="altix-350.html">Altix 350</a> (66)
+</li>
+<li><a href="altix-450.html">Altix 450</a> (4)
+</li>
+<li><a href="altix-4700.html">Altix 4700</a> (3)
+</li>
+<li><a href="altix-uv.html">Altix UV</a> (3)
+</li>
+<li><a href="altix-uv-1000.html">Altix UV 1000</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="prism.html">Prism</a>, <a href="origin-350.html">Origin 350</a>, <a href="onyx4.html">Onyx4</a>, <a href="numalink.html">Numalink</a>, <a href="o2.html">O2</a>, <a href="o300.html">O300</a>, <a href="octane.html">Octane</a>, <a href="onyx2.html">Onyx2</a>, <a href="origin.html">Origin</a>, <a href="origin-3000.html">Origin 3000</a>, <a href="machine.html">machine</a>
+</li>
+<li>Processors: <a href="4-cpus.html">4 CPUs</a>, <a href="ia64.html">IA64</a>, <a href="mips.html">MIPS</a>, <a href="t2.html">T2</a>, <a href="processor-board.html">processor board</a>
+</li>
+<li>Graphics: <a href="prism-graphics-brick.html">Prism graphics brick</a>
+</li>
+<li>Operating systems: <a href="sles.html">SLES</a>, <a href="debian-7.html">Debian 7</a>, <a href="linux.html">Linux</a>, <a href="debian.html">Debian</a>, <a href="rhel.html">RHEL</a>, <a href="red-hat-linux.html">Red Hat Linux</a>, <a href="sles11.html">SLES11</a>, <a href="debian-6.html">Debian 6</a>, <a href="gentoo.html">Gentoo</a>, <a href="ia64-linux.html">IA64 Linux</a>, <a href="irix.html">IRIX</a>, <a href="linux-distributions.html">Linux distributions</a>, <a href="nt.html">NT</a>, <a href="sles9.html">SLES9</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="t2-linux.html">T2 Linux</a>, <a href="vms.html">VMS</a>, <a href="windows.html">Windows</a>, <a href="windows-server-2003.html">Windows Server 2003</a>, <a href="x11-forwarding.html">X11 forwarding</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="quicktransit.html">QuickTransit</a>, <a href="radeon-driver.html">radeon driver</a>, <a href="iris-emulator.html">IRIS emulator</a>, <a href="mipspro-compiler.html">MIPSpro compiler</a>, <a href="minecraft.html">Minecraft</a>, <a href="quicktransit-1-2.html">QuickTransit 1.2</a>, <a href="rosetta.html">Rosetta</a>, <a href="desktop.html">desktop</a>
+</li>
+<li>Parts and peripherals: <a href="dvd-drive.html">DVD drive</a>, <a href="io10.html">IO10</a>, <a href="io9.html">IO9</a>, <a href="backplane.html">backplane</a>, <a href="firegl-cards.html">FireGL cards</a>, <a href="ide-to-sata-adapter.html">IDE to SATA adapter</a>, <a href="io-board.html">IO board</a>, <a href="l2-controller.html">L2 controller</a>, <a href="pci-usb-card.html">PCI USB card</a>, <a href="pci-riser.html">PCI riser</a>, <a href="sata-controller.html">SATA controller</a>, <a href="ssd.html">SSD</a>, <a href="vga-card.html">VGA card</a>, <a href="xio-board.html">XIO board</a>, <a href="battery.html">battery</a>, <a href="compute-bricks.html">compute bricks</a>, <a href="nodeboard.html">nodeboard</a>, <a href="rack-tezro.html">rack Tezro</a>
+</li>
+<li>Standards and interfaces: <a href="efi.html">EFI</a>, <a href="agp.html">AGP</a>, <a href="dma.html">DMA</a>, <a href="ntfs.html">NTFS</a>, <a href="pci.html">PCI</a>, <a href="usb.html">USB</a>, <a href="x.html">X</a>, <a href="x3.html">X3</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>, <a href="red-hat-6-2.html">Red Hat 6.2</a>
+</li>
+<li>Other: <a href="mopar.html">Mopar</a>, <a href="nmi-button.html">NMI button</a>, <a href="openrct2.html">OpenRCT2</a>, <a href="pic.html">PIC</a>, <a href="suse.html">SUSE</a>, <a href="fglrx.html">fglrx</a>, <a href="pin.html">pin</a>
+</li></ul>
+</body>
+</html>

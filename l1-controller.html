@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1 controller</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>L1 controller</h1>
+<p>Claims: 14 Part of <a href="l1.html">L1</a></p>
+<p>The L1 controller can be connected to an L2 controller via USB, using a 50 pin connector with 48V DC power, and can communicate through the USB B port or a special kernel module in LooOooOOoOoonix. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The L1 controller can receive commands from IRIX and can be used for troubleshooting. <sup><a href="#s3">3</a></sup> The L1 controller serial settings are 38400 baud, 8 data bits, no parity, 1 stop bit, and no flow control. <sup><a href="#s4">4</a></sup> The L1 controller can boot from PROM but fails to initialize graphics hardware. <sup><a href="#s5">5</a></sup> The L1 controller is a Dallas chip on the PCI interface board, and the Dallas DS1687 controls the L1 controller. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The L1 controller can be accessed via a direct connection or through the L2 remote management system, which is x86-based and can be run in a VM. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The L2 controller connects via USB to the L1 controller on up to 4 Bricks and requires a 50 pin connector with 48V DC power. The power supply is needed when purchasing an L2 controller. (user-8b3c, 2020-08-07, exchange 97327, check: supported)</li>
+<li id="s2">The L2 controller can communicate with L1 controllers via the USB B port or through a special kernel mod in LooOooOOoOoonix. (user-27ce, 2022-03-13, exchange 27187, check: uncheckable)</li>
+<li id="s3">The L1 controller can be used for troubleshooting and can receive commands from IRIX. (user-1a5a, 2026-06-13, exchange 123554, check: uncheckable)</li>
+<li id="s4">The L1 controller serial settings are 38400 baud, 8 data bits, no parity, 1 stop bit, no flow control. (user-d41d, 2026-09-01, exchange 214548, check: supported)</li>
+<li id="s5">The L1 controller can boot from PROM but fails to initialize graphics hardware. (user-27ce, 2022-02-10, exchange 25555, check: uncheckable)</li>
+<li id="s6">The Snaphat stores prom variables and is the RTC that holds system variables, while the Dallas DS1687 controls the L1 controller. (user-e4d0, 2025-05-22, exchange 56697, check: uncheckable)</li>
+<li id="s7">The Dallas on the PCI interface board is the L1 controller. (user-e4d0, 2025-07-01, exchange 225216, check: uncheckable)</li>
+<li id="s8">The Fuel's L1 controller can only be accessed via a direct connection or through the L2 remote management system, which is x86-based and can be run in a VM. (user-27ce, 2024-04-18, exchange 210252, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="tezro.html">Tezro</a>, <a href="fuel.html">Fuel</a>, <a href="g-brick.html">G-brick</a>, <a href="rtc.html">RTC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Parts and peripherals: <a href="l2-controller.html">L2 controller</a>, <a href="prom.html">PROM</a>, <a href="brick.html">brick</a>
+</li>
+<li>Companies: <a href="dallas.html">Dallas</a>
+</li>
+<li>Other: <a href="pod.html">POD</a>, <a href="snaphat.html">Snaphat</a>
+</li></ul>
+</body>
+</html>

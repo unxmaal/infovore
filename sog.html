@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoG</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SoG</h1>
+<p>Claims: 43 Background: 7 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Component_video">Component video</a>.</p>
+<p>Signal-on-green (SoG) is a video signal format in which the sync information is carried on the green channel. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Most SGI machines produce a signal-on-green (SoG) output, and display cards can also output SoG along with H+V and other sync signals, with configuration options. <sup><a href="#s1">1</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The O2 outputs SoG as well as regular sync lines, which can confuse monitors, while the Indy uses SoG and the Octane uses regular signal. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The Personal IRIS uses SoG for R, G, and B and has a VGA connector, and some systems also produced composite sync. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Many monitors handle SoG without issue, including many ViewSonic models, every ASUS LCD tried, and older Dell monitors, though newer Dell monitors are less reliable and typically do not support more than 60Hz analog. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Some Dell monitors work with SoG and have been tested on V12, and most 4:3 Dell LCDs support it. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> The HP LP2065 monitor supports SoG and works with Octane and newer Suns, but requires a gender changer or VGA to DVI adapter for Indigo2. <sup><a href="#s16">16</a></sup> Some quality tube monitors, CRTs, and TFTs can be SoG compatible. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> Monitors can sync to a wide range of signals, including SOG adapted to VGA. <sup><a href="#s19">19</a></sup> Some TV models do not support SoG, and a TV might not display anything with SoG, but using a green tint can make the display readable. <sup><a href="#s20">20</a></sup> A hacky 13W3 cable can be modified to work with an Indy by removing pins. <sup><a href="#s20">20</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Most SGI machines produce a sync on green signal (SOG). Many monitors will not handle this and either no picture or a green tinted display will occur. (user-22f9, 2019-07-27, exchange 2776, check: uncheckable)</li>
+<li id="s2">the only issue is the video signal on the green line because of SoG (user-231e, 2026-01-09, exchange 120630, check: uncheckable)</li>
+<li id="s3">The SoG requirement for most modern SGIs is a myth; display cards can output SoG, H+V, and many other sync signals, with configuration options. (user-c831, 2020-12-10, exchange 98012, check: uncheckable)</li>
+<li id="s4">The setgfx man page describes options for outputting SoG and sync bits; the default often includes SoG. (user-9860, 2021-11-09, exchange 205868, check: uncheckable)</li>
+<li id="s5">The O2 is SOG but also has regular sync lines. (user-e872, 2021-11-09, exchange 21927, check: supported)</li>
+<li id="s6">The Octane uses regular signal, unlike the Indy which uses SoG. (user-8de9, 2022-07-08, exchange 31003, check: supported)</li>
+<li id="s7">The O2 can have issues with pins connecting and may confuse displays due to its SoG and regular sync signals. (user-e872, 2022-10-11, exchange 33296, check: supported)</li>
+<li id="s8">The O2 may generate h/v sync and SoG, confusing monitors. (user-37bb, 2024-05-29, exchange 218423, check: supported)</li>
+<li id="s9">The Personal IRIS uses SoG for R, G, and B; it has a VGA connector. (user-8de9, 2022-03-29, exchange 217542, check: supported)</li>
+<li id="s10">It did composite sync and SOG, worked with Suns, SGIs, HP9000... (user-03ad, 2022-08-25, exchange 207584, check: uncheckable)</li>
+<li id="s11">the ViewSonic monitor handles SoG without issue when used with an O2. (user-bc18, 2020-04-23, exchange 7726, check: supported)</li>
+<li id="s12">ViewSonic monitors handle SoG well, with many models supporting it. (user-b1da, 2020-04-23, exchange 7726, check: uncheckable)</li>
+<li id="s13">The older Dell monitors support SoG, but newer ones are less reliable and typically don't support &gt; 60Hz analog. (user-9860, 2024-12-19, exchange 224319, check: supported)</li>
+<li id="s14">The DELL 1913S and DELL U2410 monitors work with SoG and have been tested on V12. (user-bc5d, 2019-10-10, exchange 3806, check: supported)</li>
+<li id="s15">Most 4:3 Dell LCDs support Sog. (user-4f7c, 2025-07-24, exchange 212784, check: supported)</li>
+<li id="s16">The HP LP2065 monitor supports SoG and works with Octane and newer Suns, but requires a gender changer or VGA to DVI adapter for Indigo2. (user-1171, 2025-02-22, exchange 114895, check: supported)</li>
+<li id="s17">Some quality tube monitors or TFTs can be SoG compatible. (user-03ad, 2023-09-11, exchange 209213, check: uncheckable)</li>
+<li id="s18">CRTs can support SoG. (user-e4d0, 2024-06-11, exchange 46677, check: uncheckable)</li>
+<li id="s19">Monitors can sync to a wide range of signals, including SOG adapted to vga. (user-24f0, 2026-03-26, exchange 179595, check: uncheckable)</li>
+<li id="s20">Some TV models do not support SoG, but using a green tint can make the display readable. A TV might not display anything with SoG. A hacky 13W3 cable can be modified to work with an Indy by removing pins. (user-554a, 2026-04-14, exchange 213877, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sog-monitor.html">SOG monitor</a> (9)
+</li>
+<li><a href="sog-signal.html">SoG signal</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="indy.html">Indy</a>, <a href="4d-440-vgx.html">4D/440 VGX</a>, <a href="indigo.html">Indigo</a>, <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Graphics: <a href="v12.html">V12</a>, <a href="graphics.html">graphics</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="xsetmon.html">xsetmon</a>
+</li>
+<li>Parts and peripherals: <a href="dell-monitor.html">Dell monitor</a>, <a href="viewsonic-monitor.html">ViewSonic monitor</a>, <a href="13w3-to-vga-adapter.html">13W3 to VGA adapter</a>, <a href="13w3-cable.html">13w3 cable</a>, <a href="crt.html">CRT</a>, <a href="vga-adapter.html">VGA adapter</a>, <a href="vga-connector.html">VGA connector</a>, <a href="capture-card.html">capture card</a>, <a href="dip-switch-adapter.html">dip switch adapter</a>, <a href="monitor.html">monitor</a>, <a href="video-signal.html">video signal</a>
+</li>
+<li>Standards and interfaces: <a href="13w3.html">13W3</a>, <a href="dvi.html">DVI</a>, <a href="vga.html">VGA</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sgi-h-v-sync.html">SGI H/V sync</a>, <a href="sun.html">Sun</a>, <a href="dell.html">Dell</a>, <a href="dell-u2410.html">Dell U2410</a>, <a href="ebay.html">eBay</a>
+</li>
+<li>Other: <a href="zip.html">Zip</a>, <a href="composite-sync.html">composite sync</a>, <a href="man-page.html">man page</a>, <a href="signal.html">signal</a>, <a href="support.html">support</a>
+</li></ul>
+</body>
+</html>

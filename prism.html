@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Prism</h1>
+<p>Claims: 171 Background: 12 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Prism">SGI Prism</a>, <a href="https://en.wikipedia.org/wiki/SGI_Altix">SGI Altix</a>, <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/QuickTransit">QuickTransit</a>, <a href="https://en.wikipedia.org/wiki/SGI_Tezro">SGI Tezro</a>.</p>
+<h2 id="with-onyx4">With Onyx4</h2>
+<p>The Onyx4 and Prism use the same GPU, and the Onyx4 compute node can be repurposed into a Prism by replacing the graphics card. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Onyx4 is faster and more reliable than the Prism, though the Prism has been difficult to work with. <sup><a href="#s3">3</a></sup> The only configurations with a single AGP riser were the rack Prism and Onyx4, both dual-pipe. <sup><a href="#s4">4</a></sup> The Altix 350 has FireGL X2.1 cards which are useful for Onyx4 due to Prism compatibility issues. <sup><a href="#s5">5</a></sup> Altix and Prism systems are not fully compatible with Onyx4 systems due to differences in hardware and firmware. <sup><a href="#s6">6</a></sup> My Onyx4 and Prism bricks cost the better part of a grand each. <sup><a href="#s7">7</a></sup> The CBOB can be found in different configurations, including as part of a Prism setup or with an IP badge and Onyx4 USB ports. <sup><a href="#s8">8</a></sup> Vertex buffers (VBOs) were not available on SGI V12 systems until Onyx4 (and Prism). <sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>The SGI Prism is a visualization system built on Itanium 2 processors that runs Linux, and it can run IRIX software through QuickTransit, which SGI announced would first be available in October 2004. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The Prism uses EFI and SLES 9 as its intended OS, with ProPack required for graphics and hardware support, though it may work with SLES 11 and possibly older Red Hat Enterprise versions in headless mode. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The Prism has DVI output, and its graphics can be provided by ATI FireGL X2/3 or ELSA Permedia cards, though the Altix 350's graphics require SGI-specific drivers such as the SGI ProPack kernel. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The Prism is essentially a Tezro chassis with different skins, and it can run with one CPU while Prism racks and Onyx systems can have multiple graphics pipes. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> The Prism is prone to crashing during installation, and it may not understand USB. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s16">16</a></sup> It was released in 2005 and comes in both desktop and deskside models, with the desktop version being about the size of a Tezro. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> The Prism uses dual AGP graphics cards rather than PCIe, and it uses normal kernel modules for storage and networking along with EFI firmware. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> The only officially supported graphics cards were the FireGL T2, X2, and X3, which require SGI firmware and ProPack 4 for SLES 9. <sup><a href="#s33">33</a></sup> It supports OpenGL 1.3 but not 2.0, and it can perform texturing. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> The Prism has limited software availability compared to IRIX, is only compatible with SGI ProPack, and has limited software support. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup> It came with RedHat and was later replaced with SuSE, and SLES 11 supports 2D but not 3D graphics on the Prism. <sup><a href="#s33">33</a></sup><sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> Prism hardware is powerful but quirky. <sup><a href="#s40">40</a></sup> The Prism is SGI's first designed workstation and the only Itanium-based workstation SGI produced, created to build a high-end COTS system using standard hardware. <sup><a href="#s41">41</a></sup><sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup> Prism and Altix 350/3000 are the same, just add a graphics module, and more Altix parts can be added by adjusting serial numbers. <sup><a href="#s44">44</a></sup><sup><a href="#s45">45</a></sup> Prism's OS is SLES with a customized ATI fglrx driver for Itanium and dual AGP cards, and it boots from a normal SLES9 installation disc. <sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> ProPack4 brings the gfx support to the Prism, and ProPack 4 SP4 is the last supported disc for the Prism. <sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup> The Prism uses EFI firmware and can support NUMAlink clusters, but running Windows on it requires custom kernel drivers and an AGP riser. <sup><a href="#s50">50</a></sup> The Prism has issues with one of its four CPU bricks, which is half-connected and requires configuration fixes to properly recognize its CPUs. <sup><a href="#s51">51</a></sup> The SLES 9 installation on the Prism fails to start X, despite having the drivers installed and following instructions, due to the flex kernel driver not loading. <sup><a href="#s52">52</a></sup> Graphics drivers do not work on newer kernels on a Prism. <sup><a href="#s53">53</a></sup> The SGI Prism was a desktop workstation belonging to SGI's main MIPS line, alongside the Visual Workstation. <sup><a href="#s54">54</a></sup><sup><a href="#s55">55</a></sup> It is an Altix 350 with dual AGP slots, and the deskside model can support four displays via dual AGP. <sup><a href="#s54">54</a></sup><sup><a href="#s56">56</a></sup> The Prism is considered a more interesting machine than a standard Altix 350, though it is not as special as other IRIX boxes. <sup><a href="#s57">57</a></sup><sup><a href="#s58">58</a></sup> It can run Linux with the framebuffer, though this is not yet optimized. <sup><a href="#s59">59</a></sup> The Prism is a desktop machine that looks cool but can be annoying, and it runs glxgears but nothing more demanding. <sup><a href="#s60">60</a></sup><sup><a href="#s61">61</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Onyx4 and Prism use the same GPU. (user-22f9, 2019-06-02, exchange 1896, check: supported)</li>
+<li id="s2">The Onyx4 compute node can be repurposed into a Prism by replacing the graphics card. (user-59b9, 2020-07-22, exchange 216329, check: supported)</li>
+<li id="s3">The Onyx4 is faster and more reliable than the Prism, though the Prism has been difficult to work with. (user-b7c4, 2020-06-19, exchange 9120, check: supported)</li>
+<li id="s4">The only configurations with a single AGP riser were the rack Prism and Onyx4, both dual-pipe. (user-b7c4, 2020-08-05, exchange 75294, check: supported)</li>
+<li id="s5">The Altix 350 has FireGL X2.1 cards which are useful for Onyx4 due to Prism compatibility issues. (user-5906, 2022-12-16, exchange 106009, check: supported)</li>
+<li id="s6">Altix and Prism systems are not fully compatible with Onyx4 systems due to differences in hardware and firmware. (user-59b9, 2023-02-27, exchange 208391, check: supported)</li>
+<li id="s7">My Onyx4 and Prism bricks cost the better part of a grand each. (user-59b9, 2024-05-09, exchange 111178, check: supported)</li>
+<li id="s8">The CBOB can be found in different configurations, including as part of a Prism setup or with an IP badge and Onyx4 USB ports. (user-5906, 2025-12-29, exchange 120370, check: supported)</li>
+<li id="s9">Vertex buffers (VBOs) were not available on SGI V12 systems until Onyx4 (and Prism). (user-5906, 2026-05-13, exchange 215996, check: supported)</li>
+<li id="s10">The Prism can run IRIX software using a translator. (user-1a5a, 2023-04-13, exchange 37245, check: uncheckable)</li>
+<li id="s11">Silicon Graphics announced QuickTransit’s first availability in October 2004 on its Prism visualization systems, which used QuickTransit to run IRIX applications on Itanium 2 processors and Linux. (user-888b, 2019-02-28, exchange 814, check: supported)</li>
+<li id="s12">The Prism runs Linux. (user-c383, 2019-09-12, exchange 203945, check: uncheckable)</li>
+<li id="s13">The Prism uses SLES 9 as the official OS, with ProPack required for graphics and potentially working up to SLES 11, and possibly with older Red Hat Enterprise versions; headless mode allows more OS options. (user-b7c4, 2019-08-18, exchange 216279, check: supported)</li>
+<li id="s14">The Prism uses EFI. (user-b7c4, 2020-01-01, exchange 5240, check: uncheckable)</li>
+<li id="s15">The Prism uses SLES9 as the intended OS, which can run a few more things, both older and newer. (user-b7c4, 2020-06-19, exchange 9121, check: uncheckable)</li>
+<li id="s16">The Prism requires SLES9 with ProPack for full hardware support; attempting to install other OSes crashes the system partway through the install. (user-b7c4, 2020-07-08, exchange 9470, check: uncheckable)</li>
+<li id="s17">The Prism requires kernel 2.6.5-7 for a GUI with the ATI FireGL X2/3, but a gfx-adapter from ELSA with a Permedia chipset can be used with generic drivers instead. (user-bf68, 2018-12-31, exchange 216274, check: supported)</li>
+<li id="s18">The Prism graphics on the Altix 350 require SGI-specific drivers, such as the SGI ProPack kernel. (user-1446, 2020-06-19, exchange 204315, check: supported)</li>
+<li id="s19">Prism setup with Altix 350 base node and Prism brick provides DVI output via ATI FireGL X3 cards. (user-f229, 2020-12-29, exchange 13205, check: supported)</li>
+<li id="s20">The Prism has DVI output. (user-f229, 2020-12-29, exchange 13201, check: uncheckable)</li>
+<li id="s21">A Prism rack can run with one CPU. (user-b7c4, 2020-01-23, exchange 75010, check: uncheckable)</li>
+<li id="s22">Prism racks and Onyx systems can have multiple graphics pipes. (user-6d41, 2020-01-23, exchange 75010, check: supported)</li>
+<li id="s23">The Prism is essentially a Tezro chassis with different skins. (user-b7c4, 2021-01-15, exchange 13858, check: supported)</li>
+<li id="s24">The Prism crashes when loading the initrd. (user-b7c4, 2020-02-01, exchange 216286, check: uncheckable)</li>
+<li id="s25">The Prism crashes 100% of the time on CD install. (user-b7c4, 2020-04-20, exchange 7654, check: supported)</li>
+<li id="s26">The Prism came out in 2005 and has dual FireGL X3 GPUs; it can run glxgears but lacks software for modern Linux. (user-b7c4, 2021-03-11, exchange 180577, check: supported)</li>
+<li id="s27">Desktop Prisms exist. (user-b7c4, 2023-02-27, exchange 36419, check: uncheckable)</li>
+<li id="s28">The desktop Prism is about the size of a Tezro. (user-b1da, 2023-04-13, exchange 222979, check: supported)</li>
+<li id="s29">Prism was an IA-64 box which required weird drivers because of the dual AGP. (user-1361, 2021-11-26, exchange 22625, check: supported)</li>
+<li id="s30">Prism has dual AGP. (user-b1da, 2021-11-26, exchange 22625, check: uncheckable)</li>
+<li id="s31">The Prism does not use PCIe. (user-1361, 2022-02-26, exchange 26471, check: uncheckable)</li>
+<li id="s32">Prism uses normal kernel modules for storage and networking and EFI firmware. (user-b1da, 2023-02-27, exchange 208390, check: uncheckable)</li>
+<li id="s33">The only officially supported graphics cards for SGI Prism were the FireGL T2, X2, and X3, which require SGI firmware and ProPack 4 for SLES 9. Radeon 9200 cards provide only 2D acceleration. SLES 11 supports 2D graphics (user-59b9, 2023-07-08, exchange 216464, check: supported)</li>
+<li id="s34">The Prism supports OpenGL 1.3 but not 2.0; drivers do not interface well with YaST, causing issues. (user-b7c4, 2021-08-09, exchange 19108, check: supported)</li>
+<li id="s35">Prism can do texturing. (user-b1da, 2021-11-26, exchange 22625, check: uncheckable)</li>
+<li id="s36">The Prism has limited software availability compared to IRIX. (user-59b9, 2021-03-02, exchange 15078, check: uncheckable)</li>
+<li id="s37">Prism is only compatible with SGI ProPack and has limited software support. (user-cd83, 2023-02-27, exchange 208390, check: uncheckable)</li>
+<li id="s38">SLES 11 does not support 3D graphics on SGI Prism but might support 2D. SLES 11 supports 3D graphics on Altix 4000. An Altix 4700 might have had 2D graphics support. (user-03ad, 2023-07-08, exchange 216464, check: supported)</li>
+<li id="s39">The Prism came with RedHat and was later replaced with SuSE. (user-03ad, 2023-12-06, exchange 216479, check: uncheckable)</li>
+<li id="s40">Prism hardware is powerful but quirky. (user-b7c4, 2021-08-07, exchange 79612, check: uncheckable)</li>
+<li id="s41">The Prism is SGI's first designed workstation. (user-24f0, 2025-02-06, exchange 53866, check: uncheckable)</li>
+<li id="s42">The Prism is the only Itanium-based workstation SGI produced. (user-8de9, 2025-02-06, exchange 211891, check: uncheckable)</li>
+<li id="s43">The purpose of the Prism was to create a high-end COTS system using standard hardware. (user-ab99, 2025-05-19, exchange 56622, check: uncheckable)</li>
+<li id="s44">Prism and Altix 350/3000 are the same, just add a graphics module. (user-03ad, 2024-09-25, exchange 216508, check: supported)</li>
+<li id="s45">You can add more Altix parts to a Prism by adjusting serial numbers. (user-03ad, 2024-09-25, exchange 216508, check: uncheckable)</li>
+<li id="s46">Prism's OS is SLES with a customized ATI fglrx driver for Itanium and dual AGP cards. (user-b1da, 2024-08-10, exchange 210780, check: uncheckable)</li>
+<li id="s47">The Prism boots from a normal SLES9 installation disc. (user-6e7b, 2024-09-13, exchange 216498, check: uncheckable)</li>
+<li id="s48">ProPack4 brings the gfx support to the Prism. (user-bf68, 2024-03-23, exchange 216487, check: uncheckable)</li>
+<li id="s49">ProPack 4 SP4 is the last supported disc for the Prism. (user-5906, 2025-01-17, exchange 216527, check: supported)</li>
+<li id="s50">The Prism uses EFI firmware and can support NUMAlink clusters, but running Windows on it requires custom kernel drivers and an AGP riser. (user-24f0, 2025-02-06, exchange 53869, check: uncheckable)</li>
+<li id="s51">The Prism has issues with one of its four CPU bricks, which is half-connected and requires configuration fixes to properly recognize its CPUs. (user-24f0, 2024-09-10, exchange 216497, check: supported)</li>
+<li id="s52">The SLES 9 installation on the Prism fails to start X, despite having the drivers installed and following instructions, due to the flex kernel driver not loading. (user-24f0, 2024-09-13, exchange 216501, check: supported)</li>
+<li id="s53">Graphics drivers do not work on newer kernels on a Prism. (user-24f0, 2025-01-15, exchange 216523, check: uncheckable)</li>
+<li id="s54">the prism is an altix 350 with dual AGP slots; the XG2N rackmount has additional features beyond AGP slots. (user-24f0, 2025-07-08, exchange 216575, check: supported)</li>
+<li id="s55">The Visual Workstation and Prism were SGI's main MIPS line. (user-71e7, 2026-09-14, exchange 125601, check: uncheckable)</li>
+<li id="s56">The deskside Prism can support four displays via dual AGP. (user-e872, 2025-09-30, exchange 59736, check: supported)</li>
+<li id="s57">The Prism is a more interesting machine compared to a standard Altix 350. (user-24f0, 2025-09-11, exchange 59221, check: supported)</li>
+<li id="s58">The Prism is not as special as IRIX boxes and is unlikely to have been used for flight simulations due to its hardware limitations. (user-24f0, 2026-07-29, exchange 244241, check: uncheckable)</li>
+<li id="s59">The SGI Prism can run Linux with the framebuffer, though not yet optimized. (user-4f7c, 2026-08-01, exchange 65014, check: uncheckable)</li>
+<li id="s60">The Prism is a desktop machine that looks cool but can be annoying. (user-b7c4, 2026-07-07, exchange 214163, check: uncheckable)</li>
+<li id="s61">The Prism runs glxgears but nothing more demanding. (user-b7c4, 2025-12-01, exchange 213380, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="prism-brick.html">Prism brick</a> (12)
+</li>
+<li><a href="prism-deskside.html">Prism deskside</a> (4)
+</li>
+<li><a href="prism-ds.html">Prism DS</a> (5)
+</li>
+<li><a href="prism-graphics-brick.html">Prism graphics brick</a> (4)
+</li>
+<li><a href="prism-graphics-card.html">Prism graphics card</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx4.html">Onyx4</a>, <a href="altix.html">Altix</a>, <a href="altix-350.html">Altix 350</a>, <a href="tezro.html">Tezro</a>, <a href="o2.html">O2</a>, <a href="onyx.html">Onyx</a>, <a href="origin-350.html">Origin 350</a>, <a href="altix-4700.html">Altix 4700</a>, <a href="c8000.html">C8000</a>, <a href="crimson.html">Crimson</a>, <a href="fuel.html">Fuel</a>, <a href="g-brick.html">G-brick</a>, <a href="numalink.html">Numalink</a>, <a href="octane.html">Octane</a>, <a href="vax.html">VAX</a>, <a href="visual-workstation.html">Visual Workstation</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>, <a href="t2.html">T2</a>, <a href="itanium.html">Itanium</a>, <a href="itanium-2.html">Itanium 2</a>, <a href="mips.html">MIPS</a>, <a href="mips-r2000.html">MIPS R2000</a>
+</li>
+<li>Graphics: <a href="firegl-x3.html">FireGL X3</a>, <a href="firegl-x2.html">FireGL X2</a>, <a href="firegl-x1.html">FireGL X1</a>, <a href="pci-graphics-card.html">PCI graphics card</a>, <a href="v12.html">V12</a>, <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="sles9.html">SLES9</a>, <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="propack.html">ProPack</a>, <a href="debian.html">Debian</a>, <a href="sles.html">SLES</a>, <a href="sles11.html">SLES11</a>, <a href="gentoo.html">Gentoo</a>, <a href="irix-box.html">IRIX box</a>, <a href="propack-4.html">Propack 4</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="cd-install.html">CD install</a>, <a href="chimera.html">Chimera</a>, <a href="efi-firmware.html">EFI firmware</a>, <a href="mathematica.html">Mathematica</a>, <a href="opengl.html">OpenGL</a>, <a href="quicktransit.html">QuickTransit</a>, <a href="xsgi.html">Xsgi</a>
+</li>
+<li>Parts and peripherals: <a href="1600sw-monitor.html">1600SW monitor</a>, <a href="agp-riser.html">AGP riser</a>, <a href="ati-card.html">ATI card</a>, <a href="l1-cache.html">L1 cache</a>, <a href="x3-card.html">X3 card</a>
+</li>
+<li>Standards and interfaces: <a href="agp-slot.html">AGP slot</a>, <a href="dvi-output.html">DVI output</a>, <a href="efi.html">EFI</a>, <a href="pci-card.html">PCI card</a>, <a href="sca-scsi.html">SCA SCSI</a>, <a href="x1.html">X1</a>, <a href="x2.html">X2</a>, <a href="x3.html">X3</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="red-hat.html">Red Hat</a>, <a href="dec.html">DEC</a>, <a href="vmware-fusion.html">VMWare Fusion</a>
+</li>
+<li>Other: <a href="cbob.html">CBOB</a>, <a href="dual-agp.html">dual AGP</a>, <a href="glxgears.html">glxgears</a>, <a href="techpub.html">techpub</a>, <a href="2005.html">2005</a>, <a href="540.html">540</a>, <a href="hal.html">HAL</a>, <a href="houdini.html">Houdini</a>, <a href="input-leap.html">Input-Leap</a>, <a href="xinerama.html">Xinerama</a>, <a href="yast.html">YaST</a>, <a href="big-iron.html">big iron</a>, <a href="overlay.html">overlay</a>, <a href="routing.html">routing</a>
+</li></ul>
+</body>
+</html>

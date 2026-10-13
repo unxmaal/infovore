@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>par</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>par</h1>
+<p>Claims: 5 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/GNU_Debugger">GNU Debugger</a>.</p>
+<p>par is the IRIX equivalent of strace, which is not the same as on other systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> par can be used to trace system calls and file operations, such as identifying library opens and tracking down issues. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It can be used alongside gdb for debugging binaries, and the fx command is simpler for resizing partitions compared to Linux. <sup><a href="#s3">3</a></sup><sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX strace is not the same as on other systems; use par instead. (user-42cf, 2019-05-26, exchange 77857, check: uncheckable)</li>
+<li id="s2">The IRIX equivalent of strace is called par. (user-21b8, 2024-06-10, exchange 71352, check: uncheckable)</li>
+<li id="s3">debugging a binary in IRIX using gdb involves running the program, making breakpoints, and using commands like 'b' to set them; 'par' can show system calls. (user-2189, 2020-06-13, exchange 68686, check: uncheckable)</li>
+<li id="s4">par can be used to trace file operations, as shown with `par -rsSSQQ -s` and `par -SS -s` to identify library opens, and examples like `par -rsSSQQ fm | grep -i tiff` to track down issues. (user-8547, 2022-03-17, exchange 81287, check: supported)</li>
+<li id="s5">The `fx` command is simpler for resizing partitions compared to Linux, requiring just `par` and `ro`. (user-f229, 2021-09-08, exchange 79813, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="fx.html">fx</a>, <a href="gdb.html">gdb</a>
+</li>
+<li>Other: <a href="strace.html">strace</a>
+</li></ul>
+</body>
+</html>

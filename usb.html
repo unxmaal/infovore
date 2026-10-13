@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USB</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>USB</h1>
+<p>Claims: 107 Background: 18 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/USB">USB</a>, <a href="https://en.wikipedia.org/wiki/Video_Graphics_Array">Video Graphics Array</a>, <a href="https://en.wikipedia.org/wiki/Zip_drive">Zip drive</a>.</p>
+<h2 id="with-firewire">With Firewire</h2>
+<p>IP35 systems support FireWire mass storage but not USB mass storage, while IRIX supports FireWire storage but not USB storage. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> IRIX supports OHCI chipsets for USB and FireWire, which is a mostly hardware-based implementation requiring a driver similar to a SCSI card. <sup><a href="#s3">3</a></sup> FireWire performs better than USB in terms of system resource usage and throughput due to DMA transfers and full-duplex capability. <sup><a href="#s4">4</a></sup> The Octane2 does not support USB, but USB support exists in IP35 systems, where USB mice and keyboards can be used before IRIX boots, while FireWire support is present in Octane2 but not built by default. <sup><a href="#s5">5</a></sup> On the 2k, the onboard USB is 1.1 and should use FireWire external disks or a USB2 card for better performance, and USB and FireWire drivers from Fuel/Tezro could potentially work on Octane and O2. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> A combo FireWire/USB card can be used on SGI Fuel machines, with FireWire detected as DM10 and USB supporting keyboard and mouse. <sup><a href="#s8">8</a></sup> Commercial UNIX vendors neglected FireWire and USB, expecting Macs to fade. <sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>Late version kernels, starting from 2.2.7, support USB. <sup><a href="#s10">10</a></sup> USB support is assumed to mean storage device support. <sup><a href="#s11">11</a></sup> USB is almost universally regarded as being terrible, and Linux has trouble with USB plug and play. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> High-end laptops started getting USB in 98. <sup><a href="#s14">14</a></sup> OHCI is USB 1.1 only, but supports USB Keyboard/Mouse. <sup><a href="#s15">15</a></sup> Some laptops, like Thinkpads, use PS/2 for trackpoints, but trackpads are often USB. <sup><a href="#s16">16</a></sup> The Pismo PowerBook had a FW400 port, built-in Ethernet, and USB; it lacked ADB. <sup><a href="#s17">17</a></sup> The T40 can boot from USB. <sup><a href="#s18">18</a></sup> USB is a compact and durable connector that has evolved many times and supports a wide range of devices with many drivers available. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The PS/2 protocol can be transported over USB using a USB HID interface, and some keyboards support both USB and PS/2. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> USB support cannot be added to systems prior to the Fuel due to kernel limitations, and only certain chipsets are supported by IRIX for USB. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> On IRIX, USB supports mouse, keyboard, and audio, but only IP35 systems and up support USB, with no mass storage support. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> USB can be used to connect to SGI systems via a dongle that creates a /dev entry, though some adapters may be counterfeit. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> USB is used for a range of devices and functions, including audio output (e.g., a Griffin iMic with a Fuel), GPIB cards, and reflashing system PROM to rescue machines with corrupted PROM or to flash new PROM images during development. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> USB can work seamlessly on old systems with the right drivers, as seen with an IP35 system, though some devices are incompatible with IRIX and most are USB. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> USB can be used as a transport for other protocols, which makes them easier to translate, and the same protocol can run over USB transport. <sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup> USB can be used for imaging drives, either through the ZULUSCSI (which can display status over USB and sequentially image multiple drives) or by connecting a drive to a computer via USB and using dd_rescue, with a dual Xeon significantly speeding up SCSI drive imaging over USB compared to the Zulu. <sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup> USB can conflict with other controllers, such as the onboard USB conflicting with the Adaptec SCSI controller on the Media Bus card, which may require IRQ sharing to work. <sup><a href="#s38">38</a></sup> Some devices are protocol compatible with USB but may not convert to serial, such as Intuos2 tablets. <sup><a href="#s39">39</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IP35 systems support FireWire mass storage but not USB mass storage. (user-b7c4, 2019-06-22, exchange 2160, check: uncheckable)</li>
+<li id="s2">IRIX supports Firewire storage but not USB storage. (user-b7c4, 2020-05-30, exchange 216937, check: uncheckable)</li>
+<li id="s3">IRIX supports OHCI chipsets for USB and FireWire, which is a mostly Hardware-based implementation requiring a driver similar to a SCSI card. (user-8b3c, 2020-05-30, exchange 216937, check: uncheckable)</li>
+<li id="s4">Firewire performs better than USB in terms of system resource usage and throughput due to DMA transfers and full-duplex capability. (user-c831, 2020-05-14, exchange 231210, check: uncheckable)</li>
+<li id="s5">The Octane2 does not support USB, but USB support exists in IP35 systems, where USB mice and keyboards can be used before IRIX boots. Firewire support is present in Octane2 but not built by default. (user-b7c4, 2020-06-14, exchange 97061, check: supported)</li>
+<li id="s6">On the 2k, the onboard USB is 1.1 and should use firewire external disks or a USB2 card for better performance. (user-7b1c, 2022-05-13, exchange 29078, check: supported)</li>
+<li id="s7">USB and Firewire drivers from Fuel/Tezro could potentially work on Octane and O2. (user-6afa, 2022-09-22, exchange 105042, check: supported)</li>
+<li id="s8">A combo Firewire/USB card can be used on SGI Fuel machines, with Firewire detected as DM10 and USB supporting keyboard and mouse. (user-3e2d, 2025-12-27, exchange 225831, check: supported)</li>
+<li id="s9">Commercial UNIX vendors neglected FireWire and USB, expecting Macs to fade. (user-baf6, 2024-03-27, exchange 223808, check: uncheckable)</li>
+<li id="s10">Late version kernels, starting from 2.2.7, support USB. (user-f229, 2019-06-04, exchange 1925, check: supported)</li>
+<li id="s11">USB support is assumed to mean storage device support (user-f229, 2019-08-25, exchange 203914, check: uncheckable)</li>
+<li id="s12">usb is almost universally regarded as being terrible (user-8307, 2021-03-29, exchange 69290, check: uncheckable)</li>
+<li id="s13">Linux has trouble with USB plug and play. (user-b7c4, 2020-12-25, exchange 144490, check: uncheckable)</li>
+<li id="s14">High end laptops started getting USB in 98 (user-bf68, 2019-10-06, exchange 220766, check: supported)</li>
+<li id="s15">OHCI is USB 1.1 only, but supports USB Keyboard/Mouse, and PS/2 sets are harder to find and less reliable. (user-8b3c, 2020-01-28, exchange 5744, check: supported)</li>
+<li id="s16">Some laptops, like Thinkpads, use PS/2 for trackpoints, but trackpads are often USB. (user-1446, 2020-05-05, exchange 96794, check: supported)</li>
+<li id="s17">The Pismo PowerBook had a FW400 port, built-in Ethernet, and USB; it lacked ADB. (user-f229, 2020-10-20, exchange 144209, check: uncheckable)</li>
+<li id="s18">The T40 can boot from USB. (user-1361, 2020-05-06, exchange 8130, check: uncheckable)</li>
+<li id="s19">USB has evolved many times and supports a wide range of devices with many drivers available. (user-c831, 2023-08-01, exchange 209002, check: uncheckable)</li>
+<li id="s20">USB is compact and durable compared to other connectors like PS/2 or mini DIN. (user-e872, 2023-09-22, exchange 40930, check: supported)</li>
+<li id="s21">PS/2 protocol can be transported over USB using a USB HID interface. (user-37bb, 2023-03-22, exchange 208470, check: supported)</li>
+<li id="s22">A Japanese USB keyboard supports both USB and PS/2. (user-b1da, 2023-08-22, exchange 177308, check: supported)</li>
+<li id="s23">USB support cannot be added to systems prior to the Fuel due to kernel limitations. (user-baf6, 2024-02-14, exchange 210027, check: supported)</li>
+<li id="s24">Only certain chipsets are supported by IRIX for USB. (user-616d, 2025-09-02, exchange 58834, check: uncheckable)</li>
+<li id="s25">USB on Irix supports mouse, keyboard and audio so far. (user-5c71, 2024-10-01, exchange 224113, check: uncheckable)</li>
+<li id="s26">Only IP35 systems and up support USB on IRIX, with no mass storage support. (user-24f0, 2025-09-02, exchange 212977, check: uncheckable)</li>
+<li id="s27">FTDI adapters work for connecting SGI systems via USB, but you need a null-modem cable and a specific driver; some adapters may be counterfeit. (user-6dfb, 2024-11-28, exchange 224257, check: uncheckable)</li>
+<li id="s28">To connect to an SGI via USB, plug in the dongle, which creates a /dev entry like /dev/tty.usbserialfoo. Use `screen /dev/tty.usbserialfoo 9600` to start a session at 9600 baud, and ctrl-a k to exit. (user-07ed, 2024-12-24, exchange 113272, check: supported)</li>
+<li id="s29">I used a Griffin iMic with a Fuel for audio out, so I guess add that to the USB list (user-c3c8, 2025-11-10, exchange 213308, check: supported)</li>
+<li id="s30">We can now reflash the system PROM via USB. It can be used for rescuing MBs with corrupted PROM. Most important usecase is for PROM development, as you just type a command on the host and the new PROM image is flashed. (user-757f, 2026-03-15, exchange 226230, check: uncheckable)</li>
+<li id="s31">None of the devices would be compatible with IRIX and most are USB. (user-ec52, 2025-11-25, exchange 219280, check: uncheckable)</li>
+<li id="s32">USB works seamlessly on old systems with the right drivers, as seen with an IP35 system. (user-1a5a, 2026-06-17, exchange 219807, check: uncheckable)</li>
+<li id="s33">The protocol is the same but uses USB for transport. (user-d960, 2026-08-18, exchange 219978, check: uncheckable)</li>
+<li id="s34">Using USB for transport makes it easier to translate. (user-4f7c, 2026-08-18, exchange 219978, check: uncheckable)</li>
+<li id="s35">The newest firmware for the ZULUSCSI can display status over USB, and it can sequentially image multiple drives. (user-616d, 2026-08-13, exchange 226867, check: uncheckable)</li>
+<li id="s36">Using a dual Xeon can significantly speed up SCSI drive imaging over USB compared to the Zulu. (user-616d, 2026-08-17, exchange 124892, check: uncheckable)</li>
+<li id="s37">Connecting a drive to a computer via USB and using dd_rescue can be an alternative method for imaging. (user-616d, 2026-09-07, exchange 214598, check: uncheckable)</li>
+<li id="s38">The onboard USB conflicts with the Adaptec SCSI controller on the Media Bus card, which may require IRQ sharing to work. (user-59df, 2026-08-15, exchange 234837, check: uncheckable)</li>
+<li id="s39">Intuos2 tablets are protocol compatible with USB but may not convert to serial. (user-4f7c, 2026-08-21, exchange 219986, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="usb-1-0.html">USB 1.0</a> (3)
+</li>
+<li><a href="usb-1-1.html">USB 1.1</a> (3)
+</li>
+<li><a href="usb-cable.html">USB cable</a> (3)
+</li>
+<li><a href="usb-card.html">USB card</a> (10)
+</li>
+<li><a href="usb-devices.html">USB devices</a> (8)
+</li>
+<li><a href="usb-dongle.html">USB dongle</a> (3)
+</li>
+<li><a href="usb-drive.html">USB drive</a> (6)
+</li>
+<li><a href="usb-driver.html">USB driver</a> (7)
+</li>
+<li><a href="usb-flash-drive.html">USB flash drive</a> (4)
+</li>
+<li><a href="usb-hub.html">USB hub</a> (3)
+</li>
+<li><a href="usb-input.html">USB input</a> (3)
+</li>
+<li><a href="usb-keyboard.html">USB keyboard</a> (15)
+</li>
+<li><a href="usb-mass-storage.html">USB mass storage</a> (9)
+</li>
+<li><a href="usb-mouse.html">USB mouse</a> (8)
+</li>
+<li><a href="usb-pci-card.html">USB PCI card</a> (3)
+</li>
+<li><a href="usb-peripherals.html">USB peripherals</a> (3)
+</li>
+<li><a href="usb-port.html">USB port</a> (12)
+</li>
+<li><a href="usb-serial-adapter.html">USB serial adapter</a> (3)
+</li>
+<li><a href="usb-stack.html">USB stack</a> (4)
+</li>
+<li><a href="usb-stick.html">USB stick</a> (6)
+</li>
+<li><a href="usb-support.html">USB support</a> (7)
+</li>
+<li><a href="usb-to-ethernet-adapter.html">USB to Ethernet adapter</a> (3)
+</li>
+<li><a href="usb-to-ps2-adapter.html">USB to PS2 adapter</a> (5)
+</li>
+<li><a href="usb3.html">USB3</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="tezro.html">Tezro</a>, <a href="altix.html">Altix</a>, <a href="g3-beige.html">G3 Beige</a>, <a href="indy.html">Indy</a>, <a href="mac.html">Mac</a>, <a href="octane.html">Octane</a>, <a href="sgi-hardware.html">SGI hardware</a>, <a href="machine.html">machine</a>
+</li>
+<li>Processors: <a href="itanium.html">Itanium</a>, <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="bsd.html">BSD</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-7-0.html">IRIX 7.0</a>, <a href="linux.html">Linux</a>, <a href="netbsd.html">NetBSD</a>, <a href="os-9-2.html">OS 9.2</a>, <a href="windows-95.html">Windows 95</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="c3600.html">C3600</a>, <a href="chimera.html">Chimera</a>, <a href="compositor.html">Compositor</a>, <a href="gnome.html">GNOME</a>, <a href="kde.html">KDE</a>, <a href="sd-card.html">SD card</a>, <a href="boot.html">boot</a>, <a href="driver.html">driver</a>, <a href="firmware.html">firmware</a>, <a href="sudo.html">sudo</a>
+</li>
+<li>Parts and peripherals: <a href="ip35.html">IP35</a>, <a href="zip-drive.html">Zip drive</a>, <a href="keyboard.html">keyboard</a>, <a href="mouse.html">mouse</a>, <a href="adaptec-scsi-controller.html">Adaptec SCSI controller</a>, <a href="jaz-drive.html">Jaz drive</a>, <a href="kvm.html">KVM</a>, <a href="l1.html">L1</a>, <a href="n64-board.html">N64 board</a>, <a href="ps-2-mouse.html">PS/2 mouse</a>, <a href="rs232-ports.html">RS232 ports</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="adapter.html">adapter</a>, <a href="chipset.html">chipset</a>, <a href="device.html">device</a>, <a href="drive.html">drive</a>, <a href="mechanical-keyboard.html">mechanical keyboard</a>, <a href="network.html">network</a>, <a href="system-prom.html">system PROM</a>
+</li>
+<li>Standards and interfaces: <a href="firewire.html">Firewire</a>, <a href="scsi.html">SCSI</a>, <a href="serial.html">serial</a>, <a href="dvi.html">DVI</a>, <a href="adb.html">ADB</a>, <a href="dma.html">DMA</a>, <a href="ethernet.html">Ethernet</a>, <a href="pci.html">PCI</a>, <a href="pcie.html">PCIe</a>, <a href="ps-2-protocol.html">PS/2 protocol</a>, <a href="rs232.html">RS232</a>, <a href="vga.html">VGA</a>, <a href="wifi.html">WiFi</a>, <a href="gigabit-ethernet.html">gigabit Ethernet</a>, <a href="protocol.html">protocol</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="red-hat-6-2.html">Red Hat 6.2</a>
+</li>
+<li>Other: <a href="cinema-display.html">Cinema display</a>, <a href="ohci.html">OHCI</a>, <a href="1998.html">1998</a>, <a href="2k.html">2k</a>, <a href="9600-baud.html">9600 baud</a>, <a href="alpha-nt.html">Alpha NT</a>, <a href="centos.html">CentOS</a>, <a href="gpib.html">GPIB</a>, <a href="localtalk.html">LocalTalk</a>, <a href="rs-422.html">RS-422</a>, <a href="uhci.html">UHCI</a>, <a href="vesa.html">VESA</a>, <a href="backup.html">backup</a>, <a href="ddrescue.html">ddrescue</a>, <a href="image.html">image</a>, <a href="keyboard-mouse.html">keyboard/mouse</a>, <a href="latency.html">latency</a>, <a href="mini-din.html">mini DIN</a>, <a href="multipipe.html">multipipe</a>, <a href="sync-signal.html">sync signal</a>, <a href="trackpad.html">trackpad</a>
+</li></ul>
+</body>
+</html>

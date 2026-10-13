@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cross-compiler</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>cross-compiler</h1>
+<p>Claims: 10 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/LLVM">LLVM</a>.</p>
+<p>Binutils is built to produce output for the target system by the cross-compiler. <sup><a href="#s1">1</a></sup> To use a cross-compiler, set environment variables like CC and CXX to point to the cross-compiler binaries. <sup><a href="#s2">2</a></sup> Running `vagrant provision` repeatedly ensures the VM has the crosscompiler and Irix headers installed in /opt/gcc and /opt/binutils. <sup><a href="#s3">3</a></sup> Cross compiler support was alive but the cross compiler did not work fully. <sup><a href="#s4">4</a></sup> The GCC way of describing compilation targets changed significantly between versions 4.x and 5.3, with 5.3 being more challenging to support with a cross-compiler, while LLVM is easier to use as a code generation backend. <sup><a href="#s5">5</a></sup> A cross compiler can be built using a script in the irix directory of the llvm14-irix branch. <sup><a href="#s6">6</a></sup> A cross-compiler for IRIX can build x86 binaries. <sup><a href="#s7">7</a></sup> If you're asking about missing libraries and header files, it should be enough to copy them from your SGI machine to the PC's sysroot directory in the cross-compiler, though some libraries may need to be added manually. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Binutils is built to produce output for the target system by the cross-compiler. (user-42cf, 2018-12-30, exchange 66832, check: uncheckable)</li>
+<li id="s2">To use a cross-compiler, set environment variables like CC and CXX to point to the cross-compiler binaries. (user-ba81, 2019-01-01, exchange 66892, check: uncheckable)</li>
+<li id="s3">Running `vagrant provision` repeatedly ensures the VM has the crosscompiler and Irix headers installed in /opt/gcc and /opt/binutils. (user-9b9c, 2019-03-03, exchange 877, check: supported)</li>
+<li id="s4">Cross compiler support was alive but the cross compiler did not work fully. (user-b1da, 2020-02-14, exchange 6378, check: uncheckable)</li>
+<li id="s5">The GCC way of describing compilation targets changed significantly between versions 4.x and 5.3, with 5.3 being more challenging to support with a cross-compiler. LLVM is easier to use as a code generation backend for a (user-42cf, 2021-04-01, exchange 217086, check: supported)</li>
+<li id="s6">A cross compiler can be built using a script in the irix directory of the llvm14-irix branch. (user-9860, 2021-10-28, exchange 80022, check: uncheckable)</li>
+<li id="s7">A cross-compiler for IRIX can build x86 binaries. (user-42cf, 2023-05-27, exchange 38254, check: uncheckable)</li>
+<li id="s8">If you’re asking about missing libraries and header files, it should be enough to copy them from your SGI machine to the PC’s sysroot directory in the cross-compiler. I’ve had to add some libraries myself. (user-8c9b, 2026-08-28, exchange 73822, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="pc.html">PC</a>, <a href="machine.html">machine</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-headers.html">IRIX headers</a>, <a href="vm.html">VM</a>
+</li>
+<li>Software: <a href="llvm.html">LLVM</a>, <a href="binutils.html">binutils</a>, <a href="library.html">library</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

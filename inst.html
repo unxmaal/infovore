@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>inst</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>inst</h1>
+<p>Claims: 52</p>
+<p>INST is a separate operating system from PROM, and it is the IRIX installer that handles base and overlay packages with dependencies. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It is invoked from the command line or the software manager, which serve similar purposes, though inst is more advanced and preferred by experienced users. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> IRIX installer packages are .tardist files, and inst can take a long time to extract them, so extracting them first and then using -f on the folder can be faster. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s5">5</a></sup> inst may use hashes or IDs to detect if an installation is an upgrade, and it will look for the old install and use it. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Running inst requires a certain amount of disk space under /var/tmp or an equivalent directory, and it fails after creating 26 temporary directories when installing multiple tardist packages, suggesting a limit or space issue. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> From the inst admin menu, mkfs is available to partition and format the drive, and inst and mkfs are needed to format a drive in some cases. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> inst copies a mini filesystem into the swap partition and boots the kernel from there, and the post-install script copies a kernel into the mini-root, sash and ide programs into the drive's volume header, and performs various linking and font tasks. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> inst can install multiple patches from a folder, but it requires manual confirmation for each one, and it works well but is a bit of a pain with conflicts. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> inst and swmgr are used for software management on SGI IRIX, with inst for console and swmgr for GUI, installing most SGI IRIX packages and parsing tardists; some third-party software is also installable via these tools, which are considered among the best package management tools for Unix systems. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> inst cannot install directly from a tar file; it requires a tardist file to be untar'ed into a folder before opening it, and it will untar tardists to a temp directory one at a time. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> inst can load selections from a network path specified as an IP address and path combined, and it can be forced to install on an O2 if it is not COFF. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> inst can query installed packages, as shown with examples for Alias and DevilutionX. <sup><a href="#s28">28</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">prom is one operating system and inst is another; prom networking is not the same as inst networking. (user-2189, 2019-09-04, exchange 76822, check: uncheckable)</li>
+<li id="s2">The PROM and INST are separate 'operating systems'. (user-2189, 2019-09-07, exchange 76830, check: uncheckable)</li>
+<li id="s3">The IRIX installer (INST) handles base and overlay packages with dependencies. (user-f229, 2020-11-16, exchange 77290, check: uncheckable)</li>
+<li id="s4">Software manager and `inst` serve similar purposes for installing software. (user-b1da, 2020-04-25, exchange 7816, check: supported)</li>
+<li id="s5">IRIX installer packages are .tardist files, installed via inst on the command line or the software manager. (user-d903, 2020-06-07, exchange 8896, check: uncheckable)</li>
+<li id="s6">The `swmgr` command is less advanced than `inst`; experienced users prefer `inst`. Community fragmentation is partly due to such tool differences. (user-e4d0, 2024-02-27, exchange 210087, check: supported)</li>
+<li id="s7">inst can take a long time to extract tardists, so extracting them first and then using -f on the folder can be faster. (user-ba81, 2019-11-25, exchange 77001, check: uncheckable)</li>
+<li id="s8">extracting tardists first before using inst can be faster. (user-f229, 2019-11-25, exchange 77001, check: uncheckable)</li>
+<li id="s9">inst may use hashes or IDs to detect if an installation is an upgrade. (user-f229, 2019-07-23, exchange 67624, check: uncheckable)</li>
+<li id="s10">Once you hit inst, it will look for the old install and use it. (user-f229, 2021-10-25, exchange 21573, check: uncheckable)</li>
+<li id="s11">Running 'inst' requires a certain amount of disk space under /var/tmp or an equivalent directory. It's advisable to have this space available or to move the untarred files before running 'inst'. (user-2d09, 2019-08-10, exchange 67737, check: uncheckable)</li>
+<li id="s12">The `inst` command fails after creating 26 temporary directories when installing multiple tardist packages, suggesting a limit or space issue; extracting tardist files manually resolves the issue by avoiding temporary un (user-bc5d, 2019-09-22, exchange 3607, check: supported)</li>
+<li id="s13">From 'inst', use the admin menu to run `mkfs` to partition and format the drive. (user-2189, 2019-09-07, exchange 76830, check: supported)</li>
+<li id="s14">inst and mkfs are needed to format a drive in some cases. (user-b1da, 2021-10-25, exchange 21560, check: uncheckable)</li>
+<li id="s15">The inst admin menu has mkfs. (user-b1da, 2021-10-25, exchange 21573, check: uncheckable)</li>
+<li id="s16">inst copies a mini filesystem into the swap partition and boots the kernel from there. (user-9860, 2021-10-25, exchange 21563, check: uncheckable)</li>
+<li id="s17">The `inst` post-install script copies a kernel into the mini-root, sash and ide programs into the drive's volume header, and performs various linking and font tasks, but it fails to do so on the user's IP12. (user-f229, 2022-02-18, exchange 241004, check: supported)</li>
+<li id="s18">Use inst -f . to install from a tardist file. (user-24f0, 2024-12-05, exchange 218629, check: uncheckable)</li>
+<li id="s19">The 'inst' command can install multiple patches from a folder, but it requires manual confirmation for each one. (user-c3c8, 2024-12-24, exchange 86154, check: uncheckable)</li>
+<li id="s20">Inst works well its just a bit of a pain with conflicts (user-4f7c, 2025-06-22, exchange 218989, check: uncheckable)</li>
+<li id="s21">Irix's `inst` and `swmgr` are used for software management, with `inst` for console and `swmgr` for GUI, installing most SGI Irix packages and parsing tardists. Some third-party software is also installable via these, or (user-e4d0, 2026-01-30, exchange 219461, check: supported)</li>
+<li id="s22">inst and swmgr is one of the best package management tools for Unix systems. (user-3e2d, 2026-09-20, exchange 214691, check: uncheckable)</li>
+<li id="s23">IRIX 5.3 'inst' cannot install from a tar file; unpack the tar file in a temp directory and point inst at that directory. (user-86e1, 2025-09-26, exchange 219136, check: supported)</li>
+<li id="s24">inst requires a tardist file to be un tar’ed into a folder before opening it. (user-f190, 2026-03-30, exchange 90191, check: uncheckable)</li>
+<li id="s25">Inst will untar tardists to a temp directory, one at a time. (user-5906, 2026-05-02, exchange 219704, check: uncheckable)</li>
+<li id="s26">inst can load selections from a network path specified as IP address and path combined. (user-ac3f, 2025-11-28, exchange 60691, check: uncheckable)</li>
+<li id="s27">Inst can be forced to install on an O2 if it's not COFF. (user-1a5a, 2026-03-07, exchange 219549, check: supported)</li>
+<li id="s28">The `inst` command can query installed packages, as shown with examples for Alias and DevilutionX. (user-e4d0, 2026-01-30, exchange 219461, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="inst-command.html">inst command</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="octane2-vpro.html">Octane2 VPro</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="miniroot.html">miniroot</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="solaris-2-6.html">Solaris 2.6</a>
+</li>
+<li>Software: <a href="tardist.html">tardist</a>, <a href="swmgr.html">swmgr</a>, <a href="booterizer.html">Booterizer</a>, <a href="mkfs.html">mkfs</a>, <a href="tardist-file.html">tardist file</a>, <a href="gui.html">GUI</a>, <a href="ide.html">IDE</a>, <a href="mipspro.html">MIPSpro</a>, <a href="rse.html">RSE</a>, <a href="boot-process.html">boot process</a>, <a href="fx.html">fx</a>, <a href="ifconfig.html">ifconfig</a>, <a href="installer.html">installer</a>, <a href="irix-ansible.html">irix_ansible</a>, <a href="package.html">package</a>, <a href="patch.html">patch</a>, <a href="sash.html">sash</a>, <a href="shell.html">shell</a>, <a href="software-manager.html">software manager</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="disk-space.html">disk space</a>, <a href="drive.html">drive</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>, <a href="tftp.html">TFTP</a>
+</li>
+<li>Companies: <a href="red-hat.html">Red Hat</a>
+</li>
+<li>Other: <a href="gfxboard.html">GFXBOARD</a>, <a href="admin-menu.html">admin menu</a>
+</li></ul>
+</body>
+</html>

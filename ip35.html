@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IP35</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IP35</h1>
+<p>Claims: 80 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>.</p>
+<p>IRIX 6.5.30 is good for IP35 machines, and the Synergy 1.4.2 client works on IRIX64 6.5 07202013 IP35. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The IP35 uses 16 kB pages and supports USB in PROM, with many units coming with USB PCI cards from the factory. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The IP35 has an Iris Audio Processor version EMU revision A4, and the M-Audio Revolution 7.1 works on the Octane and IP35. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The IP35 supports SAS/SATA PCI cards, including the LSI SAS3041X-R, LSI SAS3442X, LSI SAS3442X-R, and LSI SAS3080X-R. <sup><a href="#s7">7</a></sup> Connecting an SSD to a SAS adapter supported by an IP35 will not boot the system; the system HD must be connected to the onboard SCSI adapter. <sup><a href="#s8">8</a></sup> The IP35 does not support dumping the boot ROM contents over serial with the standard command, and its serial port baud rate is 38400. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The IP35 uses a different Dallas chip than the Snaphat, and requires initialization for the Dallas chips to boot. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The IP35 does not have bodge wires, and its boards commonly have a bank of RAM that goes bad. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The IP35 platform is used by the Origin 300, Fuel, and Tezro machines, and its diagnostics come in flavors for Fuel, Tezro, and Origin class hardware. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> IP35 systems use three-phase power and, like the O350, consume only a few watts when powered down with only L1 running. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> The IP35 runs at 66 MHz, faster than the O2/Octane's 33 MHz, and does not use a bridge. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> IP35 is SN1, whereas the IP27 is SN0. <sup><a href="#s21">21</a></sup> The IP35 supports standard block sizes including 512B, SAS PCI cards, and NVMe drives, and its IO9 includes SCSI (controllers 0/1) and IDE (controller 2) controllers. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> The IP35 has rudimentary USB HID support at the PROM level, works before IRIX boots, and supports tablets. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> Installing IRIX via LOVE on IP35 hardware causes TLB errors and crashes, while Reanimator works fine, and certain TFTP servers can cause issues. <sup><a href="#s28">28</a></sup> IP35 has different allowed binaries than the O350/Tezro, and IRIX 6.5.28 works on Octane but has glitches on IP35. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">6.5.30 is good for IP35 machines. (user-0251, 2024-11-14, exchange 211256, check: supported)</li>
+<li id="s2">Synergy 1.4.2 Client works on IRIX64 6.5 07202013 IP35. (user-b7c4, 2019-01-05, exchange 56, check: supported)</li>
+<li id="s3">IRIX 6.5 uses 16 kB pages on IP35. (user-42cf, 2019-07-17, exchange 214791, check: supported)</li>
+<li id="s4">IP35 supports USB in PROM and many came with USB PCI cards from the factory. (user-b7c4, 2021-07-25, exchange 205295, check: uncheckable)</li>
+<li id="s5">the M-Audio Revolution 7.1 works on the Octane and IP35 (user-b7c4, 2019-06-29, exchange 2252, check: supported)</li>
+<li id="s6">The IP35 has an Iris Audio Processor version EMU revision A4. (user-b7c4, 2019-06-29, exchange 2251, check: uncheckable)</li>
+<li id="s7">The ip35 supports SAS/SATA PCI cards including the LSI SAS3041X-R with 4 internal SAS/SATA ports, the LSI SAS3442X with 8 ports (4 internal, 4 external), the LSI SAS3442X-R with 8 ports, the LSI SAS3080X-R with 8internal (user-bf68, 2021-11-23, exchange 22461, check: supported)</li>
+<li id="s8">Connecting a SSD to a SAS-adapter supported by an IP35 will not boot the system; the system HD must be connected to the onboard SCSI-adapter. (user-bf68, 2019-06-26, exchange 2217, check: uncheckable)</li>
+<li id="s9">The IP35 does not support dumping the boot ROM contents over serial with the standard command. (user-b7c4, 2019-06-26, exchange 2210, check: uncheckable)</li>
+<li id="s10">The serial port baud rate for IP35 is 38400. (user-b1da, 2022-10-15, exchange 222597, check: supported)</li>
+<li id="s11">The IP35 uses a different Dallas chip than the Snaphat, and a prototype for the Snaphat exists but couldn't be programmed. (user-8547, 2021-08-02, exchange 99638, check: uncheckable)</li>
+<li id="s12">The ip35 requires initialization for the Dallas chips; without initialization, the system stays blank even though the LCD lights up and power comes on. (user-b1da, 2022-03-10, exchange 27034, check: uncheckable)</li>
+<li id="s13">The IP35 does not have bodge wires. (user-0251, 2021-11-14, exchange 80097, check: uncheckable)</li>
+<li id="s14">IP35 boards commonly have a bank of RAM that goes bad. (user-b7c4, 2022-03-19, exchange 102935, check: uncheckable)</li>
+<li id="s15">The Origin 300 and Fuel both use IP35. (user-24f0, 2023-10-19, exchange 209420, check: supported)</li>
+<li id="s16">IP35 diagnostics have flavors for Fuel, Tezro, and Origin class hardware. (user-e4d0, 2023-12-01, exchange 209668, check: supported)</li>
+<li id="s17">IP35 machines like O350 use minimal power when powered down, with only L1 running; tests show only a few watts. (user-9860, 2023-02-15, exchange 106548, check: supported)</li>
+<li id="s18">Rackmount systems like the IP35 need three-phase power. (user-41d2, 2023-03-29, exchange 36987, check: supported)</li>
+<li id="s19">The IP35 does not use a bridge. (user-24f0, 2025-11-10, exchange 225673, check: uncheckable)</li>
+<li id="s20">The IP35 can run at 66 MHz, which is faster than the O2/Octane's 33 MHz. (user-e4d0, 2025-12-06, exchange 225743, check: supported)</li>
+<li id="s21">ip35 is SN1 and ip27 is SN0. (user-ce51, 2026-09-24, exchange 166314, check: uncheckable)</li>
+<li id="s22">The IP35 supports standard block sizes including 512B. (user-b7c4, 2024-02-25, exchange 44825, check: supported)</li>
+<li id="s23">IP35 systems and up can use SAS PCI cards. (user-24f0, 2024-04-26, exchange 223863, check: uncheckable)</li>
+<li id="s24">On IP35, the IO9 has SCSI &amp; IDE controllers. SCSI controllers are 0/1, and the IDE controller is 2 (user-e4d0, 2026-03-28, exchange 215938, check: supported)</li>
+<li id="s25">nvme works on ip32, ip30 and ip35 (user-3e2d, 2026-08-27, exchange 125172, check: uncheckable)</li>
+<li id="s26">ip35 supports tablets; its in man usbinput (user-1171, 2025-01-15, exchange 52646, check: uncheckable)</li>
+<li id="s27">The IP35 has rudimentary USB HID support at the PROM level, working before IRIX boots. (user-b7c4, 2025-11-10, exchange 60413, check: uncheckable)</li>
+<li id="s28">Installing IRIX via LOVE on IP35 hardware causes TLB errors and crashes, while Reanimator works fine; certain TFTP servers can cause issues. (user-59b9, 2023-02-25, exchange 36393, check: uncheckable)</li>
+<li id="s29">The IP35 has different binaries allowed to run on the platform compared to O350/Tezro. (user-6c80, 2023-12-01, exchange 209668, check: supported)</li>
+<li id="s30">IRIX 6.5.28 works on Octane but has glitches on IP35. (user-07ed, 2024-11-14, exchange 211256, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ip35-node-board.html">IP35 node board</a> (3)
+</li>
+<li><a href="ip35-prom.html">IP35 PROM</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="fuel.html">Fuel</a>, <a href="o2.html">O2</a>, <a href="mgras.html">MGRAS</a>, <a href="octane-v10.html">Octane V10</a>, <a href="onyx2.html">Onyx2</a>, <a href="origin-300.html">Origin 300</a>, <a href="origin-350.html">Origin 350</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Graphics: <a href="firegl.html">FireGL</a>, <a href="vpro.html">VPro</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="debian.html">Debian</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-28.html">IRIX 6.5.28</a>, <a href="linux-kernel.html">Linux kernel</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="dcd.html">DCD</a>, <a href="ide.html">IDE</a>, <a href="love.html">LOVE</a>, <a href="reanimator.html">Reanimator</a>, <a href="x86-emulator.html">x86 emulator</a>
+</li>
+<li>Parts and peripherals: <a href="dm10.html">DM10</a>, <a href="dallas-chip.html">Dallas chip</a>, <a href="ip30.html">IP30</a>, <a href="ip32.html">IP32</a>, <a href="dvd-drive.html">DVD drive</a>, <a href="io9.html">IO9</a>, <a href="l1.html">L1</a>, <a href="l2-controller.html">L2 controller</a>, <a href="pci-usb-card.html">PCI USB card</a>, <a href="psu.html">PSU</a>, <a href="ram.html">RAM</a>, <a href="ssd.html">SSD</a>, <a href="card.html">card</a>
+</li>
+<li>Standards and interfaces: <a href="firewire.html">Firewire</a>, <a href="usb.html">USB</a>, <a href="nvme.html">NVMe</a>, <a href="scsi.html">SCSI</a>, <a href="scsi-ssd.html">SCSI SSD</a>, <a href="usb-input.html">USB input</a>, <a href="usb-stack.html">USB stack</a>, <a href="firewire-mass-storage.html">firewire mass storage</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="dallas.html">Dallas</a>
+</li>
+<li>Other: <a href="ip27.html">IP27</a>, <a href="voyager.html">Voyager</a>, <a href="clock-monotonic.html">CLOCK_MONOTONIC</a>, <a href="clock-sgi-cycle.html">CLOCK_SGI_CYCLE</a>, <a href="cintiq.html">Cintiq</a>, <a href="lsi-sas3041x-r.html">LSI SAS3041X-R</a>, <a href="m-audio-revolution-7-1.html">M-Audio Revolution 7.1</a>, <a href="o2-octane.html">O2/Octane</a>, <a href="o350-tezro.html">O350/Tezro</a>, <a href="r300.html">R300</a>, <a href="snaphat.html">Snaphat</a>, <a href="baud-rate.html">baud rate</a>
+</li></ul>
+</body>
+</html>

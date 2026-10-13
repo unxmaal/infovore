@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI device</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI device</h1>
+<p>Claims: 23 Part of <a href="scsi.html">SCSI</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SCSI">SCSI</a>.</p>
+<p>SCSI devices can be configured as separate LUNs, allowing all volumes to be seen simultaneously while periodically interrupting reads to poll other LUNs. <sup><a href="#s1">1</a></sup> No format command is needed for any SCSI device; the device only needs to be partitioned, and a unixy filesystem will format it. <sup><a href="#s2">2</a></sup> A SCSI device may need to be tested with an RS6k/pSeries AIX compatible HBA. <sup><a href="#s3">3</a></sup> The SCSI device defaults to ID 0 when all jumpers are removed, which may conflict with the controller, and no terminator should be at the end of the device chain. <sup><a href="#s4">4</a></sup> The SCSI device may not standardize for media size changes; it uses disk notches for read/write sensing, with the window notch and switch flipped between disks. <sup><a href="#s5">5</a></sup> Adding the SCSI device for MO requires additional setup steps. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Amiga can configure a SCSI device as separate LUNs, allowing it to see all volumes simultaneously but periodically interrupting reads by polling other LUNs. (user-d903, 2021-04-06, exchange 77355, check: uncheckable)</li>
+<li id="s2">You don't need a format command for any SCSI device; just partition it, and a unixy filesystem will format it. (user-f229, 2021-10-25, exchange 21557, check: uncheckable)</li>
+<li id="s3">You might need to test an RS6k/pSeries AIX compatible HBA with your SCSI device. (user-07ed, 2021-11-04, exchange 21820, check: uncheckable)</li>
+<li id="s4">When all jumpers are removed, a SCSI device defaults to ID 0, which may conflict with the controller; ensure no terminator is at the end of the device chain. (user-3e2d, 2025-02-09, exchange 114646, check: supported)</li>
+<li id="s5">The SCSI device may not standardize for media size changes; it uses disk notches for read/write sensing, with the window notch and switch flipped between disks. (user-2a3c, 2026-04-06, exchange 62944, check: uncheckable)</li>
+<li id="s6">Adding the SCSI device for MO requires additional setup steps. (user-e4d0, 2026-06-08, exchange 239151, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="4d-50.html">4D/50</a>, <a href="amiga.html">Amiga</a>, <a href="g5.html">G5</a>, <a href="iris.html">IRIS</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Graphics: <a href="graphics.html">graphics</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="leopard.html">Leopard</a>
+</li>
+<li>Software: <a href="sd-card.html">SD card</a>, <a href="fx.html">fx</a>
+</li>
+<li>Parts and peripherals: <a href="hdd.html">HDD</a>, <a href="scsi-controller.html">SCSI controller</a>, <a href="power-supply.html">power supply</a>, <a href="tape-drive.html">tape drive</a>
+</li>
+<li>Other: <a href="luns.html">LUNs</a>, <a href="command.html">command</a>, <a href="termination.html">termination</a>
+</li></ul>
+</body>
+</html>

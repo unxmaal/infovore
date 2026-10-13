@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>dd</h1>
+<p>Claims: 50 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Dd_%28Unix%29">Dd (Unix)</a>.</p>
+<p>dd is a Unix utility that copies data bit by bit, regardless of the file system, and is used to create disk images, copy boot sectors and boot headers, and convert files to ASCII. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> dd can image a disk by copying it to storage, and the resulting image can be restored by copying it back to the target drive. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> dd can create disk images of specified size using the 'bs' and 'count' options, and images can be stored on an NFS share. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> dd can be used to image various systems, including IRIX, HP-UX, DYNIX/ptx, and Raspberry Pi, and can dump PROM contents via /dev/mem on IRIX. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> dd can copy CDs and EFS media, though safecopy is preferred for EFS media, and artificial bad sectors may cause dd to fail. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> dd can erase an IRIX HDD to check for bad sectors, but filesystem-level handling of bad sectors is not done by dd, so tar or xfsdump may be preferable for backups. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> dd can move a system install between disks, though LVM, partition table fixes, or additional steps may be required. <sup><a href="#s12">12</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> Running dd on a running root filesystem may not create a consistent image, and the caffeinate command can prevent macOS from sleeping during dd operations. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> dd can create disk images over the network using NFS or FTP, and using a larger block size can speed up this process. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> dd can also be used to write to rdsk device files via NFS shares, and to copy a disk image to a device with a progress bar. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> dd can write /dev/zero to a file for a filesystem performance test. <sup><a href="#s30">30</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You can use 'dd' on Linux to copy the contents of a drive bit by bit, regardless of the file system. (user-59b9, 2019-12-25, exchange 5081, check: uncheckable)</li>
+<li id="s2">tar is easier to use than dd for copying files, but dd is necessary for boot sectors. (user-e872, 2021-12-28, exchange 80578, check: uncheckable)</li>
+<li id="s3">The dd command can be used to copy boot headers in Linux. (user-e872, 2022-02-21, exchange 26056, check: uncheckable)</li>
+<li id="s4">`find` and `dd` are the two Unix outliers with unique syntax and capabilities. (user-42cf, 2023-08-03, exchange 108206, check: supported)</li>
+<li id="s5">To parse strings from an EBCDIC file, one can use `dd if=INPUTFILE conv=ascii | strings`. (user-b1da, 2024-01-13, exchange 43745, check: supported)</li>
+<li id="s6">There is a command-line method to convert a file to ASCII and extract strings: `dd if=INPUTFILE conv=ascii | strings -tx`. (user-6c80, 2024-01-13, exchange 43741, check: supported)</li>
+<li id="s7">dd can be used to image a disk. (user-616d, 2025-11-01, exchange 119517, check: uncheckable)</li>
+<li id="s8">To take a disk image of an IRIX system, use 'dd' to copy the disk to storage. (user-b7c4, 2019-11-28, exchange 4418, check: uncheckable)</li>
+<li id="s9">For restoration, use 'dd' to copy the image back to the target drive. (user-b7c4, 2019-11-28, exchange 4418, check: uncheckable)</li>
+<li id="s10">You can use dd to make a disk image and store it on an NFS share. (user-cd83, 2020-01-18, exchange 5528, check: uncheckable)</li>
+<li id="s11">dd can be used to create disk images with a specified size using the 'bs' and 'count' options, though FAT32 has a file size limit. (user-ae91, 2024-05-17, exchange 111297, check: uncheckable)</li>
+<li id="s12">dd can be used to move an HP-UX installation between disks, though LVM might require additional steps or a live CD/USB for recovery. (user-237d, 2020-06-10, exchange 160843, check: uncheckable)</li>
+<li id="s13">Physical memory can be accessed via `/dev/mem` on IRIX, allowing PROM contents to be dumped using `dd`. (user-e04c, 2020-08-12, exchange 78603, check: supported)</li>
+<li id="s14">dd can be used to create a hard disk image of an Octane with IRIX, even if the Octane itself is not running. (user-79ed, 2020-12-13, exchange 12833, check: supported)</li>
+<li id="s15">To create a fully exact image of a DYNIX/ptx tape, `dd` can be used after rewinding the tape with `mt`, preserving all filesystem data and TOC contents; `tar` preserves filesystem content but not raw filesystem data. (user-ff99, 2022-08-13, exchange 216136, check: supported)</li>
+<li id="s16">To write an image to a Raspberry Pi, use dd on Unix or balenaEtcher and Win32DiskImager on Windows. (user-7b1c, 2020-03-13, exchange 77095, check: uncheckable)</li>
+<li id="s17">When ripping EFS media, use `safecopy` instead of `dd` and set the proper sector size. (user-2189, 2020-07-05, exchange 216716, check: supported)</li>
+<li id="s18">The command `dd if=/dev/sr0 of=dump.iso` can be used to copy a CD, but artificial bad sectors might cause it to fail. (user-5510, 2023-04-26, exchange 208612, check: supported)</li>
+<li id="s19">Using 'dd' with zeroes can erase an IRIX HDD and check for bad sectors. (user-42cf, 2019-01-19, exchange 146, check: uncheckable)</li>
+<li id="s20">Using `dd` on an IRIX disk with bad sectors might cause issues, as filesystem-level handling of bad sectors is not done by `dd`. Consider using `tar` or `xfsdump` for backups. (user-8547, 2022-02-21, exchange 206473, check: supported)</li>
+<li id="s21">dd can be used to move a system install and may require parted to fix the partition table. (user-8547, 2022-02-21, exchange 206472, check: uncheckable)</li>
+<li id="s22">You can manually enter the geometry or dd the old drive to the new one if the new drive is larger. (user-237d, 2024-01-20, exchange 240222, check: uncheckable)</li>
+<li id="s23">Running 'dd' on a running root filesystem may not create a consistent image. (user-c831, 2020-04-20, exchange 7633, check: uncheckable)</li>
+<li id="s24">The 'caffeinate' command prevents macOS from sleeping, useful for running utilities like 'dd' without the system entering sleep mode. (user-b4f4, 2022-06-21, exchange 146450, check: uncheckable)</li>
+<li id="s25">Imaging a smaller HDD to a larger one can be done using dd over the network via NFS or FTP. (user-6dfb, 2025-01-10, exchange 52044, check: uncheckable)</li>
+<li id="s26">Disk images can be created over the network using dd, tar, or xfsdump. (user-1085, 2025-05-04, exchange 225014, check: uncheckable)</li>
+<li id="s27">Using dd with a larger block size can speed up network disk image creation. (user-42cf, 2025-05-04, exchange 225014, check: uncheckable)</li>
+<li id="s28">NFS shares can be used to dd rdsk device files for disk image creation. (user-22f9, 2025-05-04, exchange 225014, check: uncheckable)</li>
+<li id="s29">dd can copy a disk image to a device with a progress bar. (user-37bb, 2026-04-14, exchange 63043, check: uncheckable)</li>
+<li id="s30">You can use `dd` to write /dev/zero to a file for a filesystem performance test. (user-ba5b, 2026-08-23, exchange 240924, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="dd-command.html">dd command</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="tar.html">tar</a>, <a href="xfsdump.html">xfsdump</a>, <a href="cd.html">CD</a>, <a href="efs-filesystem.html">EFS filesystem</a>, <a href="ps2.html">PS2</a>, <a href="sd-card.html">SD card</a>, <a href="rsh.html">rsh</a>, <a href="tar-file.html">tar file</a>
+</li>
+<li>Parts and peripherals: <a href="disk-image.html">disk image</a>, <a href="dat-drive.html">DAT drive</a>, <a href="disk.html">disk</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>, <a href="nfs.html">NFS</a>, <a href="ftp.html">FTP</a>, <a href="ssh.html">SSH</a>, <a href="usb-stick.html">USB stick</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>
+</li>
+<li>Other: <a href="bad-sectors.html">bad sectors</a>, <a href="luns.html">LUNs</a>, <a href="lvm.html">LVM</a>, <a href="ddrescue.html">ddrescue</a>, <a href="exfat.html">exFAT</a>, <a href="find.html">find</a>, <a href="ini-file.html">ini file</a>, <a href="safecopy.html">safecopy</a>, <a href="sector-size.html">sector size</a>
+</li></ul>
+</body>
+</html>

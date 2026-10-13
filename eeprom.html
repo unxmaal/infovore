@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEPROM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>EEPROM</h1>
+<p>Claims: 34 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/EEPROM">EEPROM</a>.</p>
+<p>EEPROM is a non-volatile memory type similar to CMOS. <sup><a href="#s1">1</a></sup> EEPROMs commonly store hardware identifiers such as MAC addresses, system IDs, and serial numbers, as seen in the SGI O2 (PCI riser), the front panel system ID/MAC connector, and the OS/2 SE ES9k serial number. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> EEPROMs can also store configuration data, including R4000 CPU settings like endianness and cache timing, IPL changes, and Video Format Combiner workspace settings. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> A faulty or corrupted EEPROM can cause problems such as a bad Ethernet address (ff:ff:ff:ff:ff:ff), garbage output causing fallback VOP usage, mismatched DIMM errors, and difficulty using a Dell P992 CRT monitor. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> EEPROMs can be dumped using hardware like the TL866, and switching between R3K and R4K processors can clear or invalidate the stored MAC address values. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> EEPROMs are sensitive to static electricity and should be shipped using antistatic foam and a small box to avoid damaging the pins. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">EEPROM is similar to CMOS (user-1361, 2020-02-01, exchange 5848, check: uncheckable)</li>
+<li id="s2">The serial number for OS/2 SE on the ES9k is stored in BCD format on an EEPROM on the front panel. (user-5926, 2023-06-07, exchange 177213, check: supported)</li>
+<li id="s3">The O2 has an EEPROM on the PCI riser for the MAC address. (user-31d7, 2020-03-24, exchange 96590, check: supported)</li>
+<li id="s4">The front panel of the system connects to a little blue IDC connector next to the power, which contains an EEPROM with the system ID and MAC address. (user-86e1, 2024-09-23, exchange 224097, check: uncheckable)</li>
+<li id="s5">The program function makes changes to the IPL by writing to an eeprom. (user-5e15, 2021-11-28, exchange 175748, check: uncheckable)</li>
+<li id="s6">The EEPROM configures the R4000 CPU settings like endianness and cache timing. (user-a719, 2023-07-14, exchange 220288, check: supported)</li>
+<li id="s7">The Onyx2 can be set up with two workspaces/screens using the Video Format Combiner, which can be saved to the EEPROM and accessed after reboot. (user-22f9, 2024-11-10, exchange 211229, check: supported)</li>
+<li id="s8">The DG2 uses an EEPROM for initial output, which, if bad, can feed it garbage and cause it to use a fallback VOP. (user-c9fb, 2020-11-24, exchange 221133, check: uncheckable)</li>
+<li id="s9">A bad Ethernet address (ff:ff:ff:ff:ff:ff) indicates a faulty EEPROM containing the hardware Ethernet address. (user-ba81, 2021-04-18, exchange 221285, check: uncheckable)</li>
+<li id="s10">The presence or absence of the EEPROM might cause 'mismatched DIMM' errors. (user-b1da, 2022-02-18, exchange 222013, check: uncheckable)</li>
+<li id="s11">A Dell P992 CRT monitor's EEPROM was corrupted, making it difficult to use. (user-24f0, 2024-01-20, exchange 223635, check: uncheckable)</li>
+<li id="s12">The Indigo2 R4400 can have its EEPROM dumped using hardware like TL866. (user-b57f, 2023-07-14, exchange 220290, check: supported)</li>
+<li id="s13">Switching from an R4k to an R3k clears the EEPROM to FF:FF:FF:FF:FF:FF. (user-9219, 2025-03-21, exchange 55413, check: supported)</li>
+<li id="s14">Upgrading from R3K to R4K repositions the MAC address in the EEPROM, but putting a R3K board back results in invalid values. (user-9219, 2025-04-21, exchange 56128, check: supported)</li>
+<li id="s15">Use antistatic foam and a small box to ship EEPROMs without damaging the pins. (user-07ed, 2025-03-21, exchange 212237, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="eeprom-programmer.html">EEPROM programmer</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mac-address.html">MAC address</a>, <a href="o2.html">O2</a>, <a href="onyx2.html">Onyx2</a>, <a href="system-id.html">system ID</a>
+</li>
+<li>Processors: <a href="r3k.html">R3K</a>, <a href="r4000.html">R4000</a>, <a href="r4000-cpu.html">R4000 CPU</a>
+</li>
+<li>Operating systems: <a href="os-2-se.html">OS/2 SE</a>
+</li>
+<li>Parts and peripherals: <a href="eprom.html">EPROM</a>, <a href="cpu.html">CPU</a>, <a href="crt-monitor.html">CRT monitor</a>, <a href="idc-connector.html">IDC connector</a>, <a href="prom.html">PROM</a>, <a href="board.html">board</a>, <a href="flash-memory.html">flash memory</a>
+</li>
+<li>Other: <a href="cmos.html">CMOS</a>, <a href="cpld.html">CPLD</a>, <a href="flash.html">Flash</a>, <a href="ipl.html">IPL</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>network boot</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>network boot</h1>
+<p>Claims: 6 Part of <a href="network.html">network</a></p>
+<p>The Sun E250 can boot from the network by default. <sup><a href="#s1">1</a></sup> For Solaris, setting the root directory for network boot to "/share/nfs/solaris/Solaris_10/Tools/Boot" is necessary for it to find the install media. <sup><a href="#s2">2</a></sup> A flat NVRAM will not cause SCSI errors but may cause a network boot (diag-boot). <sup><a href="#s3">3</a></sup> You cannot boot miniroot without a drive unless you network boot, and booting fx might allow you to wipe and repartition to ensure a clean volume header and root partition scheme before copying a fresh miniroot. <sup><a href="#s4">4</a></sup> Bootstrapping IRIX over the network is the only method, and it is not difficult. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Sun E250 can boot from network by default. (user-1b6a, 2020-08-27, exchange 180194, check: uncheckable)</li>
+<li id="s2">Setting the root directory for network boot to "/share/nfs/solaris/Solaris_10/Tools/Boot" is necessary for Solaris to find the install media. (user-1361, 2021-03-11, exchange 180583, check: supported)</li>
+<li id="s3">A flat NVRAM will not cause SCSI errors, but may cause a network boot (diag-boot). (user-08fb, 2024-05-25, exchange 240316, check: uncheckable)</li>
+<li id="s4">You can't boot miniroot without a drive unless you network boot; booting fx might allow you to wipe and repartition to ensure a clean volume header and root partition scheme, then copy a fresh miniroot. (user-1629, 2024-11-17, exchange 112808, check: uncheckable)</li>
+<li id="s5">Bootstrapping IRIX over the network is the only method, and it is not difficult. (user-24f0, 2025-05-28, exchange 212547, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris.html">Solaris</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="fx.html">fx</a>, <a href="root-directory.html">root directory</a>
+</li>
+<li>Parts and peripherals: <a href="nvram.html">NVRAM</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="e250.html">E250</a>
+</li></ul>
+</body>
+</html>

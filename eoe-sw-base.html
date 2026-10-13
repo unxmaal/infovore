@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eoe.sw.base</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>eoe.sw.base</h1>
+<p>Claims: 6</p>
+<p>eoe.sw.base conflicts arise with NFS files from booterizer installation, NFS 5.3, and incompatible software versions such as irix_dev.sw.headers (1274627335) with eoe.sw.base (1289434520). <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> RapidApp 1.1 requires a newer version of eoe.sw.base than is compatible with IRIX 6.5.30, so upgrading RapidApp or eoe.sw.base may be necessary. <sup><a href="#s4">4</a></sup> When encountering a package conflict with eoe.sw.base, you usually just need to load the overlays, which include patches for things on the NFS disks to make them compatible with changes in 6.5.x. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the NFS files from booterizer installation give version conflicts with eoe.sw.base. (user-d166, 2019-09-10, exchange 216834, check: uncheckable)</li>
+<li id="s2">NFS 5.3 cannot be installed due to compatibility issues with eoe.sw.base. (user-d2ef, 2023-05-25, exchange 38212, check: supported)</li>
+<li id="s3">Incompatible versions of software can prevent installation, such as irix_dev.sw.headers (1274627335) with eoe.sw.base (1289434520). (user-231e, 2026-05-01, exchange 90563, check: supported)</li>
+<li id="s4">RapidApp 1.1 requires a newer version of eoe.sw.base than is compatible with IRIX 6.5.30; upgrading RapidApp or eoe.sw.base may be necessary. (user-3a92, 2023-05-04, exchange 218031, check: supported)</li>
+<li id="s5">Any time you run into a package conflict with eoe.sw.base, you usually just need to load the overlays. The overlays included patches for things that are on the NFS disks to make them compatible with changes in 6.5.x, (user-d903, 2022-09-12, exchange 217691, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-6-5-x.html">IRIX 6.5.x</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li>
+<li>Other: <a href="rapidapp.html">RapidApp</a>, <a href="overlay.html">overlay</a>
+</li></ul>
+</body>
+</html>

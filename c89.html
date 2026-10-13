@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C89</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>C89</h1>
+<p>Claims: 7 Part of <a href="c-2.html">C</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Open64">Open64</a>.</p>
+<p>C89 is supported by older compilers such as MIPSpro, an SGI compiler that is fast but may lack full C99 support. <sup><a href="#s1">1</a></sup> Using a C89 compiler can offer portability benefits, as C89 codebases can be compiled with ancient compilers. <sup><a href="#s2">2</a></sup> However, C89 compilers can cause build failures, such as ./configure failing with c89, and compiling GCC on HP-UX with a C99 compiler may fail due to bootstrap comparison errors, in which case a C89 compiler should be used instead. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The stdint.h header is required for C99 compilers but may be optional for C89 compilers on IRIX, and upgrading to a C99 compiler is recommended for future compatibility. <sup><a href="#s5">5</a></sup> C89 code can avoid the need for a modern compiler by using ifdefs for sized integer types. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">MIPSpro is an older SGI compiler that supports C89 and is fast but may lack full C99 support. (user-42cf, 2019-07-12, exchange 2460, check: uncheckable)</li>
+<li id="s2">C89 codebases can be compiled with ancient compilers, offering portability benefits. (user-21b8, 2024-05-19, exchange 71300, check: uncheckable)</li>
+<li id="s3">Compiling GCC on HP-UX with a C99 compiler may fail due to bootstrap comparison errors; try using a C89 compiler instead. (user-b1da, 2020-06-06, exchange 8868, check: uncheckable)</li>
+<li id="s4">./configure fails with c89, use GCC 2 instead (user-b1da, 2020-06-06, exchange 8869, check: supported)</li>
+<li id="s5">The stdint.h header is required for C99 compilers but may be optional for C89 compilers on IRIX; upgrading the compiler to C99 is recommended for future compatibility. (user-21b8, 2024-05-11, exchange 215492, check: uncheckable)</li>
+<li id="s6">my code is C89 + some ifdefs for sized integer types, so a modern version of gcc is not needed. (user-21b8, 2025-02-14, exchange 215643, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="c99.html">C99</a>, <a href="mipspro.html">MIPSpro</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="hp.html">HP</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>passwd file</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>passwd file</h1>
+<p>Claims: 6 Part of <a href="passwd.html">passwd</a></p>
+<p>The passwd file can be edited to disable login capability, for example by setting the password field to :: and removing :* or :&lt;hash&gt; to clean it up. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> To change the passwd file, one can use vi to edit and save it, then reboot into IRIX, or boot an install CD or access the file by mounting a second hard drive from another SGI. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Minirooting an Onyx2 allows copying the /etc/passwd file for cracking with tools like John the Ripper. <sup><a href="#s5">5</a></sup> The passwd file was corrupted in a certain way, and nobody was root. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You can disable login capability by editing the passwd file. (user-e872, 2021-08-14, exchange 205387, check: uncheckable)</li>
+<li id="s2">To clean up the passwd file, set the password field to ::, removing :* or :&lt;hash&gt;. (user-1629, 2024-11-24, exchange 50860, check: uncheckable)</li>
+<li id="s3">To change the passwd file, use vi to edit and save it, then reboot into IRIX. (user-25b9, 2024-04-27, exchange 111066, check: uncheckable)</li>
+<li id="s4">To reset user logins on IRIX, one can boot an install CD or access the passwd file by mounting a second hard drive from another SGI. (user-44d7, 2025-08-09, exchange 225316, check: uncheckable)</li>
+<li id="s5">Minirooting an Onyx2 allows copying the /etc/passwd file for cracking with tools like John the Ripper. (user-c831, 2026-05-08, exchange 219723, check: supported)</li>
+<li id="s6">passwd file was corrupted in a certain way, nobody was root (user-cb4c, 2020-02-23, exchange 216890, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx2.html">Onyx2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="vi.html">vi</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/etc/network/interfaces.d/eth0</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/etc/network/interfaces.d/eth0</h1>
+<p>Claims: 3</p>
+<p>The `eth0` configuration in `/etc/network/interfaces.d/eth0` is ignored if `dhcpcd` is managing the interface, and setting `eth0` in `/etc/dhcpcd.conf` resolves the issue. <sup><a href="#s1">1</a></sup> To fix DHCP issues, change 'manual' to 'static' in `/etc/network/interfaces.d/eth0`. <sup><a href="#s2">2</a></sup> Commenting out the gateway line in `/etc/network/interfaces.d/eth0` resolved the boot error. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The `eth0` configuration in `/etc/network/interfaces.d/eth0` is ignored if `dhcpcd` is managing the interface, and setting `eth0` in `/etc/dhcpcd.conf` resolves the issue. The booterizer pi image file is slightly too big (user-95db, 2021-09-20, exchange 77436, check: supported)</li>
+<li id="s2">To fix DHCP issues, change 'manual' to 'static' in /etc/network/interfaces.d/eth0. (user-e4d0, 2022-09-30, exchange 77614, check: uncheckable)</li>
+<li id="s3">Commenting out the gateway line in /etc/network/interfaces.d/eth0 resolved the boot error. (user-4292, 2022-11-06, exchange 77641, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Other: <a href="eth0.html">eth0</a>
+</li></ul>
+</body>
+</html>

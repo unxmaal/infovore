@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>diskperf</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>diskperf</h1>
+<p>Claims: 15 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Fuel">SGI Fuel</a>, <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<p>diskperf is a command available in IRIX for benchmarking disk performance, including SCSI cards and HDDs, with examples for RAID setup found in the diskperf man page. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The tool can test XFS data subvolume performance with various request sizes, and flags such as -W show XFS overhead while -D can cause errors with certain disks due to direct I/O issues. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The command `diskperf -D -W -r4k -m4m -c2g /mnt/diskperf` can be used to test disk performance. <sup><a href="#s7">7</a></sup> Real-world use reportedly achieves ~75-80MB/sec, and the tool has been run on various systems including an indigo2 impact with zuluscsi. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">6.5.22 includes the `diskperf` command for benchmarking SCSI cards. (user-6afa, 2020-07-24, exchange 78550, check: supported)</li>
+<li id="s2">diskalign and diskperf man pages contain examples for RAID setup. (user-8547, 2023-02-24, exchange 106640, check: uncheckable)</li>
+<li id="s3">In IRIX 6.5.30, the built-in `diskperf` command can be used for HDD benchmarking; there's also a third-party CLI tool, though the name is unknown. (user-e872, 2023-05-16, exchange 208708, check: supported)</li>
+<li id="s4">The diskperf tool on an IRIX64 fuel 6.5 machine shows XFS data subvolume performance with various request sizes. (user-f229, 2022-02-07, exchange 80911, check: supported)</li>
+<li id="s5">The `-D` flag in `diskperf` causes errors with certain disks, especially with Red Rock SCSI SSDs, due to direct I/O issues. (user-5906, 2025-05-25, exchange 225112, check: supported)</li>
+<li id="s6">The -W flag in diskperf shows XFS overhead. (user-3e2d, 2025-12-14, exchange 89013, check: uncheckable)</li>
+<li id="s7">The command `diskperf -D -W -r4k -m4m -c2g /mnt/diskperf` can be used to test disk performance. (user-e4d0, 2026-01-26, exchange 215887, check: supported)</li>
+<li id="s8">Fuel can do ~75-80MB/sec in real world use according to diskperf. (user-b7c4, 2019-06-17, exchange 2087, check: supported)</li>
+<li id="s9">diskperf with zuluscsi on indigo2 impact (user-7973, 2024-02-15, exchange 223704, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix64.html">IRIX64</a>
+</li>
+<li>Software: <a href="xfs.html">XFS</a>, <a href="mame.html">MAME</a>
+</li>
+<li>Parts and peripherals: <a href="red-rock-sca.html">Red Rock SCA</a>, <a href="zuluscsi.html">ZuluSCSI</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-timeouts.html">SCSI timeouts</a>
+</li>
+<li>Other: <a href="66mhz.html">66mhz</a>
+</li></ul>
+</body>
+</html>

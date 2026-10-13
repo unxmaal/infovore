@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLES</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SLES</h1>
+<p>Claims: 13 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Prism">SGI Prism</a>.</p>
+<p>Altix systems can run various Linux distributions, with SLES or RHEL being recommended, though the Altix 350 can boot only RHEL and SLES, often failing on other versions due to memory mapping issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SLES is acceptable as a distro but is not preferred as a modern one, and YaST, its tool for autoconfiguring the system, frequently makes mistakes requiring manual intervention. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> SGI put tons of work into the kernel, releasing open source updates and bolt-on proprietary patches distributed with its customized SLES releases, and used SGI Advanced Linux on some of the bigger Altix systems, where Propack 4 was SLES. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The Prism requires SGI's specific version of SLES to work with accelerated desktops on a PCI card in an Altix, using SLES with a customized ATI fglrx driver for Itanium and dual AGP cards, and you need the matching propack for the correct SLES SP version. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> QuickTransit has worked on SLES on an Altix but not on RHEL, possibly due to processor incompatibility, and did not work fully in a SLES VM, while its licenses work with 1.2 but require setting the date back or using libtimefake to avoid expiry in 2005. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The Albatross can only run SLES. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Altix systems can run various Linux distributions, with SLES or RHEL being recommended. (user-1446, 2022-03-28, exchange 27638, check: uncheckable)</li>
+<li id="s2">The Altix 350 can boot RHEL and SLES but not other versions of Linux, often due to memory mapping issues. (user-9528, 2023-02-27, exchange 208392, check: supported)</li>
+<li id="s3">SUSE is nice on an Altix and is not preferred as a modern distro, but SLES is acceptable. (user-1446, 2020-05-30, exchange 8699, check: uncheckable)</li>
+<li id="s4">YaST is a tool in SLES for autoconfiguring the system but frequently makes mistakes, requiring manual intervention. (user-b7c4, 2020-12-09, exchange 12719, check: uncheckable)</li>
+<li id="s5">SGI put tons of work into the kernel, both released as open source updates and bolt on proprietary kernel patches that they distributed with their customize SLES releases. (user-c831, 2023-04-13, exchange 37245, check: uncheckable)</li>
+<li id="s6">SGI Advanced Linux was used on some of the bigger Altix systems. Propack 4 was SLES. (user-86e1, 2024-01-08, exchange 216481, check: supported)</li>
+<li id="s7">The Prism requires SGI's specific version of SLES to work with accelerated desktops on a PCI card in an Altix. (user-59b9, 2020-12-09, exchange 204547, check: uncheckable)</li>
+<li id="s8">Prism's OS is SLES with a customized ATI fglrx driver for Itanium and dual AGP cards. (user-b1da, 2024-08-10, exchange 210780, check: uncheckable)</li>
+<li id="s9">you need the matching propack for the correct SLES SP version. (user-03ad, 2024-03-23, exchange 216487, check: uncheckable)</li>
+<li id="s10">QuickTransit has worked on SLES on an Altix but not on RHEL, possibly due to processor incompatibility. (user-9528, 2022-01-20, exchange 216421, check: uncheckable)</li>
+<li id="s11">QuickTransit did not work fully in a SLES VM. (user-1867, 2026-06-16, exchange 76625, check: uncheckable)</li>
+<li id="s12">QuickTransit licenses work with 1.2 but require setting the date back or using libtimefake to avoid expiry in 2005. (user-ba81, 2022-01-20, exchange 216421, check: supported)</li>
+<li id="s13">The Albatross can only run SLES. (user-0251, 2024-03-02, exchange 76007, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sles-10.html">SLES 10</a> (11)
+</li>
+<li><a href="sles-9-sp3.html">SLES 9 SP3</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="prism.html">Prism</a>, <a href="altix-350.html">Altix 350</a>
+</li>
+<li>Operating systems: <a href="rhel.html">RHEL</a>, <a href="linux-distributions.html">Linux distributions</a>, <a href="propack.html">ProPack</a>, <a href="propack-4.html">Propack 4</a>
+</li>
+<li>Software: <a href="quicktransit.html">QuickTransit</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="suse.html">SUSE</a>, <a href="yast.html">YaST</a>
+</li></ul>
+</body>
+</html>

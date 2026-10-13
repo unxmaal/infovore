@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KVM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>KVM</h1>
+<p>Claims: 51 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/KVM_switch">KVM switch</a>, <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>.</p>
+<p>KVM and bhyve are well-established hypervisors that have received significant development effort over the last decade, making them suitable recommendations for modern use, and they are used for VMs. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Proxmox uses KVM and LXC containers. <sup><a href="#s3">3</a></sup> QEMU without KVM is only good for different architectures or really old OSes. <sup><a href="#s4">4</a></sup> OpenVZ limits optimization potential due to lack of kernel control, and VMs are not always well-integrated with the host system, with KVM being an exception. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> KVMs struggle with connecting diverse hardware. <sup><a href="#s7">7</a></sup> KVM can run multiple GPUs, but they must be from the same vendor, and it can mix Intel and AMD by downgrading the CPU to a generic x64, while EVC masks CPUID features to provide a common baseline. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Linux was first to hide CPUID in KVM, possibly before KVM was mainlined. <sup><a href="#s10">10</a></sup> Dilos supports KVM and SPARC. <sup><a href="#s11">11</a></sup> IRIX switches keyboards into scancode 3, which many KVMs do not support from the start. <sup><a href="#s12">12</a></sup> The only reliable KVMs are old datacenter units such as Avocent, which were designed to work with IRIX. <sup><a href="#s13">13</a></sup> The keyboard issues persist with and without the KVM, and the symptoms are consistent across different firmware versions. <sup><a href="#s14">14</a></sup> Swapping a SIP module with different firmware made the KVM work properly. <sup><a href="#s15">15</a></sup> Adding error parity error checking and checking for a valid start bit fixed keyboard issues with the KVM. <sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">KVM and bhyve are well-established hypervisors with significant development effort over the last decade, making them suitable recommendations for modern use. (user-37ee, 2020-08-06, exchange 10429, check: uncheckable)</li>
+<li id="s2">KVM and bhyve are used for VMs. (user-7b1c, 2022-06-02, exchange 29655, check: uncheckable)</li>
+<li id="s3">proxmox uses kvm and lxc containers (user-8560, 2020-07-25, exchange 10023, check: uncheckable)</li>
+<li id="s4">QEMU without KVM is only good for different architectures or really old OSes. (user-1446, 2020-11-25, exchange 12412, check: uncheckable)</li>
+<li id="s5">OpenVZ limits optimization potential due to lack of kernel control. (user-22f9, 2019-02-08, exchange 506, check: uncheckable)</li>
+<li id="s6">VMs are not always well-integrated with the host system, with KVM being an exception. (user-22f9, 2019-06-01, exchange 1865, check: uncheckable)</li>
+<li id="s7">KVMs struggle with connecting diverse hardware. (user-b7c4, 2020-04-15, exchange 7523, check: uncheckable)</li>
+<li id="s8">KVM can run multiple GPUs, but they must be from the same vendor. (user-7b1c, 2020-06-24, exchange 9200, check: uncheckable)</li>
+<li id="s9">KVM can mix Intel and AMD by downgrading the CPU to a generic x64, while EVC masks CPUID features to provide a common baseline. (user-b1da, 2022-04-20, exchange 234005, check: uncheckable)</li>
+<li id="s10">Linux was first to hide CPUID in KVM, possibly before KVM was mainlined. (user-37ee, 2020-06-24, exchange 9201, check: uncheckable)</li>
+<li id="s11">Dilos supports KVM and SPARC. (user-cade, 2020-08-30, exchange 10812, check: uncheckable)</li>
+<li id="s12">IRIX switches keyboards into scancode 3, many kvms dont like it to begin with. (user-3e2d, 2026-07-21, exchange 214231, check: supported)</li>
+<li id="s13">The only reliable kvms are old datacenter avocent and such that was designed to work with IRIX. (user-3e2d, 2026-07-21, exchange 214231, check: uncheckable)</li>
+<li id="s14">The keyboard issues persist with and without the KVM, and the symptoms are consistent across different firmware versions. (user-21b8, 2026-07-24, exchange 214254, check: uncheckable)</li>
+<li id="s15">Swapping a SIP module with different firmware made the KVM work properly. (user-616d, 2026-07-24, exchange 214255, check: uncheckable)</li>
+<li id="s16">Adding error parity error checking and checking for a valid start bit fixed keyboard issues with the KVM. (user-21b8, 2026-07-24, exchange 214255, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="kvm-switch.html">KVM switch</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Processors: <a href="sparc.html">SPARC</a>
+</li>
+<li>Graphics: <a href="gpu-passthrough.html">GPU passthrough</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="win2k.html">Win2k</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="proxmox.html">Proxmox</a>, <a href="qemu.html">QEMU</a>, <a href="firmware-version.html">firmware version</a>
+</li>
+<li>Parts and peripherals: <a href="keyboard.html">keyboard</a>, <a href="ps-2-keyboard.html">PS/2 keyboard</a>, <a href="13w3-port.html">13W3 port</a>, <a href="13w3-to-vga-adapter.html">13W3 to VGA adapter</a>, <a href="pi-keyboard.html">PI keyboard</a>, <a href="usb-port.html">USB port</a>, <a href="mice.html">mice</a>, <a href="video.html">video</a>
+</li>
+<li>Standards and interfaces: <a href="usb.html">USB</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="amd.html">AMD</a>, <a href="intel.html">Intel</a>, <a href="nvidia.html">Nvidia</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="bhyve.html">bhyve</a>, <a href="cpuid.html">CPUID</a>, <a href="edid.html">EDID</a>, <a href="openvz.html">OpenVZ</a>, <a href="ps-2-to-usb-converter.html">PS/2 to USB converter</a>, <a href="r210-ii.html">R210 II</a>, <a href="vt320.html">VT320</a>, <a href="keyboard-mouse.html">keyboard/mouse</a>, <a href="scan-code-set-3.html">scan code set 3</a>
+</li></ul>
+</body>
+</html>

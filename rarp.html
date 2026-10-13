@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RARP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RARP</h1>
+<p>Claims: 7</p>
+<ul>
+<li>RARP maps a MAC address to an IP address, the reverse of ARP. (user-7b1c, exchange 239486, 2022-01-11; 1 speaker(s), 1 conversation(s))
+</li>
+<li>RARP does not supply the netmask, leading to the broadcast address being derived from the IP address using the class A/B/C schema, which can result in incorrect broadcast addresses in certain networks. (user-ab99, exchange 206315, 2022-01-26; 1 speaker(s), 1 conversation(s))
+</li>
+<li>If you're not getting an IP, though, it's a RARP problem. I might be able to help debug that? For RARP, you'll need to make sure the client and server are on the same segment - same VLAN, etc, no router between them. RAR (user-7b1c, exchange 239767, 2022-07-09; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Setting up a Linux jumpserver for Solaris involves configuring TFTP, RARP, BOOTPARAM, and NFS, and ensuring direct cable connection for netbooting. (user-2189, exchange 203666, 2019-01-29; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The kernel determines IP addresses via RARP on SGI machines, as evidenced by entries in `/etc/ethers` on DNS, DHCP, and Bootparams servers. (user-6e7b, exchange 90498, 2026-04-26; 1 speaker(s), 1 conversation(s))
+</li>
+<li>SPARC netboot uses RARP instead of DHCP and loads a kernel by converting the IP address to hex; Solaris install server script handles this. (user-7b1c, exchange 239972, 2023-03-01; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Jumpstart uses TFTP to load data over the network, with ARP/RARP for connection establishment. (user-7151, exchange 239915, 2022-12-11; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="sparc.html">SPARC</a>
+</li>
+<li>Operating systems: <a href="kernel.html">kernel</a>, <a href="netboot.html">netboot</a>
+</li>
+<li>Standards and interfaces: <a href="tftp.html">TFTP</a>, <a href="dhcp.html">DHCP</a>, <a href="ip-address.html">IP address</a>, <a href="nfs.html">NFS</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="arp.html">ARP</a>, <a href="jumpstart.html">Jumpstart</a>
+</li></ul>
+</body>
+</html>

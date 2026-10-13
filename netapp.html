@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetApp</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NetApp</h1>
+<p>Claims: 13</p>
+<p>NetApp creates a filesystem (WAFL) on top of RAID on whatever disks you put in an aggregate, and you can make a volume that serves as a filesystem for NAS or create a LUN in a volume presented via iSCSI or FC. <sup><a href="#s1">1</a></sup> NetApp does not use dedicated hardware for RAID; it runs as a dedicated and isolated process in the OS, and its RAID-DP implementation (RAID 6, dual parity) is solid. <sup><a href="#s2">2</a></sup> By 2007, NetApp had FC backplanes and allowed mixing drive speeds and sizes within an enclosure, whereas early EMC used spindle sync. <sup><a href="#s3">3</a></sup> Hitachi and NetApp branded SSDs sometimes lack the ability to set sector size, requiring careful low-level formatting, and some older NetApp drives show 520B/sector. <sup><a href="#s4">4</a></sup> Reformatting NetApp and EMC HDDs to 512-byte sectors usually works, but some SAS disks may fail if not zeroed first. <sup><a href="#s5">5</a></sup> FusionIO cards have 75PBW endurance on SLC flash and were OEMed by Sandisk and NetApp. <sup><a href="#s6">6</a></sup> The Indy can connect to a NetApp via 10Gb Ethernet with NFS, but it has buffering and TCP flow control issues. <sup><a href="#s7">7</a></sup> NetApp can run with one socket and half the RAM. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NetApp creates a filesystem (WAFL) on top of RAID on whatever disks you put in an aggregate. You make a volume that can be a filesystem for NAS, or you create a LUN in a volume and then present the LUN via iSCSI or FC or (user-07ed, 2021-11-16, exchange 22202, check: uncheckable)</li>
+<li id="s2">NetApps don't have dedicated hardware for RAID; it is a dedicated and isolated process in the OS. Their RAID-DP implementation (RAID 6, dual parity) is solid. (user-07ed, 2021-11-16, exchange 22202, check: supported)</li>
+<li id="s3">Early EMC used spindle sync, but by 2007, NetApp had FC backplanes and allowed mixing drive speeds and sizes within an enclosure. (user-07ed, 2022-03-17, exchange 206683, check: supported)</li>
+<li id="s4">Hitachi and NetApp branded SSDs sometimes lack the ability to set sector size, requiring careful low-level formatting; FC disks can be very cheap, and some older NetApp drives also show 520B/sector. (user-86e1, 2024-08-27, exchange 224071, check: supported)</li>
+<li id="s5">Reformatting NetApp and EMC HDDs to 512-byte sectors usually works, but some SAS disks may fail if not zeroed first. (user-07ed, 2026-04-05, exchange 122466, check: supported)</li>
+<li id="s6">FusionIO cards have 75PBW endurance on SLC flash and were OEMed by Sandisk and NetApp. (user-b1da, 2021-01-20, exchange 13963, check: supported)</li>
+<li id="s7">The Indy can connect to a NetApp via 10Gb Ethernet with NFS, but it has buffering and TCP flow control issues. (user-07ed, 2024-10-04, exchange 224125, check: supported)</li>
+<li id="s8">NetApp can run with one socket and half the RAM. (user-07ed, 2025-02-27, exchange 115073, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Parts and peripherals: <a href="ssd.html">SSD</a>, <a href="fc-backplane.html">FC backplane</a>, <a href="fc-disks.html">FC disks</a>, <a href="fusionio-cards.html">FusionIO cards</a>, <a href="nas.html">NAS</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="raid.html">RAID</a>
+</li>
+<li>Other: <a href="emc.html">EMC</a>, <a href="trunas.html">TruNAS</a>, <a href="truenas-scale.html">TrueNAS Scale</a>
+</li></ul>
+</body>
+</html>

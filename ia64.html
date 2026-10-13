@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IA64</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IA64</h1>
+<p>Claims: 83 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Linux_kernel">Linux kernel</a>, <a href="https://en.wikipedia.org/wiki/Video_games_and_Linux">Video games and Linux</a>.</p>
+<h2 id="with-hp">With HP</h2>
+<p>HP-UX for IA-64 supports user-level virtualization. <sup><a href="#s1">1</a></sup> HP-UX is considered a decent choice for IA64, though CDE can be problematic and PA2.0 CPUs provide full 64-bit support. <sup><a href="#s2">2</a></sup> HP 9000 containers for HP-UX on ia64 are available for download as part of the general SRP package from HPE, but not all versions are supported, and they are also available from tenox.pdp-11.ru. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> There should be a PA-RISC to IA64 translation layer baked in HP-UX. <sup><a href="#s5">5</a></sup></p>
+<h2 id="general">General</h2>
+<p>IA64 is a VLIW architecture that was abandoned in 1999 in favor of RISC ports. <sup><a href="#s6">6</a></sup> The architecture was marked as orphaned in the Linux kernel. <sup><a href="#s7">7</a></sup> Debian dropped ia64 support, and GCC has dropped ia64 support in its last release. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Gentoo is the only up-to-date distro for IA-64, though it is difficult to use and lacks kernel support. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The compilers for IA-64 included Intel for Windows and Linux, Microsoft Visual C++ for Windows, GCC for Linux/FreeBSD/HP-UX, aCC for HP-UX, and Open64 for Linux. <sup><a href="#s12">12</a></sup> There is no known LLVM/Clang support for IA64. <sup><a href="#s13">13</a></sup> OpenVMS 8.x and 9.x are limited to Alpha/IA64 processors, and there's now an AMD64 version but it's less known. <sup><a href="#s14">14</a></sup> The x86 VMS license is available through the hobbyist program for Alpha or IA64 systems. <sup><a href="#s15">15</a></sup> Building modern software on IA64 is difficult, as gcc cannot be built on HP-UX 11.23 ia64 and building the Linux kernel can result in an internal compiler error even with a cross toolchain. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> The main patch set to re-enable ia64 for Linux 6.7 is available on GitHub. <sup><a href="#s18">18</a></sup> SUSE 9 on IA64 is supported by the SLES 9 SP3 installer kernel, with kernel sources available in the CD6 ISO. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Intel compilers on IA64 produced faster code than gcc. <sup><a href="#s21">21</a></sup> The file system is not compatible with IA64 systems due to different firmware requirements. <sup><a href="#s22">22</a></sup> CPU speed impacts software performance based on compiler optimizations; SGI's Berkeley architecture has a register window system that limits visible registers per cycle; IA64 and MIPS, Alpha, PowerPC, ARM are Stanford RISC. <sup><a href="#s23">23</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">HP-UX for IA-64 supports user-f9d4 virtualization. (user-7b1c, 2020-04-23, exchange 7735, check: supported)</li>
+<li id="s2">HP-UX is a decent choice for IA64, though CDE can be problematic. PA2.0 CPUs provide full 64-bit support. (user-b1da, 2020-10-01, exchange 11291, check: supported)</li>
+<li id="s3">HP 9000 containers for HP-UX on ia64 are available for download as part of the general SRP package from HPE, but not all versions are supported. (user-ba81, 2021-10-22, exchange 161317, check: supported)</li>
+<li id="s4">HP 9000 containers for HP-UX on ia64 are also available from tenox.pdp-11.ru. (user-ba81, 2021-10-22, exchange 161317, check: supported)</li>
+<li id="s5">There should be a PA-RISC to IA64 translation layer baked in HP-UX. (user-7b1c, 2022-05-19, exchange 216434, check: uncheckable)</li>
+<li id="s6">IA64 is VLIW and was abandoned in 1999 for RISC ports. (user-585b, 2019-11-14, exchange 4199, check: supported)</li>
+<li id="s7">The ia64 architecture was marked as orphaned in the Linux kernel. (user-f229, 2021-02-01, exchange 75634, check: uncheckable)</li>
+<li id="s8">gcc is actually dropping ia64. (user-f9d4, 2019-12-07, exchange 95911, check: uncheckable)</li>
+<li id="s9">GCC dropped IA64 support in its last release. (user-1361, 2022-02-25, exchange 26415, check: uncheckable)</li>
+<li id="s10">Gentoo is the only up-to-date distro for IA-64, but it is difficult to use. (user-1446, 2020-01-17, exchange 216283, check: supported)</li>
+<li id="s11">Gentoo still technically supports IA64 builds but lacks kernel support. (user-59b9, 2020-09-02, exchange 75353, check: uncheckable)</li>
+<li id="s12">The compilers for IA-64 included Intel for Windows and Linux, Microsoft Visual C++ for Windows, GCC for Linux/FreeBSD/HP-UX, aCC for HP-UX, and Open64 for Linux. HP shipped GCC with HP-UX. (user-1446, 2020-09-30, exchange 11280, check: supported)</li>
+<li id="s13">There is no known LLVM/Clang support for IA64. (user-5510, 2022-05-23, exchange 161963, check: uncheckable)</li>
+<li id="s14">OpenVMS 8.x and 9.x are limited to Alpha/IA64 processors, and there's now an AMD64 version but it's less known. (user-7b1c, 2023-03-27, exchange 74429, check: supported)</li>
+<li id="s15">The x86 VMS license is available through the hobbyist program for Alpha or IA64 systems. (user-2047, 2023-04-03, exchange 235338, check: uncheckable)</li>
+<li id="s16">I have yet to find a way to build any modern gcc on HP-UX 11.23 ia64. (user-03ad, 2023-05-30, exchange 215386, check: supported)</li>
+<li id="s17">Building the Linux kernel for ia64 can result in an ICE even with a cross toolchain, which is unusual. (user-1446, 2023-08-14, exchange 75949, check: uncheckable)</li>
+<li id="s18">The main patch set to re-enable ia64 for Linux 6.7 is available on GitHub. (user-6e7b, 2023-12-11, exchange 43089, check: supported)</li>
+<li id="s19">The SLES 9 SP3 installer kernel supports the ia64 hardware. (user-5906, 2024-09-13, exchange 216499, check: supported)</li>
+<li id="s20">The kernel sources for SUSE 9 on IA64 can be found in the CD6 ISO. (user-6e7b, 2024-09-13, exchange 216500, check: supported)</li>
+<li id="s21">Intel compilers on IA64 produced faster code than gcc. (user-03ad, 2025-01-03, exchange 51870, check: uncheckable)</li>
+<li id="s22">The file system is not compatible with IA64 systems due to different firmware requirements. (user-22f9, 2025-01-17, exchange 52807, check: uncheckable)</li>
+<li id="s23">CPU speed impacts software performance based on compiler optimizations; SGI's Berkeley architecture has a register window system that limits visible registers per cycle; IA64 and MIPS, Alpha, PowerPC, ARM are Stanford R1 (user-22f9, 2025-02-05, exchange 114497, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ia64-architecture.html">IA64 architecture</a> (4)
+</li>
+<li><a href="ia64-linux.html">IA64 Linux</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="prism.html">Prism</a>, <a href="altix.html">Altix</a>, <a href="server-2003.html">Server 2003</a>, <a href="tezro.html">Tezro</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Processors: <a href="pa-risc.html">PA-RISC</a>, <a href="itanium.html">Itanium</a>, <a href="alpha-cpu.html">Alpha CPU</a>, <a href="mips.html">MIPS</a>, <a href="x86.html">x86</a>
+</li>
+<li>Operating systems: <a href="vms.html">VMS</a>, <a href="sles11.html">SLES11</a>, <a href="windows.html">Windows</a>, <a href="debian.html">Debian</a>, <a href="gentoo.html">Gentoo</a>, <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="aix.html">AIX</a>, <a href="debian-6.html">Debian 6</a>, <a href="debian-7.html">Debian 7</a>, <a href="linux-kernel.html">Linux kernel</a>, <a href="openvms.html">OpenVMS</a>, <a href="propack.html">ProPack</a>, <a href="propack-7.html">ProPack 7</a>, <a href="sles-10.html">SLES 10</a>, <a href="sles-9-sp3.html">SLES 9 SP3</a>, <a href="windows-xp.html">Windows XP</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="gnu-linux.html">GNU/Linux</a>, <a href="mathematica.html">Mathematica</a>, <a href="c-2.html">C</a>, <a href="c.html">C++</a>, <a href="cde.html">CDE</a>, <a href="hpe.html">HPE</a>, <a href="half-life.html">Half-Life</a>, <a href="ida-pro.html">IDA Pro</a>, <a href="minecraft.html">Minecraft</a>, <a href="binutils.html">binutils</a>, <a href="package.html">package</a>, <a href="radeon-driver.html">radeon driver</a>
+</li>
+<li>Parts and peripherals: <a href="card.html">card</a>
+</li>
+<li>Standards and interfaces: <a href="pci-x.html">PCI-X</a>, <a href="x.html">X</a>, <a href="x86-64.html">x86_64</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="dec.html">DEC</a>, <a href="gcc.html">GCC</a>, <a href="sgi.html">SGI</a>, <a href="amd64.html">AMD64</a>, <a href="hp-rx4610.html">HP rx4610</a>, <a href="intel.html">Intel</a>, <a href="nvidia.html">Nvidia</a>
+</li>
+<li>Other: <a href="acc.html">aCC</a>, <a href="3d-performance.html">3D performance</a>, <a href="c-11.html">C++11</a>, <a href="hp-ux-11-23.html">HP-UX 11.23</a>, <a href="hp-ux-11-31.html">HP-UX 11.31</a>, <a href="ia-32.html">IA-32</a>, <a href="suse-9.html">SUSE 9</a>, <a href="ski.html">Ski</a>, <a href="vsi.html">VSI</a>, <a href="dual-agp.html">dual AGP</a>, <a href="fglrx.html">fglrx</a>, <a href="hypervisor.html">hypervisor</a>
+</li></ul>
+</body>
+</html>

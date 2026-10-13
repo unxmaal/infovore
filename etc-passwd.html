@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/etc/passwd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/etc/passwd</h1>
+<p>Claims: 17 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash (Unix shell)</a>.</p>
+<p>Editing /etc/passwd can change a user's default shell by setting the last field to the path of bash, then logging out and back in, or by using the vi editor to make the change (including clearing a password hash by setting it to ::). <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> This can be done by starting an installation and using the admin menu to open a shell, booting miniroot from the network, or booting into single user mode, which on IRIX requires a second disk and then mounting the root disk. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> On IRIX, editing /etc/passwd in single user mode can clear a forgotten password, and the system uses /etc/passwd without a shadow file by default, storing the password hash directly in the file. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The IRIX system uses a specific hashing mechanism for passwords, and a corrupted /etc/passwd with a messed-up hash can prevent a machine such as an Octane from starting, which may be fixed by restoring an old /etc/passwd file. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> On macOS, changing the user shell requires modifying a plist file rather than /etc/passwd. <sup><a href="#s10">10</a></sup> The login window excludes accounts with a locked password field in /etc/passwd, and checking the file might reveal information about the system's configuration. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Editing /etc/passwd directly can cause issues with system files, and modifying the root user's home directory to point to /root/ ensures /root/.cshrc is used instead of /.cshrc, though incorrect paths can cause issues with sudo and other commands. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> /etc/passwd contains an entry for the demos user, and there is an .icons directory in /usr/demos with relevant files. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To set bash as the default shell for a user, edit the user's entry in /etc/passwd and change the last field to the path of bash, then log out and back in. (user-b7c4, 2019-11-27, exchange 4394, check: uncheckable)</li>
+<li id="s2">The vi editor can be used to modify the /etc/passwd file, such as clearing the password hash by changing it to ::. (user-e4d0, 2024-04-27, exchange 111065, check: uncheckable)</li>
+<li id="s3">You can start an installation and use the admin menu to start a shell to edit /etc/passwd. (user-ba81, 2020-04-29, exchange 216909, check: uncheckable)</li>
+<li id="s4">You can boot miniroot from the network and edit /etc/passwd to gain access. (user-24f0, 2024-04-27, exchange 111057, check: uncheckable)</li>
+<li id="s5">IRIX requires a second disk to boot in single user mode and then allows mounting the root disk to edit the /etc/passwd file. (user-f229, 2020-12-20, exchange 13061, check: uncheckable)</li>
+<li id="s6">Booting into single user mode and editing /etc/passwd can clear a forgotten password in IRIX. (user-bba0, 2024-07-15, exchange 210656, check: uncheckable)</li>
+<li id="s7">The IRIX system uses /etc/passwd and does not use a shadow file by default. (user-9860, 2021-10-20, exchange 21304, check: uncheckable)</li>
+<li id="s8">The IRIX operating system uses a specific hashing mechanism for passwords, and the `/etc/passwd` file contains the hash when the shadow file is not enabled. (user-e872, 2022-12-22, exchange 208120, check: supported)</li>
+<li id="s9">Octane cannot start due to a corrupted /etc/passwd file with a messed-up hash; restoring an old /etc/passwd file may fix the issue. (user-6dfb, 2024-11-24, exchange 50859, check: supported)</li>
+<li id="s10">Changing the user shell on macOS requires modifying a plist file rather than /etc/passwd. (user-1361, 2022-03-12, exchange 27162, check: uncheckable)</li>
+<li id="s11">The login window excludes accounts with a locked password field in /etc/passwd. (user-b1da, 2024-06-11, exchange 210460, check: uncheckable)</li>
+<li id="s12">Checking /etc/passwd might reveal information about the system's configuration. (user-8547, 2024-04-28, exchange 111080, check: uncheckable)</li>
+<li id="s13">Editing /etc/passwd directly can change the default shell, but may cause issues with system files. (user-6afa, 2020-07-19, exchange 9744, check: uncheckable)</li>
+<li id="s14">Modifying the root user's home directory to point to /root/ in /etc/passwd ensures /root/.cshrc is used instead of /.cshrc. Incorrect paths can cause issues with sudo and other commands. (user-2a3c, 2025-10-26, exchange 213259, check: uncheckable)</li>
+<li id="s15">/etc/passwd contains an entry for the demos user, and there is an .icons directory in /usr/demos with relevant files. (user-8547, 2024-03-10, exchange 223764, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="single-user-mode.html">single user mode</a>, <a href="macos.html">macOS</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>, <a href="installation.html">installation</a>, <a href="shell.html">shell</a>
+</li>
+<li>Parts and peripherals: <a href="network.html">network</a>, <a href="root-disk.html">root disk</a>
+</li>
+<li>Other: <a href="admin-menu.html">admin menu</a>, <a href="icons.html">icons</a>
+</li></ul>
+</body>
+</html>

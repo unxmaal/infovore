@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>grep</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>grep</h1>
+<p>Claims: 11</p>
+<p>grep is a Unix tool used for searching text, and it is more efficient than writing scripts in languages like Clojure for simple tasks. <sup><a href="#s1">1</a></sup> It is a dependency for building git with Didbs, alongside diffutils, ncurses, bash, openssl, curl, tk, and expat. <sup><a href="#s2">2</a></sup> Common uses include verifying the environment by checking for specific versions, finding instances of a string in a build tree, and locating ELF files in a directory. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> A variant, GrepWIn, is a Windows version of grep. <sup><a href="#s6">6</a></sup> The gmake check for grep can fail on IRIX due to missing tests or system Perl differences, and some systems lack GNU grep with the -R option. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> pcrecpp and grep build successfully with no regressions. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Unix tools like grep, sort, and uniq are more efficient for simple tasks compared to writing scripts in languages like Clojure. (user-cd7d, 2022-01-05, exchange 206191, check: uncheckable)</li>
+<li id="s2">The dependencies for building git with Didbs include diffutils, grep, ncurses, bash, openssl, curl, tk, and expat. (user-2d09, 2019-09-30, exchange 67968, check: uncheckable)</li>
+<li id="s3">To verify the environment, run 'versions -n' and check for specific versions using 'grep'. (user-2189, 2019-01-19, exchange 146, check: uncheckable)</li>
+<li id="s4">`grep -rni '\/usr\/bin\/python'` finds instances of /usr/bin/python in the build tree. (user-cd7d, 2020-06-16, exchange 68707, check: supported)</li>
+<li id="s5">To find all ELF files in a directory, use `find -print0 | xargs -0 -n5 file | grep ELF` to process file names with spaces safely in batches. (user-07ed, 2022-05-07, exchange 28906, check: supported)</li>
+<li id="s6">Grep can quickly find files; GrepWIn is a Windows version. (user-281e, 2024-10-07, exchange 49636, check: uncheckable)</li>
+<li id="s7">The gmake check for grep can fail on IRIX due to missing tests or system Perl differences. (user-42cf, 2019-02-05, exchange 67001, check: uncheckable)</li>
+<li id="s8">The system does not have GNU `grep` with the -R option. (user-b7c4, 2019-11-26, exchange 78030, check: supported)</li>
+<li id="s9">pcrecpp and grep build successfully with no regressions. (user-2d09, 2020-02-20, exchange 214936, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="alpha-firmware.html">Alpha firmware</a>, <a href="bash.html">bash</a>, <a href="file.html">file</a>, <a href="gmake.html">gmake</a>, <a href="ncurses.html">ncurses</a>
+</li>
+<li>Other: <a href="awk.html">awk</a>, <a href="find.html">find</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>emulator</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>emulator</h1>
+<p>Claims: 63 Background: 5 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Emulator">Emulator</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>An emulator is a program that emulates hardware, and emulators can be modular, allowing for external modules with copyright retained by the author. <sup><a href="#s1">1</a></sup> Some emulators use software emulation, which is slower, while others can use JIT to speed up graphics and memory access. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Emulators are often single-threaded and slow due to the complexity of emulating all the hardware. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Some emulators can be overclocked to reduce load times and improve performance. <sup><a href="#s6">6</a></sup> Emulators can support various interfaces and features, such as NFS file sharing, UltraSCSI, and single-step instruction debugging. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Emulators can be used to run a variety of systems and software, including IRIX, NetBSD, and arcade games. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Using the release build of the emulator is recommended for actual use, as debug builds are too slow. <sup><a href="#s13">13</a></sup> The emulator can be optimized and extended with additional render passes for post-processing effects. <sup><a href="#s14">14</a></sup> The emulator now uses SDL_Scancode for keyboard input, allowing correct key detection for non-QWERTY layouts like de_CH. <sup><a href="#s15">15</a></sup> A user can shim libraries to intercept OpenGL code and use local hardware, bypassing the emulator stack, by converting endianness. <sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">An emulator can be modular, allowing for external modules with full copyright retained by the author. (user-ff99, 2022-05-30, exchange 235172, check: uncheckable)</li>
+<li id="s2">The Irix emulator uses software emulation, which is slower. (user-580a, 2021-03-31, exchange 16049, check: uncheckable)</li>
+<li id="s3">The emulator's memory access speed is limited by instruction emulation speed, but DMA completes faster, and graphics can be faster with Rex-JIT. (user-3e2d, 2026-06-20, exchange 220474, check: uncheckable)</li>
+<li id="s4">The emulator is slow due to the complexity of emulating all the hardware. (user-6afa, 2020-07-12, exchange 9560, check: uncheckable)</li>
+<li id="s5">The emulator is single-threaded. (user-6afa, 2020-07-12, exchange 9560, check: uncheckable)</li>
+<li id="s6">Overclocking the MAME emulator reduced the load time from 8 minutes to about 1 minute, allowing real-time mouse operation. (user-f8d5, 2022-12-05, exchange 208025, check: supported)</li>
+<li id="s7">The Indy emulator supports NFS file sharing using unfs3, which sets up a local share that can be mounted from IRIX from the gateway. (user-3e2d, 2026-04-04, exchange 93771, check: supported)</li>
+<li id="s8">The emulator could support UltraSCSI or Wide-SCSI3 interfaces, with a microcontroller nearly as powerful as an R10k. (user-1361, 2022-03-13, exchange 27211, check: supported)</li>
+<li id="s9">The emulator can single-step through MIPS instructions and emulate some programs, but lacks branch delay slot handling. (user-3e2d, 2026-03-07, exchange 62503, check: uncheckable)</li>
+<li id="s10">The emulator is intended to run IRIX, so it should not ship with a Linux or BSD disk image. (user-7973, 2026-06-11, exchange 220456, check: uncheckable)</li>
+<li id="s11">NetBSD can be bootstrapped on the emulator for CI automation and package building. (user-231e, 2026-04-29, exchange 220416, check: uncheckable)</li>
+<li id="s12">The R5K core in the emulator is good enough to play arcade games but not to boot IRIX. (user-b7c4, 2019-09-07, exchange 3381, check: supported)</li>
+<li id="s13">Using the release build of the emulator is recommended for actual use, as debug builds are too slow. (user-d251, 2026-08-14, exchange 220629, check: uncheckable)</li>
+<li id="s14">The emulator can be optimized and extended with additional render passes for post-processing effects. (user-d251, 2026-08-14, exchange 220629, check: uncheckable)</li>
+<li id="s15">The emulator now uses SDL_Scancode for keyboard input, allowing correct key detection for non-QWERTY layouts like de_CH. (user-7973, 2026-08-16, exchange 220633, check: uncheckable)</li>
+<li id="s16">A user can shim libraries to intercept OpenGL code and use local hardware, bypassing emulator stack, by converting endianness. (user-50e0, 2026-09-15, exchange 220691, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="amiga.html">Amiga</a>, <a href="ps1.html">PS1</a>, <a href="4d-20.html">4D/20</a>, <a href="microvax.html">MicroVAX</a>, <a href="o2.html">O2</a>, <a href="pc.html">PC</a>, <a href="ps3.html">PS3</a>
+</li>
+<li>Processors: <a href="68040.html">68040</a>, <a href="mips-nt.html">MIPS NT</a>, <a href="mips-instructions.html">MIPS instructions</a>, <a href="pa-risc.html">PA-RISC</a>, <a href="r10000.html">R10000</a>, <a href="r3000-cpu.html">R3000 CPU</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="netbsd.html">NetBSD</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="game.html">game</a>, <a href="gui.html">GUI</a>, <a href="jit.html">JIT</a>, <a href="mipspro-compiler.html">MIPSpro compiler</a>, <a href="n64.html">N64</a>, <a href="n64-sdk.html">N64 SDK</a>, <a href="opengl.html">OpenGL</a>, <a href="arcade-games.html">arcade games</a>
+</li>
+<li>Parts and peripherals: <a href="nic.html">NIC</a>, <a href="vampire.html">Vampire</a>, <a href="memory-map.html">memory map</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="arcs-bios.html">ARCS BIOS</a>, <a href="dma.html">DMA</a>, <a href="ftp.html">FTP</a>, <a href="serial.html">serial</a>
+</li>
+<li>Companies: <a href="cray.html">Cray</a>, <a href="sgi.html">SGI</a>, <a href="sgi-media-player.html">SGI media player</a>
+</li>
+<li>Other: <a href="3000.html">3000</a>, <a href="aic7880.html">AIC7880</a>, <a href="dhrystone.html">Dhrystone</a>, <a href="homebrew.html">Homebrew</a>, <a href="rex-jit.html">Rex JIT</a>, <a href="threadripper.html">Threadripper</a>, <a href="ultrascsi.html">UltraSCSI</a>, <a href="vmscluster.html">VMScluster</a>, <a href="clip.html">clip</a>, <a href="exploit.html">exploit</a>, <a href="flash-cart.html">flash cart</a>, <a href="host.html">host</a>, <a href="overclocking.html">overclocking</a>, <a href="parallel.html">parallel</a>, <a href="source.html">source</a>, <a href="unfs3.html">unfs3</a>
+</li></ul>
+</body>
+</html>

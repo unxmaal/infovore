@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.xinitrc</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>.xinitrc</h1>
+<p>Claims: 3</p>
+<p>The .xinitrc file can be used to set locale environment variables and load necessary fonts. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Setting the Japanese EUC-JP locale environment in .xinitrc ensures Japanese text displays correctly in CDE. <sup><a href="#s2">2</a></sup> Setting locale variables in .xinitrc ensures the window title is correctly displayed. <sup><a href="#s1">1</a></sup> The feh command in .xinitrc does not display the wallpaper on the first startx invocation after boot, but works on subsequent invocations. <sup><a href="#s3">3</a></sup> Moving the feh command to WindowMaker's autostart file fixes the wallpaper display issue. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Running Framemaker with the correct locale environment variables in a terminal might fix the text display, but setting these variables in the .xinitrc ensures the window title is correctly displayed. (user-aac7, 2026-09-12, exchange 240934, check: uncheckable)</li>
+<li id="s2">The .xinitrc file can be used to set the Japanese EUC-JP locale environment and load necessary fonts for Japanese text display in CDE. (user-aac7, 2026-09-12, exchange 240934, check: uncheckable)</li>
+<li id="s3">The feh command in xinitrc does not display the wallpaper on the first `startx` invocation after boot, but works correctly on subsequent invocations; moving the command to WindowMaker's autostart file fixes the issue. (user-7151, 2022-08-06, exchange 234093, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="framemaker.html">FrameMaker</a>
+</li>
+<li>Other: <a href="feh.html">feh</a>, <a href="font.html">font</a>
+</li></ul>
+</body>
+</html>

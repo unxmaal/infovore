@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>termpwr</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>termpwr</h1>
+<p>Claims: 3</p>
+<p>The Sun3's TERMPWR should be set to 21-22 on and 23-24 off to power terminators internally, or to 23-24 open and 21-22 short to enable termination by the drive. <sup><a href="#s1">1</a></sup> There are different 68-to-50 pin SCSI adapters, and the high byte termination needs to connect to TERMPWR on the correct ones, as they are not all created equal. <sup><a href="#s2">2</a></sup> Enabling TERMPWR from the CD-ROM drive resolved SCSI issues in one case. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Sun3's TERMPWR should be set to 21-22 on, 23-24 off to power terminators internally, with 23-24 open and 21-22 short to enable termination by the drive. (user-d903, 2021-04-20, exchange 180708, check: supported)</li>
+<li id="s2">That will work, there are however 'different' 68 - 50 pin scsi adapters, the high byte termination needs to go to termpwr on the correct ones - they're not all created equal it seems (user-c799, 2024-12-30, exchange 224349, check: supported)</li>
+<li id="s3">Enabling termpwr from the CDROM drive resolved SCSI issues in one case. (user-24f0, 2025-09-30, exchange 118934, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="cd-rom-drive.html">CD-ROM drive</a>, <a href="sun3.html">Sun3</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sgug-rse</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sgug-rse</h1>
+<p>Claims: 92</p>
+<h2 id="with-nekoware">With nekoware</h2>
+<p>SGUG-RSE is a project for installing software on IRIX, succeeding nekoware, which had replaced SGI's freeware package. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SGUG-RSE uses RPMs for software packages, whereas nekoware is the work of many people (some newer but much outdated, with dependencies harder to figure out) and tgcware is one person's work that is not updated but has dependencies in one place. <sup><a href="#s3">3</a></sup> The package search tool can find software in nekoware, sgug-rse, and sgi-freeware, and is available in the sginet-client CLI. <sup><a href="#s4">4</a></sup> Some software is available through multiple sources: dosbox is in SGUG-RSE but not available via tdnf (users should use the nekoware version that works with SDL1.x), and minicom can be found on nekoware or sgug-rse. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Installing 'man' from SGUG RSE or nekoware can cause formatting issues and converter errors, rendering manpages unusable, so users may need to revert to the default manpages. <sup><a href="#s7">7</a></sup> user-d903 promised user-f229 to push updates to booterizer for sgug-rse to eliminate nekoware. <sup><a href="#s8">8</a></sup></p>
+<h2 id="general">General</h2>
+<p>SGUG-RSE is an RPM-based distribution for IRIX 6.5 that provides modern packages and compilers, including GCC 9.2.0, so that a GNU compiler suite can be used instead of MIPSpro. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> It consists of Fedora Core 31 SRPMs that have been lightly modified to build and function on IRIX 6.5.30, plus Dan's IRIX Compatibility Library (DICL), and any SRPM could serve as a base. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The project is most active in its wip branch, and its spec files can be found in the sgug-rse-wip GitHub repository. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> It has a stable build with many packages available, though it may have some glitches. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> SGUG-RSE is a repository of software for IRIX 6.5.x, built with modern bash and gcc. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> Installation involves extracting archives under /usr as root, adding /usr/sgug/bin to your path, and launching sgugshell, which is required to use the packages. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> The installation directory /usr/sgug should not be modified outside of itself, and sgug-rse is used only when needed rather than added to shell startup files by default. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> The repository includes Barrier, netsurf-motif, Worker, XMMS, and SDL2 version 2.0.12 with patches. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> SGUG-RSE uploads HINV data to a website and optionally counts uptime. <sup><a href="#s31">31</a></sup> The SGUG-RSE project relates to compiling the IRIX-dev branch, which should work on an Octane2 if a binary is available. <sup><a href="#s32">32</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">nekoware was available until 2020, and sgug-rse is a project for installing software on IRIX. (user-22f9, 2023-10-11, exchange 41411, check: supported)</li>
+<li id="s2">freeware was a package of free software SGI was maintaining early on, replaced by nekoware, which was replaced by sgug-rse. (user-8547, 2024-06-12, exchange 218441, check: uncheckable)</li>
+<li id="s3">tgcware is one person's work, not updated, but dependencies are in one place; nekoware is many people's work, some newer but much outdated, with dependencies harder to figure out; SGUG-RSE uses RPMs for software packages (user-d903, 2020-06-07, exchange 8895, check: uncheckable)</li>
+<li id="s4">The package search tool can find software in nekoware, sgug-rse, and sgi-freeware, and is available in the sginet-client CLI. (user-7973, 2026-02-25, exchange 213705, check: uncheckable)</li>
+<li id="s5">dosbox is in SGUG-RSE, but not available via tdnf; use the one from nekoware that works with SDL1.x. (user-7973, 2024-08-25, exchange 210859, check: uncheckable)</li>
+<li id="s6">minicom can be found on nekoware or sgug-rse. (user-2a3c, 2025-10-27, exchange 225619, check: uncheckable)</li>
+<li id="s7">Installing 'man' from SGUG RSE or nekoware can cause formatting issues and converter errors, rendering manpages unusable; users may need to revert to the default manpages. (user-f190, 2025-11-24, exchange 88808, check: uncheckable)</li>
+<li id="s8">user-d903 promised user-f229 to push updates to booterizer for sgug-rse to eliminate nekoware. (user-d903, 2021-07-27, exchange 79527, check: uncheckable)</li>
+<li id="s9">sgug-rse is an RPM-based distribution for IRIX 6.5 with modernish packages and compilers. (user-6afa, 2022-10-30, exchange 70550, check: supported)</li>
+<li id="s10">sgug-rse provides RPMs for modernity and dependency tracking. (user-2189, 2020-02-11, exchange 6315, check: uncheckable)</li>
+<li id="s11">SGUG-RSE runs GCC 9.2.0. (user-22f9, 2025-03-18, exchange 218837, check: supported)</li>
+<li id="s12">Using a GNU compiler suite (`sgug-rse`) avoids the need for MIPSpro. (user-42cf, 2022-01-17, exchange 24787, check: supported)</li>
+<li id="s13">sgug-rse consists of fedora core 31 srpms that have been lightly modified to build and function on irix 6.5.30, plus 'dicl', Dan's IRIX Compatibility Library, that provides some stuff that lots of newer apps expect but I (user-2189, 2020-06-18, exchange 68736, check: supported)</li>
+<li id="s14">All of SGUG-RSE starts off as fc31 srpms, though any srpm would work fine as a base. (user-9860, 2022-12-18, exchange 208105, check: uncheckable)</li>
+<li id="s15">rse is built from spec files, possibly similar to those in Fedora Core 31, and can be found in the sgug-rse-wip GitHub repository. (user-42cf, 2020-03-29, exchange 7074, check: supported)</li>
+<li id="s16">The sgug-rse project is most active in its wip branch. (user-2189, 2020-06-12, exchange 214986, check: uncheckable)</li>
+<li id="s17">sgug rse has a stable build with many packages available. (user-0251, 2021-11-13, exchange 217296, check: uncheckable)</li>
+<li id="s18">sgug-rse has newer compilers and libraries but may have some glitches; SGI's original compilers and libraries are tightly integrated but based on old C standards. (user-d903, 2022-10-30, exchange 70550, check: uncheckable)</li>
+<li id="s19">Sgug-rse is a project with modern bash and gcc. (user-24f0, 2023-02-17, exchange 36153, check: uncheckable)</li>
+<li id="s20">SGUG-RSE is intended for IRIX 6.5.x. (user-7973, 2023-05-28, exchange 220275, check: supported)</li>
+<li id="s21">SDL2 is available from SGUG RSE, a repository of software for IRIX. (user-6c80, 2024-11-26, exchange 50933, check: uncheckable)</li>
+<li id="s22">To install SGUG-RSE, extract archives under /usr as root, run /usr/sgug/bin/sgugshell, and follow the documentation; errors often result from missteps. (user-2189, 2023-02-10, exchange 215368, check: uncheckable)</li>
+<li id="s23">Adding /usr/sgug/bin to your path when using SGUG-RSE is recommended to avoid conflicts with native IRIX tools. (user-7973, 2023-02-17, exchange 208338, check: uncheckable)</li>
+<li id="s24">Launching the sgugshell is required to use sgug-rse packages. (user-7973, 2023-10-29, exchange 209471, check: uncheckable)</li>
+<li id="s25">The SGUG-RSE installation directory /usr/sgug should not be modified outside of /usr/sgug; if issues arise, revert or reboot. (user-2189, 2023-02-10, exchange 215368, check: uncheckable)</li>
+<li id="s26">sgug-rse is used only when needed, not added to shell startup files by default. (user-21b8, 2026-01-09, exchange 215860, check: uncheckable)</li>
+<li id="s27">Barrier, a fork of synergy included in SGUG-RSE, works well for combining two Linux boxes and SGI gear across multiple monitors. (user-7973, 2023-02-17, exchange 217919, check: supported)</li>
+<li id="s28">Netsurf-Motif runs on sgug-rse. (user-e872, 2025-02-07, exchange 53982, check: uncheckable)</li>
+<li id="s29">Worker is a filemanager available in the sgug-rse repository for IRIX that offers a Dopus-like experience, including a superior Git client. (user-e872, 2025-11-08, exchange 88619, check: uncheckable)</li>
+<li id="s30">The SGUG-RSE SDL2 version is 2.0.12 with patches and builds without errors with --enable-video-opengl. (user-7973, 2025-10-05, exchange 215823, check: supported)</li>
+<li id="s31">SGUG-RSE uploads HINV data to a website and optionally counts uptime. (user-7973, 2025-04-11, exchange 55859, check: uncheckable)</li>
+<li id="s32">you got a binary handy? their Octane2 should compile IRIX-dev branch with SGUG-RSE installed. (user-7973, 2026-08-20, exchange 219985, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sgug-rse-project.html">sgug-rse project</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="mac-os-x.html">Mac OS X</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="big-endian.html">big endian</a>
+</li>
+<li>Processors: <a href="32-bit-irix.html">32-bit IRIX</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-5.html">IRIX 5</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-6-5-x.html">IRIX 6.5.x</a>, <a href="irix64.html">IRIX64</a>, <a href="linux-box.html">Linux box</a>
+</li>
+<li>Software: <a href="nekoware.html">nekoware</a>, <a href="sdl2.html">SDL2</a>, <a href="sgugshell.html">sgugshell</a>, <a href="tardist.html">tardist</a>, <a href="tdnf.html">tdnf</a>, <a href="booterizer.html">Booterizer</a>, <a href="rpm.html">RPM</a>, <a href="rse.html">RSE</a>, <a href="didbs.html">didbs</a>, <a href="installation.html">installation</a>, <a href="irix-ansible.html">irix_ansible</a>, <a href="netsurf-motif.html">netsurf-motif</a>, <a href="root.html">root</a>, <a href="xmms.html">xmms</a>, <a href="barrier.html">Barrier</a>, <a href="dosbox.html">DOSBox</a>, <a href="gl-library.html">GL library</a>, <a href="gnu-grep.html">GNU grep</a>, <a href="gnu-tar.html">GNU tar</a>, <a href="mipspro.html">MIPSpro</a>, <a href="opengl.html">OpenGL</a>, <a href="openssh.html">OpenSSH</a>, <a href="path.html">PATH</a>, <a href="pidgin.html">Pidgin</a>, <a href="rpm-package.html">RPM package</a>, <a href="synergy.html">Synergy</a>, <a href="binary.html">binary</a>, <a href="distcc.html">distcc</a>, <a href="emacs.html">emacs</a>, <a href="freeware.html">freeware</a>, <a href="git.html">git</a>, <a href="mplayer.html">mplayer</a>, <a href="ncurses.html">ncurses</a>, <a href="nedit.html">nedit</a>, <a href="sginet.html">sginet</a>, <a href="sgug-libraries.html">sgug libraries</a>, <a href="spec-file.html">spec file</a>, <a href="tgcware.html">tgcware</a>, <a href="toolchain.html">toolchain</a>
+</li>
+<li>Standards and interfaces: <a href="ssh.html">SSH</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="libxext.html">libXext</a>, <a href="22.html">.22</a>, <a href="30.html">.30</a>, <a href="mp3.html">MP3</a>, <a href="r4x00.html">R4x00</a>, <a href="sorbet-leopard.html">Sorbet Leopard</a>, <a href="worker.html">Worker</a>, <a href="xsgisetspecialdestroyhandler.html">_XSGISetSpecialDestroyHandler</a>, <a href="archive.html">archive</a>, <a href="dicl.html">dicl</a>, <a href="directory.html">directory</a>, <a href="g.html">g++</a>, <a href="iconv.html">iconv</a>, <a href="libglcore.html">libGLcore</a>, <a href="llama2-c.html">llama2.c</a>, <a href="nekodeps.html">nekodeps</a>, <a href="xsginet-globe.html">xSGINet-globe</a>
+</li></ul>
+</body>
+</html>

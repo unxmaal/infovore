@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dallas chip</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Dallas chip</h1>
+<p>Claims: 89</p>
+<p>The Dallas chip combines a battery, a clock, and 8k SRAM, and it retains data across reboots as long as power is not completely removed. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It is necessary for booting past the PROM, powering on the L1, and displaying information, and its absence can prevent machines from functioning properly in a cluster or stack. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> A failing Dallas chip can cause corrupted Ethernet addresses, garbage eaddr values, off clocks, network issues, stuck red lights, and machines refusing to run. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The chip can be replaced with a modern variant that still exists, though it may be tricky to remove and is sometimes socketed. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> Replacement methods include swapping the chip, hacking it, cutting it in half to solder a new battery and clock crystal, or using refurbishment services. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Fixes may also involve setting environment variables, using raw byte write commands, or correcting clock issues with NTP. <sup><a href="#s21">21</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The Dallas chip stores non-volatile data and may need to be replaced, either by reseating it, swapping in a known working chip for diagnosis, or installing a new one. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> Reseating the chip can resolve issues with the L1 cache, but a dead Dallas chip prevents the L1 cache from coming up. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> A faulty Dallas chip can cause Ethernet errors, CMOS reset and keyboard issues, and solid amber indicating possible board failure. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> Replacing the Dallas chip can fix issues, and doing so may require a socket to avoid damaging the board. <sup><a href="#s25">25</a></sup><sup><a href="#s31">31</a></sup> The MAC address is hard-coded on the IO board rather than stored in the Dallas chip. <sup><a href="#s32">32</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">a Dallas chip is a battery, a clock, and 8k SRAM. (user-03ad, 2022-06-26, exchange 182525, check: supported)</li>
+<li id="s2">The Dallas chip retains data across reboots as long as power is not completely removed. (user-9860, 2021-11-28, exchange 221724, check: uncheckable)</li>
+<li id="s3">Many SGI systems require a Dallas chip to boot past the PROM. (user-8b3c, 2019-11-14, exchange 4195, check: uncheckable)</li>
+<li id="s4">The Dallas chip is necessary for the L1 to power on and display information, and its absence can prevent the machine from functioning properly in a cluster. (user-59b9, 2020-08-29, exchange 75335, check: uncheckable)</li>
+<li id="s5">Servers without a working Dallas chip will not display brick details or function in a stack. (user-59b9, 2020-08-29, exchange 75335, check: uncheckable)</li>
+<li id="s6">Indy has a PSU that can fail and requires a Dallas chip to fix. (user-0251, 2019-04-04, exchange 1284, check: supported)</li>
+<li id="s7">The Ethernet address obtained from non-volatile RAM during controller initialization was corrupted, requiring a Dallas chip upgrade or setting a MAC address manually. The netmask is not available in miniroot, and serial- (user-5823, 2019-08-10, exchange 2976, check: uncheckable)</li>
+<li id="s8">The NVRAM, likely the Dallas chip or 1-wire NVRAM on the frontplane of Octane and Octane 2 systems, can fail, causing reliability issues or stuck red lights; it may be fixable. (user-5fa2, 2021-07-16, exchange 99490, check: supported)</li>
+<li id="s9">An Indy's clock being off is likely due to an old DALLAS chip and can be corrected with NTP. (user-7b1c, 2021-09-24, exchange 205598, check: supported)</li>
+<li id="s10">The Indy may have a garbage eaddr indicating a bad Dallas chip, which can be fixed by setting the environment variable or using a raw byte write command. (user-6afa, 2021-11-28, exchange 221724, check: supported)</li>
+<li id="s11">The Indigo2 may show no text and a non-responsive mouse due to issues with the Dallas chip, possibly related to a loose connection or power supply. (user-6afa, 2022-01-02, exchange 221807, check: supported)</li>
+<li id="s12">The Dallas chip on the system controller paddleboard can fail in O2K and similar machines, causing them to refuse to run. (user-2d40, 2023-10-04, exchange 209333, check: uncheckable)</li>
+<li id="s13">An Indy with a dying Dallas chip may experience network issues. (user-24f0, 2024-11-30, exchange 51153, check: supported)</li>
+<li id="s14">The Dallas chip on the Indy can be replaced with a modern variant that still exists. (user-59b9, 2020-08-22, exchange 10727, check: supported)</li>
+<li id="s15">Dallas chip on the motherboard is replaceable but tricky to remove; it's socketed (user-b1da, 2021-07-16, exchange 99491, check: uncheckable)</li>
+<li id="s16">The Dallas chip in an Indy is difficult to replace; the original works but Chinese replacements may not. (user-ae91, 2024-05-08, exchange 223885, check: supported)</li>
+<li id="s17">Replacing the Dallas chip involves cutting it in half and soldering a new battery and clock crystal. (user-b7c4, 2020-08-22, exchange 10727, check: uncheckable)</li>
+<li id="s18">replacing the dallas chip in an origin 300 is as easy as removing the old one and inserting the new one (user-9849, 2021-04-10, exchange 204939, check: supported)</li>
+<li id="s19">Glitch works provides Dallas chip replacements and refurbishments for Indys. (user-22f9, 2021-11-28, exchange 221724, check: uncheckable)</li>
+<li id="s20">The O2's Dallas chip is still in production and can be bought from DigiKey; Glitchworks also makes replacements which are recommended. (user-9860, 2023-04-25, exchange 37569, check: supported)</li>
+<li id="s21">To fix the issue, set environment variables and possibly replace or hack the Dallas chip. (user-cd83, 2019-12-28, exchange 96066, check: uncheckable)</li>
+<li id="s22">The Dallas chip should be reseated as it stores non-volatile data. (user-22f9, 2025-03-17, exchange 224740, check: uncheckable)</li>
+<li id="s23">A new Dallas chip is needed. (user-2a3c, 2025-08-02, exchange 58090, check: uncheckable)</li>
+<li id="s24">Swapping a known working Dallas chip can help diagnose issues. (user-24f0, 2025-11-05, exchange 216586, check: uncheckable)</li>
+<li id="s25">Replacing the Dallas chip can fix issues. (user-5d99, 2026-07-12, exchange 214184, check: uncheckable)</li>
+<li id="s26">Reseating the Dallas chip can resolve issues with the L1. (user-24f0, 2025-11-11, exchange 225677, check: uncheckable)</li>
+<li id="s27">L1 cache never comes up if the Dallas chip is dead. (user-b1da, 2025-11-12, exchange 119683, check: uncheckable)</li>
+<li id="s28">If the Dallas chip is faulty, the system will frequently throw Ethernet errors. (user-1a5a, 2025-09-09, exchange 118459, check: uncheckable)</li>
+<li id="s29">The DALLAS Chip may cause issues with CMOS reset and keyboard functionality. (user-59df, 2026-06-13, exchange 160251, check: uncheckable)</li>
+<li id="s30">Solid amber indicates board failure, perhaps the Dallas chip is bad. (user-5d99, 2026-07-12, exchange 214184, check: uncheckable)</li>
+<li id="s31">Replacing a Dallas chip can require a socket to prevent damaging the board. (user-22ae, 2026-07-13, exchange 214187, check: uncheckable)</li>
+<li id="s32">The MAC address is hard-coded on the IO board, not stored in the Dallas chip. (user-86e1, 2026-07-06, exchange 124007, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="mac-address.html">MAC address</a>, <a href="origin-350.html">Origin 350</a>, <a href="fuel.html">Fuel</a>, <a href="g4-sawtooth.html">G4 Sawtooth</a>, <a href="indigo2.html">Indigo2</a>, <a href="indigo2-impact.html">Indigo2 Impact</a>, <a href="octane.html">Octane</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="origin-300.html">Origin 300</a>, <a href="pc.html">PC</a>, <a href="rtc.html">RTC</a>, <a href="st-chip.html">ST chip</a>
+</li>
+<li>Graphics: <a href="infinitereality.html">InfiniteReality</a>
+</li>
+<li>Software: <a href="flexlm.html">FlexLM</a>, <a href="environment-variables.html">environment variables</a>
+</li>
+<li>Parts and peripherals: <a href="l1-cache.html">L1 cache</a>, <a href="ip35.html">IP35</a>, <a href="nvram.html">NVRAM</a>, <a href="psu.html">PSU</a>, <a href="system-controller.html">system controller</a>, <a href="io-board.html">IO board</a>, <a href="l1.html">L1</a>, <a href="nic.html">NIC</a>, <a href="pc-analyser-card.html">PC analyser card</a>, <a href="pci-card-cage.html">PCI card cage</a>, <a href="r-brick.html">R-brick</a>, <a href="battery-replacement.html">battery replacement</a>, <a href="chip.html">chip</a>, <a href="fan.html">fan</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet-address.html">Ethernet address</a>
+</li>
+<li>Companies: <a href="glitchworks.html">Glitchworks</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="io4.html">IO4</a>, <a href="atx.html">ATX</a>, <a href="ds1742w.html">DS1742W</a>, <a href="dual-pentium-pro.html">Dual Pentium Pro</a>, <a href="m-serials.html">M-serials</a>, <a href="ntp.html">NTP</a>, <a href="snaphat.html">Snaphat</a>, <a href="coin-cell.html">coin cell</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI driver</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI driver</h1>
+<p>Claims: 6 Part of <a href="scsi.html">SCSI</a></p>
+<p>The SCSI driver can be broken in various ways depending on the system: a correctly configured kernel may boot while the SCSI driver does nothing when loaded, and NetBSD contains a bug in the scsi driver for this machine. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> OpenBSD's SCSI driver refuses to use DMA with the CMD controller, limiting performance to PIO. <sup><a href="#s3">3</a></sup> The scsi driver has an error in NetBSD 6 that causes an error on every disk access. <sup><a href="#s4">4</a></sup> The R10K CPU has a pre-execution bug in the SCSI driver related to speculative execution that can lock a machine solid, and the bug was fixed with workarounds in the 6.5 kernel source. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The kernel with the right configuration can boot, but the SCSI driver might be broken, as it does nothing when loaded. (user-1446, 2020-07-28, exchange 216337, check: uncheckable)</li>
+<li id="s2">NetBSD has a bug in the scsi driver for this machine. (user-e872, 2024-11-28, exchange 240428, check: uncheckable)</li>
+<li id="s3">OpenBSD's SCSI driver refuses to use DMA with the CMD controller, limiting performance to PIO. (user-07ed, 2024-03-12, exchange 240270, check: uncheckable)</li>
+<li id="s4">The scsi driver has an error in netbsd 6 that causes an error on every disk access. (user-e872, 2024-11-28, exchange 240429, check: supported)</li>
+<li id="s5">The R10K CPU has a pre-execution bug in the SCSI driver that can lock a machine solid; the bug is related to speculative execution and was fixed with workarounds in the 6.5 kernel source. (user-bba0, 2026-09-16, exchange 66539, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="r10k-cpu.html">R10K CPU</a>
+</li>
+<li>Operating systems: <a href="irix-6-5.html">IRIX 6.5</a>, <a href="netbsd.html">NetBSD</a>, <a href="openbsd.html">OpenBSD</a>
+</li>
+<li>Standards and interfaces: <a href="dma.html">DMA</a>
+</li>
+<li>Other: <a href="pio.html">PIO</a>
+</li></ul>
+</body>
+</html>

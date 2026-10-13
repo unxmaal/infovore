@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProPack</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ProPack</h1>
+<p>Claims: 19</p>
+<p>The SGI Prism requires SLES 9 with ProPack for full hardware support, and attempting to install other operating systems crashes the system partway through the install. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> ProPack is required for graphics, imaging, and ALE3, and the Prism is only compatible with SGI ProPack with limited software support. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The Prism GPU driver is closed source, wrapped into SGI's custom kernel, and available with ProPack for kernel 2.4. <sup><a href="#s6">6</a></sup> The fglrx driver in ProPack is tailored for SGI-supported setups and requires SGI-specific extensions, while the standard radeon driver is included in SLES 10. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Propack would not work on SLES 10 due to the wrong libc version and likely not on SLES 11, and the matching ProPack is needed for the correct SLES SP version. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The PCI Radeon 9200 SE can run X with the radeon driver on SLES 9 with ProPack but lacks 3D acceleration and crashes with fglrx, and SLES 11 fails to display properly. <sup><a href="#s11">11</a></sup> Debian ran well on IA64 but lost support without ProPack, and ProPack likely never worked officially on Debian. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> ProPack 4 SP4 is the last supported disc for the Prism, and there is a ProPack for SLES 11. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Prism uses SLES 9 as the official OS, with ProPack required for graphics and potentially working up to SLES 11, and possibly with older Red Hat Enterprise versions; headless mode allows more OS options. (user-b7c4, 2019-08-18, exchange 216279, check: supported)</li>
+<li id="s2">The Prism requires SLES9 with ProPack for full hardware support; attempting to install other OSes crashes the system partway through the install. (user-b7c4, 2020-07-08, exchange 9470, check: uncheckable)</li>
+<li id="s3">Prism is only compatible with SGI ProPack and has limited software support. (user-cd83, 2023-02-27, exchange 208390, check: uncheckable)</li>
+<li id="s4">The ProPack is required for imaging. The FireGL card is not supported by it. (user-9528, 2023-11-11, exchange 216477, check: uncheckable)</li>
+<li id="s5">ProPack and closed source SGI drivers are required for ALE3. (user-03ad, 2026-08-09, exchange 216641, check: uncheckable)</li>
+<li id="s6">The Prism GPU driver is closed source and wrapped into SGI's custom kernel, available with propack for kernel 2.4. (user-24f0, 2026-04-08, exchange 216602, check: supported)</li>
+<li id="s7">The fglrx driver is part of Propack and the standard radeon driver is included in SLES 10. (user-1446, 2020-07-30, exchange 75279, check: supported)</li>
+<li id="s8">The fglrx driver in ProPack is tailored for SGI-supported setups and requires SGI-specific extensions. (user-59b9, 2020-08-24, exchange 216345, check: uncheckable)</li>
+<li id="s9">Propack would not work on SLES10 due to the wrong libc version and likely not on SLES11. (user-1446, 2020-06-11, exchange 75194, check: uncheckable)</li>
+<li id="s10">you need the matching propack for the correct SLES SP version. (user-03ad, 2024-03-23, exchange 216487, check: uncheckable)</li>
+<li id="s11">The PCI Radeon 9200 SE can run X with the radeon driver on SLES9 with ProPack, but lacks 3D acceleration and crashes with fglrx due to undefined symbols. SLES11 fails to display properly. (user-59b9, 2020-09-23, exchange 216361, check: supported)</li>
+<li id="s12">Debian ran well on IA64 but lost support without propack. (user-6d41, 2020-01-23, exchange 75005, check: uncheckable)</li>
+<li id="s13">Propack likely never worked officially on Debian. (user-b7c4, 2020-01-23, exchange 75005, check: uncheckable)</li>
+<li id="s14">There is a ProPack for SLES 11. (user-03ad, 2024-05-07, exchange 76048, check: supported)</li>
+<li id="s15">ProPack 4 SP4 is the last supported disc for the Prism. (user-5906, 2025-01-17, exchange 216527, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="propack-4.html">Propack 4</a> (10)
+</li>
+<li><a href="propack-7.html">ProPack 7</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="prism.html">Prism</a>, <a href="xio.html">XIO</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>, <a href="itanium.html">Itanium</a>
+</li>
+<li>Operating systems: <a href="sles9.html">SLES9</a>, <a href="sles-10.html">SLES 10</a>, <a href="sles11.html">SLES11</a>, <a href="debian.html">Debian</a>, <a href="linux.html">Linux</a>, <a href="sles.html">SLES</a>
+</li>
+<li>Software: <a href="fglrx-driver.html">fglrx driver</a>, <a href="compositor.html">Compositor</a>, <a href="radeon-driver.html">radeon driver</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="ioc3.html">IOC3</a>, <a href="fglrx.html">fglrx</a>
+</li></ul>
+</body>
+</html>

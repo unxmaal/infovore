@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gxemul</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>gxemul</h1>
+<p>Claims: 12</p>
+<p>gxemul is a buggy, reverse-engineered emulator that works well enough to run Ultrix and OSF/1, including running Ultrix quite nicely apart from a broken tape implementation. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SGI's IRIX ran on non-SGI platforms such as the MIPS Decstation, and GXemul has good Decstation support. <sup><a href="#s3">3</a></sup> gxemul's hardware implementation is based on NetBSD drivers. <sup><a href="#s4">4</a></sup> Running GXemul with specific arguments, such as -v -E sgi -e ip32 -C RM5200 with a 0xbfc00000:ip32prom.rev4.18.bin file, allows emulating an IP32 PROM, and using incompatible CPU/PROM versions can result in a black screen and frozen emulation. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The -Q flag makes gxemul use the provided PROM. <sup><a href="#s7">7</a></sup> gxemul allowed single stepping through code in 2018. <sup><a href="#s8">8</a></sup> gxemul does not actively develop and lacks IRIX support, but it is being worked on to run NetBSD over NFS. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> QEMU and GXemul both run reasonably well, even on slow hosts. <sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">gxemul works well enough to run Ultrix and OSF/1 despite being buggy and reverse engineered by trial and error. (user-237d, 2019-11-12, exchange 92419, check: supported)</li>
+<li id="s2">gxemul runs Ultrix quite nicely (minus the broken tape implementation) (user-237d, 2024-02-03, exchange 163002, check: uncheckable)</li>
+<li id="s3">SGI's IRIX ran on non-SGI platforms like MIPS Decstation, and GXemul has good Decstation support. (user-1446, 2020-05-07, exchange 8168, check: uncheckable)</li>
+<li id="s4">gxemul's hardware implementation is based on NetBSD drivers. (user-8780, 2026-02-10, exchange 213667, check: uncheckable)</li>
+<li id="s5">/gxemul -v -E sgi -e ip32 -C RM5200 0xbfc00000:ip32prom.rev4.18.bin (user-c799, 2026-01-11, exchange 120715, check: uncheckable)</li>
+<li id="s6">Running GXemul with specific arguments allows emulating an IP32 PROM; using incompatible CPU/PROM versions can result in a black screen and frozen emulation. (user-8780, 2026-01-17, exchange 215870, check: uncheckable)</li>
+<li id="s7">-Q flag makes gxemul use the provided PROM (user-8780, 2026-01-11, exchange 120715, check: uncheckable)</li>
+<li id="s8">gxemul allowed single stepping through code in 2018. (user-fb4e, 2026-02-10, exchange 213667, check: supported)</li>
+<li id="s9">gxemul does not actively develop and lacks IRIX support. (user-fb4e, 2026-02-10, exchange 213667, check: uncheckable)</li>
+<li id="s10">gxemul is being worked on to run NetBSD over NFS. (user-8780, 2026-03-07, exchange 213750, check: uncheckable)</li>
+<li id="s11">QEMU and GXemul both run reasonably well, even on slow hosts. (user-304d, 2026-09-25, exchange 220715, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ibook-g4.html">iBook G4</a>
+</li>
+<li>Processors: <a href="mips-decstation.html">MIPS DECstation</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="netbsd.html">NetBSD</a>, <a href="ultrix.html">Ultrix</a>, <a href="osf-1.html">OSF/1</a>
+</li>
+<li>Software: <a href="qemu.html">QEMU</a>
+</li>
+<li>Parts and peripherals: <a href="ip32-prom.html">IP32 PROM</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

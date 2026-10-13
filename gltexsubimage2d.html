@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>glTexSubImage2D</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>glTexSubImage2D</h1>
+<p>Claims: 4</p>
+<p>glTexSubImage2D updates texture data without allocating a new texture object, and can be used alongside glTexImage2D. <sup><a href="#s1">1</a></sup> The code for glTexSubImage2D can be implemented manually by copying pixel data, which works with GL 1.1 extensions on an O2. <sup><a href="#s2">2</a></sup> A broken AI-generated code was fixed by changing glTexImage2D to glTexImage2D followed by glTexSubImage2D. <sup><a href="#s3">3</a></sup> To debug the glTexSubImage2D call, add a printf statement before the call to print the parameters. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">you have to glTexImage2D or ideally glTexSubImage2D to update texture data without allocating a new texture object (user-6afa, 2023-10-13, exchange 209387, check: uncheckable)</li>
+<li id="s2">The code for glTexSubImage2D can be implemented manually by copying pixel data, and this works with GL 1.1 extensions on an O2. (user-21b8, 2025-07-22, exchange 72551, check: supported)</li>
+<li id="s3">We fixed a broken AI-generated code by changing glTexImage2D to glTexImage2D followed by glTexSubImage2D. (user-6afa, 2026-02-09, exchange 213660, check: uncheckable)</li>
+<li id="s4">To debug the glTexSubImage2D call, add a printf statement before the call to print the parameters. (user-21b8, 2025-07-22, exchange 72550, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Other: <a href="glteximage2d.html">glTexImage2D</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xsetmon</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>xsetmon</h1>
+<p>Claims: 12</p>
+<p>xsetmon is a control panel for video output options, available via /usr/gfx/xsetmon, and can be used after logging in. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can change the resolution IRIX runs at, set the default startup resolution when run as root (saving the setting in the user's dot files), and apply gamma settings without a GUI at login by configuring it in .sgisession. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Framebuffer settings in xsetmon can impact the visual modes reported by glxinfo, such as the bit depth and doublebuffering. <sup><a href="#s7">7</a></sup> Resolutions between 109Mhz and 193Mhz won't work on v6/v8 systems and will be ignored by xsetmon, and the 1920x1080 resolution is not available in xsetmon, so users may need to use setmon directly. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> A monitor that doesn't properly filter SoG signals may cause green coloration that can't be fixed with software, but using a VGA adapter on the first port can make the monitor compatible with SoG. <sup><a href="#s4">4</a></sup><sup><a href="#s10">10</a></sup> Using a VFO file created with xsetmon can result in graphical corruption due to incorrect microcode. <sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">xsetmon is a control panel for video output options. (user-b1da, 2021-10-16, exchange 205741, check: uncheckable)</li>
+<li id="s2">xsetmon shows graphics output; available via /usr/gfx/xsetmon. (user-554a, 2024-11-30, exchange 211363, check: uncheckable)</li>
+<li id="s3">You can login and use xsetmon or a similar command. (user-b1da, 2023-03-26, exchange 36946, check: uncheckable)</li>
+<li id="s4">The `xsetmon` command can change the resolution IRIX runs at, but a monitor that doesn't properly filter SoG signals may cause green coloration that can't be fixed with software. (user-b7c4, 2019-10-25, exchange 3982, check: supported)</li>
+<li id="s5">xsetmon sets the default startup resolution when run as root, saving the setting in the user's dot files. (user-6afa, 2023-10-11, exchange 218211, check: uncheckable)</li>
+<li id="s6">The `xsetmon` command can be used to apply gamma settings without GUI at login by configuring it in `.sgisession`. (user-e872, 2023-10-11, exchange 84294, check: supported)</li>
+<li id="s7">Framebuffer settings in xsetmon can impact the visual modes reported by glxinfo, such as the bit depth and doublebuffering. (user-6afa, 2021-10-18, exchange 21260, check: uncheckable)</li>
+<li id="s8">Resolutions between 109Mhz and 193Mhz won't work on v6/v8 systems and will be ignored by xsetmon. (user-22f9, 2020-10-04, exchange 97639, check: supported)</li>
+<li id="s9">The 1920x1080 resolution is not available in xsetmon, and users may need to use setmon directly. (user-56d4, 2022-09-14, exchange 104915, check: uncheckable)</li>
+<li id="s10">Using a VGA adapter on the first port can make the monitor compatible with SoG. An X-based GUI like xsetmon can save settings more reliably. (user-b7c4, 2024-09-28, exchange 224106, check: uncheckable)</li>
+<li id="s11">Using a VFO file created with xsetmon can result in graphical corruption due to incorrect microcode. (user-bba0, 2024-06-13, exchange 46848, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Graphics: <a href="resolution.html">resolution</a>, <a href="v6.html">V6</a>, <a href="v8.html">V8</a>
+</li>
+<li>Software: <a href="setmon.html">setmon</a>
+</li>
+<li>Parts and peripherals: <a href="sog.html">SoG</a>, <a href="sog-signal.html">SoG signal</a>, <a href="vfo-file.html">VFO file</a>, <a href="vga-adapter.html">VGA adapter</a>
+</li>
+<li>Other: <a href="glxinfo.html">glxinfo</a>
+</li></ul>
+</body>
+</html>

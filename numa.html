@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NUMA</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NUMA</h1>
+<p>Claims: 13</p>
+<p>NUMA stands for non-uniform memory access, where hitting memory on another host can significantly degrade performance. <sup><a href="#s1">1</a></sup> In a multi-processor system, NUMA architecture is simpler to implement than SMP for design purposes. <sup><a href="#s2">2</a></sup> Unified memory means all CPUs can access all RAM, while NUMA means faster access to local memory and slower to non-local memory. <sup><a href="#s3">3</a></sup> Low traffic across a bridge can provide the benefits of both NUMA and networked clusters, but not all workloads suit this model, especially those needing fast node interconnects. <sup><a href="#s4">4</a></sup> Irix supported NUMA for some form of asymmetrical mp. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NUMA stands for non-uniform memory access, where hitting memory on another host can significantly degrade performance. (user-b1da, 2021-03-08, exchange 15266, check: uncheckable)</li>
+<li id="s2">In a multi-processor system, NUMA architecture is simpler to implement than SMP for design purposes. (user-6afa, 2020-07-20, exchange 9760, check: uncheckable)</li>
+<li id="s3">Unified memory means all CPUs can access all RAM, while NUMA means faster access to local memory and slower to non-local memory. (user-b1da, 2021-03-10, exchange 15352, check: uncheckable)</li>
+<li id="s4">Low traffic across a bridge can provide the benefits of both NUMA and networked clusters, but not all workloads suit this model, especially those needing fast node interconnects. (user-9b9c, 2019-03-25, exchange 74962, check: uncheckable)</li>
+<li id="s5">Irix supported NUMA for some form of asymmetrical mp (user-22f9, 2025-02-17, exchange 54392, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="numa-cables.html">NUMA cables</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Parts and peripherals: <a href="power.html">POWER</a>, <a href="unified-memory.html">Unified memory</a>, <a href="backplane.html">backplane</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet.html">Ethernet</a>, <a href="infiniband.html">Infiniband</a>, <a href="smp.html">SMP</a>
+</li>
+<li>Other: <a href="z.html">-z</a>, <a href="e4500.html">E4500</a>, <a href="cluster.html">cluster</a>, <a href="uptime.html">uptime</a>
+</li></ul>
+</body>
+</html>

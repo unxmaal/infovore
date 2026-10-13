@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>serial console</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>serial console</h1>
+<p>Claims: 39 Part of <a href="serial.html">serial</a></p>
+<p>A serial console provides console access without requiring Ethernet, and can be used to install or run operating systems such as Irix, OpenBSD, NetBSD, and PPC Linux. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The serial console is useful for debugging, testing RAM and video card issues, and revealing errors that might be missed in the GUI. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Accessing the serial console may be necessary to boot into the PROM, fix certain issues, or enter service mode, and some systems default to serial console when no keyboard and mouse are detected. <sup><a href="#s1">1</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The serial console can be connected via a serial port, telnet to a serial server, or a modified cable, though some systems report no serial console available or problems such as freezing on boot. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">There is a nvram setting to always use the serial console even with keyboard and video; hitting esc gets you into the PROM. (user-f229, 2019-05-06, exchange 203781, check: uncheckable)</li>
+<li id="s2">Ethernet is considered unnecessary for a serial console. (user-c831, 2019-12-03, exchange 95888, check: uncheckable)</li>
+<li id="s3">You can install/run Irix on it using serial console. (user-a719, 2020-09-24, exchange 92644, check: uncheckable)</li>
+<li id="s4">OpenBSD may not default to a serial console like FreeBSD. NetBSD does not have reported issues with this setup. (user-9528, 2021-08-31, exchange 180884, check: uncheckable)</li>
+<li id="s5">The configuration interface is clunky and only supports plain HTTP, but allows SSH to a serial console. It runs PPC Linux internally. (user-86e1, 2024-06-27, exchange 111694, check: uncheckable)</li>
+<li id="s6">For debugging, a serial console might help; try unplugging all but power and serial to see if the machine comes up. (user-9849, 2021-04-27, exchange 16974, check: uncheckable)</li>
+<li id="s7">You can use a serial console to test RAM and video card issues. (user-8de9, 2025-02-26, exchange 224663, check: uncheckable)</li>
+<li id="s8">Serial console can show errors that might be missed in the GUI. (user-e872, 2025-09-03, exchange 118351, check: uncheckable)</li>
+<li id="s9">To fix the reality pipe issue, one needs to access the serial console. (user-1171, 2021-10-02, exchange 100289, check: uncheckable)</li>
+<li id="s10">The Indy may default to serial console if no keyboard and mouse are detected. (user-59b9, 2021-11-29, exchange 101044, check: supported)</li>
+<li id="s11">To boot into the PROM, you need a serial console if the graphical console fails. The system may not reach PROM if there's an issue with the boot drive or other hardware. (user-9860, 2022-11-14, exchange 207928, check: uncheckable)</li>
+<li id="s12">The Sun's serial console is accessible via /dev/ttyUSB0 with the correct port and settings. (user-8de9, 2022-02-25, exchange 181527, check: uncheckable)</li>
+<li id="s13">You can schedule power-on times or use a remotely controlled power strip for remote power control; serial console only comes up on power-on, no IPMI equivalent. (user-e872, 2025-12-22, exchange 225811, check: uncheckable)</li>
+<li id="s14">Cutting the wires on the serial console except for RXD, TXD, GND, and the frame ground/drain wire made it work. (user-f0f5, 2025-12-23, exchange 213438, check: uncheckable)</li>
+<li id="s15">The serial console can be connected via telnet to a serial server exposing the serial console. (user-2a3c, 2026-06-05, exchange 90901, check: uncheckable)</li>
+<li id="s16">The serial console behaves strangely and freezes on boot with certain kernels, and these issues are present in both stable and mainline kernel versions. (user-0f65, 2025-03-24, exchange 76297, check: uncheckable)</li>
+<li id="s17">There is no serial console available for the system. (user-e4d0, 2022-11-23, exchange 207971, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="arm.html">ARM</a>, <a href="fuel.html">Fuel</a>, <a href="indy.html">Indy</a>, <a href="machine.html">machine</a>
+</li>
+<li>Processors: <a href="processor.html">processor</a>
+</li>
+<li>Graphics: <a href="ge.html">GE</a>, <a href="gpu.html">GPU</a>, <a href="graphics-driver.html">graphics driver</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="freebsd.html">FreeBSD</a>, <a href="openbsd.html">OpenBSD</a>, <a href="single-user-mode.html">single user mode</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>, <a href="news.html">NeWS</a>, <a href="installer.html">installer</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="cdrom.html">CDROM</a>, <a href="ethernet-cable.html">Ethernet cable</a>, <a href="boot-drive.html">boot drive</a>, <a href="keyboard.html">keyboard</a>, <a href="monitor.html">monitor</a>, <a href="null-modem-cable.html">null modem cable</a>
+</li>
+<li>Standards and interfaces: <a href="arc.html">ARC</a>, <a href="ethernet.html">Ethernet</a>, <a href="ssh.html">SSH</a>, <a href="telnet.html">telnet</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="4d1-3-3-2.html">4D1-3.3.2</a>, <a href="64mb.html">64MB</a>, <a href="decwindows.html">DECwindows</a>, <a href="http.html">HTTP</a>, <a href="multimeter.html">multimeter</a>, <a href="pinout.html">pinout</a>, <a href="text-mode.html">text mode</a>
+</li></ul>
+</body>
+</html>

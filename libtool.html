@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>libtool</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>libtool</h1>
+<p>Claims: 19 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/GNU_Debugger">GNU Debugger</a>.</p>
+<p>libtool is a generic library support script that hides the complexity of using shared libraries behind a consistent, portable interface. It is a 12k line bash script that handles library linking and other things for platform-agnostic systems, with special handling for dependencies and shims, and is a main blocker for pkgsrc on IRIX. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> libtool solves a very precise problem, which is 'how do we set up a compiler environment for ANY system type in this list of systems?'. <sup><a href="#s3">3</a></sup> The build process uses libtool to determine dependencies, scans headers, and links temporary object files with gcc; errors occur after the header scan step. libtool can produce errors like 'Illegal option -- .' and its verbose mode can be accessed with 'export V=1'. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> libtool is a main blocker for pkgsrc on IRIX. pkgsrc's libtool needs fixing to correctly place compiled objects during builds. <sup><a href="#s2">2</a></sup><sup><a href="#s6">6</a></sup> libtool is case-sensitive; in tcsh, use setenv LIBTOOL `which libtool`; in bash, use export LIBTOOL=`which libtool`. <sup><a href="#s7">7</a></sup> GDB can be run on a binary from within the build tree of an autotools project using 'libtool --mode=execute gdb'. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">libtool is a generic library support script that hides the complexity of using shared libraries behind a consistent, portable interface. (user-42cf, 2019-02-18, exchange 67082, check: uncheckable)</li>
+<li id="s2">libtool is a 12k line bash script that handles library linking and other things for platform-agnostic systems, with special handling for dependencies and shims, and is a main blocker for pkgsrc on IRIX. (user-2189, 2019-04-11, exchange 1339, check: supported)</li>
+<li id="s3">libtool solves a very precise problem, which is 'how do we set up a compiler environment for ANY system type in this list of systems?'; pkgsrc works on all of the supported systems because it ships source code and it abd (user-2189, 2019-04-11, exchange 1343, check: uncheckable)</li>
+<li id="s4">The build process uses libtool to determine dependencies, scans headers, and links temporary object files with gcc; errors occur after the header scan step. The process is not fully understood by the speaker. (user-42cf, 2019-01-22, exchange 66966, check: uncheckable)</li>
+<li id="s5">libtool can produce errors like 'Illegal option -- .' and its verbose mode can be accessed with 'export V=1' (user-42cf, 2019-02-18, exchange 67080, check: supported)</li>
+<li id="s6">pkgsrc's libtool needs fixing to correctly place compiled objects during builds. (user-2189, 2019-04-24, exchange 1483, check: uncheckable)</li>
+<li id="s7">Libtool is case-sensitive; in tcsh, use setenv LIBTOOL `which libtool`; in bash, use export LIBTOOL=`which libtool`; report issues with the Zephyr IM port to the maintainer if it fails on FreeBSD. (user-637b, 2019-04-27, exchange 1537, check: supported)</li>
+<li id="s8">GDB can be run on a binary from within the build tree of an autotools project using 'libtool --mode=execute gdb'. (user-2d09, 2019-09-13, exchange 214835, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="freebsd.html">FreeBSD</a>
+</li>
+<li>Software: <a href="pkgsrc.html">pkgsrc</a>, <a href="rpm.html">RPM</a>, <a href="bash-script.html">bash script</a>, <a href="gdb.html">gdb</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="bzip2.html">bzip2</a>, <a href="gnutls.html">gnutls</a>, <a href="gtk-2.html">gtk+</a>
+</li></ul>
+</body>
+</html>

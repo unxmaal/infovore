@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samba</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Samba</h1>
+<p>Claims: 11</p>
+<p>Samba is a file-sharing service that can be virtualized with StarWind and installed on lightweight base distributions such as Alpine or Ubuntu, where it must be manually configured along with other necessary services. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can share a filesystem via CIFS and NFS, re-share NFS to handle UID mismatches, and provide NFS-like functionality on Windows, though this is more complex than FTP. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It is considered a better option for sharing files between a modern Linux machine and a Windows 98 machine than NFS. <sup><a href="#s7">7</a></sup> Older systems such as Win3.11/DOS can use Samba with SMB1 enabled, while Warp 3 Connect and Warp 4 did not reliably network with it. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Samba is described as insecure, and Samba V3.0 for IRIX 6.5 costs $300. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Wyse thin client with NT 4.0 embedded can run period-correct software with 50MB of free disk space and can use Samba for additional storage. (user-237d, 2020-04-11, exchange 233822, check: supported)</li>
+<li id="s2">StarWind can virtualize Samba. (user-b1da, 2020-09-12, exchange 10991, check: uncheckable)</li>
+<li id="s3">The manual way to create a new container involves using a lightweight base distro like Alpine or Ubuntu and installing necessary services like Samba, then manually configuring it. (user-9860, 2021-10-06, exchange 20815, check: uncheckable)</li>
+<li id="s4">If I didn't have a NAS and didn't want to get one - this means a *nix box running Samba and sharing the same filesystem via CIFS and NFS. Permissions get exciting in anything but very small setups - so probably fine at (user-07ed, 2022-08-18, exchange 32111, check: uncheckable)</li>
+<li id="s5">A Linux machine re-shares NFS via Samba to handle UID mismatch. (user-07ed, 2025-12-13, exchange 225763, check: uncheckable)</li>
+<li id="s6">Samba can be used for NFS-like functionality on Windows, but it's more complex than FTP. (user-1629, 2024-11-21, exchange 50711, check: uncheckable)</li>
+<li id="s7">Samba is a better option for sharing files between a modern Linux machine and a Windows 98 machine than NFS. (user-818d, 2026-07-12, exchange 234784, check: supported)</li>
+<li id="s8">Win3.11/DOS can use Samba without issue, but you need to enable SMB1; Win11 might require a go-between as SMB1 can't be directly enabled. (user-95db, 2023-05-09, exchange 157918, check: uncheckable)</li>
+<li id="s9">Warp 3 Connect and Warp 4 did not reliably network with Samba. (user-e532, 2026-02-26, exchange 179529, check: supported)</li>
+<li id="s10">Samba is insecure. (user-6dfb, 2024-11-21, exchange 50794, check: uncheckable)</li>
+<li id="s11">Samba V3.0 for IRIX 6.5 costs $300. (user-aac7, 2026-08-27, exchange 125162, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-6-5.html">IRIX 6.5</a>, <a href="ubuntu.html">Ubuntu</a>, <a href="windows.html">Windows</a>, <a href="windows-98.html">Windows 98</a>
+</li>
+<li>Parts and peripherals: <a href="nas.html">NAS</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="ftp.html">FTP</a>
+</li>
+<li>Other: <a href="warp-4.html">Warp 4</a>, <a href="container.html">container</a>
+</li></ul>
+</body>
+</html>

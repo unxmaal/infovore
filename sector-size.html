@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sector size</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sector size</h1>
+<p>Claims: 4</p>
+<p>The SCSI controller on the IRIX machine supports up to 4 billion sectors with C/H/S 16-bit/8-bit/8-bit addressing, and the sector size is a factor. <sup><a href="#s1">1</a></sup> The sector size on SGI CDs is 512 bytes, while on ISO9660 it is 4096 bytes. <sup><a href="#s2">2</a></sup> When ripping EFS media, `safecopy` should be used instead of `dd`, with the proper sector size set. <sup><a href="#s3">3</a></sup> The Multia wants to change the sector size dynamically when booting from optical devices. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SCSI controller on the IRIX machine supports up to 4 billion sectors with C/H/S 16-bit/8-bit/8-bit, and the size of the sector is a factor. (user-8b3c, 2019-07-19, exchange 220740, check: supported)</li>
+<li id="s2">The sector size on SGI CDs is 512 bytes, and on ISO9660 it is 4096 bytes. (user-bc5d, 2020-07-05, exchange 216716, check: supported)</li>
+<li id="s3">When ripping EFS media, use `safecopy` instead of `dd` and set the proper sector size. (user-2189, 2020-07-05, exchange 216716, check: supported)</li>
+<li id="s4">The Multia wants to change sector size dynamically when booting from optical devices. (user-95db, 2022-06-28, exchange 235190, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="multia.html">Multia</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="cd.html">CD</a>, <a href="dd.html">dd</a>
+</li>
+<li>Parts and peripherals: <a href="scsi-controller.html">SCSI controller</a>
+</li>
+<li>Companies: <a href="iso9660.html">ISO9660</a>
+</li>
+<li>Other: <a href="safecopy.html">safecopy</a>
+</li></ul>
+</body>
+</html>

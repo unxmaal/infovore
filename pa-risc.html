@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PA-RISC</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PA-RISC</h1>
+<p>Claims: 54 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/NeXTSTEP">NeXTSTEP</a>, <a href="https://en.wikipedia.org/wiki/Pkgsrc">Pkgsrc</a>, <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>.</p>
+<h2 id="with-hp">With HP</h2>
+<p>HP replaced PA-RISC with IA-64, similar to how DEC replaced VAX with Alpha. <sup><a href="#s1">1</a></sup> HP-UX has PA-RISC emulation built-in, and the Itanium could run PA-RISC code via HP-UX, which was generally fast, though not as efficient as native PA-RISC. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> There should be a PA-RISC to IA64 translation layer baked in HP-UX. <sup><a href="#s4">4</a></sup> Old GE portable ultrasound devices run HP-UX on PA-RISC. <sup><a href="#s5">5</a></sup> Patran 2006 R1 is available for HP-UX on both parisc and itanium architectures. <sup><a href="#s6">6</a></sup></p>
+<h2 id="general">General</h2>
+<p>PA-RISC is a RISC architecture that was declared a dead-end by the 21st century and was intended to be replaced by IA64/Itanium, which was given a planned lifetime of 18 years, 3 months, and 4 days. <sup><a href="#s7">7</a></sup> PA-RISC has two ABIs, with the 64-bit one being very different and only supported by HP-UX, and it does not officially support 64-bit executables except for the kernel. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> PA-RISC has vector extensions that might be useful for optimization. <sup><a href="#s10">10</a></sup> LLVM has a MIPS backend but not a PA-RISC backend, though Ghidra supports PA-RISC and Radare2 has some PA-RISC support. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> IDA might support PA-RISC assembly, but disassemblers for the platform are limited, especially for IA-64, and runtime assessment is challenging. <sup><a href="#s14">14</a></sup> NeXTSTEP was ported to multiple architectures including PA-RISC, and it requires special RAM for HP9000 systems, with 64MB recommended and a 2GB disk image suggested for SCSI emulation. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The Macintosh Application Environment was available for SPARC and PA-RISC but not for IRIX. <sup><a href="#s17">17</a></sup> gcc 9.x can be built on PA-RISC HP-UX 11i v1, and pkgsrc on PA-RISC can be ported successfully. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">HP replaced PA-RISC with IA-64, similar to how DEC replaced VAX with Alpha. (user-6e7b, 2023-12-11, exchange 209706, check: supported)</li>
+<li id="s2">The Itanium could run PA-RISC code via HP-UX, which was generally fast, though not as efficient as native PA-RISC. There was no direct software emulation layer, but it could run PA-RISC binaries without issues. (user-03ad, 2023-12-11, exchange 43087, check: uncheckable)</li>
+<li id="s3">HP-UX has PA-RISC emulation built-in. (user-03ad, 2025-11-05, exchange 235820, check: uncheckable)</li>
+<li id="s4">There should be a PA-RISC to IA64 translation layer baked in HP-UX. (user-7b1c, 2022-05-19, exchange 216434, check: uncheckable)</li>
+<li id="s5">Old GE portable ultrasound devices run HP-UX on PA-RISC. (user-37bb, 2023-10-01, exchange 41170, check: uncheckable)</li>
+<li id="s6">Patran 2006 R1 is available for HP-UX on both parisc and itanium architectures. (user-6c80, 2023-11-30, exchange 42865, check: supported)</li>
+<li id="s7">PA-RISC was declared a dead-end by the 21st century and was intended to be replaced by IA64/Itanium, which was given a planned lifetime of 18 years, 3 months, and 4 days. (user-a50f, 2020-10-06, exchange 234917, check: supported)</li>
+<li id="s8">PA-RISC has two ABIs, with the 64-bit one being very different and only supported by HP-UX. (user-711b, 2020-12-26, exchange 75467, check: supported)</li>
+<li id="s9">Parisc does not officially support 64-bit executables except for the kernel. (user-37ee, 2020-12-26, exchange 75469, check: supported)</li>
+<li id="s10">PA-RISC has vector extensions that might be useful for optimization. (user-b1da, 2020-07-23, exchange 97250, check: uncheckable)</li>
+<li id="s11">LLVM has a MIPS backend but not a PA-RISC backend. (user-b1da, 2020-07-25, exchange 10030, check: uncheckable)</li>
+<li id="s12">Ghidra supports PA-RISC. (user-b7c4, 2021-02-26, exchange 15024, check: uncheckable)</li>
+<li id="s13">Radare2 has some PA-RISC support. (user-59b9, 2021-02-26, exchange 15024, check: uncheckable)</li>
+<li id="s14">IDA might support PA-RISC assembly, but disassemblers for the platform are limited, especially for IA-64, and runtime assessment is challenging. (user-59b9, 2021-02-26, exchange 15024, check: supported)</li>
+<li id="s15">NeXTSTEP saw a pa-risc release (user-2d40, 2020-06-12, exchange 8977, check: uncheckable)</li>
+<li id="s16">NEXTSTEP on PA-RISC requires special RAM for HP9000 systems; 64MB is recommended, and a 2GB disk image is suggested for SCSI emulation. (user-03ad, 2026-05-10, exchange 165364, check: supported)</li>
+<li id="s17">The Macintosh Application Environment was not released for IRIX; it was available for SPARC and PA-RISC. (user-e872, 2025-08-15, exchange 219043, check: uncheckable)</li>
+<li id="s18">gcc 9.x can be built on PA-RISC HP-UX 11i v1. (user-95db, 2023-05-30, exchange 215385, check: supported)</li>
+<li id="s19">pkgsrc on PA-RISC can be ported successfully. (user-b1da, 2022-05-11, exchange 181953, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="c8000.html">C8000</a>, <a href="j5600.html">J5600</a>, <a href="iris.html">IRIS</a>, <a href="indigo.html">Indigo</a>
+</li>
+<li>Processors: <a href="itanium.html">Itanium</a>, <a href="ia64.html">IA64</a>, <a href="mips.html">MIPS</a>, <a href="sparc.html">SPARC</a>, <a href="ppc.html">PPC</a>
+</li>
+<li>Operating systems: <a href="nextstep.html">NeXTSTEP</a>, <a href="bsd.html">BSD</a>, <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="c3000.html">C3000</a>, <a href="llvm.html">LLVM</a>, <a href="qemu.html">QEMU</a>, <a href="compiler.html">compiler</a>, <a href="emulator.html">emulator</a>, <a href="pkgsrc.html">pkgsrc</a>
+</li>
+<li>Standards and interfaces: <a href="pci-x.html">PCI-X</a>, <a href="vme.html">VME</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="dec.html">DEC</a>, <a href="hp9000.html">HP9000</a>, <a href="gcc.html">GCC</a>, <a href="hp-9000.html">HP 9000</a>, <a href="next.html">NeXT</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="3000.html">3000</a>, <a href="abi.html">ABI</a>, <a href="hp-ux-11i.html">HP-UX 11i</a>, <a href="hp-ux-11i-v1.html">HP-UX 11i v1</a>, <a href="internet-explorer.html">Internet Explorer</a>, <a href="j6000.html">J6000</a>, <a href="superdome.html">Superdome</a>, <a href="hp-ux-11i-v3.html">hp-ux 11i v3</a>
+</li></ul>
+</body>
+</html>

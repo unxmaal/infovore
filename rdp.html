@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RDP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RDP</h1>
+<p>Claims: 11</p>
+<p>The RDP in the Ultra64/N64 is a custom, hardwired ASIC (not a general-purpose processor that runs instructions from memory), and it was a prototype still in an experimental phase at the time. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The N64 GPU consists of the RSP and RDP chips and uses custom display list calls, which are complex and require learning. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The RDP can be offloaded to a separate thread or GPU, and a proper vr4300i emulation without JIT interpreting is possible by offloading cp0 and cp1 to their own thread. <sup><a href="#s7">7</a></sup> The BSP can be used as an RDP command parser, streaming data from main memory with DMA and processing display lists, though it requires CPU intervention for CRIME rasterizer interaction. <sup><a href="#s8">8</a></sup> The GPU for RDP and RSP might struggle with complex and varied tasks. <sup><a href="#s9">9</a></sup> NT 4.0 Terminal Server with FX32 allowed concurrent RDP (Remote Desktop) access to x86 apps on an Alpha, and Terminal Server requires RDP to be enabled. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the RDP section is more or less a hardware post-processor (user-b7c4, 2020-01-10, exchange 5394, check: uncheckable)</li>
+<li id="s2">The RDP in the Ultra64 is a prototype ASIC still in the 'we're trying stuff so just label it with date codes' phase. (user-cade, 2020-09-04, exchange 10887, check: uncheckable)</li>
+<li id="s3">The RDP does not run instructions from memory but is custom/hardwired. (user-8780, 2024-10-15, exchange 227246, check: uncheckable)</li>
+<li id="s4">Some N64 documents, like RSP and RDP manuals, are publicly available for hardware understanding. (user-8b3c, 2022-10-07, exchange 227232, check: uncheckable)</li>
+<li id="s5">The RDP in the N64 has complex calls that require learning. (user-5510, 2023-03-16, exchange 36704, check: uncheckable)</li>
+<li id="s6">The N64 GPU consists of RSP and RDP chips, using custom display list calls. (user-cdae, 2024-08-29, exchange 48819, check: uncheckable)</li>
+<li id="s7">The RDP can be offloaded to a separate thread or GPU, and a proper vr4300i emulation without JIT interpreting is possible by offloading cp0 and cp1 to their own thread. (user-cade, 2020-08-27, exchange 220161, check: uncheckable)</li>
+<li id="s8">The BSP can be used as an RDP command parser, streaming data from main memory with DMA and processing display lists, though it requires CPU intervention for CRIME rasterizer interaction. (user-8780, 2025-07-20, exchange 225273, check: uncheckable)</li>
+<li id="s9">The GPU for RDP and RSP might struggle with complex and varied tasks. (user-cade, 2020-08-27, exchange 220161, check: uncheckable)</li>
+<li id="s10">NT 4.0 Terminal Server with FX32 allowed concurrent RDP access to x86 apps on an Alpha (user-07ed, 2022-05-17, exchange 182005, check: supported)</li>
+<li id="s11">Terminal Server requires RDP (Remote Desktop) to be enabled. (user-07ed, 2026-01-25, exchange 219442, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sgi-hardware.html">SGI hardware</a>, <a href="terminal-server.html">Terminal Server</a>, <a href="ultra64.html">Ultra64</a>
+</li>
+<li>Processors: <a href="x86.html">x86</a>
+</li>
+<li>Graphics: <a href="gpu.html">GPU</a>
+</li>
+<li>Operating systems: <a href="nt-4-0.html">NT 4.0</a>
+</li>
+<li>Software: <a href="n64.html">N64</a>
+</li>
+<li>Standards and interfaces: <a href="rsp.html">RSP</a>, <a href="dma.html">DMA</a>
+</li>
+<li>Companies: <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="bsp.html">BSP</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.bashrc</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>.bashrc</h1>
+<p>Claims: 16</p>
+<p>.bashrc is a file used by bash to set up configurations, and it is saved in the home directory. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It runs every terminal session and every time a new window is opened, so it is used for permanent environment variable changes. <sup><a href="#s1">1</a></sup><sup><a href="#s3">3</a></sup> Login shells run .profile and non-login shells run .bashrc, and sourcing .bashrc from .profile ensures it runs for both. <sup><a href="#s4">4</a></sup> It can be used to add directories to PATH, such as exporting PATH=/opt/local/bin:$PATH, and to set aliases. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The prompt in .bashrc can show the current branch and be updated with any command in the window. <sup><a href="#s8">8</a></sup> It is not always run depending on how the client requests a shell, and Bash does not load it when using winterm. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The .bashrc file is used by bash to set up configurations every time a new window is opened. (user-f229, 2019-07-16, exchange 2533, check: uncheckable)</li>
+<li id="s2">You can save it as .bashrc in your home directory. (user-ba81, 2019-12-13, exchange 78060, check: uncheckable)</li>
+<li id="s3">.bashrc runs every terminal session and should be used for permanent environment variable changes. (user-d903, 2019-11-27, exchange 4413, check: uncheckable)</li>
+<li id="s4">Login shells run .profile and non login shells run .bashrc; sourcing .bashrc from .profile ensures it runs for both. (user-6afa, 2020-08-21, exchange 69028, check: uncheckable)</li>
+<li id="s5">To automatically symlink all binaries in /opt/local, add `export PATH=/opt/local/bin:$PATH` to your .bashrc or .bash_profile. (user-db13, 2019-07-14, exchange 2491, check: supported)</li>
+<li id="s6">To add directories to PATH, modify .bashrc for bash or similar files for other shells. (user-2a24, 2021-05-17, exchange 217131, check: uncheckable)</li>
+<li id="s7">Use an alias for running sugshell, like `dev`, and update the path in .bashrc. (user-f229, 2021-11-29, exchange 215231, check: supported)</li>
+<li id="s8">The prompt in .bashrc shows the current branch and can be updated with any command in the window. (user-f229, 2019-07-21, exchange 67589, check: uncheckable)</li>
+<li id="s9">.bash_profile is for settings that should be inherited by everything, while .bashrc is for transient stuff; .bashrc isn't always run depending on how the client requests a shell. (user-8560, 2019-03-01, exchange 203707, check: uncheckable)</li>
+<li id="s10">Bash does not load bashrc when using winterm due to a specific loading mechanism. (user-888b, 2019-03-01, exchange 834, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bash.html">bash</a>, <a href="path.html">PATH</a>, <a href="rse.html">RSE</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li>
+<li>Other: <a href="bash-profile.html">.bash_profile</a>, <a href="profile.html">.profile</a>, <a href="sugshell.html">sugshell</a>, <a href="cshrc.html">.cshrc</a>, <a href="dev.html">/dev</a>, <a href="sgugshell-sh.html">sgugshell.sh</a>
+</li></ul>
+</body>
+</html>

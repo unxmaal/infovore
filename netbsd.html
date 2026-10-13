@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetBSD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NetBSD</h1>
+<p>Claims: 162 Background: 15 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/NetBSD">NetBSD</a>, <a href="https://en.wikipedia.org/wiki/VAX">VAX</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>, <a href="https://en.wikipedia.org/wiki/Amiga">Amiga</a>, <a href="https://en.wikipedia.org/wiki/FreeBSD">FreeBSD</a>, <a href="https://en.wikipedia.org/wiki/Tcsh">Tcsh</a>.</p>
+<h2 id="with-o2">With O2</h2>
+<p>NetBSD runs on a stock O2, though it boots with an R10K/R12K CPU and lacks full functionality. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> NetBSD has a bug in the scsi driver for the O2, and the ZULUSCSI 1.2 has compatibility issues with NetBSD on the O2 and possibly other systems. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Compiling db for NetBSD on an O2 can fail due to custom mutexes treating the CPU as mips1, lacking sync instructions. <sup><a href="#s5">5</a></sup> The O2 can boot into a graphics console, but this requires running NetBSD with specific configurations to avoid printing too much to the ARCS graphics console. <sup><a href="#s6">6</a></sup> sigh 32-bit NetBSD on the O2 is limited to 256MB of physical RAM, even though it has 320MB, likely because the kernel code has cut corners. <sup><a href="#s7">7</a></sup> Booting NetBSD on an O2 and expanding its memory range are challenging tasks. <sup><a href="#s8">8</a></sup></p>
+<h2 id="general">General</h2>
+<p>NetBSD is a Unix-like operating system that runs on a wide range of hardware, from vintage machines to modern systems. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> It has a VAX port that can build most pkgsrc pieces, and it is traditionally considered the best option for vintage hardware support. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> NetBSD also runs on other platforms including Amiga, SuperH, PPC750, Alpha, and the Z180, and it has a package manager that can be bootstrapped to other platforms. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> It can netboot on some hardware, and it has been used to host web servers and the iTunes Store via WebObjects. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> NetBSD is a relatively small operating system with good documentation, supporting a vast amount of hardware but lacking extensive testing. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> NetBSD runs on a wide range of systems, including 68040-based Macs, NVAX, and old-world Mac systems. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> pkgsrc is a cross-platform port system originally from NetBSD that works with OpenBSD, Linux, FreeBSD, and Solaris. <sup><a href="#s27">27</a></sup> NetBSD's quality has declined due to a lack of testing and support for a wide range of hardware. <sup><a href="#s28">28</a></sup> The i386 port of NetBSD was based on Net/2 and later incorporated more 4.4BSD code. <sup><a href="#s29">29</a></sup> NetBSD supports the MIPS line, Arm boards, and the R8000 CPU. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> NetBSD can be booted over a network, including diskless booting via TFTP or an ND server exposing raw filesystem blocks, but it is slow on 10mbps links. <sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup> NetBSD has issues booting on some systems, including crashes with mixed hyperSPARC modules, problems with X11 on Ultra 5, and booting issues in an emulator. <sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> NetBSD support for some systems may be marked as supported but may not actually work. <sup><a href="#s40">40</a></sup> NetBSD does not ship tcsh by default but it can be installed. <sup><a href="#s41">41</a></sup> NetBSD is a viable Unix option for old machines, but the appeal lies elsewhere. <sup><a href="#s42">42</a></sup> NetBSD can be booted on the Indy, which provides a dedicated ISO for that purpose, and it can also be bootstrapped on the emulator for CI automation and package building. <sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> To boot NetBSD on an sgimips machine, load the ISO, boot dksc(0,4,8)ip2xboot, then boot dash f. <sup><a href="#s45">45</a></sup> NetBSD has not been reported to boot on an Onyx1, and there is no evidence of an Indigo2 running it despite NetBSD being listed as supporting MIPS. <sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> The R3000 Indigo 1 and Indigo R3000 could run NetBSD, but modern userland is bloated, and upstream NetBSD was not fixed regarding R3K Indigos even though a fix existed but was not upstreamed. <sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup> NetBSD detects the actual clock rate using real-time, while IRIX approximates it, and a 100Hz interrupt is consistently 100Hz in NetBSD's emulator. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> Electropaint runs at 60fps on an Indy running NetBSD but requires additional configuration, and Ctrl-C can be used to break out of the installer. <sup><a href="#s52">52</a></sup><sup><a href="#s53">53</a></sup> The code in machdep_init and cpu_idle causes the system to enter an idle loop, which may be the cause of the boot issues with NetBSD. <sup><a href="#s54">54</a></sup> NetBSD has a broken graphics driver that shows a black screen, but it should initialize graphics and uses UART as console if graphics fail. <sup><a href="#s55">55</a></sup><sup><a href="#s56">56</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NetBSD runs on a stock O2. (user-7b1c, 2022-11-14, exchange 207933, check: supported)</li>
+<li id="s2">NetBSD boots on the O2 with an R10K/R12K CPU but lacks full functionality. (user-231e, 2026-08-20, exchange 125049, check: supported)</li>
+<li id="s3">NetBSD has a bug in the scsi driver for this machine. (user-e872, 2024-11-28, exchange 240428, check: uncheckable)</li>
+<li id="s4">The ZULUSCSI 1.2 has compatibility issues with NetBSD on the O2 and possibly other systems. (user-231e, 2025-12-22, exchange 120211, check: supported)</li>
+<li id="s5">Compiling db for NetBSD on an O2 can fail due to custom mutexes treating the CPU as mips1, lacking sync instructions. (user-231e, 2026-01-15, exchange 89358, check: supported)</li>
+<li id="s6">The O2 can boot into a graphics console, but it requires running NetBSD with specific configurations to avoid printing too much to the ARCS graphics console. (user-231e, 2026-02-03, exchange 213623, check: supported)</li>
+<li id="s7">sigh 32 bit netbsd on the o2 is limited to 256mb of physical ram, even though it has 320mb; kernel code likely has cut corners. (user-231e, 2026-04-22, exchange 122706, check: supported)</li>
+<li id="s8">Booting NetBSD on an O2 and expanding its memory range are challenging tasks. (user-231e, 2026-05-06, exchange 201291, check: supported)</li>
+<li id="s9">NetBSD can still boot. (user-1361, 2021-03-09, exchange 15330, check: uncheckable)</li>
+<li id="s10">NetBSD runs on VAX hardware. (user-7b1c, 2021-10-26, exchange 235010, check: uncheckable)</li>
+<li id="s11">NetBSD is traditionally the best bet for vintage hardware support. (user-3dfe, 2020-04-14, exchange 7472, check: uncheckable)</li>
+<li id="s12">NetBSD makes limited hardware as useful as possible. (user-bf68, 2019-07-15, exchange 216829, check: uncheckable)</li>
+<li id="s13">NetBSD is mentioned. (user-e872, 2020-11-07, exchange 12015, check: uncheckable)</li>
+<li id="s14">NetBSD has a port for VAX and can build most pkgsrc pieces for it. (user-42cf, 2019-02-08, exchange 503, check: uncheckable)</li>
+<li id="s15">NetBSD has a VAX port. (user-f9d4, 2021-01-01, exchange 204605, check: uncheckable)</li>
+<li id="s16">NetBSD is good for PPC750 (user-0251, 2019-12-18, exchange 4930, check: uncheckable)</li>
+<li id="s17">netbsd runs on a Z180 (user-6afa, 2020-07-21, exchange 9810, check: uncheckable)</li>
+<li id="s18">NetBSD runs on some SuperH machines. (user-9528, 2020-12-24, exchange 13139, check: uncheckable)</li>
+<li id="s19">NetBSD has a package manager that can be bootstrapped to other platforms. (user-b1da, 2020-07-29, exchange 10134, check: uncheckable)</li>
+<li id="s20">NetBSD is being used to host a local web server with archived websites. (user-22f9, 2019-12-08, exchange 4706, check: uncheckable)</li>
+<li id="s21">Apple used NetBSD to host the iTunes Store via WebObjects, which was ported from Darwin to NetBSD using shims. (user-3e3c, 2021-03-09, exchange 15319, check: uncheckable)</li>
+<li id="s22">NetBSD is relatively small and has good documentation. (user-42cf, 2021-12-20, exchange 231592, check: uncheckable)</li>
+<li id="s23">NetBSD supports a vast amount of hardware but lacks extensive testing. (user-03ad, 2022-11-17, exchange 234149, check: uncheckable)</li>
+<li id="s24">NetBSD runs on 68040-based Macs. (user-9528, 2021-12-20, exchange 231592, check: supported)</li>
+<li id="s25">NetBSD and OpenBSD ran on NVAX. (user-03ad, 2023-01-20, exchange 235300, check: uncheckable)</li>
+<li id="s26">NetBSD officially supports old-world systems, and Linux can potentially use bootx to run on the Daystar Genesis MP. (user-af19, 2022-06-20, exchange 207226, check: uncheckable)</li>
+<li id="s27">pkgsrc is a cross-platform port system originally from NetBSD and works with OpenBSD, Linux, FreeBSD, and Solaris. (user-7b1c, 2022-01-17, exchange 181295, check: uncheckable)</li>
+<li id="s28">NetBSD's quality has declined due to a lack of testing and support for a wide range of hardware. (user-03ad, 2022-11-17, exchange 234149, check: uncheckable)</li>
+<li id="s29">The i386 port of NetBSD was based on Net/2 and later incorporated more 4.4BSD code. (user-03ad, 2023-10-26, exchange 223470, check: supported)</li>
+<li id="s30">NetBSD supports the MIPS line. (user-e872, 2024-06-06, exchange 46465, check: uncheckable)</li>
+<li id="s31">NetBSD can be installed on Arm boards, and it works easily once the installation method is figured out. (user-22f9, 2025-02-14, exchange 216226, check: uncheckable)</li>
+<li id="s32">The R8000 CPU can run NetBSD. (user-231e, 2025-12-17, exchange 120081, check: supported)</li>
+<li id="s33">NetBSD diskless booting requires specifying the correct file to TFTP, similar to SunOS 4.x where the file name includes the Sun's IP in hexadecimal. (user-9528, 2024-02-15, exchange 184899, check: supported)</li>
+<li id="s34">Diskless NetBSD can be run from an ND server exposing raw filesystem blocks to the client, and the kernel name can be passed as an argument. (user-9528, 2024-02-15, exchange 184903, check: uncheckable)</li>
+<li id="s35">NetBSD can be booted over a network, but it is slow on 10mbps links. (user-1085, 2025-05-15, exchange 218952, check: supported)</li>
+<li id="s36">I used diskless NetBSD to create those images. (user-1085, 2025-10-27, exchange 93618, check: uncheckable)</li>
+<li id="s37">NetBSD has issues with X11 on Ultra 5, possibly due to graphics card support. (user-7151, 2024-12-07, exchange 240437, check: supported)</li>
+<li id="s38">NetBSD would crash when booting with mixed speed or cache size hyperSPARC modules but worked with mixed speeds or cache sizes of the same type. (user-08fb, 2025-02-23, exchange 240514, check: uncheckable)</li>
+<li id="s39">NetBSD had issues booting in the emulator, possibly related to the video switch, which broke the system. (user-1085, 2026-01-11, exchange 220385, check: uncheckable)</li>
+<li id="s40">NetBSD support for some systems may be marked as supported but may not actually work. (user-03ad, 2024-06-06, exchange 210420, check: uncheckable)</li>
+<li id="s41">NetBSD does not ship tcsh by default but it can be installed; it is portable and has run on various architectures, though it may have bugs. FreeBSD has cross-compiled developers and does not use their own product as much (user-22f9, 2025-02-15, exchange 86662, check: uncheckable)</li>
+<li id="s42">NetBSD is a viable Unix option for old machines, but the appeal lies elsewhere. (user-e872, 2026-03-02, exchange 213732, check: uncheckable)</li>
+<li id="s43">NetBSD can be bootstrapped on the emulator for CI automation and package building. (user-231e, 2026-04-29, exchange 220416, check: uncheckable)</li>
+<li id="s44">NetBSD provides an ISO for the Indy that can be booted. (user-231e, 2026-05-07, exchange 93880, check: supported)</li>
+<li id="s45">To boot NetBSD on an sgimips machine, load the ISO, boot dksc(0,4,8)ip2xboot, then boot dash f. (user-231e, 2026-05-06, exchange 220420, check: supported)</li>
+<li id="s46">NetBSD has not been reported to boot on an Onyx1. (user-231e, 2026-05-06, exchange 201283, check: uncheckable)</li>
+<li id="s47">NetBSD is listed as supporting MIPS, but there's no evidence of Indigo2 running it. (user-d3bf, 2026-08-12, exchange 214426, check: supported)</li>
+<li id="s48">The R3000 Indigo 1 can run NetBSD, but modern userland is bloated. (user-231e, 2026-08-11, exchange 124771, check: supported)</li>
+<li id="s49">Upstream NetBSD was not fixed regarding R3K Indigos; a fix existed but was not upstreamed. (user-6e7b, 2026-08-11, exchange 226858, check: supported)</li>
+<li id="s50">NetBSD detects the actual clock rate using real-time, while IRIX approximates it. (user-3e2d, 2026-05-09, exchange 220423, check: uncheckable)</li>
+<li id="s51">A 100Hz interrupt is consistently 100Hz in NetBSD's emulator. (user-3e2d, 2026-05-09, exchange 220423, check: supported)</li>
+<li id="s52">Electropaint runs at 60fps on an Indy running NetBSD, but requires additional configuration. (user-231e, 2026-04-27, exchange 220410, check: supported)</li>
+<li id="s53">Ctrl-C can be used to break out of the installer in NetBSD. (user-231e, 2026-06-21, exchange 220478, check: uncheckable)</li>
+<li id="s54">The code in machdep_init and cpu_idle causes the system to enter an idle loop, which may be the cause of the boot issues with NetBSD. (user-3e2d, 2026-05-09, exchange 220421, check: uncheckable)</li>
+<li id="s55">NetBSD has a broken graphics driver that shows a black screen. (user-231e, 2026-06-21, exchange 220478, check: uncheckable)</li>
+<li id="s56">NetBSD should initialize graphics but uses UART as console if graphics fail. (user-231e, 2026-06-21, exchange 220478, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="vax.html">VAX</a>, <a href="indy.html">Indy</a>, <a href="indigo2.html">Indigo2</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="amiga.html">Amiga</a>, <a href="challenge-s.html">Challenge S</a>, <a href="g3.html">G3</a>, <a href="iicx.html">IIcx</a>, <a href="iris.html">IRIS</a>, <a href="mac-os-x.html">Mac OS X</a>, <a href="onyx1.html">Onyx1</a>, <a href="qube.html">Qube</a>, <a href="sparcclassic.html">SPARCclassic</a>, <a href="sparcstation-5.html">SPARCstation 5</a>, <a href="ss20.html">SS20</a>, <a href="sun3.html">Sun3</a>, <a href="beige-g3.html">beige G3</a>
+</li>
+<li>Processors: <a href="32-bit.html">32-bit</a>, <a href="68k-box.html">68k box</a>, <a href="hypersparc.html">HyperSPARC</a>, <a href="indigo-r3000.html">Indigo R3000</a>, <a href="mips.html">MIPS</a>, <a href="mips3.html">MIPS3</a>, <a href="r10k-o2.html">R10K O2</a>, <a href="r3k-indigo.html">R3K Indigo</a>, <a href="r4600.html">R4600</a>, <a href="r5000-o2.html">R5000 O2</a>, <a href="r8000-cpu.html">R8000 CPU</a>, <a href="r8k-cpu.html">R8K CPU</a>, <a href="sparc-hardware.html">SPARC hardware</a>, <a href="t2.html">T2</a>, <a href="z180.html">Z180</a>, <a href="x86-cobalt.html">x86 Cobalt</a>
+</li>
+<li>Graphics: <a href="graphics-driver.html">graphics driver</a>
+</li>
+<li>Operating systems: <a href="openbsd.html">OpenBSD</a>, <a href="ultrix.html">Ultrix</a>, <a href="linux.html">Linux</a>, <a href="openvms.html">OpenVMS</a>, <a href="freebsd.html">FreeBSD</a>, <a href="irix.html">IRIX</a>, <a href="tru64.html">Tru64</a>, <a href="debian.html">Debian</a>, <a href="gentoo.html">Gentoo</a>, <a href="haiku.html">Haiku</a>, <a href="minix.html">MINIX</a>, <a href="os-9.html">OS 9</a>, <a href="os-x.html">OS X</a>, <a href="sunos-4-x.html">SunOS 4.x</a>
+</li>
+<li>Software: <a href="pkgsrc.html">pkgsrc</a>, <a href="emulator.html">emulator</a>, <a href="gxemul.html">gxemul</a>, <a href="arcs-firmware.html">ARCS firmware</a>, <a href="electropaint.html">ElectroPaint</a>, <a href="gnome.html">GNOME</a>, <a href="n64.html">N64</a>, <a href="scsi-driver.html">SCSI driver</a>, <a href="xfce.html">XFCE</a>, <a href="package-manager.html">package manager</a>, <a href="tcsh.html">tcsh</a>
+</li>
+<li>Parts and peripherals: <a href="256mb-of-ram.html">256MB of RAM</a>, <a href="64-mb-ram.html">64 MB RAM</a>, <a href="arm-board.html">ARM board</a>, <a href="idprom.html">IDPROM</a>, <a href="l2-cache.html">L2 cache</a>, <a href="prom.html">PROM</a>, <a href="scsi-board.html">SCSI board</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="keyboard.html">keyboard</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="arcs-bios.html">ARCS BIOS</a>, <a href="ssh.html">SSH</a>, <a href="usb.html">USB</a>, <a href="x-support.html">X support</a>, <a href="x68000.html">x68000</a>
+</li>
+<li>Companies: <a href="dec.html">DEC</a>, <a href="sgi.html">SGI</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="kl10.html">kl10</a>, <a href="256mb.html">256MB</a>, <a href="4-4bsd.html">4.4BSD</a>, <a href="darwin.html">Darwin</a>, <a href="daystar-genesis-mp.html">Daystar Genesis MP</a>, <a href="permedia-2.html">Permedia 2</a>, <a href="superh.html">SuperH</a>, <a href="vs2000.html">VS2000</a>, <a href="diskless-booting.html">diskless booting</a>, <a href="dksc.html">dksc</a>, <a href="headless.html">headless</a>, <a href="mpg123.html">mpg123</a>, <a href="r4000-cpp.html">r4000.cpp</a>, <a href="sgi-mips.html">sgi_mips</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ROM</h1>
+<p>Claims: 48 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Programmable_ROM">Programmable ROM</a>, <a href="https://en.wikipedia.org/wiki/Read-only_memory">Read-only memory</a>.</p>
+<p>When an embedded system's processor is first powered up, it typically loads the program from ROM into RAM and then starts executing from the program counter's address. <sup><a href="#s1">1</a></sup> The ROM is mapped to a fixed location, such as the upper 40KB or a base address like 0xbfc00000, and the reset vector can point to the beginning of the ROM. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The ROM can be stored on a chip, on a graphics board, or on a cartridge, and it can be updated by flashing, swapping chips, or replacing the board. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The ROM can contain a driver for a PCI video card, a copyright header, or code that runs without memory protection issues. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> A bad ROM or startup circuit can cause a machine to do nothing when turned on, and ROM issues can affect RAM addressing. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> ROM checksum mismatches can either be ignored if the name matches or cause a VM to stop, and VM software can continue execution even if a ROM is missing. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">When an embedded system's processor is first powered up, it typically loads the program from ROM into RAM and then starts executing from the program counter's address. (user-42cf, 2021-04-01, exchange 16123, check: uncheckable)</li>
+<li id="s2">ROM was mapped to the upper 40KB originally. (user-d903, 2020-04-07, exchange 7300, check: supported)</li>
+<li id="s3">The reset vector can point to the beginning of the ROM, and omitting expansion allows more space for sound and UART. (user-1361, 2022-01-17, exchange 24781, check: uncheckable)</li>
+<li id="s4">When loading the ROM into IDA, the base address of the segment should be at 0xbfc00000. (user-b1da, 2023-08-12, exchange 223247, check: uncheckable)</li>
+<li id="s5">Later SGI's could flash the ROM version over software, but for the Indy it's a chip swap. (user-b7c4, 2020-08-22, exchange 10726, check: supported)</li>
+<li id="s6">The ROM is on the graphics board, under the cover. (user-b7c4, 2020-08-22, exchange 10726, check: uncheckable)</li>
+<li id="s7">the n64 hardware loads the rom onto a cartridge (user-8547, 2023-12-04, exchange 42942, check: uncheckable)</li>
+<li id="s8">PCI allows a video card to have its own driver in a ROM on the card itself, which can increase the card's cost. (user-8b3c, 2020-09-26, exchange 221072, check: uncheckable)</li>
+<li id="s9">Writing code without memory protection and masking interrupts can lead to immediate crashes due to overwriting interrupt vectors or code, but running it in ROM avoids these issues. (user-21b8, 2022-08-21, exchange 236126, check: uncheckable)</li>
+<li id="s10">The IP4 Professional IRIS ENP-10 ROMs start with a header containing a readable copyright string and need merging (high/low byte). (user-86e1, 2023-08-18, exchange 223266, check: supported)</li>
+<li id="s11">It's the ROM that messes up if the front right pin isn't making contact with the socket when trying to address too much RAM. (user-1361, 2020-12-04, exchange 204538, check: uncheckable)</li>
+<li id="s12">The ROM issue can cause problems with RAM addressing. (user-1361, 2020-12-04, exchange 204538, check: uncheckable)</li>
+<li id="s13">Bad ROM or startup circuit issues can cause a machine to do nothing when turned on. (user-22f9, 2022-02-16, exchange 231635, check: uncheckable)</li>
+<li id="s14">ROM checksum mismatches can be ignored if the name matches but the CRC does not. (user-e04c, 2020-09-24, exchange 92643, check: uncheckable)</li>
+<li id="s15">VM software can continue execution even if a ROM is missing, showing a warning but not stopping. (user-a719, 2020-09-24, exchange 92643, check: uncheckable)</li>
+<li id="s16">ROM checksum mismatches caused the VM to stop. (user-e04c, 2020-09-24, exchange 92643, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="rom-chip.html">ROM chip</a> (3)
+</li>
+<li><a href="rom-monitor.html">ROM monitor</a> (3)
+</li>
+<li><a href="rom-simm.html">ROM SIMM</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="ip12.html">IP12</a>
+</li>
+<li>Processors: <a href="r4000.html">R4000</a>, <a href="r5000.html">R5000</a>, <a href="processor.html">processor</a>
+</li>
+<li>Graphics: <a href="graphics-board.html">graphics board</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="a-ux.html">A/UX</a>, <a href="dos.html">DOS</a>, <a href="os.html">OS</a>, <a href="windows.html">Windows</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="amiga-emulator.html">Amiga emulator</a>, <a href="n64-game.html">N64 game</a>, <a href="emulation.html">emulation</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="memory.html">memory</a>, <a href="l2-cache.html">L2 cache</a>, <a href="led.html">LED</a>, <a href="prom.html">PROM</a>, <a href="chip.html">chip</a>, <a href="disk-image.html">disk image</a>, <a href="display.html">display</a>, <a href="jumper.html">jumper</a>, <a href="memory-protection.html">memory protection</a>, <a href="mouse.html">mouse</a>, <a href="video-card.html">video card</a>
+</li>
+<li>Standards and interfaces: <a href="pci.html">PCI</a>, <a href="endianness.html">endianness</a>, <a href="serial.html">serial</a>
+</li>
+<li>Companies: <a href="cobalt.html">Cobalt</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="cia.html">CIA</a>, <a href="ida.html">IDA</a>, <a href="xt.html">XT</a>, <a href="zenith.html">Zenith</a>, <a href="interrupts.html">interrupts</a>
+</li></ul>
+</body>
+</html>

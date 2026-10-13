@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>efs2tar</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>efs2tar</h1>
+<p>Claims: 12 Part of <a href="efs.html">EFS</a></p>
+<p>efs2tar is a command-line tool that reads EFS-formatted CD image dumps, which are common for SGI CDs, and can handle .iso or .img files in the correct format. <sup><a href="#s1">1</a></sup> It extracts EFS filesystem contents into tar files, requiring a specific path and arguments, and requires an absolute path or --help for error handling. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can be installed using Go via `go get github.com/sophaskins/efs2tar` and `go install github.com/sophaskins/efs2tar`. <sup><a href="#s4">4</a></sup> It is a usable tool for converting EFS CD images but has poor documentation, and it may not work on OpenBSD. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Memory issues can cause efs2tar and similar tools like efsextract to fail. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">efs2tar reads efs-formatted CD image dumps, which are common for SGI CDs, and can handle .iso or .img files with the correct format. (user-3663, 2021-03-05, exchange 217052, check: uncheckable)</li>
+<li id="s2">efs2tar is a command that requires a specific path and arguments to extract EFS images to tar files. (user-8de9, 2022-05-28, exchange 207101, check: uncheckable)</li>
+<li id="s3">The command `efs2tar` requires an absolute path or --help for error handling. The error 'Open: no such file or directory' indicates the command was not found in the PATH. (user-7b1c, 2022-05-28, exchange 29548, check: supported)</li>
+<li id="s4">For the record (if anyone is having trouble with that clusterfuck that is Go): basically, you install go, and then you do ``` go get github.com/sophaskins/efs2tar go install github.com/sophaskins/efs2tar ``` and then the (user-3663, 2020-10-02, exchange 217013, check: supported)</li>
+<li id="s5">efs2tar is a usable tool for converting EFS CD images but has poor documentation. (user-d903, 2022-07-26, exchange 222384, check: uncheckable)</li>
+<li id="s6">efs2tar may not work on OpenBSD. (user-d903, 2022-07-26, exchange 222384, check: uncheckable)</li>
+<li id="s7">Memory issues can cause software like efsextract and efs2tar to fail. (user-616d, 2024-11-18, exchange 112816, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Operating systems: <a href="openbsd.html">OpenBSD</a>
+</li>
+<li>Software: <a href="efsextract.html">efsextract</a>, <a href="cd.html">CD</a>
+</li>
+<li>Other: <a href="chdman.html">chdman</a>, <a href="chd-files.html">CHD files</a>, <a href="go.html">Go</a>
+</li></ul>
+</body>
+</html>

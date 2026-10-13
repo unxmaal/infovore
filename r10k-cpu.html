@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R10K CPU</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>R10K CPU</h1>
+<p>Claims: 43 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>, <a href="https://en.wikipedia.org/wiki/SGI_Indigo2">SGI Indigo2</a>.</p>
+<h2 id="with-o2">With O2</h2>
+<p>The O2 can use an R10K CPU, though integrating it was difficult and not originally planned. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The R10K CPU was installed on two different CPU modules for the O2, one with PROM and one without. <sup><a href="#s3">3</a></sup> The R10K CPU's clock speed on the O2 is limited by the FPGA, which explains the increase from 3x60 MHz to 180 MHz. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> An O2 with an R10K CPU typically sells for $100-$850, and one with a 250 MHz R10K is approximately half as slow as an IRIX64 250 MHz R10K. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> An R10K CPU on an O2 is expected to be faster than an Octane2, but it runs OpenGL 3-4 times slower than an R5K CPU. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>The R10K CPU is used in several SGI systems, including the Octane, Indigo 2, and O2. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> An Indy cannot run an R10k CPU, while an r5k system can use one but requires removing the PCI cage for installation. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The R10K CPU has better floating-point performance than the R5200 300 MHz, and a system with two drive trays likely has an r5k CPU, while one tray indicates an r10k or r12k CPU. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The R10k CPU is well-documented for programmers but lacks detailed schematics and microcode documentation. <sup><a href="#s17">17</a></sup> The R10K CPU has a pre-execution bug in the SCSI driver related to speculative execution that can lock a machine solid, and this was fixed with workarounds in the 6.5 kernel source. <sup><a href="#s18">18</a></sup> Early R10k CPUs had rendering video issues, which were resolved with later R10ks. <sup><a href="#s19">19</a></sup> The R10K CPU was sold for around $380 on eBay in 2020, and a 195MHz R10K CPU is not suitable for modern web browsing. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O2 can use an R10k CPU, supports presenter, dual head, or flat panel, and has built-in PCI and texture capability. (user-5510, 2023-09-01, exchange 40324, check: supported)</li>
+<li id="s2">Integrating the R10K CPU into the O2 was difficult and not originally planned. (user-2a3c, 2026-02-02, exchange 121350, check: supported)</li>
+<li id="s3">The R10k CPU was installed on two different CPU modules for the O2, one with PROM and one without. (user-757f, 2025-12-28, exchange 120328, check: supported)</li>
+<li id="s4">The R10K CPU's clock speed on the O2 is limited by the FPGA. (user-757f, 2026-02-02, exchange 121350, check: supported)</li>
+<li id="s5">The FPGA limitation explains the clock speed increase from 3x60 MHz to 180 MHz. (user-c799, 2026-02-02, exchange 121350, check: supported)</li>
+<li id="s6">The O2 with an R10k CPU typically sells for $100-$850. (user-e4d0, 2022-05-12, exchange 207024, check: supported)</li>
+<li id="s7">An O2 with a 250 MHz R10 CPU is approximately half as slow as an IRIX64 250 MHz R10K CPU. (user-8547, 2022-01-07, exchange 24290, check: supported)</li>
+<li id="s8">An R10K CPU on an O2 is expected to be faster than an Octane2. (user-e4e2, 2026-08-03, exchange 244267, check: supported)</li>
+<li id="s9">The O2 can run OpenGL faster with an r5k CPU, achieving 95-115 fps compared to 3-4 times slower with an r10k. (user-21b8, 2025-09-25, exchange 215818, check: supported)</li>
+<li id="s10">The Octane can run at 250 MHz with an R10k CPU. (user-8547, 2019-06-07, exchange 1956, check: supported)</li>
+<li id="s11">The Indigo 2 uses the R10K CPU. (user-e4d0, 2024-04-10, exchange 232219, check: supported)</li>
+<li id="s12">The R5K O2 can boot with an R10K CPU and R10K tray but may require a different drive configuration. (user-2d28, 2026-02-15, exchange 226090, check: supported)</li>
+<li id="s13">An Indy can't run an R10k CPU. (user-6afa, 2020-09-08, exchange 97503, check: supported)</li>
+<li id="s14">The r5k system can use an r10k CPU but requires removing the PCI cage for installation, which is needed for networking. (user-8547, 2022-02-18, exchange 222006, check: supported)</li>
+<li id="s15">A system with two drive trays likely has an r5k CPU, while one tray indicates an r10k or r12k CPU. (user-0251, 2021-07-24, exchange 18682, check: supported)</li>
+<li id="s16">The R10k CPU has better floating-point performance compared to the R5200 300 MHz, and the machine has more memory. (user-bf68, 2026-06-17, exchange 244086, check: supported)</li>
+<li id="s17">The R10k CPU is well-documented for programmers but lacks detailed schematics and microcode documentation. (user-1446, 2020-09-11, exchange 92608, check: supported)</li>
+<li id="s18">The R10K CPU has a pre-execution bug in the SCSI driver that can lock a machine solid; the bug is related to speculative execution and was fixed with workarounds in the 6.5 kernel source. (user-bba0, 2026-09-16, exchange 66539, check: supported)</li>
+<li id="s19">Early R10k CPUs had rendering video issues, which were resolved with later R10ks. (user-03ad, 2023-11-17, exchange 209554, check: supported)</li>
+<li id="s20">The R10K CPU was sold for around $380 on eBay in 2020. (user-1a5a, 2026-06-05, exchange 244048, check: supported)</li>
+<li id="s21">A 195MHz R10K CPU is not suitable for modern web browsing. (user-b7c4, 2026-09-18, exchange 214674, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="blade-2000.html">Blade 2000</a>, <a href="iris.html">IRIS</a>, <a href="indigo2-impact.html">Indigo2 Impact</a>, <a href="indigo2-solid-impact.html">Indigo2 Solid Impact</a>, <a href="indy.html">Indy</a>, <a href="onyx-ir.html">Onyx IR</a>, <a href="r5k-o2.html">R5k O2</a>
+</li>
+<li>Processors: <a href="r5k-cpu.html">R5K CPU</a>, <a href="mips-architecture.html">MIPS architecture</a>, <a href="r12k-cpu.html">R12K CPU</a>, <a href="r5000.html">R5000</a>, <a href="r5200-300-mhz.html">R5200 300 MHz</a>, <a href="r8k-cpu.html">R8K CPU</a>
+</li>
+<li>Graphics: <a href="gpu.html">GPU</a>, <a href="si-graphics.html">SI graphics</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix64.html">IRIX64</a>
+</li>
+<li>Software: <a href="fpga.html">FPGA</a>, <a href="opengl.html">OpenGL</a>, <a href="presenter.html">Presenter</a>, <a href="scsi-driver.html">SCSI driver</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="third-party-ram.html">Third-party RAM</a>, <a href="memory.html">memory</a>
+</li>
+<li>Other: <a href="195-mhz.html">195 MHz</a>, <a href="dual-head.html">dual head</a>
+</li></ul>
+</body>
+</html>

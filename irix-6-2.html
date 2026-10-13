@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX 6.2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX 6.2</h1>
+<p>Claims: 137 Part of <a href="irix.html">IRIX</a> Background: 8 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/SGI_Indy">SGI Indy</a>, <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<h2 id="with-irix-5-3">With IRIX 5.3</h2>
+<p>When using the new R4000 core, IRIX 5.3 fails to link the kernel during installation due to issues with the R4000 core, while IRIX 6.2 encounters a segfault at the same stage, and this segfault issue is consistent across both IRIX 5.3 and IRIX 6.2. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The MIPS compiler for IRIX 5.3 and early IRIX 6.2 requires patch 1118 to resolve fmul in delay slot warnings when using makerom with the N64 SDK. <sup><a href="#s3">3</a></sup> U64 Drivers exist for 5.3 and 6.2 in available sdks online. <sup><a href="#s4">4</a></sup> IRIX 5.3 and 6.2 have pre-installed HDD images in MAME, with the MAME image for IRIX 6.2 being 446MB and for 5.3 being 336MB. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Some users recommend using IRIX 6.2, but one can also dual-boot IRIX 5.3 by partitioning the drive. <sup><a href="#s7">7</a></sup> IRIX 5.3 or 6.2 runs well with 64MB of RAM on slow processors, even in console mode. <sup><a href="#s8">8</a></sup></p>
+<h2 id="with-irix-6-5">With IRIX 6.5</h2>
+<p>IRIX 6.2 and 6.5 can be slow, but Profile Guided Optimization can significantly improve performance when used with Link Time Optimization, especially on IRIX 6.2 and 6.5. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> IRIX 6.5 has OpenGL 1.1, while 6.2 has only OpenGL 1.0 for textures. <sup><a href="#s11">11</a></sup> IRIX 6.5 had issues with demo executables and strange errors, while 6.2 had missing executables for most demos. <sup><a href="#s12">12</a></sup> The SGI SDK for N64 development is compatible with IRIX 6.5 but works best on 6.2 or 6.3. <sup><a href="#s13">13</a></sup> The Onyx can run an SGI IRIX 6.2 drive and keep an SGI IRIX 6.5 install for swapping between, without Vigra. <sup><a href="#s14">14</a></sup> Weatherstar software runs on 6.2 or 6.3, not 6.5. <sup><a href="#s15">15</a></sup> 6.2 with POSIX threads + patches is a fine platform unless you want to run some commercial software that requires 6.5. <sup><a href="#s16">16</a></sup> XFS disks formatted in IRIX 6.5 may not mount in IRIX 6.2 due to format changes. <sup><a href="#s17">17</a></sup></p>
+<h2 id="general">General</h2>
+<p>IRIX 6.2 is a 64-bit release supporting multiple SGI systems, including the Indigo2 and the Indy. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> It has more software than IRIX 6.0 and 6.1, but lacks Nekoware and SGUG-RSE. <sup><a href="#s20">20</a></sup> The top-end IRIS Crimson configuration includes a R4400 CPU at 150MHz, 1MB L2 cache, 256MB RAM, a 7.2GB hard drive, and RealityEngine graphics. <sup><a href="#s21">21</a></sup> R3K support was not dropped until IRIX 6.2, and it is considered a good option for machines with 128 MB or less RAM. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> It lacks full C99 support and does not support modern crypto standards. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> Software release 6.2 had limited support and many bugs, and patches can cause CD-ROM drive errors. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> It uses a combined (MxN) implementation strategy with sprocs and user-level context switching for local threads via NSPR. <sup><a href="#s28">28</a></sup> With the 12/1999 patch set, it is functionally equivalent to IRIX 6.5.6 for NFS v3. <sup><a href="#s29">29</a></sup> IRIX 6.2 is an all-platforms release, similar to IRIX 6.0, whereas IRIX 6.3 was platform-specific for O2 systems. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> IRIX 6.2 runs on the Indigo2, and it used to run on the Indigo. <sup><a href="#s32">32</a></sup> The Indigo2 IMPACT 10000 (IMPACT) version of IRIX 6.2 includes MIPSpro 7.3 and the IRIS Development Option 7.1, and it is the latest version of IRIX 6.2. <sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup> IRIX 6.2 did not run on Indigo2 R10K systems initially, as a later version was required. <sup><a href="#s35">35</a></sup> The Indy with a R4600 runs IRIX 6.2 but does not save the resolution, requiring manual adjustment which can cause display issues. <sup><a href="#s36">36</a></sup> The Power Indigo2 runs IRIX 6.2 and not 5.3. <sup><a href="#s37">37</a></sup> The R8000 runs IRIX 6.2, and ATLAS optimized for it performs on par with SGI's own implementation. <sup><a href="#s38">38</a></sup> The 4DDN kernel component is limited to systems supported by IRIX 6.2, specifically IP17 to IP26. <sup><a href="#s39">39</a></sup> AppleTalk Software (Xinet) has an activation that varies by version and may be limited to IRIX 6.2. <sup><a href="#s40">40</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX 5.3 fails to link the kernel during installation due to issues with the R4000 core, but IRIX 6.2 encounters a segfault at the same stage. (user-2223, 2019-01-27, exchange 220082, check: supported)</li>
+<li id="s2">The segfault issue is consistent across both IRIX 5.3 and IRIX 6.2 when using the new R4000 core. (user-2223, 2019-01-27, exchange 220082, check: supported)</li>
+<li id="s3">The MIPS compiler for IRIX 5.3 and early IRIX 6.2 requires patch 1118 to resolve fmul in delay slot warnings when using makerom with the N64 SDK; this patch is included in OS2.01_N64_PAK (SGI version) but not in later I畦 (user-45c8, 2019-08-03, exchange 227110, check: supported)</li>
+<li id="s4">U64 Drivers exist for 5.3 and 6.2 in available sdks online. (user-edea, 2020-01-05, exchange 227147, check: supported)</li>
+<li id="s5">IRIX 5.3 and 6.2 have pre-installed HDD images in MAME. (user-3663, 2020-06-29, exchange 92532, check: supported)</li>
+<li id="s6">The MAME image for IRIX 6.2 is 446MB and for 5.3 is 336MB. (user-37bb, 2021-09-18, exchange 20159, check: supported)</li>
+<li id="s7">Some users recommend using IRIX 6.2, but one can also dual-boot IRIX 5.3 by partitioning the drive. (user-281e, 2023-09-23, exchange 218193, check: supported)</li>
+<li id="s8">IRIX 5.3 or 6.2 runs well with 64MB of RAM on slow processors, even in console mode. (user-03ad, 2024-02-25, exchange 44827, check: supported)</li>
+<li id="s9">IRIX 6.2 and 6.5 can be slow. (user-8de9, 2022-07-01, exchange 30597, check: supported)</li>
+<li id="s10">Profile Guided Optimization can significantly improve performance when used with Link Time Optimization, especially on IRIX 6.2 and 6.5. (user-1085, 2025-10-05, exchange 93611, check: supported)</li>
+<li id="s11">IRIX 6.5 has OpenGL 1.1, 6.2/5.3 have only OpenGL 1.0 for textures. (user-ce5a, 2021-01-31, exchange 14443, check: supported)</li>
+<li id="s12">IRIX 6.5 had issues with demo executables and strange errors, while 6.2 had missing executables for most demos. (user-45c8, 2020-01-05, exchange 227147, check: supported)</li>
+<li id="s13">The SGI SDK for N64 development is compatible with IRIX 6.5 but works best on 6.2 or 6.3; by 2000, Nintendo stopped updating the SGI release of the SDK due to most studios moving to PCs for cheaper development tools; de编 (user-bc18, 2021-03-24, exchange 227178, check: supported)</li>
+<li id="s14">The Onyx can run an SGI IRIX 6.2 drive and keep an SGI IRIX 6.5 install for swapping between, without Vigra. (user-22f9, 2021-12-12, exchange 221756, check: supported)</li>
+<li id="s15">Weatherstar software runs on 6.2 or 6.3, not 6.5. (user-9305, 2022-02-19, exchange 102532, check: supported)</li>
+<li id="s16">6.2 with POSIX threads + patches is a fine platform unless you want to run some commercial software that requires 6.5. (user-86e1, 2026-04-28, exchange 201181, check: supported)</li>
+<li id="s17">XFS disks formatted in IRIX 6.5 may not mount in IRIX 6.2 due to format changes. (user-17cb, 2026-05-15, exchange 90743, check: supported)</li>
+<li id="s18">The Indy runs IRIX 6.2. (user-ce5a, 2019-09-22, exchange 3604, check: supported)</li>
+<li id="s19">IRIX 6.2 is a 64-bit release supporting multiple SGI systems including Indigo2. (user-6afa, 2022-04-18, exchange 92896, check: supported)</li>
+<li id="s20">The Indy runs IRIX 6.2, which has more software than 6.0 and 6.1 but lacks Nekoware and SGUG-RSE. (user-59fe, 2022-07-01, exchange 207292, check: supported)</li>
+<li id="s21">The top end configuration for the IRIS Crimson includes a R4400 CPU at 150MHz, 1MB L2 cache, 256MB RAM, a 7.2GB hard drive, RealityEngine graphics, and runs IRIX 6.2. (user-59fe, 2019-08-01, exchange 203871, check: supported)</li>
+<li id="s22">R3K support wasn't dropped until IRIX 6.2. (user-b7c4, 2020-05-07, exchange 8170, check: supported)</li>
+<li id="s23">Irix 6.2 is a good option for machines with 128 MB or less RAM. (user-74cb, 2021-08-14, exchange 79670, check: supported)</li>
+<li id="s24">IRIX 6.2 lacks full C99 support. (user-22f9, 2019-04-21, exchange 203765, check: supported)</li>
+<li id="s25">IRIX 6.2 does not support modern crypto standards. (user-59fe, 2022-06-17, exchange 207203, check: supported)</li>
+<li id="s26">Software release 6.2 had limited support and many bugs. (user-b7c4, 2023-06-03, exchange 208777, check: supported)</li>
+<li id="s27">IRIX 6.2 patches can cause CD-ROM drive errors. (user-59fe, 2023-03-14, exchange 36683, check: supported)</li>
+<li id="s28">IRIX 6.2 uses combined (MxN) implementation strategy with sprocs and user-level context switching for local threads via NSPR (user-f229, 2019-09-26, exchange 67934, check: supported)</li>
+<li id="s29">IRIX 6.2 with the 12/1999 patch set is functionally equivalent to IRIX 6.5.6 for NFS v3. (user-86e1, 2023-11-06, exchange 84356, check: supported)</li>
+<li id="s30">IRIX 6.0 and 6.1 are 64-bit versions branched from 5.2, with 6.2 being an all-platforms release like 6.0. IRIX 6.3 was platform-specific for O2, and 6.4 introduced S2MP (NUMA) for O2K series, making 6.2 more snappy. IRIX (user-86e1, 2026-02-19, exchange 219505, check: supported)</li>
+<li id="s31">IRIX 6.3 was only for O2 systems; try a 6.2 install image. MAME emulates Indy and Indigo2. (user-c3c8, 2023-12-08, exchange 220314, check: supported)</li>
+<li id="s32">6.2 runs on the Indigo2, and 6.2 used to run on the Indigo. (user-21b8, 2025-09-12, exchange 88093, check: supported)</li>
+<li id="s33">IRIX 6.2 with Indigo2 IMPACT 10000 includes MIPSpro 7.3 and IRIS Development Option 7.1. (user-03ad, 2024-07-03, exchange 85354, check: supported)</li>
+<li id="s34">The 'with' release is the latest version of IRIX 6.2. (user-03ad, 2024-07-04, exchange 85355, check: supported)</li>
+<li id="s35">IRIX 6.2 did not run on Indigo2 R10K initially; a later version was required. (user-86e1, 2024-06-17, exchange 223973, check: supported)</li>
+<li id="s36">The Indy with a R4600 runs IRIX 6.2 but doesn't save the resolution, requiring manual adjustment which can cause display issues. (user-1629, 2025-01-05, exchange 224367, check: supported)</li>
+<li id="s37">The Power Indigo2 runs IRIX 6.2 and not 5.3. (user-24f0, 2026-03-08, exchange 121870, check: supported)</li>
+<li id="s38">The R8000 runs IRIX 6.2, and ATLAS optimized for it performs on par with SGI's own implementation. (user-86e1, 2025-12-16, exchange 219336, check: supported)</li>
+<li id="s39">The 4DDN kernel component is limited to systems supported by IRIX 6.2, specifically IP17 to IP26. (user-86e1, 2026-01-16, exchange 89374, check: supported)</li>
+<li id="s40">AppleTalk Software (Xinet) has an activation that varies by version and may be limited to IRIX 6.2. (user-164b, 2026-09-21, exchange 92127, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="crimson.html">Crimson</a>, <a href="impact.html">Impact</a>, <a href="indigo2-video.html">Indigo2 Video</a>, <a href="onyx.html">Onyx</a>, <a href="impact-i2.html">IMPACT I2</a>, <a href="ipx.html">IPX</a>, <a href="iris.html">IRIS</a>, <a href="indigo.html">Indigo</a>, <a href="indigo2-extreme.html">Indigo2 Extreme</a>, <a href="o2.html">O2</a>, <a href="r5k-indy.html">R5K Indy</a>, <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Processors: <a href="r4400.html">R4400</a>, <a href="r4000.html">R4000</a>, <a href="mips4.html">MIPS4</a>, <a href="r10000.html">R10000</a>, <a href="r4600.html">R4600</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-3.html">IRIX 6.3</a>, <a href="irix-5-2.html">IRIX 5.2</a>, <a href="miniroot.html">miniroot</a>, <a href="irix-5-1.html">IRIX 5.1</a>, <a href="irix-6.html">IRIX 6</a>, <a href="irix-6-0.html">IRIX 6.0</a>, <a href="irix-6-1.html">IRIX 6.1</a>, <a href="irix-6-5-0.html">IRIX 6.5.0</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="n32-binary.html">N32 binary</a>, <a href="n32.html">n32</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="softimage-3-8.html">Softimage 3.8</a>, <a href="fx-program.html">*fx* program</a>, <a href="autocad-r13.html">AutoCAD R13</a>, <a href="coff.html">COFF</a>, <a href="love.html">LOVE</a>, <a href="mipspro.html">MIPSpro</a>, <a href="mipspro-7-4.html">MIPSpro 7.4</a>, <a href="opengl-1-0.html">OpenGL 1.0</a>, <a href="opengl-1-1.html">OpenGL 1.1</a>, <a href="path.html">PATH</a>, <a href="softimage-3d.html">SOFTIMAGE 3D</a>, <a href="xfs.html">XFS</a>, <a href="bash.html">bash</a>, <a href="n64-demo.html">n64 demo</a>, <a href="nekoware.html">nekoware</a>, <a href="scp.html">scp</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="tgcware.html">tgcware</a>
+</li>
+<li>Parts and peripherals: <a href="power-i2.html">Power I2</a>, <a href="power-indigo2.html">Power Indigo2</a>, <a href="ram.html">RAM</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="zuluscsi-blaster.html">ZuluSCSI Blaster</a>, <a href="tape.html">tape</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>, <a href="nfsv3.html">NFSv3</a>, <a href="posix-threads.html">POSIX threads</a>, <a href="rcp.html">RCP</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="inperson.html">InPerson</a>, <a href="6-3.html">6.3</a>, <a href="4-x.html">4.x</a>, <a href="4ddn.html">4DDN</a>, <a href="atlas.html">ATLAS</a>, <a href="galileo.html">Galileo</a>, <a href="indyemu.html">IndyEmu</a>, <a href="nspr.html">NSPR</a>, <a href="netmeeting.html">NetMeeting</a>, <a href="scummvm.html">ScummVM</a>, <a href="spacenavd.html">spacenavd</a>, <a href="tmux.html">tmux</a>
+</li></ul>
+</body>
+</html>

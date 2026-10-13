@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EFS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>EFS</h1>
+<p>Claims: 69 Background: 15 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Extent_File_System">Extent File System</a>, <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>.</p>
+<p>EFS is a file system used by SGI systems, with IRIX CDs and most SGI discs formatted in this format. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> You can mount EFS images using a loopback device with the 'efs' file system type, for example: mount -o loop -t efs your_image.iso /your/mount/point. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> EFS support works for reading on some Linux distributions, though stock Debian does not mount EFS by default and may need recompilation. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> EFS cannot be booted directly, as the PROM will fail to load /unix from the root slice. <sup><a href="#s9">9</a></sup> EFS is the file system used by IRIX, not XFS. <sup><a href="#s10">10</a></sup> IRIX 5.2 uses EFS by default. <sup><a href="#s11">11</a></sup> EFS has a 2 GB file size limit and an 8 GB volume size limit, though it can support 8 gigabyte volumes across larger drives if the controller supports it. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> EFS in IRIX uses multiple allocation groups to allow contention-free multi-CPU file system operations. <sup><a href="#s14">14</a></sup> EFS is considered inferior to FAT32 and is not scalable to an entire OS level. <sup><a href="#s15">15</a></sup> EFS can be mounted in Linux, but not written to, and can be supported via modprobe efs. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> The Arch kernel package does not build the EFS module, and the userspace tools for EFS don't work. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> OPUS supports EFS filesystems for making and fscking EFS ISOs or hard disks. <sup><a href="#s20">20</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">EFS file system has an 8 GB limit. (user-edea, 2019-07-24, exchange 92326, check: supported)</li>
+<li id="s2">Irix CDs were formatted as efs. (user-37ee, 2019-09-18, exchange 216839, check: uncheckable)</li>
+<li id="s3">Most SGI discs are in efs format. (user-580a, 2020-08-01, exchange 10212, check: uncheckable)</li>
+<li id="s4">To mount an EFS formatted ISO on IRIX, use: mount -o loop,ro -t efs your_disc_image.iso /your/mount/point (user-8547, 2019-01-21, exchange 172, check: uncheckable)</li>
+<li id="s5">The 'mount' command with the 'efs' type is used to mount ISO files. (user-59fe, 2021-08-02, exchange 205332, check: uncheckable)</li>
+<li id="s6">You can create a loop device from a partitioned disk image and mount it with 'mount -t efs /dev/loop /mountpoint' (user-cdcd, 2022-08-12, exchange 220238, check: uncheckable)</li>
+<li id="s7">EFS support works for reading on some Linux distributions like Ubuntu. (user-f587, 2021-03-05, exchange 217054, check: uncheckable)</li>
+<li id="s8">Stock Debian does not mount EFS by default, but can be recompiled to support it. (user-9528, 2023-01-24, exchange 217895, check: uncheckable)</li>
+<li id="s9">You cannot boot directly from EFS; the PROM will fail to load /unix from the root slice. (user-f229, 2021-11-16, exchange 77483, check: uncheckable)</li>
+<li id="s10">EFS is the file system used by IRIX, not XFS. (user-17cb, 2025-10-24, exchange 60192, check: uncheckable)</li>
+<li id="s11">IRIX 5.2 uses EFS by default. (user-554a, 2024-11-28, exchange 51073, check: supported)</li>
+<li id="s12">EFS requires loading into IRIX for boot; it lacks SMP support and has a 2 GB file size limit and 8 GB volume size limit. (user-22f9, 2025-01-17, exchange 211676, check: supported)</li>
+<li id="s13">EFS can support 8 gigabyte volumes across larger drives if the controller supports it. (user-22f9, 2025-01-17, exchange 52807, check: supported)</li>
+<li id="s14">EFS in IRIX uses multiple allocation groups to allow contention-free multi-CPU file system operations. (user-6c80, 2025-01-17, exchange 211677, check: uncheckable)</li>
+<li id="s15">The file system is not scalable to an entire OS level and is considered inferior to FAT32. (user-22f9, 2025-01-17, exchange 52807, check: uncheckable)</li>
+<li id="s16">EFS can be mounted in Linux, but not written to. (user-c831, 2024-11-21, exchange 50698, check: uncheckable)</li>
+<li id="s17">Debian can support EFS with modprobe efs. (user-9528, 2025-03-10, exchange 224708, check: uncheckable)</li>
+<li id="s18">The userspace tools for EFS don't work. (user-07ed, 2026-06-08, exchange 90933, check: uncheckable)</li>
+<li id="s19">The Arch kernel package doesn't build the EFS module. (user-0de0, 2026-06-08, exchange 90933, check: uncheckable)</li>
+<li id="s20">OPUS supports EFS filesystems for making and fscking EFS ISOs or hard disks. (user-c986, 2026-07-01, exchange 94171, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="efs-cd.html">EFS CD</a> (3)
+</li>
+<li><a href="efs-disc.html">EFS disc</a> (3)
+</li>
+<li><a href="efs-filesystem.html">EFS filesystem</a> (13)
+</li>
+<li><a href="efs-image.html">EFS image</a> (6)
+</li>
+<li><a href="efs-isos.html">EFS ISOs</a> (3)
+</li>
+<li><a href="efs-partition.html">EFS partition</a> (7)
+</li>
+<li><a href="efs-volume.html">EFS volume</a> (3)
+</li>
+<li><a href="efs2tar.html">efs2tar</a> (12)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="filesystem.html">filesystem</a>, <a href="irix-file-system.html">IRIX file system</a>, <a href="indigo2-impact.html">Indigo2 Impact</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="debian.html">Debian</a>, <a href="irix-cds.html">IRIX CDs</a>, <a href="linux.html">Linux</a>, <a href="debian-11.html">Debian 11</a>, <a href="irix-5-1.html">IRIX 5.1</a>, <a href="irix-5-2.html">IRIX 5.2</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-cd-image.html">IRIX CD image</a>, <a href="ubuntu.html">Ubuntu</a>, <a href="unix.html">Unix</a>
+</li>
+<li>Software: <a href="xfs.html">XFS</a>, <a href="mount.html">mount</a>, <a href="disklabel.html">disklabel</a>, <a href="tar.html">tar</a>, <a href="alias.html">Alias</a>, <a href="xfs-partition.html">XFS partition</a>, <a href="file.html">file</a>, <a href="partition.html">partition</a>, <a href="scp.html">scp</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="drive.html">drive</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="hfs.html">HFS</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>, <a href="iso9660.html">ISO9660</a>, <a href="sgi-disc.html">SGI disc</a>
+</li>
+<li>Other: <a href="loop-device.html">loop device</a>, <a href="6-3.html">6.3</a>, <a href="fat32.html">FAT32</a>, <a href="indizone-2.html">IndiZone 2</a>, <a href="hexdump.html">hexdump</a>, <a href="loopback-device.html">loopback device</a>
+</li></ul>
+</body>
+</html>

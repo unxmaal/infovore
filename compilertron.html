@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compilertron</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Compilertron</h1>
+<p>Claims: 13</p>
+<p>Compilertron is a cross-compiler setup for IRIX, available as a Docker container or a vagrant virtual machine, and can be used for cross-compilation with distcc on an IRIX box. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It generates native code using a C runtime for operating system-specific tasks, with existing backends for IRIX and big-endian MIPS. <sup><a href="#s4">4</a></sup> Compilertron acts as a distcc server for IRIX hosts, using the host's linker for linking and, by default, GCC's libstdc++ for compiled binaries. <sup><a href="#s5">5</a></sup> It runs distcc in a container to speed up builds on IRIX by about 10x, though the IRIX box still does much of the work, and the backoff period can be disabled with `export DISTCC_BACKOFF_PERIOD=0`. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Building Compilertron requires a significant amount of disk space, but 75GB should be sufficient as it is a virtual machine that can be provisioned with additional storage if needed. <sup><a href="#s8">8</a></sup> Enabling libstdc++ in Compilertron requires removing `--disable-libstdcxx` from `build_gcc.sh`, patching `libstdc++-v3/crossconfig.m4` to include IRIX, and running the patched sources in the Dockerfile. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Compilertron aims to produce IRIX binaries with minimal effort, not to serve as a development tool for GCC. (user-2189, 2018-12-31, exchange 66850, check: uncheckable)</li>
+<li id="s2">Compilertron is a vagrant crosscompiler setup for IRIX, and GCC 8.2.0 with binutils including a linker is available. (user-ba81, 2019-01-29, exchange 203664, check: supported)</li>
+<li id="s3">user-2189's compilertron is a Docker container that can be used for cross-compilation with distcc on an IRIX box. (user-2189, 2021-11-30, exchange 70031, check: uncheckable)</li>
+<li id="s4">The Compilertron generates native code but uses a C runtime for operating system-specific tasks, with existing backends for IRIX and big-endian MIPS. (user-888b, 2020-04-30, exchange 7937, check: uncheckable)</li>
+<li id="s5">Compilertron acts as a distcc server for IRIX hosts, using the host's linker for linking, and by default uses GCC's libstdc++ for compiled binaries. (user-8780, 2021-02-09, exchange 69217, check: uncheckable)</li>
+<li id="s6">Compilertron runs distcc in a container to speed up builds on IRIX by about 10x, though the IRIX box still does much of the work. (user-2189, 2020-06-21, exchange 68751, check: supported)</li>
+<li id="s7">The backoff period can be disabled with `export DISTCC_BACKOFF_PERIOD=0`. The Compilertron container may refuse connections. (user-59b9, 2020-09-15, exchange 215054, check: supported)</li>
+<li id="s8">Building Compilertron requires a significant amount of disk space, but 75GB should be sufficient as it is a virtual machine and can be provisioned with additional storage if needed. (user-2189, 2019-03-03, exchange 203709, check: supported)</li>
+<li id="s9">Enabling libstdc++ in compilertron requires removing `--disable-libstdcxx` from `build_gcc.sh`, patching `libstdc++-v3/crossconfig.m4` to include IRIX, and running the patched sources in the Dockerfile. (user-8780, 2021-02-03, exchange 69202, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-binaries.html">IRIX binaries</a>
+</li>
+<li>Software: <a href="docker-container.html">Docker container</a>, <a href="distcc.html">distcc</a>, <a href="pkgsrc.html">pkgsrc</a>, <a href="binutils.html">binutils</a>
+</li>
+<li>Parts and peripherals: <a href="disk-space.html">disk space</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>
+</li>
+<li>Other: <a href="cross-compilation.html">cross-compilation</a>, <a href="libstdc.html">libstdc++</a>
+</li></ul>
+</body>
+</html>

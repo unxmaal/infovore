@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>root disk</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>root disk</h1>
+<p>Claims: 5 Part of <a href="root.html">root</a></p>
+<p>IRIX requires a second disk to boot in single user mode and then allows mounting the root disk to edit the /etc/passwd file. <sup><a href="#s1">1</a></sup> The PI on an SGI should not be restarted while a RASCSI device is serving as the root disk, as the SGI will kernel panic. <sup><a href="#s2">2</a></sup> The system complains about the root disk and a PCI controller, suggesting issues with the disk or a non-standard configuration, and powering down and swapping disks can help diagnose the problem. <sup><a href="#s3">3</a></sup> Cloning a root disk can be done directly to blue SCSI following Mapleson's guide. <sup><a href="#s4">4</a></sup> A disk labeled as such is likely a Seagate disk and probably used as a root disk. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX requires a second disk to boot in single user mode and then allows mounting the root disk to edit the /etc/passwd file. (user-f229, 2020-12-20, exchange 13061, check: uncheckable)</li>
+<li id="s2">The PI on an SGI should not be restarted while a RASCSI device is serving as the root disk, as the SGI will kernel panic. (user-f229, 2021-09-07, exchange 221507, check: uncheckable)</li>
+<li id="s3">The system complains about the root disk and a PCI controller, suggesting issues with the disk or a non-standard configuration. Powering down and swapping disks can help diagnose the problem. (user-8547, 2022-11-12, exchange 82392, check: uncheckable)</li>
+<li id="s4">Cloning a root disk can be done directly to blue SCSI following Mapleson's guide. (user-17cb, 2025-08-11, exchange 212863, check: uncheckable)</li>
+<li id="s5">It is likely a Seagate disk and probably used as a root disk if labeled as such. (user-4f7c, 2026-08-19, exchange 124963, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="pi.html">PI</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="single-user-mode.html">single user mode</a>
+</li>
+<li>Software: <a href="etc-passwd.html">/etc/passwd</a>
+</li>
+<li>Parts and peripherals: <a href="bluescsi.html">BlueSCSI</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jumpstart</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Jumpstart</h1>
+<p>Claims: 4</p>
+<p>Jumpstart allows netbooting Solaris by responding to client addresses via /etc/hosts and /etc/ethers, tftping the kernel, and checking a custom config file for installation. <sup><a href="#s1">1</a></sup> It uses TFTP to load data over the network, with ARP/RARP for connection establishment. <sup><a href="#s2">2</a></sup> Jumpstart can install Solaris over the network on a T1000, showing package installation details. <sup><a href="#s3">3</a></sup> It can be used even with a broken Ethernet address if the network address is set in OBP before booting. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Jumpstart allows netbooting Solaris, responding to client addresses via /etc/hosts and /etc/ethers, tftping the kernel, and checking a custom config file for installation. (user-9528, 2021-11-18, exchange 239443, check: uncheckable)</li>
+<li id="s2">Jumpstart uses TFTP to load data over the network, with ARP/RARP for connection establishment. (user-7151, 2022-12-11, exchange 239915, check: uncheckable)</li>
+<li id="s3">Jumpstart can install Solaris over the network on a T1000, showing package installation details. (user-fa69, 2022-11-20, exchange 239900, check: uncheckable)</li>
+<li id="s4">Jumpstart can be used even with a broken Ethernet address if the network address is set in OBP before booting. (user-9528, 2023-11-12, exchange 240177, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="t1000.html">T1000</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>
+</li>
+<li>Standards and interfaces: <a href="obp.html">OBP</a>, <a href="tftp.html">TFTP</a>
+</li>
+<li>Other: <a href="arp.html">ARP</a>, <a href="rarp.html">RARP</a>
+</li></ul>
+</body>
+</html>

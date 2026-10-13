@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>efsextract</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>efsextract</h1>
+<p>Claims: 13</p>
+<p>efsextract is a tool for extracting files from SGI CD images or EFS file systems, with options for listing files, creating tar archives, and extracting bootfiles. <sup><a href="#s1">1</a></sup> It can parse ISO files to list packages for IRIX 5.2 Beta II, including version info and requirements, and can be used to extract EFS files without compiling a kernel module. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> efsextract only supports efs and iso9660 filesystems, not the filesystem used by the Linux LiveCD or all MIPS Magnum discs. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It has bugs including stack corruption when buffer size is not 512 bytes, permission denied errors from creating directories without the +d mode flag, and signed/unsigned int32 offset problems when extracting IRIX filesystems. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Compiling efsextract requires defining functions for byte order conversion, and the fix was pushed to GitHub. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">efsextract is a tool for extracting files from SGI CD images or EFS file systems, with options for listing files, creating tar archives, and extracting bootfiles. (user-bba0, 2024-09-08, exchange 210941, check: uncheckable)</li>
+<li id="s2">The `efsextract` tool can parse ISO files to list packages for IRIX 5.2 Beta II, including version info and requirements. (user-6c80, 2023-11-09, exchange 166062, check: supported)</li>
+<li id="s3">The efsextract tool can be used to extract EFS files without compiling a kernel module. (user-6c80, 2024-06-18, exchange 47035, check: uncheckable)</li>
+<li id="s4">efsextract only supports efs and iso9660 filesystems, not the filesystem used by the Linux LiveCD. (user-bba0, 2024-09-09, exchange 210948, check: uncheckable)</li>
+<li id="s5">efsextract works with ISO9660 discs but not all MIPS Magnum discs; there are bugs including stack corruption when buffer size is not 512 bytes. (user-6c80, 2023-11-26, exchange 218235, check: supported)</li>
+<li id="s6">efsextract creates directories without the +d mode flag, leading to permission denied errors when writing files into them. (user-231e, 2026-05-03, exchange 93859, check: uncheckable)</li>
+<li id="s7">efsextract has issues extracting IRIX filesystems due to signed/unsigned int32 offset problems. (user-231e, 2026-05-03, exchange 93860, check: uncheckable)</li>
+<li id="s8">Compiling efsextract requires defining functions for byte order conversion. (user-bba0, 2024-09-08, exchange 210941, check: uncheckable)</li>
+<li id="s9">The efsextract fix was pushed to GitHub. (user-6c80, 2024-09-08, exchange 49038, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="irix-file-system.html">IRIX file system</a>
+</li>
+<li>Processors: <a href="mips-magnum.html">MIPS Magnum</a>
+</li>
+<li>Software: <a href="efs2tar.html">efs2tar</a>, <a href="github.html">GitHub</a>, <a href="tar.html">tar</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>, <a href="iso9660.html">ISO9660</a>
+</li></ul>
+</body>
+</html>

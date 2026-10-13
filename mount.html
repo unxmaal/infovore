@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mount</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>mount</h1>
+<p>Claims: 19</p>
+<p>The mount command mounts an image file with a specific file system type, and it supports loopback mounting of ISO images in IRIX 6.5. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> To mount an EFS formatted ISO on IRIX, use: mount -o loop,ro -t efs your_disc_image.iso /your/mount/point. <sup><a href="#s3">3</a></sup> The 'mount' command with the 'efs' type is used to mount ISO files. <sup><a href="#s4">4</a></sup> The command to mount an XFS image is `sudo mount -t xfs xfs.img /mnt/xfsimage`. <sup><a href="#s5">5</a></sup> mount can show NFS version information. <sup><a href="#s6">6</a></sup> The bg option for mount retries in the background, while fg retries in the foreground and blocks further processing until complete. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The `mount` command mounts an image file with a specific file system type. (user-22f9, 2020-07-23, exchange 9890, check: supported)</li>
+<li id="s2">The `mount` command supports loopback mounting of ISO images in IRIX 6.5, using `mount -o loop &lt;filename&gt;.iso /&lt;path&gt;`. However, Pop!_OS does not support mounting ZFS, and XFS support in Pop!_OS may be incomplete. (user-59b9, 2020-09-13, exchange 10996, check: supported)</li>
+<li id="s3">To mount an EFS formatted ISO on IRIX, use: mount -o loop,ro -t efs your_disc_image.iso /your/mount/point (user-8547, 2019-01-21, exchange 172, check: uncheckable)</li>
+<li id="s4">The 'mount' command with the 'efs' type is used to mount ISO files. (user-59fe, 2021-08-02, exchange 205332, check: uncheckable)</li>
+<li id="s5">The command to mount an XFS image is `sudo mount -t xfs xfs.img /mnt/xfsimage`. (user-1361, 2020-07-23, exchange 9885, check: supported)</li>
+<li id="s6">mount can show NFS version information. (user-37ee, 2020-09-10, exchange 10953, check: uncheckable)</li>
+<li id="s7">The bg option for mount retries in the background, while fg retries in the foreground and blocks further processing until complete. (user-f229, 2022-02-03, exchange 80865, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="mount-command.html">mount command</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="efs-partition.html">EFS partition</a>, <a href="xfs.html">XFS</a>, <a href="zulu.html">Zulu</a>, <a href="scp.html">scp</a>
+</li>
+<li>Parts and peripherals: <a href="drive.html">drive</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-export.html">NFS export</a>
+</li>
+<li>Companies: <a href="iso-file.html">ISO file</a>, <a href="iso-image.html">ISO image</a>, <a href="iso9660.html">ISO9660</a>
+</li>
+<li>Other: <a href="image.html">image</a>, <a href="loopback-device.html">loopback device</a>
+</li></ul>
+</body>
+</html>

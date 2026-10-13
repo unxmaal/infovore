@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAE</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PAE</h1>
+<p>Claims: 6</p>
+<p>Physical Address Extension (PAE) was used in the late 32-bit era for x86 processors and was available before Itanium was sidelined. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> PAE allows a system to use more than 4GB of RAM in 4GB blocks, but a single process can't use more than 4GB. <sup><a href="#s3">3</a></sup> PAE on a 32-bit chip can't usefully address 1TB of RAM; it can only provide 4GB chunks per process, requiring real 64-bit addressing for larger memory use. <sup><a href="#s4">4</a></sup> It fixes PAE to allow 128 GB RAM on 32-bit systems and has a 64-bit version. <sup><a href="#s5">5</a></sup> If the machine will/can never have more RAM, and you can select non-PAE I'd do that. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Physical Address Extension (PAE) was used in the late 32-bit era for x86 processors. (user-8de9, 2025-02-01, exchange 53676, check: supported)</li>
+<li id="s2">PAE was available before Itanium was sidelined. (user-22f9, 2025-02-01, exchange 53676, check: uncheckable)</li>
+<li id="s3">PAE allows a system to use more than 4GB of RAM in 4GB blocks, but a single process can't use more than 4GB. (user-5510, 2022-05-18, exchange 146306, check: supported)</li>
+<li id="s4">PAE on a 32-bit chip can't usefully address 1TB of RAM; it can only provide 4GB chunks per process, requiring real 64-bit addressing for larger memory use. (user-7b1c, 2022-12-05, exchange 105846, check: supported)</li>
+<li id="s5">It fixes PAE to allow 128 GB RAM on 32-bit systems and has a 64-bit version. (user-8de9, 2025-02-12, exchange 159122, check: supported)</li>
+<li id="s6">If the machine will/can never have more RAM, and you can select non-PAE I’d do that. Would be interesting to benchmark compare though something mildly memory intensive. (user-07ed, 2024-11-23, exchange 158818, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="32-bit.html">32-bit</a>
+</li>
+<li>Parts and peripherals: <a href="memory.html">memory</a>
+</li></ul>
+</body>
+</html>

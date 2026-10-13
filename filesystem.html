@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>filesystem</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>filesystem</h1>
+<p>Claims: 26 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/Unix">Unix</a>, <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<p>The filesystem is organized around the OS in the Unix style. <sup><a href="#s1">1</a></sup> The `fx` command creates the disklabel or partition table, while `mkfs` creates the filesystem, and the latter can only be executed after booting into the installer or a minimal live version of the OS. <sup><a href="#s2">2</a></sup> XFS is an SGI filesystem, and its Irix version uses 32-bit date stamps, so setting the clock forward will cause the filesystem to interpret the time incorrectly. <sup><a href="#s3">3</a></sup> Reading SGI filesystems like EFS and XFS can be complicated due to disklabel and filesystem issues. <sup><a href="#s4">4</a></sup> The SGI filesystem can be challenging to recover data from using UFS explorer. <sup><a href="#s5">5</a></sup> XFS post Kernel 3.16 lacks dir v2 support, risking data loss, and no common filesystem is compatible with Windows, with GNU/Linux support being rare. <sup><a href="#s6">6</a></sup> The O2 does not support mass storage for IRIX. <sup><a href="#s6">6</a></sup> The file system operations use a global lock, leading to synchronous operations and performance issues. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The OS is organized around the filesystem, which is the Unix style. (user-d5ee, 2026-03-29, exchange 151428, check: uncheckable)</li>
+<li id="s2">The `fx` command creates the disklabel/partition table, while `mkfs` creates the filesystem, which can only be executed after booting into the installer or a minimal live version of the OS. (user-b1da, 2022-11-12, exchange 82384, check: supported)</li>
+<li id="s3">XFS version of Irix uses 32-bit date stamps, so setting the clock forward will cause the filesystem to interpret the time incorrectly. (user-07ed, 2023-08-23, exchange 218133, check: supported)</li>
+<li id="s4">Reading SGI filesystems like EFS and XFS can be complicated due to disklabel and filesystem issues. (user-d903, 2021-03-05, exchange 217054, check: uncheckable)</li>
+<li id="s5">The SGI filesystem can be challenging to recover data from using UFS explorer. (user-9305, 2023-09-28, exchange 41082, check: uncheckable)</li>
+<li id="s6">The O2 does not support mass storage for IRIX. No common filesystem is compatible with Windows, and GNU/Linux support is rare. XFS post Kernel 3.16 lacks dir v2 support, risking data loss. FAT32, partial HFS, and UDF are (user-22f9, 2025-03-16, exchange 55170, check: supported)</li>
+<li id="s7">The file system operations use a global lock, leading to synchronous operations and performance issues. (user-22f9, 2025-01-17, exchange 52807, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="mac.html">Mac</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-4.html">IRIX 4</a>, <a href="linux.html">Linux</a>, <a href="ultrix.html">Ultrix</a>, <a href="unix.html">Unix</a>, <a href="bootloader.html">bootloader</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="xfs.html">XFS</a>, <a href="efs.html">EFS</a>, <a href="gui.html">GUI</a>, <a href="sd-card.html">SD card</a>, <a href="disklabel.html">disklabel</a>, <a href="fx-command.html">fx command</a>, <a href="mkfs.html">mkfs</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="scsi-disk.html">SCSI disk</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="disk.html">disk</a>
+</li>
+<li>Standards and interfaces: <a href="rcp.html">RCP</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="cli.html">CLI</a>, <a href="fat32.html">FAT32</a>, <a href="backup.html">backup</a>, <a href="permissions.html">permissions</a>
+</li></ul>
+</body>
+</html>

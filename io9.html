@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IO9</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IO9</h1>
+<p>Claims: 38 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Altix">SGI Altix</a>.</p>
+<p>The IO9 is an SGI IO card that provides SCSI connectivity and is required to boot several SGI systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> An IO9 has two SCSI ports and external SCSI, delivering ports to the system through an edge connector that connects to the ports' riser. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s5">5</a></sup> The IO9 can be configured with a CPU module and SCSI backplane to make a bootable O350, and an O350 with an IO9 is typically a CBrick or base node. <sup><a href="#s1">1</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s4">4</a></sup> The IO9 differs from the IO8, which is the Origin 300's IO card and has a different edge connector. <sup><a href="#s7">7</a></sup> The IO9 supports various operating systems, including Debian 6 on the Altix 350, Linux kernel 4.9.231 (with issues), t2 and 4.19.325 on the Altix 3000, and SCSI &amp; IDE controllers on the IP35. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The MPX can be connected to a bootable O3x0 or configured with a CPU-module, IO9, and SCSI-backplane to become a bootable O350. (user-bf68, 2019-11-13, exchange 220797, check: supported)</li>
+<li id="s2">An IO9 has two SCSI ports and an IO10 has two SATA ports and one SCSI port. (user-b1da, 2020-01-31, exchange 5816, check: supported)</li>
+<li id="s3">io9 has external SCSI. (user-1446, 2020-05-05, exchange 8096, check: uncheckable)</li>
+<li id="s4">An IO9 is required to boot the system. (user-cd7d, 2022-11-25, exchange 34148, check: uncheckable)</li>
+<li id="s5">The IO9 provides the ports through an edge connector to the ports' riser. (user-5906, 2026-02-28, exchange 226142, check: uncheckable)</li>
+<li id="s6">Typically an O350 with an IO9 is just a CBrick as I recall. Unless it has graphics, too. 'Base node' is also used in the documentation if I’m remembering correctly. (user-59b9, 2022-11-13, exchange 105587, check: supported)</li>
+<li id="s7">The IO8 card is the origin 300's IO card and it has a different edge connector compared to the IO9. (user-b1da, 2022-11-26, exchange 222674, check: supported)</li>
+<li id="s8">Debian 6 runs on the Altix 350 with io9. (user-bf68, 2020-01-23, exchange 75006, check: supported)</li>
+<li id="s9">Linux kernel 4.9.231 can boot on io9 but has issues with radeon, firmware loading, and Xorg drivers, and the system hangs. (user-1446, 2020-07-29, exchange 75276, check: supported)</li>
+<li id="s10">The altix 3000 with IO9 can run t2 and 4.19.325 after compiling in qla drivers and getting firmware into the kernel. (user-0f65, 2025-03-28, exchange 216554, check: supported)</li>
+<li id="s11">On IP35, the IO9 has SCSI &amp; IDE controllers. SCSI controllers are 0/1, and the IDE controller is 2 (user-e4d0, 2026-03-28, exchange 215938, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="altix-350.html">Altix 350</a>, <a href="altix.html">Altix</a>, <a href="tezro.html">Tezro</a>, <a href="cpu-module.html">CPU module</a>, <a href="onyx4.html">Onyx4</a>, <a href="radeon.html">Radeon</a>, <a href="altix-3000.html">altix 3000</a>
+</li>
+<li>Processors: <a href="t2.html">T2</a>
+</li>
+<li>Operating systems: <a href="debian-6.html">Debian 6</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>, <a href="ps2.html">PS2</a>
+</li>
+<li>Parts and peripherals: <a href="io10.html">IO10</a>, <a href="scsi-backplane.html">SCSI backplane</a>, <a href="c-brick.html">C-brick</a>, <a href="cdrom.html">CDROM</a>, <a href="ip35.html">IP35</a>, <a href="l1.html">L1</a>, <a href="pci-riser.html">PCI riser</a>, <a href="red-rock.html">Red Rock</a>, <a href="scsi-port.html">SCSI port</a>, <a href="riser-board.html">riser board</a>
+</li>
+<li>Standards and interfaces: <a href="agp.html">AGP</a>, <a href="scsi.html">SCSI</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="mpx.html">MPX</a>, <a href="o3x0.html">O3X0</a>, <a href="snaphat.html">Snaphat</a>, <a href="external-scsi.html">external SCSI</a>
+</li></ul>
+</body>
+</html>

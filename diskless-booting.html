@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>diskless booting</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>diskless booting</h1>
+<p>Claims: 3</p>
+<p>Diskless booting involves copying a miniroot to a swap partition and mounting it as root, which requires a kernel capable of mounting the root filesystem, and the PROM environment can specify the root path. <sup><a href="#s1">1</a></sup> NetBSD diskless booting requires specifying the correct file to TFTP, similar to SunOS 4.x where the file name includes the Sun's IP in hexadecimal. <sup><a href="#s2">2</a></sup> 433T supports diskless booting over Ethernet using an emulated dn3500 server. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Diskless booting involves copying a miniroot to a swap partition and mounting it as root; the kernel must be capable of mounting the root filesystem, and the PROM environment can specify the root path. (user-4eea, 2025-09-05, exchange 87878, check: uncheckable)</li>
+<li id="s2">NetBSD diskless booting requires specifying the correct file to TFTP, similar to SunOS 4.x where the file name includes the Sun's IP in hexadecimal. (user-9528, 2024-02-15, exchange 184899, check: supported)</li>
+<li id="s3">433T supports diskless booting over Ethernet using an emulated dn3500 server. (user-9528, 2026-01-28, exchange 235901, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="netbsd.html">NetBSD</a>, <a href="sunos-4-x.html">SunOS 4.x</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="root-filesystem.html">root filesystem</a>, <a href="swap-partition.html">swap partition</a>
+</li></ul>
+</body>
+</html>

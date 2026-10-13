@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>disk image</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>disk image</h1>
+<p>Claims: 17 Part of <a href="disk.html">disk</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>.</p>
+<p>A disk image is a copy of a disk taken to storage, typically using the 'dd' command, which can be stored on an NFS share. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Disk images are used to recover data from non-booting disks, such as a C8000, by creating an image and checking it for corruption. <sup><a href="#s3">3</a></sup> Creating a disk image can be slow even on systems with modern hardware like SSDs and multiple CPUs. <sup><a href="#s4">4</a></sup> Installing IRIX requires using fx to create partitions on a disk image, as the installation process is specific to SGI disks. <sup><a href="#s5">5</a></sup> Booting from a disk image involves pointing the system at the desired OS configuration and the disk image, and can be done with commands like 'boot -f dksc(0.1.8)sash.ip6 DKSC(0.1.7)/unix'. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Running SGI emulation requires ROMs and a disk image with a recent MAME build. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To take a disk image of an IRIX system, use 'dd' to copy the disk to storage. (user-b7c4, 2019-11-28, exchange 4418, check: uncheckable)</li>
+<li id="s2">You can use dd to make a disk image and store it on an NFS share. (user-cd83, 2020-01-18, exchange 5528, check: uncheckable)</li>
+<li id="s3">To recover data from a non-booting C8000 disk, use dd to create an image of the disk and check the image for corruption. (user-cb4c, 2020-09-07, exchange 204416, check: uncheckable)</li>
+<li id="s4">Creating a disk image can be slow even on systems with modern hardware like SSDs and multiple CPUs. (user-baf6, 2022-06-12, exchange 182369, check: uncheckable)</li>
+<li id="s5">To install IRIX, you need to use fx to create partitions on a disk image, as the installation process is specific to SGI disks. (user-e4d0, 2024-05-10, exchange 218387, check: uncheckable)</li>
+<li id="s6">The command 'boot -f dksc(0.1.8)sash.ip6 DKSC(0.1.7)/unix' boots the system using a disk image. (user-2d40, 2023-09-23, exchange 218192, check: supported)</li>
+<li id="s7">Bootstrapping an SGI workstation involves pointing it at the .ini file for the desired OS and the disk image. (user-9528, 2025-12-19, exchange 186976, check: uncheckable)</li>
+<li id="s8">Running SGI emulation requires ROMs and a disk image with a recent MAME build. (user-d903, 2021-12-13, exchange 217351, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="c8000.html">C8000</a>, <a href="workstation.html">workstation</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="os.html">OS</a>
+</li>
+<li>Software: <a href="dd.html">dd</a>, <a href="imgburn.html">ImgBurn</a>, <a href="mame.html">MAME</a>, <a href="reanimator.html">Reanimator</a>, <a href="boot.html">boot</a>, <a href="fx.html">fx</a>, <a href="game.html">game</a>
+</li>
+<li>Parts and peripherals: <a href="zuluscsi.html">ZuluSCSI</a>, <a href="rom.html">ROM</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="luns.html">LUNs</a>
+</li></ul>
+</body>
+</html>

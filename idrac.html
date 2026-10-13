@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iDRAC</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>iDRAC</h1>
+<p>Claims: 6</p>
+<p>The iDRAC on the DL360 G7 has compatibility issues with certain HBAs and weak CPUs. <sup><a href="#s1">1</a></sup> iDRAC can use HTML5 instead of the Java web app. <sup><a href="#s2">2</a></sup> The iDRAC allows booting from a virtual CD over the network, a process that involves logging into the iDRAC, launching the virtual console, creating a virtual CD, mounting an ISO, and setting the boot device temporarily. <sup><a href="#s3">3</a></sup> The PERC HBA can be switched to HBA mode using LSI firmware, which disables monitoring from iDRAC and requires a system reboot, may need alternative firmware reflashing, and involves finicky BIOS settings that may not work. <sup><a href="#s4">4</a></sup> Dell PSUs have firmware for out-of-band management through iDRAC. <sup><a href="#s5">5</a></sup> Reports exist of people unbricking iDRAC on Dell servers, which might help if the BMC fails to fully boot, but no such documentation exists for Lenovo servers, which require replacing the whole mobo in such cases. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The iDRAC on the DL360 G7 has compatibility issues with certain HBAs and has weak CPUs. (user-b1da, 2020-02-04, exchange 5977, check: uncheckable)</li>
+<li id="s2">iDRAC can use HTML5 instead of the Java web app. (user-b1da, 2020-04-30, exchange 7939, check: uncheckable)</li>
+<li id="s3">The iDRAC allows booting from a virtual CD over the network; the process involves logging into the iDRAC, launching the virtual console, creating a virtual CD, mounting an ISO, and setting the boot device temporarily. Re (user-2189, 2020-12-17, exchange 98057, check: uncheckable)</li>
+<li id="s4">PERC HBA can be switched to HBA mode, which disables monitoring from iDRAC and requires system reboot; alternative firmware reflashing might be needed; LSI firmware is used; BIOS settings for this are finicky and may not (user-9860, 2021-09-21, exchange 20306, check: uncheckable)</li>
+<li id="s5">Dell PSUs have firmware for out-of-band management through iDRAC. (user-b1da, 2022-04-28, exchange 222195, check: uncheckable)</li>
+<li id="s6">Reports exist of people unbricking iDRAC on Dell servers, which might help if the BMC fails to fully boot, but no such documentation exists for Lenovo servers, which require replacing the whole mobo in such cases. (user-baf6, 2023-10-18, exchange 209415, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="dell-server.html">Dell server</a>
+</li>
+<li>Parts and peripherals: <a href="dell-psu.html">Dell PSU</a>
+</li>
+<li>Other: <a href="dl360-g7.html">DL360 G7</a>, <a href="hba.html">HBA</a>
+</li></ul>
+</body>
+</html>

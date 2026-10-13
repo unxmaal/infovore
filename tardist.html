@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tardist</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>tardist</h1>
+<p>Claims: 54</p>
+<p>A tardist is a tar archive packaged inside the IRIX `inst` format, and its file structure typically includes license, install, readme, remove, and sw files. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Tardist files can be created using tools such as EPM, irixports with EPM (with spec.py handling package specifications), nekoware, and tgcware scripts, and can contain selectable install sections for the main install, manpages, dev libraries, and source. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Tardist packages built with DIDBS GCC work on other IRIX machines, and tardist files can be installed on IRIX by following specific installation steps. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The `inst` command requires a tardist file to be untarred into a folder before opening it, and it can fail after creating 26 temporary directories when installing multiple tardist packages, a problem resolved by extracting files manually. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The software manager on IRIX has trouble reading tardist files, and the swmgr tool cannot open certain tardist files, reporting them as 'bad'. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The swmgr tool can download .tardist files over the web to /tmp, and gunzip is needed to decompress .tardist files on IRIX 5.3. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> Tardist files can contain source code and patch files, though their inclusion was arbitrary among developers, and better nekoware packages included source and patches as optional installs. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The tardist file structure includes license, install, readme, remove, and sw files. (user-42cf, 2019-02-06, exchange 214732, check: uncheckable)</li>
+<li id="s2">Tardist files are tar archives inside an inst format. (user-d903, 2020-08-11, exchange 10518, check: uncheckable)</li>
+<li id="s3">EPM v4.4.1 can compile and install on IRIX and create a tardist. (user-2189, 2019-02-03, exchange 66993, check: uncheckable)</li>
+<li id="s4">irixports with epm can build and package software into tardist, with spec.py handling package specifications. (user-2189, 2019-11-07, exchange 214883, check: uncheckable)</li>
+<li id="s5">Creating packages for software can involve using tools like nekoware and tgcware scripts for tardist creation. (user-c831, 2020-02-19, exchange 68432, check: uncheckable)</li>
+<li id="s6">There were tools for creating a tardist with selectable install sections for the main install, manpages, dev libraries, source, etc. The build version could be iterated, showing up as an update for a previous install. (user-d903, 2021-11-14, exchange 217302, check: uncheckable)</li>
+<li id="s7">TARDIST packages built with DIDBS GCC work on other IRIX machines. (user-2189, 2019-08-31, exchange 67827, check: uncheckable)</li>
+<li id="s8">Tardist files can be installed on IRIX by following specific installation steps. (user-554a, 2024-11-28, exchange 51043, check: uncheckable)</li>
+<li id="s9">The `inst` command fails after creating 26 temporary directories when installing multiple tardist packages, suggesting a limit or space issue; extracting tardist files manually resolves the issue by avoiding temporary un (user-bc5d, 2019-09-22, exchange 3607, check: supported)</li>
+<li id="s10">inst requires a tardist file to be un tar’ed into a folder before opening it. (user-f190, 2026-03-30, exchange 90191, check: uncheckable)</li>
+<li id="s11">The software manager on IRIX has trouble reading tardist files, requiring manual extraction. (user-281e, 2024-08-13, exchange 210799, check: uncheckable)</li>
+<li id="s12">The swmgr tool on IRIX 5.3 Indy cannot open certain tardist files from tgcware, reporting them as 'bad'. (user-7973, 2026-02-07, exchange 89631, check: supported)</li>
+<li id="s13">swmgr can download .tardist files over the web to /tmp. (user-56d4, 2023-02-03, exchange 208287, check: uncheckable)</li>
+<li id="s14">gunzip is needed to decompress .tardist files on IRIX 5.3. (user-c6be, 2025-09-26, exchange 219136, check: supported)</li>
+<li id="s15">nekoware packages often included source codes and patch files, but the organization was arbitrary, with some developers including them in the tardist files and others not. Discussions about building them were on the lost (user-d903, 2021-07-14, exchange 69755, check: uncheckable)</li>
+<li id="s16">better nekoware packages had source and patches in the tardist as optional installs. (user-6afa, 2021-07-14, exchange 69755, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="tardist-file.html">tardist file</a> (3)
+</li>
+<li><a href="tardist-package.html">tardist package</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>
+</li>
+<li>Software: <a href="inst.html">inst</a>, <a href="nekoware.html">nekoware</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="swmgr.html">swmgr</a>, <a href="openssl.html">OpenSSL</a>, <a href="rpm.html">RPM</a>, <a href="epm.html">epm</a>, <a href="irixports.html">irixports</a>, <a href="tgcware.html">tgcware</a>, <a href="booterizer.html">Booterizer</a>, <a href="cd.html">CD</a>, <a href="dev-libraries.html">Dev Libraries</a>, <a href="glut.html">GLUT</a>, <a href="openssh.html">OpenSSH</a>, <a href="rse.html">RSE</a>, <a href="sdl2.html">SDL2</a>, <a href="didbs.html">didbs</a>, <a href="install.html">install</a>, <a href="license.html">license</a>, <a href="package.html">package</a>, <a href="software-manager.html">software manager</a>, <a href="sshd.html">sshd</a>
+</li>
+<li>Companies: <a href="gcc8.html">gcc8</a>
+</li>
+<li>Other: <a href="readme.html">README</a>, <a href="fw-hexedit.html">fw_hexedit</a>, <a href="gunzip.html">gunzip</a>, <a href="man-page.html">man page</a>, <a href="source-code.html">source code</a>, <a href="tarball.html">tarball</a>
+</li></ul>
+</body>
+</html>

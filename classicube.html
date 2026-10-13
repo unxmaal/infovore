@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClassiCube</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ClassiCube</h1>
+<p>Claims: 19</p>
+<p>ClassiCube is a Minecraft clone written in C that is being ported to IRIX, where it runs fairly well. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can have flickering issues, possibly related to missing libraries or vsync settings, but runs without flickering on SGI Vizserver at around 30fps, flickering only when run on video out. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It also has audio issues with Ogg files on some SGI hardware. <sup><a href="#s6">6</a></sup> Compiling ClassiCube requires linking against libraries in /usr/lib32 using the -Wl,--allow-shlib-undefined flag, and can link to libX11.so.1 instead of libX11.so.6 by adjusting library paths. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> A patch to force double-buffering could improve compatibility, and a bgra bug related to ClassiCube has been fixed. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Its SSL/TLS error can be resolved by using a newer OpenSSL, and the Singleplayer option can be accessed by starting it from sgugshell to ensure the correct OpenSSL is used for downloading resources. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Running ClassiCube without arguments downloads resources, but the single player button in the menu does not function. <sup><a href="#s14">14</a></sup> It requires T-RAM to run without snow cube on IRIX, and the Indy is too slow for it. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">I'm talking to the developer for classicube and he is making an effort to be able to get it to run on irix. (user-24f0, 2023-03-19, exchange 208457, check: uncheckable)</li>
+<li id="s2">classicube is promising for being ported. (user-56d4, 2023-03-20, exchange 106874, check: uncheckable)</li>
+<li id="s3">ClassiCube, a Minecraft clone in C, runs fairly well on IRIX. (user-24f0, 2023-04-09, exchange 217978, check: uncheckable)</li>
+<li id="s4">ClassiCube on IRIX can have flickering issues, possibly related to missing libraries or vsync settings. (user-95db, 2023-04-18, exchange 83357, check: uncheckable)</li>
+<li id="s5">Classicube runs without flickering on SGI Vizserver and averages around 30fps, but flickers when run on video out. (user-24f0, 2025-02-19, exchange 71965, check: supported)</li>
+<li id="s6">ClassiCube has audio issues with Ogg files on some SGI hardware. (user-59b9, 2023-04-25, exchange 218006, check: uncheckable)</li>
+<li id="s7">install libX11-devel and libcurl-devel for ClassiCube port. (user-e4d0, 2023-05-09, exchange 218037, check: uncheckable)</li>
+<li id="s8">ClassiCube can link to libX11.so.1 instead of libX11.so.6 by adjusting library paths. (user-22f9, 2025-02-19, exchange 114863, check: uncheckable)</li>
+<li id="s9">Compiling ClassiCube requires linking against libraries in /usr/lib32 and using the -Wl,--allow-shlib-undefined flag to resolve undefined references. (user-24f0, 2025-02-22, exchange 114893, check: uncheckable)</li>
+<li id="s10">A patch for ClassiCube to force double-buffering could improve compatibility. (user-6afa, 2023-06-06, exchange 83706, check: uncheckable)</li>
+<li id="s11">A bgra bug related to Classicube has been fixed. (user-24f0, 2025-05-07, exchange 218930, check: uncheckable)</li>
+<li id="s12">ClassiCube's SSL/TLS error can be resolved by using a newer OpenSSL, as suggested by sgug-rse. (user-23f2, 2025-05-10, exchange 56471, check: uncheckable)</li>
+<li id="s13">ClassiCube's Singleplayer option can be accessed by starting it from sgugshell to ensure the correct OpenSSL is used for downloading resources. (user-e872, 2025-05-10, exchange 56471, check: uncheckable)</li>
+<li id="s14">Running classicube without arguments downloads resources, and the single player button in the menu does not function. (user-503b, 2023-07-06, exchange 83793, check: uncheckable)</li>
+<li id="s15">Classicube requires T-RAM to run without snow cube on IRIX, and the Indy is too slow for it; compiling on IRIX 5.3 is not possible. (user-24f0, 2025-05-07, exchange 218930, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="sgi-hardware.html">SGI hardware</a>, <a href="tram.html">TRAM</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>
+</li>
+<li>Software: <a href="openssl.html">OpenSSL</a>, <a href="vizserver.html">VizServer</a>, <a href="library.html">library</a>, <a href="sgugshell.html">sgugshell</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="usr-lib32.html">/usr/lib32</a>, <a href="libx11-devel.html">libX11-devel</a>
+</li></ul>
+</body>
+</html>

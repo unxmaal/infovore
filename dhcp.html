@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DHCP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>DHCP</h1>
+<p>Claims: 35 Background: 9 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol">Dynamic Host Configuration Protocol</a>, <a href="https://en.wikipedia.org/wiki/Bootstrap_Protocol">Bootstrap Protocol</a>.</p>
+<p>A DHCP client must perform a DHCP request in order to receive an IP address, which requires the host to facilitate ARP requests. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The DHCP process can check the address and use the default netmask, and options 3 and 6 can set the gateway and resolv.conf. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> DHCP can be used on network interfaces to allow access, and it can be combined with zeroconf (mDNS) to provide a complete network solution. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> BOOTP and DHCP support appears in IRIX 6.5, which was a transitional period that remained flaky, and later versions such as 6.5.30 were somewhat more reliable. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> DHCP on IRIX is unreliable and can stop working randomly, and IRIX does not automatically register its hostname with DNS when using DHCP. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> DHCP can cause IP conflicts, and out of the box IRIX might DHCP only the IP and not the default gateway. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Static IP addressing is considered a good practice to avoid issues with DHCP. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the SGI box has to facilitate ARP requests in order to even receive an IP from the DHCP. (user-37ee, 2021-08-08, exchange 217197, check: uncheckable)</li>
+<li id="s2">The client must perform a DHCP request before the system works. (user-86e1, 2025-07-27, exchange 93599, check: uncheckable)</li>
+<li id="s3">DHCP is checked, default net mask used (user-369f, 2022-04-19, exchange 206868, check: uncheckable)</li>
+<li id="s4">proclaim sets the gateway and resolv.conf via DHCP options 3 and 6. (user-3e2d, 2025-02-21, exchange 86730, check: supported)</li>
+<li id="s5">It is set up to use DHCP on one of the two gigabit interfaces, allowing SSH access. (user-7b1c, 2022-02-24, exchange 181519, check: supported)</li>
+<li id="s6">A raspi-based solution can provide a complete network solution, including DHCP and zeroconf (mDNS) for IRIX. (user-3360, 2020-06-09, exchange 204301, check: uncheckable)</li>
+<li id="s7">glsnoop was intended to fully replace snoop, and 6.5 was the transitional period for IPv6 and DHCP support in IRIX, which remained flaky; no version past 6.5 ever materialized. (user-bc18, 2021-03-22, exchange 204864, check: supported)</li>
+<li id="s8">6.5.30 seems to be a bit more reliable with DHCP than .22 and prior. (user-b7c4, 2024-11-21, exchange 50719, check: supported)</li>
+<li id="s9">The DHCP implementation in IRIX is unreliable and can stop working randomly. (user-3e2d, 2025-01-18, exchange 52900, check: uncheckable)</li>
+<li id="s10">DHCP on IRIX is not reliable and can be garbage. (user-22f9, 2025-01-18, exchange 52900, check: uncheckable)</li>
+<li id="s11">IRIX does not automatically register its hostname with DNS when using DHCP. (user-86e1, 2025-10-10, exchange 213205, check: uncheckable)</li>
+<li id="s12">DHCP can cause IP conflicts, as seen in a previous job where an employee's laptop stole an IP address. (user-22f9, 2025-01-18, exchange 211694, check: uncheckable)</li>
+<li id="s13">Out of the box, IRIX might DHCP only the IP and not the default gateway. (user-1629, 2024-11-21, exchange 50719, check: uncheckable)</li>
+<li id="s14">Static IP addressing is a good practice to avoid issues with DHCP. (user-d903, 2020-06-07, exchange 8880, check: uncheckable)</li>
+<li id="s15">Setting static IPs instead of relying on DHCP avoids IP conflicts and makes configuration easier. (user-baf6, 2023-08-15, exchange 39776, check: uncheckable)</li>
+<li id="s16">DHCP can be unreliable, try setting a static IP. (user-07ed, 2025-10-04, exchange 150931, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="dhcp-server.html">DHCP server</a> (8)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="iris.html">IRIS</a>, <a href="mac-address.html">MAC address</a>, <a href="o2.html">O2</a>, <a href="ultra-5.html">Ultra 5</a>
+</li>
+<li>Processors: <a href="sparc.html">SPARC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="openbsd.html">OpenBSD</a>, <a href="openbsd-sgi.html">OpenBSD/sgi</a>, <a href="solaris.html">Solaris</a>, <a href="netboot.html">netboot</a>
+</li>
+<li>Software: <a href="love-installer.html">LOVE installer</a>, <a href="path.html">PATH</a>
+</li>
+<li>Parts and peripherals: <a href="network-emulation.html">network emulation</a>
+</li>
+<li>Standards and interfaces: <a href="bootp.html">bootp</a>, <a href="tftp.html">TFTP</a>, <a href="dns.html">DNS</a>, <a href="efi.html">EFI</a>, <a href="ipv6.html">IPv6</a>, <a href="ssh.html">SSH</a>, <a href="wifi.html">WiFi</a>
+</li>
+<li>Companies: <a href="sgi-box.html">SGI box</a>
+</li>
+<li>Other: <a href="2-6-kernel.html">2.6 kernel</a>, <a href="http.html">HTTP</a>, <a href="internet-explorer.html">Internet Explorer</a>, <a href="ntp.html">NTP</a>, <a href="pxe.html">PXE</a>, <a href="rarp.html">RARP</a>, <a href="raspi.html">Raspi</a>, <a href="default-gateway.html">default gateway</a>, <a href="filename.html">filename</a>, <a href="label.html">label</a>, <a href="netmask.html">netmask</a>, <a href="static-ip.html">static IP</a>
+</li></ul>
+</body>
+</html>

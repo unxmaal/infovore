@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVMe drive</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NVMe drive</h1>
+<p>Claims: 16 Part of <a href="nvme.html">NVMe</a></p>
+<p>An NVMe drive can get hot, often requiring a heat sink or heat gumstick for cooling, and not every NVMe drive has 4 lanes—good ones do, but cheaper ones might have only 1 lane. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Adding an NVMe drive can change the device names of other interfaces due to their location on the PCI bus, and without bifurcation it can be tried in both slots of a card. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The IRIX kernel can potentially boot from an NVMe drive if the kernel has the necessary driver built in, and a setup with the root filesystem on a spinny disk and the rest on an NVMe drive is possible. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Booting from an NVMe drive without a spinner or TFTP server works if the system drive is pulled, changing the OSLoadPartition is not necessary, and the NVMe drive is seen on 2008SP6 but causes segmentation faults with sw_config. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Zapit is an Alias/Wavefront program for editing NTSC video with zero lag using an NVMe drive on an SGI O2. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">An NVMe drive can get hot, often requiring a heat sink or heat gumstick for cooling. (user-e872, 2022-01-09, exchange 24425, check: uncheckable)</li>
+<li id="s2">Not every NVMe drive has 4 lanes; good ones do, but cheaper ones might have only 1 lane. (user-3e2d, 2025-12-11, exchange 119985, check: supported)</li>
+<li id="s3">Without bifurcation, an NVMe drive can be tried in both slots of that card. (user-e872, 2022-11-01, exchange 33643, check: uncheckable)</li>
+<li id="s4">Adding an NVMe drive can change the device names of other interfaces due to their location on the PCI bus. (user-7b1c, 2023-01-30, exchange 208264, check: uncheckable)</li>
+<li id="s5">The IRIX kernel can potentially boot from an NVMe drive if the kernel has the necessary driver built in. (user-3e2d, 2025-11-25, exchange 219278, check: uncheckable)</li>
+<li id="s6">A setup with the root filesystem on a spinny disk and the rest on an NVMe drive is possible. (user-e872, 2025-11-30, exchange 225724, check: uncheckable)</li>
+<li id="s7">Booting from an NVMe drive without a spinner or TFTP server works if the system drive is pulled, changing the OSLoadPartition is not necessary. (user-f190, 2026-01-04, exchange 225864, check: uncheckable)</li>
+<li id="s8">The NVMe drive is seen on 2008SP6 but causes segmentation faults with sw_config. (user-4847, 2026-08-17, exchange 143424, check: uncheckable)</li>
+<li id="s9">Zapit is an Alias/Wavefront program for editing NTSC video with zero lag using an NVME drive on an SGI O2. (user-1a5a, 2025-12-27, exchange 219352, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="tftp-server.html">TFTP server</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="root-filesystem.html">root filesystem</a>
+</li>
+<li>Parts and peripherals: <a href="spinny-disk.html">spinny disk</a>
+</li>
+<li>Standards and interfaces: <a href="pci-card.html">PCI card</a>, <a href="raid.html">RAID</a>
+</li>
+<li>Other: <a href="alias-wavefront.html">Alias/Wavefront</a>, <a href="ntsc-video.html">NTSC video</a>, <a href="zapit.html">ZapIt</a>, <a href="sw-config.html">sw_config</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IO3</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IO3</h1>
+<p>Claims: 9</p>
+<p>The IO3 board is necessary for a functional VME bus in Crimson, and the IO2/IO3/IO3B bridge VME to PowerPath while the GM board bridges PowerPath to graphics, with both having massive connectors. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The SCSI controller on the IO3 is a WD33c93, and the IO3 and IO3B controllers use different WD33C93A chips, with IO3B using AMD chips which have a quirk, possibly fixed in newer versions. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> An IO3 or IO3B can connect both drive bays to separate SCSI channels, while an IO2 with a single channel requires a jumper to connect all bays to one chain. <sup><a href="#s5">5</a></sup> The 4D/380 has an IO3, IP7, and MC2 that require testing; a minimal 8MB RAM setup is sufficient for diagnostics, which include CPU, bus, memory, path, IO, FPU, and MP tests. <sup><a href="#s6">6</a></sup> By putting both secondary CPU mezzanines on one IP7 and upgrading the PROM to match the IO3, an IP7 that failed earlier was made to work again. <sup><a href="#s7">7</a></sup> The PowerSeries chassis was redesigned halfway through its product life due to the release of the IO3, drive module inefficiency, and the arrival of high density RAM. <sup><a href="#s8">8</a></sup> The IP7 uses two CPU halves with minimal shared components; early 1990s PowerSeries tech refresh included 33MHz CPUs, IO3, VGX graphics, and Single Tower chassis, improving drive efficiency. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The io3 board is necessary for a functional VME bus in Crimson. (user-83aa, 2022-12-13, exchange 188455, check: supported)</li>
+<li id="s2">The IO2/IO3/IO3B bridge VME to PowerPath, and the GM board bridges PowerPath to graphics. Both have massive connectors. (user-86e1, 2023-10-25, exchange 188710, check: uncheckable)</li>
+<li id="s3">The IO3 and IO3B controllers use different WD33C93A chips, with IO3B using AMD chips which have a quirk, possibly fixed in newer versions. (user-86e1, 2024-12-03, exchange 189341, check: uncheckable)</li>
+<li id="s4">The SCSI controller on the IO3 is a WD33c93. (user-86e1, 2024-12-03, exchange 241253, check: uncheckable)</li>
+<li id="s5">An IO3 or IO3B can connect both drive bays to separate SCSI channels, while an IO2 with a single channel requires a jumper to connect all bays to one chain. (user-86e1, 2024-11-28, exchange 189334, check: uncheckable)</li>
+<li id="s6">The 4D/380 has an IO3, IP7, and MC2 that require testing; a minimal 8MB RAM setup is sufficient for diagnostics, which include CPU, bus, memory, path, IO, FPU, and MP tests. The IO3 has issues with the IO PROM and ECC,虽略 (user-86e1, 2025-11-06, exchange 241410, check: supported)</li>
+<li id="s7">By putting both secondary CPU mezzanines on one IP7 and upgrading the PROM to match the IO3, an IP7 that failed earlier was made to work again. (user-86e1, 2025-11-09, exchange 189988, check: uncheckable)</li>
+<li id="s8">The PowerSeries chassis was redesigned halfway through its product life due to the release of the IO3, drive module inefficiency, and the arrival of high density RAM. (user-86e1, 2026-03-20, exchange 241437, check: uncheckable)</li>
+<li id="s9">The IP7 uses two CPU halves with minimal shared components; early 1990s PowerSeries tech refresh included 33MHz CPUs, IO3, VGX graphics, and Single Tower chassis, improving drive efficiency. (user-86e1, 2026-08-04, exchange 214350, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="4d-380.html">4D/380</a>, <a href="crimson.html">Crimson</a>
+</li>
+<li>Graphics: <a href="vgx-graphics.html">VGX graphics</a>
+</li>
+<li>Parts and peripherals: <a href="io3b.html">IO3B</a>, <a href="ip7.html">IP7</a>, <a href="prom.html">PROM</a>, <a href="powerseries-chassis.html">PowerSeries chassis</a>, <a href="scsi-controller.html">SCSI controller</a>
+</li>
+<li>Other: <a href="io2.html">IO2</a>
+</li></ul>
+</body>
+</html>

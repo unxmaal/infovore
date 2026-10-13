@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XZ</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XZ</h1>
+<p>Claims: 40 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Indy">SGI Indy</a>.</p>
+<h2 id="with-r5000">With R5000</h2>
+<ul>
+<li>XZ includes a geometry engine and on R4k it's faster than the CPU FP, but on R5k it's slower. (+6 similar) (user-d903, exchange 101120, 2021-12-07 to 2026-02-15; 6 speaker(s), 5 conversation(s))
+</li>
+<li>The XZ requires an R4k or R5k for optimal performance. (user-24f0, exchange 224934, 2025-04-21; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The r5000 with XL 24bit mode can perform geometry transforms faster than the XZ but cannot use the CPU for other tasks simultaneously. (user-6afa, exchange 224612, 2025-02-17; 1 speaker(s), 1 conversation(s))
+</li>
+<li>an R5000 with XL performs better 'in many cases' than XZ, which implies that it depends on the particular situation (user-c383, exchange 204996, 2021-04-23; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="general">General</h2>
+<p>The XZ includes a geometry engine that handles transformations in hardware, and it has four geometry engines but less Z buffer. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> On R4k processors the XZ is faster than the CPU for geometry tasks, but on R5k processors it is slower and the R5k can software render 3D faster. <sup><a href="#s1">1</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Installing an XZ on an R5k system can reduce 3D performance compared to XL, and it makes the system less efficient for geometry tasks but still faster for interactive logic and polygon pushing. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The XL24 is a single-height board that performs better than the double-height XZ for R5000 CPUs in many cases, and the R5000 Indy is best with a single-height XL24 board. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Using an XZ involves a trade-off where you get hardware 3D but lose 2D performance and expansion, and depending on workload it can be slower than letting the R5k do all of the work. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The XZ requires an R4k or R5k for optimal performance and a PROM version newer than July 1994 to work. <sup><a href="#s5">5</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">XZ includes a geometry engine and on R4k it's faster than the CPU FP, but on R5k it's slower. (user-d903, 2021-12-07, exchange 101120, check: supported)</li>
+<li id="s2">The Indy fills spans in hardware for graphics, and the XZ also handles transformations in hardware. (user-21b8, 2024-11-21, exchange 71694, check: supported)</li>
+<li id="s3">The XZ has four geometry engines but has less Z buffer. (user-1a5a, 2026-09-17, exchange 227063, check: supported)</li>
+<li id="s4">the R5K can software render 3D faster than the XZ can (user-b7c4, 2022-06-08, exchange 222314, check: supported)</li>
+<li id="s5">The XZ requires an R4k or R5k for optimal performance. (user-24f0, 2025-04-21, exchange 224934, check: supported)</li>
+<li id="s6">Installing XZ on a R5k system can reduce 3d performance compared to XL. (user-d903, 2021-12-07, exchange 101120, check: supported)</li>
+<li id="s7">Putting an XZ into an R5K machine makes it less efficient for geometry tasks but still faster for interactive logic and polygon pushing. The upgrade was motivated by the need for better performance in interactive tasks, (user-6afa, 2022-06-08, exchange 222313, check: supported)</li>
+<li id="s8">An XL/24 graphics card is faster than XZ for R5000 CPUs. (user-22f9, 2019-06-09, exchange 95269, check: supported)</li>
+<li id="s9">an R5000 with XL performs better 'in many cases' than XZ, which implies that it depends on the particular situation (user-c383, 2021-04-23, exchange 204996, check: supported)</li>
+<li id="s10">The XL8 and XL24 are single-height boards, while the XZ is double-height. The R5000 Indy is best with a single-height XL24 board. (user-9849, 2021-05-07, exchange 17238, check: supported)</li>
+<li id="s11">XZ is extremely uncommon and depending on workload it can be slower than letting the R5K do all of the work. (user-9219, 2026-02-15, exchange 226091, check: supported)</li>
+<li id="s12">It’s a trade-off, you get hardware 3D but you lose 2D performance and expansion. (user-1a5a, 2026-02-15, exchange 226091, check: supported)</li>
+<li id="s13">XZ requires a certain minimum PROM version, and PROM can't init hardware it doesn't know about; the PROM version must be newer than July 1994 for XZ to work. (user-86e1, 2026-02-19, exchange 226108, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="xz-board.html">XZ board</a> (5)
+</li>
+<li><a href="xz-card.html">XZ card</a> (3)
+</li>
+<li><a href="xz-graphics.html">XZ graphics</a> (7)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="impact.html">Impact</a>, <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="iris.html">IRIS</a>, <a href="r5k-indy.html">R5K Indy</a>
+</li>
+<li>Processors: <a href="r5000.html">R5000</a>, <a href="r4000.html">R4000</a>, <a href="r10k-i2.html">R10K I2</a>, <a href="r4400.html">R4400</a>, <a href="r4400-indigo2.html">R4400 Indigo2</a>, <a href="r4400-indy.html">R4400 Indy</a>, <a href="r4600.html">R4600</a>, <a href="r5000-indy.html">R5000 Indy</a>
+</li>
+<li>Graphics: <a href="extreme.html">Extreme</a>, <a href="xl.html">XL</a>, <a href="xl24.html">XL24</a>, <a href="xl8.html">XL8</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-22.html">IRIX 6.5.22</a>
+</li>
+<li>Software: <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="presenter-board.html">presenter board</a>
+</li>
+<li>Other: <a href="libarchive.html">libarchive</a>, <a href="250-mhz.html">250 MHz</a>, <a href="r4600-133.html">R4600-133</a>, <a href="handle.html">handle</a>, <a href="netcat.html">netcat</a>, <a href="zstd.html">zstd</a>
+</li></ul>
+</body>
+</html>

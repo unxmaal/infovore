@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIS GL</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIS GL</h1>
+<p>Claims: 71 Part of <a href="iris.html">IRIS</a> Background: 15 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIS_GL">IRIS GL</a>, <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>.</p>
+<h2 id="with-onyx4">With Onyx4</h2>
+<p>The Onyx4 is a high-performance SGI system using ATI FireGL cards (up to 12x faster than the V12 Pro), with DVI outputs for high resolution, programmable shaders, and lower power consumption. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Onyx4 does not support IRIS GL. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> It uses XFree86, which leads to compatibility issues with many applications, and a third-party tool for Linux exists but is not from SGI. <sup><a href="#s4">4</a></sup><sup><a href="#s6">6</a></sup> Because it cannot run IRIS GL, the Onyx4 lacks full 4DWM features and vector icons, and few demos work. <sup><a href="#s2">2</a></sup><sup><a href="#s8">8</a></sup> The Onyx4 is useful for running IRIX software and using CAVE-type systems, but has compatibility issues with some software. <sup><a href="#s9">9</a></sup> mediarecord is an IRIS GL application and does not work on the Onyx4. <sup><a href="#s10">10</a></sup></p>
+<h2 id="general">General</h2>
+<p>IRIS GL is a low-level, immediate-mode graphics library that is SGI-specific and less portable than OpenGL, though it is simpler and faster, offering better performance on low-end hardware and maximum compatibility with all system versions. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> IRIS GL uses IGLOO for translation and is hardware-accelerated, with the OpenGL API available on older hardware but with limitations. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> IRIS GL was used in end-user software such as VizServer and OpenTransit, and was mission-critical for custom software like early PowerAnimator and Explorer. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> IRIS GL supported features including display lists (since version 1.0), texture mapping, backface culling, and texture objects, which were added to fix a problem with texture state caching assumed in display lists. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> SGI ported IRIS GL support to their later chips, and all IRIX systems can use IRIS GL except for Onyx 4 systems, while all configurations of the Indigo2 support it except for the server/headless ones. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> Before 1993, SGI used IRIS GL instead of Xlib for window creation, and IRIS GL manuals mention a 'mixed model' for combining Xlib and IRIS GL. <sup><a href="#s25">25</a></sup> The original IRIS GL code is being used to bring back the full original software, with IRIX 3.7 including full source code for IRIS GL, test programs, and MEX, making it complete; the goal is to port IRIS GL and incrementally upgrade it on a desktop. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> ProE had an IRIS GL-based menu system that took years to implement on Windows. <sup><a href="#s28">28</a></sup> The O2 does not support IRIS GL extensions despite supporting SGIX equivalents. <sup><a href="#s29">29</a></sup> ep was a demo for a larger IrisGL program with scripts and sliders and mentions dial I/O. <sup><a href="#s30">30</a></sup> Fuel does not run programs in COFF format and likely does not support IRIS GL. <sup><a href="#s31">31</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Onyx4 is a high-performance SGI system using ATI FireGL cards, up to 12x faster than V12 Pro but incompatible with IrisGL and requiring a different X Windows configuration; it supports DVI outputs for high-resolution (user-8b3c, 2020-11-12, exchange 221119, check: supported)</li>
+<li id="s2">The Onyx 4 has programmable shaders and lower power consumption but few demos work (no IrisGL). (user-5906, 2024-06-06, exchange 223957, check: supported)</li>
+<li id="s3">IrisGL works on SGI systems with graphics cards, excluding the Onyx4. (user-59b9, 2020-09-18, exchange 69068, check: supported)</li>
+<li id="s4">The Onyx4 does not support IrisGL; a third-party tool for Linux exists but not from SGI (user-59b9, 2020-11-12, exchange 221119, check: supported)</li>
+<li id="s5">The Onyx4, like the Prism, cannot run IRIS GL. (user-59b9, 2021-01-15, exchange 13858, check: supported)</li>
+<li id="s6">The Onyx4 lacks IRIS GL support and uses XFree86, leading to compatibility issues with many applications. (user-59b9, 2023-05-11, exchange 208684, check: supported)</li>
+<li id="s7">The Onyx4 does not support IrisGL. (user-24f0, 2023-10-17, exchange 223449, check: supported)</li>
+<li id="s8">The Onyx4 uses ATI FireGL X1 cards but cannot run IRISgl, lacking full 4DWM features and vector icons. (user-24f0, 2024-08-01, exchange 48009, check: supported)</li>
+<li id="s9">The Onyx4 is useful for running IRIX software and using CAVE-type systems, but has compatibility issues with some software and lacks IrisGL. (user-5906, 2025-09-04, exchange 118394, check: supported)</li>
+<li id="s10">mediarecord is an IRIS GL application and does not work on Onyx4. (user-b7c4, 2019-01-31, exchange 389, check: supported)</li>
+<li id="s11">IrisGL is simpler and faster, better for performance on low-end hardware. (user-22f9, 2025-02-13, exchange 211974, check: uncheckable)</li>
+<li id="s12">IrisGL has maximum compatibility with all system versions. (user-22f9, 2025-02-13, exchange 211974, check: uncheckable)</li>
+<li id="s13">IRISGL is faster and has better compatibility but is SGI-specific and less portable. (user-22f9, 2025-02-17, exchange 54385, check: uncheckable)</li>
+<li id="s14">IrisGL is a low-level graphics library that is immediate-mode only. (user-45c8, 2025-02-17, exchange 54419, check: uncheckable)</li>
+<li id="s15">IRIS GL uses IGLOO for translation. (user-e4d0, 2025-09-25, exchange 215817, check: uncheckable)</li>
+<li id="s16">IRIS GL is hardware-accelerated and the OpenGL API is available on older hardware but with limitations. (user-86e1, 2025-09-22, exchange 213107, check: uncheckable)</li>
+<li id="s17">Early PowerAnimator and Explorer likely used IRIS GL, and custom IRIS GL software was mission-critical. (user-ec52, 2025-08-18, exchange 58373, check: uncheckable)</li>
+<li id="s18">IRIS GL was used in end-user software like VizServer and OpenTransit. (user-ec52, 2025-08-18, exchange 58372, check: uncheckable)</li>
+<li id="s19">Display lists were supported since IRIS GL 1.0 and texture objects were added to fix a problem with texture state caching assumed in display lists. (user-b1da, 2023-10-01, exchange 209313, check: supported)</li>
+<li id="s20">IrisGL can perform backface culling. (user-21b8, 2024-07-03, exchange 227312, check: uncheckable)</li>
+<li id="s21">IRIX supported texture mapping through IRIS GL. (user-ec52, 2025-08-18, exchange 58373, check: uncheckable)</li>
+<li id="s22">All IRIX systems can use IRIS GL except for Onyx 4 systems. (user-6c80, 2025-02-28, exchange 86793, check: supported)</li>
+<li id="s23">All configurations of the Indigo2 support IRIS GL except for the server/headless ones. (user-6c80, 2025-02-28, exchange 86793, check: supported)</li>
+<li id="s24">SGI ported IRIS GL support to their later chips. (user-ec52, 2025-08-18, exchange 58372, check: uncheckable)</li>
+<li id="s25">Before 1993, SGI used IRISGL instead of Xlib for window creation, and IRISGL manuals mention a 'mixed model' for combining Xlib and IRISGL. (user-b1da, 2021-04-19, exchange 204981, check: supported)</li>
+<li id="s26">The original Iris GL code is being used to bring back the full original software. (user-2a3c, 2026-05-23, exchange 214001, check: uncheckable)</li>
+<li id="s27">IRIX 3.7 includes full source code for IRIS GL, test programs, and MEX, making it complete; the goal is to port IRIS GL and incrementally upgrade it on a desktop. (user-b03b, 2026-09-09, exchange 92001, check: supported)</li>
+<li id="s28">ProE had an IrisGL-based menu system that took years to implement on Windows. (user-2a3c, 2026-06-07, exchange 226539, check: uncheckable)</li>
+<li id="s29">The O2 does not support irisgl extensions despite supporting sgix equivalents; check glxinfo for details. (user-4f7c, 2026-09-15, exchange 220693, check: supported)</li>
+<li id="s30">ep was a demo for a larger IrisGL program with scripts and sliders and mentions dial I/O. (user-2a3c, 2026-05-23, exchange 214002, check: uncheckable)</li>
+<li id="s31">Fuel does not run programs in COFF format and likely does not support IRIS GL. (user-1a5a, 2025-09-23, exchange 219126, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx4.html">Onyx4</a>, <a href="fuel.html">Fuel</a>, <a href="indigo.html">Indigo</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Graphics: <a href="irisvision.html">IrisVision</a>, <a href="ati-fire-gl-x1.html">ATI Fire GL X1</a>, <a href="ati-firegl.html">ATI FireGL</a>, <a href="elan-graphics-board.html">Elan graphics board</a>, <a href="firegl-x3.html">FireGL X3</a>, <a href="ir3.html">IR3</a>, <a href="ir4.html">IR4</a>, <a href="mex.html">MEX</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-4.html">IRIX 4</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-software.html">IRIX software</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="xsgi.html">Xsgi</a>, <a href="coff.html">COFF</a>, <a href="coff-format.html">COFF format</a>, <a href="doom.html">Doom</a>, <a href="fortran.html">Fortran</a>, <a href="mame.html">MAME</a>, <a href="n64.html">N64</a>, <a href="opengl-2-0.html">OpenGL 2.0</a>, <a href="poweranimator.html">PowerAnimator</a>, <a href="proe.html">ProE</a>, <a href="softimage-3d.html">SOFTIMAGE 3D</a>, <a href="softimage.html">Softimage</a>, <a href="vizserver.html">VizServer</a>, <a href="xfree86.html">XFree86</a>, <a href="game.html">game</a>, <a href="program.html">program</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="explorer.html">Explorer</a>, <a href="inventor.html">Inventor</a>, <a href="nintendo.html">Nintendo</a>, <a href="studiopaint.html">StudioPaint</a>, <a href="textureobject.html">TextureObject</a>, <a href="xlib.html">Xlib</a>, <a href="texture-mapping.html">texture mapping</a>
+</li></ul>
+</body>
+</html>

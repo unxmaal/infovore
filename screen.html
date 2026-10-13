@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>screen</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>screen</h1>
+<p>Claims: 27 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Screen_printing">Screen printing</a>.</p>
+<p>The command `xwd -screen -out file.xwd` captures the screen in X11, though conversion to a more modern format may be needed. <sup><a href="#s1">1</a></sup> `screen` has broken attaching somewhere between 4.0.3 and latest; the latest creates the socket just fine but the attacher can't use it with `socat`. <sup><a href="#s2">2</a></sup> GNU readline can be annoying in bash, especially with screen, requiring custom bindings to improve usability. <sup><a href="#s3">3</a></sup> Terminal emulators like alsamixer may display line drawing characters correctly on VT101 but may fail to do so when run within screen even if $TERM is set to vt100 or vt102, showing instead a single character where a line drawing character is expected. <sup><a href="#s4">4</a></sup> `screen` and `cu` are classic serial terminal applications on UNIX, and on macOS, 'screen' defaults to 9600 baud while 'cu' can be used as an alternative. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> For serial console, one can start with a known-working setup and use a USB-RS232 dongle with Minicom or `screen`. <sup><a href="#s7">7</a></sup> `screen` can be built on IRIX 4 without coredumping upon detach, though it is difficult to use on IRIX 4 without issues. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> `screen` is available on IRIX 6.5.30, while `cu` is not included by default but can be installed. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The command `xwd -screen -out file.xwd` captures the screen in X11, though conversion to a more modern format may be needed. (user-42cf, 2019-06-23, exchange 2167, check: supported)</li>
+<li id="s2">`screen` has broken attaching somewhere between 4.0.3 and latest; the latest creates the socket just fine but the attacher can't use it with `socat` (user-42cf, 2020-01-23, exchange 68308, check: supported)</li>
+<li id="s3">GNU readline can be annoying in bash, especially with screen, requiring custom bindings to improve usability. (user-ba81, 2020-04-09, exchange 7340, check: uncheckable)</li>
+<li id="s4">Terminal emulators like alsamixer may display line drawing characters correctly on VT101 but may fail to do so when run within screen even if $TERM is set to vt100 or vt102, showing instead a single character where aLine (user-04a3, 2023-01-21, exchange 35605, check: uncheckable)</li>
+<li id="s5">screen and cu are classic serial terminal applications on UNIX. (user-37bb, 2024-01-29, exchange 84562, check: uncheckable)</li>
+<li id="s6">On macOS, 'screen' and 'cu' can be used to connect to serial ports; 'screen' defaults to 9600 baud, and 'cu' can be used as an alternative. (user-c831, 2026-05-31, exchange 123309, check: supported)</li>
+<li id="s7">For serial console, start with a known-working setup and use a USB-RS232 dongle with Minicom or `screen`. (user-07ed, 2022-07-11, exchange 222349, check: supported)</li>
+<li id="s8">screen can be built on IRIX 4 without coredumping upon detach. (user-ba81, 2020-04-09, exchange 7338, check: supported)</li>
+<li id="s9">screen is difficult to use on IRIX 4 without issues. (user-b7c4, 2020-04-09, exchange 7338, check: supported)</li>
+<li id="s10">cu is not included in IRIX 6.5.30 by default but can be installed, and screen is available. (user-2a3c, 2025-10-27, exchange 225619, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="screen-resolution.html">screen resolution</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="se-30.html">SE/30</a>, <a href="vax.html">VAX</a>, <a href="imac.html">iMac</a>, <a href="machine.html">machine</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>
+</li>
+<li>Operating systems: <a href="irix-4.html">IRIX 4</a>, <a href="x11.html">X11</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>, <a href="minicom.html">minicom</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="rom-monitor.html">ROM monitor</a>, <a href="battery.html">battery</a>, <a href="capacitor.html">capacitor</a>, <a href="display.html">display</a>, <a href="hard-drive.html">hard drive</a>, <a href="keyboard.html">keyboard</a>, <a href="modem.html">modem</a>, <a href="monitor.html">monitor</a>
+</li>
+<li>Companies: <a href="next.html">NeXT</a>
+</li>
+<li>Other: <a href="cu.html">cu</a>, <a href="term.html">TERM</a>, <a href="vt101.html">VT101</a>, <a href="kermit.html">kermit</a>
+</li></ul>
+</body>
+</html>

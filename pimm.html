@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIMM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PIMM</h1>
+<p>Claims: 7</p>
+<p>The PIMM attaches to the socket and screws down, sitting under the second heatsink where the Bedrock ASIC is located. <sup><a href="#s1">1</a></sup> PIMM CPU sockets require longer CPU pins and a plastic CPU seat. <sup><a href="#s2">2</a></sup> The PIMM stores model and serial numbers for the CPU and cache, which the `system` command can read from the number in a can chips. <sup><a href="#s3">3</a></sup> Baking the PIMM slowly releases tension between PCB layers and removes moisture to prevent cracking and splintering during BGA soldering, using an infrared preheater for a slow temperature ramp up and down. <sup><a href="#s4">4</a></sup> On O2K/Onyx2 nodes, removing all memory before changing the PIMM prevents the new PIMM from being tested by another node, avoiding long test times. <sup><a href="#s5">5</a></sup> The O2 can red light due to issues with the power supply, CPU, or other components like the PIMM or MRE. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Bedrock ASIC is under the second heatsink and the PIMM attaches to the socket and screws down. (user-e4d0, 2021-07-29, exchange 99578, check: uncheckable)</li>
+<li id="s2">PIMM CPU sockets require longer CPU pins and a plastic CPU seat. (user-8547, 2026-01-24, exchange 121130, check: uncheckable)</li>
+<li id="s3">The PIMM stores model/serial numbers for the CPU and cache, and the `system` command can read these values from the number in a can chips. (user-b1da, 2026-07-30, exchange 64936, check: supported)</li>
+<li id="s4">Baking the PIMM slowly releases tension between PCB layers and removes moisture to prevent cracking and splintering during BGA soldering, using an infrared preheater for a slow temperature ramp up and down. (user-3e2d, 2026-04-03, exchange 122422, check: uncheckable)</li>
+<li id="s5">On O2K/Onyx2 nodes, removing all memory before changing the PIMM prevents the new PIMM from being tested by another node, avoiding long test times. (user-86e1, 2023-06-29, exchange 223191, check: supported)</li>
+<li id="s6">The O2 can red light due to issues with the power supply, CPU, or other components like the PIMM or MRE. (user-4f7c, 2025-01-21, exchange 113780, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Parts and peripherals: <a href="cpu.html">CPU</a>, <a href="power-supply.html">power supply</a>
+</li></ul>
+</body>
+</html>

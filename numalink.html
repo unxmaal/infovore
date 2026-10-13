@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numalink</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Numalink</h1>
+<p>Claims: 58 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Altix">SGI Altix</a>.</p>
+<p>NUMALink is a high-speed interconnect for clustering SGI Origin or Onyx nodes into a single-system-image with low latency, typically 1.6 Gb/s or 3.2 Gb/s, and is used for clustering servers into a single-system-image. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It allows multiple systems to share unified memory and run a single kernel, tying connected systems together on the RAM level and making NUMA feel like UMA in terms of interconnected systems. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The technology was a feature of SGI systems that was later acquired by HPE, which still uses it in their superdome systems as of 2017. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> It requires a Numalink router to connect multiple O300 machines, and the cabling on SGI systems can connect up to eight systems without a router. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The O300 can be NUMAlinked with other O300 and O350 machines, which are compatible for NUMAlinking. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> An expansion chassis is a secondary system designed to be numalinked to a primary system for adding processors. <sup><a href="#s12">12</a></sup> Numalink was SGI's longest-lasting legacy. <sup><a href="#s13">13</a></sup> Numalink 3, 4, and 5 use the same connector as Chimera systems, and Numalink 5 is also used on Altix UV systems. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Numalink supports clusters, as seen in systems such as the Prism, Prism DS, Onyx350 InfinitePerformance, and the Fuel. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> A single Numalink brick can connect up to 8 C bricks, with the top 4 ports not carrying L1 USB. <sup><a href="#s20">20</a></sup> The USB bus carried through Numalink is called junkbus. <sup><a href="#s21">21</a></sup> Numalink is described as extremely complicated and possibly impossible even for a well-funded team of developers. <sup><a href="#s22">22</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NUMALink is a high-speed interconnect for clustering SGI Origin or Onyx nodes into a single-system-image with low latency, typically 1.6 Gb/s or 3.2 Gb/s. (user-22f9, 2019-03-10, exchange 74948, check: supported)</li>
+<li id="s2">NUMALink is used for clustering servers into a single-system-image. (user-22f9, 2019-03-10, exchange 74948, check: uncheckable)</li>
+<li id="s3">NUMAlink was a Cray technology allowing multiple systems to share unified memory and run a single kernel. (user-b1da, 2021-03-10, exchange 15352, check: uncheckable)</li>
+<li id="s4">NUMAlink ties connected systems together on the RAM level. (user-56d4, 2023-08-25, exchange 108493, check: uncheckable)</li>
+<li id="s5">NUMAlink makes NUMA feel like UMA in terms of interconnected systems. (user-baf6, 2023-08-25, exchange 108493, check: uncheckable)</li>
+<li id="s6">NUMALink is a feature of SGI systems that was later acquired by HPE. (user-8b3c, 2021-06-21, exchange 17987, check: uncheckable)</li>
+<li id="s7">HPE still uses numalink in their superdome systems as of 2017. (user-bc18, 2019-06-02, exchange 1884, check: supported)</li>
+<li id="s8">NUMAlink requires a Numalink router to connect multiple O300 machines. (user-b7c4, 2019-03-02, exchange 839, check: supported)</li>
+<li id="s9">The NUMAlink cabling on SGI systems can connect up to eight systems without a router. (user-59b9, 2022-07-18, exchange 207395, check: supported)</li>
+<li id="s10">The O300 can be NUMAlinked with other O300 and O350 machines. (user-888b, 2019-03-02, exchange 839, check: supported)</li>
+<li id="s11">O300 and O350 machines are compatible for NUMAlinking. (user-22f9, 2019-03-02, exchange 839, check: supported)</li>
+<li id="s12">An expansion chassis is a secondary system designed to be numalinked to a primary system for adding processors. (user-b7c4, 2020-02-01, exchange 75048, check: uncheckable)</li>
+<li id="s13">Numalink was SGI's longest-lasting legacy. (user-b7c4, 2024-09-10, exchange 112104, check: uncheckable)</li>
+<li id="s14">Numalink 5 uses the same connector as Chimera systems and is used on Altix UV systems. (user-24f0, 2024-03-10, exchange 210130, check: supported)</li>
+<li id="s15">Numalink 3 and 4 use the same connector as Chimera systems. (user-e4d0, 2024-03-10, exchange 210130, check: supported)</li>
+<li id="s16">The Fuel is an Origin 300 with a VPro duct-taped to it, has its own L1, HUB, and during boot looks for a Numalink router, and believes it's a single CPU brick. (user-24f0, 2024-09-01, exchange 210915, check: supported)</li>
+<li id="s17">The Prism uses EFI firmware and can support NUMAlink clusters, but running Windows on it requires custom kernel drivers and an AGP riser. (user-24f0, 2025-02-06, exchange 53869, check: uncheckable)</li>
+<li id="s18">The Onyx350 InfinitePerformance can be configured to use Numalink with only one other node, though this can be unlocked. (user-b1da, 2025-07-01, exchange 212662, check: uncheckable)</li>
+<li id="s19">The Prism DS supports Numalink, unlike the Tezro Tower. (user-bf68, 2026-07-29, exchange 244241, check: supported)</li>
+<li id="s20">A single Numalink brick can connect up to 8 C bricks, with the top 4 ports not carrying L1 USB. (user-24f0, 2025-04-23, exchange 224941, check: supported)</li>
+<li id="s21">The name of the USB bus carried through Numalink is called junkbus. (user-24f0, 2025-05-19, exchange 225081, check: uncheckable)</li>
+<li id="s22">Numalink is extremely complicated and likely impossible even for a well-funded team of developers. (user-24f0, 2026-07-11, exchange 214177, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="numalink-cable.html">numalink cable</a> (12)
+</li>
+<li><a href="numalink-port.html">NUMAlink port</a> (3)
+</li>
+<li><a href="numalink-router.html">Numalink router</a> (8)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="origin-200.html">Origin 200</a>, <a href="o300.html">O300</a>, <a href="octane.html">Octane</a>, <a href="onyx4.html">Onyx4</a>, <a href="xio.html">XIO</a>, <a href="a350.html">A350</a>, <a href="altix.html">Altix</a>, <a href="altix-330.html">Altix 330</a>, <a href="altix-uv.html">Altix UV</a>, <a href="fuel.html">Fuel</a>, <a href="g-brick.html">G-brick</a>, <a href="onyx2.html">Onyx2</a>, <a href="origin.html">Origin</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="origin-300.html">Origin 300</a>, <a href="prism.html">Prism</a>, <a href="prism-ds.html">Prism DS</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>
+</li>
+<li>Operating systems: <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="chimera.html">Chimera</a>, <a href="hpe.html">HPE</a>, <a href="efi-firmware.html">EFI firmware</a>, <a href="l1-firmware.html">L1 firmware</a>
+</li>
+<li>Parts and peripherals: <a href="c-brick.html">C-brick</a>, <a href="l2-controller.html">L2 controller</a>, <a href="xio-connector.html">XIO connector</a>, <a href="performance.html">performance</a>, <a href="price.html">price</a>
+</li>
+<li>Standards and interfaces: <a href="x1.html">X1</a>
+</li>
+<li>Other: <a href="node.html">node</a>, <a href="330.html">330</a>, <a href="nl4-router.html">NL4 router</a>, <a href="superdome.html">Superdome</a>, <a href="v-brick.html">V-Brick</a>, <a href="reliability.html">reliability</a>, <a href="spec.html">spec</a>
+</li></ul>
+</body>
+</html>

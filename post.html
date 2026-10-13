@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POST</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>POST</h1>
+<p>Claims: 11</p>
+<p>POST results vary depending on hardware configuration, such as memory module speed, where a 400MHz module fails POST while a US-I/200 does not. <sup><a href="#s1">1</a></sup> POST can fail due to physical damage, such as cache heat sinks damaged during shipping. <sup><a href="#s1">1</a></sup> The vast majority of boot time for a server is spent on POST rather than the OS itself. <sup><a href="#s2">2</a></sup> To diagnose POST issues, one can enable all POST options, set the output device to ttya, and monitor serial output during booting. <sup><a href="#s3">3</a></sup> POST can be slow on certain machines, such as the Intellistation 9114 Model 275, possibly due to a dead battery, and on RS/6000 machines after a battery replacement or in service mode. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> POST can also be slow on SS20 machines and in serial tests, especially if the NVRAM battery has failed, leading to diag-mode and verbose POST. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> A complete memory test via POST is useful for checking faulty DIMMs when Memtest86 cannot be used. <sup><a href="#s8">8</a></sup> If the machine POSTed and displayed the PROM monitor, the motherboard might still be salvageable. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Memory modules from different speeds have different POST results; a 400MHz module fails POST while a US-I/200 does not. Shipping can damage cache heat sinks, leading to POST failures. (user-7b1c, 2020-04-23, exchange 96714, check: supported)</li>
+<li id="s2">parallel init is a false gain; the vast majority of boot time for a server is POST, not the OS itself. (user-3ff5, 2020-12-10, exchange 204550, check: uncheckable)</li>
+<li id="s3">Another thing to try is to turn on all the POST shinies, set output-device to ttya and monitor serial output while booting. (user-7b1c, 2022-05-19, exchange 182032, check: uncheckable)</li>
+<li id="s4">The Intellistation 9114 Model 275 POSTs slowly, possibly due to a dead battery. (user-22f9, 2022-07-03, exchange 176237, check: supported)</li>
+<li id="s5">The RS/6000 POST and IPL can take a long time after a battery replacement or in service mode, but not once configured. (user-07ed, 2022-07-03, exchange 176237, check: supported)</li>
+<li id="s6">In serial tests, video output can take a long time, especially if the NVRAM battery has failed, leading to diag-mode and verbose POST. (user-07ed, 2022-09-22, exchange 183011, check: uncheckable)</li>
+<li id="s7">POST is slow on SS20 machines. (user-7b1c, 2022-09-22, exchange 183006, check: uncheckable)</li>
+<li id="s8">A complete memory test via POST is useful for checking faulty DIMMs when Memtest86 cannot be used. (user-baf6, 2022-09-22, exchange 239848, check: uncheckable)</li>
+<li id="s9">If the machine POSTed and displayed the PROM monitor, the motherboard might still be salvageable. (user-d492, 2025-09-14, exchange 118593, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="post-card.html">POST card</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="rs-6000.html">RS/6000</a>, <a href="ss20.html">SS20</a>
+</li>
+<li>Software: <a href="boot-time.html">boot time</a>
+</li>
+<li>Parts and peripherals: <a href="video-port.html">video port</a>, <a href="nvram-battery.html">NVRAM battery</a>, <a href="prom-monitor.html">PROM monitor</a>, <a href="battery.html">battery</a>, <a href="battery-replacement.html">battery replacement</a>, <a href="memory-modules.html">memory modules</a>, <a href="memory-test.html">memory test</a>, <a href="video-output.html">video output</a>
+</li>
+<li>Standards and interfaces: <a href="serial-output.html">serial output</a>
+</li>
+<li>Other: <a href="ipl.html">IPL</a>
+</li></ul>
+</body>
+</html>

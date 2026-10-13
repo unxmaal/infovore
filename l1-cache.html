@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1 cache</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>L1 cache</h1>
+<p>Claims: 15 Part of <a href="l1.html">L1</a></p>
+<p>The IP17 CPU contains 64 KB of L1 cache and 1 MB of L2 cache, with the L2 cache composed of 8 128K x 8bit SRAMs and 2 16K x 4bit SRAMs per bank, while 'hinv' reports 64 KB of cache because the L1 cache is not included. <sup><a href="#s1">1</a></sup> The Dallas chip on the PCI board is for the L1 cache. <sup><a href="#s2">2</a></sup> The L1 cache never comes up if the Dallas chip is dead, and if the NVRAM is not written to, the L1 cache may not come up. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> A flat Dallas chip prevents L1 cache, but power cycling can make it work, and the PSU requires multiple power cycles to start the L1 cache. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The system needs to be powered up, down, and up again for the L1 cache to start. <sup><a href="#s7">7</a></sup> If the L1 cache comes up, it will have no NVRAM settings and will report as a ---c---. <sup><a href="#s8">8</a></sup> A bad PSU can cause I2C issues severe enough to affect L1 cache functionality; this can be debugged by checking PSU and env chips; fixes may involve replacement. <sup><a href="#s9">9</a></sup> The Altix 350 can overheat if the L1 cache is running without fans. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IP17 CPU has 64 KB of L1 cache and 1 MB of L2 cache, with the L2 cache composed of 8 128K x 8bit SRAMs and 2 16K x 4bit SRAMs per bank, while 'hinv' reports 64 KB of cache because the L1 cache is not included. (user-86e1, 2023-11-16, exchange 241129, check: supported)</li>
+<li id="s2">The Dallas chip on the PCI board is for the L1 cache. (user-e4d0, 2023-03-09, exchange 36590, check: uncheckable)</li>
+<li id="s3">If the NVRAM is not written to, the L1 cache may not come up; swapping a known real but dead Dallas chip might help diagnose the issue. (user-b1da, 2024-07-03, exchange 210616, check: uncheckable)</li>
+<li id="s4">L1 cache never comes up if the Dallas chip is dead. (user-b1da, 2025-11-12, exchange 119683, check: uncheckable)</li>
+<li id="s5">A flat Dallas chip prevents L1 cache, but power cycling can make it work. (user-986f, 2025-05-11, exchange 212472, check: uncheckable)</li>
+<li id="s6">The PSU requires multiple power cycles to start the L1 cache. (user-db24, 2026-07-24, exchange 226754, check: uncheckable)</li>
+<li id="s7">The system needs to be powered up, down, and up again for the L1 cache to start. (user-e52d, 2026-07-24, exchange 226754, check: uncheckable)</li>
+<li id="s8">If the L1 cache comes up, it will have no NVRAM settings and will report as a ---c---. (user-24f0, 2025-11-12, exchange 119683, check: uncheckable)</li>
+<li id="s9">A bad PSU can cause I2C issues severe enough to affect L1 cache functionality; this can be debugged by checking PSU and env chips; fixes may involve replacement. (user-22f9, 2021-10-30, exchange 100661, check: uncheckable)</li>
+<li id="s10">The Altix 350 can overheat if the L1 cache is running without fans. (user-24f0, 2025-11-07, exchange 216589, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="altix-350.html">Altix 350</a>, <a href="prism.html">Prism</a>
+</li>
+<li>Software: <a href="chimera.html">Chimera</a>
+</li>
+<li>Parts and peripherals: <a href="dallas-chip.html">Dallas chip</a>, <a href="l2-cache.html">L2 cache</a>, <a href="psu.html">PSU</a>, <a href="asic.html">ASIC</a>, <a href="nvram.html">NVRAM</a>
+</li>
+<li>Companies: <a href="dallas-clock-chip.html">Dallas clock chip</a>
+</li>
+<li>Other: <a href="i2c.html">I2C</a>, <a href="big-iron.html">big iron</a>
+</li></ul>
+</body>
+</html>

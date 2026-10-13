@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tftpd-hpa</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>tftpd-hpa</h1>
+<p>Claims: 8</p>
+<p>tftpd-hpa is used to resolve TFTP server problems and is installed alongside isc-dhcp-server for network booting. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> tftpd-hpa does not start if the configuration file has Windows line endings. <sup><a href="#s3">3</a></sup> The assigned TFTP port range in tftpd-hpa's defaults file resolves issues with the Indigo handling high port numbers after an initial transfer on port 69. <sup><a href="#s4">4</a></sup> tftpd-hpa can get hung up randomly after sending fx.ARCS, and the solution is to restart tftpd-hpa. <sup><a href="#s5">5</a></sup> boot -f errors due to tftpd-hpa crashing can be fixed by restarting it. <sup><a href="#s6">6</a></sup> The version of tftpd-hpa that booterizer uses has a bug. <sup><a href="#s7">7</a></sup> tftpd-hpa fails to serve the install file named with the hex version of the IP, suggesting the issue might be resolved by changing the default password to nobody and turning off secure mode. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">tftpd-hpa is used to resolve TFTP server problems. (user-637b, 2019-12-29, exchange 5177, check: uncheckable)</li>
+<li id="s2">isc-dhcp-server and tftpd-hpa are installed for network booting (user-c9fb, 2022-09-05, exchange 217683, check: uncheckable)</li>
+<li id="s3">tftpd-hpa does not start if the configuration file has Windows line endings. (user-f229, 2019-01-04, exchange 76719, check: uncheckable)</li>
+<li id="s4">The assigned TFTP port range in tftpd-hpa’s defaults file resolves issues with the Indigo handling high port numbers after an initial transfer on port 69. (user-86c4, 2022-12-31, exchange 35185, check: supported)</li>
+<li id="s5">tftpd-hpa can get hung up randomly after sending fx.ARCS and the solution is to restart tftpd-hpa (user-c9fb, 2021-08-13, exchange 19243, check: uncheckable)</li>
+<li id="s6">boot -f errors due to tftpd-hpa crashing can be fixed by restarting it (user-c9fb, 2022-09-05, exchange 217683, check: uncheckable)</li>
+<li id="s7">The version of tftpd-hpa that booterizer uses has a bug. (user-c9fb, 2022-08-13, exchange 104623, check: uncheckable)</li>
+<li id="s8">tftpd-hpa fails to serve the install file named with the hex version of the IP, suggesting the issue might be resolved by changing the default password to nobody and turning off secure mode. (user-5c71, 2023-06-07, exchange 183992, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>
+</li>
+<li>Standards and interfaces: <a href="tftp.html">TFTP</a>
+</li>
+<li>Other: <a href="isc-dhcp-server.html">isc-dhcp-server</a>
+</li></ul>
+</body>
+</html>

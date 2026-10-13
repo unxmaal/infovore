@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rpmbuild</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>rpmbuild</h1>
+<p>Claims: 21 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/RPM_Package_Manager">RPM Package Manager</a>, <a href="https://en.wikipedia.org/wiki/Distcc">Distcc</a>.</p>
+<p>rpmbuild unpacks the base tar and source code, compiles it, and generates a new binary RPM, handling dependencies, build paths, and library locations to simplify package creation. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It tells you its direct dependencies, uses /bin/sh by default (overridable with %_buildshell, sometimes replaced by a faster shell such as dash), and can be run with a -j flag for make parallelism. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> It can be resumed from a failed state using -bi to build up to the install step and --short-circuit to skip install bits, though it overwrites the target rpm and can still produce wrapper scripts, indicating the build process is not idempotent. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> distcc works well with rpmbuild, and attic'ing rpmbuild with distcc using dual slower CPUs with higher total MHz can be more effective than one faster CPU for Irix workstations. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The IRIX libc regexp implementation is slow, affecting rpmbuild through file and libmagic.so, causing significant delays in building RPM packages. <sup><a href="#s13">13</a></sup> Building DICL from source via rpmbuild can result in missing symbols like malloc/printf, while using pre-built RPMs works fine. <sup><a href="#s14">14</a></sup> Running rpmbuild on ninja-build can lock up during the test suite, leaving an unkillable process consuming 100% of a CPU (test 18), which prevents further build steps. <sup><a href="#s15">15</a></sup> The rpmbuild process may require specific wip rpmbuild packages to work correctly, as of recently fixed issues. <sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">rpmbuild unpacks the code and compiles it and generates a new binary RPM. (user-e473, 2020-07-14, exchange 215036, check: uncheckable)</li>
+<li id="s2">rpmbuild unpacks the base tar for you. (user-e473, 2020-07-14, exchange 215036, check: uncheckable)</li>
+<li id="s3">rpmbuild simplifies package creation by handling dependencies, build paths, and library locations. (user-2189, 2021-07-28, exchange 215188, check: uncheckable)</li>
+<li id="s4">rpmbuild tells you its direct dependencies. (user-6afa, 2020-07-14, exchange 215036, check: uncheckable)</li>
+<li id="s5">Rpmbuild uses /bin/sh by default, but can be overridden with `%_buildshell`. (user-2189, 2021-06-10, exchange 215163, check: supported)</li>
+<li id="s6">Rpmbuild uses a specific shell for speedup, such as dash. (user-42cf, 2021-06-10, exchange 215163, check: uncheckable)</li>
+<li id="s7">rpmbuild can be used with a `-j` flag for make parallelism. (user-b1da, 2021-04-21, exchange 215137, check: supported)</li>
+<li id="s8">rpmbuild overwrites the target rpm when building packages. (user-cd7d, 2020-06-15, exchange 214990, check: uncheckable)</li>
+<li id="s9">Running `rpmbuild -bi --short-circuit` can still produce wrapper scripts, indicating the build process is not idempotent. (user-cd7d, 2020-06-17, exchange 214994, check: supported)</li>
+<li id="s10">rpmbuild can be resumed from a failed state by using -bi to build up to the install part and --short-circuit to skip over install bits. (user-2189, 2020-07-01, exchange 68873, check: uncheckable)</li>
+<li id="s11">distcc works well with `rpmbuild`. (user-2d09, 2020-03-12, exchange 214948, check: supported)</li>
+<li id="s12">attic'ing rpmbuild with distcc, using dual slower CPUs with higher total MHz can be more effective than one faster CPU for Irix workstations. (user-e872, 2020-10-25, exchange 69087, check: uncheckable)</li>
+<li id="s13">The IRIX libc regexp implementation is slow, affecting `rpmbuild` through `file` and `libmagic.so`, causing significant delays in building RPM packages. (user-2d09, 2020-03-29, exchange 214952, check: supported)</li>
+<li id="s14">Building DICL from source via rpmbuild can result in missing symbols like malloc/printf, while using pre-built RPMs works fine. (user-cd7d, 2020-06-10, exchange 68655, check: uncheckable)</li>
+<li id="s15">Running rpmbuild on ninja-build can lock up during the test suite, leaving an unkillable process consuming 100% of a CPU (test 18). This issue prevents further build steps and hinders porting fish from fc31. (user-e473, 2020-06-07, exchange 68651, check: supported)</li>
+<li id="s16">The rpmbuild process can be used to build packages, but it may require specific wip rpmbuild packages to work correctly, as of recently fixed issues. (user-e872, 2021-03-14, exchange 69259, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="distcc.html">distcc</a>, <a href="srpm.html">SRPM</a>, <a href="dnf.html">dnf</a>, <a href="file.html">file</a>
+</li>
+<li>Other: <a href="bin-sh.html">/bin/sh</a>, <a href="dash.html">dash</a>, <a href="dicl.html">dicl</a>, <a href="fc31.html">fc31</a>
+</li></ul>
+</body>
+</html>

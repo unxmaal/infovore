@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAID</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RAID</h1>
+<p>Claims: 13</p>
+<p>For performance, an ideal RAID setup used separate partitions for /, /var, and /usr, with /usr as a raided partition for redundancy. <sup><a href="#s1">1</a></sup> RAID was designed for spinning rust drives that have very different failure modes than NVMe drives. <sup><a href="#s2">2</a></sup> A server using RAID and tapes experienced a failure just before a backup, with the system disk no longer booting and the system disk backup missing. <sup><a href="#s3">3</a></sup> BIOS updates can reset RAID configuration, causing boot issues. <sup><a href="#s4">4</a></sup> The Maximus V Gene motherboard handles RAID, which Windows presents as a single storage device. <sup><a href="#s5">5</a></sup> Single disks didn't transfer at ATA133, but two on one channel could max it out with Bigfoot drives in RAID. <sup><a href="#s6">6</a></sup> NetApp creates a filesystem (WAFL) on top of RAID on whatever disks you put in an aggregate, and you make a volume that can be a filesystem for NAS, or you create a LUN in a volume and then present the LUN via iSCSI or FC. <sup><a href="#s7">7</a></sup> The IO Processor handles RAID and write caching for DASDs, and can expand an array while the system is running. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">For performance, an ideal setup was to have separate partitions for /, /var, and /usr, with /usr as a raided partition for redundancy. (user-8547, 2019-05-31, exchange 1849, check: uncheckable)</li>
+<li id="s2">RAID was made for spinning rust drives that have very different failure modes than NVMe drives. (user-bc5d, 2020-03-16, exchange 6924, check: uncheckable)</li>
+<li id="s3">A server using RAID and tapes experienced a failure just before a backup, with the system disk no longer booting and the system disk backup missing. (user-2d40, 2019-12-23, exchange 5015, check: uncheckable)</li>
+<li id="s4">BIOS updates can reset RAID configuration, causing boot issues. (user-1361, 2020-06-27, exchange 9241, check: uncheckable)</li>
+<li id="s5">The Maximus V Gene motherboard handles RAID, which Windows presents as a single storage device. (user-0251, 2021-01-20, exchange 13959, check: uncheckable)</li>
+<li id="s6">Single disks didn’t transfer at ATA133, but two on one channel could max it out with Bigfoot drives in RAID. (user-c831, 2021-05-14, exchange 180753, check: supported)</li>
+<li id="s7">NetApp creates a filesystem (WAFL) on top of RAID on whatever disks you put in an aggregate. You make a volume that can be a filesystem for NAS, or you create a LUN in a volume and then present the LUN via iSCSI or FC or (user-07ed, 2021-11-16, exchange 22202, check: uncheckable)</li>
+<li id="s8">The IO Processor handles RAID and write caching for DASDs, and can expand an array while the system is running. (user-b1da, 2022-05-11, exchange 176070, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="raid-0.html">RAID 0</a> (7)
+</li>
+<li><a href="raid-1.html">RAID 1</a> (5)
+</li>
+<li><a href="raid-5.html">RAID 5</a> (7)
+</li>
+<li><a href="raid-array.html">RAID array</a> (5)
+</li>
+<li><a href="raid-card.html">RAID card</a> (5)
+</li>
+<li><a href="raid-controller.html">RAID controller</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="xfs.html">XFS</a>, <a href="xvm.html">XVM</a>, <a href="partition.html">partition</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="nas.html">NAS</a>, <a href="nvme-drive.html">NVMe drive</a>, <a href="motherboard.html">motherboard</a>, <a href="system-disk.html">system disk</a>, <a href="tape.html">tape</a>
+</li>
+<li>Standards and interfaces: <a href="serial-interface.html">serial interface</a>
+</li>
+<li>Companies: <a href="ibm.html">IBM</a>, <a href="netapp.html">NetApp</a>
+</li>
+<li>Other: <a href="usr.html">/usr</a>, <a href="ata133.html">ATA133</a>, <a href="jbod.html">JBOD</a>, <a href="mfiop.html">MFIOP</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EFI</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>EFI</h1>
+<p>Claims: 18</p>
+<p>EFI is used by the Prism and the Altix A350 c-brick, which boots to EFI with specific partition details when made bootable via a SCSI-PCI adapter and external disk or netboot. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The startup sequence is primarily serial until EFI, and the Altix EFI recognizes an SSD with NTFS but cannot read it. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The Altix EFI bootloader in the SGI Altix350 netboot process uses an EFI loader to request DHCP, which points to a TFTP server for the next server, which can be any program, including an OS kernel loader like ELILO. <sup><a href="#s5">5</a></sup> Deskside prism outputs analog at EFI by default, and a VGA adapter is needed for DVI output. <sup><a href="#s6">6</a></sup> EFI should recognize the CD as an IO brick for it to work, and booting Linux might help identify issues. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Prism uses EFI. (user-b7c4, 2020-01-01, exchange 5240, check: uncheckable)</li>
+<li id="s2">The Altix A350 c-brick can be made bootable with a SCSI-PCI adapter and external disk or netboot, and boots to EFI with specific partition details. (user-bc5d, 2020-03-08, exchange 216298, check: uncheckable)</li>
+<li id="s3">The system's startup sequence is primarily serial until EFI. (user-59b9, 2020-12-29, exchange 13204, check: uncheckable)</li>
+<li id="s4">The Altix EFI recognizes an SSD with NTFS but can't read it. (user-59b9, 2020-08-30, exchange 216352, check: uncheckable)</li>
+<li id="s5">The EFI bootloader in the SGI Altix350 netboot process uses an EFI loader to request DHCP, which points to a TFTP server for the next server, which can be any program, including an OS kernel leader like ELILO. (user-bc5d, 2020-04-20, exchange 7669, check: uncheckable)</li>
+<li id="s6">Deskside prism outputs analog at EFI by default; VGA adapter is needed for DVI output. (user-b7c4, 2020-08-23, exchange 75308, check: uncheckable)</li>
+<li id="s7">EFI should recognize the CD as an IO brick for it to work; booting Linux might help identify issues. (user-24f0, 2026-04-15, exchange 216612, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="efi-firmware.html">EFI firmware</a> (3)
+</li>
+<li><a href="efi-shell.html">EFI shell</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="prism.html">Prism</a>
+</li>
+<li>Graphics: <a href="firegl-x1.html">FireGL X1</a>
+</li>
+<li>Software: <a href="rust.html">Rust</a>, <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="c-brick.html">C-brick</a>, <a href="dvd-drive.html">DVD drive</a>, <a href="dvi-port.html">DVI port</a>, <a href="pci-riser.html">PCI riser</a>, <a href="prism-brick.html">Prism brick</a>, <a href="sata-controller.html">SATA controller</a>, <a href="ssd.html">SSD</a>, <a href="vga-adapter.html">VGA adapter</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="ntfs.html">NTFS</a>, <a href="openfirmware.html">OpenFirmware</a>, <a href="tftp.html">TFTP</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Other: <a href="pxe.html">PXE</a>
+</li></ul>
+</body>
+</html>

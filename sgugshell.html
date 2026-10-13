@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sgugshell</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sgugshell</h1>
+<p>Claims: 30</p>
+<p>sgugshell is a bash script that acts as a wrapper for the login shell, preconfiguring environment variables for SGI tools and providing tdnf. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It is available from the WNA branch on git and can be used as an alternative shell. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Running sgugshell sets the proper environment for SGI tools and is required to use sgug-rse packages, which are installed with tdnf. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> It can execute other programs passed to it, though this feature is not included in the default install of RSE. <sup><a href="#s9">9</a></sup> It can be invoked for normal users but not for root. <sup><a href="#s10">10</a></sup> Setting sgugshell as the login shell can break XWindows, so it should be launched only when needed rather than set as the shell. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">skeletal `sgugshell` is a wrapper for the login shell to ensure a known good environment. (user-42cf, 2019-07-17, exchange 214790, check: supported)</li>
+<li id="s2">sgugshell is just a script that preconfigures a bunch of env vars for building programs. (user-d903, 2022-04-08, exchange 215304, check: uncheckable)</li>
+<li id="s3">sgugshell provides tdnf and sets up SGUG environment variables. (user-7973, 2023-05-09, exchange 218037, check: uncheckable)</li>
+<li id="s4">sgugshell is available from the WNA branch on git. (user-e872, 2021-07-06, exchange 69736, check: uncheckable)</li>
+<li id="s5">sgugshell can be used as an alternative shell. (user-aeae, 2025-11-12, exchange 60458, check: uncheckable)</li>
+<li id="s6">Running /usr/sgug/bin/sgugshell sets the proper environment for SGI tools, but manually launching it is required for some applications like Netsurf. (user-2189, 2021-08-17, exchange 69898, check: uncheckable)</li>
+<li id="s7">sgug-rse installation requires running 'sgugshell' and installing RPM packages with 'tdnf'. (user-7973, 2022-08-28, exchange 32354, check: uncheckable)</li>
+<li id="s8">Launching the sgugshell is required to use sgug-rse packages. (user-7973, 2023-10-29, exchange 209471, check: uncheckable)</li>
+<li id="s9">sgugshell can execute other programs passed to it, but this feature is not included in the default install of RSE. (user-6afa, 2022-04-17, exchange 81480, check: uncheckable)</li>
+<li id="s10">sgug shell can be invoked for normal users, but not for root. (user-f190, 2026-01-09, exchange 89314, check: uncheckable)</li>
+<li id="s11">Setting sgugshell as the login shell can break XWindows, as evidenced by errors with /usr/lib32/libvk.so.1 when running SGI applications. (user-aeae, 2025-11-12, exchange 213314, check: uncheckable)</li>
+<li id="s12">Changing the login shell to sgugshell can cause XWindows issues. (user-aeae, 2025-11-12, exchange 60433, check: uncheckable)</li>
+<li id="s13">To use sgugshell, launch it when needed. (user-7973, 2026-01-11, exchange 72969, check: uncheckable)</li>
+<li id="s14">Do not set sgugshell as your shell to avoid issues. (user-2189, 2026-02-14, exchange 73129, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="netsurf.html">Netsurf</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="tdnf.html">tdnf</a>, <a href="classicube.html">ClassiCube</a>, <a href="openssl.html">OpenSSL</a>, <a href="rpm-package.html">RPM package</a>, <a href="rse.html">RSE</a>, <a href="didbs.html">didbs</a>, <a href="git.html">git</a>, <a href="mrxvt.html">mrxvt</a>, <a href="sgug-libraries.html">sgug libraries</a>
+</li>
+<li>Standards and interfaces: <a href="x-window.html">X Window</a>
+</li>
+<li>Companies: <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="usr-sgug.html">/usr/sgug</a>, <a href="abiword.html">Abiword</a>, <a href="htop.html">htop</a>
+</li></ul>
+</body>
+</html>

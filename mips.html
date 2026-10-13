@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIPS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MIPS</h1>
+<p>Claims: 198 Background: 15 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/MIPS_architecture_processors">MIPS architecture processors</a>, <a href="https://en.wikipedia.org/wiki/ARM_architecture_family">ARM architecture family</a>, <a href="https://en.wikipedia.org/wiki/Amiga">Amiga</a>, <a href="https://en.wikipedia.org/wiki/Dbx_%28debugger%29">Dbx (debugger)</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/Nintendo_64">Nintendo 64</a>, <a href="https://en.wikipedia.org/wiki/PowerPC">PowerPC</a>, <a href="https://en.wikipedia.org/wiki/Silicon_Graphics">Silicon Graphics</a>, <a href="https://en.wikipedia.org/wiki/Ultrix">Ultrix</a>, <a href="https://en.wikipedia.org/wiki/Windows_NT">Windows NT</a>.</p>
+<h2 id="with-irix">With IRIX</h2>
+<ul>
+<li>When linking MIPS code, symbols must be referenced before they are linked; using GNU ld requires caution with mixing object files from different compilers, and there are known issues on IRIX. (user-22f9, exchange 1338, 2019-04-11; 1 speaker(s), 1 conversation(s))
+</li>
+<li>There was no value add from MIPs or Irix at a certain point (user-616d, exchange 211495, 2024-12-31; 1 speaker(s), 1 conversation(s))
+</li>
+<li>The math fixes involved identifying the GCC version where support for IRIX on MIPS was removed, narrowing it down using git bisect, and finding a minimal fix. (user-2d09, exchange 67913, 2019-09-23; 1 speaker(s), 1 conversation(s))
+</li>
+<li>MIPS is more dead than IRIX. (user-8b3c, exchange 11098, 2020-09-21; 1 speaker(s), 1 conversation(s))
+</li>
+<li>IRIX was never designed to run on x86-based architectures; it requires MIPS architecture or ARCS firmware. (user-59b9, exchange 16002, 2021-03-29; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Ripping and viewing N64 models from ROMs on IRIX involves data mining and reverse engineering, and requires MIPS decompiling knowledge. (user-bc18, exchange 220751, 2019-08-17; 1 speaker(s), 1 conversation(s))
+</li>
+<li>IRIX can potentially be ported to non-MIPS hardware by reverse engineering and rewriting the MIPS code, though it would be complex and not very practical. (user-580a, exchange 10242, 2020-08-02; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Emulating IRIX on modern PCs can be slower than running IRIX on actual hardware due to architectural differences between MIPS and x86 architectures. (user-22f9, exchange 78562, 2020-07-31; 1 speaker(s), 1 conversation(s))
+</li>
+<li>SGI missed two opportunities to port IRIX off MIPS. (user-d903, exchange 10243, 2020-08-02; 1 speaker(s), 1 conversation(s))
+</li>
+<li>porting IRIX to x86 wouldn't solve your problem anyways since the Traces/Blender binaries for IRIX will be MIPS (user-95db, exchange 34194, 2022-11-27; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="general">General</h2>
+<p>MIPS was one of the earliest RISC architectures, was huge in embedded systems, and survived SGI, but has since declined. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> MIPS has fewer instructions compared to x86. <sup><a href="#s3">3</a></sup> MIPS is a meaningless indicator of processor speed. <sup><a href="#s4">4</a></sup> MIPS gained support from a Chinese company. <sup><a href="#s5">5</a></sup> RISC-V is a modern ISA with some advantages over MIPS. <sup><a href="#s6">6</a></sup> Compiling for MIPS on Linux uses GCC, and LLVM has a MIPS backend. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Rene Rebe of T2 Linux SDE got MIPS working in mainline Linux. <sup><a href="#s9">9</a></sup> SBCL's MIPS backend is done and already has Linux-MIPS support. <sup><a href="#s10">10</a></sup> MIPS is a big-endian architecture that typically includes only an FPU, though the Nintendo 64's RSP is a MIPS III variant with 8-lane 16-bit vector capabilities as a coprocessor. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> MIPS does not support SIMD instructions, and branch comparisons are only between pairs of registers or between one register and zero, with conditional jumps supported by instructions like BEQ and BNE. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> MIPS processors were used in SGI systems, which ran IRIX and used ARCS firmware, as well as in the Cobalt RAQ machines, the Personal Iris, and early Ultrix machines. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> MIPS support is disappearing, as it was discontinued when the mobile and embedded markets shifted to ARM, and OpenBSD cavium support is being removed. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> MIPS ports of OpenJDK exist but are of the wrong endianness, and MIPS codegen works with the n32 ABI even on a poorly tested target. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> MIPS influences instruction set architecture design when creating a CPU on an FPGA. <sup><a href="#s26">26</a></sup> MIPS has unusual features such as all-in-one compare-and-branch instructions and a branch delay slot, in which the instruction is executed before the branch is taken, but it is still considered a good architecture, and RISC-V is very similar to it. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> RISC/OS development was stopped around 1992 when SGI bought MIPS, and SGI quickly switched to using MIPS processors. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> RISC/os contains code for multiple architectures including MIPS and R2300, and the 3.7 source tree contains MIPS-specific code that can be compiled as SVR3 or SVR0. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> The best DEC machines ran MIPS, with Personal DecStation 5000s using MIPS processors before Alphas followed. <sup><a href="#s33">33</a></sup> Some early models use i960 and Intel RISC CPUs, while others use MIPS, and they can use IBM PS/2. <sup><a href="#s34">34</a></sup> Steve Jobs saw MIPS as better suited for computer graphics than for raw power. <sup><a href="#s35">35</a></sup> MIPS originated as a research project at Stanford. <sup><a href="#s36">36</a></sup> MIPS CPUs run two threads per CPU, whereas PowerPC runs a single thread per CPU. <sup><a href="#s37">37</a></sup> MIPS licensed the R4200 to NEC, who created the R4300i variant, and MIPS created the specifications for the Nintendo 64's CPU. <sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> RISC-V is similar to MIPS but without delay slots. <sup><a href="#s40">40</a></sup> Non-modern RISC processors like MIPS have poor code density, which is why ARM has features like Thumb. <sup><a href="#s41">41</a></sup> MIPS changed the specification for its chips in the early 2000s, so code should be recompiled and assembly code heavily reviewed, as the results are very similar but not compatible. <sup><a href="#s42">42</a></sup> The Open MIPS initiative was reversed in 2019, affecting MIPS's competitive position against ARM. <sup><a href="#s43">43</a></sup> MIPS abandoned support for the MIPS architecture, but the name MIPS is still used. <sup><a href="#s44">44</a></sup> The MIPS instruction rate is calculated every frame and varies due to cache misses, TLB lookups, and bus hits. <sup><a href="#s45">45</a></sup> The MIPS emulation loop involves multiple steps including checking for interrupts, translating and fetching instructions, decoding, executing, handling exceptions, and advancing the instruction pointer. <sup><a href="#s46">46</a></sup> Clock rate is not a great performance indicator for MIPS because of stronger IPC. <sup><a href="#s47">47</a></sup> Microsoft abandoned MIPS for Windows CE. <sup><a href="#s48">48</a></sup> NetBSD is listed as supporting MIPS, but there is no evidence of Indigo2 running it. <sup><a href="#s49">49</a></sup> A BSD flavor runs on MIPS but not optimally. <sup><a href="#s50">50</a></sup> The old live CD RC6 for MIPS is no longer available, and no new releases followed. <sup><a href="#s51">51</a></sup> Gentoo does not run on MIPS machines anymore. <sup><a href="#s52">52</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">MIPS was one of the earliest RISC architectures but has since declined. (user-8b3c, 2020-09-21, exchange 11098, check: uncheckable)</li>
+<li id="s2">MIPS was huge in embedded systems and survived SGI. (user-f9d4, 2020-02-12, exchange 6342, check: uncheckable)</li>
+<li id="s3">MIPS has fewer instructions compared to x86. (user-cd7d, 2019-03-04, exchange 887, check: uncheckable)</li>
+<li id="s4">MIPS is a meaningless indicator of processor speed. (user-42cf, 2020-04-15, exchange 7503, check: uncheckable)</li>
+<li id="s5">MIPS gained support from a Chinese company. (user-8b3c, 2020-09-21, exchange 11098, check: uncheckable)</li>
+<li id="s6">RISC-V is a modern ISA with some advantages over MIPS. (user-e04c, 2020-09-21, exchange 11098, check: uncheckable)</li>
+<li id="s7">Compiling for MIPS on Linux uses GCC. (user-2189, 2019-04-04, exchange 1281, check: uncheckable)</li>
+<li id="s8">LLVM has a MIPS backend but not a PA-RISC backend. (user-b1da, 2020-07-25, exchange 10030, check: uncheckable)</li>
+<li id="s9">Rene Rebe of T2 Linux SDE got MIPS working in mainline Linux. (user-c831, 2020-05-05, exchange 8118, check: uncheckable)</li>
+<li id="s10">SBCL's MIPS backend is done, and it already has Linux-MIPS support. (user-9b9c, 2019-04-10, exchange 67151, check: uncheckable)</li>
+<li id="s11">MIPS is big endian. (user-9305, 2020-12-20, exchange 13017, check: uncheckable)</li>
+<li id="s12">The MIPS architecture typically includes only an FPU, but the Nintendo 64's RSP is a MIPS III variant with 8-lane 16-bit vector capabilities as a coprocessor. (user-22f9, 2021-01-04, exchange 13468, check: supported)</li>
+<li id="s13">MIPS does not support SIMD instructions. (user-b1da, 2021-06-22, exchange 18049, check: uncheckable)</li>
+<li id="s14">Branch comparisons in MIPS are only between pairs of registers or between one register and zero. (user-07ed, 2022-08-04, exchange 31700, check: uncheckable)</li>
+<li id="s15">Conditional jumps in MIPS are supported by instructions like BEQ and BNE, which compare the contents of two registers and branch based on equality or inequality. (user-cc5c, 2022-08-04, exchange 207476, check: supported)</li>
+<li id="s16">IRIX was never designed to run on x86-based architectures; it requires MIPS architecture or ARCS firmware. (user-59b9, 2021-03-29, exchange 16002, check: uncheckable)</li>
+<li id="s17">SGI systems used MIPS processors and ARCS firmware. (user-bc18, 2021-03-29, exchange 16002, check: uncheckable)</li>
+<li id="s18">Cobalt RAQ machines use MIPS processors in early models. (user-0251, 2021-12-28, exchange 101386, check: uncheckable)</li>
+<li id="s19">Ultrix-11 for VAX and MIPS shared the same codebase as Ultrix-32. (user-237d, 2022-01-27, exchange 161507, check: supported)</li>
+<li id="s20">The Personal Iris was MIPS based. (user-cd83, 2022-02-10, exchange 206384, check: supported)</li>
+<li id="s21">Ultrix ran on both DEC MIPS and VAX architectures. (user-8de9, 2022-05-06, exchange 28888, check: uncheckable)</li>
+<li id="s22">MIPS support is disappearing with OpenBSD cavium support. (user-9860, 2021-10-14, exchange 79954, check: uncheckable)</li>
+<li id="s23">MIPS was discontinued as the mobile and embedded markets shifted to ARM. (user-8547, 2022-05-03, exchange 28770, check: uncheckable)</li>
+<li id="s24">MIPS codegen works with n32 ABI even on a poorly tested target. (user-9860, 2021-11-27, exchange 70010, check: uncheckable)</li>
+<li id="s25">MIPS ports of OpenJDK exist but are of the wrong endianness. (user-56d4, 2022-03-28, exchange 27638, check: uncheckable)</li>
+<li id="s26">MIPS influences the instruction set architecture design when creating a CPU on an FPGA. (user-8203, 2023-01-14, exchange 126540, check: uncheckable)</li>
+<li id="s27">The compare and branch all-in-one instructions are strange and the branch delay slot is bizarre on MIPS, but it is still a nice architecture, better than most; RISC-V is very similar to MIPS. (user-21b8, 2023-01-15, exchange 126541, check: uncheckable)</li>
+<li id="s28">In MIPS, the instruction in the branch delay slot is executed before the branch is taken. (user-cdcd, 2023-08-13, exchange 223251, check: uncheckable)</li>
+<li id="s29">RISC/OS development was stopped around 1992 when SGI bought MIPS. (user-b1da, 2023-01-26, exchange 215366, check: supported)</li>
+<li id="s30">SGI quickly switched to using MIPS processors. (user-c383, 2023-05-22, exchange 38156, check: uncheckable)</li>
+<li id="s31">RISC/os contains code for multiple architectures including MIPS and R2300. (user-56d4, 2024-04-05, exchange 93382, check: supported)</li>
+<li id="s32">The 3.7 source tree contains MIPS-specific code and can be compiled as SVR3 or SVR0. (user-56d4, 2024-04-06, exchange 189040, check: supported)</li>
+<li id="s33">The best DEC ran MIPS; Personal DecStation 5000s used MIPS processors; Alphas followed. (user-f229, 2023-08-31, exchange 40318, check: supported)</li>
+<li id="s34">Some early models use i960 and Intel RISC CPUs, while others use MIPS. They can use IBM PS/2, are sometimes password-protected without local storage. (user-22f9, 2024-04-10, exchange 235425, check: supported)</li>
+<li id="s35">Steve Jobs saw MIPS as better suited for computer graphics than for raw power. (user-bc18, 2024-04-10, exchange 148458, check: uncheckable)</li>
+<li id="s36">MIPS was a research project at Stanford originally. (user-22f9, 2025-04-28, exchange 224981, check: uncheckable)</li>
+<li id="s37">MIPS runs two threads per CPU, whereas Power PC only runs a single thread per CPU. (user-59df, 2026-03-21, exchange 232923, check: supported)</li>
+<li id="s38">MIPS licensed the R4200 to NEC, who created the R4300i variant. (user-1a5a, 2025-07-04, exchange 212683, check: supported)</li>
+<li id="s39">MIPS created the specifications for the N64's CPU. (user-24f0, 2025-07-04, exchange 212683, check: uncheckable)</li>
+<li id="s40">RISC-V is a lot like MIPS but without delay slots. (user-8203, 2025-03-23, exchange 227249, check: uncheckable)</li>
+<li id="s41">Non-modern RISC processors like MIPS have poor code density, which is why ARM has features like Thumb. (user-22f9, 2025-02-05, exchange 114458, check: uncheckable)</li>
+<li id="s42">MIPS changed the spec for their chips in the early 2000’s; code should be recompiled and assembly code should be heavily reviewed as they are very similar but not compatible. (user-8b3c, 2025-11-19, exchange 227256, check: supported)</li>
+<li id="s43">The Open MIPS initiative was reversed in 2019, affecting MIPS's competitive position against ARM. (user-c799, 2026-02-01, exchange 226049, check: supported)</li>
+<li id="s44">MIPS abandoned support for the MIPS architecture but the name MIPS is still used. (user-2a3c, 2025-07-11, exchange 57581, check: uncheckable)</li>
+<li id="s45">The MIPS instruction rate is calculated every frame and varies due to cache misses, TLB lookups, and bus hits. (user-3e2d, 2026-04-26, exchange 220409, check: uncheckable)</li>
+<li id="s46">The MIPS emulation loop involves multiple steps including checking for interrupts, translating and fetching instructions, decoding, executing, handling exceptions, and advancing the instruction pointer; each translation解 (user-3e2d, 2026-05-14, exchange 93905, check: uncheckable)</li>
+<li id="s47">clock rate isn't a great performance indicator for MIPS because of stronger IPC. (user-1a5a, 2026-06-17, exchange 226585, check: uncheckable)</li>
+<li id="s48">microsoft abandoned mips for wince (user-3e2d, 2026-05-17, exchange 227266, check: uncheckable)</li>
+<li id="s49">NetBSD is listed as supporting MIPS, but there's no evidence of Indigo2 running it. (user-d3bf, 2026-08-12, exchange 214426, check: supported)</li>
+<li id="s50">A BSD flavor runs on MIPS but not optimally. (user-cd83, 2026-09-16, exchange 214658, check: uncheckable)</li>
+<li id="s51">The old live CD RC6 for MIPS is no longer available, and no new releases followed. (user-3e2d, 2026-09-16, exchange 66537, check: uncheckable)</li>
+<li id="s52">Gentoo does not run on MIPS machines anymore. (user-3e2d, 2026-09-16, exchange 214658, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="mips-architecture.html">MIPS architecture</a> (16)
+</li>
+<li><a href="mips-assembly.html">MIPS assembly</a> (8)
+</li>
+<li><a href="mips-binary.html">MIPS binary</a> (3)
+</li>
+<li><a href="mips-chip.html">MIPS chip</a> (7)
+</li>
+<li><a href="mips-cobalt.html">MIPS Cobalt</a> (3)
+</li>
+<li><a href="mips-code.html">MIPS code</a> (3)
+</li>
+<li><a href="mips-core.html">MIPS core</a> (3)
+</li>
+<li><a href="mips-cpu.html">MIPS CPU</a> (34)
+</li>
+<li><a href="mips-decstation.html">MIPS DECstation</a> (3)
+</li>
+<li><a href="mips-emulation.html">MIPS emulation</a> (4)
+</li>
+<li><a href="mips-iii.html">MIPS III</a> (8)
+</li>
+<li><a href="mips-instructions.html">MIPS instructions</a> (3)
+</li>
+<li><a href="mips-iv.html">MIPS IV</a> (9)
+</li>
+<li><a href="mips-linux.html">MIPS Linux</a> (3)
+</li>
+<li><a href="mips-magnum.html">MIPS Magnum</a> (14)
+</li>
+<li><a href="mips-nt.html">MIPS NT</a> (7)
+</li>
+<li><a href="mips-processor.html">MIPS processor</a> (15)
+</li>
+<li><a href="mips-r10000.html">MIPS R10000</a> (6)
+</li>
+<li><a href="mips-r2000.html">MIPS R2000</a> (4)
+</li>
+<li><a href="mips-r2300.html">MIPS R2300</a> (3)
+</li>
+<li><a href="mips-r4400.html">MIPS R4400</a> (3)
+</li>
+<li><a href="mips-sgi.html">MIPS SGI</a> (4)
+</li>
+<li><a href="mips3.html">MIPS3</a> (34)
+</li>
+<li><a href="mips32.html">MIPS32</a> (5)
+</li>
+<li><a href="mips4.html">MIPS4</a> (22)
+</li>
+<li><a href="mips64.html">MIPS64</a> (7)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="arm.html">ARM</a>, <a href="indigo.html">Indigo</a>, <a href="tezro.html">Tezro</a>, <a href="vax.html">VAX</a>, <a href="iris.html">IRIS</a>, <a href="indigo2.html">Indigo2</a>, <a href="486.html">486</a>, <a href="4d-series.html">4D series</a>, <a href="4d-60.html">4D/60</a>, <a href="4d-70.html">4D/70</a>, <a href="altix.html">Altix</a>, <a href="amiga.html">Amiga</a>, <a href="ipc.html">IPC</a>, <a href="o2.html">O2</a>, <a href="psp.html">PSP</a>, <a href="prism.html">Prism</a>, <a href="qube.html">Qube</a>, <a href="visual-workstation.html">Visual Workstation</a>
+</li>
+<li>Processors: <a href="sparc.html">SPARC</a>, <a href="x86.html">x86</a>, <a href="itanium.html">Itanium</a>, <a href="ppc.html">PPC</a>, <a href="powerpc.html">PowerPC</a>, <a href="pa-risc.html">PA-RISC</a>, <a href="68k.html">68k</a>, <a href="risc-v.html">RISC-V</a>, <a href="r2300.html">R2300</a>, <a href="68040.html">68040</a>, <a href="ia64.html">IA64</a>, <a href="pentium-ii.html">Pentium II</a>, <a href="r2000.html">R2000</a>, <a href="r2k.html">R2K</a>, <a href="r4000.html">R4000</a>, <a href="risc-architecture.html">RISC architecture</a>, <a href="x86-architecture.html">x86 architecture</a>
+</li>
+<li>Graphics: <a href="v10.html">V10</a>, <a href="v6.html">V6</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="gentoo.html">Gentoo</a>, <a href="linux.html">Linux</a>, <a href="windows-nt.html">Windows NT</a>, <a href="openbsd.html">OpenBSD</a>, <a href="risc-os.html">RISC OS</a>, <a href="ultrix.html">Ultrix</a>, <a href="windows.html">Windows</a>, <a href="bsd.html">BSD</a>, <a href="irix-3-3.html">IRIX 3.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="nt.html">NT</a>, <a href="netbsd.html">NetBSD</a>, <a href="windows-nt-4-0.html">Windows NT 4.0</a>, <a href="windows-xp.html">Windows XP</a>, <a href="macos.html">macOS</a>, <a href="n32-abi.html">n32 ABI</a>
+</li>
+<li>Software: <a href="n64.html">N64</a>, <a href="ioquake3.html">ioquake3</a>, <a href="lightwave.html">Lightwave</a>, <a href="alias.html">Alias</a>, <a href="dosbox.html">DOSBox</a>, <a href="gnu-ld.html">GNU ld</a>, <a href="llvm.html">LLVM</a>, <a href="love-installer.html">LOVE installer</a>, <a href="mame.html">MAME</a>, <a href="mipspro.html">MIPSpro</a>, <a href="qemu.html">QEMU</a>, <a href="rust.html">Rust</a>, <a href="sbcl.html">SBCL</a>, <a href="saturn.html">Saturn</a>, <a href="binary.html">binary</a>, <a href="binutils.html">binutils</a>, <a href="dbx.html">dbx</a>, <a href="rld.html">rld</a>
+</li>
+<li>Parts and peripherals: <a href="chipset.html">chipset</a>, <a href="l1-command.html">L1 command</a>, <a href="power.html">POWER</a>, <a href="power5.html">POWER5</a>, <a href="brick.html">brick</a>, <a href="memory.html">memory</a>
+</li>
+<li>Standards and interfaces: <a href="arcs.html">ARCS</a>, <a href="dma.html">DMA</a>, <a href="rsp.html">RSP</a>, <a href="usb.html">USB</a>, <a href="x86-64.html">x86_64</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="dec.html">DEC</a>, <a href="gcc.html">GCC</a>, <a href="cisco.html">Cisco</a>, <a href="cisco-switch.html">Cisco switch</a>, <a href="cobalt-raq.html">Cobalt RAQ</a>, <a href="microsoft.html">Microsoft</a>, <a href="nec.html">NEC</a>, <a href="next.html">NeXT</a>, <a href="sgi-box.html">SGI box</a>
+</li>
+<li>Other: <a href="cavium.html">Cavium</a>, <a href="wince.html">WinCE</a>, <a href="i960.html">i960</a>, <a href="octeon.html">octeon</a>, <a href="320-540.html">320/540</a>, <a href="loongson.html">Loongson</a>, <a href="lua.html">Lua</a>, <a href="mx.html">MX</a>, <a href="open64.html">Open64</a>, <a href="powervr.html">PowerVR</a>, <a href="raq.html">RaQ</a>, <a href="simd.html">SIMD</a>, <a href="svr3.html">SVR3</a>, <a href="screamernet.html">Screamernet</a>, <a href="steve-jobs.html">Steve Jobs</a>, <a href="superh.html">SuperH</a>, <a href="tlb.html">TLB</a>, <a href="assembly.html">assembly</a>, <a href="i486.html">i486</a>, <a href="libc.html">libc</a>, <a href="libsodium.html">libsodium</a>, <a href="lld.html">lld</a>, <a href="o32.html">o32</a>, <a href="pthread.html">pthread</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xset</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>xset</h1>
+<p>Claims: 5</p>
+<p>xset can adjust screensaver activation in X11, disable screen blanking using XSetScreenSaver and XSetDisplaySaver commands, and works on Xsgi. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> freetype2 allows TrueType fonts to be used in X11 applications, and the font path can be set with xset fp after running mkfontdir to recognize new font directories. <sup><a href="#s3">3</a></sup> xset shows the default IRIX font count, and rehashing does not change it. <sup><a href="#s4">4</a></sup> The ssaver panel changes user settings into xset commands and writes them to ~/.desktop-&lt;hostname&gt;/panelsession, which are executed by /usr/lib/X11/xdm/Xsession.dt. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Screensaver activation in X11 can be adjusted with `xset`. (user-42cf, 2021-06-04, exchange 17738, check: supported)</li>
+<li id="s2">xset can disable screen blanking using XSetScreenSaver and XSetDisplaySaver commands, and modern xset works on Xsgi. (user-42cf, 2025-04-24, exchange 215704, check: uncheckable)</li>
+<li id="s3">freetype2 allows the use of TrueType fonts in X11 applications; the font path can be set with xset fp and mkfontdir must be run to recognize new font directories. (user-42cf, 2019-07-20, exchange 67567, check: uncheckable)</li>
+<li id="s4">xset shows the default IRIX font count, and rehashing does not change it. (user-17cb, 2024-04-22, exchange 45719, check: uncheckable)</li>
+<li id="s5">the ssaver panel changes user settings into xset commands and writes them to ~/.desktop-&lt;hostname&gt;/panelsession, which are executed by /usr/lib/X11/xdm/Xsession.dt. (user-b1da, 2021-04-04, exchange 79150, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="xsgi.html">Xsgi</a>
+</li></ul>
+</body>
+</html>

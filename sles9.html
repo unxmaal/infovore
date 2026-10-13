@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLES9</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SLES9</h1>
+<p>Claims: 34</p>
+<p>The Prism uses SLES 9 as its official/intended OS, with ProPack required for full hardware support and graphics, and it may also work with older or newer OSes (including possibly SLES 11 and older Red Hat Enterprise versions); headless mode allows more OS options. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> SLES9 and SGI ProPack are available on archive.org, and ProPack 4 can only be installed on SLES9. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The SLES 9 installation process reboots after loading CD contents into RAM, and the installer requires direct device access to display properly (rebooting occurs without it). <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The Altix 350 with a graphics module requires special installation instructions for SLES 9, as it may not boot/install properly from DVDs without them, and installing the base 5.3 version from CD results in constant SCSI bus errors which are resolved by removing the CD drive. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> For graphics acceleration, SLES9 requires either SLES9 or an old version of Red Hat, and it runs with the fglrx driver. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The fglrx driver is available in SLES 9 but requires a compatible PCI card, and SLES9 might not support certain PCI cards with the fglrx driver. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Disabling SGI-specific extensions might allow the fglrx driver to work. <sup><a href="#s14">14</a></sup> The FireMV 2200 is not supported by the SLES 9 and SGI ProPack kernels, causing X to crash with 'cannot read V_BIOS' even with the radeon module. <sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Prism uses SLES 9 as the official OS, with ProPack required for graphics and potentially working up to SLES 11, and possibly with older Red Hat Enterprise versions; headless mode allows more OS options. (user-b7c4, 2019-08-18, exchange 216279, check: supported)</li>
+<li id="s2">The Prism uses SLES9 as the intended OS, which can run a few more things, both older and newer. (user-b7c4, 2020-06-19, exchange 9121, check: uncheckable)</li>
+<li id="s3">The Prism requires SLES9 with ProPack for full hardware support; attempting to install other OSes crashes the system partway through the install. (user-b7c4, 2020-07-08, exchange 9470, check: uncheckable)</li>
+<li id="s4">SLES9 and SGI propack are available on archive.org, and SLES10 did not support Itanium for altix UV (x86 bung). (user-b7c4, 2020-04-07, exchange 216308, check: uncheckable)</li>
+<li id="s5">Propack4 can only be installed on SLES9. (user-24f0, 2025-01-16, exchange 216525, check: uncheckable)</li>
+<li id="s6">The SLES 9 installation process reboots after loading CD contents into RAM. (user-b7c4, 2020-02-02, exchange 75051, check: supported)</li>
+<li id="s7">The SLES9 installer requires direct device access to display properly; rebooting occurs without it. (user-e872, 2025-06-28, exchange 76374, check: uncheckable)</li>
+<li id="s8">The Altix 350 with a graphics module requires special installation instructions for SLES 9, as it may not boot/install properly from DVDs without these instructions. (user-03ad, 2025-06-29, exchange 216569, check: supported)</li>
+<li id="s9">Installing the base 5.3 version from CD results in constant SCSI bus errors which are resolved by removing the CD drive. (user-7ded, 2026-04-29, exchange 90548, check: supported)</li>
+<li id="s10">To have hardware acceleration, it requires either SLES9 or an old version of Red Hat. (user-b7c4, 2020-04-20, exchange 7657, check: uncheckable)</li>
+<li id="s11">SLES9 is used with fglrx. (user-59b9, 2020-08-24, exchange 75312, check: uncheckable)</li>
+<li id="s12">SLES 9 might not support certain PCI cards with the fglrx driver. (user-1446, 2020-07-26, exchange 216332, check: supported)</li>
+<li id="s13">The fglrx driver is available in SLES 9 but requires a compatible PCI card, and the user does not have boot media for SLES 10. (user-59b9, 2020-07-30, exchange 75279, check: supported)</li>
+<li id="s14">Disabling SGI-specific extensions might allow the fglrx driver to work. (user-59b9, 2020-08-24, exchange 216345, check: uncheckable)</li>
+<li id="s15">The FireMV 2200 is not supported by the SLES 9 and SGI ProPack kernels, causing X to crash with 'cannot read V_BIOS' even with the radeon module. (user-59b9, 2020-06-11, exchange 216319, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="prism.html">Prism</a>, <a href="altix-350.html">Altix 350</a>, <a href="altix.html">Altix</a>, <a href="radeon.html">Radeon</a>, <a href="zx6000.html">zx6000</a>
+</li>
+<li>Processors: <a href="itanium.html">Itanium</a>
+</li>
+<li>Graphics: <a href="firegl-x1.html">FireGL X1</a>
+</li>
+<li>Operating systems: <a href="propack.html">ProPack</a>, <a href="propack-4.html">Propack 4</a>, <a href="sles-10.html">SLES 10</a>, <a href="sles11.html">SLES11</a>, <a href="debian-6.html">Debian 6</a>, <a href="debian-7.html">Debian 7</a>
+</li>
+<li>Software: <a href="radeon-driver.html">radeon driver</a>, <a href="quicktransit.html">QuickTransit</a>, <a href="fglrx-driver.html">fglrx driver</a>, <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="cd-drive.html">CD drive</a>
+</li>
+<li>Standards and interfaces: <a href="x.html">X</a>, <a href="x3.html">X3</a>
+</li>
+<li>Companies: <a href="red-hat.html">Red Hat</a>
+</li>
+<li>Other: <a href="fglrx.html">fglrx</a>, <a href="firemv-2200.html">FireMV 2200</a>, <a href="radeonhd.html">radeonhd</a>
+</li></ul>
+</body>
+</html>

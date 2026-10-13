@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IP32</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IP32</h1>
+<p>Claims: 14</p>
+<p>IP32 is a 64-bit hardware family. <sup><a href="#s1">1</a></sup> The ip32 can run IRIX up to version 6.9 but lacks Xenocara support for SGI. <sup><a href="#s2">2</a></sup> Registration determines O2+ by reading the IPxx and offering a selection list, which for IP32 includes O2 or O2+. <sup><a href="#s3">3</a></sup> Compilation times vary: around 40 minutes on dual 300 IP30 machines and 1 hour 12 minutes on a 400 MHz IP32. <sup><a href="#s4">4</a></sup> IP32 has phantom devices with bar0 size set to 0 that don't respond to mmio, while IP30 and IP35 do not have this issue. <sup><a href="#s5">5</a></sup> Bar0 size 0 indicates a dead device, but the driver does not try to access nonexistent registers. <sup><a href="#s6">6</a></sup> IP32's bridge handling is iffy, with 6.5.30 being much better; 6.5.22 and 6.5.7 sources mention external PCI extension box support but did not test it. <sup><a href="#s7">7</a></sup> The built-in NVMe driver works on IP32 with up to 256MB RAM, with one or more bridges, and works on ip30 and ip35. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IP32 is a 64-bit hardware family. (user-2189, 2019-03-03, exchange 876, check: supported)</li>
+<li id="s2">The ip32 can run IRIX up to version 6.9 but lacks Xenocara support - <a href="https://github.com/openbsd/xenocara">Xenocara</a> - for SGI. (user-6e7b, 2024-10-13, exchange 236164, check: supported)</li>
+<li id="s3">Registration determines O2+ by reading the IPxx and offering a selection list, which for IP32 includes O2 or O2+. (user-7973, 2025-06-02, exchange 215745, check: supported)</li>
+<li id="s4">Compilation times vary: around 40 minutes on dual 300 IP30 machines and 1 hour 12 minutes on a 400 MHz IP32. (user-e4d0, 2025-08-07, exchange 215793, check: supported)</li>
+<li id="s5">IP32 has phantom devices with bar0 size set to 0 that don't respond to mmio, while IP30 and IP35 do not have this issue. (user-3e2d, 2026-03-09, exchange 121937, check: supported)</li>
+<li id="s6">Bar0 size 0 indicates a dead device, but the driver does not try to access nonexistent registers. (user-757f, 2026-03-09, exchange 121937, check: supported)</li>
+<li id="s7">IP32's bridge handling is iffy, with 6.5.30 being much better. 6.5.22 and 6.5.7 sources mention external PCI extension box support but did not test it. (user-757f, 2026-03-09, exchange 121937, check: supported)</li>
+<li id="s8">The built-in NVMe driver works on IP32 with up to 256MB RAM. (user-757f, 2026-03-10, exchange 121959, check: supported)</li>
+<li id="s9">The NVMe driver works on IP32 with one or more bridges, and booting from NVMe on IP32 is planned. (user-757f, 2026-03-10, exchange 121947, check: uncheckable)</li>
+<li id="s10">nvme works on ip32, ip30 and ip35 (user-3e2d, 2026-08-27, exchange 125172, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ip32-prom.html">IP32 PROM</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ip22.html">IP22</a>, <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-6-5-7.html">IRIX 6.5.7</a>
+</li>
+<li>Software: <a href="nvme-driver.html">NVMe driver</a>
+</li>
+<li>Parts and peripherals: <a href="ip30.html">IP30</a>, <a href="ip35.html">IP35</a>, <a href="ip28.html">IP28</a>, <a href="ip6.html">IP6</a>
+</li>
+<li>Standards and interfaces: <a href="nvme.html">NVMe</a>
+</li>
+<li>Other: <a href="xenocara.html">Xenocara</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROM settings</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PROM settings</h1>
+<p>Claims: 4 Part of <a href="prom.html">PROM</a></p>
+<p>PROM settings can point to the wrong partition as root, which is partition 0 by SGI's standard, and the miniroot boots from the swap partition if IRIX hasn't used it for swap yet. <sup><a href="#s1">1</a></sup> The Indy may default to a specific resolution and refresh rate despite using a known good monitor and cable setup, possibly due to PROM settings or corruption. <sup><a href="#s2">2</a></sup> When cloning an SGI system, it's important to printenv after inserting the cloned disk to check for PROM settings that may not have transferred. <sup><a href="#s3">3</a></sup> To preserve PROM settings, one should print them with 'printenv' and reset them with 'resetenv'. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The miniroot boots from the swap partition if IRIX hasn't used it for swap yet, and an issue could be prom settings pointing to the wrong partition as root, which is partition 0 by SGI's standard. (user-d903, 2021-05-04, exchange 217114, check: supported)</li>
+<li id="s2">The Indy may default to a specific resolution and refresh rate despite using a known good monitor and cable setup, possibly due to PROM settings or corruption. (user-22f9, 2022-01-15, exchange 101535, check: supported)</li>
+<li id="s3">When cloning an SGI system, it's important to printenv after inserting the cloned disk to check for PROM settings that may not have transferred. (user-8547, 2022-02-21, exchange 26052, check: uncheckable)</li>
+<li id="s4">To preserve PROM settings, one should print them with 'printenv' and reset them with 'resetenv'. (user-8547, 2022-02-23, exchange 26283, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Graphics: <a href="resolution.html">resolution</a>
+</li>
+<li>Operating systems: <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="swap-partition.html">swap partition</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="printenv.html">printenv</a>, <a href="refresh-rate.html">refresh rate</a>, <a href="resetenv.html">resetenv</a>
+</li></ul>
+</body>
+</html>

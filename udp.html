@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UDP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>UDP</h1>
+<p>Claims: 9 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Network_File_System">Network File System</a>.</p>
+<p>UDP is used by StarCraft for online play on port 6112, alongside TCP/IP. <sup><a href="#s1">1</a></sup> NFS typically uses TCP by default but can use UDP, and NFSv3 and older versions use dynamic ports. <sup><a href="#s2">2</a></sup> NFSv3 only works on UDP, which is turned off by default in many Linux distributions including RHEL. <sup><a href="#s3">3</a></sup> To use old-style NFS over UDP, configure the Linux NFS server with options like rw, sync, no_root_squash, and no_subtree_check, then restart the NFS service. <sup><a href="#s4">4</a></sup> TCP is generally slower for NFS, though it may have had issues with UDP in the past. <sup><a href="#s5">5</a></sup> The PikVM sends a UDP stream of pointer data to the SGI machine to move the mouse. <sup><a href="#s6">6</a></sup> The PelOrion rendering engine can switch the WanXL card to UDP for data input, and the PelOrion card can be used via deframer and UDP or the fire_str command. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">StarCraft uses TCP/IP and UDP ports 6112 for online play. (user-c831, 2019-12-09, exchange 4743, check: supported)</li>
+<li id="s2">NFS typically uses TCP by default, but can use UDP. NFSv3 and older use dynamic ports, while NFSv4 uses port 2049. NFS servers may require clients to use secure ports below 1024, which NAT may translate to high-numbered, (user-e4e2, 2026-04-03, exchange 93757, check: supported)</li>
+<li id="s3">nfs v3, which is the highest version the 6.5.22 stack supports ONLY WORKS ON UDP, which is turned off by default inside many linux distributions including RHEL (user-ab99, 2021-10-01, exchange 20617, check: supported)</li>
+<li id="s4">To use old style NFS over UDP, configure the Linux NFS server with options like rw, sync, no_root_squash, no_subtree_check, and restart the NFS service using ngc -r nfs. (user-17cb, 2019-09-22, exchange 3606, check: uncheckable)</li>
+<li id="s5">TCP is generally slower for NFS but may have had issues with UDP in the past. (user-f229, 2022-02-03, exchange 80864, check: uncheckable)</li>
+<li id="s6">The PikVM sends a UDP stream of pointer data to the SGI machine, which then moves the mouse. (user-1171, 2026-08-03, exchange 124586, check: uncheckable)</li>
+<li id="s7">The PelOrion rendering engine uses the WanXL card for data input, which can be switched to UDP; the system has a console layout with windows appearing in specific spots on startup; the software platform requires A/V (user-9305, 2021-10-05, exchange 166439, check: uncheckable)</li>
+<li id="s8">To use the PelOrion card, you can either use deframer and UDP or the fire_str command, which involves database-style calls. (user-9305, 2026-08-24, exchange 226921, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Parts and peripherals: <a href="pelorion-card.html">PelOrion card</a>, <a href="mouse.html">mouse</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="nfs-client.html">NFS client</a>, <a href="nfsv3.html">NFSv3</a>, <a href="tcp-ip.html">TCP/IP</a>
+</li>
+<li>Other: <a href="tcp.html">TCP</a>, <a href="av.html">AV</a>, <a href="pikvm.html">PiKVM</a>
+</li></ul>
+</body>
+</html>

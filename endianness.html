@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>endianness</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>endianness</h1>
+<p>Claims: 11</p>
+<p>Endianness determines whether data is accessed 16 or 32 bits at a time, and ROMs should be split into bytes and interleaved accordingly. <sup><a href="#s1">1</a></sup> The R4000 processor can use either endianness by changing a status register bit, and the Indigo used an R3000 processor which likely had similar endianness capabilities. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> To handle endianness, the buffer can be loaded and then each accessor copies and byteswaps the binary data during the copy process, while some hardware requires swizzling that can be done in hardware or software depending on the peripheral and frequency of access. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Endianness issues can cause crashes, such as `Hunk_AllocName: bad size: -664895488`, and can break real-time rendering of large amounts of foliage on RISC architectures. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The endianness detection for Irix COFF is based on COFF magic header values, matching only LE variants, and our ARM nodes are little-endian. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> There were endianness issues to fix, and some issues likely remain. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">ROMs should be split into bytes and accessed either 16 or 32 bits at a time, depending on endianness, and interleaved accordingly. (user-4c09, 2020-08-12, exchange 78607, check: supported)</li>
+<li id="s2">the R4000 processor can use either endianness by changing a status register bit. (user-e04c, 2020-10-14, exchange 11516, check: supported)</li>
+<li id="s3">the Indigo used an R3000 processor which likely had similar endianness capabilities. (user-e04c, 2020-10-14, exchange 11516, check: supported)</li>
+<li id="s4">To handle endianness, load the buffer, then for each accessor, copy and byteswap the binary data during the copy process. (user-6afa, 2023-10-07, exchange 209352, check: uncheckable)</li>
+<li id="s5">Some hardware requires swizzling for endianness, which can be done in hardware or software, depending on the peripheral and frequency of access. (user-231e, 2026-05-07, exchange 122994, check: uncheckable)</li>
+<li id="s6">The binary crashes with `Hunk_AllocName: bad size: -664895488` due to an endianness issue. (user-59b9, 2021-06-27, exchange 69692, check: supported)</li>
+<li id="s7">Aligned access and endianness can break real-time rendering of large amounts of foliage on RISC architectures. (user-22f9, 2025-04-20, exchange 116290, check: uncheckable)</li>
+<li id="s8">The endianness detection for Irix COFF is based on COFF magic header values, matching only LE variants. (user-8780, 2026-08-14, exchange 219957, check: uncheckable)</li>
+<li id="s9">Our ARM nodes are little-endian. (user-cd7d, 2023-02-21, exchange 36308, check: uncheckable)</li>
+<li id="s10">Issues likely due to endianness. (user-757f, 2026-03-19, exchange 73242, check: uncheckable)</li>
+<li id="s11">There were some endianness issues to fix; they likely still exist. (user-757f, 2026-05-17, exchange 73645, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>
+</li>
+<li>Processors: <a href="r3000.html">R3000</a>, <a href="r4000.html">R4000</a>, <a href="risc-architecture.html">RISC architecture</a>
+</li>
+<li>Parts and peripherals: <a href="rom.html">ROM</a>
+</li>
+<li>Other: <a href="buffer.html">buffer</a>
+</li></ul>
+</body>
+</html>

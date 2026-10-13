@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>POD</h1>
+<p>Claims: 4</p>
+<p>POD is a hardware configuration diagnostic screen that can indicate issues like bad RAM or unrecognized hardware. <sup><a href="#s1">1</a></sup> The core boot process of L1 does a numalink and I/O scan by default, and can be bypassed with debug commands in hex, such as 'debug 0x4000'. <sup><a href="#s2">2</a></sup> A softreset from L1 can boot the console back into the POD, and Claude can debug through Pod by connecting to the L1 controller on a Tezro. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">POD is a hardware configuration diagnostic screen that can indicate issues like bad RAM or unrecognized hardware. (user-b7c4, 2021-12-13, exchange 23313, check: uncheckable)</li>
+<li id="s2">The core boot process of L1 does a numalink and I/O scan by default, and can be bypassed with debug commands in hex, such as 'debug 0x4000'. A softreset from L1 can boot the console back into the POD. (user-e4e2, 2026-04-28, exchange 90536, check: uncheckable)</li>
+<li id="s3">Claude can debug through Pod by connecting to the L1 controller on a Tezro. (user-3e2d, 2026-09-07, exchange 226994, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="tezro.html">Tezro</a>
+</li>
+<li>Parts and peripherals: <a href="l1.html">L1</a>, <a href="l1-controller.html">L1 controller</a>
+</li>
+<li>Other: <a href="kubernetes.html">Kubernetes</a>
+</li></ul>
+</body>
+</html>

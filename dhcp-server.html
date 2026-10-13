@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DHCP server</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>DHCP server</h1>
+<p>Claims: 8 Part of <a href="dhcp.html">DHCP</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bootstrap_Protocol">Bootstrap Protocol</a>.</p>
+<p>On a fresh IRIX Pi image, the DHCP server fails to load, and the eth0 configuration does not take effect. <sup><a href="#s1">1</a></sup> The DHCP server configuration is missing a subnet declaration, and the VM cannot resolve its own hostname. <sup><a href="#s2">2</a></sup> Disabling predictable network names fixes the interface name issue but does not resolve the DHCP server failure. <sup><a href="#s3">3</a></sup> The DHCP server's lease does not include routes. <sup><a href="#s4">4</a></sup> Network installers need to run on a network segment or subnet without another DHCP server running. <sup><a href="#s5">5</a></sup> A Linux box running a DHCP server can cause conflicts, and disabling it can help. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The DHCP server fails to load and eth0 configuration doesn't take on a fresh IRIX Pi image. (user-95db, 2021-09-22, exchange 77438, check: uncheckable)</li>
+<li id="s2">The DHCP server configuration is missing a subnet declaration and the VM can't resolve its own hostname. (user-b1da, 2022-01-31, exchange 25297, check: uncheckable)</li>
+<li id="s3">Disabling predictable network names fixes the interface name issue but does not resolve the DHCP server failure. (user-22f9, 2022-03-09, exchange 216772, check: uncheckable)</li>
+<li id="s4">the DHCP server's lease does not include routes. (user-3e2d, 2025-01-18, exchange 52902, check: uncheckable)</li>
+<li id="s5">network installers need to run on a network segment/subnet without another DHCP server running (user-07ed, 2025-05-27, exchange 216802, check: uncheckable)</li>
+<li id="s6">A Linux box running a DHCP server can cause conflicts; disabling it can help. (user-ae4b, 2025-05-27, exchange 216804, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="linux-box.html">Linux box</a>, <a href="vm.html">VM</a>
+</li>
+<li>Standards and interfaces: <a href="bootp.html">bootp</a>
+</li>
+<li>Other: <a href="eth0.html">eth0</a>
+</li></ul>
+</body>
+</html>

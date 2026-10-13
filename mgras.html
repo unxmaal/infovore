@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MGRAS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MGRAS</h1>
+<p>Claims: 22 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>.</p>
+<p>The MGRAS is a graphics card that supports certain resolutions and configurations, but has VRAM limitations that prevent it from performing certain GL operations at 1920x1080 24bpp. <sup><a href="#s1">1</a></sup> On vPro hardware it performs color space conversion on the CPU, while on MGRAS it uses the color matrix extension. <sup><a href="#s2">2</a></sup> inst files can have GFXBOARD or MGRAS restrictions that can be overridden with -m GFXBOARD= or -m MGRAS= options or by modifying the files with sed. <sup><a href="#s3">3</a></sup> The maximum pixel clock for MGRAS is 160MHz, which is lower than the required for 1920x1200 resolution. <sup><a href="#s4">4</a></sup> An Octane can support VPRO and MGRAS, but only one will work correctly; multiple SE heads can be used, but an Octane accepts only three. <sup><a href="#s5">5</a></sup> Mixing MGRAS and VPro graphics in the same machine can cause compatibility issues. <sup><a href="#s6">6</a></sup> Textures can appear as rainbows or be invisible, affecting gameplay, which may be due to insufficient texture RAM on MGRAS, which has only 4 MB. <sup><a href="#s7">7</a></sup> MGRAS offers options for V12+DCD without a breakout box. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The MGRAS cannot do certain GL things at 1920x1080 24bpp due to VRAM limitations. (user-42cf, 2021-04-29, exchange 98934, check: supported)</li>
+<li id="s2">On vPro it performs color space conversion on the CPU, while on Mgras it uses the color matrix extension. (user-6afa, 2021-10-08, exchange 79919, check: uncheckable)</li>
+<li id="s3">inst files can have GFXBOARD or MGRAS restrictions that can be overridden with -m GFXBOARD= or -m MGRAS= options or by modifying the files with sed. A ruby inst clone is available for Linux at https://github.com/irixxxx/ (user-9860, 2021-10-24, exchange 217274, check: uncheckable)</li>
+<li id="s4">The maximum pixel clock for MGRAS is 160MHz, which is lower than the required for 1920x1200 resolution. (user-2a24, 2022-04-30, exchange 217577, check: supported)</li>
+<li id="s5">An Octane can support VPRO and MGRAS, but only one will work correctly; multiple SE heads can be used, but an Octane accepts only three, and CADDuo cards allow three independent users. (user-59b9, 2022-08-05, exchange 207487, check: supported)</li>
+<li id="s6">Mixing MGRAS and VPro graphics in the same machine can cause compatibility issues. (user-56d4, 2022-09-14, exchange 104902, check: uncheckable)</li>
+<li id="s7">Textures can appear as rainbows or be invisible, affecting gameplay. This issue is not related to cards or TRAMs, and may be due to insufficient texture RAM on MGRAS, which has only 4 MB. (user-59b9, 2022-09-20, exchange 105007, check: supported)</li>
+<li id="s8">MGRAS offers options for V12+DCD without a breakout box. (user-d41d, 2023-03-25, exchange 222945, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="mgras-card.html">MGRAS card</a> (7)
+</li>
+<li><a href="mgras-octane.html">MGRAS Octane</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="o2.html">O2</a>, <a href="octane1.html">Octane1</a>, <a href="onyx2-demos.html">Onyx2 demos</a>, <a href="xbow-1-3.html">Xbow 1.3</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>, <a href="odyssey.html">Odyssey</a>, <a href="vpro-graphics.html">VPro graphics</a>, <a href="graphics.html">graphics</a>
+</li>
+<li>Operating systems: <a href="irix-software.html">IRIX software</a>
+</li>
+<li>Software: <a href="glquake.html">GLQuake</a>, <a href="quake-3.html">Quake 3</a>, <a href="devilutionx.html">devilutionX</a>, <a href="sed.html">sed</a>, <a href="software-manager.html">software manager</a>
+</li>
+<li>Parts and peripherals: <a href="cherokee-psu.html">Cherokee PSU</a>, <a href="ip35.html">IP35</a>
+</li>
+<li>Other: <a href="gfxboard.html">GFXBOARD</a>, <a href="scorched3d.html">Scorched3D</a>, <a href="textures.html">textures</a>
+</li></ul>
+</body>
+</html>

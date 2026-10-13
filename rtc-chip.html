@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RTC chip</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RTC chip</h1>
+<p>Claims: 5 Part of <a href="rtc.html">RTC</a></p>
+<p>The RTC chip can be involved in fixing soft power-off issues caused by a non-working power button on some systems, which may be resolved by adjusting a jumper next to the RTC chip. <sup><a href="#s1">1</a></sup> Unlike some previous SGI machines (e.g. Indy, Indigo2), the O2 does not store its ethernet MAC address on the RTC chip; instead, it is located on a three-pin DS2502 chip on the PCI riser. <sup><a href="#s2">2</a></sup> When changing the RTC chip on an O2, a resetenv and bypass jumper may not resolve boot issues, and existing guides may not work; a NVRAM dump from a functioning O2 might be needed to diagnose the problem. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The soft power off through the power button not working on some systems can be fixed by adjusting a jumper next to the RTC chip. (user-bc18, 2019-07-11, exchange 95338, check: uncheckable)</li>
+<li id="s2">Unlike some previous SGI machines (e.g. Indy, Indigo2), the O2 doesn't store its ethernet MAC address on this chip (it is instead located on a three-pin DS2502 chip on the PCI riser), however, the RTC chip is responsible (user-bc18, 2019-08-11, exchange 2982, check: supported)</li>
+<li id="s3">When changing the RTC chip on an O2, a resetenv and bypass jumper may not resolve boot issues, and existing guides may not work; a NVRAM dump from a functioning O2 might be needed to diagnose the problem. (user-c831, 2020-01-22, exchange 5652, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Parts and peripherals: <a href="power-button.html">power button</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet-mac-address.html">Ethernet MAC address</a>
+</li>
+<li>Other: <a href="resetenv.html">resetenv</a>
+</li></ul>
+</body>
+</html>

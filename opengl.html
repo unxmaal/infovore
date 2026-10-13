@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenGL</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>OpenGL</h1>
+<p>Claims: 184 Background: 78 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/IRIS_GL">IRIS GL</a>, <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/Silicon_Graphics">Silicon Graphics</a>, <a href="https://en.wikipedia.org/wiki/Blender_%28software%29">Blender (software)</a>, <a href="https://en.wikipedia.org/wiki/Xsgi">Xsgi</a>.</p>
+<p>OpenGL originated from AIX and was implemented in hardware. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> OpenGL and SDL are the respective ports for Linux and Win9x, and the Linux port uses OpenGL. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Shaders began as an OpenGL 1.4 extension and became part of the core in OpenGL 2.0, so it is theoretically possible to use shaders on an Onyx4, which supports OpenGL 1.4 and was planned to support 2.0. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Texture dimensions must be powers of two, which is common in OpenGL and OpenGL ES, but padding can be used for non-compliant cases. <sup><a href="#s7">7</a></sup> OpenGL supports z-buffering in every version, and the drawing order only matters for alpha blending. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Glide is a low-level version of OpenGL, similar to Vulkan in 1998, and 3dfx took OpenGL, removed unnecessary parts for gaming, and created Glide. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Vulkan is preferred over OpenGL. <sup><a href="#s12">12</a></sup> OpenGL support was added through patches, and OpenGL on Linux would not have existed without Mark Kilgaard's work. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> OpenGL on SGI systems was limited to versions 1.1 and 1.2, while OpenGL on IRIX 5.3 was early. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> X used tokenized OpenGL calls to minimize network traffic, especially for texture objects and display lists. <sup><a href="#s17">17</a></sup> Double buffering issues can cause flickering in OpenGL rendering without explicit vsync support, and adjusting the swap interval can affect rendering output. <sup><a href="#s18">18</a></sup> OpenGL applications use the GPU framebuffer and are composited separately, with specific OpenGL calls affecting the bus bandwidth. <sup><a href="#s19">19</a></sup> Using common OpenGL APIs ensured Quake 3 would work on most hardware, and Performer software should run on any Windows computer with OpenGL capability. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> Video players can use glDrawBuffers or textures to draw video, with glDrawBuffers being faster on older hardware. <sup><a href="#s22">22</a></sup> The OpenGL extension for render targets is GL_EXT_framebuffer_object. <sup><a href="#s23">23</a></sup> OpenGL is a graphics library with multiple layers of helpers for creating graphics programs, and its predecessor, the IRIX Graphics Library (GL), led to modern OpenGL and GLUT. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> An ex-Cray engineer was a lead coder on the GL project that became OpenGL. <sup><a href="#s26">26</a></sup> OpenGL can be used with Solaris on Creator or Elite cards for better performance, and Suns can support decent OpenGL. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> OpenGL and XGL are related, as OpenGL can be translated to XGL with a library that handles the calls, though games may need adaptation for performance issues. <sup><a href="#s29">29</a></sup> Xsgi supports both OpenGL and GL on SGI hardware, while Onyx4 uses XFree86 which does not support GL. <sup><a href="#s30">30</a></sup> With an X server running on a GL-capable system, remote OpenGL over GLX works great. <sup><a href="#s31">31</a></sup> OpenGL has a color mask that lets you render to just the red or blue channels, which is useful for red/blue stereo glasses, and the glasses can be used with OpenGL for at least one mode. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> OpenGL rendering is possible with the right setup, and /dev/opengl is provided by a driver on the host for translating OpenGL calls. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> OpenGL performs well on the hardware, but it assumes certain things about the underlying hardware and is not portable, which is why it was developed. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup> OpenGL became available around IRIX 4.0, and IRIS Inventor CD is OpenGL rather than IRIS GL. <sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> Iris Explorer was used for scientific visualization and continued to receive support in later versions using OpenGL. <sup><a href="#s40">40</a></sup> Performer supports OpenGL on SGI hardware but does not fully implement all texture extensions. <sup><a href="#s41">41</a></sup> FreeGLUT wraps OpenGL calls into utility functions for multiple platforms, allowing window creation, OpenGL initialization, and input handling in a platform-independent way, while OpenGL itself does the graphics. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup> OpenGL can render 2D as if it were 3D. <sup><a href="#s44">44</a></sup> For UI elements, using nearest sampling is recommended, especially when multiple UI icons are packed in a single texture. <sup><a href="#s45">45</a></sup> IRIX does not support non-power-of-two textures in OpenGL, requiring textures to be rounded up to the nearest power of two when creating them. <sup><a href="#s46">46</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The brick texture in IRIX's maze screensaver is similar to Windows 9x's maze screensaver, as both use OpenGL, which originated from AIX. (user-bc18, 2020-05-27, exchange 8641, check: supported)</li>
+<li id="s2">OpenGL was implemented in hardware. (user-2d40, 2021-01-27, exchange 14233, check: uncheckable)</li>
+<li id="s3">OpenGL and SDL are the respective ports for Linux and Win9x. (user-22f9, 2020-05-04, exchange 126180, check: uncheckable)</li>
+<li id="s4">The Linux port uses OpenGL. (user-22f9, 2020-05-04, exchange 227154, check: uncheckable)</li>
+<li id="s5">Shaders, which began as an OpenGL 1.4 extension, became part of the core in OpenGL 2.0, so it is theoretically possible to use shaders on an Onyx4. (user-b1da, 2019-10-17, exchange 68044, check: supported)</li>
+<li id="s6">The Onyx4 supports OpenGL 1.4, and was planned to support 2.0. (user-b1da, 2020-09-06, exchange 204415, check: supported)</li>
+<li id="s7">Texture dimensions must be powers of two, which is common in OpenGL and OpenGL ES, but padding can be used for non-compliant cases. (user-b1da, 2019-10-17, exchange 214870, check: supported)</li>
+<li id="s8">OpenGL supports z-buffering in every version, and the drawing order only matters for alpha blending. (user-21b8, 2020-06-11, exchange 204306, check: uncheckable)</li>
+<li id="s9">For opaque polygons, the drawing order doesn't matter as long as depth testing is enabled. (user-21b8, 2020-06-11, exchange 204306, check: uncheckable)</li>
+<li id="s10">Glide is a low-level version of OpenGL, similar to Vulkan in 1998. (user-17cb, 2020-07-07, exchange 9458, check: supported)</li>
+<li id="s11">3dfx took OpenGL, removed unnecessary parts for gaming, and created Glide. (user-17cb, 2020-07-07, exchange 9458, check: supported)</li>
+<li id="s12">Vulkan is preferred over OpenGL (user-bc18, 2021-01-22, exchange 14041, check: uncheckable)</li>
+<li id="s13">OpenGL support was added through patches. (user-ce5a, 2021-02-07, exchange 98343, check: uncheckable)</li>
+<li id="s14">OpenGL on Linux wouldn't have existed without Mark Kilgaard's work. (user-c831, 2021-02-15, exchange 217050, check: uncheckable)</li>
+<li id="s15">OpenGL support in IRIX 5.3 is early. (user-b1da, 2021-10-17, exchange 205742, check: supported)</li>
+<li id="s16">OpenGL on SGI systems was limited to versions 1.1 and 1.2. (user-8547, 2022-02-05, exchange 80879, check: supported)</li>
+<li id="s17">X used tokenized OpenGL calls to minimize network traffic, especially for texture objects and display lists. (user-6afa, 2021-12-05, exchange 23039, check: uncheckable)</li>
+<li id="s18">Double buffering issues can cause flickering in OpenGL rendering without explicit vsync support, and adjusting the swap interval can affect rendering output. (user-b1da, 2021-05-14, exchange 17356, check: uncheckable)</li>
+<li id="s19">OpenGL applications use the GPU framebuffer and are composited separately, with specific OpenGL calls affecting the bus bandwidth. (user-b1da, 2023-03-27, exchange 36952, check: uncheckable)</li>
+<li id="s20">Using common OpenGL APIs ensured Quake 3 would work on most hardware. (user-27ce, 2022-05-21, exchange 207071, check: supported)</li>
+<li id="s21">Performer software should run on any Windows computer with OpenGL capability. (user-ce5a, 2022-10-10, exchange 82276, check: uncheckable)</li>
+<li id="s22">Video players can use glDrawBuffers or textures to draw video, with glDrawBuffers being faster on older hardware. (user-ff99, 2022-02-04, exchange 80877, check: uncheckable)</li>
+<li id="s23">The OpenGL extension for render targets is GL_EXT_framebuffer_object. (user-17cb, 2022-06-13, exchange 70418, check: uncheckable)</li>
+<li id="s24">IRIX Graphics Library is the predecessor to modern OpenGL and GLUT. (user-c831, 2023-09-04, exchange 209162, check: uncheckable)</li>
+<li id="s25">OpenGL is a graphics library with multiple layers of helpers for creating graphics programs. (user-21b8, 2024-07-02, exchange 126907, check: uncheckable)</li>
+<li id="s26">An ex-Cray engineer was a lead coder on the GL project that became OpenGL. (user-281e, 2025-01-24, exchange 211768, check: uncheckable)</li>
+<li id="s27">The ZuluSCSI settings allow adjusting the number of cylinders, and OpenGL can be used with Solaris on Creator or Elite cards for better performance. (user-03ad, 2023-05-05, exchange 240025, check: uncheckable)</li>
+<li id="s28">Suns can support decent OpenGL. (user-3e2d, 2025-01-27, exchange 53510, check: uncheckable)</li>
+<li id="s29">OpenGL can be translated to XGL with a library that handles the calls, but games may need adaptation for performance issues. (user-5510, 2023-05-10, exchange 183869, check: uncheckable)</li>
+<li id="s30">Xsgi supports both OpenGL and GL on SGI hardware, while Onyx4 uses XFree86 which does not support GL. (user-86e1, 2024-04-26, exchange 223861, check: supported)</li>
+<li id="s31">With an X server running on a GL-capable system, remote OpenGL over GLX works great. (user-21b8, 2024-02-08, exchange 209999, check: uncheckable)</li>
+<li id="s32">The glasses can be used with OpenGL for at least one mode, as mentioned in the VMD documentation. (user-ff20, 2023-05-28, exchange 223144, check: uncheckable)</li>
+<li id="s33">OpenGL has a color mask that lets you render to just the red or blue channels, which is useful for red/blue stereo glasses. (user-6c80, 2025-03-24, exchange 72106, check: uncheckable)</li>
+<li id="s34">OpenGL rendering is possible with the right setup. (user-c831, 2024-12-03, exchange 211388, check: uncheckable)</li>
+<li id="s35">/dev/opengl is provided by a driver on the host for translating OpenGL calls. (user-8780, 2025-06-06, exchange 87498, check: uncheckable)</li>
+<li id="s36">OpenGL performs well on the hardware. (user-21b8, 2025-08-11, exchange 127039, check: uncheckable)</li>
+<li id="s37">OpenGL assumes certain things about underlying hardware and isn't portable, which is why it was developed. (user-86e1, 2025-09-22, exchange 213107, check: uncheckable)</li>
+<li id="s38">OpenGL became available around IRIX 4.0. (user-9219, 2025-09-22, exchange 213106, check: supported)</li>
+<li id="s39">IRIS Inventor CD is OpenGL, not IRIS GL. (user-1a5a, 2025-08-18, exchange 58373, check: uncheckable)</li>
+<li id="s40">Iris Explorer was used for scientific visualization and continued to receive support with later versions using OpenGL. (user-ec52, 2025-08-18, exchange 212885, check: uncheckable)</li>
+<li id="s41">Performer supports OpenGL on SGI hardware but doesn't fully implement all texture extensions. (user-24f0, 2025-08-22, exchange 225341, check: uncheckable)</li>
+<li id="s42">FreeGLUT wraps OpenGL calls into utility functions for multiple platforms. It compiles under IRIX. GLUT allows creating windows, initializing OpenGL, and handling input in a platform-independent way. GLU is not mentioned (user-281e, 2025-08-28, exchange 219057, check: uncheckable)</li>
+<li id="s43">GLUT handles setup and input, while OpenGL does graphics. (user-21b8, 2026-09-24, exchange 236180, check: uncheckable)</li>
+<li id="s44">OpenGL can render 2D as if it were 3D. (user-7973, 2025-09-10, exchange 215809, check: supported)</li>
+<li id="s45">For UI elements, using nearest sampling is recommended, especially when multiple UI icons are packed in a single texture. (user-3e2d, 2025-07-23, exchange 72564, check: uncheckable)</li>
+<li id="s46">IRIX does not support non-power-of-two textures in OpenGL, requiring textures to be rounded up to the nearest power of two when creating them. (user-6afa, 2026-02-09, exchange 213658, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="opengl-1-0.html">OpenGL 1.0</a> (9)
+</li>
+<li><a href="opengl-1-1.html">OpenGL 1.1</a> (25)
+</li>
+<li><a href="opengl-1-2.html">OpenGL 1.2</a> (11)
+</li>
+<li><a href="opengl-1-3.html">OpenGL 1.3</a> (7)
+</li>
+<li><a href="opengl-1-4.html">OpenGL 1.4</a> (5)
+</li>
+<li><a href="opengl-1-x.html">OpenGL 1.x</a> (4)
+</li>
+<li><a href="opengl-2-0.html">OpenGL 2.0</a> (6)
+</li>
+<li><a href="opengl-applications.html">OpenGL applications</a> (5)
+</li>
+<li><a href="opengl-context.html">OpenGL context</a> (3)
+</li>
+<li><a href="opengl-driver.html">OpenGL driver</a> (3)
+</li>
+<li><a href="opengl-es-2.html">OpenGL ES 2</a> (3)
+</li>
+<li><a href="opengl-extensions.html">OpenGL extensions</a> (3)
+</li>
+<li><a href="opengl-multipipe.html">OpenGL MultiPipe</a> (4)
+</li>
+<li><a href="opengl-programming-guide.html">OpenGL Programming Guide</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="onyx4.html">Onyx4</a>, <a href="sgi-hardware.html">SGI hardware</a>, <a href="4d-380.html">4D/380</a>, <a href="indigo.html">Indigo</a>, <a href="prism.html">Prism</a>, <a href="r10k-cpu.html">R10K CPU</a>, <a href="vw320.html">VW320</a>, <a href="zx.html">ZX</a>, <a href="zx6000.html">zx6000</a>
+</li>
+<li>Processors: <a href="r5k-cpu.html">R5K CPU</a>, <a href="ppc64el.html">ppc64el</a>
+</li>
+<li>Graphics: <a href="xgl.html">XGL</a>, <a href="vpro.html">VPro</a>, <a href="gpu.html">GPU</a>, <a href="irisvision.html">IrisVision</a>, <a href="v6.html">V6</a>, <a href="v8.html">V8</a>, <a href="vgx.html">VGX</a>, <a href="xvr-100.html">XVR-100</a>, <a href="graphics-card.html">graphics card</a>, <a href="resolution.html">resolution</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="aix.html">AIX</a>, <a href="irix-4-0.html">IRIX 4.0</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-5-x.html">IRIX 5.x</a>, <a href="macos-8-1.html">MacOS 8.1</a>, <a href="nt4.html">NT4</a>, <a href="os-2-warp.html">OS/2 Warp</a>, <a href="sco-unix.html">SCO Unix</a>, <a href="solaris.html">Solaris</a>, <a href="windows.html">Windows</a>, <a href="windows-95.html">Windows 95</a>, <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="iris-gl.html">IRIS GL</a>, <a href="glut.html">GLUT</a>, <a href="sdl.html">SDL</a>, <a href="vulkan.html">Vulkan</a>, <a href="glide.html">Glide</a>, <a href="directx.html">DirectX</a>, <a href="half-life.html">Half-Life</a>, <a href="mesa.html">Mesa</a>, <a href="solidworks.html">SolidWorks</a>, <a href="xfs.html">XFS</a>, <a href="blender.html">Blender</a>, <a href="cad.html">CAD</a>, <a href="cd-images.html">CD images</a>, <a href="doom.html">Doom</a>, <a href="fortran.html">Fortran</a>, <a href="gl.html">GL</a>, <a href="glquake.html">GLQuake</a>, <a href="glx.html">GLX</a>, <a href="gnu-linux.html">GNU/Linux</a>, <a href="lwjgl.html">LWJGL</a>, <a href="maya.html">Maya</a>, <a href="n64.html">N64</a>, <a href="performer.html">Performer</a>, <a href="quake.html">Quake</a>, <a href="sdl1.html">SDL1</a>, <a href="sdl2.html">SDL2</a>, <a href="softimage-3d.html">SOFTIMAGE 3D</a>, <a href="x-server.html">X server</a>, <a href="xfree86.html">XFree86</a>, <a href="xsgi.html">Xsgi</a>, <a href="driver.html">driver</a>, <a href="emulator.html">emulator</a>, <a href="freeglut.html">freeglut</a>, <a href="game.html">game</a>, <a href="game-engine.html">game engine</a>, <a href="ioquake3.html">ioquake3</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="software-rendering.html">software rendering</a>
+</li>
+<li>Parts and peripherals: <a href="tram-board.html">TRAM board</a>, <a href="visualize-card.html">Visualize card</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="display-list.html">display list</a>, <a href="framebuffer.html">framebuffer</a>, <a href="video-card.html">video card</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>, <a href="posix.html">POSIX</a>, <a href="rsp.html">RSP</a>, <a href="x.html">X</a>, <a href="x-window.html">X Window</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="3dfx.html">3dfx</a>, <a href="dec.html">DEC</a>, <a href="hp.html">HP</a>, <a href="sgug.html">SGUG</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="xshmputimage.html">XShmPutImage</a>, <a href="aleph0-demo.html">Aleph0 demo</a>, <a href="battalion.html">Battalion</a>, <a href="cuda.html">CUDA</a>, <a href="glu.html">GLU</a>, <a href="ice.html">ICE</a>, <a href="metal.html">Metal</a>, <a href="phigs.html">PHIGS</a>, <a href="prboom.html">PrBoom</a>, <a href="prboom-2.html">PrBoom+</a>, <a href="qt.html">Qt</a>, <a href="unreal.html">Unreal</a>, <a href="xvr-2500.html">XVR-2500</a>, <a href="yast.html">YaST</a>, <a href="z-buffering.html">Z-Buffering</a>, <a href="xsgisetspecialdestroyhandler.html">_XSGISetSpecialDestroyHandler</a>, <a href="assembly.html">assembly</a>, <a href="bug.html">bug</a>, <a href="color-depth.html">color depth</a>, <a href="database.html">database</a>, <a href="double-buffering.html">double buffering</a>, <a href="flickering.html">flickering</a>, <a href="flying-toasters.html">flying toasters</a>, <a href="gldrawpixels.html">glDrawPixels</a>, <a href="glass.html">glass</a>, <a href="gpubench.html">gpubench</a>, <a href="hp-ux-11i-v3.html">hp-ux 11i v3</a>, <a href="libglcore.html">libGLcore</a>, <a href="libxext.html">libXext</a>, <a href="qt-4-8-7.html">qt 4.8.7</a>, <a href="textures.html">textures</a>, <a href="vcxsrv.html">vcxsrv</a>, <a href="version.html">version</a>, <a href="vsync.html">vsync</a>
+</li></ul>
+</body>
+</html>

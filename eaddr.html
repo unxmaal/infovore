@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eaddr</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>eaddr</h1>
+<p>Claims: 8</p>
+<p>The eaddr is the MAC address stored in the EEPROM at 0xfa to 0xff. <sup><a href="#s1">1</a></sup> The PROM does not include eaddr, so alternative methods such as using ping, examining router attached devices, capturing MAC addresses with Wireshark, or checking bootp logs in BootRizer may be required to determine the address. <sup><a href="#s2">2</a></sup> The eaddr is not set on the Fuel, and the setting in /etc/nvram may have been reset, so it should be checked and set if necessary. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> If the console settings or MAC address are incorrect, Irix may crash, and setting eaddr may fix it. <sup><a href="#s6">6</a></sup> If you have the new ROM, you can set eaddr using setenv -f eaddr with the MAC address on the back of the machine. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The eaddr is at 0xfa to 0xff in the EEPROM. (user-9219, 2025-03-21, exchange 212237, check: supported)</li>
+<li id="s2">The PROM does not include eaddr, requiring alternative methods like using ping, examining router attached devices, capturing MAC addresses with Wireshark, or checking bootp logs in BootRizer to determine the address. (user-f229, 2020-02-19, exchange 77077, check: uncheckable)</li>
+<li id="s3">The eaddr is not set on the Fuel. (user-ba81, 2020-02-29, exchange 6655, check: supported)</li>
+<li id="s4">/etc/nvram eaddr (user-22f9, 2020-06-07, exchange 8882, check: uncheckable)</li>
+<li id="s5">The eaddr setting in nvram might have been reset, check and set it if necessary. (user-ce6b, 2023-07-30, exchange 220298, check: uncheckable)</li>
+<li id="s6">Irix crashes if the console settings or MAC address are incorrect; setting `eaddr` may fix it. (user-3663, 2024-08-04, exchange 111894, check: supported)</li>
+<li id="s7">If you have the new rom I would do the setenv -f eaddr (the mac address on the back of the machine) (user-1446, 2019-12-16, exchange 78077, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="mac-address.html">MAC address</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="ping.html">ping</a>, <a href="setenv.html">setenv</a>
+</li>
+<li>Parts and peripherals: <a href="nvram.html">NVRAM</a>, <a href="prom.html">PROM</a>
+</li>
+<li>Other: <a href="wireshark.html">Wireshark</a>
+</li></ul>
+</body>
+</html>

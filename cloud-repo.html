@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cloud repo</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>cloud repo</h1>
+<p>Claims: 3 Part of <a href="cloud.html">cloud</a></p>
+<p>The cloudrepo setup instructions are on the github wiki. <sup><a href="#s1">1</a></sup> To get the cloud repo version of packages, add the cloud repo as a DNF repository and update using `tdnf --refresh list` and `tdnf update`. <sup><a href="#s2">2</a></sup> The cloud repo contains packages in master or wip_testing; 200 packages are converting and building properly via mogrix, all FC40 except tdnf, and gettext installation is difficult. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The cloudrepo setup instructions are on the github wiki. (user-b1da, 2022-12-07, exchange 34554, check: uncheckable)</li>
+<li id="s2">To get the cloud repo version of packages, add the cloud repo as a DNF repository and update using `tdnf --refresh list` and `tdnf update`. (user-b1da, 2023-03-21, exchange 83189, check: supported)</li>
+<li id="s3">The cloud repo contains packages in master or wip_testing; 200 packages are converting and building properly via mogrix, all FC40 except tdnf, and gettext installation is difficult. (user-2189, 2026-02-07, exchange 215894, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="dnf.html">dnf</a>, <a href="tdnf.html">tdnf</a>
+</li>
+<li>Other: <a href="gettext.html">gettext</a>
+</li></ul>
+</body>
+</html>

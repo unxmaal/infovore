@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WSL2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>WSL2</h1>
+<p>Claims: 15 Part of <a href="wsl.html">WSL</a></p>
+<p>WSL2 runs a Linux kernel in a hyperv session, virtualizing the OS by running Windows in a Hyper-V VM and Linux in a VM. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> WSL2 can be used to run GUI apps, X11 apps, and shell stuff, using Wayland and a custom Linux GPU device based on a Windows DirectX host GPU. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> WSL2 can run raw sockets, and the X11 server runs inside the WSL environment behind the Hyper-V virtual network interface rather than at the Windows level. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> WSL2 can be exported to a tar file and reimported to a separate partition, though this requires the partition to be the main system drive due to warnings. <sup><a href="#s8">8</a></sup> WSL2 has networking issues, including a problematic virtual network switch that may require reinstalling Hyper-V components, and difficulty setting up a static IP associated with a specific NIC. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Nested virtualization is not supported by WSL2, especially on AMD CPUs, and ancient kernels lacking Hyper-V guest features will not work in WSL2. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">WSL2 is a VM. (user-ba81, 2020-01-22, exchange 5630, check: uncheckable)</li>
+<li id="s2">WSL2 virtualizes your entire OS, running HyperV and then Windows in a VM and Linux in a VM. (user-1361, 2020-06-15, exchange 9058, check: uncheckable)</li>
+<li id="s3">WSL2 runs a Linux kernel in a hyperv session. (user-1361, 2020-07-29, exchange 10119, check: uncheckable)</li>
+<li id="s4">WSL2 will use Wayland and a custom Linux GPU device based on a Windows DirectX host GPU for GUI apps. (user-1446, 2020-06-15, exchange 9059, check: uncheckable)</li>
+<li id="s5">WSL2 can be set up to run X11 apps or shell stuff. (user-e872, 2022-01-07, exchange 24323, check: uncheckable)</li>
+<li id="s6">The X11 server in WSL2 runs inside the WSL environment rather than at the Windows level, unlike X410, and is hidden behind the Hyper-V virtual network interface. (user-d903, 2021-08-13, exchange 233909, check: uncheckable)</li>
+<li id="s7">WSL2 can run raw sockets. (user-42cf, 2021-12-08, exchange 23093, check: uncheckable)</li>
+<li id="s8">WSL2 can be exported to a tar file and reimported to a separate partition, but it requires the partition to be the main system drive due to warnings. (user-d903, 2020-06-15, exchange 9060, check: uncheckable)</li>
+<li id="s9">The virtual network switch in WSL2 can be problematic, requiring reinstallation of Hyperv components after breaking networking. (user-d903, 2020-06-15, exchange 9060, check: uncheckable)</li>
+<li id="s10">WSL2 has issues setting up a static IP associated with a specific NIC. (user-d903, 2021-03-05, exchange 217054, check: uncheckable)</li>
+<li id="s11">Nested virtualization is not supported by WSL2, especially on AMD CPUs. (user-1361, 2020-06-15, exchange 9058, check: uncheckable)</li>
+<li id="s12">The ancient kernel lacks support for hyper-v guest features and thus won't work in wsl2. (user-1446, 2022-05-23, exchange 207082, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="x11-server.html">X11 server</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="linux.html">Linux</a>, <a href="linux-kernel.html">Linux kernel</a>, <a href="windows.html">Windows</a>, <a href="windows-10.html">Windows 10</a>
+</li>
+<li>Software: <a href="hyperv.html">HyperV</a>, <a href="partition.html">partition</a>, <a href="tar-file.html">tar file</a>
+</li></ul>
+</body>
+</html>

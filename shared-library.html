@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shared library</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>shared library</h1>
+<p>Claims: 11</p>
+<p>Using a shared library implies sharing it between programs, so storing it locally without sharing is redundant. <sup><a href="#s1">1</a></sup> To build a shared library, you need to compile the source files as position-independent code and link them with -shared, and optionally -soname. <sup><a href="#s2">2</a></sup> At runtime, the loader uses the latest ABI-compatible shared library, so when a library breaks the ABI you increment the major version number, and when adding new entry points without breaking the ABI you increment the minor version. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Using a shared library implies sharing between programs; storing it locally without sharing is redundant. (user-d903, 2022-12-29, exchange 70636, check: uncheckable)</li>
+<li id="s2">To build a shared library, you need to compile the source files as position-independent code and link them with -shared, and optionally -soname. For example, adding -fPIC to CFLAGS and creating a rule like `libfoo.so.2.4 (user-21b8, 2025-10-02, exchange 219152, check: uncheckable)</li>
+<li id="s3">At runtime, the loader will use the latest ABI-compatible shared library. When a library breaks the ABI, increment the major version number. When adding new entry points without breaking the ABI, increment the minor (user-21b8, 2025-10-02, exchange 219152, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="catia-v5.html">CATIA V5</a>, <a href="elf.html">ELF</a>, <a href="rld.html">rld</a>
+</li></ul>
+</body>
+</html>

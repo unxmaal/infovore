@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VICE</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VICE</h1>
+<p>Claims: 19</p>
+<p>The VICE is a modified R4K processor that faces the user and was intended to handle geometry calculations, though it was not used on the O2 due to performance issues or to avoid competing with the Octane. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The VICE runs at 60 MHz rather than the 66 MHz listed in its specs, because a fixed 60 MHz oscillator feeds the VCLOCK pin while the ICS clock generator handles the CPU/SysAD and receives the system clock on the SClock pin. <sup><a href="#s3">3</a></sup> R10k and R12k modules run the VICE at 60 MHz. <sup><a href="#s4">4</a></sup> The VICE has the potential to be overclocked because the sysAD clock is functionally isolated from the clock used for its internal processors and its host interface block, and an overclocked VICE has a separate clock for IO and compute. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> SGI/IRIX ships microcode for the VICE's BSP/MSP programmable systems for each supported VICE codec. <sup><a href="#s7">7</a></sup> CRIME RE shares the VICE's memory with the MSP and uses DMA features. <sup><a href="#s8">8</a></sup> The VICE can have multiple instances, though they were never tested on the same bus. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">VICE is a modified R4K that faces the user. (user-b7c4, 2020-01-26, exchange 5724, check: supported)</li>
+<li id="s2">The VICE was intended to handle geometry calculations but was not used on the O2 due to performance issues or to avoid competing with the Octane. (user-24f0, 2025-06-17, exchange 225179, check: supported)</li>
+<li id="s3">The Vice runs at 60 MHz, even though its specs say 66 MHz, due to a fixed 60 MHz oscillator feeding the VCLOCK pin, while the ICS clock gen handles the CPU/SysAD and receives the system clock on the SClock pin. (user-757f, 2026-01-24, exchange 121131, check: supported)</li>
+<li id="s4">R10k and R12k modules run the Vice at 60 MHz. (user-757f, 2026-01-24, exchange 121132, check: supported)</li>
+<li id="s5">VICE has the potential to be overclocked because the sysAD clock is functionally isolated from the clock used for its internal processors and its host interface block. (user-4f7c, 2025-08-22, exchange 225344, check: uncheckable)</li>
+<li id="s6">Overclocked vice has a separate clock for IO and compute. (user-4f7c, 2026-03-06, exchange 226174, check: uncheckable)</li>
+<li id="s7">SGI/IRIX ships micro code for the VICE’s BSP/MSP programmable systems for each supported VICE codec. (user-a7cb, 2026-09-22, exchange 220707, check: uncheckable)</li>
+<li id="s8">CRIME RE shares VICE's memory with the MSP and uses DMA features. (user-8780, 2026-03-06, exchange 121812, check: uncheckable)</li>
+<li id="s9">VICE can have multiple instances, though they were never tested on the same bus. (user-4f7c, 2025-04-01, exchange 212290, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="vice-chip.html">VICE chip</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="rm7000.html">RM7000</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>, <a href="r12000.html">R12000</a>, <a href="r4000.html">R4000</a>, <a href="r7000.html">R7000</a>
+</li>
+<li>Software: <a href="sdl1-2.html">SDL1.2</a>, <a href="microcode.html">microcode</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="zuluscsi.html">ZuluSCSI</a>
+</li>
+<li>Other: <a href="66mhz.html">66mhz</a>, <a href="commodore-64.html">Commodore 64</a>, <a href="ice.html">ICE</a>, <a href="msp.html">MSP</a>, <a href="sgi-irix.html">SGI/IRIX</a>
+</li></ul>
+</body>
+</html>

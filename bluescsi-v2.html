@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlueSCSI V2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>BlueSCSI V2</h1>
+<p>Claims: 28 Part of <a href="bluescsi.html">BlueSCSI</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/A/UX">A/UX</a>.</p>
+<p>BlueSCSI V2 is an open hardware and software fork of ZuluSCSI's SCSI2SD implementation, described as a significant improvement over version 1 and likely suitable for many systems. <sup><a href="#s1">1</a></sup> It is one of the cheapest SCSI emulators, with boards and BOM build costing around $50-70 for five units from jlcpcb or pcbway, plus a pi pico and SD card. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It works well on Fuel and O2, providing faster seek times and quieter operation for the O2, and works well in an SGI Indy for disk imaging. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It works on the R10k Indigo2 for CD emulation but is slow for main HDD use, and works on the R12k O2 and R4k Indigo2, though it requires a clock-delay option on the O2 to avoid write errors. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> It is considered a better fork than ZuluSCSI for SGI use, with better firmware for SGI compatibility, though it is a cost-cut derivative of ZuluSCSI from a hardware perspective. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> It is cheaper and compatible with SGI systems, but SD cards sometimes have issues, and high-speed SCSI emulation with ultrascsi-320 speeds is desired but currently unavailable. <sup><a href="#s12">12</a></sup> On IRIX it lacks a hardware eject button and cannot cycle CD-ROM images by dragging to trash, though the hardware has a switch that could be used to switch CD images during installation. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> It can cause issues with the user-interface for 4DW on an Indigo2, including menu function inoperability and loss of user-theming, and may have firmware issues not present in Zulu firmware. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">BlueSCSI v2 is an open hardware and software fork of ZuluSCSI's SCSI2SD implementation, which is a significant improvement from version 1 and likely suitable for many systems. (user-4c05, 2023-10-02, exchange 41196, check: supported)</li>
+<li id="s2">The bluescsiv2 is one of the cheapest SCSI emulators, with boards and BOM build costing around $70 for five units from jlcpcb or pcbway, plus a pi pico and SD card. (user-24f0, 2025-01-13, exchange 211604, check: supported)</li>
+<li id="s3">The bluescsiv2 is a board that can be made for around 50-70 dollars and works better with SGI systems than zuluscsis do. (user-24f0, 2025-03-21, exchange 55402, check: supported)</li>
+<li id="s4">The bluescsi v2 works well on Fuel and O2. (user-95db, 2023-01-25, exchange 222822, check: supported)</li>
+<li id="s5">A BluesCSI v2 can provide faster seek times and quieter operation for the O2. (user-17cb, 2024-09-29, exchange 215580, check: supported)</li>
+<li id="s6">BlueSCSI V2 works well in an SGI Indy for disk imaging. (user-0bb7, 2026-02-07, exchange 62004, check: supported)</li>
+<li id="s7">Bluescsi V2 works on an Indigo2 R10k for CD emulation but is slow for main HDD use. (user-bba0, 2024-09-07, exchange 224083, check: supported)</li>
+<li id="s8">bluescsi v2 works on r12k O2 and r4k Indigo2; requires a clock-delay option on O2 to avoid write errors, which may have been fixed. (user-17cb, 2025-05-17, exchange 56611, check: supported)</li>
+<li id="s9">BluesCSI V2 has better firmware for SGI compatibility. (user-24f0, 2025-03-21, exchange 212235, check: uncheckable)</li>
+<li id="s10">BluesCSI V2 is a better fork than ZuluSCSI for SGI use. (user-24f0, 2025-03-21, exchange 212235, check: uncheckable)</li>
+<li id="s11">Zulu is from a hardware perspective better, BlueSCSI V2 is a cost-cut derivative of it (user-f763, 2026-02-06, exchange 61969, check: uncheckable)</li>
+<li id="s12">The bluescsiv2 is cheaper and compatible with SGI systems, but SD cards sometimes have issues. High-speed SCSI emulation with ultrascsi-320 speeds is desired but currently unavailable. (user-24f0, 2024-07-23, exchange 210702, check: supported)</li>
+<li id="s13">BlueSCSIv2 on IRIX lacks a hardware eject button and cannot cycle CD-ROM images by dragging to trash. (user-bba0, 2024-06-07, exchange 210424, check: uncheckable)</li>
+<li id="s14">The BlueSCSI v2 hardware has a switch that, when not wired to reset, could be used to switch CD images during IRIX installation. (user-bba0, 2024-06-19, exchange 210531, check: uncheckable)</li>
+<li id="s15">The BlueSCSIv2 can cause issues with the user-interface for 4DW on an Indigo2, including menu function inoperability and loss of user-theming, which can be persistent across user accounts and even the root account. (user-17cb, 2025-06-16, exchange 225167, check: supported)</li>
+<li id="s16">The BlueSCSIv2 firmware may have issues that are not present in Zulu firmware. (user-17cb, 2025-06-16, exchange 225167, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="fuel.html">Fuel</a>, <a href="octane.html">Octane</a>, <a href="onyx3.html">Onyx3</a>, <a href="pi.html">PI</a>
+</li>
+<li>Processors: <a href="indigo-r4000.html">Indigo R4000</a>, <a href="indigo2-r10k.html">Indigo2 R10K</a>, <a href="r12k-o2.html">R12K O2</a>, <a href="r4k-indigo2.html">R4K Indigo2</a>
+</li>
+<li>Operating systems: <a href="a-ux.html">A/UX</a>, <a href="irix.html">IRIX</a>, <a href="nextstep.html">NeXTSTEP</a>
+</li>
+<li>Software: <a href="sd-card.html">SD card</a>, <a href="zulu.html">Zulu</a>, <a href="zulu-firmware.html">Zulu firmware</a>, <a href="daynaport-driver.html">daynaport driver</a>
+</li>
+<li>Parts and peripherals: <a href="zuluscsi.html">ZuluSCSI</a>
+</li>
+<li>Other: <a href="switch.html">switch</a>
+</li></ul>
+</body>
+</html>

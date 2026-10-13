@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>miniroot</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>miniroot</h1>
+<p>Claims: 53 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SATA">SATA</a>, <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<p>Miniroot is the SGI environment used for installation and certain maintenance tasks. <sup><a href="#s1">1</a></sup> It is available on IRIX install discs, where the Install Tools and Overlay 1 disc contains the miniroot for the installer. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It can be booted from a CD, from tape (not supported in IRIX 6.2), from SCSI and handed over to SATA, or over the network. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Booting into miniroot allows access to the disk, such as mounting the original disk, unmounting and remounting the root disk to modify the root partition while booted, and mounting /dev/realroot at /root. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> It can be used to grow the root file system onto another disk with xlv, to fix the hwgraph tree with ioconfig, to edit /etc/passwd for access, and to reload root's tcsh. <sup><a href="#s12">12</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> It has rsh and rcp but not SCP, and lacks some commands such as tr. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> It can configure the IP, mounts partition 1 as swap, and may show different slice numbers for the same disk compared to a full IRIX installation. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> Booting into miniroot may require single-user mode, and issues with it can cause boot failures, kernel panics, and write failed errors. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> Diskless booting involves copying a miniroot to a swap partition and mounting it as root, requiring a kernel capable of mounting the root filesystem and a PROM environment that can specify the root path. <sup><a href="#s25">25</a></sup> The miniroot is used during IRIX installation rather than for booting the system, and has been the preferred way to install IRIX since at least IRIX 3.X. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> The miniroot is stored on the disk's swap partition and may indicate a previous failed installation attempt. <sup><a href="#s28">28</a></sup> Without a drive, Sash cannot load the miniroot. <sup><a href="#s29">29</a></sup> If you have a corrupt filesystem on your disk, the miniroot may attempt to mount it and crash, so it is a good idea to format the disk before installation, especially with old disks. <sup><a href="#s30">30</a></sup> Miniroot can be used to reset passwords on a locked out IRIX system, and the Indy can boot miniroot to reset the password, giving a warning if the root password seems changed. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> You can boot into miniroot from an install medium to fight with inst again. <sup><a href="#s33">33</a></sup> XFS changes the on-disk format, making the miniroot of the original install CDROM unable to read the installed system disk. <sup><a href="#s34">34</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Miniroot is the SGI environment used for installation and certain maintenance tasks. (user-e4d0, 2024-04-27, exchange 111063, check: uncheckable)</li>
+<li id="s2">Use the Install Tools and Overlay 1 disc to start; it has the miniroot for the installer. (user-d903, 2019-10-01, exchange 203968, check: supported)</li>
+<li id="s3">Miniroot is available on IRIX install discs for maintenance. (user-b7c4, 2019-11-28, exchange 4418, check: uncheckable)</li>
+<li id="s4">The first IRIX installation CD contains a miniroot that is installed and loaded. (user-8547, 2022-11-07, exchange 217768, check: uncheckable)</li>
+<li id="s5">The miniroot and install tools are in overlays 1 for IRIX 6.5.30. (user-24f0, 2024-04-27, exchange 111057, check: supported)</li>
+<li id="s6">You can start a miniroot from SCSI and hand it over to SATA; the Unix kernel can be loaded over the network. (user-7973, 2023-02-17, exchange 222859, check: uncheckable)</li>
+<li id="s7">Loading the miniroot from tape is not supported in IRIX 6.2, but software installation from tape is still possible. (user-e4d0, 2024-05-03, exchange 85010, check: supported)</li>
+<li id="s8">For IRIX installations, one can boot the miniroot from a CD and then mount a second hard disk with distribution files. (user-e4d0, 2024-07-09, exchange 77701, check: uncheckable)</li>
+<li id="s9">Booting IRIX inst miniroot automatically mounts /dev/realroot at /root, allowing access to files via a spawned shell. (user-1446, 2020-09-10, exchange 10949, check: uncheckable)</li>
+<li id="s10">You can unmount and remount the root disk from miniroot, which allows modifying the root partition while booted. (user-d903, 2022-01-07, exchange 217399, check: uncheckable)</li>
+<li id="s11">Boot into an installation miniroot and mount your original disk. Try `ioconfig -f /mountpoint/hw` to fix the hwgraph tree. (user-9528, 2022-05-09, exchange 81557, check: supported)</li>
+<li id="s12">To grow the root file system onto another disk, you can use xlv to create a logical volume, unmount the root, make the new disk a volume, remount, and grow the filesystem. This process requires a miniroot or another IRIX (user-5c71, 2022-01-07, exchange 217398, check: uncheckable)</li>
+<li id="s13">To fix root's tcsh, reload or use the miniroot. (user-22f9, 2023-10-10, exchange 209365, check: uncheckable)</li>
+<li id="s14">You can boot miniroot from the network and edit /etc/passwd to gain access. (user-24f0, 2024-04-27, exchange 111057, check: uncheckable)</li>
+<li id="s15">The miniroot does not have SCP but has rsh and rcp. (user-1446, 2020-09-10, exchange 10954, check: uncheckable)</li>
+<li id="s16">tr is a unix command that translates characters in a given string. The script to install the appletalk subsystem (package) wants to use tr....tr isn't available in the miniroot. (user-1629, 2024-11-21, exchange 50706, check: uncheckable)</li>
+<li id="s17">You can configure the IP in miniroot. (user-2189, 2020-04-23, exchange 77151, check: uncheckable)</li>
+<li id="s18">The miniroot mounts par 1 as swap, which is normal when booting the miniroot. (user-616d, 2024-12-07, exchange 86041, check: supported)</li>
+<li id="s19">The miniroot may show different slice numbers for the same disk compared to a full IRIX installation. (user-e4d0, 2025-07-14, exchange 117674, check: uncheckable)</li>
+<li id="s20">The O2 has CPU board compatibility issues that can cause boot failures and miniroot problems after reformatting the drive. (user-9c31, 2021-02-02, exchange 14492, check: supported)</li>
+<li id="s21">To boot into miniroot, one needs to start the system in single-user mode. (user-4292, 2022-10-30, exchange 77631, check: uncheckable)</li>
+<li id="s22">The system kernel panics after downloading the miniroot, specifically getting to 100% and crashing before the install starts, with different error messages for different versions of IRIX. (user-511a, 2024-11-15, exchange 224226, check: supported)</li>
+<li id="s23">Installing IRIX throws memory-related kernel panics due to issues with miniroot, and reports 'data path test failed' and 'RTC path test failed'. (user-511a, 2024-12-02, exchange 113021, check: uncheckable)</li>
+<li id="s24">Miniroot loading can fail with a write failed error. (user-24f0, 2025-01-25, exchange 53394, check: uncheckable)</li>
+<li id="s25">Diskless booting involves copying a miniroot to a swap partition and mounting it as root; the kernel must be capable of mounting the root filesystem, and the PROM environment can specify the root path. (user-4eea, 2025-09-05, exchange 87878, check: uncheckable)</li>
+<li id="s26">Miniroot is used during IRIX installation, not for booting the system. (user-3e2d, 2025-11-25, exchange 219278, check: uncheckable)</li>
+<li id="s27">The miniroot has been the preferred way to install IRIX since at least IRIX 3.X. (user-03ad, 2026-05-08, exchange 219724, check: supported)</li>
+<li id="s28">The miniroot is stored on the disk's swap partition and may indicate a previous failed installation attempt. (user-5906, 2025-11-15, exchange 225691, check: uncheckable)</li>
+<li id="s29">Without a drive, Sash cannot load the miniroot. (user-583a, 2025-09-16, exchange 219117, check: uncheckable)</li>
+<li id="s30">If you have a corrupt filesystem on your disk, the miniroot may attempt to mount it and crash; it's a good idea to format the disk before installation, especially with old disks. (user-86e1, 2025-12-09, exchange 213405, check: uncheckable)</li>
+<li id="s31">Miniroot can be used to reset passwords on a locked out IRIX system. (user-1a5a, 2026-01-31, exchange 219467, check: uncheckable)</li>
+<li id="s32">The Indy can boot miniroot to reset the password and gives a warning if the root password seems changed. (user-1a5a, 2026-05-08, exchange 219723, check: supported)</li>
+<li id="s33">Boot into miniroot from an install medium to fight with inst again. (user-7973, 2026-03-05, exchange 213739, check: uncheckable)</li>
+<li id="s34">XFS changes the on-disk format, making the miniroot of the original install CDROM unable to read the installed system disk. (user-1a5a, 2026-04-28, exchange 243938, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="miniroot-kernel.html">miniroot kernel</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="c8000.html">C8000</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-installation.html">IRIX installation</a>, <a href="irix-3-x.html">IRIX 3.x</a>, <a href="irix-kernel.html">IRIX kernel</a>, <a href="unix-kernel.html">Unix kernel</a>, <a href="single-user-mode.html">single user mode</a>
+</li>
+<li>Software: <a href="inst.html">inst</a>, <a href="sash.html">sash</a>, <a href="swap-partition.html">swap partition</a>, <a href="etc-passwd.html">/etc/passwd</a>, <a href="booterizer.html">Booterizer</a>, <a href="cd.html">CD</a>, <a href="ide.html">IDE</a>, <a href="xfs.html">XFS</a>, <a href="fx.html">fx</a>, <a href="install.html">install</a>, <a href="root-filesystem.html">root filesystem</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="disk.html">disk</a>, <a href="cdrom.html">CDROM</a>, <a href="prom-settings.html">PROM settings</a>, <a href="network.html">network</a>, <a href="network-boot.html">network boot</a>, <a href="tape.html">tape</a>
+</li>
+<li>Standards and interfaces: <a href="sata.html">SATA</a>, <a href="scsi.html">SCSI</a>, <a href="tftp.html">TFTP</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="plex.html">Plex</a>, <a href="raion.html">Raion</a>, <a href="diskless-booting.html">diskless booting</a>, <a href="overlay.html">overlay</a>, <a href="overlay-discs.html">overlay discs</a>, <a href="partitioning.html">partitioning</a>
+</li></ul>
+</body>
+</html>

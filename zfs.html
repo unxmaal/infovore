@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZFS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ZFS</h1>
+<p>Claims: 80 Background: 45 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/ZFS">ZFS</a>, <a href="https://en.wikipedia.org/wiki/FreeBSD">FreeBSD</a>, <a href="https://en.wikipedia.org/wiki/Oracle_Solaris">Oracle Solaris</a>.</p>
+<p>ZFS is a file system used for storage that offers data integrity features such as end-to-end checksumming with regular scrubbing, a multiple-copies feature for corruption protection on a single disk, and mechanisms to avoid the write hole by ensuring data integrity during writes. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> ZFS avoids the write hole by updating blocks on disk and then updating filesystem info only after the blocks are on disk, ensuring data integrity in case of power loss. <sup><a href="#s3">3</a></sup><sup><a href="#s5">5</a></sup> ZFS is used on Solaris, which is actively developed, and is also available on FreeBSD and other systems, with TrueNAS running on ZFS. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Solaris 10 ZFS pools are compatible with OpenZFS. <sup><a href="#s10">10</a></sup> ZFS is not mainlined in Linux because Linus Torvalds does not want it, though Canonical shipped in-kernel ZFS on Ubuntu server 20.04 despite licensing issues. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> ZFS requires a fixed number of disks at setup, with easy migration to larger disks but not resizing the pool, and adding disks requires creating a new vdev or pool rather than incrementally adding to an existing vdev. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> ZFS allows replacing a disk with a larger one but not a smaller one, and does not support mixed sizes in the same vdevs for striped pools. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> ZFS can use 5 disks with RAIDZ2 for Z2 and 6 disks for Z3, providing 4x usable capacity with 2 disk redundancy. <sup><a href="#s18">18</a></sup> ZFS is a resilient file system that is reliable and easy to manage, but not necessarily fast out of the box, requiring substantial RAM for optimal performance (2GB is barely sufficient, while 8GB is recommended, and more is better) and workload-specific tuning (tuning variables are similar across platforms). <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> ZFS is optimized for systems with 32GB of RAM or more, and running it requires investing in an entire node that can run ZFS and specifically cannot run VMware. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> ZFS is not backwards or cross-platform compatible, and migrating off ZFS or to Linux-ZFS causes pain due to the rebase from OpenSolaris to ZOL leaving FreeBSD in a bad situation. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> ZFS is interoperable between Solaris and FreeBSD with careful pool version management, and ZFS on Linux can do encrypted snapshot-based incremental backups. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> ZFS is preferred over hardware RAID controllers that abstract drive access, and compression can speed up disk operations by saving disk bandwidth, which is more scarce than CPU. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> ZFS setup is simpler than UFS because ZFS does not require partitioning the disk, and Truenas Scale is easy to use for managing storage with ZFS. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> ZFS is used for large file writes and occasional random access, with patterns similar to surveillance video storage, and is reliable for data integrity and can be used for backups between servers or tape. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> ZFS is still notable today, and Sun's ZFS was not a disaster when new. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Using a database to store files is inefficient; ZFS can handle deduplication of files stored as files, but managing read caches can be complex. (user-e872, 2020-07-01, exchange 9303, check: uncheckable)</li>
+<li id="s2">ZFS has a multiple-copies feature for corruption protection on a single disk. (user-7b1c, 2020-07-10, exchange 74080, check: uncheckable)</li>
+<li id="s3">ZFS avoids the write hole through a mechanism that ensures data integrity during writes (user-9860, 2021-10-09, exchange 20919, check: uncheckable)</li>
+<li id="s4">End-to-end checksumming in ZFS ensures data integrity through regular scrubbing. (user-5397, 2021-10-09, exchange 20921, check: uncheckable)</li>
+<li id="s5">ZFS avoids write hole by updating blocks on disk and then updating filesystem info only after the blocks are on disk, ensuring data integrity in case of power loss. (user-9860, 2021-10-09, exchange 20920, check: uncheckable)</li>
+<li id="s6">Solaris is actively developed and uses ZFS, a file system people are willing to break the GPL for. (user-b1da, 2020-04-28, exchange 7896, check: uncheckable)</li>
+<li id="s7">Solaris offers ZFS without requiring FreeBSD. (user-b1da, 2020-06-24, exchange 9202, check: uncheckable)</li>
+<li id="s8">FreeBSD and ZFS are used for storage instead of Linux, with ZFS offering better file system integrity and quality of life improvements. (user-37ee, 2020-11-13, exchange 217019, check: uncheckable)</li>
+<li id="s9">TrueNAS runs on ZFS. (user-9860, 2021-09-12, exchange 205530, check: uncheckable)</li>
+<li id="s10">Solaris 10 ZFS pools are compatible with OpenZFS. (user-b1da, 2022-06-02, exchange 29655, check: supported)</li>
+<li id="s11">ZFS is not mainlined in Linux because Linus Torvalds does not want it. (user-37ee, 2020-06-24, exchange 9201, check: uncheckable)</li>
+<li id="s12">Canonical shipped ZFS in-kernel on Ubuntu server 20.04 despite licensing issues. (user-37ee, 2020-11-14, exchange 78815, check: supported)</li>
+<li id="s13">ZFS requires a fixed number of disks at setup, with easy migration to larger disks but not resizing the pool. (user-5397, 2021-10-09, exchange 205694, check: uncheckable)</li>
+<li id="s14">Adding another vdev in ZFS does not resize the pool. (user-b1da, 2021-10-09, exchange 205694, check: uncheckable)</li>
+<li id="s15">Adding disks to an existing ZFS pool requires creating a new vdev or pool, rather than incrementally adding to an existing vdev. (user-9860, 2021-10-09, exchange 20920, check: uncheckable)</li>
+<li id="s16">ZFS allows replacing a disk with a larger one but not a smaller one. (user-237d, 2021-09-20, exchange 217246, check: uncheckable)</li>
+<li id="s17">ZFS does not support mixed sizes in the same vdevs for striped pools. (user-c9fb, 2021-10-09, exchange 20923, check: uncheckable)</li>
+<li id="s18">ZFS can use 5 disks with RAIDZ2 for Z2 and 6 disks for Z3, providing 4x usable capacity with 2 disk redundancy. (user-9860, 2021-10-09, exchange 20920, check: supported)</li>
+<li id="s19">Brendan Gregg worked on ZFS code. (user-b1da, 2022-06-02, exchange 29655, check: uncheckable)</li>
+<li id="s20">ZFS requires substantial RAM for optimal performance; 2GB is barely sufficient, while 8GB is recommended, and more is better. (user-7b1c, 2022-07-06, exchange 239760, check: supported)</li>
+<li id="s21">ZFS requires workload-specific tuning for optimal performance, and tuning variables are similar across platforms. (user-237d, 2022-08-28, exchange 239813, check: uncheckable)</li>
+<li id="s22">ZFS is reliable and easy to manage, but not necessarily fast out of the box. (user-237d, 2022-08-28, exchange 239813, check: uncheckable)</li>
+<li id="s23">ZFS is a resilient file system. (user-24f0, 2025-04-22, exchange 56149, check: uncheckable)</li>
+<li id="s24">ZFS is optimized for systems with 32GB of RAM or more. (user-7b1c, 2022-03-07, exchange 181636, check: supported)</li>
+<li id="s25">DPUs doing that would actually solve my main problem - that being I want to run ZFS but running ZFS requires investing in an entire node that can run ZFS and specifically can't run VMware. (user-b1da, 2022-08-31, exchange 234108, check: uncheckable)</li>
+<li id="s26">ZFS is not backwards or cross-platform compatible. (user-4c05, 2022-04-10, exchange 81441, check: uncheckable)</li>
+<li id="s27">Migrating off ZFS or to Linux-ZFS causes pain due to the rebase from OpenSolaris to ZOL leaving FreeBSD in a bad situation. (user-22f9, 2025-01-13, exchange 52344, check: uncheckable)</li>
+<li id="s28">ZFS is interoperable between Solaris and FreeBSD with careful pool version management. (user-7b1c, 2022-04-22, exchange 181894, check: uncheckable)</li>
+<li id="s29">ZFS on Linux can do encrypted snapshot-based incremental backups. (user-86e1, 2023-05-16, exchange 38052, check: uncheckable)</li>
+<li id="s30">Compression on ZFS can speed up disk operations by saving disk bandwidth, which is more scarce than CPU. (user-7b1c, 2022-05-16, exchange 29229, check: uncheckable)</li>
+<li id="s31">ZFS is preferred over hardware RAID controllers that abstract drive access. (user-baf6, 2023-08-16, exchange 209067, check: uncheckable)</li>
+<li id="s32">ZFS setup is simpler than UFS because ZFS does not require partitioning the disk. (user-baf6, 2022-05-28, exchange 239659, check: uncheckable)</li>
+<li id="s33">Truenas scale is easy to use for managing storage with ZFS. (user-24f0, 2025-04-22, exchange 56149, check: uncheckable)</li>
+<li id="s34">ZFS is used for large file writes and occasional random access, with patterns similar to surveillance video storage. (user-237d, 2022-08-28, exchange 239813, check: uncheckable)</li>
+<li id="s35">ZFS is reliable for data integrity and can be used for backups between servers or tape. (user-86e1, 2026-07-19, exchange 64578, check: uncheckable)</li>
+<li id="s36">Sun's ZFS was not a disaster when new. (user-07ed, 2022-11-09, exchange 217772, check: uncheckable)</li>
+<li id="s37">ZFS is still notable today. (user-7b1c, 2022-11-29, exchange 34306, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="zfs-pool.html">ZFS pool</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="blade-1000.html">Blade 1000</a>, <a href="u2.html">U2</a>, <a href="ultra-2.html">Ultra 2</a>
+</li>
+<li>Processors: <a href="mips-magnum.html">MIPS Magnum</a>
+</li>
+<li>Operating systems: <a href="solaris-10.html">Solaris 10</a>, <a href="freebsd.html">FreeBSD</a>, <a href="solaris.html">Solaris</a>, <a href="linux.html">Linux</a>, <a href="os.html">OS</a>, <a href="solaris-11.html">Solaris 11</a>, <a href="vms.html">VMS</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="xfs.html">XFS</a>, <a href="proxmox.html">Proxmox</a>
+</li>
+<li>Parts and peripherals: <a href="nas.html">NAS</a>, <a href="power.html">POWER</a>, <a href="ram.html">RAM</a>, <a href="ssd.html">SSD</a>, <a href="disk.html">disk</a>
+</li>
+<li>Standards and interfaces: <a href="iscsi.html">iSCSI</a>, <a href="ftp.html">FTP</a>, <a href="infiniband.html">Infiniband</a>, <a href="sata-ssd.html">SATA SSD</a>
+</li>
+<li>Companies: <a href="amd64.html">AMD64</a>, <a href="dell-r620.html">Dell R620</a>, <a href="sun.html">Sun</a>, <a href="vmware.html">VMware</a>
+</li>
+<li>Other: <a href="openzfs.html">OpenZFS</a>, <a href="hardware-raid.html">hardware RAID</a>, <a href="ceph.html">Ceph</a>, <a href="dl360-g7.html">DL360 G7</a>, <a href="dpu.html">DPU</a>, <a href="jbod.html">JBOD</a>, <a href="jfs.html">JFS</a>, <a href="ltt.html">LTT</a>, <a href="opensolaris.html">OpenSolaris</a>, <a href="raidz2.html">RAIDZ2</a>, <a href="truenas.html">TrueNAS</a>, <a href="truenas-scale.html">TrueNAS Scale</a>, <a href="ufs.html">UFS</a>, <a href="database.html">database</a>, <a href="fiber.html">fiber</a>
+</li></ul>
+</body>
+</html>

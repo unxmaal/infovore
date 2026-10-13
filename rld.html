@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rld</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>rld</h1>
+<p>Claims: 21</p>
+<p>rld is the runtime linker for IRIX, equivalent to ld.so on Linux and other Unix systems, where it determines where programs run and manages shared libraries during runtime. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It is not part of the kernel, which is not really aware of dynamic libraries, and the IRIX implementation is partially in the shared C library and part of the ELF implementation, making truly statically linked binaries impossible. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> rld uses internal interfaces such as _rld_new_interface for functionality like dladdr, and this symbol exists even if it is not present at link time. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> GNU binutils can produce a shared library that rld cannot successfully relocate under certain conditions, and the error rld: Error: unresolvable symbol in /usr/lib32/libGLcore.so: __rld_obj_head occurs when using the -Wl,--version-script,binary.ver option. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> rld ignores an undefined symbol named gl_INTERPRET_END in libGLcore.so and libgl.so without causing runtime issues, because both libraries have a symbol gl_INTERPET_END with a value, which can make rld and older linkers like mipspro ld ignore undefined symbols. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> rld does not honor library replacement or other rld environment variables for setuid and setgid programs unless the user is root. <sup><a href="#s12">12</a></sup> It requires code conforming to the IRIX ABI, and lld can be configured to emit such code. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">rld is the runtime linker equivalent to ld.so on Linux. (user-42cf, 2020-01-27, exchange 220139, check: uncheckable)</li>
+<li id="s2">The dynamic linker, `rld` on IRIX, and `ld.so` on Unix systems, determines where programs run and manage shared libraries during runtime. (user-42cf, 2021-05-22, exchange 17501, check: supported)</li>
+<li id="s3">rld isn't part of the kernel and is all hacks on top of static binary support; the kernel isn't really aware of dynamic libs at all (user-9860, 2021-12-10, exchange 215242, check: uncheckable)</li>
+<li id="s4">The IRIX implementation of rld is partially implemented in the shared C library, making truly statically linked binaries impossible. (user-b1da, 2024-02-27, exchange 218304, check: uncheckable)</li>
+<li id="s5">The IRIX implementation of rld is part of the ELF implementation, necessary for proper shared libraries. (user-86e1, 2024-02-27, exchange 218304, check: uncheckable)</li>
+<li id="s6">`_rld_new_interface` is loaded at runtime by `rld`, so the symbol exists even if it's not present at link time (user-42cf, 2019-07-24, exchange 67627, check: supported)</li>
+<li id="s7">The IRIX runtime linker (rld) uses internal interfaces like `_rld_new_interface` for functionality such as `dladdr`. (user-b1da, 2024-02-27, exchange 218304, check: supported)</li>
+<li id="s8">GNU binutils produces a shared library that rld can't successfully relocate under certain conditions. (user-42cf, 2020-01-27, exchange 220139, check: uncheckable)</li>
+<li id="s9">The error `rld: Error: unresolvable symbol in /usr/lib32/libGLcore.so: __rld_obj_head` occurs when using the `-Wl,--version-script,binary.ver` option in the link. (user-9860, 2021-12-03, exchange 70072, check: supported)</li>
+<li id="s10">rld ignores an undefined symbol named 'gl_INTERPRET_END' in libGLcore.so and libgl.so without causing runtime issues. (user-9860, 2021-10-18, exchange 79970, check: uncheckable)</li>
+<li id="s11">Both libraries have a symbol `gl_INTERPET_END` with a value, which can make `rld` and older linkers like `mipspro ld` ignore undefined symbols. (user-9860, 2021-10-18, exchange 79971, check: supported)</li>
+<li id="s12">rld does not honor library replacement or other rld environment variables for setuid and setgid programs unless the user is root. (user-2d09, 2019-10-09, exchange 214867, check: uncheckable)</li>
+<li id="s13">rld requires code conforming to the IRIX ABI, and lld can be configured to emit such code. (user-9860, 2021-10-28, exchange 80022, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-ld.html">IRIX ld</a>, <a href="risc-os.html">RISC OS</a>
+</li>
+<li>Software: <a href="elf.html">ELF</a>, <a href="gnu-binutils.html">GNU binutils</a>, <a href="ld.html">ld</a>, <a href="mplayer.html">mplayer</a>, <a href="shared-library.html">shared library</a>
+</li>
+<li>Companies: <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="rld-new-interface.html">_rld_new_interface</a>, <a href="dladdr.html">dladdr</a>, <a href="dynamic-linker.html">dynamic linker</a>, <a href="libglcore-so.html">libGLcore.so</a>, <a href="lld.html">lld</a>
+</li></ul>
+</body>
+</html>

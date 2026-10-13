@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ping</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ping</h1>
+<p>Claims: 11</p>
+<p>On IRIX, the ping command may be absent and require package installation to enable, with the correct path being /usr/etc/ping. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Pinging a router or external address tests network connectivity. <sup><a href="#s3">3</a></sup> From the box, it cannot ping external addresses like 8.8.8.8 even though telnet works, suggesting routing issues. <sup><a href="#s4">4</a></sup> The system may respond to ping but not telnet, indicating network or firewall problems. <sup><a href="#s5">5</a></sup> Solaris 7 can reach a Sun Ultra 10 with ping. <sup><a href="#s6">6</a></sup> A ping count of 300 or more is considered high, while anything lower is amazing. <sup><a href="#s7">7</a></sup> Pinging any address may yield no answer, as may bootp attempts. <sup><a href="#s8">8</a></sup> The PROM does not include eaddr, requiring alternative methods to determine the address. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IRIX machine lacks the ping command and requires a package installation to enable it. (user-818d, 2025-11-04, exchange 219217, check: uncheckable)</li>
+<li id="s2">`/usr/etc/ping` is the correct path for ping on IRIX. (user-42cf, 2019-02-16, exchange 203690, check: supported)</li>
+<li id="s3">Pinging a router or external IP tests network connectivity. (user-9d76, 2023-09-14, exchange 218172, check: uncheckable)</li>
+<li id="s4">From the box, it cannot ping external addresses like 8.8.8.8, even though telnet works; routing issues may be involved. (user-ebdc, 2025-07-25, exchange 219022, check: supported)</li>
+<li id="s5">The system responds to ping but not telnet, suggesting network issues or firewall problems. (user-637b, 2019-12-04, exchange 4549, check: uncheckable)</li>
+<li id="s6">Solaris 7 can reach a Sun Ultra 10 with ping. (user-5217, 2024-06-12, exchange 46779, check: supported)</li>
+<li id="s7">300+ ping is considered high, anything lower is amazing. (user-281e, 2025-01-14, exchange 211615, check: supported)</li>
+<li id="s8">ping to any address just gives no answer at all and same message when trying to bootp. (user-7973, 2021-08-08, exchange 217197, check: uncheckable)</li>
+<li id="s9">The PROM does not include eaddr, requiring alternative methods like using ping, examining router attached devices, capturing MAC addresses with Wireshark, or checking bootp logs in BootRizer to determine the address. (user-f229, 2020-02-19, exchange 77077, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ping-command.html">ping command</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ultra-10.html">Ultra 10</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris-7.html">Solaris 7</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>
+</li>
+<li>Standards and interfaces: <a href="telnet.html">telnet</a>, <a href="bootp.html">bootp</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="wireshark.html">Wireshark</a>, <a href="cron-job.html">cron job</a>, <a href="eaddr.html">eaddr</a>, <a href="reboot.html">reboot</a>
+</li></ul>
+</body>
+</html>

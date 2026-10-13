@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCI</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PCI</h1>
+<p>Claims: 93 Background: 14 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/PCI-X">PCI-X</a>, <a href="https://en.wikipedia.org/wiki/Accelerated_Graphics_Port">Accelerated Graphics Port</a>, <a href="https://en.wikipedia.org/wiki/NVM_Express">NVM Express</a>, <a href="https://en.wikipedia.org/wiki/PCI_Express">PCI Express</a>, <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>.</p>
+<p>SGI initially resisted PCI, but later supported it on machines after the Indigo2. <sup><a href="#s1">1</a></sup> The Sun Ultra 5 and 10 are single-processor systems with PCI, while the Ultra 2 is dual-processor with SBus. <sup><a href="#s2">2</a></sup> The O350 has 4 PCI slots and can mount graphics. <sup><a href="#s3">3</a></sup> The Ultra 10 towers have a UPA slot and some PCI. <sup><a href="#s4">4</a></sup> The Octane can optionally support PCI cards. <sup><a href="#s5">5</a></sup> The G5 tower supports PCI, PCI-X, and PCIe. <sup><a href="#s6">6</a></sup> PCI-X doubles the maximum clock speed of conventional PCI from 66 MHz to 133 MHz, increasing the theoretical maximum data exchange between the processor and peripherals to 1.06 GB/s. <sup><a href="#s7">7</a></sup> All PCI-X is 64 bit, but not all PCI is 64 bit, though both can be 64 bit. <sup><a href="#s8">8</a></sup> PCI is a shared bus in which all slots share bandwidth, making it likely slower than PCI-X, which is suitable for video capture and DAW tasks. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> PCI is limited to ~100MB/s, while PCIe uses a star network and requires a PHY unlike PCI. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> PCI and AGP use GART, while PCIe uses its own GART or full VM system, and PCI signaling is shared except for bus req/grant and cfgreg. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> A PCI to PCIe adapter can be used for NVMe support. <sup><a href="#s17">17</a></sup> PCI has more bandwidth than FDDI. <sup><a href="#s18">18</a></sup> The PCI bracket spacings follow the Intel ATX spec or the original IBM AT form factor, though finding authoritative sources is challenging. <sup><a href="#s19">19</a></sup> PISA is a combo PCI+ISA slot that also works directly for ISA cards, using a connector similar to EISA for ISA compatibility. <sup><a href="#s20">20</a></sup> VLB and Fast Ethernet coexisted with PCI and EISA, with VLB being the low-end option. <sup><a href="#s21">21</a></sup> VLB cards, especially low-end ones, were often more expensive and sought after than their PCI or EISA counterparts. <sup><a href="#s22">22</a></sup> 486 motherboards with PCI were rare, making VLB graphics cards more interesting for 486 systems. <sup><a href="#s23">23</a></sup> The PCI vendor ID for Intel is 0x8086. <sup><a href="#s24">24</a></sup> The interface board has XIO and PCI slots. <sup><a href="#s25">25</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SGI initially resisted PCI, but later supported it on machines after the Indigo2. (user-f229, 2019-10-29, exchange 4028, check: supported)</li>
+<li id="s2">The Sun Ultra 5 and 10 are single-processor systems with PCI, while the Ultra 2 is dual-processor with SBus. (user-b7c4, 2019-12-09, exchange 73976, check: supported)</li>
+<li id="s3">The O350 can take R16K CPUs, up to 8GB RAM per brick, and has better cooling and quieter operation compared to the O300; it has 4 PCI slots and can mount graphics. The Radeon card supports OpenGL 1.4 but not IRISGL, and (user-9849, 2021-04-15, exchange 16590, check: supported)</li>
+<li id="s4">The Ultra 10 towers have a UPA slot and some PCI. (user-1361, 2022-02-09, exchange 233957, check: supported)</li>
+<li id="s5">The Octane can optionally support PCI cards. (user-d41d, 2022-02-10, exchange 221968, check: supported)</li>
+<li id="s6">The G5 tower supports PCI, PCI-X, and PCIe. (user-e872, 2022-03-15, exchange 145996, check: uncheckable)</li>
+<li id="s7">PCI-X doubles the maximum clock speed of conventional PCI from 66 MHz to 133 MHz, increasing the theoretical maximum data exchange between the processor and peripherals to 1.06 GB/s. (user-8547, 2022-05-27, exchange 29535, check: supported)</li>
+<li id="s8">also, all pci-x is 64 bit but not all pci is 64 bit. but both pci-x and pci can be 64 bit (user-c831, 2020-04-25, exchange 7795, check: supported)</li>
+<li id="s9">PCI and PCI-X connections are suitable for video capture and DAW tasks. (user-8de9, 2022-09-22, exchange 105042, check: uncheckable)</li>
+<li id="s10">PCI is a shared bus and likely to be slower than PCI-X (user-24f0, 2025-11-13, exchange 225684, check: uncheckable)</li>
+<li id="s11">PCI is a bus, not a star architecture like PCIe, so all slots share bandwidth. (user-3e2d, 2025-11-26, exchange 88833, check: uncheckable)</li>
+<li id="s12">Regular PCI is limited to ~100MB/s (user-86e1, 2025-11-13, exchange 225684, check: supported)</li>
+<li id="s13">PCIe requires a PHY, unlike PCI. (user-231e, 2025-12-28, exchange 120344, check: uncheckable)</li>
+<li id="s14">PCI is a shared bus, while PCIe uses a star network. (user-3e2d, 2026-01-17, exchange 225973, check: uncheckable)</li>
+<li id="s15">PCI and AGP use GART, while PCIe uses its own GART or full VM system. (user-3e2d, 2026-01-02, exchange 213469, check: uncheckable)</li>
+<li id="s16">PCI != PCIe; the signaling for PCI is shared except for bus req/grant and cfgreg. (user-231e, 2026-01-09, exchange 120672, check: uncheckable)</li>
+<li id="s17">A PCI to PCIe adapter can be used for NVMe support. (user-f190, 2026-01-08, exchange 213502, check: uncheckable)</li>
+<li id="s18">PCI has more bandwidth than FDDI. (user-616d, 2025-03-15, exchange 242254, check: uncheckable)</li>
+<li id="s19">The PCI bracket spacings follow the Intel ATX spec or the original IBM AT form factor. Finding authoritative sources is challenging. (user-07ed, 2025-04-01, exchange 212287, check: uncheckable)</li>
+<li id="s20">PISA is a combo PCI+ISA slot that also works directly for ISA cards, using a connector similar to EISA for ISA compatibility. (user-237d, 2026-03-19, exchange 122179, check: uncheckable)</li>
+<li id="s21">VLB and Fast Ethernet coexisted with PCI and EISA, with VLB being the low-end option. (user-e532, 2026-07-07, exchange 234778, check: uncheckable)</li>
+<li id="s22">VLB cards, especially low-end ones, were often more expensive and sought after than their PCI or EISA counterparts. (user-59df, 2026-07-07, exchange 234778, check: uncheckable)</li>
+<li id="s23">486 motherboards with PCI were rare, making VLB graphics cards more interesting for 486 systems. (user-e532, 2026-07-07, exchange 234778, check: supported)</li>
+<li id="s24">The PCI vendor ID for Intel is 0x8086. (user-07ed, 2026-06-10, exchange 226548, check: uncheckable)</li>
+<li id="s25">The interface board has XIO and PCI slots. (user-e4d0, 2026-09-09, exchange 125473, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="pci-box.html">PCI box</a> (3)
+</li>
+<li><a href="pci-bridge.html">PCI bridge</a> (4)
+</li>
+<li><a href="pci-bus.html">PCI bus</a> (10)
+</li>
+<li><a href="pci-cage.html">PCI cage</a> (8)
+</li>
+<li><a href="pci-card.html">PCI card</a> (52)
+</li>
+<li><a href="pci-devices.html">PCI devices</a> (6)
+</li>
+<li><a href="pci-driver.html">PCI driver</a> (3)
+</li>
+<li><a href="pci-express.html">PCI Express</a> (4)
+</li>
+<li><a href="pci-graphics-card.html">PCI graphics card</a> (3)
+</li>
+<li><a href="pci-power-mac.html">PCI Power Mac</a> (5)
+</li>
+<li><a href="pci-riser.html">PCI riser</a> (21)
+</li>
+<li><a href="pci-scsi-card.html">PCI SCSI card</a> (3)
+</li>
+<li><a href="pci-scsi-controller.html">PCI SCSI controller</a> (3)
+</li>
+<li><a href="pci-shoebox.html">PCI shoebox</a> (6)
+</li>
+<li><a href="pci-slot.html">PCI slot</a> (40)
+</li>
+<li><a href="pci-usb-card.html">PCI USB card</a> (6)
+</li>
+<li><a href="pci-video-card.html">PCI video card</a> (6)
+</li>
+<li><a href="pci64.html">PCI64</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="xio.html">XIO</a>, <a href="origin-350.html">Origin 350</a>, <a href="ultra-10.html">Ultra 10</a>, <a href="43p.html">43P</a>, <a href="alphastation.html">Alphastation</a>, <a href="altix.html">Altix</a>, <a href="amiga.html">Amiga</a>, <a href="creator3d.html">Creator3D</a>, <a href="g5-tower.html">G5 tower</a>, <a href="mac.html">Mac</a>, <a href="mac-pro.html">Mac Pro</a>, <a href="onyx4.html">Onyx4</a>, <a href="pc.html">PC</a>, <a href="ultra-2.html">Ultra 2</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="machine.html">machine</a>
+</li>
+<li>Processors: <a href="ppc.html">PPC</a>, <a href="pentium-2.html">Pentium 2</a>, <a href="r12000.html">R12000</a>, <a href="r16000.html">R16000</a>, <a href="x86.html">x86</a>
+</li>
+<li>Graphics: <a href="expert3d.html">Expert3D</a>
+</li>
+<li>Operating systems: <a href="dos.html">DOS</a>, <a href="nt.html">NT</a>, <a href="osf-1-3-2.html">OSF/1 3.2</a>, <a href="windows-nt.html">Windows NT</a>
+</li>
+<li>Software: <a href="fpga.html">FPGA</a>, <a href="nvme-driver.html">NVMe driver</a>
+</li>
+<li>Parts and peripherals: <a href="8gb-ram.html">8GB RAM</a>, <a href="power.html">POWER</a>, <a href="ps-2-port.html">PS/2 port</a>, <a href="rom.html">ROM</a>, <a href="sata-drives.html">SATA drives</a>, <a href="scsi-cable.html">SCSI cable</a>, <a href="ssd.html">SSD</a>, <a href="vlb-card.html">VLB card</a>, <a href="frontplane.html">frontplane</a>, <a href="motherboard.html">motherboard</a>, <a href="parallel-port.html">parallel port</a>, <a href="riser.html">riser</a>, <a href="video-card.html">video card</a>
+</li>
+<li>Standards and interfaces: <a href="pcie.html">PCIe</a>, <a href="eisa.html">EISA</a>, <a href="isa.html">ISA</a>, <a href="pci-x.html">PCI-X</a>, <a href="agp.html">AGP</a>, <a href="isa-slot.html">ISA slot</a>, <a href="mca.html">MCA</a>, <a href="vlb.html">VLB</a>, <a href="fddi.html">FDDI</a>, <a href="nvme.html">NVMe</a>, <a href="openstep.html">OPENSTEP</a>, <a href="raid-0.html">RAID 0</a>, <a href="sata.html">SATA</a>, <a href="scsi.html">SCSI</a>, <a href="upa.html">UPA</a>, <a href="upa-slot.html">UPA slot</a>, <a href="usb.html">USB</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="ibm.html">IBM</a>, <a href="intel.html">Intel</a>, <a href="intel-sc450nx.html">Intel SC450NX</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="100mbit-ethernet.html">100Mbit Ethernet</a>, <a href="athlon-xp.html">Athlon XP</a>, <a href="fast-ethernet.html">Fast Ethernet</a>, <a href="gpib.html">GPIB</a>, <a href="lsi.html">LSI</a>, <a href="microchannel.html">Microchannel</a>, <a href="flash-storage.html">flash storage</a>, <a href="user-5510.html">user-5510</a>
+</li></ul>
+</body>
+</html>

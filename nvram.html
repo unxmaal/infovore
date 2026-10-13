@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVRAM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NVRAM</h1>
+<p>Claims: 79</p>
+<p>NVRAM is a small amount of memory that retains data without power, and its battery failure can cause power circuitry issues and unrecognized hardware. <sup><a href="#s1">1</a></sup> Many systems require a working NVRAM to boot; otherwise, they will not turn on, and some machines will not POST without a live NVRAM. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> NVRAM failure can cause systems to hang during boot, perform an extended POST, or display no video output, as experienced with the Ultra 2 and Ultra 60. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The MAC address is stored in NVRAM and, if lost, needs to be repaired and reprogrammed to allow the network to function. <sup><a href="#s8">8</a></sup> A new NVRAM chip is needed if the current one is corrupted, and it can be replaced by copying a valid configuration from another machine. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Fixing NVRAM issues is a good first step when machines fail to boot, and reprogramming the NVRAM can be done using a documented procedure. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> NVRAM stores system settings and variables, including the machine type, ethernet (MAC) address, boot parameters, time, and audio volume on SGI machines. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> A dead or invalid NVRAM can cause a range of problems, including POST beep codes without video, garbage serial output, SCSI errors, failure to detect hard drives, L1 cache failing to initialize, and system errors being interpreted as various weird faults. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The OBP has defaults for the environment, so machines should generally still start without NVRAM, though they may complain, default to diag-switch as true, or cause a network boot. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> Fixing NVRAM often involves reprogramming it, since a replacement chip loses all information; the host ID or a valid MAC address can be used for the address's last digits, and checksum errors may not be resolved by enableall/resetenv. <sup><a href="#s14">14</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> NVRAM is managed by chips such as the Dallas DS1687 and ST DS1685, which handle L1 controller operations and system variables, and may be backed by a battery or coin cell. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> NVRAM can be replaced on various systems, sometimes by swapping a battery or chip, and some replacements are preferred over universal processor-based ones. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NVRAM battery failure can cause power circuitry issues and unrecognized hardware. (user-f9d4, 2019-12-06, exchange 4656, check: uncheckable)</li>
+<li id="s2">Some Suns won't POST without a live NVRAM. (user-b7c4, 2020-03-10, exchange 6831, check: uncheckable)</li>
+<li id="s3">Most M88k systems, including old SGIs, require a working NVRAM to boot; otherwise, they won't turn on. (user-237d, 2022-05-12, exchange 234015, check: uncheckable)</li>
+<li id="s4">A U60 system with a dead NVRAM battery does not boot, even if described as working, and opening the system is required to replace the NVRAM. (user-1361, 2020-03-21, exchange 6980, check: uncheckable)</li>
+<li id="s5">A dual 450 U60 doesn't run diagnostics and won't get to diagnostics during boot; it turns on but doesn't run diagnostics; a new NVRAM was ordered; it also doesn't show video (user-1361, 2020-07-15, exchange 9599, check: supported)</li>
+<li id="s6">NVRAM failure causes it to perform an extended POST. (user-9528, 2022-01-22, exchange 181321, check: uncheckable)</li>
+<li id="s7">The machine beeps and flashes keyboard lights but shows no video output; the NVRAM may be faulty, as the machine may hang if the NVRAM is completely dead, as experienced with an Ultra 2. (user-56d4, 2022-11-29, exchange 183281, check: supported)</li>
+<li id="s8">The MAC address is stored in NVRAM and needs to be repaired and reprogrammed if lost. (user-03ad, 2022-06-06, exchange 239681, check: uncheckable)</li>
+<li id="s9">A new NVRAM chip is needed if the current one is corrupted. (user-e0a4, 2020-11-03, exchange 97800, check: uncheckable)</li>
+<li id="s10">Replacing NVRAM chips can be done by copying a valid configuration from another machine, but the Fuel will auto-initialise a blank chip. (user-59df, 2020-11-03, exchange 97800, check: supported)</li>
+<li id="s11">Suns with invalid NVRAM often can't boot and fixing NVRAM issues is a good first step. (user-b7c4, 2020-08-28, exchange 239241, check: uncheckable)</li>
+<li id="s12">To reprogram the NVRAM, follow the procedure at http://www.obsolyte.com/sunFAQ/faq_nvram.html. (user-03ad, 2022-06-17, exchange 182392, check: uncheckable)</li>
+<li id="s13">The SunBlade 2000 uses a SEEPROM for NVRAM. (user-5510, 2022-12-11, exchange 239916, check: supported)</li>
+<li id="s14">The eaddr setting in nvram might have been reset, check and set it if necessary. (user-ce6b, 2023-07-30, exchange 220298, check: uncheckable)</li>
+<li id="s15">The audio volume on SGI machines is stored in NVRAM and pressing and holding the volume buttons may interfere with other RTC operations. (user-86e1, 2023-10-27, exchange 93288, check: uncheckable)</li>
+<li id="s16">NVRAM losing boot parameters can cause battery issues. (user-7fd9, 2025-03-14, exchange 115304, check: uncheckable)</li>
+<li id="s17">An Ultra 5 with a dead NVRAM might produce POST beep codes but fail to display video, with a serial port showing garbage output. (user-56d4, 2023-04-04, exchange 240002, check: supported)</li>
+<li id="s18">Old SPARC boxes can have SCSI errors and not detect hard drives if the NVRAM is invalid. (user-b7c4, 2024-05-25, exchange 240316, check: uncheckable)</li>
+<li id="s19">If the NVRAM is not written to, the L1 cache may not come up; swapping a known real but dead Dallas chip might help diagnose the issue. (user-b1da, 2024-07-03, exchange 210616, check: uncheckable)</li>
+<li id="s20">System errors are logged in NVRAM, so a scrambled NVRAM might be interpreted as various weird errors. (user-86e1, 2025-03-20, exchange 224768, check: uncheckable)</li>
+<li id="s21">The OBP has defaults for the environment, so the machine should also start without the NVRAM, though the machine will likely complain. (user-22f9, 2023-11-28, exchange 184637, check: uncheckable)</li>
+<li id="s22">A flat NVRAM will not cause SCSI errors, but may cause a network boot (diag-boot). (user-08fb, 2024-05-25, exchange 240316, check: uncheckable)</li>
+<li id="s23">It should post with a dead or even missing NVRAM, but default to diag-switch as true. (user-03ad, 2025-08-24, exchange 186654, check: uncheckable)</li>
+<li id="s24">When replacing NVRAM, one must reprogram it as it will have lost all information, and can use the host ID for the MAC address's last digits if available. (user-237d, 2024-01-24, exchange 184799, check: uncheckable)</li>
+<li id="s25">Checksum errors to the nvram were not resolved by `enableall`/`resetenv`. (user-e52d, 2026-07-22, exchange 124230, check: supported)</li>
+<li id="s26">The Blade150 has both a timekeeper chip and a coin cell for NVRAM, but only on some revisions. (user-b7c4, 2023-08-04, exchange 39484, check: uncheckable)</li>
+<li id="s27">The yellow box on the mainboard is a replaceable battery/crystal for the RTC and NVRAM for the system, with the Dallas clock chip for the L1 controller. (user-1629, 2025-01-30, exchange 114005, check: uncheckable)</li>
+<li id="s28">The Dallas DS1687 and ST DS1685 chips manage NVRAM and RTC functions, with the DS1687 handling L1 controller operations and the DS1685 managing system variables. (user-3e2d, 2025-05-22, exchange 56697, check: uncheckable)</li>
+<li id="s29">The Indigo's NVRAM can be replaced with a Tadiran TL-2450/P battery; on some models, the battery was not soldered and could be swapped out easily with added insulation. (user-5a0f, 2023-06-05, exchange 223156, check: supported)</li>
+<li id="s30">The Glitchworks NVRAM replacement is preferred over a universal NVRAM based on a processor; a complete 48T02 replacement would be better. (user-07ed, 2024-07-12, exchange 240333, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="nvram-battery.html">NVRAM battery</a> (8)
+</li>
+<li><a href="nvram-chip.html">NVRAM chip</a> (8)
+</li>
+<li><a href="nvram-module.html">NVRAM module</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="u60.html">U60</a>, <a href="mac-address.html">MAC address</a>, <a href="blade-150.html">Blade 150</a>, <a href="ipx.html">IPX</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="rtc.html">RTC</a>, <a href="u10.html">U10</a>, <a href="ultra-45.html">Ultra 45</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="ultra-60.html">Ultra 60</a>, <a href="indigo.html">Indigo</a>, <a href="onyx4.html">Onyx4</a>, <a href="sparcbook.html">SPARCbook</a>, <a href="sparcstation-10.html">SPARCstation 10</a>, <a href="sunblade-2000.html">SunBlade 2000</a>, <a href="tezro.html">Tezro</a>, <a href="ultra-2.html">Ultra 2</a>
+</li>
+<li>Processors: <a href="sparc.html">SPARC</a>, <a href="030.html">030</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-install.html">IRIX install</a>, <a href="nt4.html">NT4</a>, <a href="os.html">OS</a>, <a href="solaris.html">Solaris</a>, <a href="solaris-8.html">Solaris 8</a>
+</li>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="mame.html">MAME</a>, <a href="console.html">console</a>, <a href="software.html">software</a>
+</li>
+<li>Parts and peripherals: <a href="dallas-chip.html">Dallas chip</a>, <a href="ram.html">RAM</a>, <a href="baseio-prom-monitor.html">BASEIO PROM Monitor</a>, <a href="baseio-board.html">BASEIO board</a>, <a href="cpu.html">CPU</a>, <a href="idprom.html">IDPROM</a>, <a href="l1-cache.html">L1 cache</a>, <a href="network-boot.html">network boot</a>, <a href="parallel-port.html">parallel port</a>, <a href="video.html">video</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="ethernet-address.html">Ethernet address</a>, <a href="obp.html">OBP</a>, <a href="openstep.html">OPENSTEP</a>, <a href="serial.html">serial</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sun.html">Sun</a>, <a href="dallas-clock-chip.html">Dallas clock chip</a>, <a href="sgi-version-6-210.html">SGI Version 6.210</a>
+</li>
+<li>Other: <a href="coin-cell.html">coin cell</a>, <a href="m88k.html">M88k</a>, <a href="pram.html">PRAM</a>, <a href="ss1.html">SS1</a>, <a href="snaphat.html">Snaphat</a>, <a href="u80.html">U80</a>, <a href="eaddr.html">eaddr</a>, <a href="resetenv.html">resetenv</a>, <a href="timekeeper-chip.html">timekeeper chip</a>
+</li></ul>
+</body>
+</html>

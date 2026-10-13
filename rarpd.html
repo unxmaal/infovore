@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rarpd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>rarpd</h1>
+<p>Claims: 5</p>
+<p>rarpd was failing because a space was used instead of a tab between the MAC and hostname. <sup><a href="#s1">1</a></sup> Netbooting Solaris beyond version 2.3 requires modifications and kernel recompilation with rarpd support, but it may not work reliably. <sup><a href="#s2">2</a></sup> Netbooting requires explicitly declaring the netmask for rarpd or bootparamd. <sup><a href="#s3">3</a></sup> Running rarpd interactively can help diagnose RARP requests, and 'not bootable' indicates an issue with the boot configuration. <sup><a href="#s4">4</a></sup> The SPARCstation runs well on an isolated network with a Raspberry Pi server running rarpd and ftpd. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">rarpd was failing because a space was used instead of a tab between the MAC and hostname. (user-2189, 2019-02-24, exchange 757, check: uncheckable)</li>
+<li id="s2">Netbooting Solaris beyond version 2.3 requires modifications and kernel recompilation with rarpd support, but it may not work reliably. (user-1361, 2021-03-06, exchange 15159, check: supported)</li>
+<li id="s3">Netbooting requires explicitly declaring the netmask for rarpd or bootparamd. (user-04a3, 2021-03-07, exchange 15197, check: uncheckable)</li>
+<li id="s4">Running rarpd interactively can help diagnose RARP requests, and 'not bootable' indicates an issue with the boot configuration. (user-1361, 2021-03-11, exchange 180581, check: uncheckable)</li>
+<li id="s5">The SPARCstation runs well on an isolated network with a Raspberry Pi server running rarpd and ftpd. (user-d5ee, 2023-06-07, exchange 240054, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="raspberry-pi.html">Raspberry Pi</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>
+</li>
+<li>Companies: <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="bootparamd.html">bootparamd</a>, <a href="netmask.html">netmask</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1 console</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>L1 console</h1>
+<p>Claims: 5 Part of <a href="l1.html">L1</a></p>
+<p>The default console is the L1 console. <sup><a href="#s1">1</a></sup> The L1 console can be used to power the system and boot to an OS using specific commands. <sup><a href="#s2">2</a></sup> Setting the baud rate to 38400 is necessary for connecting to the Prism console. <sup><a href="#s3">3</a></sup><sup><a href="#s2">2</a></sup> The debug command on the L1 console can be used to increase the debug level by running debug 0x4000. <sup><a href="#s4">4</a></sup> Debugging a disabled CPU or memory error might involve running 'debug 0x10d' in the L1 console, then 'go cac', 'clearalllogs', 'initalllogs', 'clear', 'flush', 'reset', 'enableall', 'update', and 'reset' from the PROM. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The default console is the L1 console. (user-0f65, 2026-07-07, exchange 76634, check: uncheckable)</li>
+<li id="s2">A Prism console requires setting the baud rate to 38400 for connection. The L1 console can be used to power the system and boot to an OS using specific commands. (user-24f0, 2023-06-29, exchange 75904, check: supported)</li>
+<li id="s3">Setting the baud rate to 38400 is necessary for connecting to the Prism console. From the L1 console, use `pwr u` to power the system and then press CTRL-D to drop to the EFI boot monitor. (user-59b9, 2023-06-29, exchange 75904, check: supported)</li>
+<li id="s4">The debug command on the L1 console can be used to increase the debug level by running debug 0x4000. (user-e4e2, 2026-07-23, exchange 226741, check: uncheckable)</li>
+<li id="s5">Debugging a disabled CPU or memory error might involve running 'debug 0x10d' in the L1 console, then 'go cac', 'clearalllogs', 'initalllogs', 'clear', 'flush', 'reset', 'enableall', 'update', and 'reset' from the PROM. (user-8547, 2019-07-16, exchange 2549, check: uncheckable)</li>
+</ol>
+</body>
+</html>

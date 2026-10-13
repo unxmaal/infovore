@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>binary</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>binary</h1>
+<p>Claims: 18</p>
+<p>A binary is a compiled program that can be downloaded from a provided link and run directly. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The sshd binary can generate keys on startup if they do not exist. <sup><a href="#s3">3</a></sup> The binary is o32, which is 32-bit for MIPS, as indicated by the 'file' command output. <sup><a href="#s4">4</a></sup> The binary requires IRIX 4.0.5. <sup><a href="#s5">5</a></sup> To run a binary when clicked, it must be tagged with `tag 0x0 &lt;binary&gt;` to avoid the error `Could not find a file typing rule to perform the requested action`. <sup><a href="#s6">6</a></sup> The tag `0x0` is used for generic executable icons. <sup><a href="#s6">6</a></sup> To patch a binary, use offset 0ca5f0 with new value 0320f809, and old value 8f99c9fc for error checking. <sup><a href="#s7">7</a></sup> With a single binary, it avoids dealing with OS version changes and the need for tools like ansible and distribution management. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The binary was compiled by someone else and can be downloaded from the provided link. (user-04a3, 2022-02-22, exchange 26174, check: uncheckable)</li>
+<li id="s2">Executing the binary directly may open files sequentially rather than in parallel, reducing the likelihood of hitting ulimit compared to using xargs or similar tools that spawn processes in parallel. (user-42cf, 2025-05-01, exchange 87183, check: uncheckable)</li>
+<li id="s3">The sshd binary can generate keys on startup if they don't exist. (user-42cf, 2019-06-21, exchange 67268, check: uncheckable)</li>
+<li id="s4">The binary is o32, which is 32-bit for MIPS, as indicated by the 'file' command output. (user-21b8, 2026-01-01, exchange 219375, check: supported)</li>
+<li id="s5">The binary requires IRIX 4.0.5. (user-7973, 2025-08-11, exchange 189846, check: supported)</li>
+<li id="s6">To run a binary when clicked, it must be tagged with `tag 0x0 &lt;binary&gt;` to avoid the error `Could not find a file typing rule to perform the requested action`. The tag `0x0` is used for generic executable icons and canbe (user-bc5d, 2019-10-07, exchange 68015, check: supported)</li>
+<li id="s7">To patch a binary, use offset 0ca5f0 with new value 0320f809, and old value 8f99c9fc for error checking. (user-ce6b, 2022-03-18, exchange 217528, check: uncheckable)</li>
+<li id="s8">with a single binary, it avoids dealing with OS version changes and the need for tools like ansible and distribution management. (user-2189, 2023-02-18, exchange 36246, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix-4-0-5.html">IRIX 4.0.5</a>
+</li>
+<li>Software: <a href="ghidra.html">Ghidra</a>, <a href="makefile.html">Makefile</a>, <a href="irix-ansible.html">irix_ansible</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="sshd.html">sshd</a>
+</li>
+<li>Parts and peripherals: <a href="disk-space.html">disk space</a>
+</li>
+<li>Standards and interfaces: <a href="ftp.html">FTP</a>
+</li>
+<li>Other: <a href="hardware-texture-mapping.html">hardware texture mapping</a>, <a href="o32.html">o32</a>, <a href="pkg-config.html">pkg-config</a>, <a href="ulimit.html">ulimit</a>, <a href="value.html">value</a>
+</li></ul>
+</body>
+</html>

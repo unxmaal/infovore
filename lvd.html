@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LVD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>LVD</h1>
+<p>Claims: 13</p>
+<p>The disks are either LVD or SE signaling type. <sup><a href="#s1">1</a></sup> SE and LVD refer to different types of SCSI circuitry, with SE being limited in length and LVD extending the distance, while both use the same voltage levels but differ in signaling method. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Devices can autosense and use both SE and LVD, but mixing SE and LVD drives on the same bus can cause problems. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The SE and LVD versions of the Red Rock disk are separate SKUs, with the LVD version having differential transceivers. <sup><a href="#s6">6</a></sup> Most U160 and U320 cards support LVD or SE, but typically use SE for Fast/Wide modes and below. <sup><a href="#s7">7</a></sup> LVD can operate in SE mode, but compatibility and performance may vary. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The disks are either LVD or SE signaling type. (user-b1da, 2020-01-18, exchange 5542, check: uncheckable)</li>
+<li id="s2">Every device on an HVD bus must be an HVD device; level shifters might exist but are uncommon. SE and LVD use the same voltage levels but differ in signaling method, with LVD maintaining better signal integrity at high-f (user-7b1c, 2022-07-01, exchange 30591, check: uncheckable)</li>
+<li id="s3">SE and LVD refer to different types of SCSI circuitry, with SE being limited in length and LVD extending the distance. (user-15a0, 2022-11-10, exchange 105511, check: uncheckable)</li>
+<li id="s4">Devices can autosense and use both SE and LVD, but connecting LVD/SE devices to an HVD bus without adapters can cause issues. (user-7b1c, 2022-07-01, exchange 30591, check: uncheckable)</li>
+<li id="s5">Mixing SE and LVD drives on the same bus can cause problems, as reported by Microsoft Knowledge Base. (user-15a0, 2022-11-10, exchange 105511, check: uncheckable)</li>
+<li id="s6">The SE and LVD versions of the Red Rock disk are separate SKUs, with the LVD version having differential transceivers. (user-1fc3, 2025-11-08, exchange 225668, check: uncheckable)</li>
+<li id="s7">Most U160 and U320 cards support LVD or SE, but typically use SE for Fast/Wide modes and below. (user-7b1c, 2022-07-01, exchange 30591, check: uncheckable)</li>
+<li id="s8">LVD can operate in SE mode, but compatibility and performance may vary. (user-3663, 2024-08-06, exchange 224043, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="lvd-disks.html">LVD disks</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="se.html">SE</a>, <a href="se-mode.html">SE mode</a>
+</li>
+<li>Parts and peripherals: <a href="ssd.html">SSD</a>, <a href="disk.html">disk</a>
+</li>
+<li>Standards and interfaces: <a href="hvd.html">HVD</a>, <a href="u320.html">U320</a>
+</li>
+<li>Other: <a href="rp2040.html">RP2040</a>, <a href="u160.html">U160</a>, <a href="wide-scsi.html">wide SCSI</a>
+</li></ul>
+</body>
+</html>

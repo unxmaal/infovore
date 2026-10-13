@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>n32 ABI</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>n32 ABI</h1>
+<p>Claims: 4 Part of <a href="n32.html">n32</a></p>
+<p>The N32 ABI is used for running 32-bit code on a 64-bit OS. <sup><a href="#s1">1</a></sup> The n32 ABI is not well tested, and codegen issues exist with LLVM. <sup><a href="#s2">2</a></sup> MIPS codegen works with n32 ABI even on a poorly tested target. <sup><a href="#s3">3</a></sup> QEMU-IRIX supports building 32-bit MIPS binaries using the n32 ABI, and does not automatically enable 64-bit mode with -march. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The N32 ABI is used for running 32-bit code on a 64-bit OS. (user-2d09, 2019-09-29, exchange 67964, check: supported)</li>
+<li id="s2">n32 ABI is not well tested, and codegen issues exist with LLVM. (user-9860, 2021-10-12, exchange 217262, check: uncheckable)</li>
+<li id="s3">MIPS codegen works with n32 ABI even on a poorly tested target. (user-9860, 2021-11-27, exchange 70010, check: uncheckable)</li>
+<li id="s4">QEMU-IRIX supports building 32-bit MIPS binaries using the n32 ABI, and does not automatically enable 64-bit mode with -march. (user-5510, 2023-08-11, exchange 77686, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="mips-binary.html">MIPS binary</a>
+</li>
+<li>Operating systems: <a href="qemu-irix.html">qemu-irix</a>
+</li>
+<li>Software: <a href="llvm.html">LLVM</a>
+</li></ul>
+</body>
+</html>

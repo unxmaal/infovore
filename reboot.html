@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reboot</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>reboot</h1>
+<p>Claims: 8</p>
+<p>A reboot can be triggered by running devfsadm as root, or by using other methods such as reboot -- -r to create device nodes in /dev and /devices. <sup><a href="#s1">1</a></sup> Certain configuration changes require a reboot to take effect, including IRIX network settings, X server settings, and reconfiguring X after swapping graphics cards (via 'touch /reconfigure &amp;&amp; reboot'). <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Reboots may also be used to apply changes made through automation tools, such as running an Ansible playbook and then rebooting the system. <sup><a href="#s5">5</a></sup> A broken I1 keyboard can cause a kernel panic when plugged in, though the system may reboot with no visible damage. <sup><a href="#s6">6</a></sup> A cronjob can be set up to ping an external IP and reboot the system upon 100% packet loss, though this approach becomes complex for better reliability. <sup><a href="#s7">7</a></sup> After a reboot, the system works fine without errors. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">run devfsadm as root; reboot -- -r are other ways to create device nodes in /dev and /devices (user-237d, 2020-07-03, exchange 180118, check: uncheckable)</li>
+<li id="s2">IRIX network settings require a reboot to take effect. (user-b7c4, 2020-09-29, exchange 11229, check: uncheckable)</li>
+<li id="s3">X server settings changes affect all users and require a reboot. (user-6afa, 2022-02-12, exchange 81040, check: uncheckable)</li>
+<li id="s4">To reconfigure X after swapping graphics cards, running 'touch /reconfigure &amp;&amp; reboot' is necessary; afbconfig might also work. (user-3a92, 2022-08-05, exchange 182761, check: uncheckable)</li>
+<li id="s5">To apply changes, run the Ansible playbook and reboot the system. (user-2189, 2021-09-20, exchange 77434, check: uncheckable)</li>
+<li id="s6">Plugging in a broken I1 keyboard can make bad noises and cause a kernel panic, but it may reboot with no visible damage. (user-b7c4, 2021-10-29, exchange 221639, check: uncheckable)</li>
+<li id="s7">You can set up a cronjob to ping an external IP and reboot if there's 100% packet loss, but for better reliability, it gets complex quickly. (user-237d, 2022-12-10, exchange 234154, check: supported)</li>
+<li id="s8">After a reboot, the system works fine without errors. (user-4292, 2022-11-12, exchange 82392, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="kernel-panic.html">kernel panic</a>
+</li>
+<li>Software: <a href="ansible-playbook.html">Ansible playbook</a>, <a href="ping.html">ping</a>
+</li>
+<li>Parts and peripherals: <a href="device.html">device</a>
+</li>
+<li>Standards and interfaces: <a href="x.html">X</a>
+</li>
+<li>Other: <a href="dev.html">/dev</a>, <a href="cron-job.html">cron job</a>, <a href="devfsadm.html">devfsadm</a>
+</li></ul>
+</body>
+</html>

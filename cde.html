@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CDE</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CDE</h1>
+<p>Claims: 76 Background: 8 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Common_Desktop_Environment">Common Desktop Environment</a>, <a href="https://en.wikipedia.org/wiki/FreeBSD">FreeBSD</a>, <a href="https://en.wikipedia.org/wiki/Oracle_Solaris">Oracle Solaris</a>.</p>
+<p>CDE is a desktop environment that runs on a wide range of Unix-like systems, including Solaris, HP-UX, AIX, IRIX, FreeBSD, OpenBSD, and OpenVMS (the latter via Remote OpenVMSAnywhere). <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> CDE was widely used, though it was not available on SGI systems and was considered a regression relative to Sun's later Java Desktop. <sup><a href="#s10">10</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s11">11</a></sup> CDE has been packaged by Red Hat and is available through package managers such as FreeBSD's pkg. <sup><a href="#s2">2</a></sup><sup><a href="#s12">12</a></sup> CDE features configurable keybindings, but it lacks a task manager or task bar, requiring users to iconify and reopen applications. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> CDE action icons are 16-color XPM files that must be provided in three sizes: 48x48, 32x32, and 16x16. <sup><a href="#s15">15</a></sup> To create CDE icons, images are downscaled to the required sizes, converted to 16 colors, and exported as XPM, with care needed to preserve transparency. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> CDE boots if the Xservers file lacks explicit depth and class settings, defaulting to an 8-bit desktop. <sup><a href="#s19">19</a></sup> CDE is an open-source desktop environment that uses ROX-filer or pcmanfm as its file manager, and it is available for Linux. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> CDE can be built with Clang on FreeBSD and OpenBSD, with OpenBSD possibly distributing a recent build of Clang as a viable alternative to GCC. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> CDE runs on a range of platforms, including Solaris 10, Solaris 8, Solaris 9, Solaris 2.4, IRIX, OpenBSD, FreeBSD, and the Alpha and VAX series, though its performance varies by platform and software version. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> CDE is often considered clunky and is frequently replaced by alternatives such as WindowMaker, GNOME, XFCE, 4DWM, or OpenWindows. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup><sup><a href="#s31">31</a></sup><sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup><sup><a href="#s41">41</a></sup> CDE can be customized to minimize the bottom bar, use virtual desktops with middle-click, save the desktop layout by logging out, and open the same windows on login. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> Xlib documentation and tutorials for Motif and CDE are available online, and instructions for changing graphics resolution and colors can be found there as well. <sup><a href="#s45">45</a></sup><sup><a href="#s46">46</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Remote OpenVMSAnywhere allows using CDE on OpenVMS from a distance. (user-888b, 2019-07-24, exchange 2733, check: uncheckable)</li>
+<li id="s2">On FreeBSD, you can just 'pkg install cde', believe it or not. (user-7b1c, 2020-02-20, exchange 6496, check: uncheckable)</li>
+<li id="s3">CDE was widely used, with SGI being one of the few exceptions. (user-b1da, 2020-08-18, exchange 10646, check: uncheckable)</li>
+<li id="s4">HP-UX is a decent choice for IA64, though CDE can be problematic. PA2.0 CPUs provide full 64-bit support. (user-b1da, 2020-10-01, exchange 11291, check: supported)</li>
+<li id="s5">Compiling CDE on OpenBSD results in SIGBUS errors and other issues. (user-be12, 2021-05-26, exchange 180762, check: uncheckable)</li>
+<li id="s6">Solaris 11.4 is useful for CDE in a VM. (user-7b1c, 2022-03-06, exchange 239551, check: supported)</li>
+<li id="s7">CDE was attempted under FreeBSD for maximum confusion. (user-7b1c, 2022-03-12, exchange 239561, check: uncheckable)</li>
+<li id="s8">Some 10.x versions of IRIX came with VUE, others came with CDE. (user-7b1c, 2022-04-07, exchange 161758, check: supported)</li>
+<li id="s9">CDE is more Solaris, HPUX, AIX, etc., but 6.5 comes with CDE packages. (user-7b1c, 2022-06-26, exchange 207269, check: supported)</li>
+<li id="s10">CDE was worse than Sun's later Java Desktop. (user-2189, 2019-04-15, exchange 1379, check: uncheckable)</li>
+<li id="s11">CDE was a regression, fixed by an older build from nekoware. (user-b7c4, 2022-01-12, exchange 217405, check: uncheckable)</li>
+<li id="s12">Red Hat packaged CDE at one point. (user-7b1c, 2022-04-07, exchange 235118, check: uncheckable)</li>
+<li id="s13">CDE lacks a task manager or task bar, making it difficult to use; users must iconify and reopen applications. (user-c831, 2021-03-27, exchange 79108, check: uncheckable)</li>
+<li id="s14">CDE also has configurable keybindings. (user-7b1c, 2022-06-26, exchange 207269, check: uncheckable)</li>
+<li id="s15">CDE action icons are 16-color XPM files requiring three sizes: 48x48, 32x32, and 16x16. (user-b1da, 2020-06-10, exchange 160846, check: supported)</li>
+<li id="s16">To create icons for CDE, duplicate the image three times, downscale, convert to indexed color with 16 colors, convert back to RGB, and export as `.png` and `.xpm`. GIMP may cut away transparency edges, so check and save. (user-b1da, 2020-06-11, exchange 234893, check: supported)</li>
+<li id="s17">GIMP may remove transparency when converting back to indexed color, so ensure it's preserved and manually load icons in CDE. (user-b1da, 2020-06-11, exchange 234893, check: uncheckable)</li>
+<li id="s18">To generate icons for CDE, downscale images to 48x48 or the required size, convert to 16 colors in Photoshop, and export as XPM using GIMP. (user-b1da, 2021-01-08, exchange 75607, check: supported)</li>
+<li id="s19">CDE boots if the Xservers file lacks explicit depth and class settings, defaulting to an 8-bit desktop. (user-d903, 2020-08-08, exchange 68994, check: supported)</li>
+<li id="s20">CDE is open-source and uses ROX-filer or pcmanfm as its file manager. (user-7b1c, 2022-06-26, exchange 30498, check: uncheckable)</li>
+<li id="s21">CDE is available for Linux (user-8547, 2022-08-26, exchange 217670, check: uncheckable)</li>
+<li id="s22">I'm compiling CDE for OpenBSD rn (user-7151, 2022-10-31, exchange 183141, check: uncheckable)</li>
+<li id="s23">Clang can build CDE on FreeBSD. (user-fa69, 2022-11-01, exchange 239874, check: uncheckable)</li>
+<li id="s24">OpenBSD may distribute a recent build of Clang, making it a viable alternative to GCC for building CDE. (user-fa69, 2022-11-01, exchange 239874, check: uncheckable)</li>
+<li id="s25">CDE works well on old IBM RS/6000s. (user-7b1c, 2022-07-15, exchange 162146, check: supported)</li>
+<li id="s26">Solaris 10 runs faster with CDE or WMaker and sufficient RAM and/or the correct filesystem. (user-5510, 2022-09-12, exchange 207653, check: supported)</li>
+<li id="s27">CDE's performance can vary by platform and software version. (user-7b1c, 2022-10-24, exchange 239867, check: uncheckable)</li>
+<li id="s28">CDE on an Alpha with 64MB of RAM is agonizingly slow. (user-03ad, 2022-11-05, exchange 235282, check: supported)</li>
+<li id="s29">Solaris 2.4 is the last version to support SunVideo and SunPC, with 2.5.1 adding CDE as an option. (user-15a0, 2023-04-02, exchange 183738, check: supported)</li>
+<li id="s30">CDE would be removed after selection on SGI hardware. (user-5510, 2023-08-30, exchange 40288, check: uncheckable)</li>
+<li id="s31">CDE on IRIX is not as good as WindowMaker. (user-56d4, 2023-09-23, exchange 40964, check: uncheckable)</li>
+<li id="s32">CDE starts with 32MB, 64MB is better, and 128MB is suitable for Solaris 8. (user-03ad, 2024-12-07, exchange 185730, check: supported)</li>
+<li id="s33">CDE on Solaris 9 is tight on 64MB but works with 512MB. (user-03ad, 2024-12-07, exchange 240438, check: supported)</li>
+<li id="s34">A 21164 Alpha can run VMS with CDE. (user-03ad, 2025-11-29, exchange 164691, check: supported)</li>
+<li id="s35">On Alpha, it is a port of CDE like you'd find on any 90s unix. On VAX, it is something more basic; DECwindows Motif is available but CDE requires an Alpha. (user-e532, 2026-02-04, exchange 165021, check: supported)</li>
+<li id="s36">Even on IRIX, CDE feels clunkier than the IRIX desktop. (user-7b1c, 2022-09-27, exchange 32975, check: uncheckable)</li>
+<li id="s37">OpenWindows can be a good alternative to CDE. (user-042f, 2022-10-24, exchange 239867, check: uncheckable)</li>
+<li id="s38">CDE is clunky. (user-56d4, 2023-08-30, exchange 40287, check: uncheckable)</li>
+<li id="s39">CDE or XFCE desktop environments are preferred over GNOME. (user-a2cf, 2024-05-14, exchange 240310, check: uncheckable)</li>
+<li id="s40">4dwm is superior to CDE as a window manager. (user-8547, 2026-08-18, exchange 91753, check: supported)</li>
+<li id="s41">4DWM fits well with novel computer interfaces better than CDE. (user-4f7c, 2026-08-18, exchange 219976, check: supported)</li>
+<li id="s42">CDE can be customized to minimize the bottom bar and use virtual desktops with middle-click. (user-8547, 2022-10-05, exchange 217737, check: uncheckable)</li>
+<li id="s43">To enable arrow key history and tab completion in ksh, one might need to switch to bash. CDE opens the same windows on login which can be changed by customizing the environment and logging out and back in. (user-7151, 2022-12-30, exchange 239933, check: uncheckable)</li>
+<li id="s44">To save the desktop layout in CDE, one must logout, not shut down the system. (user-03ad, 2023-05-05, exchange 218033, check: uncheckable)</li>
+<li id="s45">Xlib documentation and tutorials for Motif and CDE are available online. (user-21b8, 2022-11-13, exchange 215344, check: uncheckable)</li>
+<li id="s46">To change graphics resolution and amount of colours, set a X server option at startup. For CDE, refer to specific instructions online. (user-03ad, 2024-11-18, exchange 163443, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="rs-6000.html">RS/6000</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="vax.html">VAX</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>, <a href="sparc.html">SPARC</a>
+</li>
+<li>Graphics: <a href="xvr-100.html">XVR-100</a>
+</li>
+<li>Operating systems: <a href="4dwm.html">4dwm</a>, <a href="irix.html">IRIX</a>, <a href="freebsd.html">FreeBSD</a>, <a href="openbsd.html">OpenBSD</a>, <a href="solaris.html">Solaris</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="vms.html">VMS</a>, <a href="x11.html">X11</a>, <a href="irix-10.html">IRIX 10</a>, <a href="linux.html">Linux</a>, <a href="os.html">OS</a>, <a href="os-and-versions.html">OS and versions</a>, <a href="openvms.html">OpenVMS</a>, <a href="solaris-11-4.html">Solaris 11.4</a>, <a href="solaris-2-4.html">Solaris 2.4</a>, <a href="solaris-8.html">Solaris 8</a>, <a href="booting.html">booting</a>
+</li>
+<li>Software: <a href="x-server.html">X server</a>, <a href="gimp.html">GIMP</a>, <a href="gnome.html">GNOME</a>, <a href="clang.html">clang</a>, <a href="photoshop.html">Photoshop</a>, <a href="xfce.html">XFCE</a>, <a href="xsun.html">Xsun</a>, <a href="bash.html">bash</a>
+</li>
+<li>Parts and peripherals: <a href="64-mb-of-ram.html">64 MB of RAM</a>, <a href="ram.html">RAM</a>, <a href="vga-card.html">VGA card</a>, <a href="wayland.html">Wayland</a>, <a href="xorg.html">Xorg</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>, <a href="x.html">X</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="dec.html">DEC</a>, <a href="gcc.html">GCC</a>, <a href="hp-vue.html">HP VUE</a>, <a href="red-hat.html">Red Hat</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="64mb.html">64MB</a>, <a href="decwindows-motif.html">DECwindows Motif</a>, <a href="jds.html">JDS</a>, <a href="mobaxterm.html">Mobaxterm</a>, <a href="openwindows.html">OpenWindows</a>, <a href="staroffice.html">StarOffice</a>, <a href="window-maker.html">Window Maker</a>, <a href="xlib.html">Xlib</a>, <a href="dtlogin.html">dtlogin</a>, <a href="icons.html">icons</a>, <a href="ksh.html">ksh</a>
+</li></ul>
+</body>
+</html>

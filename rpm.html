@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RPM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RPM</h1>
+<p>Claims: 73</p>
+<p>RPM is a package management system that is considered a decent package manager, handling dependencies and installation order, and is regarded as better than a source port system or Tardist, though it is not a very good solution and was hated by users as notorious bloatware even on early Linux. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> RPM can be built on various platforms, including Alpha using DEC compilers and used on Tru64, runs on IRIX64 6.5, and requires C11 features like __thread and __alignof__, so it must be built with gcc rather than MIPSPro. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> rpm needs specific tools to build packages, can complain about binary architecture mismatches, does not have out-of-box auto dependency management, and relies on external tools like yum for dependency resolution. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> To build RPM packages, one can download the source RPM, modify the spec file, and use rpmbuild with --nocheck, and rpm can use multiple CPUs for building packages based on the host's CPU count unless overridden. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> rpm provides repeatable builds with defined rules in spec files, making porting easier and more reliable, and includes an embedded LUA interpreter. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> rpm can force the installation of a newer package that conflicts with an older one, but this may require removing the old package first, and rpm -q --whatprovides can help identify where files come from, though it's not always accurate. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> RPM is planned for future implementation and may replace the current setup over time, with SGI using existing tools like rpm to create tardist packages rather than reinventing the wheel. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> RPM is a package management system used by several operating systems and distributions, including RSE (based on FC31), SGUG stuff (from 5.1L), and AIX. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> RPM builds software from a SPEC file, which is a build script, and existing spec files can be used as a starting point for creating RPMs. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> To build an RPM from Fedora source, install the SRPM, copy the spec file, and run `rpmbuild -ba`; the resulting RPM can then be installed. <sup><a href="#s25">25</a></sup> When installing source RPMs with `rpm -ivh`, the spec files are installed in the user's home directory unless run as root, where they go in /root/rpmbuild/SPECS; this can be changed by setting the rpmbuild home directory. <sup><a href="#s26">26</a></sup> An RPM based environment using up to date versions of gcc has been developed, and RPM packages can be built on IRIX by setting up RPM environment variables and folders, installing the SRPM, and running `rpmbuild -ba` on the spec file, which may fail initially and require patches. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> RPM and other package managers can be difficult to use, and packaging for SGI systems using tardist or RPM is challenging. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">RPM is a decent package manager. (user-f229, 2020-07-26, exchange 204361, check: uncheckable)</li>
+<li id="s2">RPM is a package manager that handles things better than Tardist. (user-2189, 2019-11-03, exchange 4087, check: uncheckable)</li>
+<li id="s3">The big issue I see is that yum and rpm, even in their modern form, are notorious bloatware, even on early Linux, and people hated rpm; it was not a very good solution, but it's better than having a source port system, (user-c831, 2020-01-09, exchange 5378, check: uncheckable)</li>
+<li id="s4">RPM is the base tool for package management, handling dependencies and installation orders. (user-f229, 2021-04-14, exchange 69462, check: uncheckable)</li>
+<li id="s5">RPM is a package management system that can be built on Alpha using DEC compilers and also used on Tru64; it's not a bad system. (user-f229, 2019-05-24, exchange 1775, check: uncheckable)</li>
+<li id="s6">rpm version 4.15.0 runs on IRIX64 6.5. (user-2d09, 2019-09-30, exchange 214861, check: supported)</li>
+<li id="s7">RPM requires C11 features like `__thread` and `__alignof__`, so it must be built with gcc rather than MIPSPro. (user-2d09, 2019-10-05, exchange 68005, check: supported)</li>
+<li id="s8">rpm needs specific tools to build packages and can complain about binary architecture mismatches. (user-2d09, 2019-10-25, exchange 68071, check: uncheckable)</li>
+<li id="s9">rpm does not have out-of-box auto dependency management; it relies on external tools like yum for dependency resolution. (user-2d09, 2020-03-12, exchange 214948, check: uncheckable)</li>
+<li id="s10">To build RPM packages, one can download the source RPM, modify the spec file, and use rpmbuild with --nocheck to build the package. (user-2189, 2020-02-16, exchange 68398, check: uncheckable)</li>
+<li id="s11">rpm can use multiple CPUs for building packages, with the number based on the host's CPU count unless overridden. (user-2d09, 2020-04-11, exchange 214956, check: uncheckable)</li>
+<li id="s12">rpm provides repeatable builds with defined rules in spec files, making porting easier and more reliable. (user-42cf, 2020-05-18, exchange 68643, check: uncheckable)</li>
+<li id="s13">RPM includes an embedded LUA interpreter. (user-2189, 2020-07-22, exchange 215039, check: uncheckable)</li>
+<li id="s14">rpm can force the installation of a newer package that conflicts with an older one, but this may require removing the old package first. (user-2189, 2020-07-01, exchange 68874, check: uncheckable)</li>
+<li id="s15">rpm -q --whatprovides can help identify where files come from, though it's not always accurate. (user-2d09, 2020-04-30, exchange 68597, check: uncheckable)</li>
+<li id="s16">RPM is planned for future implementation. (user-2d09, 2020-01-05, exchange 68250, check: uncheckable)</li>
+<li id="s17">With newer gcc and rpm build environment in RSE, there's hope it will replace the current setup over time. (user-d903, 2021-07-27, exchange 79522, check: uncheckable)</li>
+<li id="s18">SGI did not reinvent the wheel for RSE by using existing tools like rpm to create tardist packages. (user-d903, 2021-11-16, exchange 217304, check: uncheckable)</li>
+<li id="s19">RSE is based on FC31 and uses RPM for package management after extensive consideration and proof of concept with pkgsrc. (user-f229, 2022-06-23, exchange 30435, check: uncheckable)</li>
+<li id="s20">RSE is RPM based. (user-f229, 2023-06-23, exchange 38910, check: uncheckable)</li>
+<li id="s21">SGUG stuff uses rpm for package management, starting from 5.1L. (user-e4d0, 2026-01-30, exchange 89575, check: supported)</li>
+<li id="s22">AIX uses rpm for package management. (user-0bb7, 2026-01-30, exchange 89575, check: uncheckable)</li>
+<li id="s23">RPM builds software from a SPEC file, which is a build script. (user-f229, 2023-04-10, exchange 83318, check: uncheckable)</li>
+<li id="s24">Existing spec files can be used as a starting point for creating RPMs. (user-e872, 2023-04-10, exchange 83318, check: uncheckable)</li>
+<li id="s25">To build an RPM from Fedora source, install the SRPM, copy the spec file, and run rpmbuild -ba. The resulting RPM can then be installed. (user-e872, 2022-02-03, exchange 70276, check: uncheckable)</li>
+<li id="s26">When installing source RPMs with `rpm -ivh`, the spec files are installed in the user's home directory unless run as root, where they go in /root/rpmbuild/SPECS. This can be changed by setting the rpmbuild home directory (user-7973, 2024-02-29, exchange 215447, check: supported)</li>
+<li id="s27">An RPM based environment using up to date versions of gcc has been developed. (user-d903, 2022-01-16, exchange 80746, check: uncheckable)</li>
+<li id="s28">To build RPM packages on IRIX, set up RPM environment variables and folders, install the SRPM, and run `rpmbuild -ba` on the spec file, which may fail initially; patches are made for changes; start jobs on the IRIX box,岗 (user-e872, 2023-01-16, exchange 215364, check: supported)</li>
+<li id="s29">RPM and other package managers can be difficult to use. (user-e872, 2022-03-04, exchange 215298, check: uncheckable)</li>
+<li id="s30">the source code is available on GitHub and includes changes to make it compile, but packaging for SGI systems using tardist or RPM is challenging. (user-ae4b, 2025-02-16, exchange 212010, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="rpm-package.html">RPM package</a> (10)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Processors: <a href="mips4.html">MIPS4</a>, <a href="r14000.html">R14000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="aix.html">AIX</a>, <a href="fedora.html">Fedora</a>, <a href="irix64.html">IRIX64</a>, <a href="tru64.html">Tru64</a>
+</li>
+<li>Software: <a href="spec-file.html">spec file</a>, <a href="rse.html">RSE</a>, <a href="nekoware.html">nekoware</a>, <a href="openssl.html">OpenSSL</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="tardist.html">tardist</a>, <a href="tdnf.html">tdnf</a>, <a href="mipspro.html">MIPSpro</a>, <a href="openssh.html">OpenSSH</a>, <a href="srpm.html">SRPM</a>, <a href="xfce.html">XFCE</a>, <a href="compiler.html">compiler</a>, <a href="didbs.html">didbs</a>, <a href="dnf.html">dnf</a>, <a href="emacs.html">emacs</a>, <a href="libtool.html">libtool</a>, <a href="manual.html">manual</a>, <a href="package-management.html">package management</a>, <a href="patch.html">patch</a>, <a href="pkgsrc.html">pkgsrc</a>, <a href="python2.html">python2</a>, <a href="sshd.html">sshd</a>, <a href="swmgr.html">swmgr</a>, <a href="tardist-package.html">tardist package</a>, <a href="vim.html">vim</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgug.html">SGUG</a>, <a href="dec.html">DEC</a>, <a href="iso.html">ISO</a>
+</li>
+<li>Other: <a href="yum.html">yum</a>, <a href="lua.html">Lua</a>, <a href="dependencies.html">dependencies</a>, <a href="dlopen.html">dlopen</a>, <a href="fc31.html">fc31</a>, <a href="gnutls.html">gnutls</a>, <a href="gobject-introspection.html">gobject-introspection</a>, <a href="libdicl.html">libdicl</a>, <a href="source.html">source</a>, <a href="source-code.html">source code</a>
+</li></ul>
+</body>
+</html>

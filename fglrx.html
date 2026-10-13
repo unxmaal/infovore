@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fglrx</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>fglrx</h1>
+<p>Claims: 9 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Radeon">Radeon</a>.</p>
+<p>The fglrx driver was available for ia64 platforms but not currently supported, whereas radeon is supported on i386 and x86_64. <sup><a href="#s1">1</a></sup> The SGI 3450 requires a supported graphics card; the radeon driver does not work properly, and on SLES9 only older cards are supported. <sup><a href="#s2">2</a></sup> Newer cards like the Radeon 9200 and FireGL R200-series may work with the fglrx driver, and SLES9 is used with fglrx. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The X1s work with the radeon driver but lack 3D acceleration, so fglrx may be required for 3D acceleration. <sup><a href="#s4">4</a></sup> The PCI Radeon 9200 SE can run X with the radeon driver on SLES9 with ProPack, but lacks 3D acceleration and crashes with fglrx due to undefined symbols, while SLES11 fails to display properly. <sup><a href="#s5">5</a></sup> Using fglrx instead of radeon might resolve the issue, and Debian 7 with fglrx running in realtime can provide acceleration on Altixes. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The fglrx driver was available for ia64 platforms but not currently supported, whereas radeon is supported on i386 and x86_64. (user-1446, 2020-06-12, exchange 75210, check: uncheckable)</li>
+<li id="s2">The SGI 3450 requires a supported graphics card; the `radeon` driver does not work properly. On SLES9, only older cards are supported. Newer cards like the Radeon 9200 and FireGL R200-series may work with the `fglrx` or` (user-59b9, 2020-07-01, exchange 75236, check: supported)</li>
+<li id="s3">SLES9 is used with fglrx. (user-59b9, 2020-08-24, exchange 75312, check: uncheckable)</li>
+<li id="s4">The X1s work with the `radeon` driver but lack 3D acceleration; `fglrx` may be required for 3D acceleration. (user-59b9, 2020-08-23, exchange 75309, check: supported)</li>
+<li id="s5">The PCI Radeon 9200 SE can run X with the radeon driver on SLES9 with ProPack, but lacks 3D acceleration and crashes with fglrx due to undefined symbols. SLES11 fails to display properly. (user-59b9, 2020-09-23, exchange 216361, check: supported)</li>
+<li id="s6">Using FGLRX instead of radeon might resolve the issue. (user-59b9, 2020-09-29, exchange 75396, check: uncheckable)</li>
+<li id="s7">Debian 7 with fglrx running in realtime can provide acceleration on Altixes. (user-1446, 2020-10-20, exchange 11672, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="fglrx-driver.html">fglrx driver</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="radeon.html">Radeon</a>, <a href="altix.html">Altix</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>
+</li>
+<li>Operating systems: <a href="sles9.html">SLES9</a>, <a href="debian-7.html">Debian 7</a>, <a href="propack.html">ProPack</a>, <a href="sles-10.html">SLES 10</a>, <a href="sles11.html">SLES11</a>
+</li>
+<li>Standards and interfaces: <a href="x1.html">X1</a>
+</li>
+<li>Other: <a href="3d-performance.html">3D performance</a>
+</li></ul>
+</body>
+</html>

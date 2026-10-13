@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clock battery</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>clock battery</h1>
+<p>Claims: 14</p>
+<p>The clock battery is a Dallas NVRAM that cannot explode, and in Indigos it is a Tadiran lithium thionyl chloride primary cell that is long-life and leak-resistant but can cause a corrosive mess if it leaks. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The clock battery in the Indigo is soldered, whereas R4k Indigos have a socket for the clock battery. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> A dead clock battery can cause problems on various systems: M88k systems brick and are restored by replacing the battery, the display can indicate a dead clock battery, the 'TOOL' light may not be lit and the system may not boot past the BIOS screen, and the 'Can't set tod clock' error can be cleared by replacing the battery. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The Indigo1 has clock batteries that can leak into the board, and it also has power supply issues. <sup><a href="#s9">9</a></sup> A working clock battery is crucial for an old Sun SS10, and to boot the IDE on a disk on a pre-ARCS machine with a missing clock battery, use `boot -f dksc(0,3,8)ide.IP6 fe. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> To blast the password, either use a jumper or remove the clock battery. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Clock battery can't explode. It's a Dallas NVRAM. (user-03ad, 2023-09-04, exchange 209160, check: uncheckable)</li>
+<li id="s2">The clock battery in Indigos is a Tadiran lithium thionyl chloride primary cell, which is long-life and leak-resistant but can cause a corrosive mess if it leaks. (user-e532, 2025-03-17, exchange 224742, check: uncheckable)</li>
+<li id="s3">The clock battery in the Indigo is soldered, which can be annoying. (user-8de9, 2025-03-17, exchange 224742, check: supported)</li>
+<li id="s4">R4k Indigos have a socket for the clock battery. (user-9219, 2025-03-17, exchange 224742, check: supported)</li>
+<li id="s5">M88k systems brick when the clock battery dies, and replacing the battery restores them. (user-8de9, 2022-05-12, exchange 234015, check: uncheckable)</li>
+<li id="s6">The display indicates the system doesn't like the keyboard and the battery in the clock is dead. (user-b1da, 2023-08-16, exchange 108335, check: uncheckable)</li>
+<li id="s7">The 'TOOL' light not being lit could be due to a missing clock battery, which might prevent the system from booting past the BIOS screen. (user-5906, 2024-03-02, exchange 227238, check: uncheckable)</li>
+<li id="s8">The 'Can't set tod clock' error can be cleared by replacing the clock battery. (user-c986, 2026-06-24, exchange 226619, check: uncheckable)</li>
+<li id="s9">The Indigo1 has power supply issues and clock batteries that can leak into the board. (user-b7c4, 2026-06-25, exchange 244126, check: uncheckable)</li>
+<li id="s10">A working clock battery is crucial for an old Sun SS10. (user-1361, 2022-02-25, exchange 102675, check: uncheckable)</li>
+<li id="s11">To boot the IDE on a disk, use `boot -f dksc(0,3,8)ide.IP6 fe` for a pre-ARCS machine with a missing clock battery. (user-b1da, 2023-08-21, exchange 39877, check: supported)</li>
+<li id="s12">to blast the password it's either a jumper or you remove the clock battery (user-f9d4, 2020-01-03, exchange 5280, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>, <a href="indigo1.html">Indigo1</a>, <a href="r4k-indigo.html">R4K Indigo</a>, <a href="ss10.html">SS10</a>
+</li>
+<li>Software: <a href="boot.html">boot</a>
+</li>
+<li>Parts and peripherals: <a href="psu.html">PSU</a>, <a href="jumper.html">jumper</a>, <a href="keyboard.html">keyboard</a>, <a href="power-supply.html">power supply</a>
+</li>
+<li>Standards and interfaces: <a href="arcs.html">ARCS</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="m88k.html">M88k</a>, <a href="dksc.html">dksc</a>, <a href="password.html">password</a>
+</li></ul>
+</body>
+</html>

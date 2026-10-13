@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROM monitor</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PROM monitor</h1>
+<p>Claims: 11 Part of <a href="prom.html">PROM</a></p>
+<p>The PROM monitor on Unix boxes, especially Suns, offers high-quality graphics from boot. <sup><a href="#s1">1</a></sup> To access the PROM monitor, hit escape when booting and type 'ide' to run the diagnostics suite. <sup><a href="#s2">2</a></sup> The PROM Monitor prints its version with 'BE' for big-endian and 'LE' for little-endian architectures. <sup><a href="#s3">3</a></sup> Updating the hardware inventory in the PROM monitor can resolve issues with new or re-enabled components. <sup><a href="#s4">4</a></sup> The error is likely due to the eaddr not being set in prom monitor; setting 'setenv monitor h' or 'setenv -f eaddr 08:00:69:12:34:56' should resolve it, and 'printenv' can be used to check the eaddr. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> If the machine POSTed and displayed the PROM monitor, the motherboard might still be salvageable. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The PROM monitor on Unix boxes, especially Suns, offers high-quality graphics from boot. (user-c831, 2021-03-06, exchange 15164, check: uncheckable)</li>
+<li id="s2">To access the PROM monitor, hit escape when booting and type 'ide' to run the diagnostics suite. (user-8547, 2022-05-03, exchange 103576, check: uncheckable)</li>
+<li id="s3">The PROM Monitor prints its version with 'BE' for big-endian and 'LE' for little-endian architectures. (user-86e1, 2023-11-14, exchange 42180, check: uncheckable)</li>
+<li id="s4">Updating the hardware inventory in the PROM monitor can resolve issues with new or re-enabled components. (user-15a0, 2023-01-01, exchange 106163, check: uncheckable)</li>
+<li id="s5">The error is likely due to the eaddr not being set in prom monitor; setting 'setenv monitor h' or 'setenv -f eaddr 08:00:69:12:34:56' should resolve it. (user-ce6b, 2023-07-19, exchange 220292, check: supported)</li>
+<li id="s6">Use 'printenv' in the prom monitor to check the eaddr. (user-e4d0, 2025-04-26, exchange 212415, check: uncheckable)</li>
+<li id="s7">If the machine POSTed and displayed the PROM monitor, the motherboard might still be salvageable. (user-d492, 2025-09-14, exchange 118593, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>
+</li>
+<li>Parts and peripherals: <a href="hard-drive.html">hard drive</a>
+</li>
+<li>Other: <a href="post.html">POST</a>, <a href="label.html">label</a>, <a href="overlay.html">overlay</a>
+</li></ul>
+</body>
+</html>

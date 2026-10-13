@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pkgsrc</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>pkgsrc</h1>
+<p>Claims: 65 Background: 12 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Pkgsrc">Pkgsrc</a>, <a href="https://en.wikipedia.org/wiki/NetBSD">NetBSD</a>, <a href="https://en.wikipedia.org/wiki/VAX">VAX</a>, <a href="https://en.wikipedia.org/wiki/Wget">Wget</a>.</p>
+<p>pkgsrc is a source-based package framework that ships source code and works across multiple supported systems, including NetBSD, IRIX, Solaris, HP-UX, VAX, FreeBSD, and Tribblix. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It is considered the shortest path to compiling modern, current open-source packages on IRIX, and it can be pulled from https://github.com/sgidevnet/pkgsrc for building software. <sup><a href="#s1">1</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> pkgsrc traditionally aimed to support OSes other than NetBSD and used to have working cross-compilation support, though it can also be used to cross-compile via a cross-compiler VM. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s6">6</a></sup> The process for installing pkgsrc involves installing a working version of GCC, extracting pkgsrc to /usr/pkgsrc, running pkgsrc's bootstrap, and then installing libgetopt. <sup><a href="#s11">11</a></sup> The pkgsrc bootstrap process works with a plain installation of gcc 8.2.0, requiring only CC and CXX environment variables set to point to the gcc and g++ executables. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> pkgsrc's bootstrap script makes incorrect assumptions and shoves them into global settings, and it requires a properly set LD_LIBRARY_PATH or LD_LIBRARYN32_PATH to compile. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> pkgsrc is complex and has failed to compile packages properly on IRIX, with libtool being a main blocker. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> pkgsrc's libtool needs fixing to correctly place compiled objects during builds, as libtool fails to copy bins from lib/ to the directory where it's putting stuff for packaging in pkgsrc. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> pkgsrc is a cross-platform port system originally from NetBSD and works with OpenBSD, Linux, FreeBSD, and Solaris. <sup><a href="#s20">20</a></sup> pkgsrc source code is typically stored in /usr/pkgsrc, but can be mounted elsewhere for more space. <sup><a href="#s21">21</a></sup> Using CVS to check out pkgsrc is slow initially, but tarballs are faster. <sup><a href="#s22">22</a></sup> A proper GNU environment is recommended before working with pkgsrc. <sup><a href="#s23">23</a></sup> The README for pkgsrc lists a specific GCC binary to use. <sup><a href="#s24">24</a></sup> pkgsrc does not support multilib, but you can use `--abi` for GCC. <sup><a href="#s25">25</a></sup> You can compile your own packages from pkgsrc, and there's a good chance it will work. <sup><a href="#s26">26</a></sup> pkgsrc has deviated quite a bit from what it was back in the day. <sup><a href="#s27">27</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">pkgsrc seems to be a good way forward for getting a viable working browser on IRIX. (user-2189, 2018-12-30, exchange 66834, check: uncheckable)</li>
+<li id="s2">pkgsrc may need to be addressed when installing software on both Solaris and IRIX systems. (user-2189, 2019-02-07, exchange 475, check: uncheckable)</li>
+<li id="s3">NetBSD has a port for VAX and can build most pkgsrc pieces for it. (user-42cf, 2019-02-08, exchange 503, check: uncheckable)</li>
+<li id="s4">libtool solves a very precise problem, which is 'how do we set up a compiler environment for ANY system type in this list of systems?'; pkgsrc works on all of the supported systems because it ships source code and it abd (user-2189, 2019-04-11, exchange 1343, check: uncheckable)</li>
+<li id="s5">pkgsrc is up and irixports is impressive (user-2d28, 2019-07-18, exchange 67527, check: uncheckable)</li>
+<li id="s6">pkgsrc traditionally aimed to support OSes other than NetBSD and used to have a working cross-compilation support. (user-42cf, 2019-08-06, exchange 214818, check: uncheckable)</li>
+<li id="s7">pkgsrc is the shortest path to a method to compile modern, current opensource packages on irix and is at this very moment the method that has the potential to yield good results the fastest (user-2189, 2019-04-11, exchange 1343, check: uncheckable)</li>
+<li id="s8">pkgsrc can be pulled from https://github.com/sgidevnet/pkgsrc for building software. (user-2189, 2019-04-11, exchange 1344, check: uncheckable)</li>
+<li id="s9">pkgsrc would bring the cross-compiler VM up to modern standards. (user-2189, 2019-01-15, exchange 112, check: uncheckable)</li>
+<li id="s10">I'm experimenting with compilertron, a vm cross-compiler, and trying to get it to xcompile pkgsrc, encountering irixisms that pkgsrc is unprepared for. (user-2189, 2019-05-30, exchange 203806, check: uncheckable)</li>
+<li id="s11">The process for installing pkgsrc involves installing a working version of GCC, extracting pkgsrc to /usr/pkgsrc, running pkgsrc's bootstrap, and then installing libgetopt. (user-f229, 2019-05-07, exchange 1609, check: uncheckable)</li>
+<li id="s12">Setting `CXX` instead of `GCC` is necessary for configuring packages with pkgsrc. (user-42cf, 2019-01-23, exchange 210, check: supported)</li>
+<li id="s13">The pkgsrc bootstrap process works with a plain installation of gcc 8.2.0, requiring only CC and CXX environment variables set to point to the gcc and g++ executables. (user-42cf, 2019-02-07, exchange 67010, check: supported)</li>
+<li id="s14">pkgsrc requires a properly set LD_LIBRARY_PATH or LD_LIBRARYN32_PATH to compile. (user-22f9, 2019-01-23, exchange 209, check: uncheckable)</li>
+<li id="s15">pkgsrc's bootstrap script makes incorrect assumptions and shoves them into global settings. (user-2189, 2019-05-08, exchange 1628, check: uncheckable)</li>
+<li id="s16">libtool is a 12k line bash script that handles library linking and other things for platform-agnostic systems, with special handling for dependencies and shims, and is a main blocker for pkgsrc on IRIX. (user-2189, 2019-04-11, exchange 1339, check: supported)</li>
+<li id="s17">pkgsrc is complex and has failed to compile packages properly on IRIX. (user-2189, 2019-06-20, exchange 67250, check: uncheckable)</li>
+<li id="s18">Libtool fails to copy bins from lib/ to the directory where it's putting stuff for packaging in pkgsrc. (user-2189, 2019-03-17, exchange 67140, check: uncheckable)</li>
+<li id="s19">pkgsrc's libtool needs fixing to correctly place compiled objects during builds. (user-2189, 2019-04-24, exchange 1483, check: uncheckable)</li>
+<li id="s20">pkgsrc is a cross-platform port system originally from NetBSD and works with OpenBSD, Linux, FreeBSD, and Solaris. (user-7b1c, 2022-01-17, exchange 181295, check: uncheckable)</li>
+<li id="s21">pkgsrc source code is typically stored in /usr/pkgsrc, but can be mounted elsewhere for more space. (user-37ee, 2020-09-29, exchange 11236, check: uncheckable)</li>
+<li id="s22">Using CVS to check out pkgsrc is slow initially, but tarballs are faster. (user-37ee, 2020-09-29, exchange 11236, check: uncheckable)</li>
+<li id="s23">A proper GNU environment is recommended before working with pkgsrc. (user-37ee, 2021-02-27, exchange 204797, check: uncheckable)</li>
+<li id="s24">The README for pkgsrc lists a specific GCC binary to use. (user-711b, 2020-12-27, exchange 75475, check: uncheckable)</li>
+<li id="s25">pkgsrc does not support multilib, but you can use `--abi` for GCC. (user-711b, 2021-01-07, exchange 75563, check: supported)</li>
+<li id="s26">you can compile your own packages from pkgsrc, and there's a good chance it will work. (user-237d, 2023-03-27, exchange 74418, check: uncheckable)</li>
+<li id="s27">pkgsrc has deviated quite a bit from what it was back in the day. (user-42cf, 2022-02-09, exchange 80933, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="c8000.html">C8000</a>, <a href="octane.html">Octane</a>, <a href="vax.html">VAX</a>
+</li>
+<li>Processors: <a href="32-bit-abi.html">32-bit ABI</a>, <a href="pa-risc.html">PA-RISC</a>, <a href="sparc.html">SPARC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="netbsd.html">NetBSD</a>, <a href="solaris.html">Solaris</a>, <a href="freebsd.html">FreeBSD</a>, <a href="linux.html">Linux</a>, <a href="openbsd.html">OpenBSD</a>, <a href="qnx.html">QNX</a>
+</li>
+<li>Software: <a href="libtool.html">libtool</a>, <a href="wget.html">wget</a>, <a href="compilertron.html">Compilertron</a>, <a href="perl.html">Perl</a>, <a href="github.html">GitHub</a>, <a href="rpm.html">RPM</a>, <a href="rse.html">RSE</a>, <a href="bash-script.html">bash script</a>, <a href="browser.html">browser</a>, <a href="clang.html">clang</a>, <a href="epm.html">epm</a>, <a href="irixports.html">irixports</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="gcc.html">GCC</a>, <a href="gcc-7.html">GCC 7</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>
+</li>
+<li>Other: <a href="bmake.html">bmake</a>, <a href="cxx.html">CXX</a>, <a href="hp-ux-11i-v1.html">HP-UX 11i v1</a>, <a href="links.html">Links</a>, <a href="tribblix.html">Tribblix</a>, <a href="bootstrap.html">bootstrap</a>, <a href="fc31.html">fc31</a>, <a href="getopt-long.html">getopt_long</a>
+</li></ul>
+</body>
+</html>

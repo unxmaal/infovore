@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>spec file</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>spec file</h1>
+<p>Claims: 17</p>
+<p>The spec file is used to build RPM packages, typically by downloading or installing a source RPM, modifying the spec file, and running rpmbuild (with -ba, or with --nocheck to skip checks) to produce the package. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The spec file can be modified to resolve build issues, such as setting specific exports to fix dynamic linking, commenting out the gpgv2 line to allow the gnutls build to proceed, or replacing it with the latest version from a specific branch and applying patches. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The spec file can conditionally include Python 2 or 3 setup based on the Python version, apply patches using %patch followed by the patch number in the %prep section, and its change log should be updated when it is modified. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The Makefile calls configure and autoconf on its own, ignoring flags from the spec file, which can cause linking issues, and resolving a build error in a spec file patch may require specifying the correct file path and adjusting version checks in the Makefile.in.in. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The poppler spec file is version 0.72, but the one being patched is version 0.26, used by Xpdf 3.04, and the dist directory of the GL2 source contains the entire SPEC file for 4D1-2.0. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To build RPM packages, one can download the source RPM, modify the spec file, and use rpmbuild with --nocheck to build the package. (user-2189, 2020-02-16, exchange 68398, check: uncheckable)</li>
+<li id="s2">To build an RPM from Fedora source, install the SRPM, copy the spec file, and run rpmbuild -ba. The resulting RPM can then be installed. (user-e872, 2022-02-03, exchange 70276, check: uncheckable)</li>
+<li id="s3">To build RPM packages on IRIX, set up RPM environment variables and folders, install the SRPM, and run `rpmbuild -ba` on the spec file, which may fail initially; patches are made for changes; start jobs on the IRIX box,岗 (user-e872, 2023-01-16, exchange 215364, check: supported)</li>
+<li id="s4">Building openssh with specific exports in the .spec file can resolve dynamic linking issues. (user-b4f4, 2020-01-05, exchange 68251, check: uncheckable)</li>
+<li id="s5">commenting out the gpgv2 line in the spec file allows the gnutls build to proceed. (user-cd7d, 2020-06-22, exchange 68766, check: uncheckable)</li>
+<li id="s6">When building RPMs, replacing the spec file with the latest version from a specific branch and applying any patches is necessary for updates. (user-2189, 2021-03-15, exchange 69266, check: uncheckable)</li>
+<li id="s7">The spec file conditionally includes Python 2 or 3 setup based on the Python version. (user-2189, 2020-06-22, exchange 68773, check: supported)</li>
+<li id="s8">To apply patches, use %patch followed by the patch number in the %prep section of the spec file. (user-2189, 2020-12-27, exchange 69169, check: uncheckable)</li>
+<li id="s9">The change log should be updated when modifying the spec file. (user-e872, 2021-04-14, exchange 215119, check: uncheckable)</li>
+<li id="s10">To resolve a build error in the spec file patch, one must specify the correct file path and may need to adjust version checks in the Makefile.in.in, though this could cause issues if gettext is upgraded. (user-17cb, 2020-12-27, exchange 215078, check: uncheckable)</li>
+<li id="s11">The Makefile calls configure and autoconf on its own, ignoring flags from the Spec file, causing issues with linking. (user-e872, 2021-07-28, exchange 215190, check: uncheckable)</li>
+<li id="s12">The poppler spec file is version 0.72, but the one being patched is version 0.26, used by Xpdf 3.04. (user-17cb, 2022-01-24, exchange 70254, check: supported)</li>
+<li id="s13">`genimage` generates an image given a spec and idb, while `genprod` generates a product containing a given set of images; the `dist` directory of the GL2 source contains the entire SPEC file for 4D1-2.0. (user-56d4, 2024-06-13, exchange 189147, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="fedora.html">Fedora</a>
+</li>
+<li>Software: <a href="rpm.html">RPM</a>, <a href="patch.html">patch</a>, <a href="makefile.html">Makefile</a>, <a href="openssh.html">OpenSSH</a>, <a href="srpm.html">SRPM</a>, <a href="configure.html">configure</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Other: <a href="autoconf.html">autoconf</a>, <a href="export.html">export</a>, <a href="genimage.html">genimage</a>, <a href="genprod.html">genprod</a>, <a href="gettext.html">gettext</a>
+</li></ul>
+</body>
+</html>

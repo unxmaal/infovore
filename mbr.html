@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBR</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MBR</h1>
+<p>Claims: 6</p>
+<p>MBR supports 2TB volumes, though not all controllers can handle that capacity, and SGI systems manage multi-TB volumes over Fiber Channel with unknown specifics. <sup><a href="#s1">1</a></sup> GPT is the replacement for MBR, providing a different disklabel and including a fallback MBR for BIOS compatibility. <sup><a href="#s2">2</a></sup> UEFI bootloaders look for the ESP rather than the MBR. <sup><a href="#s3">3</a></sup> Modern SSDs recognize when a new MBR or GPT partition table is written and interpret it as a full trim. <sup><a href="#s4">4</a></sup> Some controllers can understand MBR and GPT partition tables and parse the free/in-use blocks directly from FAT/EXFAT/maybe NTFS, but not UNIX filesystems. <sup><a href="#s5">5</a></sup> Installation steps differ based on whether you use MBR with BIOS or UEFI. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">MBR supports 2TB but not all controllers handle that, SGI systems manage multi-TB volumes over Fiber Channel with unknown specifics (user-b1da, 2020-01-16, exchange 5488, check: supported)</li>
+<li id="s2">GPT is the replacement for MBR, providing a different disklabel, and includes a fallback MBR for BIOS compatibility. (user-37ee, 2021-01-02, exchange 13417, check: uncheckable)</li>
+<li id="s3">UEFI bootloaders look for the ESP, not the MBR. (user-37ee, 2021-01-02, exchange 13418, check: uncheckable)</li>
+<li id="s4">Modern SSDs recognize when a new MBR or GPT partition table is written and interpret it as a full trim. (user-9860, 2021-10-03, exchange 100296, check: uncheckable)</li>
+<li id="s5">Some controllers can understand MBR and GPT partition tables and parse the free/in use blocks directly from FAT/EXFAT/maybe NTFS, but not UNIX filesystems. (user-d903, 2023-08-14, exchange 240094, check: uncheckable)</li>
+<li id="s6">Installation steps differ based on whether you use MBR with BIOS or UEFI. (user-22f9, 2024-11-20, exchange 50644, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="partition-table.html">partition table</a>
+</li>
+<li>Parts and peripherals: <a href="ssd.html">SSD</a>, <a href="controller.html">controller</a>
+</li>
+<li>Standards and interfaces: <a href="uefi.html">UEFI</a>, <a href="fibre-channel.html">Fibre Channel</a>
+</li>
+<li>Other: <a href="gpt.html">GPT</a>, <a href="esp.html">ESP</a>
+</li></ul>
+</body>
+</html>

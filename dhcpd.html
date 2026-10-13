@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dhcpd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>dhcpd</h1>
+<p>Claims: 5</p>
+<p>The booterizer daemon uses dhcpd for bootp. <sup><a href="#s1">1</a></sup> The dhcpd config in booterizer fails to assign 192.168.1.x addresses, instead giving 169 autoconfig addresses, which is inconsistent with the readme stating it should use 192.168.1.x. <sup><a href="#s2">2</a></sup> You can modify the dhcpd config to add an entry for other (non-sgi, cisco phone) devices, and setting the IP in ansible/roles/rpi_setup/templates/*dhcpd* allows the RPI to connect to an SGI without manual intervention. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> To troubleshoot DHCP server issues, check the syslog with 'tail -f /var/log/syslog' while starting dhcpd. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">daemon booterizer uses dhcpd for bootp. (user-b1da, 2021-03-06, exchange 77344, check: uncheckable)</li>
+<li id="s2">The dhcpd config in booterizer fails to assign 192.168.1.x addresses, instead giving 169 autoconfig addresses, which is inconsistent with the readme stating it should use 192.168.1.x. (user-95db, 2021-09-19, exchange 216746, check: supported)</li>
+<li id="s3">you'd just modify the dhcpd conf to add an entry for whatever other (non-sgi, cisco phone) device. (user-2189, 2021-08-08, exchange 217197, check: uncheckable)</li>
+<li id="s4">Setting the IP in ansible/roles/rpi_setup/templates/*dhcpd* allows the RPI to connect to an SGI without manual intervention. (user-6afa, 2021-11-29, exchange 216757, check: uncheckable)</li>
+<li id="s5">To troubleshoot DHCP server issues, check the syslog with 'tail -f /var/log/syslog' while starting dhcpd. (user-7973, 2022-03-09, exchange 216768, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="booterizer.html">Booterizer</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="rpi.html">RPi</a>, <a href="syslog.html">SYSLOG</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNU ld</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GNU ld</h1>
+<p>Claims: 10</p>
+<p>GNU ld is a linker that is not fully compatible with lld, but lld can be adapted to work with it using regex. <sup><a href="#s1">1</a></sup> Unlike GNU ld, IRIX ld requires that symbol references be resolved before they are called, which can be wasteful. <sup><a href="#s2">2</a></sup> When linking MIPS code, symbols must be referenced before they are linked, and using GNU ld requires caution with mixing object files from different compilers, with known issues on IRIX. <sup><a href="#s3">3</a></sup> Using gcc and GNU ld can resolve compilation issues with ncurses, and the 'undefined reference' issue with GNU ld can be resolved using the -Wl,&lt;flag&gt; argument. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The GNU ld on an IRIX Octane workstation generates a ROM binary that is 100% garbage when converting sm64.u.elf to sm64.u.bin, but this issue is due to problems with IRIX libraries, not GNU ld. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The system linker is preferable to GNU ld on IRIX, but GNU ld should work, and the native linker may not be compatible with GNU ld on IRIX, but it's possible to get it to work with the right RPMs. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">lld is not fully compatible with GNU ld but can be adapted using regex. (user-22f9, 2019-02-08, exchange 501, check: uncheckable)</li>
+<li id="s2">IRIX ld requires that symbol references be resolved before they are called, unlike GNU ld, which can be wasteful but avoids this issue. (user-22f9, 2019-04-11, exchange 1337, check: uncheckable)</li>
+<li id="s3">When linking MIPS code, symbols must be referenced before they are linked; using GNU ld requires caution with mixing object files from different compilers, and there are known issues on IRIX. (user-22f9, 2019-04-11, exchange 1338, check: uncheckable)</li>
+<li id="s4">using gcc and gnu ld can resolve compilation issues with ncurses. (user-8547, 2019-08-16, exchange 67754, check: uncheckable)</li>
+<li id="s5">To resolve the 'undefined reference' issue with GNU ld, one can use the -Wl,&lt;flag&gt; argument. (user-b1da, 2021-04-05, exchange 215107, check: uncheckable)</li>
+<li id="s6">The GNU ld on an IRIX Octane workstation generates a ROM binary that is 100% garbage when converting sm64.u.elf to sm64.u.bin, with no recognizable content and unexpected bytes, and pads early to 8MB. (user-cdae, 2020-02-04, exchange 6018, check: supported)</li>
+<li id="s7">The IRIX ld issue is due to problems with IRIX libraries, not GNU ld. (user-1446, 2020-09-28, exchange 11220, check: uncheckable)</li>
+<li id="s8">The system linker is preferable to GNU ld on IRIX. (user-1446, 2020-09-28, exchange 11216, check: uncheckable)</li>
+<li id="s9">The system linker had issues but GNU ld should work! (user-5510, 2022-05-11, exchange 181961, check: uncheckable)</li>
+<li id="s10">The native linker may not be compatible with GNU ld on IRIX, but it's possible to get it to work with the right RPMs. (user-b1da, 2022-08-11, exchange 222426, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="system-linker.html">system linker</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-ld.html">IRIX ld</a>, <a href="irix-octane.html">IRIX Octane</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="lld.html">lld</a>
+</li></ul>
+</body>
+</html>

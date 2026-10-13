@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MacPorts</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MacPorts</h1>
+<p>Claims: 6</p>
+<p>MacPorts installs to /usr/local without requiring root permissions, and adds its paths to .profile, though these are not reflected in $PATH under zsh until the export command is moved to .zshrc. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> When installing a new version of a program, MacPorts binaries should be placed in the PATH before system binaries. <sup><a href="#s3">3</a></sup> MacPorts has a larger community and better documentation than Tigerbrew, which has issues with PPC support, and it has been used to build tools on a Quad G5. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Copying /opt/local via tar is an easy way to transfer MacPorts between G4s. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">macports uses /usr/local and doesn't require root permissions. (user-d903, 2020-07-27, exchange 144091, check: uncheckable)</li>
+<li id="s2">MacPorts adds paths to .profile, but they are not reflected in $PATH when using zsh; moving the export command to .zshrc fixes it. (user-17cb, 2021-01-19, exchange 144640, check: uncheckable)</li>
+<li id="s3">When installing a new version of a program with Macports, ensure the Macports binaries are in the PATH before system binaries. (user-17cb, 2021-01-19, exchange 144639, check: uncheckable)</li>
+<li id="s4">macports was used to build tools on a Quad G5. (user-c831, 2020-07-27, exchange 144091, check: uncheckable)</li>
+<li id="s5">Tigerbrew has issues with PPC support, while MacPorts has a larger community and better documentation. (user-17cb, 2021-01-17, exchange 144604, check: uncheckable)</li>
+<li id="s6">Copying /opt/local via tar is an easy way to transfer Macports between G4s. (user-5397, 2021-02-18, exchange 231407, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="g4.html">G4</a>
+</li>
+<li>Software: <a href="path.html">PATH</a>
+</li>
+<li>Other: <a href="profile.html">.profile</a>, <a href="usr-local.html">/usr/local</a>, <a href="quad-g5.html">Quad G5</a>, <a href="tigerbrew.html">Tigerbrew</a>, <a href="zsh.html">zsh</a>
+</li></ul>
+</body>
+</html>

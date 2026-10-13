@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>L1</h1>
+<p>Claims: 41</p>
+<p>L1 is total control of a single brick, L2 is control of a rack, and L3 is control of a network. <sup><a href="#s1">1</a></sup> L1 is a tiny embedded computer with its own operating system and command-line interface, used for lights-out management. <sup><a href="#s2">2</a></sup> L1 can be accessed over a serial console, which is a common method, and it can also be accessed over USB, which is simpler to set up. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> To access L1 over serial, connect a 9-pin serial cable to the SCSI port and hook it to a terminal with settings 38400/8/N/1, then type commands such as `env off`, `help`, and `pwr u`. <sup><a href="#s7">7</a></sup> Control+d and control+t drop you in and out of L1, and you can use `L1` to tell the controller not to switch back to the system console until explicitly told to do so. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> From L1 you can run `* pwr up` to access the EFI shell, where you can use a CD drive for OS installs. <sup><a href="#s8">8</a></sup> You send specific commands to other bricks from the master L1 using the syntax `&lt;brick id&gt;: &lt;command&gt;`. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> L1 boots without RAM, using serial for boot, and it does a numalink and I/O scan by default, which can be bypassed with debug commands in hex such as `debug 0x4000`. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">L1 is total control of a brick, L2 is control of a rack, L3 is control of a network. (user-b7c4, 2019-08-17, exchange 3049, check: uncheckable)</li>
+<li id="s2">L1 is a tiny embedded computer with its own operating system and CLI, used for lights out management via serial. (user-6d41, 2020-02-01, exchange 75047, check: uncheckable)</li>
+<li id="s3">L1 can be remotely accessed via a serial cable connected to a PC. (user-b7c4, 2019-08-30, exchange 3244, check: uncheckable)</li>
+<li id="s4">L1 over USB is simpler to set up than L1 over serial, and the console port is also L1. (user-b7c4, 2020-02-07, exchange 216289, check: uncheckable)</li>
+<li id="s5">Accessing the L1 via serial is common. (user-6afa, 2022-04-21, exchange 220230, check: uncheckable)</li>
+<li id="s6">L1 can be accessed over a serial console. (user-cd83, 2022-12-31, exchange 35182, check: uncheckable)</li>
+<li id="s7">To access L1, open the Fuel, connect a 9-pin serial cable to the SCSI port, and hook it to a Terminal with settings 38400/8/N/1; type commands like `env off`, `help`, and `pwr u`. (user-f229, 2020-01-02, exchange 96101, check: supported)</li>
+<li id="s8">control+d and control+t drop you in and out of L1; from L1, run `* pwr up` to access the EFI shell where you can use a CD drive for OS installs. (user-b7c4, 2020-02-02, exchange 75053, check: supported)</li>
+<li id="s9">Typing `L1` in L1 tells the controller not to switch back to the system console until explicitly told to do so. (user-b7c4, 2020-02-16, exchange 220873, check: supported)</li>
+<li id="s10">To switch between L1 and IRIX console, use Ctrl-t and Ctrl-d. (user-e4d0, 2022-10-19, exchange 105364, check: uncheckable)</li>
+<li id="s11">You send specific commands to the other brick from the master L1; the syntax is &lt;brick id&gt;: &lt;command&gt;. (user-b7c4, 2019-07-14, exchange 2481, check: uncheckable)</li>
+<li id="s12">Serial on brick 1 can pass commands to other L1's in the same rack. (user-b7c4, 2022-04-21, exchange 220229, check: supported)</li>
+<li id="s13">L1 boots without RAM. (user-b1da, 2021-04-29, exchange 17064, check: uncheckable)</li>
+<li id="s14">L1 uses serial for boot. (user-b1da, 2021-04-29, exchange 17064, check: uncheckable)</li>
+<li id="s15">The core boot process of L1 does a numalink and I/O scan by default, and can be bypassed with debug commands in hex, such as 'debug 0x4000'. A softreset from L1 can boot the console back into the POD. (user-e4e2, 2026-04-28, exchange 90536, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="l1-cache.html">L1 cache</a> (15)
+</li>
+<li><a href="l1-command.html">L1 command</a> (4)
+</li>
+<li><a href="l1-console.html">L1 console</a> (5)
+</li>
+<li><a href="l1-controller.html">L1 controller</a> (14)
+</li>
+<li><a href="l1-firmware.html">L1 firmware</a> (4)
+</li>
+<li><a href="l1-prompt.html">L1 prompt</a> (3)
+</li>
+<li><a href="l1-serial-port.html">L1 serial port</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Software: <a href="efi-shell.html">EFI shell</a>
+</li>
+<li>Parts and peripherals: <a href="l2.html">L2</a>, <a href="router.html">router</a>, <a href="cd-drive.html">CD drive</a>, <a href="dip-switches.html">DIP switches</a>, <a href="dallas-chip.html">Dallas chip</a>, <a href="io9.html">IO9</a>, <a href="ip35.html">IP35</a>, <a href="r-brick.html">R-brick</a>, <a href="scsi-port.html">SCSI port</a>, <a href="brick.html">brick</a>, <a href="card.html">card</a>, <a href="serial-cable.html">serial cable</a>
+</li>
+<li>Standards and interfaces: <a href="serial.html">serial</a>, <a href="usb.html">USB</a>, <a href="serial-communication.html">serial communication</a>, <a href="serial-number.html">serial number</a>, <a href="telnet.html">telnet</a>
+</li>
+<li>Companies: <a href="dallas.html">Dallas</a>
+</li>
+<li>Other: <a href="l3.html">L3</a>, <a href="l3-software.html">L3 software</a>, <a href="pdu.html">PDU</a>, <a href="pod.html">POD</a>
+</li></ul>
+</body>
+</html>

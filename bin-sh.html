@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/bin/sh</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/bin/sh</h1>
+<p>Claims: 7 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash (Unix shell)</a>.</p>
+<p>The default shell is /bin/sh, often csh for root. <sup><a href="#s1">1</a></sup> The bourne shell (/bin/sh) doesn't do tab completion or history. <sup><a href="#s2">2</a></sup> Rpmbuild uses /bin/sh by default, but can be overridden with %_buildshell. <sup><a href="#s3">3</a></sup> aterm checks the SHELL environment variable, falls back to getpwuid, and uses /bin/sh if the shell is not set, with /bin/bash as the last resort. <sup><a href="#s4">4</a></sup> A 4.19 kernel can boot an SGI system into /bin/sh but may require device nodes to be populated in /dev. <sup><a href="#s5">5</a></sup> mksh is a good alternative to /bin/sh for those preferring something other than bash, and an alternative shell like ksh can be used for configure scripts to work around issues with /bin/sh. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The default shell is /bin/sh, often csh for root. (user-1629, 2024-11-21, exchange 50723, check: uncheckable)</li>
+<li id="s2">bourne shell (/bin/sh) doesn't do tab completion or history. (user-237d, 2022-02-14, exchange 81067, check: uncheckable)</li>
+<li id="s3">Rpmbuild uses /bin/sh by default, but can be overridden with `%_buildshell`. (user-2189, 2021-06-10, exchange 215163, check: supported)</li>
+<li id="s4">aterm checks the SHELL environment variable, falls back to getpwuid, and uses /bin/sh if the shell is not set, with /bin/bash as the last resort. (user-21b8, 2024-05-23, exchange 215500, check: uncheckable)</li>
+<li id="s5">A 4.19 kernel can boot an SGI system into /bin/sh but may require device nodes to be populated in /dev. (user-1446, 2020-07-28, exchange 75268, check: supported)</li>
+<li id="s6">mksh is a good alternative to /bin/sh for those preferring something other than bash. (user-03ad, 2022-09-18, exchange 217699, check: uncheckable)</li>
+<li id="s7">You can use an alternative shell like ksh for configure scripts to work around issues with /bin/sh. (user-ba81, 2023-06-22, exchange 162807, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bourne-shell.html">Bourne shell</a>, <a href="aterm.html">aterm</a>, <a href="bash.html">bash</a>, <a href="csh.html">csh</a>, <a href="rpmbuild.html">rpmbuild</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="bin-bash.html">/bin/bash</a>, <a href="4-19-kernel.html">4.19 kernel</a>, <a href="ksh.html">ksh</a>, <a href="mksh.html">mksh</a>
+</li></ul>
+</body>
+</html>

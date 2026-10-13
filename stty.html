@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stty</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>stty</h1>
+<p>Claims: 4</p>
+<p>stty is a command used to configure terminal settings, including control characters such as the interrupt character and the erase (backspace) character. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can set the interrupt character for the current session, for example to Ctrl-V Ctrl-C. <sup><a href="#s1">1</a></sup> The effect of changing the erase character depends on the environment: setting erase to ^H makes backspace work correctly in Winterm, while in Aterm it makes backspace return ^H, and using 'stty erase ^?' on Windows PowerShell causes backspace to stop working while it works on Linux SSH, suggesting a Windows-specific issue. <sup><a href="#s4">4</a></sup><sup><a href="#s2">2</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">`stty intr &lt;ctrl-v&gt;&lt;ctrl-c&gt;` sets the interrupt character for the current session. (user-6afa, 2022-06-02, exchange 103971, check: supported)</li>
+<li id="s2">stty is a command to set up the terminal and allows you to change things like control characters and stuff; in Winterm, setting erase to ^H makes backspace work correctly, while in Aterm, it makes backspace return ^H; mR (user-7151, 2024-08-09, exchange 218502, check: uncheckable)</li>
+<li id="s3">Irix has stty which can be used to configure terminal settings like backspace. (user-7151, 2024-08-09, exchange 218503, check: uncheckable)</li>
+<li id="s4">Using 'stty erase ^?' on Windows PowerShell causes backspace to not work, but works on Linux SSH, suggesting a Windows issue. (user-b1da, 2022-12-26, exchange 208147, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="aterm.html">aterm</a>, <a href="winterm.html">winterm</a>
+</li></ul>
+</body>
+</html>

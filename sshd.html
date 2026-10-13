@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sshd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sshd</h1>
+<p>Claims: 18 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Heartbleed">Heartbleed</a>.</p>
+<p>sshd is an option for providing SSH access, and the sl_sshd service is used instead of the default sshd. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> sshd requires host keys, which can be generated on startup if they do not exist, though some versions require manual generation. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Root logins are not allowed by default in sshd. <sup><a href="#s6">6</a></sup> sshd can be packaged into a tardist, run as a native system service, or installed via RPMs from the SGI.SH yum repo. <sup><a href="#s4">4</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The RSE version of sshd does not work properly, has SSL issues, and does not read host RSA keys or listen on a port, requiring nekoware for now. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Solaris 7 with a specific patch provides a /dev/random, which is essential for sshd, but the patch is hard to find. <sup><a href="#s11">11</a></sup> sshd does not have an init script, but one can be cobbled together from jupo's tgc_sshd init script. <sup><a href="#s12">12</a></sup> The bootstrap.yml Ansible playbook configures sshd and should ensure it is running, though bootstrap might claim to install it without actually running it. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The sshd service `sl_sshd` is used instead of the default sshd. (user-42cf, 2019-06-21, exchange 67268, check: supported)</li>
+<li id="s2">An SSHD is an option. (user-9db9, 2022-02-22, exchange 206499, check: uncheckable)</li>
+<li id="s3">The sshd binary can generate keys on startup if they don't exist. (user-42cf, 2019-06-21, exchange 67268, check: uncheckable)</li>
+<li id="s4">The sshd packaged into tardist generates host keys in the correct place if they do not exist. (user-b4f4, 2019-06-21, exchange 67269, check: uncheckable)</li>
+<li id="s5">sshd requires host keys which were not found, and needs to be manually generated. (user-f229, 2020-06-18, exchange 68734, check: uncheckable)</li>
+<li id="s6">Root logins are not allowed by default in sshd. (user-42cf, 2019-06-21, exchange 67268, check: uncheckable)</li>
+<li id="s7">sshd from freeware can be a native system service (user-42cf, 2021-04-12, exchange 69383, check: uncheckable)</li>
+<li id="s8">The SGI.SH yum repo provides new packages including sshd. (user-f229, 2021-11-17, exchange 69980, check: uncheckable)</li>
+<li id="s9">The RSE version of sshd does not work properly and requires nekoware for now; it has SSL issues and does not read host RSA keys or listen on a port. (user-f229, 2020-05-16, exchange 8406, check: uncheckable)</li>
+<li id="s10">OpenSSL issues persist in rse, affecting git and sshd, requiring a fix. (user-f229, 2020-06-18, exchange 68735, check: uncheckable)</li>
+<li id="s11">Solaris 7 with a specific patch provides a /dev/random, which is essential for SSHD; the patch is hard to find. (user-42cf, 2020-03-30, exchange 7128, check: supported)</li>
+<li id="s12">sshd doesn't have an init script; one can be cobbled together from jupo's tgc_sshd init script. (user-f587, 2021-04-12, exchange 69415, check: uncheckable)</li>
+<li id="s13">Verify that sshd is running, as bootstrap might claim to install it but not actually run it. (user-2189, 2019-09-08, exchange 76834, check: uncheckable)</li>
+<li id="s14">The bootstrap.yml Ansible playbook configures SSHD, and it should ensure SSHD is running. (user-d903, 2019-10-07, exchange 3782, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris-7.html">Solaris 7</a>
+</li>
+<li>Software: <a href="rse.html">RSE</a>, <a href="ansible-playbook.html">Ansible playbook</a>, <a href="openssl.html">OpenSSL</a>, <a href="rpm.html">RPM</a>, <a href="ansible.html">ansible</a>, <a href="binary.html">binary</a>, <a href="freeware.html">freeware</a>, <a href="git.html">git</a>, <a href="init-script.html">init script</a>, <a href="nekoware.html">nekoware</a>, <a href="patch.html">patch</a>, <a href="root-login.html">root login</a>, <a href="tardist.html">tardist</a>
+</li>
+<li>Standards and interfaces: <a href="ssl.html">SSL</a>
+</li></ul>
+</body>
+</html>

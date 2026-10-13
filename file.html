@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>file</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>file</h1>
+<p>Claims: 15</p>
+<p>The `file` command can analyze files, including identifying ELF files, the file system type of an ISO file, and the ABI version of an executable such as N32 on MIPS. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The `efs` module is used to loopback mount archive files and has an ELF header at offset 0x200, so it can be analyzed with `file`, `hexdump`, and `readelf`. <sup><a href="#s1">1</a></sup> The IRIX libc regexp implementation is slow, affecting `rpmbuild` through `file` and `libmagic.so`, causing significant delays in building RPM packages. <sup><a href="#s5">5</a></sup> A depot can be a single file or an unpacked tree with an index describing the package, and sometimes packages from different versions or systems can be installed, though this is not officially supported. <sup><a href="#s6">6</a></sup> Installing an unrelated package can overwrite a shared library file, causing software to stop working, and corruption of a file or changes to license files might also affect software functionality. <sup><a href="#s7">7</a></sup> The file glut can be found at https://web.archive.org/web/20020219135303/http://freeware.sgi.com:80/Dist/fw_glut-3.7.tardist. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the `efs` module is used to loopback mount archive files; it has an ELF header at offset 0x200 and can be analyzed with `file`, `hexdump`, and `readelf` commands. (user-42cf, 2019-01-04, exchange 47, check: supported)</li>
+<li id="s2">To find all ELF files in a directory, use `find -print0 | xargs -0 -n5 file | grep ELF` to process file names with spaces safely in batches. (user-07ed, 2022-05-07, exchange 28906, check: supported)</li>
+<li id="s3">The `file` command is used to determine the file system type of an ISO file. (user-7b1c, 2022-11-07, exchange 216783, check: supported)</li>
+<li id="s4">The 'file' utility can identify the ABI version of an executable, such as N32 on MIPS, which was supported by newer IRIX versions. (user-21b8, 2025-12-31, exchange 219370, check: uncheckable)</li>
+<li id="s5">The IRIX libc regexp implementation is slow, affecting `rpmbuild` through `file` and `libmagic.so`, causing significant delays in building RPM packages. (user-2d09, 2020-03-29, exchange 214952, check: supported)</li>
+<li id="s6">a depot can be a single file or an unpacked tree with an index describing the package, and sometimes packages from different versions or systems can be installed, though this is not officially supported. (user-237d, 2021-10-07, exchange 234999, check: uncheckable)</li>
+<li id="s7">Installing an unrelated package can overwrite a shared library file, causing software to stop working; corruption of a file can also cause issues; changes to license files might affect software functionality. (user-8547, 2022-07-15, exchange 81773, check: uncheckable)</li>
+<li id="s8">The file glut can be found at https://web.archive.org/web/20020219135303/http://freeware.sgi.com:80/Dist/fw_glut-3.7.tardist. (user-281e, 2025-08-27, exchange 219056, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="file-looper.html">File looper</a> (3)
+</li>
+<li><a href="file-manager.html">file manager</a> (3)
+</li>
+<li><a href="file-server.html">file server</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="n32.html">n32</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="glut.html">GLUT</a>, <a href="ghostscript.html">Ghostscript</a>, <a href="grep.html">grep</a>, <a href="license-file.html">license file</a>, <a href="programs.html">programs</a>, <a href="rpmbuild.html">rpmbuild</a>, <a href="software.html">software</a>
+</li>
+<li>Standards and interfaces: <a href="dns.html">DNS</a>, <a href="nfs.html">NFS</a>
+</li>
+<li>Companies: <a href="iso-file.html">ISO file</a>, <a href="sgi-depot.html">SGI Depot</a>, <a href="archive-org.html">archive.org</a>
+</li>
+<li>Other: <a href="directory.html">directory</a>, <a href="find.html">find</a>, <a href="hexdump.html">hexdump</a>, <a href="nsswitch-conf.html">nsswitch.conf</a>, <a href="tree.html">tree</a>
+</li></ul>
+</body>
+</html>

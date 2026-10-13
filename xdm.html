@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XDM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XDM</h1>
+<p>Claims: 9</p>
+<p>XDM is used to start graphical sessions on SGI systems, such as launching 4dwm via /var/X11/xdm/Xsession on an SGI X server, and it can provide a full SGI desktop on a local X server. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> On Windows, VcXsrv can serve as an X server and PuTTY as an SSH client to run an X session on an SGI using /var/X11/xdm/Xsession. <sup><a href="#s3">3</a></sup> To enable barrier in XDM's Xlogin, set DisplayManager*authorize to on in /var/X11/xdm/xdm-config. <sup><a href="#s4">4</a></sup> The XDM issue is caused by a missing user image in /usr/local/lib/faces, despite expecting a generic icon to display. <sup><a href="#s5">5</a></sup> A ~/.icons/login.icon that is a TIFF file causes crashes in fm, xdm, and imgview. <sup><a href="#s6">6</a></sup> dtlogin segfaults when receiving an XDMCP query, but XDM works. <sup><a href="#s7">7</a></sup> XDM and XSgi do not play nicely. <sup><a href="#s8">8</a></sup> A JIT compiler miscompiling instructions led to processes like xdm, 4Dwm, and clogin getting stuck sleeping and unkillable, which was resolved by fixing 512K aliasing for lowmem. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">XDM provides a full SGI desktop on a local X server. (user-f229, 2020-12-28, exchange 98102, check: uncheckable)</li>
+<li id="s2">Run /var/X11/xdm/Xsession to start 4dwm on an SGI X server. (user-d903, 2019-12-25, exchange 216870, check: supported)</li>
+<li id="s3">On Windows, VcXsrv can act as an X server and PuTTY as an SSH client to run an X session on an SGI, using /var/X11/xdm/Xsession to start a graphical session. (user-bc5d, 2019-11-10, exchange 95680, check: uncheckable)</li>
+<li id="s4">To enable barrier in Xdm's Xlogin, set DisplayManager*authorize to on in /var/X11/xdm/xdm-config. (user-17cb, 2021-08-09, exchange 69896, check: uncheckable)</li>
+<li id="s5">The XDM issue is caused by a missing user image in /usr/local/lib/faces, despite expecting a generic icon to display. (user-8547, 2021-12-16, exchange 217369, check: uncheckable)</li>
+<li id="s6">~/.icons/login.icon being a TIFF file causes crashes in fm, xdm, and imgview. (user-8547, 2021-12-17, exchange 80484, check: uncheckable)</li>
+<li id="s7">dtlogin segfaults when receiving an XDMCP query, but XDM works. (user-7b1c, 2022-09-24, exchange 239850, check: uncheckable)</li>
+<li id="s8">XDM and XSgi do not play nicely. (user-a7cb, 2026-07-11, exchange 220514, check: uncheckable)</li>
+<li id="s9">The JIT compiler was miscompiling instructions, leading to issues with processes like xdm, 4Dwm, and clogin getting stuck sleeping and unkillable, which was resolved by fixing 512K aliasing for lowmem. (user-3e2d, 2026-09-12, exchange 220688, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="4dwm.html">4dwm</a>, <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="jit-compiler.html">JIT compiler</a>, <a href="x-server.html">X server</a>, <a href="xsgi.html">Xsgi</a>
+</li>
+<li>Standards and interfaces: <a href="xdmcp.html">XDMCP</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="xsession.html">Xsession</a>, <a href="clogin.html">clogin</a>, <a href="dtlogin.html">dtlogin</a>, <a href="fm.html">fm</a>
+</li></ul>
+</body>
+</html>

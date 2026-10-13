@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP32</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ESP32</h1>
+<p>Claims: 8</p>
+<p>The ESP32's main line is based on xtensa, but the C3 series uses RISC-V, and both have been reliable for development support. <sup><a href="#s1">1</a></sup> The Arduino core is used for prototyping with ESP32, though the ESP32 requires using RTOS instead of the Arduino ecosystem to avoid compiler issues with preprocessing in multithreaded code. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The ESP8266 had quirks, but the ESP32 was supposed to fix some of them. <sup><a href="#s4">4</a></sup> ESP32 takes 11 clock cycles for GPIO to turn on. <sup><a href="#s5">5</a></sup> An ESP32 could handle SCSI-to-iSCSI via WiFi, though timing is tricky. <sup><a href="#s6">6</a></sup> ESP32 has three hardware UARTs, making it a better choice for software-controlled null modem than ESP8266. <sup><a href="#s7">7</a></sup> The FujiNet board connects the GPIO pins of the ESP32 to the SIO bus, handling voltage and resistance considerations. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The ESP32's main line is based on xtensa, but the C3 series uses RISC-V; both have been reliable for development support. (user-8307, 2021-10-21, exchange 21374, check: uncheckable)</li>
+<li id="s2">The ESP32 requires using RTOS instead of the Arduino ecosystem to avoid compiler issues with preprocessing in multithreaded code. (user-b4f4, 2019-01-25, exchange 251, check: uncheckable)</li>
+<li id="s3">Arduino core is used for prototyping with ESP32. (user-b4f4, 2019-07-22, exchange 220741, check: uncheckable)</li>
+<li id="s4">The ESP8266 had quirks, but the ESP32 was supposed to fix some of them. (user-b4f4, 2019-07-22, exchange 220741, check: uncheckable)</li>
+<li id="s5">ESP32 takes 11 clock cycles for GPIO to turn on. (user-b1da, 2021-05-13, exchange 99189, check: supported)</li>
+<li id="s6">An ESP32 could handle SCSI-to-iSCSI via WiFi, though timing is tricky. (user-95db, 2021-09-22, exchange 216748, check: uncheckable)</li>
+<li id="s7">ESP32 has three hardware UARTs, making it a better choice for software-controlled null modem than ESP8266. (user-9860, 2021-11-12, exchange 221688, check: supported)</li>
+<li id="s8">The FujiNet board connects the GPIO pins of the ESP32 to the SIO bus, handling voltage and resistance considerations. (user-f229, 2022-08-12, exchange 233192, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="risc-v.html">RISC-V</a>
+</li>
+<li>Parts and peripherals: <a href="fujinet-board.html">FujiNet board</a>
+</li>
+<li>Standards and interfaces: <a href="wifi.html">WiFi</a>
+</li>
+<li>Other: <a href="esp8266.html">ESP8266</a>, <a href="gpio.html">GPIO</a>
+</li></ul>
+</body>
+</html>

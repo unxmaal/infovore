@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IO6G</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IO6G</h1>
+<p>Claims: 11</p>
+<p>An IO6G is required for an MXI board in an O2k from an Onyx2, and it is also required for an Onyx2 IMPACT build. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The IO6G can be installed in an XIO slot to add keyboard and mouse ports, and it is used in the Onyx2 MXI, which is a deskside O2k with an IO6G and different sheet metal to accommodate a double-height MXI card. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The base PCB is the same for the IO6 and IO6G, and the ioc3 is also the keyboard controller. <sup><a href="#s5">5</a></sup> The PS2 position on an IO6 lacks an ASIC to the left of the Qlogic chip that is present in the IO6G, which identifies as IO6G and is checked by the software. <sup><a href="#s6">6</a></sup> The IO6G has two sets of PS/2 ports, and the Onyx2 has a SCSI controller on the IO6G rather than the midplane. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Turning off the system for about an hour may cause SCSI probes to not see the drives until the IO6G is reseated. <sup><a href="#s9">9</a></sup> The Origin 2000 can be configured with multiple CADduo PCI cards and IO6-G for multi-user CAD workstations, and it can support two IO6-G cards with non-destructive modifications. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">an O2k requires an IO6G from an Onyx2 for an MXI board. (user-2d40, 2019-12-08, exchange 4718, check: supported)</li>
+<li id="s2">An IO6G board is required for an Onyx2 IMPACT build. (user-24f0, 2025-08-30, exchange 118249, check: supported)</li>
+<li id="s3">You can install SE or SI graphics in an XIO slot, replace the IO6 with an IO6G to add keyboard and mouse ports, and cut sheet metal to install MXI/MXE; it's legit and called an Onyx MXI. (user-86e1, 2024-03-05, exchange 110563, check: supported)</li>
+<li id="s4">The Onyx2 MXI is a deskside O2K with an IO6G for keyboard and mouse, and a different sheet metal to accommodate a double-height MXI card. (user-86e1, 2024-11-28, exchange 224256, check: supported)</li>
+<li id="s5">The base PCB is the same for io6 and io6g, and the ioc3 is also the keyboard controller. The aisc pad might be another serial port controller. (user-e4d0, 2024-12-25, exchange 113293, check: uncheckable)</li>
+<li id="s6">The PS2 position on an IO6 lacks an ASIC to the left of the Qlogic chip, which is present in IO6G; the part identifies as IO6G and the software checks this. (user-86e1, 2024-12-25, exchange 224334, check: uncheckable)</li>
+<li id="s7">The IO6G has two sets of PS/2 ports but bifurcating the heads for multiple sessions per pipe is not explicitly mentioned. (user-37bb, 2025-06-24, exchange 212629, check: supported)</li>
+<li id="s8">The Onyx2 has a SCSI controller on the IO6g, not the midplane. The white connectors on the midplane are for connecting SCSI drives to the IO6g. Cleaning the connectors with deoxit resolved the issue. The base IO slot has (user-24f0, 2025-09-21, exchange 213098, check: supported)</li>
+<li id="s9">Turning off the system for about an hour may cause SCSI probes to not see the drives until the IO6g is reseated. (user-24f0, 2025-09-22, exchange 225469, check: uncheckable)</li>
+<li id="s10">The Origin 2000 can be configured with multiple CADduo PCI cards and IO6-G for multi-user CAD workstations. (user-2a3c, 2025-10-16, exchange 213228, check: supported)</li>
+<li id="s11">The Origin2000 can support two IO6-G cards with non-destructive modifications. (user-2a3c, 2026-03-21, exchange 226250, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-2000.html">Origin 2000</a>, <a href="onyx2.html">Onyx2</a>, <a href="impact.html">Impact</a>, <a href="onyx.html">Onyx</a>, <a href="xio.html">XIO</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>
+</li>
+<li>Parts and peripherals: <a href="ps-2-port.html">PS/2 port</a>, <a href="scsi-controller.html">SCSI controller</a>
+</li>
+<li>Other: <a href="io6.html">IO6</a>, <a href="ioc3.html">IOC3</a>, <a href="midplane.html">midplane</a>
+</li></ul>
+</body>
+</html>

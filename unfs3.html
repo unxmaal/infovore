@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>unfs3</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>unfs3</h1>
+<p>Claims: 7</p>
+<p>unfs3 is a userspace NFS server, though it is described as NFSv2 in one source and NFSv3 in others. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It can be used as a small NFS server on a Raspberry Pi. <sup><a href="#s1">1</a></sup> Unfs3 on a Raspberry Pi works well with IRIX. <sup><a href="#s3">3</a></sup> The Indy emulator supports NFS file sharing using unfs3, setting up a local share that can be mounted from IRIX from the gateway. <sup><a href="#s4">4</a></sup> Shared directories can be configured in iris.toml to start unfs3 on localhost and NAT NFS to this instance, allowing the NFS server to be mounted from 192.168.0.1. <sup><a href="#s5">5</a></sup> The NFS hack using unfs3 has been tested with Linux. <sup><a href="#s6">6</a></sup> UNFS3 can serve host-specific files/directories under the same root filesystem using directory naming conventions. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">unfs3 can be used as a small NFSv3 server on a Raspberry Pi. (user-3e2d, 2025-11-03, exchange 88539, check: uncheckable)</li>
+<li id="s2">unfs3 is a userspace NFSv2 server, while unfs3 does not support NFSv3. (user-6e7b, 2026-06-13, exchange 244519, check: uncheckable)</li>
+<li id="s3">Unfs3 on a Raspberry Pi works well with IRIX. (user-3e2d, 2025-12-13, exchange 225761, check: uncheckable)</li>
+<li id="s4">The Indy emulator supports NFS file sharing using unfs3, which sets up a local share that can be mounted from IRIX from the gateway. (user-3e2d, 2026-04-04, exchange 93771, check: supported)</li>
+<li id="s5">You can configure shared directories in iris.toml to start unfs3 on localhost and NAT NFS to this instance, allowing you to mount the NFS server from 192.168.0.1. (user-3e2d, 2026-04-05, exchange 73458, check: supported)</li>
+<li id="s6">The NFS hack using unfs3 has been tested with Linux. (user-3e2d, 2026-05-27, exchange 220441, check: uncheckable)</li>
+<li id="s7">UNFS3 can serve host-specific files/directories under the same root filesystem using directory naming conventions. (user-6e7b, 2026-06-13, exchange 244520, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="emulator.html">emulator</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li></ul>
+</body>
+</html>

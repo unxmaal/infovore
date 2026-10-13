@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ARP</h1>
+<p>Claims: 3</p>
+<p>ARP resolves network addresses by associating a device's MAC address with its IP address, and a failure to do so typically indicates a network issue or routing problem. <sup><a href="#s1">1</a></sup> Jumpstart uses TFTP to load data over the network, relying on ARP and RARP for connection establishment. <sup><a href="#s2">2</a></sup> A packet may show a different lladdr in the ARP message and its header. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">ARP can't resolve network address means the device's MAC address and IP address aren't correctly associated, often due to a network issue or routing problem. (user-79ed, 2020-10-17, exchange 77270, check: uncheckable)</li>
+<li id="s2">Jumpstart uses TFTP to load data over the network, with ARP/RARP for connection establishment. (user-7151, 2022-12-11, exchange 239915, check: uncheckable)</li>
+<li id="s3">There is an issue with the packet showing different lladdr in ARP and header. (user-d5ee, 2024-04-02, exchange 185068, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Standards and interfaces: <a href="tftp.html">TFTP</a>
+</li>
+<li>Other: <a href="jumpstart.html">Jumpstart</a>, <a href="rarp.html">RARP</a>, <a href="header.html">header</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>irix_ansible</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>irix_ansible</h1>
+<p>Claims: 44 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Comparison_of_open-source_configuration_management_software">Comparison of open-source configuration management software</a>.</p>
+<p>irix_ansible is a collection of known good configuration methods for IRIX that automates installation and system configuration. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It installs wget, python, and openssh, starts sshd, installs nekodeps and base packages, performs security hardening, and deploys network setup via ansible tasks. <sup><a href="#s1">1</a></sup><sup><a href="#s4">4</a></sup> The project is hosted on GitHub, with instructions at https://github.com/unxmaal/irix_ansible. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It runs on a modern box and provisions a target box, and can be used with Booterizer, which resets IRIX development environments to reduce the risk of system changes. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The setup uses a vault system with two passwords, one in group_vars/default/vault.yml and one in ~/.vault_pass.txt, to encrypt and decrypt configuration files. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> It can rebuild a system from bare metal in about 30 minutes, and Booterizer and irix_ansible together allow reprovisioning in about 30-45 minutes. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The documentation is difficult, and pinning the ansible version can help. <sup><a href="#s14">14</a></sup> irix_ansible may fail to install certain packages due to timeouts, but manual intervention can resolve the issue. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The irix_ansible script requires copying .bashrc to .bash_profile for bash to pick it up. <sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">irix_ansible installs wget, python, and openssh, starts sshd, installs nekodeps, base packages, and performs security hardening. (user-2189, 2019-01-12, exchange 76734, check: uncheckable)</li>
+<li id="s2">irix_ansible is a collection of known good configuration methods for IRIX. (user-2189, 2020-05-18, exchange 77171, check: uncheckable)</li>
+<li id="s3">IRIX_ansible preserves the best known method for performing tasks with IRIX as code. (user-2189, 2020-07-04, exchange 77231, check: uncheckable)</li>
+<li id="s4">irix_ansible deploys network setup via ansible tasks. (user-2189, 2020-05-18, exchange 77171, check: uncheckable)</li>
+<li id="s5">IRIX ansible is in GitHub. (user-f229, 2020-08-07, exchange 78602, check: uncheckable)</li>
+<li id="s6">The instructions for it are at &lt;https://github.com/unxmaal/irix_ansible&gt; (user-d903, 2020-08-15, exchange 216719, check: uncheckable)</li>
+<li id="s7">irix_ansible runs on a modern box and provisions a target box. (user-2189, 2020-02-11, exchange 6315, check: uncheckable)</li>
+<li id="s8">Booterizer is designed to make IRIX development environments easy to reset, reducing the risk of system changes. (user-2189, 2019-02-26, exchange 781, check: uncheckable)</li>
+<li id="s9">Booterizer can be used with IRIX_ansible for configuring IRIX systems to a desired state, allowing for flexible and repeatable deployments. (user-2189, 2019-02-26, exchange 781, check: uncheckable)</li>
+<li id="s10">irix_ansible requires creating a ~/.vault_pass.txt file with the vault password for ansible vaults. (user-b1da, 2019-10-27, exchange 76936, check: uncheckable)</li>
+<li id="s11">The IRIX Ansible setup uses a vault system with two passwords: one in 'group_vars/default/vault.yml' and one in '~/.vault_pass.txt', to encrypt and decrypt configuration files. (user-d903, 2019-10-28, exchange 76939, check: supported)</li>
+<li id="s12">Irix_ansible can rebuild a system from bare metal in about 30 minutes but needs to be fixed for xf86 and irixports. (user-2189, 2019-07-16, exchange 67499, check: supported)</li>
+<li id="s13">Booterizer and Irix Ansible are tools for managing IRIX system configurations, allowing for reprovisioning in about 30-45 minutes. (user-2189, 2019-08-03, exchange 67697, check: supported)</li>
+<li id="s14">The irix_ansible documentation is difficult, and pinning the ansible version can help. (user-2189, 2019-08-03, exchange 2871, check: uncheckable)</li>
+<li id="s15">irix_ansible may require manual intervention for bundle installation due to when clauses failing. (user-2189, 2019-07-14, exchange 216654, check: uncheckable)</li>
+<li id="s16">irix_ansible will fail to install certain packages due to timeouts, but manual intervention can resolve the issue. (user-f229, 2020-08-19, exchange 216720, check: uncheckable)</li>
+<li id="s17">The irix_ansible script requires copying .bashrc to .bash_profile for bash to pick it up. (user-bba0, 2024-06-13, exchange 46848, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="python.html">Python</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="ansible-task.html">Ansible task</a>, <a href="github.html">GitHub</a>, <a href="openssh.html">OpenSSH</a>, <a href="rse.html">RSE</a>, <a href="vagrant.html">Vagrant</a>, <a href="ansible.html">ansible</a>, <a href="binary.html">binary</a>, <a href="inst.html">inst</a>, <a href="wget.html">wget</a>
+</li>
+<li>Standards and interfaces: <a href="ssh.html">SSH</a>
+</li>
+<li>Other: <a href="remote-x11.html">remote X11</a>, <a href="tarball.html">tarball</a>
+</li></ul>
+</body>
+</html>

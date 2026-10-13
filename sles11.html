@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLES11</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SLES11</h1>
+<p>Claims: 21</p>
+<p>ProPack 6 is available for SLES11 on x86_64 and IA64, and ProPack 7 is compatible with Altix 350 gear and can enhance SLES11 support on Altix and Prism systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SLES11 is not available for Itanium, though ProPack 7 ISOs for SLES11 on Itanium are available from the original Novell sources. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> SLES11 does not support 3D graphics on SGI Prism but might support 2D, while it supports 3D graphics on Altix 4000 and an Altix 4700 might have had 2D graphics support. <sup><a href="#s5">5</a></sup> The SLES 11 update repos provide access to the IA64 version of the *fglrx* driver package, which improves 3D performance and stability. <sup><a href="#s6">6</a></sup> SLES11 can be installed but does not bring up graphics, and `radeonhd` crashes in SLES11 while `radeon` is still present but crashes. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Netbooting can install SLES11 on an Altix 350 without an IO9 card, and netboot sources for SLES11 are being prepared. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> SLES11 runs on the Altix 350, can work with USB sound out of the box, and using VMs allows for easy setup of specialized environments like SLES11 for an Altix install server. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">I have ProPack 6 for SLES10 and SLES11 on IA64, and ProPack 6 for SLES11 on x86_64 and IA64. (user-03ad, 2026-05-28, exchange 219767, check: supported)</li>
+<li id="s2">ProPack 7 is compatible with Altix 350 gear and can enhance SLES11 support on Altix/Prism systems. (user-59b9, 2021-01-15, exchange 13859, check: supported)</li>
+<li id="s3">SLES 11 is not available for Itanium. (user-59b9, 2020-06-09, exchange 216315, check: supported)</li>
+<li id="s4">ProPack 7 ISOs for SLES11 on Itanium are available from the original Novell sources. (user-59b9, 2022-01-25, exchange 216429, check: supported)</li>
+<li id="s5">SLES 11 does not support 3D graphics on SGI Prism but might support 2D. SLES 11 supports 3D graphics on Altix 4000. An Altix 4700 might have had 2D graphics support. (user-03ad, 2023-07-08, exchange 216464, check: supported)</li>
+<li id="s6">The SLES 11 update repos provide access to the IA64 version of the *fglrx* driver package, which improves 3D performance and stability. (user-59b9, 2020-06-12, exchange 216321, check: supported)</li>
+<li id="s7">SLES11 can be installed but does not bring up graphics; an evaluation activation key can be obtained from the new SUSE site. (user-59b9, 2020-06-10, exchange 216316, check: uncheckable)</li>
+<li id="s8">`radeonhd` supports some newer FireGL cards but not the FireGL X1; it crashes in SLES11. `radeon` is still present but crashes. (user-59b9, 2020-08-25, exchange 216347, check: supported)</li>
+<li id="s9">Netboot sources for SLES11 are being prepared. (user-1446, 2020-06-12, exchange 75208, check: uncheckable)</li>
+<li id="s10">Netbooting can install SLES11 on an A350 without an IO9 card. (user-bc5d, 2021-04-29, exchange 17045, check: uncheckable)</li>
+<li id="s11">sles11 runs on the altix 350 (user-1446, 2020-06-12, exchange 75211, check: supported)</li>
+<li id="s12">Using VMs allows for easy setup of specialized environments like SLES11 for an Altix install server. (user-1446, 2020-08-02, exchange 10287, check: uncheckable)</li>
+<li id="s13">SLES11 can work with USB sound out of the box. (user-1446, 2020-09-29, exchange 75397, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="altix-350.html">Altix 350</a>, <a href="prism.html">Prism</a>, <a href="a350.html">A350</a>, <a href="altix-4700.html">Altix 4700</a>, <a href="radeon.html">Radeon</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>, <a href="itanium.html">Itanium</a>
+</li>
+<li>Operating systems: <a href="propack.html">ProPack</a>, <a href="propack-7.html">ProPack 7</a>, <a href="sles-10.html">SLES 10</a>, <a href="sles9.html">SLES9</a>, <a href="propack-4.html">Propack 4</a>, <a href="vms.html">VMS</a>
+</li>
+<li>Parts and peripherals: <a href="agp-riser.html">AGP riser</a>
+</li>
+<li>Standards and interfaces: <a href="x86-64.html">x86_64</a>
+</li>
+<li>Other: <a href="3d-performance.html">3D performance</a>, <a href="fglrx.html">fglrx</a>, <a href="radeonhd.html">radeonhd</a>
+</li></ul>
+</body>
+</html>

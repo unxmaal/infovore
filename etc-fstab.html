@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/etc/fstab</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/etc/fstab</h1>
+<p>Claims: 6</p>
+<p>In the installer, you can drop to a shell and edit the IRIX equivalent of /etc/fstab to configure mountpoints. <sup><a href="#s1">1</a></sup> Adding NFS entries to /etc/fstab allows mounting without GUI tools, and failing to do so can prevent booting. <sup><a href="#s2">2</a></sup> The mnt_freq and mnt_passno fields in /etc/fstab control the dump frequency and fsck pass number, not whether the filesystem must be present at boot. <sup><a href="#s3">3</a></sup> Solaris uses /etc/fstab instead of /etc/vfstab. <sup><a href="#s4">4</a></sup> To unmount disks, edit /etc/fstab. <sup><a href="#s5">5</a></sup> To mount an NFS share from IRIX to Linux, add the share to /etc/fstab with appropriate options and click the unmounted drive icon in the file manager to mount it on demand. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">In the installer, you can drop to a shell and edit the IRIX equivalent of /etc/fstab to configure mountpoints. (user-9860, 2021-10-25, exchange 21565, check: uncheckable)</li>
+<li id="s2">Adding NFS entries to /etc/fstab allows mounting without GUI tools; failing to do so can prevent booting. (user-6afa, 2022-02-03, exchange 217445, check: uncheckable)</li>
+<li id="s3">The mnt_freq and mnt_passno fields in /etc/fstab control the dump frequency and fsck pass number, not whether the filesystem must be present at boot. (user-f229, 2022-02-03, exchange 80865, check: uncheckable)</li>
+<li id="s4">Solaris uses `/etc/fstab` instead of `/etc/vfstab`. (user-7b1c, 2022-06-25, exchange 239730, check: supported)</li>
+<li id="s5">To edit network connections in /etc/hosts, use vi. To unmount disks, edit /etc/fstab. (user-24f0, 2024-10-14, exchange 49805, check: uncheckable)</li>
+<li id="s6">To mount an NFS share from IRIX to Linux, add the share to /etc/fstab with appropriate options and click the unmounted drive icon in the file manager to mount it on demand. (user-17cb, 2025-03-27, exchange 212267, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="etc-hosts.html">/etc/hosts</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="nfs-share.html">NFS share</a>
+</li></ul>
+</body>
+</html>

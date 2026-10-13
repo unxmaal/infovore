@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z buffer</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Z buffer</h1>
+<p>Claims: 10 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Framebuffer">Framebuffer</a>.</p>
+<p>The Z buffer is connected to the RV on the back via connectors, some of which are for a Z buffer option. <sup><a href="#s1">1</a></sup> It connects the Z buffer to brown headers. <sup><a href="#s2">2</a></sup> The Z-buffer for Personal IRIS TG graphics is on an option board, specifically the Turbo option was on a separate board with XMAP5 ASICs and an R3000 in VME form factor. <sup><a href="#s3">3</a></sup> With 8 bytes/pixel framebuffer, you can't have 24-bit color with zbuffer and double buffering, while 16 bytes/pixel allows quad-buffer and z-buffer with 10-bit color. <sup><a href="#s4">4</a></sup> With 16-bit RGB double-buffered visuals, 4 bytes can be used for the color buffer, leaving 3 for a zbuffer or 4 for a zbuffer and stencil. <sup><a href="#s5">5</a></sup> The machine has the Z-buffer and geometry engines; it is a maxxed out config with no special options. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Geometry Engine connects to the RV on the back via connectors, some of which are for a Z buffer option. (user-e4d0, 2022-02-20, exchange 102564, check: uncheckable)</li>
+<li id="s2">It connects the Z buffer to brown headers. (user-e4d0, 2024-09-25, exchange 238697, check: uncheckable)</li>
+<li id="s3">The Z-buffer for Personal IRIS TG graphics is on an option board, specifically the Turbo option was on a separate board with XMAP5 ASICs and an R3000 in VME form factor. (user-86e1, 2026-08-25, exchange 226926, check: supported)</li>
+<li id="s4">With 8 bytes/pixel framebuffer, you can't have 24-bit color with zbuffer and double buffering; 16 bytes/pixel allows quad-buffer and z-buffer with 10-bit color. (user-21b8, 2025-03-18, exchange 215672, check: supported)</li>
+<li id="s5">With 16-bit RGB double-buffered visuals, 4 bytes can be used for the color buffer, leaving 3 for a zbuffer or 4 for a zbuffer and stencil. (user-21b8, 2025-11-24, exchange 225714, check: supported)</li>
+<li id="s6">The machine has the Z-buffer and geometry engines; it is a maxxed out config with no special options. (user-8de9, 2025-02-06, exchange 211902, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Graphics: <a href="geometry-engine.html">Geometry Engine</a>, <a href="graphics-subsystem.html">graphics subsystem</a>
+</li>
+<li>Software: <a href="demos.html">demos</a>
+</li>
+<li>Parts and peripherals: <a href="framebuffer.html">framebuffer</a>
+</li>
+<li>Other: <a href="24-bit-color.html">24-bit color</a>, <a href="color.html">color</a>, <a href="double-buffering.html">double buffering</a>, <a href="powerflip.html">powerflip</a>, <a href="stencil.html">stencil</a>
+</li></ul>
+</body>
+</html>

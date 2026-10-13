@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solaris 2.6</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Solaris 2.6</h1>
+<p>Claims: 36 Part of <a href="solaris.html">Solaris</a></p>
+<p>Solaris 2.6 runs on an SS5, and can be installed from the same media onto an SS5 without issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Solaris 2.6 can be dual booted with OpenSTEP on an SS10, and runs well on an emulated SPARCstation 20 after formatting disks. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Solaris 2.6 runs on the Ultra 5 (with 512MB RAM and a UltraSPARC-IIi at 360MHz), the IPX (with a 400 megabyte disc), the Zulu (which has DHCP support), and the SPARCstation 10 with dual SM71 processors. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The SPARCstation 5 can run Solaris 2.6 or 7, with 2.6 recommended for lower spec systems, and requires a native C/C++ compiler toolchain that can differ from gcc 2.9x. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Solaris 2.6 runs on the SPARCbook without issues, though it requires tadpole patches, while Solaris 7 is too heavy for it. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Solaris 2.6 can be used to partition the harddisk, does not like swap files (but single root plus a swap slice should be fine), and can be installed from CD to recover production when root disks failed. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Solaris 2.6 on an Ultra-1 can act as a FDDI-Ethernet bridge/router with a DEC FDDI adapter. <sup><a href="#s16">16</a></sup> Solaris 2.6 can be found in physical storage, and its ISO is an ISO 9660 filesystem. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Solaris 2.6 runs on an SS5. (user-9528, 2021-10-06, exchange 239413, check: supported)</li>
+<li id="s2">Solaris 2.6 can be installed from the same media onto an SS5 without issues. (user-8198, 2021-10-06, exchange 239413, check: supported)</li>
+<li id="s3">Solaris 2.6 and OpenSTEP can be dual booted on an SS10. (user-8de9, 2022-02-20, exchange 239525, check: supported)</li>
+<li id="s4">Solaris 2.6 runs well on an emulated SPARCstation 20 after formatting disks. (user-22f9, 2020-05-13, exchange 8341, check: supported)</li>
+<li id="s5">The Ultra 5 runs Solaris 2.6 with 512MB RAM and a UltraSPARC-IIi at 360MHz. (user-a446, 2020-08-31, exchange 239245, check: supported)</li>
+<li id="s6">The IPX runs Solaris 2.6 and has a 400 megabyte disc. (user-ab99, 2022-01-25, exchange 25077, check: supported)</li>
+<li id="s7">The Zulu can run Solaris 2.6, which has DHCP support. (user-24f9, 2025-01-26, exchange 185928, check: supported)</li>
+<li id="s8">A SPARCstation 10 with dual SM71 processors runs Solaris 2.6 well. (user-616d, 2025-08-30, exchange 240670, check: supported)</li>
+<li id="s9">The SparcStation5 can run Solaris 2.6 or 7; 2.6 is recommended for lower spec systems. (user-21b8, 2024-10-12, exchange 185451, check: supported)</li>
+<li id="s10">Solaris 2.6 for SPARCstation 5 requires a native C/C++ compiler toolchain, which can be different from gcc 2.9x; javac is available but not recommended by Sun. (user-21b8, 2024-10-19, exchange 185495, check: supported)</li>
+<li id="s11">The Sparcbook works with Solaris 2.6 but requires tadpole patches; the screen hinges can break and may need repair with JBWeld. (user-3e2d, 2025-03-20, exchange 186126, check: supported)</li>
+<li id="s12">Solaris 2.6 runs on a SPARCbook without issues, but Solaris 7 is too heavy for it. (user-231e, 2026-08-19, exchange 220639, check: supported)</li>
+<li id="s13">Solaris 2.6 can be used to partition the harddisk. (user-03ad, 2022-11-05, exchange 239880, check: supported)</li>
+<li id="s14">Solaris 2.6 does not like swap files, but single root plus a swap slice should be fine. (user-7b1c, 2023-03-14, exchange 183664, check: supported)</li>
+<li id="s15">Installed Solaris 2.6 from CD to recover production when the 2.1GB root disks failed. (user-07ed, 2023-06-06, exchange 183990, check: supported)</li>
+<li id="s16">Solaris 2.6 on an Ultra-1 can act as a FDDI-Ethernet bridge/router with a DEC FDDI adapter. (user-07ed, 2026-04-16, exchange 242356, check: supported)</li>
+<li id="s17">Solaris 2.6 can be found in physical storage. (user-9528, 2021-04-19, exchange 79207, check: supported)</li>
+<li id="s18">The Solaris 2.6 ISO is an ISO 9660 filesystem. (user-b1da, 2022-11-05, exchange 239881, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sparcstation-5.html">SPARCstation 5</a>, <a href="ipx.html">IPX</a>, <a href="sparcbook.html">SPARCbook</a>, <a href="ss10.html">SS10</a>, <a href="ss5.html">SS5</a>, <a href="sparcstation-10.html">SPARCstation 10</a>, <a href="sparcstation-20.html">SPARCstation 20</a>, <a href="ultra-1.html">Ultra 1</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="workstation.html">workstation</a>
+</li>
+<li>Processors: <a href="ultrasparc-iii.html">UltraSPARC III</a>
+</li>
+<li>Operating systems: <a href="solaris-7.html">Solaris 7</a>, <a href="irix.html">IRIX</a>, <a href="solaris-2-5-1.html">Solaris 2.5.1</a>, <a href="solaris-8.html">Solaris 8</a>, <a href="sunos-2-6.html">SunOS 2.6</a>, <a href="sunos-4-x.html">SunOS 4.x</a>
+</li>
+<li>Software: <a href="zulu.html">Zulu</a>, <a href="distcc.html">distcc</a>, <a href="inst.html">inst</a>, <a href="tardist-file.html">tardist file</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="fddi-adapter.html">FDDI adapter</a>, <a href="hard-disk.html">hard disk</a>
+</li>
+<li>Standards and interfaces: <a href="openstep.html">OPENSTEP</a>, <a href="sbus.html">SBus</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>, <a href="iso9660.html">ISO9660</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="informix.html">Informix</a>, <a href="mosaic.html">Mosaic</a>
+</li></ul>
+</body>
+</html>

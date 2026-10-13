@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>configure script</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>configure script</h1>
+<p>Claims: 13 Part of <a href="configure.html">configure</a></p>
+<p>The configure script is problematic. <sup><a href="#s1">1</a></sup> It may fail to locate compilers even when 'which' finds them, as seen with mrxvt. <sup><a href="#s2">2</a></sup> It can fail to find libraries, such as glBegin in -lGL, suggesting a problem with the linker or library paths. <sup><a href="#s3">3</a></sup> It may fail to compute sizeof long long, as seen with libgomp, which stops with a bad exit status. <sup><a href="#s4">4</a></sup> It may pick up local definitions from header files, leading to compilation errors, as seen when compiling xz with gcc 8.2.0. <sup><a href="#s5">5</a></sup> It may fail on broken compilers or shells, as seen with Perl, requiring workarounds. <sup><a href="#s6">6</a></sup> It may require additional flags such as -L/usr/local/lib -R/usr/local/lib for linking, as seen with egcc. <sup><a href="#s7">7</a></sup> It may overwrite manual edits to makefiles when re-running during make, as seen in the NTP project. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The configure script is problematic. (user-b1da, 2021-09-23, exchange 205591, check: uncheckable)</li>
+<li id="s2">The configure script might fail to locate compilers even if 'which' finds them, as seen with mrxvt. (user-2d09, 2019-07-18, exchange 67534, check: uncheckable)</li>
+<li id="s3">The configure script for a program fails to find glBegin in -lGL, suggesting a problem with the linker or library paths. (user-e4d0, 2025-05-21, exchange 215728, check: uncheckable)</li>
+<li id="s4">The configure script for libgomp stops after a few minutes with a bad exit status and cannot compute sizeof long long. (user-7973, 2024-02-29, exchange 71051, check: uncheckable)</li>
+<li id="s5">when compiling xz with gcc 8.2.0, the configure script might pick up a local definition of `getopt_long` from a header file, leading to compilation errors. (user-2d09, 2019-09-05, exchange 67848, check: supported)</li>
+<li id="s6">Perl's configure script may fail on broken compilers/shells, requiring workarounds. (user-03ad, 2024-05-05, exchange 210330, check: uncheckable)</li>
+<li id="s7">The configure script for egcc might require additional flags like -L/usr/local/lib -R/usr/local/lib for linking. (user-03ad, 2022-11-06, exchange 239883, check: uncheckable)</li>
+<li id="s8">The `configure` script in the NTP project re-runs `configure` when `make` is run, which can overwrite manual edits to makefiles. (user-2d09, 2019-07-17, exchange 67515, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="makefile.html">Makefile</a>, <a href="perl.html">Perl</a>, <a href="make.html">make</a>, <a href="mrxvt.html">mrxvt</a>
+</li>
+<li>Companies: <a href="gcc-8-2-0.html">gcc 8.2.0</a>
+</li>
+<li>Other: <a href="getopt-long.html">getopt_long</a>
+</li></ul>
+</body>
+</html>

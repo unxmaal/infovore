@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FireGL cards</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>FireGL cards</h1>
+<p>Claims: 12 Part of <a href="firegl.html">FireGL</a></p>
+<p>FireGL cards are commonly used in Onyx4 systems, which have dual FireGL cards that can make rendering fast but also causes compositor issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Onyx4 has an AGP riser, allowing it to use FireGL cards instead of VPro, and FireGL cards from Onyx4 boot up without issues in the system. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Two of the outputs on FireGL cards are analog only, requiring conversion for a full digital setup. <sup><a href="#s5">5</a></sup> At 1600x1200 resolution, the second monitor on a GPU displays part of the screen with a garbled copy of the primary display, but this is fine at 1280x1024 and below. <sup><a href="#s6">6</a></sup> /usr/gfx/VOYAGER/bin/sg2flash can query FireGL cards for hardware and firmware. <sup><a href="#s7">7</a></sup> The Altix can use PCI cards for 2D acceleration, but FireGL cards require custom firmware and may not work with the EFI console, and Tezro's were only officially offered with V12 graphics from SGI; they don't run with FireGL cards. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">FireGL cards are commonly used in Onyx4 systems (user-e4d0, 2020-06-19, exchange 9129, check: supported)</li>
+<li id="s2">The Onyx4 has dual FireGL cards, which can make rendering fast but also causes compositor issues. (user-cd83, 2023-04-12, exchange 208546, check: supported)</li>
+<li id="s3">FireGL cards from Onyx4 boot up without issues in the system. (user-59b9, 2020-08-23, exchange 75308, check: supported)</li>
+<li id="s4">The Onyx4 has an AGP riser, allowing it to use FireGL cards instead of VPro. (user-5906, 2025-01-10, exchange 76171, check: supported)</li>
+<li id="s5">Two of the outputs on FireGL cards are analog only, requiring conversion for a full digital setup. (user-59b9, 2023-07-24, exchange 39332, check: uncheckable)</li>
+<li id="s6">At 1600x1200 resolution, the second monitor on a GPU displays part of the screen with a garbled copy of the primary display, but this is fine at 1280x1024 and below. (user-59b9, 2023-08-24, exchange 108476, check: uncheckable)</li>
+<li id="s7">/usr/gfx/VOYAGER/bin/sg2flash can query FireGL cards for hardware and firmware. (user-5906, 2025-01-10, exchange 216519, check: uncheckable)</li>
+<li id="s8">The Altix can use PCI cards for 2D acceleration, but FireGL cards require custom firmware and may not work with the EFI console. (user-59b9, 2023-07-20, exchange 216467, check: supported)</li>
+<li id="s9">Tezro’s were only officially offered with V12 graphics from SGI; they don’t run with FireGL cards. (user-59df, 2025-09-12, exchange 225433, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx4.html">Onyx4</a>, <a href="altix.html">Altix</a>, <a href="numalink-router.html">Numalink router</a>, <a href="tezro.html">Tezro</a>
+</li>
+<li>Graphics: <a href="v12-graphics.html">V12 graphics</a>, <a href="resolution.html">resolution</a>
+</li>
+<li>Parts and peripherals: <a href="agp-riser.html">AGP riser</a>, <a href="prism-brick.html">Prism brick</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FTP server</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>FTP server</h1>
+<p>Claims: 12 Part of <a href="ftp.html">FTP</a></p>
+<p>An FTP server can be installed on an IRIX system to enable file uploads from other machines such as Linux. <sup><a href="#s1">1</a></sup> The FTP server on IRIX uses standard FTP rather than SFTP or FTPS, and requires a user account with a non-blocked password; root login without a password does not work. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The FTP server auto-starts with the OS on IRIX, and can be started using the command 'chkconfig ftp on'. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The FTP server on IRIX can be accessed to transfer files. <sup><a href="#s5">5</a></sup> Connecting to an FTP server can fail with socket call/connect errors on IRIX while working on Linux. <sup><a href="#s6">6</a></sup> When pinging fails, the ARP table on IRIX should be checked for the FTP server's MAC address, as another host may have the same IP. <sup><a href="#s7">7</a></sup> Uploading from MAME to an FTP server stalls for files larger than about 1 kB, though downloads work fine. <sup><a href="#s8">8</a></sup> A laptop from 2003 can run an FTP server to transfer data to Amigas and Octanes. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Installed an FTP server on their IRIX system for easy uploads from Linux. (user-17cb, 2019-08-15, exchange 214824, check: uncheckable)</li>
+<li id="s2">The FTP server on IRIX is standard FTP, not SFTP or FTPS; root login without a password does not work, a user account is needed. (user-f587, 2021-05-13, exchange 77362, check: uncheckable)</li>
+<li id="s3">FTP server auto-starts with the OS on IRIX; you just need an account with a non-blocked password. (user-56d4, 2023-08-31, exchange 40292, check: uncheckable)</li>
+<li id="s4">To start the FTP server on IRIX, use 'chkconfig ftp on'. (user-d960, 2025-07-21, exchange 87625, check: uncheckable)</li>
+<li id="s5">The IRIX box's FTP server can be accessed to transfer files. (user-8de9, 2022-02-12, exchange 217471, check: uncheckable)</li>
+<li id="s6">Connecting to an FTP server fails with socket call / connect errors on IRIX but works on Linux. (user-8de9, 2022-04-02, exchange 217543, check: uncheckable)</li>
+<li id="s7">When pinging fails, check ARP table on IRIX for FTP server's MAC address; perhaps another host has the same IP. (user-8de9, 2022-04-02, exchange 217544, check: uncheckable)</li>
+<li id="s8">Uploading from Mame to a FTP server stalls for files larger than about 1 kB, but downloads work fine. (user-ce6b, 2021-05-03, exchange 92717, check: supported)</li>
+<li id="s9">I have a laptop from 2003 that runs an FTP server to transfer data to Amigas and Octanes. (user-ae4b, 2025-03-31, exchange 218848, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="amiga.html">Amiga</a>, <a href="indy.html">Indy</a>, <a href="laptop.html">laptop</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>
+</li>
+<li>Other: <a href="2003.html">2003</a>
+</li></ul>
+</body>
+</html>

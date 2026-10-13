@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gentoo</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Gentoo</h1>
+<p>Claims: 66 Background: 19 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Gentoo_Linux">Gentoo Linux</a>, <a href="https://en.wikipedia.org/wiki/FreeBSD">FreeBSD</a>, <a href="https://en.wikipedia.org/wiki/SGI_Altix">SGI Altix</a>.</p>
+<p>Gentoo can be installed on platforms that other distributions do not support, including unsupported architectures such as IA-64 and Itanium, where it is the only up-to-date and modern Linux distribution, though it is difficult to use and still technically supports IA64 builds despite lacking kernel support. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Gentoo can run on various PowerPC machines, including the G5, Powermac G4, and older R5K O2, though it does not support R10k or 12k O2s and the O2 is generally considered unsuitable, with some users reporting that it needs plentiful RAM and that setting up ALSA and Xorg may be challenging. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Gentoo can be built on older and odd architectures such as the 733 MHz G4, Pentium 133, Indy, and Ultra 10, but building on these was time-consuming and took a month to become functional, though developing on PowerPC and MIPS architectures was better prioritized in the Linux community in the past. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> Gentoo can be bootstrapped from any OS by extracting a stage 3 and using emerge, and it has a portage system for upgrades and security fixes, with 90% of the process covered in the handbook. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Gentoo excels at custom installs with fine-grained control and is used for embedded systems to target different hosts and build a userland, as well as for desktops that allow hassle-free migrations, but it can be difficult for new users and struggles with version cherry-picking. <sup><a href="#s1">1</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s10">10</a></sup> Gentoo is not more widely supported on SGI machines than OpenBSD, and there is a belief that its stages do not support the IP22 architecture, though it does have a port that is not widespread. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> Gentoo is a Linux distribution that provides a binary distribution for new users and a User Repository (GURU) for packages not found in the main repositories. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> Portage, Gentoo's package manager, can handle simultaneous compilation of multiple packages by checking dependencies and system resources, compiling packages one at a time in a chroot environment if necessary. <sup><a href="#s28">28</a></sup> The Gentoo distribution kernel project is considered great for users and often fixes bugs, such as those related to SandyBridge and XFS inode sizes. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> Gentoo is being tested on SGI boxes to fix packages for MIPS, with plans to dualboot Octane2 with IRIX. <sup><a href="#s31">31</a></sup> Gentoo does not have working IP22 stages, and X support is experimental on other machines except the IP30. <sup><a href="#s32">32</a></sup> The IP30 v6 pro has framebuffer support in Gentoo but also experiences kernel panics. <sup><a href="#s33">33</a></sup> For RISC systems, installing Gentoo requires creating a set of binaries on an AMD64 box using qemu-user, otherwise the installation can take 4-5 days for a 400 MHz G3. <sup><a href="#s34">34</a></sup> To support RISC architectures for Gentoo, one needs exotic hardware like an nbus device. <sup><a href="#s35">35</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Gentoo excels at custom installs with fine-grained control and for unsupported architectures but struggles with version cherry-picking. (user-c831, 2019-11-25, exchange 95825, check: uncheckable)</li>
+<li id="s2">Gentoo is the only up-to-date distro for IA-64, but it is difficult to use. (user-1446, 2020-01-17, exchange 216283, check: supported)</li>
+<li id="s3">Gentoo is the only modern Linux distribution that runs on Itanium. (user-1446, 2020-05-13, exchange 75179, check: uncheckable)</li>
+<li id="s4">Gentoo still technically supports IA64 builds but lacks kernel support. (user-59b9, 2020-09-02, exchange 75353, check: uncheckable)</li>
+<li id="s5">The Itanium can run Gentoo, which is the only OS still maintained for Itanium. (user-711b, 2020-12-25, exchange 216372, check: uncheckable)</li>
+<li id="s6">Gentoo can be installed on platforms that other distributions do not support. (user-5510, 2022-05-14, exchange 207035, check: uncheckable)</li>
+<li id="s7">Gentoo can run on a G5. (user-5510, 2022-05-13, exchange 207033, check: uncheckable)</li>
+<li id="s8">Gentoo does not support R10k or 12k O2s. (user-0251, 2019-09-26, exchange 126005, check: supported)</li>
+<li id="s9">Used to run Gentoo on R5K O2 more than a decade ago, needs plentiful of RAM at least (user-b4f4, 2019-09-27, exchange 126006, check: supported)</li>
+<li id="s10">Gentoo is good for PowerPC but can be difficult for new users. (user-0251, 2021-04-21, exchange 144987, check: uncheckable)</li>
+<li id="s11">Gentoo can run on Powermac G4, but setting up ALSA and Xorg may be challenging. (user-e872, 2021-12-26, exchange 231599, check: uncheckable)</li>
+<li id="s12">Gentoo can be built on a 733 MHz G4 (user-c831, 2019-12-18, exchange 4930, check: supported)</li>
+<li id="s13">Developing Gentoo on PowerPC and MIPS architectures was a time-consuming process. (user-b4f4, 2021-04-29, exchange 98916, check: uncheckable)</li>
+<li id="s14">the person who installed Gentoo on a Pentium 133 box also threw NsCDE on there and it *chugged* (user-56d4, 2022-10-31, exchange 239871, check: supported)</li>
+<li id="s15">I've ran a very old version of gentoo on my indy before. (user-9528, 2022-12-28, exchange 208157, check: supported)</li>
+<li id="s16">Building Gentoo on an Ultra 10 took a month to get functional but was better than Slowaris. (user-c831, 2023-04-27, exchange 208623, check: supported)</li>
+<li id="s17">Building Gentoo on odd architectures was better prioritized in the Linux community in the past. (user-c831, 2023-07-25, exchange 39336, check: uncheckable)</li>
+<li id="s18">Gentoo can be bootstrapped from any OS by extracting a stage 3 and using emerge. (user-1446, 2021-01-06, exchange 216389, check: supported)</li>
+<li id="s19">Gentoo has a portage system for upgrades and security fixes. (user-7b1c, 2022-07-07, exchange 30914, check: uncheckable)</li>
+<li id="s20">90% of Gentoo is in the handbook. (user-0251, 2022-06-15, exchange 30036, check: supported)</li>
+<li id="s21">Gentoo is used for embedded systems to target different hosts and build a userland. (user-37ee, 2020-08-04, exchange 10346, check: uncheckable)</li>
+<li id="s22">Gentoo is used for desktops and allows migrations without hassle. (user-37ee, 2020-08-04, exchange 10346, check: uncheckable)</li>
+<li id="s23">netbsd is soft support on vintage SGI's, and gentoo has a port but it is not widespread. (user-0251, 2021-10-09, exchange 20929, check: uncheckable)</li>
+<li id="s24">Gentoo is not more widely supported on SGI machines than OpenBSD. (user-6e7b, 2023-10-13, exchange 41498, check: uncheckable)</li>
+<li id="s25">There is a belief that Gentoo's stages do not support the IP22 architecture. (user-22f9, 2023-09-18, exchange 218182, check: uncheckable)</li>
+<li id="s26">Gentoo provides a binary distribution for new users. (user-22f9, 2024-03-15, exchange 45165, check: uncheckable)</li>
+<li id="s27">Gentoo has a User Repository (GURU) for packages not in the main repositories. (user-22f9, 2024-10-15, exchange 215584, check: uncheckable)</li>
+<li id="s28">Portage in Gentoo can handle simultaneous compilation of multiple packages by checking dependencies and system resources, compiling packages one at a time in a chroot environment if necessary. (user-22f9, 2024-02-19, exchange 240254, check: uncheckable)</li>
+<li id="s29">The Gentoo distribution kernel project often fixes bugs, such as those related to SandyBridge and XFS inode sizes. (user-22f9, 2024-03-15, exchange 45165, check: uncheckable)</li>
+<li id="s30">The dist kernel project in Gentoo is great for users. (user-22f9, 2024-03-15, exchange 45165, check: uncheckable)</li>
+<li id="s31">Gentoo is being tested on SGI boxes to fix packages for MIPS, with plans to dualboot Octane2 with IRIX. (user-22f9, 2023-11-22, exchange 42566, check: supported)</li>
+<li id="s32">Gentoo does not have working IP22 stages, and X support is experimental on other machines except the IP30. (user-22f9, 2023-11-20, exchange 109464, check: uncheckable)</li>
+<li id="s33">IP30 v6 pro has framebuffer support in Gentoo but also experiences kernel panics. (user-22f9, 2024-10-13, exchange 211110, check: uncheckable)</li>
+<li id="s34">For RISC systems, installing Gentoo requires creating a set of binaries on an AMD64 box using qemu-user, otherwise the installation can take 4-5 days for a 400 MHz G3. (user-22f9, 2024-02-22, exchange 218296, check: supported)</li>
+<li id="s35">To support RISC architectures for Gentoo, one needs exotic hardware like an nbus device. (user-22f9, 2024-08-20, exchange 232348, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix-350.html">Altix 350</a>, <a href="g5.html">G5</a>, <a href="ultra-10.html">Ultra 10</a>, <a href="altix.html">Altix</a>, <a href="g4.html">G4</a>, <a href="ip22.html">IP22</a>, <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="ps1.html">PS1</a>, <a href="prism.html">Prism</a>, <a href="r5k-o2.html">R5k O2</a>, <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="ia64.html">IA64</a>, <a href="itanium.html">Itanium</a>, <a href="powerpc.html">PowerPC</a>, <a href="mips-architecture.html">MIPS architecture</a>, <a href="r10000.html">R10000</a>, <a href="risc.html">RISC</a>, <a href="t2.html">T2</a>
+</li>
+<li>Operating systems: <a href="freebsd.html">FreeBSD</a>, <a href="debian.html">Debian</a>, <a href="openbsd.html">OpenBSD</a>, <a href="arch-linux.html">Arch Linux</a>, <a href="irix.html">IRIX</a>, <a href="linux-distro.html">Linux distro</a>, <a href="netbsd.html">NetBSD</a>, <a href="kernel.html">kernel</a>, <a href="kernel-panic.html">kernel panic</a>
+</li>
+<li>Software: <a href="n64.html">N64</a>, <a href="xfs.html">XFS</a>, <a href="init.html">init</a>, <a href="minicom.html">minicom</a>, <a href="package.html">package</a>
+</li>
+<li>Parts and peripherals: <a href="power-mac-g4.html">Power Mac G4</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>
+</li>
+<li>Companies: <a href="sgi-box.html">SGI box</a>
+</li>
+<li>Other: <a href="void.html">Void</a>, <a href="600.html">600</a>, <a href="8500.html">8500</a>, <a href="arch.html">Arch</a>, <a href="nscde.html">NsCDE</a>, <a href="pismo.html">Pismo</a>, <a href="cu.html">cu</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/etc/sys_id</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/etc/sys_id</h1>
+<p>Claims: 4</p>
+<p>The file /etc/sys_id stores the system name used in console commands, such as those created by EZSetup. <sup><a href="#s1">1</a></sup> Changing the system name requires updating /etc/sys_id and /etc/hosts to avoid losing networking. <sup><a href="#s1">1</a></sup> To set up an IRIX Octane for network access, /etc/hosts and /etc/sys_id must be correctly configured with the Octane's IP and hostname, then the network service restarted. <sup><a href="#s2">2</a></sup> To change the hostname, update /etc/sys_id, /etc/hosts, and /etc/resolv.conf, then reboot. <sup><a href="#s3">3</a></sup> Sanity checking /etc/sys_id and ensuring the hostname is correct can help with networking issues. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">#&lt;Name&gt; refers to system names used in console commands, such as those created by EZSetup; changing the system name requires updating `etc/sys_id` and `etc/hosts` to avoid losing networking. (user-45c8, 2019-09-25, exchange 203961, check: supported)</li>
+<li id="s2">To set up an IRIX Octane for network access, ensure /etc/hosts and /etc/sys_id are correctly configured with the Octane's IP and hostname, then restart the network service. (user-2189, 2019-09-08, exchange 76837, check: supported)</li>
+<li id="s3">To change the hostname, update /etc/sys_id, /etc/hosts, and /etc/resolv.conf, then reboot. (user-231e, 2026-05-15, exchange 90745, check: uncheckable)</li>
+<li id="s4">Sanity checking etc/sys_id and ensuring the hostname is correct can help with networking issues. (user-b7c4, 2020-12-10, exchange 12771, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-octane.html">IRIX Octane</a>
+</li>
+<li>Software: <a href="etc-hosts.html">/etc/hosts</a>, <a href="hostname.html">hostname</a>
+</li>
+<li>Other: <a href="etc-resolv-conf.html">/etc/resolv.conf</a>
+</li></ul>
+</body>
+</html>

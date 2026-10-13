@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>partition</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>partition</h1>
+<p>Claims: 16</p>
+<p>With a fresh drive, going to (r)epartition and choosing (ro)ot creates a basic root partition and swap partition, after which selecting .. to back out and (exi)t writes the changes. <sup><a href="#s1">1</a></sup> WSL2 can be exported to a tar file and reimported to a separate partition, but this requires the partition to be the main system drive due to warnings. <sup><a href="#s2">2</a></sup> Partition 8 contains sash and presumably the bootloader, while partition 0 holds the collection of files. <sup><a href="#s3">3</a></sup> In 32-bit Solaris, the / partition can be up to 2GB, while /usr, /var, and other directories can be larger. <sup><a href="#s4">4</a></sup> The user resized the partition to allocate 2GB for swap on their IRIX system, and the IRIX 4.0.5f installer may attempt to use a non-existent partition for the user directory instead of the root partition. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Formatting and mounting the partition as /boot is the correct procedure. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">With a fresh drive, go to (r)epartition, and choose (ro)ot; that gives a basic root partition and swap partition, no frills; then just .. back out and (exi)t and it should write the changes. (user-d903, 2019-10-01, exchange 203968, check: uncheckable)</li>
+<li id="s2">WSL2 can be exported to a tar file and reimported to a separate partition, but it requires the partition to be the main system drive due to warnings. (user-d903, 2020-06-15, exchange 9060, check: uncheckable)</li>
+<li id="s3">Partition 8 contains sash and presumably the bootloader, 0 has the collection of files (user-fa69, 2022-07-23, exchange 104324, check: supported)</li>
+<li id="s4">/ partition can be up to 2GB in 32bit Solaris; /usr, /var, etc., can be larger. (user-7b1c, 2023-03-14, exchange 239987, check: supported)</li>
+<li id="s5">The user resized the partition to allocate 2GB for swap on their IRIX system. (user-281e, 2023-11-27, exchange 42732, check: supported)</li>
+<li id="s6">The installer for IRIX 4.0.5f may attempt to use a non-existent partition for the user directory, instead of using the root partition. (user-24f0, 2025-04-16, exchange 212369, check: supported)</li>
+<li id="s7">Formatting and mounting the partition as /boot is the correct procedure. (user-f190, 2026-01-09, exchange 215862, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="partition-table.html">partition table</a> (6)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-4-0-5f.html">IRIX 4.0.5F</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="solaris.html">Solaris</a>, <a href="ultrix.html">Ultrix</a>, <a href="wsl2.html">WSL2</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="boot.html">boot</a>, <a href="sash.html">sash</a>, <a href="swap.html">swap</a>, <a href="swap-partition.html">swap partition</a>, <a href="tar-file.html">tar file</a>
+</li>
+<li>Standards and interfaces: <a href="raid.html">RAID</a>, <a href="scsi.html">SCSI</a>
+</li>
+<li>Other: <a href="usr.html">/usr</a>
+</li></ul>
+</body>
+</html>

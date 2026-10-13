@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mrxvt</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>mrxvt</h1>
+<p>Claims: 19</p>
+<p>mrxvt is recommended for terminal use because it supports tabs, customizable scrollbars, and file transfers via xmodem and zmodem, covering most terminal use cases. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Setting TERM=rxvt is considered best for mrxvt, and adding a rxvt terminfo file allows using native term capabilities with mrxvt in IRIX. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Building mrxvt can fail for various reasons, including the configure script failing to locate compilers even when 'which' finds them, missing libmpc, and the need to edit the hidden .port.sh file to replace /opt/local/bin with $didbs/bin in the PATH. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Patching mrxvt to use %ld instead of %d for pid_t can resolve issues with large PIDs. <sup><a href="#s9">9</a></sup> Some users report problems with mrxvt, including color issues caused by setting termguicolors in .vimrc, rendering and text corruption issues that can be fixed by resizing the window, and issues with nethack. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Other issues include needing to add stty bindings to .sgug_bashrc to use Ctrl-C in sgugshell, setting the TERM variable to 'iris-ansi' to display window borders, and a backspaceKey setting which is ^H. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Mrxvt is recommended for terminal use. (user-f229, 2019-07-21, exchange 67589, check: uncheckable)</li>
+<li id="s2">mrxvt supports tabs and customizable scrollbars, covering most terminal use cases. (user-7b1c, 2022-04-14, exchange 28142, check: uncheckable)</li>
+<li id="s3">mrxvt supports file transfers via xmodem and zmodem. (user-7973, 2022-11-23, exchange 82468, check: uncheckable)</li>
+<li id="s4">Adding a rxvt terminfo file allows using native term capabilities with mrxvt in IRIX. (user-f229, 2019-07-21, exchange 67591, check: uncheckable)</li>
+<li id="s5">In Mrxvt, setting TERM=rxvt is best. (user-7973, 2024-08-12, exchange 48312, check: uncheckable)</li>
+<li id="s6">The configure script might fail to locate compilers even if 'which' finds them, as seen with mrxvt. (user-2d09, 2019-07-18, exchange 67534, check: uncheckable)</li>
+<li id="s7">Building mrxvt fails due to missing libmpc. (user-17cb, 2019-12-11, exchange 214901, check: uncheckable)</li>
+<li id="s8">.port.sh is a hidden file that needs to be edited to replace /opt/local/bin with $didbs/bin in the PATH for building mrxvt on an IRIX machine. (user-17cb, 2019-12-12, exchange 68216, check: uncheckable)</li>
+<li id="s9">Patching mrxvt to use `%ld` instead of `%d` for `pid_t` can resolve issues with large PIDs. (user-2d09, 2019-07-18, exchange 67534, check: supported)</li>
+<li id="s10">Setting `termguicolors` in .vimrc causes color issues with mrxvt, removing it fixes the problem. (user-6afa, 2020-07-16, exchange 68957, check: supported)</li>
+<li id="s11">aterm works fine while mrxvt had rendering issues. (user-e872, 2025-11-10, exchange 88630, check: uncheckable)</li>
+<li id="s12">mrxvt has text corruption issues that can be fixed by resizing the window, while urxvt does not have these problems. (user-17cb, 2026-02-15, exchange 73133, check: uncheckable)</li>
+<li id="s13">user-e872 uses xterm for terminals on their Octane due to issues with mrxvt and nethack. (user-6afa, 2021-03-03, exchange 204808, check: supported)</li>
+<li id="s14">To use Ctrl-C in sgugshell with mrxvt, add stty bindings to .sgug_bashrc to reset terminal settings. (user-e872, 2021-05-07, exchange 69606, check: uncheckable)</li>
+<li id="s15">Setting the TERM variable to 'iris-ansi' can display window borders in mrxvt. (user-17cb, 2024-07-13, exchange 218474, check: uncheckable)</li>
+<li id="s16">mrxvt has a backspaceKey setting which is ^H. (user-e872, 2024-08-09, exchange 218504, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="dillo.html">Dillo</a>, <a href="rse.html">RSE</a>, <a href="aterm.html">aterm</a>, <a href="configure-script.html">configure script</a>, <a href="ncurses.html">ncurses</a>, <a href="nedit.html">nedit</a>, <a href="sginet.html">sginet</a>, <a href="sgugshell.html">sgugshell</a>
+</li>
+<li>Standards and interfaces: <a href="xterm.html">xterm</a>
+</li>
+<li>Other: <a href="nethack.html">nethack</a>, <a href="rxvt.html">rxvt</a>, <a href="xmodem.html">xmodem</a>, <a href="zmodem.html">zmodem</a>
+</li></ul>
+</body>
+</html>

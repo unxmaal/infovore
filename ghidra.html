@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ghidra</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Ghidra</h1>
+<p>Claims: 24 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Ghidra">Ghidra</a>.</p>
+<p>Ghidra is a reverse engineering tool that supports MIPS code and provides a C-like decompiled view, and it can be extended with plugins for various architectures. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Ghidra supports many file formats but has trouble loading SGI ECOFF files or later IRIX ELF files, and its COFF loader is limited to MS COFF assuming little-endian, requiring a Python script to parse big-endian ECOFF. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Ghidra has a MIPS decompiler that IDA Pro lacks, but it misses many functions compared to IDA and cannot map variables in the decompiler. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Ghidra can be used instead of IDA Pro for disassembly, though it was not as quickly adopted, and setting the $gp register value can help function analysis. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> Ghidra can load a file with trigram counts for string analysis, though it is undocumented and difficult to use. <sup><a href="#s15">15</a></sup> A Ghidra MCP provides a mechanism for an AI agent to query Ghidra for code analysis, but it requires API use which is restricted. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IDA Pro can be used to reverse engineer binaries, and Ghidra supports MIPS but may have issues with SGI MIPS binaries. (user-b4f4, 2019-05-11, exchange 214753, check: uncheckable)</li>
+<li id="s2">Ghidra can handle MIPS code. (user-cd7d, 2021-03-08, exchange 15255, check: uncheckable)</li>
+<li id="s3">Ghidra has a growing collection of plugins for disassembling various architectures. (user-6c80, 2024-01-13, exchange 43743, check: uncheckable)</li>
+<li id="s4">Ghidra provides a C-like decompiled view and can be extended with plugins for better functionality. (user-3e2d, 2026-05-30, exchange 220448, check: uncheckable)</li>
+<li id="s5">Ghidra cannot import SGI binaries. (user-8547, 2019-05-11, exchange 214754, check: uncheckable)</li>
+<li id="s6">Ghidra has trouble loading SGI ECOFF files or later IRIX ELF files. (user-e04c, 2020-05-21, exchange 8536, check: uncheckable)</li>
+<li id="s7">Ghidra supports many file formats and can be extended. (user-95db, 2022-08-05, exchange 217642, check: uncheckable)</li>
+<li id="s8">Ghidra's COFF loader is limited to MS COFF and assumes LE; a Python script can parse BE ECOFF. (user-8780, 2026-08-14, exchange 91661, check: uncheckable)</li>
+<li id="s9">Ghidra has a MIPS decompiler that is not available in Ida Pro for a large additional sum, and it lacks COFF support for Irix. (user-ce6b, 2023-01-01, exchange 217853, check: uncheckable)</li>
+<li id="s10">Ghidra misses many functions compared to IDA. (user-9305, 2023-05-24, exchange 83616, check: uncheckable)</li>
+<li id="s11">Ghidra cannot map variables in the decompiler. (user-86e1, 2024-10-15, exchange 218573, check: uncheckable)</li>
+<li id="s12">Radare2 or Ghidra can be used instead of IDA Pro for disassembly. (user-b1da, 2021-03-08, exchange 15255, check: uncheckable)</li>
+<li id="s13">Ghidra was used for reverse engineering but not as quickly taken to as IDA Pro. (user-95db, 2023-01-02, exchange 217854, check: uncheckable)</li>
+<li id="s14">Setting the $gp register value in Ghidra can help function analysis. (user-86e1, 2023-05-24, exchange 83616, check: uncheckable)</li>
+<li id="s15">Ghidra can load a file with trigram counts for string analysis, but it's undocumented and difficult to use. (user-6c80, 2024-01-13, exchange 43741, check: uncheckable)</li>
+<li id="s16">The MCP provides a mechanism for an AI agent to query Ghidra. (user-2189, 2026-02-09, exchange 215896, check: uncheckable)</li>
+<li id="s17">There is a Ghidra MCP for code analysis, but it requires API use which is restricted. (user-3e2d, 2026-03-11, exchange 122005, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="r5k-indy.html">R5K Indy</a>
+</li>
+<li>Processors: <a href="mips-binary.html">MIPS binary</a>, <a href="mips-code.html">MIPS code</a>, <a href="r4600.html">R4600</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-binaries.html">IRIX binaries</a>
+</li>
+<li>Software: <a href="ida-pro.html">IDA Pro</a>, <a href="binary.html">binary</a>, <a href="gdb.html">gdb</a>
+</li>
+<li>Parts and peripherals: <a href="o2-prom.html">O2 PROM</a>
+</li>
+<li>Other: <a href="ida.html">IDA</a>, <a href="reverse-engineering.html">reverse engineering</a>
+</li></ul>
+</body>
+</html>

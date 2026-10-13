@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JBOD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>JBOD</h1>
+<p>Claims: 6</p>
+<p>Proxmox can handle hardware RAID, JBOD, or ZFS, and the serial interface supports JBOD and RAID. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> JBOD exposes drives directly to the OS, bypassing controller-level RAID. <sup><a href="#s3">3</a></sup> JBOD storage provides no redundancy, so losing a drive means losing all data and disk failures can cause data loss in a JBOD setup. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> An O2 with JBOD SATA might experience bus resets and parity errors. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Proxmox can handle hardware RAID, JBOD, or ZFS. (user-24f9, 2020-02-28, exchange 155956, check: uncheckable)</li>
+<li id="s2">The serial interface supports JBOD and RAID. (user-e4d0, 2023-12-14, exchange 109675, check: uncheckable)</li>
+<li id="s3">JBOD exposes drives directly to the OS, bypassing controller-level RAID. (user-9860, 2022-01-03, exchange 24106, check: uncheckable)</li>
+<li id="s4">JBOD storage provides no redundancy; losing a drive means losing all data. (user-8547, 2022-01-03, exchange 24130, check: uncheckable)</li>
+<li id="s5">Disk failures can cause data loss in a JBOD setup. (user-8547, 2022-05-27, exchange 29534, check: uncheckable)</li>
+<li id="s6">An O2 with JBOD SATA might experience bus resets and parity errors. (user-6afa, 2022-02-01, exchange 221895, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Software: <a href="proxmox.html">Proxmox</a>, <a href="zfs.html">ZFS</a>
+</li>
+<li>Standards and interfaces: <a href="raid.html">RAID</a>, <a href="sata.html">SATA</a>, <a href="serial-interface.html">serial interface</a>
+</li>
+<li>Other: <a href="hardware-raid.html">hardware RAID</a>
+</li></ul>
+</body>
+</html>

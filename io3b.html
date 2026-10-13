@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IO3B</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IO3B</h1>
+<p>Claims: 11</p>
+<p>The IO3B is a bridge that connects VME to PowerPath, and it works in both PowerSeries and Crimson systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It uses an AMD WD33C93A SCSI chip, which has a quirk possibly fixed in newer versions, and it works with Zulu SCSI. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> An IO3B can connect both drive bays to separate SCSI channels, unlike an IO2 that requires a jumper to link all bays to one chain. <sup><a href="#s6">6</a></sup> The IP17 CPU board requires the last revision of the IO board, which is the IO3B, though the IO3B will also work with older CPU boards. <sup><a href="#s7">7</a></sup> Applying Deoxit Gold to the backplane connector can reduce insertion force and fix crushed pins, but requires careful handling to avoid overspray. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Onyx supports the IO3B, which is very capable for a deskside system. (user-8b3c, 2021-06-21, exchange 99372, check: supported)</li>
+<li id="s2">The IO2/IO3/IO3B bridge VME to PowerPath, and the GM board bridges PowerPath to graphics. Both have massive connectors. (user-86e1, 2023-10-25, exchange 188710, check: uncheckable)</li>
+<li id="s3">Crimson uses sash.IP17, fx.IP17 firmware and has half the PROM on the CPU board and half on the IO board; the IO3B works in both PowerSeries and Crimson. (user-86e1, 2024-04-15, exchange 45606, check: supported)</li>
+<li id="s4">The IO3 and IO3B controllers use different WD33C93A chips, with IO3B using AMD chips which have a quirk, possibly fixed in newer versions. (user-86e1, 2024-12-03, exchange 189341, check: uncheckable)</li>
+<li id="s5">The Zulu SCSI works on the IO3b. (user-c9fb, 2024-12-03, exchange 241253, check: uncheckable)</li>
+<li id="s6">An IO3 or IO3B can connect both drive bays to separate SCSI channels, while an IO2 with a single channel requires a jumper to connect all bays to one chain. (user-86e1, 2024-11-28, exchange 189334, check: uncheckable)</li>
+<li id="s7">The IP17 CPU board requires the last revision of the IO board (IO3B), but the IO3B will work with older CPU boards, and both graphics boards and chassis are the same. (user-86e1, 2025-05-06, exchange 225028, check: uncheckable)</li>
+<li id="s8">Applying Deoxit Gold to the backplane connector of an IO3B can reduce insertion force and fix crushed pins, but requires careful handling to avoid overspray. (user-86e1, 2023-10-27, exchange 241116, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="crimson.html">Crimson</a>, <a href="onyx.html">Onyx</a>
+</li>
+<li>Graphics: <a href="graphics-board.html">graphics board</a>
+</li>
+<li>Parts and peripherals: <a href="deoxit-gold.html">DeoxIt Gold</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="chassis.html">chassis</a>
+</li>
+<li>Companies: <a href="amd-chips.html">AMD chips</a>
+</li>
+<li>Other: <a href="io3.html">IO3</a>, <a href="io2.html">IO2</a>
+</li></ul>
+</body>
+</html>

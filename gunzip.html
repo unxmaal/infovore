@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gunzip</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>gunzip</h1>
+<p>Claims: 6</p>
+<p>gunzip cannot handle multi-entry .Z files; use uncompress for SGI systems. <sup><a href="#s1">1</a></sup> To install software in .tgz format on IRIX, first use gunzip to decompress it to .tar, then tar -xvf to extract it. <sup><a href="#s2">2</a></sup> IRIX's tar did not support built-in gzip decompression, so the method gunzip -c &lt;archive&gt; | tar -xvf - extracts a gzip file and then extracts its contents without damaging the original file. <sup><a href="#s3">3</a></sup> gunzip is needed to decompress .tardist files on IRIX 5.3. <sup><a href="#s4">4</a></sup> gunzip is not found in IRIX 5.3 installed from burned CD 812-0323-001, and while installing gunzip failed previously, zcat is available as a workaround. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">gunzip cannot handle multi-entry .Z files; use uncompress for SGI systems. (user-b7c4, 2019-01-22, exchange 180, check: uncheckable)</li>
+<li id="s2">To install software in .tgz format on IRIX, first use gunzip to decompress it to .tar, then tar -xvf to extract it. (user-b7c4, 2019-03-02, exchange 837, check: uncheckable)</li>
+<li id="s3">The command gunzip -c &lt;archive&gt; | tar -xvf - extracts a gzip file and then extracts its contents, and this method does not damage the original file. IRIX's tar did not support built-in gzip decompression, adhering to the (user-c831, 2021-05-22, exchange 79358, check: uncheckable)</li>
+<li id="s4">gunzip is needed to decompress .tardist files on IRIX 5.3. (user-c6be, 2025-09-26, exchange 219136, check: supported)</li>
+<li id="s5">gunzip is not found in IRIX 5.3 installed from burned CD 812-0323-001. (user-701c, 2021-01-03, exchange 78888, check: supported)</li>
+<li id="s6">Installing gunzip failed previously, but now zcat is available as a workaround. (user-c6be, 2025-10-20, exchange 88448, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix.html">IRIX</a>, <a href="irix-tar.html">IRIX tar</a>
+</li>
+<li>Software: <a href="tar.html">tar</a>, <a href="gzip.html">gzip</a>, <a href="tardist.html">tardist</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

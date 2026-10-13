@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>htop</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>htop</h1>
+<p>Claims: 5</p>
+<p>htop is available on IRIX, though it does not support that platform and exhibits some display inconsistencies for CPU load on supported SGI hardware, remaining usable for compiling userlands on an Octane with dual R12K CPUs. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It should be run under sgugshell to ensure it can find the libraries. <sup><a href="#s3">3</a></sup> A yum/tdnf repo has been created containing htop alongside sginet, gkrellm, and findutils locate with full text search. <sup><a href="#s4">4</a></sup> htop segfaults on some machines and probably needs the TERM variable adjusted. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">htop does not support IRIX, but it works on OpenBSD with some display inconsistencies for CPU load on supported SGI hardware; it's usable for compiling userlands on an Octane with dual R12K CPUs. (user-6e7b, 2024-03-22, exchange 84863, check: supported)</li>
+<li id="s2">htop is available on IRIX. (user-7973, 2026-03-28, exchange 73311, check: uncheckable)</li>
+<li id="s3">You should run htop under sgugshell to ensure it can find the libraries. (user-7973, 2024-04-11, exchange 71141, check: uncheckable)</li>
+<li id="s4">I've created a yum/tdnf repo for my stuff containing sginet, htop, gkrellm, and findutils locate with full text search. (user-7973, 2025-11-06, exchange 219224, check: uncheckable)</li>
+<li id="s5">htop segfaults on some machines and probably needs the TERM variable adjusted. (user-7973, 2025-11-10, exchange 88630, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="openbsd.html">OpenBSD</a>
+</li>
+<li>Software: <a href="sginet.html">sginet</a>, <a href="sgugshell.html">sgugshell</a>
+</li></ul>
+</body>
+</html>

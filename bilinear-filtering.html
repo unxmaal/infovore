@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bilinear filtering</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>bilinear filtering</h1>
+<p>Claims: 3</p>
+<p>Bilinear filtering can serve as a blur when drawing a lower-resolution texture at full screen, eliminating the need to blur manually and requiring no additional texture memory, though it does require more sampling. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SGI textures support border color and can be sorted by texture if memory is insufficient. <sup><a href="#s2">2</a></sup> UI HUD lines can appear due to oversampling with bilinear filtering, and adding a 1-pixel transparent guardband can help. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You probably don't need to blur it manually at all. Let the bilinear filtering when drawing the lower-ressed texture at full screen be the blur for you. It's 'free'. (user-6afa, 2021-05-29, exchange 205107, check: uncheckable)</li>
+<li id="s2">SGI textures support border color and can be sorted by texture if memory is insufficient; bilinear and trilinear filtering requires more sampling but not more texture memory. (user-3e2d, 2025-07-23, exchange 72563, check: uncheckable)</li>
+<li id="s3">UI HUD lines appear due to oversampling with bilinear filtering; adding a 1-pixel transparent guardband can help. (user-21b8, 2025-07-24, exchange 215777, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Other: <a href="textures.html">textures</a>
+</li></ul>
+</body>
+</html>

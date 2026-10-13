@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ulimit</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ulimit</h1>
+<p>Claims: 3</p>
+<ul>
+<li>Executing the binary directly may open files sequentially rather than in parallel, reducing the likelihood of hitting ulimit compared to using xargs or similar tools that spawn processes in parallel. (user-42cf, exchange 87183, 2025-05-01; 1 speaker(s), 1 conversation(s))
+</li>
+<li>find -exec executes a new process every time you do it, while xargs only spawns additional processes if the argument list becomes too long, and both can hit ulimit. (user-22f9, exchange 218911, 2025-05-01; 1 speaker(s), 1 conversation(s))
+</li>
+<li>Setting all ulimits to unlimited can cause NFS to fail on an SGI; increasing the virtual memory limit in root's .profile resolves the issue. (user-03ad, exchange 74501, 2023-10-28; 1 speaker(s), 1 conversation(s))
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="binary.html">binary</a>
+</li>
+<li>Parts and peripherals: <a href="virtual-memory.html">virtual memory</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

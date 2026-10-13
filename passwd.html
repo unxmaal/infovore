@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>passwd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>passwd</h1>
+<p>Claims: 7</p>
+<p>The passwd command is used to change user passwords in Unix-like systems, including IRIX, and requires a space between the command and the username. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> In the root profile, one can use 'passwd account_name' to change passwords. <sup><a href="#s3">3</a></sup> EZsetup limits user passwords to 6-8 characters, but passwd allows longer passwords of over 8 characters. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Deleting the root password on passwd while shadow is read only prevents root login, and checking /etc/vfstab for NFS mounts may help. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The command 'passwd' is used to change passwords in Unix-like systems, including IRIX. (user-22f9, 2022-02-20, exchange 26002, check: uncheckable)</li>
+<li id="s2">The 'passwd' command is used to change user passwords; it requires a space between the command and the username. (user-03ad, 2022-06-18, exchange 207219, check: uncheckable)</li>
+<li id="s3">In the root profile, one can use 'passwd account_name' to change passwords. (user-e872, 2025-08-08, exchange 225315, check: uncheckable)</li>
+<li id="s4">EZsetup limits user passwords to 6-8 characters, but `passwd` allows longer passwords. (user-b1da, 2020-04-25, exchange 7816, check: supported)</li>
+<li id="s5">The `passwd` utility allows setting passwords to over 8 characters, while EZsetup has a limit. (user-1446, 2020-08-18, exchange 233858, check: supported)</li>
+<li id="s6">Deleting the root password on passwd while shadow is read only prevents root login; checking /etc/vfstab for NFS mounts may help. (user-8de9, 2022-06-25, exchange 239732, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="passwd-file.html">passwd file</a> (6)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Other: <a href="ezsetup.html">EZsetup</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mksh</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>mksh</h1>
+<p>Claims: 9 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash (Unix shell)</a>.</p>
+<p>mksh is 100% compatible with ksh88 and is faster, more actively developed, and fixes some bugs like color processing. <sup><a href="#s1">1</a></sup> There are no syntax incompatibilities, and pretty much every SGI supplied program and most popular software worked with mksh. <sup><a href="#s2">2</a></sup> mksh is a good alternative to /bin/sh for those preferring something other than bash. <sup><a href="#s3">3</a></sup> Switching to mksh improved the performance of a 33 MHz machine significantly, and it is twice as fast as bash at opening up/responding on a 68k, making almost anything much faster. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Building bash on IRIX is possible and can be done using a script that spawns mksh, which then downloads and installs bash. <sup><a href="#s6">6</a></sup> irixports provides an example plist for mksh. <sup><a href="#s7">7</a></sup> mksh reads /etc/profile.d/which2.sh even though bash should not read it; this file is likely only for /bin/sh and can be deleted or renamed without ill effects. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">mksh is 100% compatible with ksh88 and faster, more actively developed, and fixes some bugs like color processing. (user-22f9, 2019-06-20, exchange 67255, check: supported)</li>
+<li id="s2">Pretty much every SGI supplied program and most of the popular software I tested worked with mksh, there are no syntax incompatibilities. (user-22f9, 2019-06-20, exchange 67255, check: uncheckable)</li>
+<li id="s3">mksh is a good alternative to /bin/sh for those preferring something other than bash. (user-03ad, 2022-09-18, exchange 217699, check: uncheckable)</li>
+<li id="s4">Switching to mksh improved the performance of a 33 MHz machine significantly. (user-17cb, 2021-01-06, exchange 74128, check: supported)</li>
+<li id="s5">mksh is twice as fast as bash at opening up / responding on a 68k, making almost anything much faster. (user-17cb, 2021-05-08, exchange 215154, check: supported)</li>
+<li id="s6">Building bash on IRIX is possible and can be done using a script that spawns mksh, which then downloads and installs bash. (user-f229, 2019-07-16, exchange 2533, check: uncheckable)</li>
+<li id="s7">irixports now includes basic uninstall functionality but lacks dependency checking; it also provides an example plist for mksh. (user-ba81, 2019-08-18, exchange 67783, check: uncheckable)</li>
+<li id="s8">mksh reads /etc/profile.d/which2.sh even though bash should not read it; this file is likely only for /bin/sh and can be deleted or renamed without ill effects (user-237d, 2021-01-05, exchange 74127, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="68k.html">68k</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>, <a href="irixports.html">irixports</a>
+</li>
+<li>Other: <a href="bin-sh.html">/bin/sh</a>, <a href="33-mhz.html">33 MHz</a>, <a href="ksh88.html">ksh88</a>
+</li></ul>
+</body>
+</html>

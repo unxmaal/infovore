@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>glDrawPixels</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>glDrawPixels</h1>
+<p>Claims: 5 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>The SGI video output (vo) plugin may be broken or glDrawPixels may be very slow. <sup><a href="#s1">1</a></sup> The SGI video output (vo:sgi:pixeltex) uses pixel_texture (rgb) and glDrawPixels for drawing. <sup><a href="#s2">2</a></sup> Using OpenGL and glDrawPixels can significantly outperform X11's XShmPutImage on the Indigo2 Elan, especially for blitting operations, but other methods like textured quads and triangles are less effective on this hardware. <sup><a href="#s3">3</a></sup> glDrawPixels is significantly faster than textured polygon rendering on the O2, even with vsync disabled, and is a clear winner for pixel rendering across different systems. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SGI video output (vo) plugin may be broken or glDrawPixels may be very slow. (user-6afa, 2020-06-28, exchange 78496, check: uncheckable)</li>
+<li id="s2">The SGI video output (vo:sgi:pixeltex) uses pixel_texture (rgb) and glDrawPixels for drawing. (user-6afa, 2021-12-17, exchange 70143, check: uncheckable)</li>
+<li id="s3">Using OpenGL and `glDrawPixels` can significantly outperform X11's `XShmPutImage` on the Indigo2 Elan, especially for blitting operations, but other methods like textured quads and triangles are less effective on this硬件. (user-21b8, 2025-05-02, exchange 72278, check: supported)</li>
+<li id="s4">glDrawPixels is significantly faster than textured polygon rendering on the O2, even with vsync disabled. (user-21b8, 2025-05-02, exchange 72280, check: supported)</li>
+<li id="s5">glDrawPixels is a clear winner for pixel rendering across different systems. (user-21b8, 2025-05-02, exchange 72280, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="x11.html">X11</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>
+</li>
+<li>Parts and peripherals: <a href="video-output.html">video output</a>
+</li>
+<li>Other: <a href="xshmputimage.html">XShmPutImage</a>, <a href="vsync.html">vsync</a>
+</li></ul>
+</body>
+</html>

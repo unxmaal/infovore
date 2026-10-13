@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>winterm</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>winterm</h1>
+<p>Claims: 20 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Xterm">Xterm</a>.</p>
+<p>Winterm is the terminal emulator that ships with IRIX, not the shell, and it can run any shell. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The blue winterm window is the primary terminal used for normal operations, and it is opened from the Admin menu's 'UNIX console' option. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Winterm can be configured to increase scrollback lines on IRIX, and it renders properly when run from the vizserver window. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Winterm is not fully compatible with various tools, and some outputs may not display correctly in it. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Winterm lacks support for many commands when TERM=ansi or ansiterm, and ncurses is not well-supported in it. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Winterm is fundamentally incapable of displaying ls --color. <sup><a href="#s11">11</a></sup> In winterm, setting erase to ^H makes backspace work correctly, while in Aterm it makes backspace return ^H. <sup><a href="#s12">12</a></sup> xterm can be installed to address winterm problems and is more compatible with a variety of tools. <sup><a href="#s13">13</a></sup><sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Winterm is the terminal that comes with IRIX, not the shell. (user-56d4, 2022-05-27, exchange 217588, check: uncheckable)</li>
+<li id="s2">winterm is the terminal emulator in IRIX and can run any shell. (user-56d4, 2022-10-01, exchange 207753, check: uncheckable)</li>
+<li id="s3">When opening the 'UNIX console' from the Admin menu, it opens the blue winterm instead of the gray term. (user-b1da, 2019-11-26, exchange 4366, check: uncheckable)</li>
+<li id="s4">Winterm, the blue window, is the primary terminal used for normal operations. (user-b1da, 2019-11-26, exchange 4366, check: uncheckable)</li>
+<li id="s5">winterm on irix can be configured to increase scrollback lines (user-b1da, 2020-03-29, exchange 7066, check: uncheckable)</li>
+<li id="s6">Winterm renders properly when run from the vizserver window. (user-b1da, 2023-03-27, exchange 36947, check: uncheckable)</li>
+<li id="s7">The IRIX shell is compatible with various terminals, but some outputs may not display correctly in `winterm`; `xterm` is recommended. (user-42cf, 2022-01-13, exchange 24628, check: supported)</li>
+<li id="s8">XTerm is more compatible with a variety of tools than winterm. (user-281e, 2024-08-18, exchange 71524, check: uncheckable)</li>
+<li id="s9">winterm with TERM=ansi or ansiterm lacks support for many commands, possibly requiring a filter to remove unsupported commands. (user-7973, 2024-05-11, exchange 215490, check: uncheckable)</li>
+<li id="s10">ncurses is not well-supported in winterm, aterm, or other terminals, and may need to be avoided in CLI projects. (user-7973, 2024-05-11, exchange 215490, check: uncheckable)</li>
+<li id="s11">winterm is fundamentally incapable of displaying ls --color (user-21b8, 2025-12-17, exchange 219339, check: uncheckable)</li>
+<li id="s12">stty is a command to set up the terminal and allows you to change things like control characters and stuff; in Winterm, setting erase to ^H makes backspace work correctly, while in Aterm, it makes backspace return ^H; mR (user-7151, 2024-08-09, exchange 218502, check: uncheckable)</li>
+<li id="s13">xterm can be installed to address winterm problems; it seems functional after installation. (user-b1da, 2021-04-17, exchange 215128, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx2.html">Onyx2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="aterm.html">aterm</a>, <a href="quake.html">Quake</a>, <a href="ncurses.html">ncurses</a>
+</li>
+<li>Parts and peripherals: <a href="l1-prompt.html">L1 prompt</a>
+</li>
+<li>Standards and interfaces: <a href="xterm.html">xterm</a>
+</li>
+<li>Other: <a href="admin-menu.html">admin menu</a>, <a href="stty.html">stty</a>
+</li></ul>
+</body>
+</html>

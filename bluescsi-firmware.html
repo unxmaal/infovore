@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlueSCSI firmware</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>BlueSCSI firmware</h1>
+<p>Claims: 5 Part of <a href="bluescsi.html">BlueSCSI</a></p>
+<p>BlueSCSI firmware makes scsi2sd easier for virtual drives and partitions, and supports ISO images as scsi CD-ROM drives. <sup><a href="#s1">1</a></sup> It can be used on both Indigo1 and Indigo2, though Indigo1 uses a different SCSI controller than Indigo2. <sup><a href="#s2">2</a></sup> BlueSCSI firmware with phase control can fix Indigo2's SCSI issues, while downgrading the firmware allows it to work on an Indigo1. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Batching writes into 4k chunks can significantly improve performance. <sup><a href="#s4">4</a></sup> Users may need to fix CRC errors on writes to emulated drives. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Bluescsi firmware makes scsi2sd easier for virtual drives and partitions, and supports ISO images as scsi CD-ROM drives. (user-c831, 2022-08-21, exchange 222448, check: uncheckable)</li>
+<li id="s2">Indigo1 uses a different SCSI controller than Indigo2, and BlueSCSI firmware with phase control can fix Indigo2's SCSI issues. (user-17cb, 2026-07-03, exchange 226671, check: supported)</li>
+<li id="s3">Downgrading BlueSCSI firmware allows it to work on an Indigo1. (user-1a5a, 2026-07-03, exchange 226671, check: uncheckable)</li>
+<li id="s4">Batching writes into 4k chunks can significantly improve performance with BlueSCSI firmware. (user-95db, 2021-10-21, exchange 100534, check: supported)</li>
+<li id="s5">The speaker is trying to fix CRC errors on writes to emulated drives with bluescsi firmware. (user-95db, 2024-08-06, exchange 216205, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo1.html">Indigo1</a>, <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Parts and peripherals: <a href="scsi2sd.html">SCSI2SD</a>
+</li></ul>
+</body>
+</html>

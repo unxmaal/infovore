@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>resolv.conf</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>resolv.conf</h1>
+<p>Claims: 7</p>
+<p>The resolv.conf file is a Unix file used for name resolution, alongside nsswitch.conf, and may be relevant when NIS is configured on old machines. <sup><a href="#s1">1</a></sup> On IRIX, the file must be named exactly 'resolv.conf' to be recognized, and /etc/resolv.conf should contain a domain entry for DNS resolution. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> HP-UX requires a resolv.conf for desktop login, and IRIX 6.5.12m can run without nsd while nslookup still works with /etc/resolv.conf. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> To support older software, a link can be created by running `rm /usr/etc/resolv.conf` followed by `ln -s /etc/resolv.conf /usr/etc/resolv.conf`, ensuring the resolver configuration is accessible. <sup><a href="#s6">6</a></sup> A name resolution problem can be caused by the machine not knowing its own name, so hosts, nsswitch.conf, and resolv.conf should be checked. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Resolv.conf and nsswitch.conf are Unix files for name resolution; NIS might be configured on old machines. (user-07ed, 2025-03-15, exchange 218836, check: uncheckable)</li>
+<li id="s2">The resolv.conf file must be named exactly 'resolv.conf' for IRIX to recognize it. (user-701c, 2020-12-10, exchange 12772, check: uncheckable)</li>
+<li id="s3">/etc/resolv.conf should have a domain entry for DNS resolution. (user-8547, 2022-07-06, exchange 217622, check: uncheckable)</li>
+<li id="s4">HP-UX requires a resolv.conf for desktop login. (user-9528, 2023-01-25, exchange 162613, check: uncheckable)</li>
+<li id="s5">IRIX 6.5.12m runs without nsd, but nslookup works with /etc/resolv.conf. (user-5217, 2024-06-12, exchange 46776, check: supported)</li>
+<li id="s6">To support some older software, create a link to the resolv.conf file by running `rm /usr/etc/resolv.conf` followed by `ln -s /etc/resolv.conf /usr/etc/resolv.conf`. This ensures the resolver configuration is accessible. (user-22f9, 2023-09-20, exchange 209262, check: supported)</li>
+<li id="s7">This can be caused by a name resolution problem. Check your hosts, nsswitch.conf, and resolv.conf to make sure the machine knows what its name is. (user-07ed, 2023-08-04, exchange 209012, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>
+</li>
+<li>Other: <a href="nsswitch-conf.html">nsswitch.conf</a>, <a href="nis.html">NIS</a>, <a href="host.html">host</a>, <a href="nsd.html">nsd</a>
+</li></ul>
+</body>
+</html>

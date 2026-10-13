@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>toolchain</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>toolchain</h1>
+<p>Claims: 10</p>
+<p>A basic toolchain is available on the install disk. <sup><a href="#s1">1</a></sup> Some toolchains are cross compilers, and one can build a ROM that can be loaded onto a flash cart. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The toolchain at http://ports.sgi.sh/lang/gcc82/gcc-8.2.0-02-irix-6.5-mips.tardist uses sjlj exceptions and is not a proper release. <sup><a href="#s5">5</a></sup> It fails to produce a relocation entry for um when GOT has more than 16k entries, causing init code to fail. <sup><a href="#s6">6</a></sup> SGUG-RSE and its toolchain are still functional on a 20+ years old IRIX system. <sup><a href="#s7">7</a></sup> The R12K O2 is ready for software to be loaded, and one plan is to set up a toolchain to compile GL stuff. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You have a basic toolchain on the install disk. (user-5510, 2023-08-04, exchange 39502, check: uncheckable)</li>
+<li id="s2">The original VMS x86 compiler toolchain was a cross compiler. (user-b1da, 2022-02-21, exchange 75777, check: uncheckable)</li>
+<li id="s3">Cross compile toolchain (user-5510, 2023-09-12, exchange 240146, check: uncheckable)</li>
+<li id="s4">The tool chain can build a ROM that can be loaded onto a flash cart. (user-1a5a, 2025-12-03, exchange 213391, check: uncheckable)</li>
+<li id="s5">The toolchain at http://ports.sgi.sh/lang/gcc82/gcc-8.2.0-02-irix-6.5-mips.tardist uses sjlj exceptions and is not a proper release. (user-42cf, 2019-07-11, exchange 67437, check: supported)</li>
+<li id="s6">The toolchain fails to produce a relocation entry for um when GOT has more than 16k entries, causing init code to fail. (user-42cf, 2021-06-08, exchange 217147, check: supported)</li>
+<li id="s7">SGUG-RSE and its toolchain are still functional on a 20+ years old IRIX system. (user-7973, 2026-03-18, exchange 219577, check: supported)</li>
+<li id="s8">The R12K O2 is ready for software to be loaded, and I plan to set up a toolchain to compile GL stuff. (user-231e, 2026-04-26, exchange 215981, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="r12k-o2.html">R12K O2</a>, <a href="x86.html">x86</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="vms.html">VMS</a>
+</li>
+<li>Software: <a href="compiler.html">compiler</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>
+</li>
+<li>Other: <a href="got.html">GOT</a>, <a href="languages.html">languages</a>, <a href="old-software.html">old software</a>
+</li></ul>
+</body>
+</html>

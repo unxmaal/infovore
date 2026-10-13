@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Makefile</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Makefile</h1>
+<p>Claims: 42 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Make_%28software%29">Make (software)</a>.</p>
+<p>Make is a utility that runs commands from a Makefile, and install is a stock command within a Makefile. <sup><a href="#s1">1</a></sup> Running 'make' on a file named 'Makefile' results in errors because 'make' is a command, not a file. <sup><a href="#s2">2</a></sup> Makefiles should avoid shell commands and aim for compatibility with smake. <sup><a href="#s3">3</a></sup> A Makefile can specify compiler and linker paths for building, as demonstrated by compiling a simple hello world program. <sup><a href="#s4">4</a></sup> A Makefile can build a shared library called libimbuf.so, including a rule that depends on make_convert to generate a header file called convert_arrays.h, which is then used to compile libimbuf.a. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The Makefile for the N64 emulator uses GNU make syntax and requires the N64 SDK, which defines OBJECTS among other things. <sup><a href="#s7">7</a></sup> The default makefile builds for 32bit, so a 32bit toolchain and libraries are required, otherwise it fails. <sup><a href="#s8">8</a></sup> The makefile uses cc, which should not be overridden by gcc if cc is a link to gcc in the path. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Make is a utility that runs commands from a Makefile, and install is a stock command within a Makefile. (user-e872, 2021-03-10, exchange 217060, check: uncheckable)</li>
+<li id="s2">running 'make' on a file named 'Makefile' results in errors because 'make' is a command, not a file. (user-b7c4, 2019-01-24, exchange 217, check: uncheckable)</li>
+<li id="s3">Makefiles should avoid shell commands and aim for compatibility with smake. (user-6c80, 2025-05-10, exchange 56473, check: uncheckable)</li>
+<li id="s4">The Makefile specifies compiler and linker paths for building with didbs, and demonstrates compiling a simple hello world program. (user-bc5d, 2019-10-07, exchange 68014, check: uncheckable)</li>
+<li id="s5">This Makefile is used to build a shared library called libimbuf.so. (user-f8d5, 2022-12-14, exchange 82610, check: uncheckable)</li>
+<li id="s6">The Makefile includes a rule that depends on make_convert to generate a header file called convert_arrays.h, which is then used to compile libimbuf.a. (user-f8d5, 2022-12-14, exchange 82610, check: uncheckable)</li>
+<li id="s7">The Makefile for the N64 emulator uses GNU make syntax and requires the N64 SDK, which defines `OBJECTS` among other things. (user-24f0, 2023-12-05, exchange 42960, check: supported)</li>
+<li id="s8">The default makefile builds for 32bit; a 32bit toolchain and libraries are required, otherwise it fails. The build uses the same assembly code as DOS for ease of development, and the generic UNIX build uses `tools/unixcf (user-21b8, 2025-12-19, exchange 227342, check: supported)</li>
+<li id="s9">the makefile uses cc, which should not be overridden by gcc if cc is a link to gcc in the path. (user-3e2d, 2026-01-09, exchange 215860, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Processors: <a href="32-bit.html">32-bit</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="dos.html">DOS</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="linux.html">Linux</a>, <a href="unix.html">Unix</a>
+</li>
+<li>Software: <a href="mipspro.html">MIPSpro</a>, <a href="make.html">make</a>, <a href="compiler.html">compiler</a>, <a href="configure.html">configure</a>, <a href="configure-script.html">configure script</a>, <a href="install.html">install</a>, <a href="n64-sdk.html">N64 SDK</a>, <a href="sdl2.html">SDL2</a>, <a href="binary.html">binary</a>, <a href="cc.html">cc</a>, <a href="didbs.html">didbs</a>, <a href="environment-variables.html">environment variables</a>, <a href="nekoware.html">nekoware</a>, <a href="program.html">program</a>, <a href="spec-file.html">spec file</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="cflags.html">CFLAGS</a>, <a href="autoconf.html">autoconf</a>, <a href="libimbuf-so.html">libimbuf.so</a>, <a href="m4.html">m4</a>, <a href="make-convert.html">make_convert</a>, <a href="source-file.html">source file</a>
+</li></ul>
+</body>
+</html>

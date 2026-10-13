@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYSLOG</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SYSLOG</h1>
+<p>Claims: 5</p>
+<p>SYSLOG is used to troubleshoot DHCP server issues by running 'tail -f /var/log/syslog' while starting dhcpd. <sup><a href="#s1">1</a></sup> A FDDI adapter can be detected by checking SYSLOG after installing the dm2/ml package. <sup><a href="#s2">2</a></sup> SYSLOG can also be checked for errors when booting into IRIX over the console. <sup><a href="#s3">3</a></sup> SYSLOG still prints a buffer too small message sometimes, indicating the fix is not yet complete. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To troubleshoot DHCP server issues, check the syslog with 'tail -f /var/log/syslog' while starting dhcpd. (user-7973, 2022-03-09, exchange 216768, check: uncheckable)</li>
+<li id="s2">To detect a FDDI adapter, check SYSLOG after installing the dm2/ml package. (user-e4d0, 2024-03-26, exchange 223802, check: uncheckable)</li>
+<li id="s3">Boot into IRIX over the console and look for errors in the SYSLOG. (user-e4d0, 2024-11-15, exchange 112786, check: uncheckable)</li>
+<li id="s4">Syslog still prints a buffer too small message sometimes, indicating the fix is not yet complete. (user-7973, 2026-06-14, exchange 226571, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iris.html">IRIS</a>, <a href="indy.html">Indy</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Parts and peripherals: <a href="fddi-adapter.html">FDDI adapter</a>
+</li>
+<li>Other: <a href="dhcpd.html">dhcpd</a>
+</li></ul>
+</body>
+</html>

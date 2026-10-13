@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCIe</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PCIe</h1>
+<p>Claims: 42 Background: 8 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/PCI_Express">PCI Express</a>, <a href="https://en.wikipedia.org/wiki/PCI-X">PCI-X</a>, <a href="https://en.wikipedia.org/wiki/Accelerated_Graphics_Port">Accelerated Graphics Port</a>, <a href="https://en.wikipedia.org/wiki/NVM_Express">NVM Express</a>, <a href="https://en.wikipedia.org/wiki/Raspberry_Pi">Raspberry Pi</a>.</p>
+<p>PCIe was introduced in 2003. <sup><a href="#s1">1</a></sup> PCIe is electrically different from PCI and PCI-X, but PCI-X is 64-bit and faster than 32-bit PCI, and PCIe can be bridged by cheap adapter cards. <sup><a href="#s2">2</a></sup> PCIe is not backwards compatible with PCI slots, though PCI and PCIe are both PCI from a software perspective. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> PCIe is point-to-point, which helps with I/O compared to total bus speed, and requires a PHY unlike PCI. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Some early PCIe GPU cards were AGP to PCIe bridges, and PCIe devices should be up and running 100ms after PERST# is deasserted. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> PCI is a shared bus, while PCIe uses a star network. <sup><a href="#s9">9</a></sup> A PMC card with multiple 1394 chips behind a PCIe xbar and a PCIe-PCI bridge can work with most SBCs that have PCI-X root complexes. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">PCIe was 2003. (user-1361, 2021-11-26, exchange 22625, check: supported)</li>
+<li id="s2">PCI-X is 64-bit and higher speed than 32-bit PCI, while PCIe is completely different electrically but still bridged by cheap adapter cards, similar to how SATA is to PATA (parallel ATA or IDE). (user-d903, 2020-11-30, exchange 231335, check: supported)</li>
+<li id="s3">PCIe is not backwards compatible with PCI slots. (user-237d, 2023-02-24, exchange 222874, check: uncheckable)</li>
+<li id="s4">AGP and PCIe are both PCI from a software perspective, so integrating them should be straightforward; AGP V3 doesn't use all its features. (user-7b1c, 2021-12-19, exchange 156608, check: uncheckable)</li>
+<li id="s5">PCIe is point-to-point, which helps in IO compared to total bus speed. (user-5510, 2022-05-22, exchange 182068, check: uncheckable)</li>
+<li id="s6">PCIe requires a PHY, unlike PCI. (user-231e, 2025-12-28, exchange 120344, check: uncheckable)</li>
+<li id="s7">Some early PCIe GPU cards were AGP to PCIe bridges. (user-b1da, 2026-01-02, exchange 213469, check: uncheckable)</li>
+<li id="s8">PCIe devices should be up and running 100ms after PERST# is deasserted. (user-757f, 2026-01-13, exchange 225929, check: supported)</li>
+<li id="s9">PCI is a shared bus, while PCIe uses a star network. (user-3e2d, 2026-01-17, exchange 225973, check: uncheckable)</li>
+<li id="s10">A PMC card with multiple 1394 chips behind a PCIe xbar and a PCIe-PCI bridge can work with most SBCs that have PCI-X root complexes. (user-86e1, 2026-01-13, exchange 225928, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="pcie-card.html">PCIe card</a> (7)
+</li>
+<li><a href="pcie-lanes.html">PCIe lanes</a> (3)
+</li>
+<li><a href="pcie-slot.html">PCIe slot</a> (7)
+</li>
+<li><a href="pcie-ssd.html">PCIe SSD</a> (4)
+</li>
+<li><a href="pcie-switch.html">PCIe switch</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="g5-tower.html">G5 tower</a>, <a href="octane.html">Octane</a>, <a href="pi.html">PI</a>, <a href="ultra-45.html">Ultra 45</a>, <a href="xio.html">XIO</a>
+</li>
+<li>Graphics: <a href="gpu.html">GPU</a>, <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="sas.html">SAS</a>
+</li>
+<li>Parts and peripherals: <a href="8gb-ram.html">8GB RAM</a>, <a href="pmc-card.html">PMC card</a>, <a href="compression-connector.html">compression connector</a>, <a href="daughter-board.html">daughter board</a>, <a href="motherboard.html">motherboard</a>, <a href="video-card.html">video card</a>
+</li>
+<li>Standards and interfaces: <a href="pci.html">PCI</a>, <a href="pci-x.html">PCI-X</a>, <a href="agp.html">AGP</a>, <a href="pci-slot.html">PCI slot</a>, <a href="sata.html">SATA</a>, <a href="nvme.html">NVMe</a>, <a href="u320-scsi.html">U320 SCSI</a>, <a href="usb.html">USB</a>
+</li>
+<li>Other: <a href="dual-agp.html">dual AGP</a>, <a href="1394.html">1394</a>, <a href="alphaserver-4000.html">Alphaserver 4000</a>, <a href="core-2.html">Core 2</a>, <a href="m-2.html">M.2</a>, <a href="nt-alpha.html">NT/Alpha</a>, <a href="pata.html">PATA</a>, <a href="diode.html">diode</a>, <a href="rx2660.html">rx2660</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clang</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>clang</h1>
+<p>Claims: 19 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Common_Desktop_Environment">Common Desktop Environment</a>, <a href="https://en.wikipedia.org/wiki/LLVM">LLVM</a>.</p>
+<p>Clang is a frontend for LLVM used as a compiler, and it is regarded as one of the best compilers for modern C++. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It is available as an alternative to gcc for modern toolchains, and on macOS gcc is symlinked to clang by default because Apple prefers LLVM. <sup><a href="#s1">1</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Clang can build CDE on FreeBSD and OpenBSD may distribute a recent build of Clang, making it a viable alternative to GCC for building CDE. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Clang version 13 supports OpenMP, and IRIX clang version 14.0.6 is available, targeting mips64-sgi-irix6.5-gnuabin32. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The SGUG gcc and clang can cross-compile IRIX from Linux, with X11 and GL support but GL can be finicky to set up. <sup><a href="#s9">9</a></sup> Building with clang can involve issues such as a limited address space from conflicting default load addresses with gcc-built shared libraries, and bootstrapping SGI packages is difficult due to libgcc and libdicl dependencies clashing, making it hard to mix gcc- and clang-built shared libraries. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Apple uses clang, a frontend for LLVM, for their compiler. (user-cb4c, 2020-03-10, exchange 216086, check: uncheckable)</li>
+<li id="s2">Clang is one of the best compilers for modern C++. (user-37ee, 2020-09-11, exchange 10966, check: uncheckable)</li>
+<li id="s3">gcc is symlinked to clang by default on macOS because Apple prefers LLVM; users can install Homebrew to easily install gcc. (user-e04c, 2020-10-01, exchange 69084, check: uncheckable)</li>
+<li id="s4">clang is available as an alternative to gcc13 for modern toolchains. (user-9860, 2022-12-14, exchange 34803, check: uncheckable)</li>
+<li id="s5">Clang can build CDE on FreeBSD. (user-fa69, 2022-11-01, exchange 239874, check: uncheckable)</li>
+<li id="s6">OpenBSD may distribute a recent build of Clang, making it a viable alternative to GCC for building CDE. (user-fa69, 2022-11-01, exchange 239874, check: uncheckable)</li>
+<li id="s7">Clang version 13 supports OpenMP. (user-9860, 2021-10-27, exchange 215218, check: supported)</li>
+<li id="s8">IRIX clang version 14.0.6 is available, targeting mips64-sgi-irix6.5-gnuabin32. (user-f229, 2023-01-16, exchange 70670, check: supported)</li>
+<li id="s9">The SGUG gcc and clang can cross-compile IRIX from Linux, with X11 and GL support but GL can be finicky to set up. (user-e872, 2024-11-21, exchange 215589, check: uncheckable)</li>
+<li id="s10">clang built binaries had a limited address space due to conflicting default load addresses with gcc-built shared libraries, while gcc and mipspro had more flexible configurations. Patching gcc and rebuilding SGUG is必要的步骤 (user-9860, 2021-11-19, exchange 69984, check: uncheckable)</li>
+<li id="s11">Bootstrapping SGI packages with clang is difficult due to libgcc and libdicl dependencies clashing, making it hard to mix gcc- and clang-built shared libraries. (user-9860, 2023-05-23, exchange 215381, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="freebsd.html">FreeBSD</a>, <a href="openbsd.html">OpenBSD</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="cde.html">CDE</a>, <a href="llvm.html">LLVM</a>, <a href="mipspro.html">MIPSpro</a>, <a href="qemu.html">QEMU</a>, <a href="mplayer.html">mplayer</a>, <a href="pkgsrc.html">pkgsrc</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgug.html">SGUG</a>, <a href="apple.html">Apple</a>, <a href="gcc-13.html">GCC 13</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="libdicl.html">libdicl</a>, <a href="libgcc.html">libgcc</a>
+</li></ul>
+</body>
+</html>

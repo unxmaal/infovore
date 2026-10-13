@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>L2</h1>
+<p>Claims: 17</p>
+<p>L1 is total control of a brick, L2 is control of a rack, and L3 is control of a network. <sup><a href="#s1">1</a></sup> The L2 is a PPC Linux box with a USB hub that controls a rack of Origin bricks, intended for rack servers like the O300, O350, and O3000. <sup><a href="#s2">2</a></sup> The L2 uses a 50-pin connector for power, which is unusual and requires specific wiring, and it can be powered by a +48V DC brick if the correct pinout is known. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The L3 is Linux software that emulates the L2, and L2/L3 controllers are needed to talk to the Router, which connects to L2 or L3 over USB rather than L1. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The L3 software communicates with L2 on the brick to reflash L1, and the fuels L1 USB-B port can connect to an L2 or L3 controller. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The L2 is handy for changing the serial numbers of L1s in individual blocks and recovering systems without serial numbers. <sup><a href="#s10">10</a></sup> The env command in L2 controls automatic power-down and must be on for the system to power down automatically. <sup><a href="#s11">11</a></sup> CTRL-T in an IRIX shell through L2 returns to L2, and CTRL-D returns from L2 to IRIX. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">L1 is total control of a brick, L2 is control of a rack, L3 is control of a network. (user-b7c4, 2019-08-17, exchange 3049, check: uncheckable)</li>
+<li id="s2">The L2 is a PPC Linux box with a USB hub that controls a rack of Origin bricks, intended for rack servers like O300, O350, O3000, and possibly others. (user-8b3c, 2019-11-22, exchange 220807, check: supported)</li>
+<li id="s3">The L2 uses a 50-pin connector for power, which is unusual and requires specific wiring. (user-e4d0, 2021-02-23, exchange 221225, check: supported)</li>
+<li id="s4">The L2 can be powered by a +48V DC brick, but the pinout for their power cable is needed. (user-b1da, 2026-02-13, exchange 226086, check: supported)</li>
+<li id="s5">The L3 is Linux software that emulates the L2. (user-b1da, 2024-01-31, exchange 110182, check: uncheckable)</li>
+<li id="s6">L2/L3 controllers are needed to talk to the Router. (user-e4d0, 2025-09-08, exchange 59102, check: uncheckable)</li>
+<li id="s7">The router connects to L2 or L3 over USB, not L1, and L2 can see all connected bricks but not vice versa. (user-b1da, 2026-02-13, exchange 226085, check: uncheckable)</li>
+<li id="s8">The L3 software communicates with L2 on the brick to reflash L1. (user-9860, 2021-11-24, exchange 217316, check: uncheckable)</li>
+<li id="s9">The fuels l1 USB-B port can connect to an L2 or L3 controller. (user-e4d0, 2024-04-18, exchange 210251, check: uncheckable)</li>
+<li id="s10">L2 is handy for changing the serial numbers of L1s in individual blocks and recovering systems without serial numbers. (user-24f0, 2024-11-22, exchange 211315, check: uncheckable)</li>
+<li id="s11">The `env` command in L2 controls automatic power-down; it must be on for the system to power down automatically. (user-e4d0, 2023-03-07, exchange 36521, check: supported)</li>
+<li id="s12">CTRL-T in an IRIX shell through L2 returns to L2, and CTRL-D returns from L2 to IRIX. (user-86e1, 2025-04-24, exchange 56206, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="l2-cache.html">L2 cache</a> (16)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Parts and peripherals: <a href="l1.html">L1</a>, <a href="router.html">router</a>, <a href="50-pin-connector.html">50-pin connector</a>, <a href="l3-controller.html">L3 controller</a>
+</li>
+<li>Standards and interfaces: <a href="pci-power-mac.html">PCI Power Mac</a>, <a href="serial.html">serial</a>, <a href="serial-number.html">serial number</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Other: <a href="l3.html">L3</a>, <a href="l3-software.html">L3 software</a>
+</li></ul>
+</body>
+</html>

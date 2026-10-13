@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>documentation</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>documentation</h1>
+<p>Claims: 23</p>
+<p>Documentation quality varies widely across systems, with some projects lacking both code quality and documentation while others come with extensive materials. <sup><a href="#s1">1</a></sup> Poor documentation can lead to undefined behavior and difficulty troubleshooting, as was the case with certain APIs. <sup><a href="#s2">2</a></sup> Some systems have limited or sparse documentation, including the Onyx4, many SGI machines, and SGI's later documentation in general. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Other systems come with abundant documentation, such as the AT&amp;T PC, Alias software, and the IBM Artic 960 card. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Documentation for certain components may not be publicly available, such as SGI's ICE chip and certain proprietary ICs. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> SGI documentation is available through various sources including developer bookshelves, GitHub repositories, and community contributions. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Documentation is valuable for recreating system behavior and understanding technical details, such as VFC blanking requirements. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Emulation and documentation are more likely to survive than hardware itself. <sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Code quality and documentation are lacking in many projects; code quality and documentation are important for project success; code quality and documentation are often ignored in favor of quick solutions; code quality (user-9849, 2021-04-04, exchange 217090, check: uncheckable)</li>
+<li id="s2">The actual issue with the APIs was poor documentation leading to undefined behavior and difficulty troubleshooting. (user-22f9, 2019-04-16, exchange 1381, check: uncheckable)</li>
+<li id="s3">The Onyx4's documentation is limited. (user-b7c4, 2019-05-23, exchange 1768, check: supported)</li>
+<li id="s4">Some SGI machines lack detailed documentation for certain components, like PSU swapping on the Onyx2. (user-b1da, 2020-07-20, exchange 9781, check: supported)</li>
+<li id="s5">A lot of SGI’s later documentation is a bit sparse, sadly. (user-59b9, 2023-09-25, exchange 223392, check: uncheckable)</li>
+<li id="s6">The AT&amp;T PC came with lots of documentation. (user-ef81, 2020-07-17, exchange 9682, check: uncheckable)</li>
+<li id="s7">Alias has software with original documentation and a letter. (user-281e, 2024-07-17, exchange 47663, check: uncheckable)</li>
+<li id="s8">The IBM Artic 960 card uses an i960 processor with available SDK/compiler and documentation, and can be found cheaply on eBay. (user-22f9, 2019-08-04, exchange 2893, check: supported)</li>
+<li id="s9">Documentation for SGI's ICE chip might not be publicly available, as it was possibly restricted to internal use or third-party commercial software. (user-b1da, 2020-07-20, exchange 9781, check: uncheckable)</li>
+<li id="s10">That's basically a non-starter/impossible due to lack of documentation on those ICs. They were all highly proprietary when they were new and eventually became nearly 100% ASIC-based. The connectors are worth more thanthe (user-1fc3, 2025-09-03, exchange 225386, check: supported)</li>
+<li id="s11">The SGI documentation for developers can be found at http://csweb.cs.wfu.edu/~torgerse/Kokua/Irix_6.5.21_doc_cd/usr/share/Insight/library/SGI_bookshelves/index.html. (user-8547, 2019-07-27, exchange 214808, check: uncheckable)</li>
+<li id="s12">erikarn.github.io is a git repo for SGI documentation contributions. (user-231e, 2026-09-20, exchange 227070, check: uncheckable)</li>
+<li id="s13">User-6c80.zone has tars containing GL bits, demo source, and documentation from SGI development. (user-e4d0, 2025-01-17, exchange 218703, check: uncheckable)</li>
+<li id="s14">The RGB values for the system colours might come from SGI documentation and are a good starting point for recreating the look. (user-281e, 2024-10-05, exchange 49622, check: uncheckable)</li>
+<li id="s15">The VFC documentation describes user-defined variables and explains that blanking, though not visible, is necessary for compatibility with CRT displays, consuming up to 25% of a video frame. (user-42cf, 2025-04-15, exchange 116088, check: supported)</li>
+<li id="s16">Emulation and documentation are more likely to survive than the hardware. (user-24f0, 2024-11-11, exchange 112699, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx2.html">Onyx2</a>, <a href="onyx4.html">Onyx4</a>, <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Processors: <a href="i960-processor.html">i960 processor</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris-1-1-2.html">Solaris 1.1.2</a>
+</li>
+<li>Software: <a href="alias.html">Alias</a>, <a href="jaleo.html">Jaleo</a>, <a href="code.html">code</a>, <a href="emulation.html">emulation</a>, <a href="install-media.html">install media</a>, <a href="server.html">server</a>, <a href="vfc.html">vfc</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="api.html">API</a>, <a href="at-t-pc.html">AT&amp;T PC</a>, <a href="ice-chip.html">ICE chip</a>, <a href="ics.html">ICs</a>, <a href="axppci33-motherboard.html">axppci33 motherboard</a>
+</li></ul>
+</body>
+</html>

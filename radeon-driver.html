@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>radeon driver</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>radeon driver</h1>
+<p>Claims: 14 Part of <a href="radeon.html">Radeon</a></p>
+<p>The radeon driver is included in SLES 10, while the fglrx driver is part of Propack. <sup><a href="#s1">1</a></sup> On Debian 7 with XFCE, the radeon driver runs on an Altix 350 with an ATI FireMV 2200, where 2D graphics worked well but 3D was more challenging. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The FireMV card causes unaligned memory errors when using the radeon driver, whether with one or both cards installed. <sup><a href="#s4">4</a></sup> SLES9 does not boot with a FireGL R200, and its radeon driver does not support direct rendering on newer cards. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The radeon driver supports the FireGL X1s but not direct rendering. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The fglrx driver is part of Propack and the standard radeon driver is included in SLES 10. (user-1446, 2020-07-30, exchange 75279, check: supported)</li>
+<li id="s2">XFCE runs on Debian 7 with the radeon driver on an Altix 350 with an ATI FireMV 2200. (user-59b9, 2020-06-12, exchange 75207, check: supported)</li>
+<li id="s3">2D graphics worked well on an Altix with a card supported by the Debian *radeon* driver, but 3D was more challenging. (user-59b9, 2025-03-29, exchange 76326, check: supported)</li>
+<li id="s4">The FireMV card causes unaligned memory errors when using the radeon driver, whether with one or both cards installed. (user-59b9, 2020-06-23, exchange 75221, check: uncheckable)</li>
+<li id="s5">SLES9 does not boot with a FireGL R200; the `radeon` driver in Debian might work but has not been tested. (user-59b9, 2020-07-21, exchange 75239, check: supported)</li>
+<li id="s6">SLES9's radeon driver doesn't support direct rendering on newer cards. (user-59b9, 2020-08-24, exchange 216345, check: uncheckable)</li>
+<li id="s7">The radeon driver supports the FireGL X1s but not direct rendering. (user-59b9, 2020-08-24, exchange 216345, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="altix-350.html">Altix 350</a>, <a href="radeon-hd3450.html">Radeon HD3450</a>
+</li>
+<li>Processors: <a href="ia64.html">IA64</a>
+</li>
+<li>Graphics: <a href="firegl-x1.html">FireGL X1</a>
+</li>
+<li>Operating systems: <a href="debian.html">Debian</a>, <a href="sles9.html">SLES9</a>, <a href="debian-7.html">Debian 7</a>, <a href="propack.html">ProPack</a>, <a href="sles-10.html">SLES 10</a>
+</li>
+<li>Software: <a href="fglrx-driver.html">fglrx driver</a>, <a href="xfce.html">XFCE</a>
+</li>
+<li>Other: <a href="dri.html">DRI</a>, <a href="suse.html">SUSE</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USB mass storage</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>USB mass storage</h1>
+<p>Claims: 9 Part of <a href="usb.html">USB</a></p>
+<p>USB Mass Storage uses SCSI commands over USB, even if it's a subset. <sup><a href="#s1">1</a></sup> The Octane predates USB, and IRIX does not have built-in support for USB mass storage, limiting file transfers to USB 1.0 speeds. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Implementing USB mass storage on IRIX requires supporting transactions up to maxdmasz and handling small transactions by chunking, making reads/writes more complex. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Win2K was the first Windows OS to support USB Mass Storage. <sup><a href="#s6">6</a></sup> Solaris versions before 10 had significant issues with USB mass storage, including hot-plugging problems. <sup><a href="#s7">7</a></sup> The RP2350A/B microcontroller does not support PCI Express, making USB mass storage a non-starter for this generation of hardware. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">USB Mass Storage uses SCSI commands over USB, even if it's a subset. (user-44d1, 2025-03-15, exchange 55167, check: uncheckable)</li>
+<li id="s2">The Octane predates USB and IRIX does not support USB mass storage. (user-b7c4, 2020-05-12, exchange 8322, check: supported)</li>
+<li id="s3">The IRIX system does not have built-in support for USB mass storage, limiting file transfers to USB 1.0 speeds. (user-24f0, 2025-01-13, exchange 52394, check: supported)</li>
+<li id="s4">Implementing USB mass storage on IRIX requires emulating transactions up to maxdmasz and handling small transactions by chunking, making reads/writes more complex. (user-3e2d, 2025-12-12, exchange 120000, check: uncheckable)</li>
+<li id="s5">Getting USB mass storage working on IRIX involves supporting transactions up to maxdmasz and handling small transactions by chunking. (user-24f0, 2025-12-12, exchange 120000, check: uncheckable)</li>
+<li id="s6">Win2K was the first Windows OS to support USB Mass Storage. (user-8b3c, 2020-05-30, exchange 216937, check: uncheckable)</li>
+<li id="s7">Solaris versions before 10 had significant issues with USB mass storage, including hot-plugging problems. (user-baf6, 2022-09-26, exchange 222538, check: supported)</li>
+<li id="s8">The RP2350A/B microcontroller does not support PCI Express, making USB mass storage a non-starter for this generation of hardware. (user-1fc3, 2025-09-03, exchange 118333, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="usb-mass-storage-driver.html">USB mass storage driver</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris.html">Solaris</a>, <a href="win2k.html">Win2k</a>
+</li>
+<li>Standards and interfaces: <a href="pci-express.html">PCI Express</a>, <a href="scsi-command.html">SCSI command</a>
+</li></ul>
+</body>
+</html>

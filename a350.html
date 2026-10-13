@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A350</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>A350</h1>
+<p>Claims: 22</p>
+<p>The A350 is a DEC Alpha machine that comes in a white-sleeved model and three black models, and is described as expensive, heavy, loud, and hot. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The A350 shares its case, including blowers, with the O350, and both machines use a PCI-X riserboard that is supposed to be compatible, though the part numbers differ and some A350 systems may lack the XIO slot. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The O350 and A350 have different 2U Interface Boards but share the 2U_RISER part number, and the bottom unit is a 2U PCI-X brick rather than a 4U P-brick. <sup><a href="#s3">3</a></sup><sup><a href="#s6">6</a></sup> The A350 has two SCSI disks and two Ethernet controllers, and the QLogic QLA 12160 works in both the O350 and A350, requiring custom SCSI wiring if no backplane is present. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> A350 nodes can be connected in a ring structure with each node having two Numalink connectors, and while a router is not required, it may be used for star wiring. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The A350 can run Debian 6, SUSE Linux Enterprise, and SLES10 or SLES11 via PXE or Netbooting even without an IO9 or IO10 card, though the latest PROM is 5.4 or 5.04 and Advanced Linux Environment 3 causes the A350 to enter POD. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The A350 has a white-sleeved model and three black models. (user-59b9, 2023-03-26, exchange 208483, check: supported)</li>
+<li id="s2">The A350 is expensive, heavy, loud, and hot. (user-b7c4, 2020-04-20, exchange 7657, check: uncheckable)</li>
+<li id="s3">The bottom unit is a PCI-X brick (2U) and not a P-brick (4U); the machines without doors have the same backside as the PCI-X; O350 and A350 share the same case including blowers, and both bricks have a riser-board that提供 (user-bf68, 2019-11-13, exchange 95717, check: supported)</li>
+<li id="s4">The PCI-X riserboard part numbers differ between O350 and A350, but they are supposed to be compatible. (user-59b9, 2020-05-13, exchange 96853, check: supported)</li>
+<li id="s5">The O350 and A350 are compatible with the same PCI-X riserboard, but some A350 systems may lack the XIO slot. (user-59b9, 2020-05-13, exchange 96853, check: supported)</li>
+<li id="s6">The O350 and A350 have different 2U Interface Boards, but share the 2U_RISER part number. (user-59b9, 2020-05-13, exchange 96853, check: supported)</li>
+<li id="s7">The A350 has two SCSI disks and two Ethernet controllers. (user-bc5d, 2019-11-25, exchange 220816, check: supported)</li>
+<li id="s8">The QLogic QLA 12160 works in O350 and A350, requiring custom SCSI wiring if no backplane is present. (user-bc5d, 2021-04-29, exchange 17045, check: supported)</li>
+<li id="s9">the A350 can be connected in a ring structure with each node having two Numalink connectors (user-bf68, 2020-01-23, exchange 75009, check: supported)</li>
+<li id="s10">a router is not required for connecting A350 nodes but may be used for star wiring (user-6d41, 2020-01-23, exchange 75009, check: uncheckable)</li>
+<li id="s11">An A350 runs Debian 6. (user-bf68, 2024-02-24, exchange 216483, check: supported)</li>
+<li id="s12">The A350 can run SUSE Linux Enterprise. (user-bc5d, 2019-11-25, exchange 220816, check: uncheckable)</li>
+<li id="s13">The latest PROM for A350 is 5.4 or 5.04. (user-bf68, 2020-06-08, exchange 97018, check: supported)</li>
+<li id="s14">Netbooting can install SLES11 on an A350 without an IO9 card. (user-bc5d, 2021-04-29, exchange 17045, check: uncheckable)</li>
+<li id="s15">PXE booting can install SuSE SLES10 on an A350 without an IO9 or IO10 card. (user-bc5d, 2021-04-29, exchange 17045, check: uncheckable)</li>
+<li id="s16">Advanced Linux Environment 3 causes the A350 to enter POD. (user-24f0, 2025-01-17, exchange 216531, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="numalink.html">Numalink</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Graphics: <a href="pci-video-card.html">PCI video card</a>
+</li>
+<li>Operating systems: <a href="debian-6.html">Debian 6</a>, <a href="sles-10.html">SLES 10</a>, <a href="sles11.html">SLES11</a>
+</li>
+<li>Parts and peripherals: <a href="ethernet-controller.html">Ethernet controller</a>, <a href="pci-x-brick.html">PCI-X brick</a>, <a href="prom.html">PROM</a>, <a href="scsi-disk.html">SCSI disk</a>
+</li>
+<li>Other: <a href="nl4r.html">NL4R</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>config.log</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>config.log</h1>
+<p>Claims: 4</p>
+<p>The config.log file is used to diagnose why the configure script fails to find required tools or settings, such as when it cannot locate the correct nm tool for the mips-sgi-irix6.5 target, resulting in an error during compilation. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> When configure cannot find something despite specifying its location via --with-something=/somepath or CFLAGS=-I/somewhere LDFLAGS=-L/somewhere, the config.log should be examined to see why it did not find them. <sup><a href="#s2">2</a></sup> Running the configure step on x86 where it succeeds can provide a config.log to diagnose the bit-size test failure during crosscompilation. <sup><a href="#s3">3</a></sup> The config.log indicates the C file attempted for the check, and compiling and running that file can provide more insight. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The config.log shows that the configure script is unable to find the correct nm tool for the mips-sgi-irix6.5 target, resulting in an error during compilation. (user-f229, 2018-12-30, exchange 66840, check: uncheckable)</li>
+<li id="s2">configure can't find something despite specifying the location via --with-something=/somepath or CFLAGS=-I/somewhere LDFLAGS=-L/somewhere, then you must look at config.log to see why it didn't find them. (user-42cf, 2019-07-27, exchange 67664, check: uncheckable)</li>
+<li id="s3">Running the configure step on x86 where it succeeds can provide a config.log to diagnose the bit-size test failure during crosscompilation. (user-2d09, 2019-09-10, exchange 67853, check: uncheckable)</li>
+<li id="s4">The `config.log` file indicates the C file attempted for the check; compiling and running that file can provide more insight. (user-709f, 2024-05-14, exchange 71292, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="x86.html">x86</a>
+</li>
+<li>Software: <a href="configure.html">configure</a>
+</li>
+<li>Other: <a href="mips-sgi-irix6-5.html">mips-sgi-irix6.5</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>software rendering</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>software rendering</h1>
+<p>Claims: 5 Part of <a href="software.html">software</a></p>
+<p>Software rendering is used as a fallback in some systems, such as SI/SE, which falls back to it when it cannot support newer OpenGL versions (e.g., OpenGL 1.3 is the oldest ES version available, and the system cannot run newer OpenGL versions). <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Software rendering works for most demos but has regressed, and it is notably slow. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Software rendering is CPU-intensive, as it appears to be the main source of high CPU usage. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> In some cases, software rendering was the only rendering method used, with no special hardware involved. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The OpenGL rendering in some Qt demos breaks software rendering, and the oldest version of ES is OpenGL 1.3, which the system can't support. (user-42cf, 2019-07-11, exchange 67431, check: supported)</li>
+<li id="s2">Software rendering works for most demos but has regressed, and the system can't run newer OpenGL versions. (user-42cf, 2019-07-11, exchange 67431, check: uncheckable)</li>
+<li id="s3">SI/SE falls back to software rendering, which is super duper slow. (user-6afa, 2021-04-11, exchange 204945, check: uncheckable)</li>
+<li id="s4">software rendering seems to be the cpu hog here. I've compiled ft2 using SDL2 with GL support, CPU usage is down to a minimum on my Octane2. (user-7973, 2026-08-26, exchange 214502, check: supported)</li>
+<li id="s5">none of it was special hardware, just software rendering (user-6afa, 2024-07-02, exchange 210608, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="opengl-1-3.html">OpenGL 1.3</a>
+</li></ul>
+</body>
+</html>

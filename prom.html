@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PROM</h1>
+<p>Claims: 190 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Programmable_ROM">Programmable ROM</a>, <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>.</p>
+<h2 id="with-irix">With IRIX</h2>
+<p>The PROM provides limited hardware support, often just enough to detect, configure, and install IRIX. <sup><a href="#s1">1</a></sup> Booting IRIX from the PROM is slow and unusable, and to boot it, type 'boot' from the PROM, using 'ls' from SASH to list disk contents. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The PROM's HINV might report differently in IRIX, and 'hinv' should show the graphics device at least at the PROM level, though 'hinv -c graphics' may show no graphics devices in IRIX. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> There is a way to force the flash of the PROM from within IRIX, but there is a danger to doing this, as you could brick your system. <sup><a href="#s7">7</a></sup> The root password for IRIX is separate from the PROM password. <sup><a href="#s8">8</a></sup> Networking setup with IRIX involves editing many text files, and even then, basic networking requires setting a hostname and understanding prom. <sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>The initialization code in PROM sets up multipliers and other parameters for the CPU, affecting its effective clock speed. <sup><a href="#s10">10</a></sup> There is a nvram setting to always use the serial console even with keyboard and video; hitting esc gets you into the PROM. <sup><a href="#s11">11</a></sup> Installing IRIX 6.5.30 updates the PROM; firmware files are on the IRIX CD; Apple does the same for newer MacBooks. <sup><a href="#s12">12</a></sup> If a system is unresponsive, commands like 'enableall', 'update', and 'reset' in the PROM might help. <sup><a href="#s13">13</a></sup> The setenv command requires editing the PROM with a hex editor for Indigo2. <sup><a href="#s14">14</a></sup> Editing the PROM with a hex editor is required to update the MAC address on an Indigo2. <sup><a href="#s15">15</a></sup> You can get a whole motherboard with V11 prom from Mashek for around $150, which is comparable to or cheaper than getting just the prom from Ian. <sup><a href="#s16">16</a></sup> The PROM is firmware executed from ROM, using RAM only for an execution stack, and it is the code that SGI R4k processors boot to. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> It can be operated entirely by keyboard using number keys to navigate options, and a mouse is not needed until booting into IRIX. <sup><a href="#s19">19</a></sup> The PROM can run hinv, and it can boot from an external drive by setting the BootDevice environment variable to dksc(x,y,z). <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> sash is a PROM with filesystem support, and the PROM auto-boot command is setenv auto-boot? true. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> The PROM's ARP response reveals the MAC address, which is useful for identifying SGI machines like the Indigo and 4D, and the location of the PROM that holds the Ethernet address can cause problems when swapping mainboards back and forth. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup> You can change the MAC address in the PROM if you are on IP22, but there are scripts that do it temporarily in IRIX. <sup><a href="#s26">26</a></sup> The PROM sees two CPUs, while the 4d1 3.x sees only one CPU. <sup><a href="#s27">27</a></sup> Updating the PROM to the latest version for an O2 changed the HINV display of VICE from DX to TRE. <sup><a href="#s28">28</a></sup> The PROM is the low-level firmware that starts up SGI machines, presenting a message box that allows interaction and distinguishing itself from the PC BIOS with an emphasis on reliability. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> It is physically composed of four EPROMs and does not support loadable drivers. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup> The SGI platform uses both prom and small prom versions, which may differ in features such as the version of sash. <sup><a href="#s33">33</a></sup> The PROM can read sash from a limited number of devices, while sash itself can handle more. <sup><a href="#s34">34</a></sup> It can access the environment variables, which are stored on the hard disk and need to be initialized, and it can reset them with the resetenv command. <sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup> It can dump itself over serial by specifying a start address and size and using a kermit script, and it can restart a machine on power-on reset to prevent certain boot issues. <sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup> The SGI platform uses prom and small prom versions, which may differ in features such as the version of sash. <sup><a href="#s33">33</a></sup> PROM on SGI systems functions as a mini IRIX kernel with limited APIs, and it is read twice during system startup. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup><sup><a href="#s41">41</a></sup> The PROM contains interrupt vectors (ip2), the FPGA bitstream baked into CPU configuration (ORCA FPGA, R10k/R12k modules), and a clock multiplier value used to generate the core clock from the module's clock generator. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> Boot depends on the PROM understanding the kernel format (via TFTP or a small XFS SCSI partition) and requiring an SGI ID, a minimum PROM version (newer than July 1994 for XZ), and a valid SCSI chain. <sup><a href="#s45">45</a></sup><sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> PROM can be manipulated through console commands (e.g., 'enableall', 'apply', 'console=G', poke/peek, 'init', 'string'), and secondary PROM chips can be added and selected during boot (Octane) or switched via console command. <sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup><sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup><sup><a href="#s52">52</a></sup> PROM corruption can be recovered (documented O2 methods, rebuilding from source with recovered headers), and various hardware issues require PROM updates or adjustments (Teton -004, IP7 IO3 upgrade, O2 R12000 VCORE/straps, Indy endianness EEPROM reprogramming). <sup><a href="#s53">53</a></sup><sup><a href="#s54">54</a></sup><sup><a href="#s55">55</a></sup><sup><a href="#s56">56</a></sup><sup><a href="#s57">57</a></sup><sup><a href="#s58">58</a></sup> PROM settings can be configured using environment variables. <sup><a href="#s59">59</a></sup><sup><a href="#s60">60</a></sup> The -p argument for setenv never worked on their machines, so 'setenv x y', 'printenv', and 'init' should be used to soft reboot the PROM and keep settings alive. <sup><a href="#s61">61</a></sup> The O2 emulator requires steps to add NVMe support and fix the PROM. <sup><a href="#s62">62</a></sup> Resetting the environment from PROM can resolve issues with an aging disk. <sup><a href="#s63">63</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The PROM provides limited hardware support, often just enough to detect, configure, and install IRIX. (user-cdcd, 2022-03-20, exchange 222097, check: uncheckable)</li>
+<li id="s2">Booting IRIX from the PROM is slow and unusable. (user-2a3c, 2024-08-23, exchange 220332, check: uncheckable)</li>
+<li id="s3">To boot IRIX, type 'boot' from the PROM. From SASH, use 'ls' to list disk contents. (user-42cf, 2025-04-14, exchange 212352, check: uncheckable)</li>
+<li id="s4">The PROM's HINV might report differently in IRIX. (user-b7c4, 2020-08-20, exchange 221037, check: uncheckable)</li>
+<li id="s5">'hinv -c graphics' shows no graphics devices in IRIX, but the board is listed in PROM and NetBSD works with it. (user-c026, 2026-08-15, exchange 124848, check: uncheckable)</li>
+<li id="s6">'hinv' should show the graphics device at least at the PROM level. (user-1a5a, 2026-08-15, exchange 124848, check: uncheckable)</li>
+<li id="s7">There is a way you can force the flash of the PROM from within IRIX, but there is a danger to doing this, as you could brick your system! (user-59df, 2021-10-03, exchange 221581, check: uncheckable)</li>
+<li id="s8">The root password for IRIX is separate from the PROM password. (user-8547, 2024-04-27, exchange 111056, check: uncheckable)</li>
+<li id="s9">With IRIX, networking setup involves editing many text files, and even then, basic networking requires setting a hostname and understanding prom. (user-3e2d, 2026-05-24, exchange 93947, check: uncheckable)</li>
+<li id="s10">The initialization code in PROM sets up multipliers and other parameters for the CPU, affecting its effective clock speed. (user-b4f4, 2019-06-22, exchange 95295, check: uncheckable)</li>
+<li id="s11">There is a nvram setting to always use the serial console even with keyboard and video; hitting esc gets you into the PROM. (user-f229, 2019-05-06, exchange 203781, check: uncheckable)</li>
+<li id="s12">Installing IRIX 6.5.30 updates the PROM; firmware files are on the IRIX CD; Apple does the same for newer MacBooks. (user-f9d4, 2019-07-14, exchange 2480, check: supported)</li>
+<li id="s13">If a system is unresponsive, commands like 'enableall', 'update', and 'reset' in the PROM might help. (user-8547, 2019-07-16, exchange 2549, check: uncheckable)</li>
+<li id="s14">The setenv command requires editing the PROM with a hex editor for Indigo2. (user-59fe, 2019-07-25, exchange 92333, check: supported)</li>
+<li id="s15">Editing the PROM with a hex editor is required to update the MAC address on an Indigo2. (user-8b3c, 2019-07-25, exchange 92333, check: supported)</li>
+<li id="s16">You can get a whole motherboard with V11 prom from Mashek for around $150, which is comparable to or cheaper than getting just the prom from Ian. (user-60fc, 2019-09-05, exchange 3336, check: supported)</li>
+<li id="s17">SGI R4k processors boot to prom. (user-f229, 2021-10-09, exchange 236207, check: supported)</li>
+<li id="s18">The PROM executes from ROM, using RAM only for an execution stack. (user-cdcd, 2023-08-13, exchange 223249, check: uncheckable)</li>
+<li id="s19">You can operate everything in PROM by keyboard using number keys to navigate options; a mouse is not needed until booting into IRIX. (user-8de9, 2022-05-28, exchange 222284, check: uncheckable)</li>
+<li id="s20">you can run hinv from the PROM (user-b1da, 2022-02-10, exchange 102261, check: uncheckable)</li>
+<li id="s21">In PROM, setting the BootDevice environment variable to dksc(x,y,z) allows booting from an external drive. (user-6afa, 2022-02-21, exchange 217493, check: uncheckable)</li>
+<li id="s22">sash is a PROM with filesystem support. (user-9860, 2021-11-01, exchange 100686, check: uncheckable)</li>
+<li id="s23">The prom auto-boot command is setenv auto-boot? true. (user-5510, 2022-05-24, exchange 239649, check: uncheckable)</li>
+<li id="s24">The PROM's ARP response reveals the MAC address, useful for identifying SGI machines like the Indigo and 4D. (user-f229, 2021-10-31, exchange 100682, check: supported)</li>
+<li id="s25">The location of the prom that holds the Ethernet address can cause problems when swapping mainboards back and forth. (user-03ad, 2023-06-14, exchange 107882, check: uncheckable)</li>
+<li id="s26">You can change the Mac address in the PROM if you are on IP22, but there are scripts that do it temporarily in IRIX. (user-03ad, 2022-12-05, exchange 208024, check: uncheckable)</li>
+<li id="s27">The PROM sees two CPUs, while the 4d1 3.x sees only one CPU. (user-f229, 2022-01-06, exchange 221815, check: supported)</li>
+<li id="s28">Updating the PROM to the latest version for an O2 changed the HINV display of VICE from DX to TRE. (user-8547, 2022-02-16, exchange 102440, check: supported)</li>
+<li id="s29">The system starts up with a message box allowing interaction with the PROM. (user-f5f4, 2023-09-22, exchange 209272, check: uncheckable)</li>
+<li id="s30">SGI machines have a PROM for better reliability compared to PC BIOS. (user-1a5a, 2024-09-07, exchange 210937, check: uncheckable)</li>
+<li id="s31">The PROM is physically 4 EPROMs. (user-86e1, 2024-04-04, exchange 220325, check: supported)</li>
+<li id="s32">The PROM does not support loadable drivers. (user-86e1, 2024-12-12, exchange 113158, check: uncheckable)</li>
+<li id="s33">The SGI platform uses prom and small prom versions which may differ in features like the version of sash. (user-24f0, 2025-06-24, exchange 57248, check: uncheckable)</li>
+<li id="s34">The PROM can read sash from a limited number of devices, and sash itself can handle more. (user-9860, 2024-12-11, exchange 113143, check: uncheckable)</li>
+<li id="s35">The envs of the PROM are stored in the HDD and need to be initialized. (user-5217, 2024-06-19, exchange 210538, check: uncheckable)</li>
+<li id="s36">resetenv can be run in the prom to reset environment variables; running it might help with missing password jumper issues. (user-511a, 2024-11-16, exchange 112792, check: uncheckable)</li>
+<li id="s37">the PROM can be made to dump itself over serial programmatically by specifying start address, size, and using a kermit script to tell the PROM to dump (user-42cf, 2025-05-05, exchange 56394, check: uncheckable)</li>
+<li id="s38">The PROM will restart a machine on power-on reset, preventing certain boot issues but not all. (user-08fb, 2025-05-06, exchange 186262, check: uncheckable)</li>
+<li id="s39">you can do quite a bit on an SGI system through the PROM (user-2a3c, 2025-09-27, exchange 225490, check: uncheckable)</li>
+<li id="s40">the PROM is like a mini IRIX kernel with limited APIs. (user-3e2d, 2025-12-08, exchange 60819, check: uncheckable)</li>
+<li id="s41">During system startup, the PROM is read twice. (user-757f, 2026-01-24, exchange 226002, check: uncheckable)</li>
+<li id="s42">Interrupt vectors on the ip2 are stored in a PROM. (user-a719, 2026-01-14, exchange 220387, check: uncheckable)</li>
+<li id="s43">The bus speed is set by a clock generator on the CPU module, which can be 50/60/66 MHz, then multiplied by a value in PROM to generate the core clock. (user-757f, 2026-01-24, exchange 121132, check: supported)</li>
+<li id="s44">The ORCA FPGA reads the PROM which contains the FPGA bitstream, and the CPU config is baked into this bitstream, making it difficult to modify. The ORCA OR2C15A is used in R10k and possibly R12k CPU modules. (user-757f, 2026-02-01, exchange 226052, check: supported)</li>
+<li id="s45">The PROM only needs the kernel in a format it can understand to boot, whether via TFTP or a tiny XFS SCSI partition like zuluscsi/etc. (user-f190, 2026-03-05, exchange 226162, check: uncheckable)</li>
+<li id="s46">The PROM needs to have an SGI ID or it will fail. (user-3e2d, 2026-05-20, exchange 219756, check: uncheckable)</li>
+<li id="s47">XZ requires a certain minimum PROM version, and PROM can't init hardware it doesn't know about; the PROM version must be newer than July 1994 for XZ to work. (user-86e1, 2026-02-19, exchange 226108, check: supported)</li>
+<li id="s48">There is a method to install a secondary PROM chip on an Octane that can be selected during boot. (user-c799, 2025-12-08, exchange 225745, check: supported)</li>
+<li id="s49">Switching the PROM to the 2nd head can be done with a console command like 'console=G' or 'console=g2'. (user-3e2d, 2026-01-14, exchange 220389, check: supported)</li>
+<li id="s50">running 'enableall' then 'apply' at the PROM can resolve POD issues. (user-986f, 2026-01-15, exchange 120904, check: uncheckable)</li>
+<li id="s51">Using PROM poke and peek commands through a serial console can reveal useful information. (user-4f7c, 2026-07-19, exchange 220537, check: uncheckable)</li>
+<li id="s52">PROM commands like 'init' can restart the PROM and rescan the SCSI interface. (user-e4e2, 2026-08-19, exchange 226907, check: uncheckable)</li>
+<li id="s53">Some Teton Systems fail the power-on Fast IU test; pushing reset allows booting. A -004 PROM replacement fixes this issue. (user-86e1, 2025-07-03, exchange 225233, check: supported)</li>
+<li id="s54">By putting both secondary CPU mezzanines on one IP7 and upgrading the PROM to match the IO3, an IP7 that failed earlier was made to work again. (user-86e1, 2025-11-09, exchange 189988, check: uncheckable)</li>
+<li id="s55">The O2 can use an R12000 CPU, but you may need to adjust the VCORE regulator and possibly update the PROM or resistor straps. (user-231e, 2026-01-05, exchange 61244, check: supported)</li>
+<li id="s56">Rebuilding the PROM from source is possible but requires recovering missing header files; prom corruption issues exist in the current build. (user-8780, 2026-02-08, exchange 213652, check: uncheckable)</li>
+<li id="s57">There are documented methods for recovering O2 motherboards with corrupt PROM. (user-757f, 2026-04-28, exchange 226405, check: supported)</li>
+<li id="s58">The Indy PROM starts by checking endianness; if little-endian, it reprograms the serial EEPROM and resets to start in big-endian mode. (user-3e2d, 2026-07-14, exchange 94307, check: supported)</li>
+<li id="s59">Ya you can set it in the prom (user-cd83, 2026-08-19, exchange 226903, check: uncheckable)</li>
+<li id="s60">yes, with environment variables in prom (user-3e2d, 2026-08-19, exchange 226903, check: uncheckable)</li>
+<li id="s61">-p argument for setenv never worked on their machines; instead, use 'setenv x y', 'printenv', and 'init' to soft reboot the PROM and keep settings alive. (user-e4e2, 2026-08-19, exchange 125007, check: uncheckable)</li>
+<li id="s62">The O2 emulator requires steps to add NVMe support and fix the PROM. (user-3e2d, 2026-08-27, exchange 125174, check: supported)</li>
+<li id="s63">Resetting the environment from PROM can resolve issues with an aging disk. (user-07f2, 2026-09-05, exchange 66237, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="prom-chip.html">PROM chip</a> (4)
+</li>
+<li><a href="prom-code.html">PROM code</a> (6)
+</li>
+<li><a href="prom-command.html">PROM command</a> (3)
+</li>
+<li><a href="prom-emulator.html">PROM emulator</a> (5)
+</li>
+<li><a href="prom-environment-variables.html">PROM environment variables</a> (3)
+</li>
+<li><a href="prom-error.html">PROM error</a> (3)
+</li>
+<li><a href="prom-hinv.html">PROM hinv</a> (5)
+</li>
+<li><a href="prom-image.html">PROM image</a> (4)
+</li>
+<li><a href="prom-monitor.html">PROM monitor</a> (11)
+</li>
+<li><a href="prom-settings.html">PROM settings</a> (4)
+</li>
+<li><a href="prom-update.html">PROM update</a> (6)
+</li>
+<li><a href="prom-variable.html">PROM variable</a> (4)
+</li>
+<li><a href="prom-version.html">PROM version</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="indy.html">Indy</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="origin-350.html">Origin 350</a>, <a href="mac-address.html">MAC address</a>, <a href="onyx4.html">Onyx4</a>, <a href="tezro.html">Tezro</a>, <a href="4d-50.html">4D/50</a>, <a href="a350.html">A350</a>, <a href="blade-2500.html">Blade 2500</a>, <a href="cpu-module.html">CPU module</a>, <a href="challenge-s.html">Challenge S</a>, <a href="fuel.html">Fuel</a>, <a href="ip22.html">IP22</a>, <a href="impact.html">Impact</a>, <a href="indigo2-solid-impact.html">Indigo2 Solid Impact</a>, <a href="macbook.html">MacBook</a>, <a href="origin-200.html">Origin 200</a>, <a href="origin-300.html">Origin 300</a>, <a href="r12000-cpu.html">R12000 CPU</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Processors: <a href="rm7000a.html">RM7000A</a>
+</li>
+<li>Graphics: <a href="max-impact.html">Max Impact</a>, <a href="odyssey-diagnostics.html">Odyssey diagnostics</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="os.html">OS</a>, <a href="kernel.html">kernel</a>, <a href="bsd.html">BSD</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-6-5-7.html">IRIX 6.5.7</a>, <a href="irix-install.html">IRIX install</a>, <a href="netbsd.html">NetBSD</a>, <a href="openbsd.html">OpenBSD</a>, <a href="unix.html">Unix</a>, <a href="netboot.html">netboot</a>
+</li>
+<li>Software: <a href="sash.html">sash</a>, <a href="setenv.html">setenv</a>, <a href="hinv.html">hinv</a>, <a href="inst.html">inst</a>, <a href="compositor.html">Compositor</a>, <a href="efs.html">EFS</a>, <a href="ide.html">IDE</a>, <a href="love.html">LOVE</a>, <a href="mashek.html">Mashek</a>, <a href="qemu.html">QEMU</a>, <a href="vice.html">VICE</a>, <a href="x-server.html">X server</a>, <a href="xz.html">XZ</a>, <a href="environment-variables.html">environment variables</a>, <a href="firmware.html">firmware</a>, <a href="firmware-image.html">firmware image</a>, <a href="init.html">init</a>, <a href="ping.html">ping</a>, <a href="ping-command.html">ping command</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="ram.html">RAM</a>, <a href="serial-console.html">serial console</a>, <a href="cpu.html">CPU</a>, <a href="scsi-controller.html">SCSI controller</a>, <a href="dimm.html">DIMM</a>, <a href="eeprom.html">EEPROM</a>, <a href="eprom.html">EPROM</a>, <a href="hdd.html">HDD</a>, <a href="io-board.html">IO board</a>, <a href="ip59.html">IP59</a>, <a href="ip7.html">IP7</a>, <a href="ip7-board.html">IP7 board</a>, <a href="l1-controller.html">L1 controller</a>, <a href="ps-2-keyboard.html">PS/2 keyboard</a>, <a href="rdram.html">RDRAM</a>, <a href="rom.html">ROM</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="boot-drive.html">boot drive</a>, <a href="command-monitor.html">command monitor</a>, <a href="disk-drive.html">disk drive</a>, <a href="drive.html">drive</a>, <a href="heatsink.html">heatsink</a>, <a href="keyboard.html">keyboard</a>, <a href="mouse.html">mouse</a>
+</li>
+<li>Standards and interfaces: <a href="serial.html">serial</a>, <a href="dvi.html">DVI</a>, <a href="ethernet.html">Ethernet</a>, <a href="ethernet-address.html">Ethernet address</a>, <a href="nfs-share.html">NFS share</a>, <a href="nvme.html">NVMe</a>, <a href="sata.html">SATA</a>, <a href="scsi-interface.html">SCSI interface</a>, <a href="tftp.html">TFTP</a>, <a href="bus-speed.html">bus speed</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="apple.html">Apple</a>
+</li>
+<li>Other: <a href="ip2.html">IP2</a>, <a href="address.html">address</a>, <a href="resetenv.html">resetenv</a>, <a href="66mhz.html">66mhz</a>, <a href="cpld.html">CPLD</a>, <a href="flash.html">Flash</a>, <a href="id.html">ID</a>, <a href="io3.html">IO3</a>, <a href="ian.html">Ian</a>, <a href="mmsc.html">MMSC</a>, <a href="pal.html">PAL</a>, <a href="teton.html">Teton</a>, <a href="wireshark.html">Wireshark</a>, <a href="converter.html">converter</a>, <a href="date.html">date</a>, <a href="debugger.html">debugger</a>, <a href="eaddr.html">eaddr</a>, <a href="reverse-engineering.html">reverse engineering</a>, <a href="update.html">update</a>
+</li></ul>
+</body>
+</html>

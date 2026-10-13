@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX installer</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX installer</h1>
+<p>Claims: 8 Part of <a href="irix.html">IRIX</a></p>
+<p>The IRIX installer is a tool that unpacks files from IRIX installer archives using irixswextract.c. <sup><a href="#s1">1</a></sup> It does not store root and swap information in the partition map but instead uses PROM environment variables. <sup><a href="#s2">2</a></sup> Booting with bootp() loads the IRIX installer. <sup><a href="#s3">3</a></sup> The IRIX installer automatically selects the necessary drivers based on the hardware installed, and the EFS package is more reliable, requiring only one disc for installation. <sup><a href="#s4">4</a></sup> The system may lock up during the IRIX installer after loading tools, possibly related to USB or partition issues. <sup><a href="#s5">5</a></sup> The IRIX installer could be automated to handle different machine types, but it would be a major chore. <sup><a href="#s6">6</a></sup> There is a mirror on GitHub for the IRIX installer. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">irixswextract.c unpacks files from IRIX installer things. (user-3f6f, 2020-08-16, exchange 10619, check: uncheckable)</li>
+<li id="s2">The IRIX installer does not store root and swap information in the partition map but uses PROM environment variables. (user-d903, 2022-04-02, exchange 188350, check: uncheckable)</li>
+<li id="s3">booting with bootp() loads the IRIX installer (user-c9fb, 2022-09-05, exchange 217683, check: uncheckable)</li>
+<li id="s4">The IRIX installer automatically selects the necessary drivers based on the hardware installed; the EFS package is more reliable and only requires one disc for installation. (user-24f0, 2025-10-15, exchange 119196, check: uncheckable)</li>
+<li id="s5">The system locks up during the IRIX installer after loading tools, possibly related to USB or partition issues. (user-281e, 2025-09-07, exchange 59066, check: uncheckable)</li>
+<li id="s6">The IRIX installer could be automated to handle different machine types, but it would be a major chore. (user-42cf, 2025-05-04, exchange 87238, check: uncheckable)</li>
+<li id="s7">There is a mirror on GitHub for the Irix installer. (user-616d, 2025-09-13, exchange 219113, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Standards and interfaces: <a href="nfs-share.html">NFS share</a>
+</li></ul>
+</body>
+</html>

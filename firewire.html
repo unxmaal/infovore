@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firewire</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Firewire</h1>
+<p>Claims: 76 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/FireWire">FireWire</a>, <a href="https://en.wikipedia.org/wiki/SGI_Visual_Workstation">SGI Visual Workstation</a>.</p>
+<h2 id="with-irix">With IRIX</h2>
+<p>IRIX supports FireWire storage, but mounting FireWire disks requires specific steps and does not always work. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> FireWire storage is available on later IRIX systems, at least for external optical devices and CF cards. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> IRIX supports FireWire storage but not USB storage, with FireWire having better native support than USB. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> FireWire device attachment can cause system crashes in IRIX. <sup><a href="#s7">7</a></sup> IRIX supports FireWire storage, potentially limited by the PCI card, and can convert SCSI devices to FireWire. <sup><a href="#s8">8</a></sup></p>
+<h2 id="general">General</h2>
+<p>FireWire is a bus technology that supports external mass storage, CD drives, and DV data transfer at recording speed, with stills saved as DV. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> It performs better than USB in terms of system resource usage and throughput due to DMA transfers and full-duplex capability. <sup><a href="#s11">11</a></sup> On IRIX, FireWire devices use emulated SCSI, and FireWire mass storage is essentially an external hard drive enclosure over a slow bus. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> FireWire does not outperform internal IDE for SSDs, with benchmarks showing IDE is 3x faster than FireWire 400. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> FireWire is used in aircraft and weapons systems for reliability, and was more prevalent than USB for professional use, especially for DV cameras, before USB hard drives became common in 2004-2005. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> FireWire can be made to work on Solaris 9 with a TI PCI-1394 card, and it can be used to mount compact flash cards on an SGI Octane running IRIX. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> Commercial UNIX vendors neglected FireWire and USB, expecting Macs to fade, and FireWire support on some UNIX systems was never fully fixed. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> FireWire has specific PCI IDs for different chipsets, and driver support is tied to these IDs. <sup><a href="#s22">22</a></sup> A combo FireWire/USB card can be used on SGI Fuel machines, with FireWire detected as DM10, though some software support for FireWire on the Fuel was incomplete. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> FireWire can be used to connect a SCSI CD drive, and a FireWire system can use a SCSI drive, though most FireWire enclosures are IDE, which can cause compatibility issues. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> FireWire typically offers 40MB/s, while SCSI on IP35 is at least Ultra160. <sup><a href="#s28">28</a></sup> You can boot later machines in target disk mode from a G3, but not necessarily from earlier ones, and you'd be limited to FireWire speeds. <sup><a href="#s29">29</a></sup> FireWire doesn't work very well in Classic MacOS, and the FireWire bus is probed at boot without error messages. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Firewire mounting disks over IRIX does not work. (user-2d40, 2020-05-20, exchange 96893, check: uncheckable)</li>
+<li id="s2">Mounting a Firewire disk in IRIX requires specific steps. (user-cd83, 2019-11-09, exchange 4140, check: uncheckable)</li>
+<li id="s3">Firewire to CF works under IRIX on later systems (user-b7c4, 2019-08-25, exchange 203914, check: uncheckable)</li>
+<li id="s4">Firewire has storage drivers on newer IRIX systems, at least for external optical devices. (user-cd83, 2023-11-22, exchange 42586, check: uncheckable)</li>
+<li id="s5">IRIX supports Firewire storage but not USB storage. (user-b7c4, 2020-05-30, exchange 216937, check: uncheckable)</li>
+<li id="s6">FireWire has better native support in IRIX than USB, which is hardware-only for IP35. (user-b7c4, 2020-12-28, exchange 204592, check: uncheckable)</li>
+<li id="s7">Firewire device attachment can cause system crashes in IRIX. (user-e4d0, 2020-06-11, exchange 216947, check: uncheckable)</li>
+<li id="s8">IRIX supports FireWire storage, potentially limited by the PCI card, and can convert SCSI devices to FireWire. (user-0251, 2024-04-10, exchange 210224, check: uncheckable)</li>
+<li id="s9">The SGI FireWire can be used for external mass storage and CD drives with specific hardware. (user-22f9, 2020-10-15, exchange 97685, check: uncheckable)</li>
+<li id="s10">FireWire is primarily for transferring DV data at recording speed, with stills saved as DV. (user-79ed, 2020-11-06, exchange 11995, check: uncheckable)</li>
+<li id="s11">Firewire performs better than USB in terms of system resource usage and throughput due to DMA transfers and full-duplex capability. (user-c831, 2020-05-14, exchange 231210, check: uncheckable)</li>
+<li id="s12">Firewire devices on IRIX use emulated SCSI. (user-7b1c, 2022-06-06, exchange 222305, check: uncheckable)</li>
+<li id="s13">Firewire mass storage is basically just an external HD enclosure over a slow bus; it's easier and better to just grab an external U320 one. (user-b7c4, 2022-02-07, exchange 102097, check: uncheckable)</li>
+<li id="s14">FireWire interface may not outperform internal IDE for SSDs, with FireWire CF performing worse than internal IDE SSD. (user-17cb, 2020-05-07, exchange 96818, check: uncheckable)</li>
+<li id="s15">The firewire bus is not faster than IDE for SATA SSDs; a benchmark shows IDE is 3x faster than firewire 400. (user-17cb, 2020-05-13, exchange 143816, check: supported)</li>
+<li id="s16">FireWire is used in aircraft and weapons systems for reliability. (user-c383, 2022-03-20, exchange 206702, check: uncheckable)</li>
+<li id="s17">USB hard drives and flash drives were not common until 2004-2005; Firewire was more prevalent for professional use, especially for DV cameras; U320 SCSI HDDs are powerful. (user-8de9, 2022-02-07, exchange 102097, check: supported)</li>
+<li id="s18">Firewire storage can be made to work on Solaris 9 with a TI PCI-1394 card. (user-07ed, 2023-05-04, exchange 107440, check: supported)</li>
+<li id="s19">FireWire on IRIX can be used to mount compact flash cards on an Octane. (user-24f0, 2024-11-13, exchange 112743, check: supported)</li>
+<li id="s20">Commercial UNIX vendors neglected FireWire and USB, expecting Macs to fade. (user-baf6, 2024-03-27, exchange 223808, check: uncheckable)</li>
+<li id="s21">Firewire was never fully fixed on some models. (user-e872, 2025-08-08, exchange 58228, check: uncheckable)</li>
+<li id="s22">Firewire has specific PCI IDs for different chipsets, and driver support is tied to these IDs. (user-e4d0, 2025-06-04, exchange 225136, check: uncheckable)</li>
+<li id="s23">A combo Firewire/USB card can be used on SGI Fuel machines, with Firewire detected as DM10 and USB supporting keyboard and mouse. (user-3e2d, 2025-12-27, exchange 225831, check: supported)</li>
+<li id="s24">Some software support for FireWire on the Fuel was incomplete. (user-1a5a, 2026-06-26, exchange 244133, check: supported)</li>
+<li id="s25">FireWire can be used to connect a SCSI CD drive, and DVLink does not support FireWire storage devices. (user-e4d0, 2024-10-11, exchange 224146, check: uncheckable)</li>
+<li id="s26">A FireWire system can use a SCSI drive. (user-616d, 2025-03-02, exchange 212114, check: uncheckable)</li>
+<li id="s27">Most FireWire enclosures are IDE, which can cause compatibility issues. (user-e872, 2024-10-23, exchange 49995, check: uncheckable)</li>
+<li id="s28">FireWire typically offers 40MB/s, while SCSI on IP35 is at least Ultra160. (user-86e1, 2024-04-10, exchange 210224, check: supported)</li>
+<li id="s29">You can boot later machines in target disk mode from a G3, but not necessarily from earlier ones; you'd be limited to FireWire speeds. (user-6e7b, 2024-04-13, exchange 148480, check: uncheckable)</li>
+<li id="s30">Firewire doesn't work very well in Classic MacOS (user-1a5a, 2025-12-26, exchange 232859, check: uncheckable)</li>
+<li id="s31">FireWire bus is probed at boot w/o error msgs (user-e4d0, 2024-10-10, exchange 224143, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="firewire-card.html">FireWire card</a> (18)
+</li>
+<li><a href="firewire-mass-storage.html">firewire mass storage</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="fuel.html">Fuel</a>, <a href="320.html">320</a>, <a href="g3.html">G3</a>, <a href="mac.html">Mac</a>
+</li>
+<li>Processors: <a href="060-cpu.html">060 CPU</a>
+</li>
+<li>Graphics: <a href="dvlink.html">DVLink</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris-9.html">Solaris 9</a>, <a href="classic-mac-os.html">Classic Mac OS</a>, <a href="solaris-8.html">Solaris 8</a>, <a href="x11.html">X11</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>, <a href="chimera.html">Chimera</a>, <a href="postscript.html">PostScript</a>
+</li>
+<li>Parts and peripherals: <a href="ip35.html">IP35</a>, <a href="dm10.html">DM10</a>, <a href="compact-flash-card.html">Compact Flash card</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="audio.html">audio</a>, <a href="flash-drive.html">flash drive</a>, <a href="texture-ram.html">texture RAM</a>
+</li>
+<li>Standards and interfaces: <a href="usb.html">USB</a>, <a href="scsi.html">SCSI</a>, <a href="pci-slot.html">PCI slot</a>, <a href="gigabit-ethernet.html">gigabit Ethernet</a>
+</li>
+<li>Other: <a href="30.html">.30</a>, <a href="2k.html">2k</a>, <a href="adat.html">ADAT</a>, <a href="cf.html">CF</a>, <a href="cinema-display.html">Cinema display</a>, <a href="lan.html">LAN</a>, <a href="ohci.html">OHCI</a>, <a href="ultra-30.html">Ultra 30</a>, <a href="zip.html">Zip</a>, <a href="film-scanner.html">film scanner</a>, <a href="ipod.html">iPod</a>
+</li></ul>
+</body>
+</html>

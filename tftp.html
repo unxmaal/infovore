@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TFTP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>TFTP</h1>
+<p>Claims: 37 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Debian">Debian</a>, <a href="https://en.wikipedia.org/wiki/File_Transfer_Protocol">File Transfer Protocol</a>, <a href="https://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol">Trivial File Transfer Protocol</a>.</p>
+<p>TFTP is commonly used alongside other network services such as BOOTP, DHCP, RARP, BOOTPARAM, NFS, and rsh to enable netbooting and remote installation of various operating systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> TFTP is used to load boot images, kernels, initrd, and firmware over the network, often as part of a multi-step process that includes acquiring an IP address and mounting a root filesystem. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s10">10</a></sup> Some bootloaders, such as ELILO and EFI loaders, request a TFTP server to obtain the next boot component, which can be an OS kernel. <sup><a href="#s11">11</a></sup><sup><a href="#s18">18</a></sup> Several tools and systems rely on TFTP for network installation, including booterizer, Love, IRIXboot, Jumpstart, and the miniroot installer. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s22">22</a></sup> TFTP can be used through Linux, including in virtual machines, and can serve as an alternative when Wi-Fi does not work. <sup><a href="#s2">2</a></sup><sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> TFTP lacks login functionality and is considered old, and file transfers over TFTP can be slower than over FTP. <sup><a href="#s25">25</a></sup><sup><a href="#s24">24</a></sup> TFTP issues can arise from configuration problems such as missing or inaccessible directories, port range settings, and service state, which may be resolved by restarting the service or adjusting settings. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Setting up a Linux jumpserver for Solaris involves configuring TFTP, RARP, BOOTPARAM, and NFS, and ensuring direct cable connection for netbooting. (user-2189, 2019-01-29, exchange 203666, check: uncheckable)</li>
+<li id="s2">The installation can be done off a Windows laptop by setting up required bits and pieces like bootp, tftp, and rsh on a virtual machine. (user-42cf, 2019-07-31, exchange 2832, check: uncheckable)</li>
+<li id="s3">Xterminals used BOOTP to configure themselves, TFTP to get firmware, and XDMCP to find a login host, running X11 from there. (user-cb4c, 2020-01-22, exchange 5648, check: uncheckable)</li>
+<li id="s4">The netboot process described in the Jurassic NL manual uses PXE, which combines BOOTP/DHCP and TFTP, and can be set up using HTTP for the rootfs, which is slightly easier to set up than NFS. (user-1446, 2020-04-20, exchange 7669, check: uncheckable)</li>
+<li id="s5">Net booting IRIX from another SGI involves bootp, tftp, and rsh. (user-9860, 2021-10-23, exchange 21422, check: uncheckable)</li>
+<li id="s6">Jumpstart uses TFTP to load data over the network, with ARP/RARP for connection establishment. (user-7151, 2022-12-11, exchange 239915, check: uncheckable)</li>
+<li id="s7">the process of booting a target involves acquiring an IP address, figuring out what to do next, acquiring a bootloader via TFTP, and booting a kernel via NFS (permissions issues may be related to root squash). (user-42cf, 2023-06-07, exchange 240055, check: uncheckable)</li>
+<li id="s8">The OpenBSD/sgi network boot process uses DHCP for IP assignment, TFTP for the boot image, and Bootparamd for file system and swap partition information. (user-6e7b, 2024-03-24, exchange 45311, check: uncheckable)</li>
+<li id="s9">To network install OpenBSD on an SGI Indy, you need a running install server and properly configure TFTP and DHCP. The process involves setting up the server and configuring the Indy to boot from the network. (user-a079, 2024-08-11, exchange 48271, check: supported)</li>
+<li id="s10">The OpenBSD boot process for SGI machines involves determining IP via BOOTP/DHCP, loading a kernel via TFTP, kernel starting, determining IP, asking Bootparamd for root and swap paths, and mounting root via NFS. (user-6e7b, 2026-04-26, exchange 90495, check: uncheckable)</li>
+<li id="s11">ELILO loads the kernel and initrd via TFTP. (user-bc5d, 2019-11-27, exchange 74983, check: uncheckable)</li>
+<li id="s12">the pi booterizer uses an archaic tftp / rsh process for loading the miniroot, which is secure only through hostname and IP checks (user-2189, 2020-03-14, exchange 77110, check: uncheckable)</li>
+<li id="s13">miniroot contains sash.* files, and fx files are typically loaded from TFTP. (user-c9fb, 2021-11-16, exchange 77481, check: uncheckable)</li>
+<li id="s14">The Tezro and Origin require loading the kernel over network using TFTP because they lack a spinning SCSI disk and need a loaded SATA driver. (user-7973, 2022-12-07, exchange 222705, check: supported)</li>
+<li id="s15">To start the installation, netboot the LOVE installer over TFTP and load the second stage file and install media over HTTP; DHCP needs TFTP parameters set; patch 'mod_install.sh' and 'mod_palo.sh' before rebooting to use (user-7973, 2025-01-03, exchange 163628, check: uncheckable)</li>
+<li id="s16">The O300 can boot from TFTP. (user-86e1, 2025-10-24, exchange 236479, check: supported)</li>
+<li id="s17">The PROM only needs the kernel in a format it can understand to boot, whether via TFTP or a tiny XFS SCSI partition like zuluscsi/etc. (user-f190, 2026-03-05, exchange 226162, check: uncheckable)</li>
+<li id="s18">The EFI bootloader in the SGI Altix350 netboot process uses an EFI loader to request DHCP, which points to a TFTP server for the next server, which can be any program, including an OS kernel leader like ELILO. (user-bc5d, 2020-04-20, exchange 7669, check: uncheckable)</li>
+<li id="s19">The miniroot installer uses special rsh and tftp magic for network installs. (user-848e, 2020-02-13, exchange 6367, check: uncheckable)</li>
+<li id="s20">booterizer serves files using tftp and can install them with `inst`. (user-b1da, 2020-04-26, exchange 77167, check: supported)</li>
+<li id="s21">IRIXboot has an issue where TFTP dies after booting fx, showing an error about null terminated bytes. (user-c9fb, 2020-11-16, exchange 77289, check: uncheckable)</li>
+<li id="s22">Love simplifies bootp, tftp, and rsh into a single binary, making it more NAT-friendly. (user-986f, 2025-09-25, exchange 216807, check: uncheckable)</li>
+<li id="s23">TFTP is old and can be used through Linux if Wi-Fi doesn't work. (user-e872, 2021-01-10, exchange 13717, check: uncheckable)</li>
+<li id="s24">Booterizer can run in virtual machines on a Linux PC, but setting up a secure environment is challenging; TFTP lacks login functionality. (user-e872, 2022-02-10, exchange 25565, check: uncheckable)</li>
+<li id="s25">Using `tftp` for file transfers can be slower than `ftp`, as I found out. (user-b1da, 2020-10-18, exchange 11649, check: supported)</li>
+<li id="s26">The assigned TFTP port range in tftpd-hpa’s defaults file resolves issues with the Indigo handling high port numbers after an initial transfer on port 69. (user-86c4, 2022-12-31, exchange 35185, check: supported)</li>
+<li id="s27">The TFTP setup may work for file transfer but encountering an opendir error indicates the directory does not exist or is not accessible, preventing bootability. (user-5c71, 2023-06-06, exchange 183984, check: uncheckable)</li>
+<li id="s28">Restarting the TFTP service or the whole server can help with TFTP issues in R10K Indigo²s. (user-6e7b, 2024-03-27, exchange 240282, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="tftp-server.html">TFTP server</a> (10)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="o300.html">O300</a>, <a href="origin.html">Origin</a>, <a href="tezro.html">Tezro</a>, <a href="netbooting.html">netbooting</a>, <a href="pi-booterizer.html">pi booterizer</a>
+</li>
+<li>Processors: <a href="r10k-indigo.html">R10K Indigo²</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="openbsd.html">OpenBSD</a>, <a href="debian.html">Debian</a>, <a href="linux.html">Linux</a>, <a href="openbsd-sgi.html">OpenBSD/sgi</a>, <a href="booting.html">booting</a>, <a href="kernel.html">kernel</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="rsh.html">rsh</a>, <a href="booterizer.html">Booterizer</a>, <a href="love.html">LOVE</a>, <a href="love-installer.html">LOVE installer</a>, <a href="inst.html">inst</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="zuluscsi.html">ZuluSCSI</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="bootp.html">bootp</a>, <a href="nfs.html">NFS</a>, <a href="dns.html">DNS</a>, <a href="efi.html">EFI</a>, <a href="ftp.html">FTP</a>, <a href="ip-address.html">IP address</a>, <a href="ipv6.html">IPv6</a>, <a href="xdmcp.html">XDMCP</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="bootp-dhcp.html">BOOTP/DHCP</a>, <a href="http.html">HTTP</a>, <a href="pxe.html">PXE</a>, <a href="rarp.html">RARP</a>, <a href="arp.html">ARP</a>, <a href="jumpstart.html">Jumpstart</a>, <a href="irixboot.html">irixboot</a>, <a href="tftpd-hpa.html">tftpd-hpa</a>
+</li></ul>
+</body>
+</html>

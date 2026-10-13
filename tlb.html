@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TLB</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>TLB</h1>
+<p>Claims: 5</p>
+<p>The TLB is a cache that stores recent full address translations, and it was a significant speedup. <sup><a href="#s1">1</a></sup> A hardware TLB exists but is managed in software by the MIPS CPU. <sup><a href="#s2">2</a></sup> The cache and the TLB were separate boards rather than separate chips. <sup><a href="#s3">3</a></sup> The CPU info TLB entry is not set at tlb 0 for the wired CPU. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">it is just super simple concept of caching last full address translations (mips segment+tlb) it was a huge speedup for me (user-3e2d, 2026-04-28, exchange 220414, check: uncheckable)</li>
+<li id="s2">A hardware TLB exists but is managed in software by the MIPS CPU. An invalid memory access at 0x0 can indicate a kernel or software bug. The bad address is 0x88, which varies. Check if the bad address is always 0x0. Over (user-2a3c, 2025-10-03, exchange 225520, check: uncheckable)</li>
+<li id="s3">the cache but also the TLB were not just separate chips but separate *boards* (user-f8e4, 2021-06-21, exchange 17996, check: uncheckable)</li>
+<li id="s4">The CPU info TLB entry is not set at tlb 0 for the wired CPU. (user-231e, 2026-01-20, exchange 93698, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="tlb-exception.html">TLB exception</a> (4)
+</li>
+<li><a href="tlb-miss.html">TLB miss</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iris.html">IRIS</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="mips-cpu.html">MIPS CPU</a>
+</li>
+<li>Parts and peripherals: <a href="cpu.html">CPU</a>, <a href="cache.html">cache</a>
+</li></ul>
+</body>
+</html>

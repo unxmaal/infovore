@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tdnf</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>tdnf</h1>
+<p>Claims: 31 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/XMMS">XMMS</a>.</p>
+<p>tdnf is a package manager for TARDIST-based systems that automatically handles dependencies, and it is used to install the base system on SGUG-RSE instead of extracting the entire repository. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> tdnf installs GPG-signed packages, imports the GPG key into rpmdb, and understands $release and $arch variables for multi-arch packages, but has issues with http paths. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> tdnf can install a wide range of packages, including Motif versions of Netsurf, Icebreaker, chocolate-doom, flx-locate, flx-joyride, Dune II, and SDL2, from online, S3, or local repositories. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> tdnf update checks for updates and may update existing packages, but does not download and install all available updates at once. <sup><a href="#s13">13</a></sup> tdnf search can list the same package multiple times if there are duplicate repositories configured, and repo priority can control which repo tdnf downloads from. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> There are known issues with tdnf, including segfaulting when downloading packages, a leftover sudo process consuming CPU, and packages such as XMMS, dosbox, and SDL_image being added to SGUG-RSE but not yet available via tdnf. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> tdnf may be broken and upgrading to the latest version on the repository may fix issues, and it could allow building and packaging 32-bit and 64-bit MIPS3 and MIPS4 packages. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">swmgr is a graphical package manager for TARDIST-based systems, while dnf/rpm-based systems use tools like tdnf for package installation, which automatically handles dependencies. (user-2d40, 2021-11-14, exchange 80111, check: uncheckable)</li>
+<li id="s2">The SGUG-RSE project uses a ports repository and installs the base system via tdnf, unlike the old method of extracting the entire repo. (user-17cb, 2024-05-31, exchange 210399, check: uncheckable)</li>
+<li id="s3">tdnf properly imports the GPG key into rpmdb for the GPG key issue. (user-cd7d, 2021-04-13, exchange 69429, check: uncheckable)</li>
+<li id="s4">tdnf installs GPG signed packages, understands $release and $arch vars for multi-arch packages, but has issues with http paths. (user-f229, 2021-04-13, exchange 69428, check: uncheckable)</li>
+<li id="s5">The `tdnf` command installs software on SGI systems, such as the Motif version of Netsurf, and requires `sugshell` to be run before executing `netsurf-motif`. The installation process does not exhibit noticeable lag. (user-f229, 2021-12-12, exchange 70101, check: supported)</li>
+<li id="s6">$ sudo tdnf install icebreaker installs the Icebreaker package; see https://linuxmasterclub.com/icebreaker for details. (user-f229, 2022-04-17, exchange 70352, check: uncheckable)</li>
+<li id="s7">The newest netsurf-motif can be installed via tdnf. (user-f229, 2022-05-27, exchange 217588, check: uncheckable)</li>
+<li id="s8">The `tdnf` package manager can install `chocolate-doom` and its dependencies from an S3 URI on an RSE 007 system. (user-f229, 2023-01-16, exchange 70673, check: supported)</li>
+<li id="s9">The `flx-locate` utility is available for IRIX via `tdnf install flx-locate`. (user-8506, 2025-07-31, exchange 215786, check: supported)</li>
+<li id="s10">To install flx-joyride, use `sudo tdnf install flx-joyride`. It is available in the online repo. (user-7973, 2025-11-14, exchange 88662, check: supported)</li>
+<li id="s11">Dune II can be installed on SGUG systems using the provided RPM and installed via tdnf. (user-7973, 2026-03-22, exchange 90098, check: uncheckable)</li>
+<li id="s12">The SDL2 package is available in the online repo and can be installed via tdnf, version 2.0.12 is mentioned. (user-7973, 2026-06-14, exchange 216028, check: supported)</li>
+<li id="s13">tdnf update checks for updates and may update existing packages, but does not download and install all available updates at once. (user-7973, 2025-01-17, exchange 86309, check: uncheckable)</li>
+<li id="s14">tdnf search can list the same package multiple times if there are duplicate repositories configured. (user-24f0, 2023-03-21, exchange 83200, check: uncheckable)</li>
+<li id="s15">In the repo config, you can set priority to control repo order, and tdnf can override which repo to download from. (user-7973, 2026-04-05, exchange 215964, check: uncheckable)</li>
+<li id="s16">There is a known issue where tdnf seg faults when trying to download packages. (user-d203, 2021-12-05, exchange 206019, check: uncheckable)</li>
+<li id="s17">A leftover `sudo` process is consuming all CPU, possibly due to a background task or a bug in tdnf. (user-b1da, 2022-12-07, exchange 34570, check: supported)</li>
+<li id="s18">The package SDL_image has been added to SGUG-RSE but is not yet available via tdnf search. (user-7973, 2023-03-24, exchange 70735, check: uncheckable)</li>
+<li id="s19">Dos2unix is a standard conversion tool for IRIX 3.3.2; it installs via tdnf from the local repository. The user is unable to find dosbox via tdnf, suggesting it may not be available in the local repository or needs to be (user-0ec4, 2024-08-07, exchange 210770, check: supported)</li>
+<li id="s20">dosbox is in SGUG-RSE, but not available via tdnf; use the one from nekoware that works with SDL1.x. (user-7973, 2024-08-25, exchange 210859, check: uncheckable)</li>
+<li id="s21">tdnf could allow building and packaging 32bit and 64bit MIPS3 and MIPS4 packages, keeping track of which ones are installed. (user-f229, 2021-04-13, exchange 69428, check: supported)</li>
+<li id="s22">tdnf probably just decided to break (user-b1da, 2022-12-07, exchange 34574, check: uncheckable)</li>
+<li id="s23">upgrading to the latest on repo may fix tdnf issues (user-cd7d, 2022-12-07, exchange 34574, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix-3-3-2.html">IRIX 3.3.2</a>, <a href="irix-5-3.html">IRIX 5.3</a>
+</li>
+<li>Software: <a href="package.html">package</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="xmms.html">xmms</a>, <a href="rpm.html">RPM</a>, <a href="netsurf-motif.html">netsurf-motif</a>, <a href="sgugshell.html">sgugshell</a>, <a href="dosbox.html">DOSBox</a>, <a href="rpm-package.html">RPM package</a>, <a href="rse.html">RSE</a>, <a href="sdl2.html">SDL2</a>, <a href="dnf.html">dnf</a>, <a href="nekoware.html">nekoware</a>, <a href="sgug-rse-project.html">sgug-rse project</a>, <a href="sudo.html">sudo</a>, <a href="swmgr.html">swmgr</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>
+</li>
+<li>Companies: <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="gpg-key.html">GPG key</a>, <a href="chocolate-doom.html">chocolate-doom</a>, <a href="cloud-repo.html">cloud repo</a>, <a href="gettext.html">gettext</a>, <a href="sugshell.html">sugshell</a>, <a href="xsginet.html">xsginet</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RISC-V</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RISC-V</h1>
+<p>Claims: 58 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/RISC-V">RISC-V</a>.</p>
+<p>RISC-V is an open-source, modern ISA that has been promoted as the next big architecture for years, changing business models for CPU companies hoping to attract users away from ARM. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It is optimized for low-power cases but is slower per watt and per clock cycle than ARM or AMD64, and its latest draft CPU is a 32-bit RISC-V based processor running at 128 MHz with 16 MB of RAM, 8 MB of EPROM, IDE support, 640x480 video output, and PS/2 keyboard support. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> RISC-V has consistent execution time for every instruction, though unaligned memory accesses are exceptions handled by the OS in kernel mode in some implementations, while most implementations allow unaligned accesses. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> It supports hardware page table walking, may have delay slots that are transparent to the programmer, and uses CSRs that are special registers accessible via special instructions rather than mapped to memory. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> RISC-V is doing well in the embedded market and is being adopted by many large companies, including WD, which uses it in hard disk controllers, and SiFive, which sells RISC-V SoCs for development and support. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> However, it faces challenges in general computing or HPC due to limited SoCs availability and licensing issues, with proper development boards costing hundreds or even thousands of dollars, and a RISC-V smartphone would not get off to a good start. <sup><a href="#s13">13</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> RISC-V is expected to match x86 performance and ARM energy efficiency in about ten years, may take 5-10 years to be used heavily embedded and for mobile adoption, and could become a competitive architecture if developed further. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> Baikal's MIPS Baikal is still available, but future development is moving to RISC-V. <sup><a href="#s22">22</a></sup> RISC-V is a lot like MIPS but without delay slots. <sup><a href="#s23">23</a></sup> Modern RISC architectures have become more CISC-like, as seen in ARM, SPARC, POWER, and RISC-V. <sup><a href="#s24">24</a></sup> The ESP32's main line is based on xtensa, but the C3 series uses RISC-V; both have been reliable for development support. <sup><a href="#s25">25</a></sup> RISC-V and PowerPC boards are available, with SiFive providing RISC-V boards and Raptor offering PowerPC boards, though they may be sold out or overpriced. <sup><a href="#s26">26</a></sup> The Pocket Reform offers CPU cards for various architectures, including RISC-V, NXP, and Raspberry Pi, in a compact form factor. <sup><a href="#s27">27</a></sup> The T31_ZX has a RISC-V core and is mostly used for video; it can run little-endian and has been tested with busybox and Slackware 15. <sup><a href="#s28">28</a></sup> The linker can output ELF binaries for RISC-V, but not bare binaries, requiring objcopy for the text segment. <sup><a href="#s29">29</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">RISC-V is not competitive or cheap enough. (user-b7c4, 2020-04-14, exchange 7470, check: uncheckable)</li>
+<li id="s2">RISC-V and OpenSPARC are open-source architectures, but they have limitations. (user-7b1c, 2021-11-17, exchange 22238, check: uncheckable)</li>
+<li id="s3">risc-v has been the next thing for years now (user-f9d4, 2019-09-08, exchange 3423, check: uncheckable)</li>
+<li id="s4">RISC-V has changed business models for CPU companies hoping to attract users away from ARM. (user-f9d4, 2019-09-22, exchange 95541, check: uncheckable)</li>
+<li id="s5">The latest draft of the CPU is a 32-bit RISC-V based processor running at 128 MHz with 16 MB of RAM, 8 MB of EPROM, IDE support, a video output resolution of 640x480, and PS/2 for keyboard. (user-3dfe, 2020-01-17, exchange 5513, check: supported)</li>
+<li id="s6">The Risc-V is optimized for low-power cases and is slower per watt and per clock cycle than ARM or AMD64. (user-7b1c, 2020-03-13, exchange 74044, check: uncheckable)</li>
+<li id="s7">RiscV has consistent execution time for every instruction. (user-4c09, 2020-08-12, exchange 10577, check: uncheckable)</li>
+<li id="s8">unaligned memory accesses are exceptions in RISC-V, which can be slow and are handled by the OS in kernel mode (user-f8e4, 2020-12-12, exchange 12830, check: uncheckable)</li>
+<li id="s9">RISC-V allows unaligned accesses in most implementations. (user-f8e4, 2020-12-12, exchange 12831, check: uncheckable)</li>
+<li id="s10">RISC-V supports hardware page table walking, a feature not common in RISC architectures of the 90s but now found in many implementations, including RISC-V and some PowerPC chips. (user-f8e4, 2020-12-12, exchange 12831, check: supported)</li>
+<li id="s11">RISC-V could have delay slots but they're transparent to the programmer. (user-f8e4, 2021-06-18, exchange 17944, check: uncheckable)</li>
+<li id="s12">CSRs in RISC-V are special registers accessible via special instructions and not mapped to memory. (user-b1da, 2021-09-09, exchange 205517, check: uncheckable)</li>
+<li id="s13">RISC-V is doing well in the embedded market, but faces challenges in the general computing or HPC space due to limited SoCs availability and licensing issues. (user-b1da, 2020-07-29, exchange 10126, check: uncheckable)</li>
+<li id="s14">RiscV is being adopted by many large companies. (user-4c09, 2020-08-12, exchange 10556, check: uncheckable)</li>
+<li id="s15">SiFive sells RiscV SoCs for development and support. (user-4c09, 2020-08-12, exchange 10577, check: uncheckable)</li>
+<li id="s16">WD plans to use RiscV for future hard disk controllers, investing significant resources into it. (user-4c09, 2020-08-12, exchange 10558, check: uncheckable)</li>
+<li id="s17">WD uses RISC-V in their hard drive controllers. (user-1361, 2020-10-16, exchange 11558, check: uncheckable)</li>
+<li id="s18">a RISC-V smartphone would not get off to a very good start (user-b1da, 2020-08-12, exchange 10547, check: uncheckable)</li>
+<li id="s19">Proper development boards for RISC-V cost hundreds or even thousands of dollars, making them expensive for smaller companies. (user-cade, 2020-09-14, exchange 11020, check: uncheckable)</li>
+<li id="s20">RISC-V is expected to match x86 performance and ARM energy efficiency in about ten years, and could become a competitive architecture if developed further. (user-c383, 2019-12-03, exchange 4535, check: supported)</li>
+<li id="s21">RiscV may take 5-10 years to be used heavily embedded and for mobile adoption. (user-4c09, 2020-08-12, exchange 10558, check: supported)</li>
+<li id="s22">MIPS Baikal is still available but future development is moving to RISC-V. (user-3123, 2021-10-13, exchange 21043, check: uncheckable)</li>
+<li id="s23">RISC-V is a lot like MIPS but without delay slots. (user-8203, 2025-03-23, exchange 227249, check: uncheckable)</li>
+<li id="s24">Modern RISC architectures have become more CISC-like, as seen in ARM, SPARC, POWER, and RISC-V. (user-7b1c, 2021-12-13, exchange 217349, check: uncheckable)</li>
+<li id="s25">The ESP32's main line is based on xtensa, but the C3 series uses RISC-V; both have been reliable for development support. (user-8307, 2021-10-21, exchange 21374, check: uncheckable)</li>
+<li id="s26">RISC-V and PowerPC boards are available, with SiFive providing RISC-V boards and Raptor offering PowerPC boards, though they may be sold out or overpriced. (user-5906, 2023-01-11, exchange 165997, check: uncheckable)</li>
+<li id="s27">The Pocket Reform offers CPU cards for various architectures, including RISC-V, NXP, and Raspberry Pi, in a compact form factor. (user-5906, 2023-01-11, exchange 165998, check: uncheckable)</li>
+<li id="s28">The T31_ZX has a RISC-V core and is mostly used for video; it can run little-endian and has been tested with busybox and Slackware 15. (user-fcb6, 2023-11-18, exchange 42312, check: supported)</li>
+<li id="s29">The linker can output ELF binaries for RISC-V, but not bare binaries, requiring objcopy for the text segment. (user-b1da, 2021-11-17, exchange 22262, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="risc-v-board.html">RISC-V board</a> (3)
+</li>
+<li><a href="risc-v-cpu.html">RISC-V CPU</a> (3)
+</li>
+<li><a href="risc-v-soft-core.html">RISC-V soft-core</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="arm.html">ARM</a>, <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="sparc.html">SPARC</a>, <a href="32-bit.html">32-bit</a>, <a href="powerpc.html">PowerPC</a>, <a href="r12000.html">R12000</a>, <a href="x86.html">x86</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="elf-binaries.html">ELF binaries</a>, <a href="gnu-as.html">GNU as</a>, <a href="compiler.html">compiler</a>
+</li>
+<li>Parts and peripherals: <a href="16mb-of-ram.html">16MB of RAM</a>, <a href="power.html">POWER</a>
+</li>
+<li>Standards and interfaces: <a href="glibc.html">glibc</a>
+</li>
+<li>Companies: <a href="amd64.html">AMD64</a>, <a href="nvidia.html">Nvidia</a>
+</li>
+<li>Other: <a href="sifive.html">SiFive</a>, <a href="wd.html">WD</a>, <a href="delay-slots.html">Delay slots</a>, <a href="esp32.html">ESP32</a>, <a href="nxp.html">NXP</a>, <a href="openpower.html">OpenPOWER</a>, <a href="opensparc.html">OpenSPARC</a>, <a href="raptor.html">Raptor</a>, <a href="busybox.html">busybox</a>, <a href="objcopy.html">objcopy</a>
+</li></ul>
+</body>
+</html>

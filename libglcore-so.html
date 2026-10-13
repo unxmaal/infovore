@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>libGLcore.so</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>libGLcore.so</h1>
+<p>Claims: 3</p>
+<p>Tyrquake requires linking against libGLcore.so, but this causes issues due to undefined references. <sup><a href="#s1">1</a></sup> The error `rld: Error: unresolvable symbol in /usr/lib32/libGLcore.so: __rld_obj_head` occurs when using the `-Wl,--version-script,binary.ver` option in the link. <sup><a href="#s2">2</a></sup> Alias 7 runs without libGLcore.so on O2, but earlier versions require hacks and work on Extreme. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Tyrquake requires linking against libGLcore.so, which is causing issues due to undefined references. (user-59b9, 2021-06-27, exchange 69690, check: uncheckable)</li>
+<li id="s2">The error `rld: Error: unresolvable symbol in /usr/lib32/libGLcore.so: __rld_obj_head` occurs when using the `-Wl,--version-script,binary.ver` option in the link. (user-9860, 2021-12-03, exchange 70072, check: supported)</li>
+<li id="s3">Alias 7 runs without libGLcore.so on O2, but earlier versions require hacks and work on Extreme. (user-8547, 2024-06-28, exchange 85334, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Graphics: <a href="extreme.html">Extreme</a>
+</li>
+<li>Software: <a href="tyrquake.html">TyrQuake</a>, <a href="mplayer.html">mplayer</a>, <a href="rld.html">rld</a>
+</li></ul>
+</body>
+</html>

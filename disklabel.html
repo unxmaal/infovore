@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>disklabel</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>disklabel</h1>
+<p>Claims: 13</p>
+<p>The SGI disklabel limits partition sizes to 32-bit block counts, suggesting a maximum partition size of 2TB, though a 4TB drive might work with careful partitioning. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> disklabel and format-type utilities use blocks because disks are sold by size but are internally divided into blocks. <sup><a href="#s3">3</a></sup> Overwriting the disklabel on the system disk can lead to data loss and system instability. <sup><a href="#s4">4</a></sup> The SGI disklabel is not understood by Linux, which can cause issues with mounting SGI disks. <sup><a href="#s5">5</a></sup> Reading SGI filesystems like EFS and XFS can be complicated due to disklabel and filesystem issues. <sup><a href="#s6">6</a></sup> The Solaris installer requires a disk label to create a new partition layout, and will remove existing partitions if one is not present. <sup><a href="#s7">7</a></sup> The format utility's command-line mode can create a Sun disklabel, necessary for partitioning a blank disk. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SGI disklabel has a limit of 2 TB due to 32-bit values for partition start and size. (user-b1da, 2022-03-27, exchange 206734, check: supported)</li>
+<li id="s2">The SGI disklabel limits partition sizes to 32-bit block counts, suggesting a maximum partition size of 2TB, though a 4TB drive might work with careful partitioning. (user-b1da, 2021-08-31, exchange 99912, check: supported)</li>
+<li id="s3">disklabel and format-type utilities use blocks because disks are sold by size but are internally divided into blocks (user-42cf, 2020-05-01, exchange 7954, check: uncheckable)</li>
+<li id="s4">Overwriting the disklabel on the system disk can lead to data loss and system instability. (user-42cf, 2020-04-16, exchange 7543, check: uncheckable)</li>
+<li id="s5">The SGI disklabel is not understood by Linux, which can cause issues with mounting SGI disks. (user-d903, 2021-07-13, exchange 221403, check: uncheckable)</li>
+<li id="s6">Reading SGI filesystems like EFS and XFS can be complicated due to disklabel and filesystem issues. (user-d903, 2021-03-05, exchange 217054, check: uncheckable)</li>
+<li id="s7">The Solaris installer requires a disk label to create a new partition layout, and will remove existing partitions if one is not present. (user-03ad, 2023-03-14, exchange 239986, check: uncheckable)</li>
+<li id="s8">The format utility's command-line mode can create a Sun disklabel, necessary for partitioning a blank disk. (user-d5ee, 2024-04-19, exchange 240299, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="filesystem.html">filesystem</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="xfs.html">XFS</a>, <a href="format-utility.html">format utility</a>
+</li>
+<li>Parts and peripherals: <a href="hdd.html">HDD</a>, <a href="system-disk.html">system disk</a>
+</li>
+<li>Other: <a href="indizone-2.html">IndiZone 2</a>, <a href="fdisk.html">fdisk</a>, <a href="format.html">format</a>
+</li></ul>
+</body>
+</html>

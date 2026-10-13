@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARCS firmware</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ARCS firmware</h1>
+<p>Claims: 10 Part of <a href="arcs.html">ARCS</a></p>
+<p>The ARCS firmware is used by the 320 and 540 'classic' Visual Workstations, which also use SGI custom chips. <sup><a href="#s1">1</a></sup> SGI Visual Workstations use ARCS firmware but run PIIIs in little endian mode, making them a hybrid. <sup><a href="#s2">2</a></sup> The Pi400 can use ARCS firmware. <sup><a href="#s3">3</a></sup> When using ARCS firmware, you cannot boot beyond Windows 2000 because the firmware limits it. <sup><a href="#s4">4</a></sup> There is no VM that supports Cobalt or ARCS firmware. <sup><a href="#s5">5</a></sup> An AlphaStation 255/300 runs Windows NT and uses ARCS firmware. <sup><a href="#s6">6</a></sup> The PROM chip is on the bottom of the mainboard, and desoldering it allows for modifying the ARCS firmware. <sup><a href="#s7">7</a></sup> The ARCS BIOS is expected to save and restore the MIPS coprocessor state and handle exceptions over to the ARCS firmware, which NetBSD may not be doing. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The 320 and 540 are the 'classic' Visual Workstations, with the ARCS firmware and SGI custom chips (user-b7c4, 2019-08-30, exchange 3251, check: supported)</li>
+<li id="s2">SGI VWS use ARCS firmware but run PIIIs in little endian mode, making them a hybrid. (user-bc18, 2020-03-23, exchange 6998, check: uncheckable)</li>
+<li id="s3">Pi400 can use ARCS firmware. (user-24f9, 2021-03-09, exchange 15296, check: uncheckable)</li>
+<li id="s4">When using ARCS firmware, you cannot boot beyond Windows 2000 because the firmware limits it. (user-bc18, 2021-03-10, exchange 217060, check: supported)</li>
+<li id="s5">There is no VM that supports Cobalt or ARCS firmware. (user-b7c4, 2021-03-31, exchange 16039, check: uncheckable)</li>
+<li id="s6">An AlphaStation 255/300 runs Windows NT and uses ARCS firmware. (user-03ad, 2023-08-30, exchange 209133, check: supported)</li>
+<li id="s7">The PROM chip is on the bottom of the mainboard, and desoldering it allows for modifying the ARCS firmware. (user-c799, 2025-01-06, exchange 51945, check: uncheckable)</li>
+<li id="s8">The ARCS BIOS is expected to save and restore the MIPS coprocessor state and handle exceptions over to the ARCS firmware, which NetBSD may not be doing. (user-c799, 2026-02-02, exchange 226056, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="pi400.html">Pi400</a>
+</li>
+<li>Processors: <a href="mips-nt.html">MIPS NT</a>
+</li>
+<li>Operating systems: <a href="nt4.html">NT4</a>, <a href="netbsd.html">NetBSD</a>, <a href="windows-2000.html">Windows 2000</a>, <a href="windows-nt.html">Windows NT</a>
+</li>
+<li>Parts and peripherals: <a href="prom-chip.html">PROM chip</a>
+</li>
+<li>Standards and interfaces: <a href="arcs-bios.html">ARCS BIOS</a>
+</li>
+<li>Companies: <a href="cobalt.html">Cobalt</a>
+</li>
+<li>Other: <a href="piii.html">PIII</a>, <a href="vw.html">VW</a>, <a href="custom-chip.html">custom chip</a>, <a href="little-endian-mode.html">little-endian mode</a>
+</li></ul>
+</body>
+</html>

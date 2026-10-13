@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>binutils</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>binutils</h1>
+<p>Claims: 39</p>
+<p>Binutils is a collection of utilities used for compilers, assemblers, linkers, and debuggers. It is designed to produce output for the target system by the cross-compiler. The package contains binaries such as addr2line, ar, as, c++filt, ld, nm, objcopy, objdump, ranlib, readelf, size, strings, and strip. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Binutils is built to produce output for the target system by the cross-compiler. It is designed to produce output for the target system by the cross-compiler. <sup><a href="#s2">2</a></sup> GNU binutils did not work well on IRIX until around the time IRIX stopped being supported. Cross-compiling an IRIX environment requires an older version of binutils that can build on FreeBSD 10.x or earlier due to license issues with GPLv3. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Binaries built with newer binutils may produce attributes IRIX rld cannot handle, leading to stack corruption. The porting guide for IRIX software suggests using IRIX's ld because binutils doesn't support necessary ABIs. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Binutils should be used with the latest gcc8 build, not IRIX as or ld. They used the latest binutils to create working binaries. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Using newer GCC with old binutils can cause issues, as demonstrated by OpenBSD's experience. Issues with newer GCC and binutils often involve file format mismatches or unrecognized keywords. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Binutils can cause issues with flags like -X, which AR may not recognize, even with official tools. The inconsistency in binary naming between binutils and GCC can cause issues in cross-compilation, as seen with CLisp. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Building binutils with aCC and +DD64 on an IA-64 system results in errors due to misaligned access and integer conversion issues, and the build fails due to an #error directive about undetected architecture endianess. <sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">binutils has a lot of helping utilities you may need, including compilers, assemblers, linkers, debuggers, etc. (user-b1da, 2020-07-24, exchange 9992, check: uncheckable)</li>
+<li id="s2">Binutils is built to produce output for the target system by the cross-compiler. (user-42cf, 2018-12-30, exchange 66832, check: uncheckable)</li>
+<li id="s3">The binutils and binutils-dev directories contain different binaries, including addr2line, ar, as, c++filt, ld, nm, objcopy, objdump, ranlib, readelf, size, strings, and strip. (user-f229, 2019-08-17, exchange 67756, check: uncheckable)</li>
+<li id="s4">GNU binutils did not work well on IRIX until around the time IRIX stopped being supported. (user-42cf, 2018-12-30, exchange 66832, check: uncheckable)</li>
+<li id="s5">Cross-compiling an IRIX environment requires an older version of binutils that can build on FreeBSD 10.x or earlier due to license issues with GPLv3. (user-22f9, 2019-02-08, exchange 502, check: supported)</li>
+<li id="s6">binaries built with newer binutils may produce attributes IRIX rld cannot handle, leading to stack corruption. (user-42cf, 2019-02-08, exchange 500, check: uncheckable)</li>
+<li id="s7">The porting guide for IRIX software suggests using IRIX's ld because binutils doesn't support necessary ABIs. (user-9b9c, 2019-03-04, exchange 884, check: uncheckable)</li>
+<li id="s8">binutils should be used with the latest gcc8 build, not IRIX `as` or `ld`. (user-2d09, 2019-07-21, exchange 67581, check: supported)</li>
+<li id="s9">They used the latest binutils to create working binaries. (user-42cf, 2025-04-20, exchange 72208, check: uncheckable)</li>
+<li id="s10">Using newer GCC with old binutils can cause issues, as demonstrated by OpenBSD's experience. (user-711b, 2020-12-22, exchange 239281, check: uncheckable)</li>
+<li id="s11">Issues with newer GCC and binutils often involve file format mismatches or unrecognized keywords. (user-237d, 2020-12-22, exchange 239281, check: uncheckable)</li>
+<li id="s12">Binutils can cause issues with flags like -X, which AR may not recognize, even with official tools. (user-5510, 2023-11-21, exchange 238604, check: uncheckable)</li>
+<li id="s13">The inconsistency in binary naming between binutils and GCC can cause issues in cross-compilation, as seen with CLisp. (user-9b9c, 2019-07-18, exchange 67534, check: uncheckable)</li>
+<li id="s14">Building binutils with aCC and +DD64 on an IA-64 system results in errors due to misaligned access and integer conversion issues, and the build fails due to an #error directive about undetected architecture endianess. (user-b1da, 2020-12-28, exchange 75506, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="ia64.html">IA64</a>, <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="openbsd.html">OpenBSD</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-environment.html">IRIX environment</a>, <a href="irix-software.html">IRIX software</a>
+</li>
+<li>Software: <a href="ld.html">ld</a>, <a href="compilertron.html">Compilertron</a>, <a href="openssh.html">OpenSSH</a>, <a href="openssl.html">OpenSSL</a>, <a href="bash.html">bash</a>, <a href="compiler.html">compiler</a>, <a href="cross-compiler.html">cross-compiler</a>, <a href="gdb.html">gdb</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>, <a href="gcc8.html">gcc8</a>, <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="ar.html">AR</a>, <a href="acc.html">aCC</a>, <a href="cross-compilation.html">cross-compilation</a>, <a href="g-2.html">g</a>, <a href="header-file.html">header file</a>, <a href="mips-sgi-irix6-5.html">mips-sgi-irix6.5</a>
+</li></ul>
+</body>
+</html>

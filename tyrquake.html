@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TyrQuake</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>TyrQuake</h1>
+<p>Claims: 13</p>
+<p>TyrQuake is a fully up to date bug fixed Quake source port with OpenGL v1 support, focusing on performance on low-end systems. It supports multiple BSD sound drivers and has improved OpenGL performance, especially on low-end systems. The source and makefile for TyrQuake can be found on the TyrQuake website. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> To compile TyrQuake, you need to install the SDL-devel package(s). The Makefile for Tyrquake is currently set to build with SDL2, but there are issues with SDL2 on IRIX; forcing SDL1 might resolve these issues. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Tyrquake compiles on every other Unix OS. Tyrquake requires linking against libGLcore.so, which is causing issues due to undefined references. Compiling a TyrQuake binary requires the -Wl,--allow-shlib-undefined linker flag to resolve undefined references to SGI extensions, and the binary runs after applying this flag. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Tyrquake is mostly functional with restored luminance lightmaps and added full texture upload and multibuffering lightmap textures to cure lightmap glitches. Explosions in TyrQuake on the O2 can drop performance to 3-4fps and cause segfaults. The TyrQuake port by Dominik runs better than other versions of Quake1, but can be chuggy and crash to desktop on the O2. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Tyrquake can be compiled on IRIX with some issues remaining. http://server/distdir/file.tardist can be used to execute inst commands from a URL instead of a local file. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">TyrQuake is a fully up to date bug fixed Quake source port with OpenGL v1 support, focusing on performance on low-end systems. (user-17cb, 2026-01-12, exchange 215867, check: uncheckable)</li>
+<li id="s2">TyrQuake supports multiple BSD sound drivers and has improved OpenGL performance, especially on low-end systems. (user-17cb, 2022-10-14, exchange 215339, check: uncheckable)</li>
+<li id="s3">The source and makefile for TyrQuake can be found on the TyrQuake website. (user-17cb, 2026-01-12, exchange 215867, check: uncheckable)</li>
+<li id="s4">To compile TyrQuake, you need to install the SDL-devel package(s). (user-59b9, 2021-07-01, exchange 69717, check: uncheckable)</li>
+<li id="s5">The Makefile for Tyrquake is currently set to build with SDL2, but there are issues with SDL2 on IRIX; forcing SDL1 might resolve these issues. (user-59b9, 2021-07-01, exchange 69719, check: uncheckable)</li>
+<li id="s6">Tyrquake compiles on every other Unix OS. (user-17cb, 2021-06-27, exchange 69688, check: uncheckable)</li>
+<li id="s7">Tyrquake requires linking against libGLcore.so, which is causing issues due to undefined references. (user-59b9, 2021-06-27, exchange 69690, check: uncheckable)</li>
+<li id="s8">Compiling a TyrQuake binary requires the `-Wl,--allow-shlib-undefined` linker flag to resolve undefined references to SGI extensions, and the binary runs after applying this flag. (user-59b9, 2021-06-27, exchange 69692, check: supported)</li>
+<li id="s9">Tyrquake is mostly functional with restored luminance lightmaps and added full texture upload and multibuffering lightmap textures to cure lightmap glitches. (user-3e2d, 2026-01-16, exchange 215869, check: uncheckable)</li>
+<li id="s10">Explosions in TyrQuake on the O2 can drop performance to 3-4fps and cause segfaults. (user-757f, 2026-03-29, exchange 215941, check: supported)</li>
+<li id="s11">The TyrQuake port by Dominik runs better than other versions of Quake1, but can be chuggy and crash to desktop on the O2. (user-17cb, 2026-03-29, exchange 215941, check: supported)</li>
+<li id="s12">I got tyrquake compiling on IRIX with some issues remaining. (user-56d4, 2024-02-18, exchange 84626, check: uncheckable)</li>
+<li id="s13">`http://server/distdir/file.tardist` can be used to execute inst commands from a URL instead of a local file. (user-2189, 2019-01-18, exchange 137, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="openbsd.html">OpenBSD</a>
+</li>
+<li>Software: <a href="glquake.html">GLQuake</a>, <a href="quake.html">Quake</a>, <a href="sdl1.html">SDL1</a>, <a href="sdl2.html">SDL2</a>
+</li>
+<li>Other: <a href="extension.html">extension</a>, <a href="libglcore-so.html">libGLcore.so</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>csh</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>csh</h1>
+<p>Claims: 16</p>
+<p>csh is the default shell in a fresh IRIX install, not bash, and is used for pre-existing configurations, while tcsh is the preferred default shell on IRIX for accounts that do real work, such as root and development accounts. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> csh does not support tab auto complete or up arrow previous commands, but tcsh does, and the built-in tcsh shell has better command history features than csh. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> tcsh was more usable than csh but less suitable for scripting, and old IRIX software often assumes csh or contains csh scripts/env/etc. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Setting PATH in csh uses 'setenv PATH /whatever/path' and in bash uses 'export PATH=/whatever/path'. <sup><a href="#s9">9</a></sup> IRIX 3 does not have tcsh or ksh93; it has csh which lacks autocomplete. <sup><a href="#s10">10</a></sup> The default shell is /bin/sh, often csh for root. <sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">each account can have its own environment, and csh is used for pre-existing configurations, while tcsh is used for accounts that do real work, such as root and development accounts. (user-8547, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s2">Csh is the default shell, and tcsh is the preferred default shell on IRIX. (user-17cb, 2020-05-18, exchange 216927, check: uncheckable)</li>
+<li id="s3">the default was csh though. (user-7b1c, 2022-09-19, exchange 82078, check: uncheckable)</li>
+<li id="s4">csh is the default shell in a fresh IRIX install, not bash. (user-baf6, 2023-08-02, exchange 209009, check: uncheckable)</li>
+<li id="s5">csh does not support tab auto complete and up arrow previous commands, but tcsh does. (user-24f0, 2024-03-18, exchange 210160, check: uncheckable)</li>
+<li id="s6">The built-in tcsh shell has better command history features than csh. (user-37bb, 2024-11-23, exchange 211323, check: uncheckable)</li>
+<li id="s7">tcsh was more usable than csh but less suitable for scripting. (user-237d, 2022-09-19, exchange 82076, check: uncheckable)</li>
+<li id="s8">Old IRIX software often assumes csh or contains csh scripts/env/etc. (user-8547, 2025-11-28, exchange 219292, check: uncheckable)</li>
+<li id="s9">setting PATH in csh uses 'setenv PATH /whatever/path' and in bash uses 'export PATH=/whatever/path'. (user-8547, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s10">Irix 3 does not have tcsh or ksh93; it has csh which lacks autocomplete. (user-24f0, 2024-03-18, exchange 218332, check: supported)</li>
+<li id="s11">The default shell is /bin/sh, often csh for root. (user-1629, 2024-11-21, exchange 50723, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix.html">IRIX</a>, <a href="irix-3.html">IRIX 3</a>
+</li>
+<li>Software: <a href="tcsh.html">tcsh</a>, <a href="bash.html">bash</a>, <a href="bourne-shell.html">Bourne shell</a>, <a href="path.html">PATH</a>
+</li>
+<li>Other: <a href="bin-sh.html">/bin/sh</a>
+</li></ul>
+</body>
+</html>

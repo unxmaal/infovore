@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-brick</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>C-brick</h1>
+<p>Claims: 13</p>
+<p>The MPX, PCIX, and C-brick can be used as a 3-brick system with MPX connecting to C-brick over NUMA and PCIX over XIO; the biggest O3x0 without R-bricks is a system with two C-bricks and any two other bricks without a R1. <sup><a href="#s1">1</a></sup> Beyond two C-Bricks, each additional C-Brick requires an R-Brick per rack. <sup><a href="#s2">2</a></sup> Typically an O350 with an IO9 is just a CBrick unless it has graphics, too, and 'Base node' is also used in the documentation. <sup><a href="#s3">3</a></sup> The Altix A350 c-brick can be made bootable with a SCSI-PCI adapter and external disk or netboot, and boots to EFI with specific partition details. <sup><a href="#s4">4</a></sup> For physical access, connecting serial to the fastest C-brick or O300 (for booting) in L1 allows communication with other bricks on the router. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The MPX, PCIX, and C-brick can be used as a 3-brick system with MPX connecting to C-brick over NUMA and PCIX over XIO; the biggest O3x0 without R-bricks is a system with two C-bricks and any two other bricks without a R1 (user-b7c4, 2019-11-13, exchange 95718, check: supported)</li>
+<li id="s2">Beyond two C-Bricks, each additional C-Brick requires an R-Brick per rack. (user-1629, 2024-11-24, exchange 224237, check: supported)</li>
+<li id="s3">Typically an O350 with an IO9 is just a CBrick as I recall. Unless it has graphics, too. 'Base node' is also used in the documentation if I’m remembering correctly. (user-59b9, 2022-11-13, exchange 105587, check: supported)</li>
+<li id="s4">The Altix A350 c-brick can be made bootable with a SCSI-PCI adapter and external disk or netboot, and boots to EFI with specific partition details. (user-bc5d, 2020-03-08, exchange 216298, check: uncheckable)</li>
+<li id="s5">For physical access, connecting serial to the fastest C-brick or O300 (for booting) in L1 allows communication with other bricks on the router. (user-b7c4, 2020-03-11, exchange 96532, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="numalink.html">Numalink</a>, <a href="o300.html">O300</a>, <a href="origin-3400.html">Origin 3400</a>, <a href="origin-350.html">Origin 350</a>, <a href="altix-3000.html">altix 3000</a>
+</li>
+<li>Parts and peripherals: <a href="r-brick.html">R-brick</a>, <a href="io9.html">IO9</a>, <a href="l2-controller.html">L2 controller</a>, <a href="numalink-cable.html">numalink cable</a>, <a href="router.html">router</a>
+</li>
+<li>Standards and interfaces: <a href="efi.html">EFI</a>, <a href="pci-x.html">PCI-X</a>, <a href="serial.html">serial</a>
+</li>
+<li>Other: <a href="i-brick.html">I-Brick</a>, <a href="mpx.html">MPX</a>
+</li></ul>
+</body>
+</html>

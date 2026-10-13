@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.cshrc</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>.cshrc</h1>
+<p>Claims: 8</p>
+<p>The .cshrc file is a configuration file for the C shell, and it is hidden and should be in the root of the user directory. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The .login file is a login script that does various things, while the .profile file is run if the shell is /bin/sh or possibly bash. <sup><a href="#s2">2</a></sup> Adding a 'stty rows 25 cols 80' line to .login, .profile, or .cshrc sets the terminal size, and setting TERM, MANPATH, EDITOR, and BROWSER in these files configures the environment. <sup><a href="#s3">3</a></sup> To run 'cad', you need to set the PATH variable to include /usr/local/srd/cad/bin and /usr/local/srd/cad/options. <sup><a href="#s4">4</a></sup> The TERM variable can be set in aterm with 'TERM=xterm' in the shell or by editing the .cshrc file. <sup><a href="#s5">5</a></sup> You can check .profile, .bashrc, or .cshrc to set PATH, and modify the current shell session to test the change. <sup><a href="#s6">6</a></sup> Setting paths in .cshrc can cause duplication, so paths should be set with setenv instead. <sup><a href="#s7">7</a></sup> Deleting login scripts and .cshrc will result in them being recreated upon logout/login. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The .cshrc file is hidden and should be in the root of the user directory. (user-e4d0, 2020-06-08, exchange 8910, check: uncheckable)</li>
+<li id="s2">.cshrc is a configuration file for the C shell; .login is a login script that does various things; .profile is run if the shell is /bin/sh or possibly bash. (user-6dfb, 2024-11-21, exchange 50729, check: uncheckable)</li>
+<li id="s3">Adding a 'stty rows 25 cols 80' line to .login, .profile, or .cshrc sets terminal size, and setting TERM, MANPATH, EDITOR, BROWSER in these files configures the environment. (user-c831, 2021-04-02, exchange 98671, check: supported)</li>
+<li id="s4">To run 'cad', you need to set the PATH variable to include /usr/local/srd/cad/bin and /usr/local/srd/cad/options. (user-ce6b, 2023-01-16, exchange 220269, check: uncheckable)</li>
+<li id="s5">Setting the TERM variable in aterm can be done with 'TERM=xterm' in the shell or by editing the .cshrc file. (user-7973, 2024-08-09, exchange 85540, check: uncheckable)</li>
+<li id="s6">Check .profile, .bashrc, or .cshrc to set PATH, and modify the current shell session to test the change. (user-21b8, 2024-08-15, exchange 215548, check: uncheckable)</li>
+<li id="s7">Setting paths in .cshrc can cause duplication; paths should be set with setenv instead. (user-17cb, 2025-10-26, exchange 60209, check: uncheckable)</li>
+<li id="s8">Deleting login scripts and .cshrc will result in them being recreated upon logout/login. (user-1629, 2024-11-21, exchange 50729, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bashrc.html">.bashrc</a>, <a href="cad.html">CAD</a>, <a href="path.html">PATH</a>, <a href="aterm.html">aterm</a>
+</li>
+<li>Other: <a href="profile.html">.profile</a>, <a href="login.html">.login</a>, <a href="term.html">TERM</a>
+</li></ul>
+</body>
+</html>

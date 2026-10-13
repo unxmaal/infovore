@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vagrant</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Vagrant</h1>
+<p>Claims: 44 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Vagrant_%28software%29">Vagrant (software)</a>, <a href="https://en.wikipedia.org/wiki/VirtualBox">VirtualBox</a>.</p>
+<p>Vagrant ships virtual machine configurations as code and keeps base disk images immutable, but has issues with Ruby code quality and error handling. <sup><a href="#s1">1</a></sup> It uses a system of plugins that must be installed manually, and the newest version may resolve plugin installation issues. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Vagrant requires hardware virtualization and can run on Windows, though it is not officially tested there. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Cross-compilation can be done using any OS that runs Vagrant, including Windows. <sup><a href="#s6">6</a></sup> Booterizer creates a virtual machine using Vagrant and Ansible to set up and provision an SGI system, with Ansible relying on Vagrant to map variables read from settings.yml and a distro yml before provisioning. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Vagrant can be used to wrap the xfsdump command for automation. <sup><a href="#s9">9</a></sup> The Vagrant build was failing even in 2020. <sup><a href="#s10">10</a></sup> Using the `vagrant-guest_ansible` plugin breaks things and is unnecessary for setting up Ansible on a Pi VM with Vagrant. <sup><a href="#s11">11</a></sup> Vagrant can pull a newer VM with minimal changes, but keyring issues may arise due to archive key updates. <sup><a href="#s12">12</a></sup> The Vagrant version of the solution is generally reliable once it works. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Vagrant allows shipping virtual machine configurations as code and maintains base disk images as immutable, but it has issues with Ruby code quality and error handling. (user-2189, 2019-01-28, exchange 313, check: uncheckable)</li>
+<li id="s2">vagrant uses a system of plugins which need to be installed manually. (user-2189, 2018-12-31, exchange 66849, check: uncheckable)</li>
+<li id="s3">The newest version of Vagrant may resolve plugin installation issues. (user-1446, 2020-04-16, exchange 77135, check: uncheckable)</li>
+<li id="s4">Vagrant requires hardware virtualization. (user-d903, 2019-09-19, exchange 76849, check: uncheckable)</li>
+<li id="s5">Vagrant can run on Windows, but it is not officially tested. (user-7b1c, 2020-04-16, exchange 77135, check: uncheckable)</li>
+<li id="s6">Cross-compilation can be done using any OS that runs Vagrant, including Windows. (user-42cf, 2019-01-03, exchange 66933, check: uncheckable)</li>
+<li id="s7">Booterizer creates a virtual machine using Vagrant and Ansible to set up and provision an SGI system. (user-7b1c, 2020-03-13, exchange 77094, check: uncheckable)</li>
+<li id="s8">Ansible relies on Vagrant to map its variables, which Vagrant reads from settings.yml and a distro yml, before provisioning the VM. (user-2189, 2019-02-04, exchange 216650, check: uncheckable)</li>
+<li id="s9">Vagrant can be used to wrap the xfsdump command for automation. (user-22f9, 2019-01-15, exchange 113, check: uncheckable)</li>
+<li id="s10">the Vagrant build was failing even in 2020. (user-6afa, 2023-03-25, exchange 36907, check: supported)</li>
+<li id="s11">Using `vagrant-guest_ansible` plugin breaks things; it's unnecessary for setting up Ansible on a Pi VM with Vagrant. (user-c831, 2023-02-06, exchange 208296, check: supported)</li>
+<li id="s12">Vagrant can pull a newer VM with minimal changes, but keyring issues may arise due to archive key updates. (user-b1da, 2023-03-25, exchange 36920, check: uncheckable)</li>
+<li id="s13">The vagrant version of the solution is generally reliable once it works. (user-b1da, 2023-02-06, exchange 35916, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="vagrant-image.html">vagrant image</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="pi.html">PI</a>, <a href="mac.html">Mac</a>, <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="vm.html">VM</a>, <a href="wsl.html">WSL</a>, <a href="linux.html">Linux</a>, <a href="os-x.html">OS X</a>, <a href="ubuntu.html">Ubuntu</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="ansible.html">ansible</a>, <a href="virtualbox.html">VirtualBox</a>, <a href="booterizer.html">Booterizer</a>, <a href="ruby.html">Ruby</a>, <a href="irix-ansible.html">irix_ansible</a>
+</li>
+<li>Other: <a href="big-sur.html">Big Sur</a>, <a href="win10.html">Win10</a>, <a href="irixboot.html">irixboot</a>, <a href="pip.html">pip</a>, <a href="plugin.html">plugin</a>, <a href="settings-yml.html">settings.yml</a>
+</li></ul>
+</body>
+</html>

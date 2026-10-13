@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.bash_profile</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>.bash_profile</h1>
+<p>Claims: 5</p>
+<p>Shell startup scripts can be added by creating a .bash_profile or .profile in the user's home directory. <sup><a href="#s1">1</a></sup> .bash_profile is for settings that should be inherited by everything, while .bashrc is for transient stuff, and .bashrc is not always run depending on how the client requests a shell. <sup><a href="#s2">2</a></sup> To automatically include all binaries in /opt/local, add `export PATH=/opt/local/bin:$PATH` to your .bashrc or .bash_profile. <sup><a href="#s3">3</a></sup> .bash_profile loads .bashrc, so .bashrc is not necessary for root, and .bash_profile is sourced before .bashrc in IRIX. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">shell startup scripts can be added by creating a .bash_profile or .profile in the user's home directory. (user-42cf, 2019-01-23, exchange 202, check: uncheckable)</li>
+<li id="s2">.bash_profile is for settings that should be inherited by everything, while .bashrc is for transient stuff; .bashrc isn't always run depending on how the client requests a shell. (user-8560, 2019-03-01, exchange 203707, check: uncheckable)</li>
+<li id="s3">To automatically symlink all binaries in /opt/local, add `export PATH=/opt/local/bin:$PATH` to your .bashrc or .bash_profile. (user-db13, 2019-07-14, exchange 2491, check: supported)</li>
+<li id="s4">.bash_profile loads .bashrc, so .bashrc is not necessary for root. (user-b1da, 2019-11-27, exchange 4413, check: uncheckable)</li>
+<li id="s5">.bash_profile is sourced before .bashrc in IRIX. (user-b4f4, 2021-05-16, exchange 217128, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bashrc.html">.bashrc</a>
+</li>
+<li>Other: <a href="profile.html">.profile</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XCreateWindow</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XCreateWindow</h1>
+<p>Claims: 3</p>
+<p>XCreateWindow fails with a BadMatch error when there is a mismatch in the root and depth of the graphics context or other attributes. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> XCreateWindow allows setting the window position, but the X server may ignore it. <sup><a href="#s3">3</a></sup> SDL2 should not pass invalid attributes to XCreateWindow, and debugging involves checking the X protocol for valid arguments and testing each suspect value in SDL2's code. <sup><a href="#s2">2</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">XCreateWindow fails due to a mismatch in the root and depth of the graphics context or other attributes. (user-b1da, 2021-04-09, exchange 16350, check: uncheckable)</li>
+<li id="s2">SDL2 should not pass invalid attributes to XCreateWindow, which can cause a BadMatch error; debugging involves checking the X protocol for valid arguments and testing each suspect value in SDL2's code. (user-21b8, 2025-11-12, exchange 72850, check: uncheckable)</li>
+<li id="s3">XCreateWindow allows setting window position, but X server may ignore it. (user-b1da, 2021-04-19, exchange 204980, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="sdl2.html">SDL2</a>, <a href="x-server.html">X server</a>
+</li>
+<li>Standards and interfaces: <a href="x-protocol.html">X protocol</a>
+</li></ul>
+</body>
+</html>

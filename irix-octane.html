@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX Octane</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX Octane</h1>
+<p>Claims: 4 Part of <a href="irix.html">IRIX</a></p>
+<p>Starting Emacs on an IRIX Octane can take about two minutes. <sup><a href="#s1">1</a></sup> To set up an IRIX Octane for network access, /etc/hosts and /etc/sys_id must be correctly configured with the Octane's IP and hostname, then the network service restarted. <sup><a href="#s2">2</a></sup> The Ansible playbook master_setup.yml configures an IRIX Octane, but users should review and customize it as needed. <sup><a href="#s3">3</a></sup> The GNU ld on an IRIX Octane workstation generates a ROM binary that is 100% garbage when converting sm64.u.elf to sm64.u.bin, with no recognizable content and unexpected bytes, and pads early to 8MB. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Starting Emacs on an IRIX Octane can take about two minutes. (user-888b, 2019-01-29, exchange 342, check: supported)</li>
+<li id="s2">To set up an IRIX Octane for network access, ensure /etc/hosts and /etc/sys_id are correctly configured with the Octane's IP and hostname, then restart the network service. (user-2189, 2019-09-08, exchange 76837, check: supported)</li>
+<li id="s3">Ansible playbook `master_setup.yml` configures an IRIX Octane, but users should review and customize it as needed. (user-2189, 2019-09-08, exchange 76837, check: supported)</li>
+<li id="s4">The GNU ld on an IRIX Octane workstation generates a ROM binary that is 100% garbage when converting sm64.u.elf to sm64.u.bin, with no recognizable content and unexpected bytes, and pads early to 8MB. (user-cdae, 2020-02-04, exchange 6018, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="etc-hosts.html">/etc/hosts</a>, <a href="ansible-playbook.html">Ansible playbook</a>, <a href="gnu-ld.html">GNU ld</a>, <a href="emacs.html">emacs</a>
+</li>
+<li>Other: <a href="etc-sys-id.html">/etc/sys_id</a>
+</li></ul>
+</body>
+</html>

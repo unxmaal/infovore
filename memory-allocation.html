@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>memory allocation</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>memory allocation</h1>
+<p>Claims: 3 Part of <a href="memory.html">memory</a></p>
+<p>Writing fast Java requires at least C++-level understanding of memory allocation. <sup><a href="#s1">1</a></sup> For functions that allocate memory, return the allocated data normally and pass pointers for additional return values, or use a struct for multiple return values. <sup><a href="#s2">2</a></sup> A mempoolreset with a 64mb heap size failed allocation when nDwords exceeded 16 million or a pointer was null. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Writing fast Java requires at least C++-level understanding of memory allocation. (user-237d, 2020-12-08, exchange 180352, check: uncheckable)</li>
+<li id="s2">For functions that allocate memory, return the allocated data normally and pass pointers for additional return values, or use a struct for multiple return values. (user-21b8, 2024-04-29, exchange 215478, check: uncheckable)</li>
+<li id="s3">nDwords over 16 million; pointer null; mempoolreset with 64mb heap size failed allocation. (user-6afa, 2024-08-11, exchange 215542, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="java.html">Java</a>
+</li>
+<li>Other: <a href="mmap.html">mmap</a>
+</li></ul>
+</body>
+</html>

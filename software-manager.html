@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>software manager</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>software manager</h1>
+<p>Claims: 20 Part of <a href="software.html">software</a></p>
+<p>Software Manager is a tool for installing software on IRIX, serving a purpose similar to the `inst` command. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It does not recognize tarballs for installation, and tardists are specific to IRIX software that should be installed through the Software Manager without manual extraction. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> You can mount a CD on a directory and use that directory as a source, or load a .22 application CD/image to cherry-pick what you want, and double-clicking the CD icon opens the Software Manager. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The Software Manager in IRIX lacks a combined repository for resolving dependencies like modern package managers, requiring manual addition of tardists, and it may complain about conflicts that need other distributions to resolve. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> In SGI IRIX 6.5.22, enabling preferences -&gt; rules in Software Manager allows installing old software without conflicts. <sup><a href="#s10">10</a></sup> The command 'inst remove neko*' can be used to remove all neko_* files using the Software Manager. <sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Software Manager is used for installing software, not for file transfer. (user-1446, 2020-04-24, exchange 7770, check: uncheckable)</li>
+<li id="s2">Software manager and `inst` serve similar purposes for installing software. (user-b1da, 2020-04-25, exchange 7816, check: supported)</li>
+<li id="s3">software manager does not recognize the tarball for installation (user-cd83, 2019-07-07, exchange 2367, check: uncheckable)</li>
+<li id="s4">Tardists are specific to IRIX software and should be installed through the Software Manager without manual extraction. (user-1446, 2021-01-03, exchange 217031, check: uncheckable)</li>
+<li id="s5">You can mount a CD on a directory and use that directory as source on software manager (user-b8fd, 2022-08-27, exchange 81957, check: uncheckable)</li>
+<li id="s6">You can load a .22 application CD/image into software manager to cherrypick what you want. (user-b7c4, 2022-08-18, exchange 81907, check: uncheckable)</li>
+<li id="s7">Double-clicking the CD icon opens the software manager. (user-5217, 2024-06-12, exchange 210486, check: uncheckable)</li>
+<li id="s8">Software Manager will complain about conflicts, and you need the other dists to resolve them. (user-e0a4, 2019-06-25, exchange 67286, check: uncheckable)</li>
+<li id="s9">The Software Manager in IRIX lacks a combined repository for resolving dependencies like modern package managers, requiring manual addition of tardists. (user-baf6, 2023-06-02, exchange 38319, check: uncheckable)</li>
+<li id="s10">In SGI IRIX 6.5.22, enabling preferences -&gt; rules in Software Manager allows installing old software without conflicts. (user-5c71, 2023-04-24, exchange 218004, check: supported)</li>
+<li id="s11">The command 'inst remove neko*' can be used to remove all neko_* files using the software manager. (user-e0a4, 2021-07-27, exchange 79522, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mgras.html">MGRAS</a>, <a href="onyx2-demos.html">Onyx2 demos</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>
+</li>
+<li>Software: <a href="inst.html">inst</a>, <a href="package-manager.html">package manager</a>, <a href="tardist.html">tardist</a>
+</li>
+<li>Parts and peripherals: <a href="cd-drive.html">CD drive</a>
+</li>
+<li>Other: <a href="dogfight.html">Dogfight</a>, <a href="prboom.html">PrBoom</a>
+</li></ul>
+</body>
+</html>

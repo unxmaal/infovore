@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PALcode</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PALcode</h1>
+<p>Claims: 7</p>
+<p>Writing your own kernel on a VAX or DEC PC Alpha involves using PALcode. <sup><a href="#s1">1</a></sup> PALcode was intended to allow operating systems to call into CPU-specific firmware for tasks like context switching and interrupt handling, but its execution resulted in inconsistent implementations across different OSes. <sup><a href="#s2">2</a></sup> VMS PALcode implemented VAX atomic queue instructions and VAX-style interrupt handling, running uninterruptibly at a higher privilege level than kernel mode. <sup><a href="#s3">3</a></sup> PALcode calls behave like macro-instructions in the architecture, but this approach didn't succeed. <sup><a href="#s4">4</a></sup> The BIOS is regular code accessed through interrupts, while PALcode has special behaviors accessed via a dedicated instruction opcode range. <sup><a href="#s5">5</a></sup> The Alpha was fast enough that they could compile VAX assembly code to it, emulate a whole bunch of VAXisms in PALcode, and still be much faster than the VAX. <sup><a href="#s6">6</a></sup> The PALcode and firmware are specific to the machine; EV5 machines like yours do not support ARC firmware. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Writing your own kernel on a VAX or DEC PC Alpha involves using PALcode. (user-888b, 2019-07-25, exchange 2741, check: uncheckable)</li>
+<li id="s2">Palcode was intended to allow operating systems to call into CPU-specific firmware for tasks like context switching and interrupt handling, but its execution resulted in inconsistent implementations across different OSes (user-f8e4, 2021-09-25, exchange 234994, check: uncheckable)</li>
+<li id="s3">VMS PALcode implemented VAX atomic queue instructions and VAX-style interrupt handling, running uninterruptibly at a higher privilege level than kernel mode. (user-2047, 2021-09-25, exchange 234995, check: uncheckable)</li>
+<li id="s4">PALcode calls behave like macro-instructions in the architecture, but this approach didn't succeed. (user-237d, 2021-09-26, exchange 161261, check: uncheckable)</li>
+<li id="s5">The BIOS is regular code accessed through interrupts, while PALcode has special behaviors accessed via a dedicated instruction opcode range. (user-2047, 2021-09-26, exchange 161262, check: uncheckable)</li>
+<li id="s6">The Alpha was fast enough that they could compile VAX assembly code to it, emulate a whole bunch of VAXisms in PALcode, and still be much faster than the VAX. (user-2047, 2022-05-09, exchange 235143, check: uncheckable)</li>
+<li id="s7">The PALcode and firmware are specific to the machine; EV5 machines like yours do not support ARC firmware. EV4 machines like the Alphastation 200 use ARC, while EV5 machines use AlphaBIOS. Linux is the only OS with a定制的P (user-03ad, 2024-12-03, exchange 235547, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="vax.html">VAX</a>
+</li>
+<li>Operating systems: <a href="alphabios.html">AlphaBIOS</a>, <a href="vms.html">VMS</a>
+</li>
+<li>Software: <a href="bios.html">BIOS</a>, <a href="firmware.html">firmware</a>
+</li>
+<li>Companies: <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="ev5.html">EV5</a>
+</li></ul>
+</body>
+</html>

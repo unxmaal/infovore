@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IO6</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IO6</h1>
+<p>Claims: 7</p>
+<p>The IO6 is a module that can be removed by clearing cards and blanks around it and gently guiding it out from the side. <sup><a href="#s1">1</a></sup> The base PCB is shared between the io6 and io6g, and the ioc3 serves as the keyboard controller. <sup><a href="#s2">2</a></sup> The PS2 position on an IO6 lacks the ASIC to the left of the Qlogic chip that is present in the IO6G, and the part identifies as IO6G, which the software checks. <sup><a href="#s3">3</a></sup> The IRIX kernel disables PS2 ports on the IO6 unless a media daughter card is present, so an IO6 can be modified to have PS2 ports but they will not be enabled without that card. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> You can install SE or SI graphics in an XIO slot, replace the IO6 with an IO6G to add keyboard and mouse ports, and cut sheet metal to install MXI/MXE, which is called an Onyx MXI. <sup><a href="#s6">6</a></sup> Parts from an Origin 2000 system are available for sale, including router boards, midplane, IO6, and a CD drive/power switch with key. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">For the IO6, removing cards and blanks around it can help to see the module and the track it’s on, and you can gently guide the module out using a hand from the side. (user-59b9, 2022-12-12, exchange 105921, check: uncheckable)</li>
+<li id="s2">The base PCB is the same for io6 and io6g, and the ioc3 is also the keyboard controller. The aisc pad might be another serial port controller. (user-e4d0, 2024-12-25, exchange 113293, check: uncheckable)</li>
+<li id="s3">The PS2 position on an IO6 lacks an ASIC to the left of the Qlogic chip, which is present in IO6G; the part identifies as IO6G and the software checks this. (user-86e1, 2024-12-25, exchange 224334, check: uncheckable)</li>
+<li id="s4">The IRIX kernel disables PS2 ports on IO6 unless a media daughter card is present. (user-86e1, 2025-08-15, exchange 225328, check: uncheckable)</li>
+<li id="s5">An IO6 can be modified to have PS2 ports, but the IRIX kernel will not enable them without the media daughter card. (user-e4d0, 2025-08-15, exchange 225328, check: uncheckable)</li>
+<li id="s6">You can install SE or SI graphics in an XIO slot, replace the IO6 with an IO6G to add keyboard and mouse ports, and cut sheet metal to install MXI/MXE; it's legit and called an Onyx MXI. (user-86e1, 2024-03-05, exchange 110563, check: supported)</li>
+<li id="s7">Parts from an Origin 2000 system are available for sale, including router boards, midplane, IO6, and CD drive/power on switch with key. (user-22f9, 2025-02-09, exchange 224588, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx.html">Onyx</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="xio.html">XIO</a>
+</li>
+<li>Operating systems: <a href="irix-kernel.html">IRIX kernel</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>
+</li>
+<li>Parts and peripherals: <a href="io6g.html">IO6G</a>, <a href="ps-2-port.html">PS/2 port</a>, <a href="card.html">card</a>, <a href="router-boards.html">router boards</a>
+</li>
+<li>Other: <a href="ioc3.html">IOC3</a>, <a href="midplane.html">midplane</a>
+</li></ul>
+</body>
+</html>

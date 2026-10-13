@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>board</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>board</h1>
+<p>Claims: 54</p>
+<p>Writing a .vfo requires specific preprocessor defines for the MGRAS chip and board, and this information is not well-documented. <sup><a href="#s1">1</a></sup> The OpenPOWER9 board supports PCIe 4.0, providing flexibility, but does not have SAS support. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The board is not VME; it has a different shape, eject handles, and 96-pin DIN plugs that are not centered. <sup><a href="#s4">4</a></sup> The board is a PCMCIA-to-MCA board with the CPU complex in front. <sup><a href="#s5">5</a></sup> The board supports both 3.3V and 5V devices. <sup><a href="#s6">6</a></sup> The firmware detects 1M or 4M SIMMs but not 2M SIMMs; the chip supports 16 banks of 4 SIMMs but the board only has 4 banks of slots. <sup><a href="#s7">7</a></sup> The early versions of this board came with EPROMs, but later models had EEPROMs; the board in question has a boot block protection jumper and uses an INTEL 28F001BXT EEPROM. <sup><a href="#s8">8</a></sup> Kernel packages are specific to each board and have different compile options, so mixing drivers between them might be problematic. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Writing a .vfo requires specific preprocessor defines for the MGRAS chip and board, and this information is not well-documented. (user-42cf, 2019-03-01, exchange 832, check: uncheckable)</li>
+<li id="s2">The OpenPOWER9 board supports PCIe 4.0, providing flexibility. (user-b1da, 2022-05-16, exchange 29226, check: supported)</li>
+<li id="s3">The OpenPOWER9 board does not have SAS support. (user-b1da, 2022-05-16, exchange 29226, check: uncheckable)</li>
+<li id="s4">The board is not VME; it has a different shape, eject handles, and 96-pin DIN plugs that are not centered. (user-237d, 2021-11-19, exchange 100932, check: supported)</li>
+<li id="s5">The board is a PCMCIA-to-MCA board with the CPU complex in front. (user-07ed, 2024-06-26, exchange 177801, check: uncheckable)</li>
+<li id="s6">The board supports both 3.3V and 5V devices. (user-757f, 2026-02-17, exchange 226097, check: supported)</li>
+<li id="s7">The firmware detects 1M or 4M SIMMs but not 2M SIMMs. The chip supports 16 banks of 4 SIMMs but the board only has 4 banks of slots. (user-a719, 2023-08-09, exchange 108244, check: supported)</li>
+<li id="s8">The early versions of this board came with EPROMs, but later models had EEPROMs. The board in question has a boot block protection jumper and uses an INTEL 28F001BXT EEPROM. (user-59df, 2026-06-06, exchange 160220, check: uncheckable)</li>
+<li id="s9">Kernel packages are specific to each board and have different compile options, so mixing drivers between them might be problematic. (user-3e2d, 2026-06-18, exchange 226592, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx.html">Onyx</a>, <a href="onyx2.html">Onyx2</a>, <a href="4d-380-vgx.html">4D/380 VGX</a>, <a href="skywriter.html">SkyWriter</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="driver.html">driver</a>
+</li>
+<li>Parts and peripherals: <a href="cable.html">cable</a>, <a href="1600sw.html">1600SW</a>, <a href="cpu.html">CPU</a>, <a href="dimm-slot.html">DIMM slot</a>, <a href="eeprom.html">EEPROM</a>, <a href="eprom.html">EPROM</a>, <a href="kapton-tape.html">Kapton tape</a>, <a href="simm.html">SIMM</a>, <a href="vfo.html">VFO</a>, <a href="cache-chips.html">cache chips</a>, <a href="capacitor-issues.html">capacitor issues</a>, <a href="monitor.html">monitor</a>, <a href="pads.html">pads</a>
+</li>
+<li>Standards and interfaces: <a href="serial-number.html">serial number</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="openpower9.html">OpenPOWER9</a>, <a href="256mb.html">256MB</a>, <a href="ip17.html">IP17</a>, <a href="ip19.html">IP19</a>, <a href="predator.html">Predator</a>, <a href="rm.html">RM</a>, <a href="bodges.html">bodges</a>, <a href="contact.html">contact</a>, <a href="mini-din.html">mini DIN</a>, <a href="raster-manager.html">raster manager</a>, <a href="wire.html">wire</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pericom</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Pericom</h1>
+<p>Claims: 4</p>
+<p>Pericom is a PCI-PCI bridge that can be used as a backup when the Mace bridge does not work, alongside options like PLX. <sup><a href="#s1">1</a></sup> The NVMe driver for IRIX uses a PCI-Pcie bridge with Pericom and PLX options, achieving initial success on Octane but facing bus errors. <sup><a href="#s2">2</a></sup> The PLX bridge works fine in IP30, similar to Pericom, and setting the barrier flag on read requests fixes hanging issues with certain drives. <sup><a href="#s3">3</a></sup> The PLX and Pericom PCI to PCI-E adapters are similar, but the Pericom needs a 3.3V power supply, which can be added via a 3.3V regulator to make it work on a 5V PCI motherboard. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">If the Mace bridge does not work, a different PCI-PCI bridge like Pericom or PLX could be used as a backup. (user-3e2d, 2025-11-03, exchange 219212, check: uncheckable)</li>
+<li id="s2">The NVMe driver for IRIX uses a PCI-Pcie bridge, with Pericom and PLX options, and has initial success on Octane but faces bus errors. (user-3e2d, 2025-11-09, exchange 225671, check: supported)</li>
+<li id="s3">The PLX bridge works fine in IP30, similar to PERICOM. Setting the barrier flag on read requests fixes hanging issues with certain drives. (user-3e2d, 2025-11-11, exchange 225675, check: uncheckable)</li>
+<li id="s4">The PLX and Pericom PCI to PCI-E adapters are similar but the Pericom needs a 3.3V power supply; a 3.3V regulator can be added to make it work on a 5V PCI motherboard. (user-3e2d, 2026-04-09, exchange 216605, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="nvme-driver.html">NVMe driver</a>
+</li>
+<li>Parts and peripherals: <a href="ip30.html">IP30</a>
+</li>
+<li>Other: <a href="plx.html">PLX</a>
+</li></ul>
+</body>
+</html>

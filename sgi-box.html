@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SGI box</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SGI box</h1>
+<p>Claims: 19 Part of <a href="sgi.html">SGI</a></p>
+<p>The SGI box must facilitate ARP requests in order to receive an IP from DHCP and requires re-provisioning to successfully download FX or start an install. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Installing an ssh client and server is the first priority, and adding your id_rsa.pub to ~/.ssh/authorized_keys enables tab autocompletion for scp commands that looks up the path on the remote machine each time. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">the SGI box has to facilitate ARP requests in order to even receive an IP from the DHCP. (user-37ee, 2021-08-08, exchange 217197, check: uncheckable)</li>
+<li id="s2">The SGI box requires re-provisioning to successfully download FX or start an install. (user-9860, 2021-09-07, exchange 77417, check: uncheckable)</li>
+<li id="s3">First priority is to install ssh client and server on the SGI box. (user-7b1c, 2022-10-08, exchange 33246, check: uncheckable)</li>
+<li id="s4">When you add your id_rsa.pub to ~/.ssh/authorized_keys on the sgi box, you will have 'tab autocompletion' while typing 'scp somefile my_sgi:/some/directory' but it will look up the path on the remote machine each time. (user-7973, 2026-03-06, exchange 62480, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="ps1.html">PS1</a>, <a href="ssh-server.html">SSH server</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="gentoo.html">Gentoo</a>
+</li>
+<li>Software: <a href="fx.html">fx</a>, <a href="install.html">install</a>, <a href="manual.html">manual</a>, <a href="scp.html">scp</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="ssh-client.html">ssh client</a>
+</li>
+<li>Other: <a href="xdcmp.html">XDCMP</a>, <a href="foam.html">foam</a>
+</li></ul>
+</body>
+</html>

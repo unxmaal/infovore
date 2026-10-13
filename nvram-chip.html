@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVRAM chip</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NVRAM chip</h1>
+<p>Claims: 8 Part of <a href="nvram.html">NVRAM</a></p>
+<p>A dead or failing NVRAM chip causes the system to hang and prevents booting diagnostics over the network, because it produces a wrong Ethernet address. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The NVRAM chip stores the hostid and Ethernet address, and for newer machines these are often printed on the chip, with the first two numbers indicating the machine type. <sup><a href="#s3">3</a></sup> The hostid and Ethernet address can be reprogrammed, and a battery replacement kit can convert the internal battery in the NVRAM chip into a CR2032 coin cell battery for Sun machines. <sup><a href="#s4">4</a></sup><sup><a href="#s3">3</a></sup> The NVRAM chip on ST systems can be accessed by cutting it in half to expose the leads for the crystal and battery. <sup><a href="#s5">5</a></sup> SS10 requires a new NVRAM chip, after which their system is now fully working. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Without the NVRAM chip, it hangs. (user-04a2, 2021-08-22, exchange 180875, check: uncheckable)</li>
+<li id="s2">Booting diagnostics over the network is also not possible due to a dead NVRAM chip causing a wrong Ethernet address. (user-e7f6, 2026-07-06, exchange 124007, check: uncheckable)</li>
+<li id="s3">The hostid and Ethernet address can be reprogrammed, and the first two numbers indicate the machine type; hostid/mac address is often noted on the NVRAM chip for newer machines. (user-03ad, 2024-01-25, exchange 240225, check: supported)</li>
+<li id="s4">A battery replacement kit converted the internal battery in the NVRam chip into a CR2032 coin cell battery for Sun machines. (user-818d, 2024-01-17, exchange 184786, check: uncheckable)</li>
+<li id="s5">The NVRAM chip on ST systems can be accessed by cutting it in half to expose the leads for the crystal and battery. (user-b7c4, 2021-07-14, exchange 239377, check: uncheckable)</li>
+<li id="s6">SS10 requires a new nvram chip; their system is now fully working. (user-04a3, 2021-03-18, exchange 180616, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ss10.html">SS10</a>, <a href="st.html">ST</a>, <a href="machine-type.html">machine type</a>
+</li>
+<li>Parts and peripherals: <a href="battery.html">battery</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet-address.html">Ethernet address</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="hostid.html">hostid</a>, <a href="model.html">model</a>
+</li></ul>
+</body>
+</html>

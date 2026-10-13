@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenBSD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>OpenBSD</h1>
+<p>Claims: 140 Background: 11 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenBSD">OpenBSD</a>, <a href="https://en.wikipedia.org/wiki/FreeBSD">FreeBSD</a>, <a href="https://en.wikipedia.org/wiki/NetBSD">NetBSD</a>, <a href="https://en.wikipedia.org/wiki/VAX">VAX</a>.</p>
+<p>OpenBSD runs well on a range of architectures, including Ultra 60, MacPPC, 486-class CPUs such as the StrongARM in Soekris boxes, Dell T710 servers, Sun Blade 1000, and the U80 with 4x450 MHz CPUs and 2GB RAM. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It also runs on the Indy with a rebirthed port, the SparcStation IPX, and SPARCs, though it may not be the best choice for SPARC hardware. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> OpenBSD has dropped support for several architectures, including SPARC32, MIPS, SGI/mips, and VMS (around version 5.8). <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> It is adding PowerPC P8 or newer LE support (ppc64), and is considered better than NetBSD on x86, ppc, and arm, though it is slow on Alpha. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> OpenBSD is generally preferred over NetBSD and is considered more stable than NetBSD for GUI use, though some users prefer FreeBSD for its features. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> It is regarded as a nice networking OS, and is used on public-facing servers and work testboxes. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> OpenBSD lacks package management, requiring use of ports, and generally boots from the install CD. <sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> It has good man pages, uses doas, and its X is not setuid by default for security reasons. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s17">17</a></sup> OpenBSD runs on a wide range of hardware, including VAX, NVAX, PPC, SPARC, and Ultra-10 systems, and can be installed on very low-end hardware such as a 33MHz R3000 with 32MB. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> OpenBSD dropped the mips/sgi port because no one volunteered to maintain it, though MIPS support was later resurrected with cavium support. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup> SPARC support may be dropped soon, and hardware acceleration is not supported in OpenBSD versions greater than 6.7. <sup><a href="#s35">35</a></sup><sup><a href="#s36">36</a></sup> OpenBSD provides binary packages but lacks modern browsers, and may have had more modern software support. <sup><a href="#s37">37</a></sup><sup><a href="#s35">35</a></sup> OpenBSD is simple, while DragonflyBSD uses a Hybrid kernel and has the HAMMER filesystem. <sup><a href="#s38">38</a></sup> OpenBSD is open, free, and current software (kernel and userland) for SGI machines. <sup><a href="#s39">39</a></sup> OpenBSD supports the IP22 kernel, maintained by user-6e7b since 2021, though it is not well-supported on IP22. <sup><a href="#s40">40</a></sup><sup><a href="#s41">41</a></sup> OpenBSD stopped supporting the sgi platform in 2021. <sup><a href="#s42">42</a></sup> OpenBSD can be installed manually using commands like dksc(0,2,8)sashARCS or booted from an .iso file using dksc(x,y,z)sashARCS. <sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> The CD ISO is a minimal installer that sets up networking and grabs file sets for OpenBSD remotely. <sup><a href="#s45">45</a></sup> An SGI Octane can run OpenBSD. <sup><a href="#s46">46</a></sup> OpenBSD is used for firewalls and mail servers. <sup><a href="#s47">47</a></sup> OpenBSD can be installed on SGI hardware through several methods, including building a root filesystem with NFSRB2 or unpacking the sets yourself, with older versions of OpenBSD sets available on the FTP server at ftp.eu.openbsd.org while the main server only carries the latest ones. <sup><a href="#s48">48</a></sup> The OpenBSD boot process for SGI machines involves determining IP via BOOTP/DHCP, loading a kernel via TFTP, starting the kernel, determining IP again, asking Bootparamd for root and swap paths, and mounting root via NFS. <sup><a href="#s49">49</a></sup> Switching to OpenBSD can make many SGI systems work out of the box, and OpenBSD can boot to a glass console if configured in PROM. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> OpenBSD can run on IRIX IRIS systems using an IP22 kernel with a custom loader, with ramdisk kernels up to 7.4 usable to boot and install OpenBSD. <sup><a href="#s52">52</a></sup><sup><a href="#s53">53</a></sup> OpenBSD talks to the WD SCSI controller via PIO port instead of DMA, using a base address from the documentation that differs from what PROM and IRIX use, and the driver has issues with emulated controllers. <sup><a href="#s54">54</a></sup><sup><a href="#s55">55</a></sup> OpenBSD requires a special read of ASR with CIP=0 after SELECT, which is incompatible with IRIX's behavior of not reading ASR and expecting an interrupt. <sup><a href="#s56">56</a></sup> OpenBSD hasn't managed to have everything under one license yet. <sup><a href="#s57">57</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">OpenBSD runs well on the Ultra 60 but not on SPARC32. (user-04a3, 2021-03-09, exchange 15328, check: supported)</li>
+<li id="s2">OpenBSD supports MacPPC architecture. (user-c831, 2019-12-18, exchange 4931, check: uncheckable)</li>
+<li id="s3">OpenBSD runs fine on 486-class CPUs like the StrongARM in Soekris boxes. (user-6d41, 2020-01-17, exchange 5520, check: supported)</li>
+<li id="s4">OpenBSD runs well on Dell T710 servers. (user-c831, 2020-02-01, exchange 96279, check: uncheckable)</li>
+<li id="s5">OpenBSD can run on a Sun Blade 1000. (user-42cf, 2020-03-13, exchange 233813, check: supported)</li>
+<li id="s6">The U80 ran OpenBSD and had 4x450 MHz CPUs and 2GB RAM. (user-04a3, 2021-02-17, exchange 239311, check: supported)</li>
+<li id="s7">The Indy can run OpenBSD with a rebirthed port. (user-07ed, 2023-05-04, exchange 223052, check: supported)</li>
+<li id="s8">I put OpenBSD on my SparcStation IPX but plan to reload it with either 4.1.4 or Solaris 7 or NeXT. (user-c831, 2019-12-13, exchange 95950, check: supported)</li>
+<li id="s9">OpenBSD may not be the best for SPARC; try Solaris for diagnostics. (user-c831, 2020-04-12, exchange 7419, check: uncheckable)</li>
+<li id="s10">OpenBSD runs fine on SPARCs. (user-37ee, 2020-06-24, exchange 9204, check: uncheckable)</li>
+<li id="s11">VMS can still be run on modern OSes, but OpenBSD dropped support around version 5.8. (user-ba81, 2020-01-25, exchange 5718, check: supported)</li>
+<li id="s12">OpenBSD had a MIPS port, but dropped it about 6+ months ago. (user-8b3c, 2020-01-28, exchange 5744, check: supported)</li>
+<li id="s13">OpenBSD dropped official support for SGI/mips due to lack of hardware for developers and lack of user interest. (user-c831, 2020-05-05, exchange 8116, check: uncheckable)</li>
+<li id="s14">OpenBSD is adding ppc64 support but it's LE, requiring at least a PowerPC P8. (user-b4c0, 2020-07-12, exchange 238099, check: uncheckable)</li>
+<li id="s15">NetBSD is good on Alpha for speed, while OpenBSD is better on x86, ppc, and arm. (user-0251, 2021-01-22, exchange 14024, check: uncheckable)</li>
+<li id="s16">OpenBSD is slow on Alpha, taking 10 seconds to register `ls`. (user-1361, 2021-01-22, exchange 14024, check: supported)</li>
+<li id="s17">OpenBSD has good man pages, but some users prefer FreeBSD for its features. (user-22f9, 2019-06-01, exchange 1865, check: uncheckable)</li>
+<li id="s18">OpenBSD is more stable than NetBSD for GUI use. (user-6d41, 2020-01-17, exchange 5520, check: uncheckable)</li>
+<li id="s19">OpenBSD is preferred over NetBSD. (user-6d41, 2020-01-17, exchange 5522, check: uncheckable)</li>
+<li id="s20">openbsd is on my public facing server, mostly happy with it (user-37ee, 2020-07-19, exchange 9745, check: uncheckable)</li>
+<li id="s21">OpenBSD is a nice networking OS too I'll admit. (user-e872, 2021-01-19, exchange 236113, check: uncheckable)</li>
+<li id="s22">OpenBSD generally boots from the install CD. (user-6d41, 2020-01-17, exchange 5521, check: uncheckable)</li>
+<li id="s23">OpenBSD lacks package management, requiring use of ports. (user-f9d4, 2020-04-02, exchange 7207, check: uncheckable)</li>
+<li id="s24">OpenBSD's X isn't setuid by default for security reasons, and can be run with xenodm; HISTFILE can be set for shell history in ksh. (user-ba81, 2019-06-01, exchange 1867, check: uncheckable)</li>
+<li id="s25">OpenBSD uses `doas` (user-37ee, 2019-10-15, exchange 203990, check: supported)</li>
+<li id="s26">OpenBSD also runs on VAX. (user-7b1c, 2022-03-12, exchange 175953, check: uncheckable)</li>
+<li id="s27">NetBSD and OpenBSD ran on NVAX. (user-03ad, 2023-01-20, exchange 235300, check: uncheckable)</li>
+<li id="s28">OpenBSD can clear and install on PPC systems. (user-5510, 2022-05-29, exchange 234042, check: uncheckable)</li>
+<li id="s29">OpenBSD is very good for PPC systems. (user-5510, 2022-05-29, exchange 234042, check: uncheckable)</li>
+<li id="s30">OpenBSD can be installed on an Ultra-10. (user-07ed, 2022-04-20, exchange 216128, check: supported)</li>
+<li id="s31">OpenBSD can run on very low-end hardware, even a 33MHz R3000 with 32MB. (user-7b1c, 2022-08-17, exchange 32079, check: supported)</li>
+<li id="s32">openbsd dropped the mips/sgi port because no one volunteered to maintain it. (user-c831, 2021-05-11, exchange 99155, check: uncheckable)</li>
+<li id="s33">openbsd resurrected mips (user-c831, 2023-05-04, exchange 107404, check: uncheckable)</li>
+<li id="s34">MIPS support is disappearing with OpenBSD cavium support. (user-9860, 2021-10-14, exchange 79954, check: uncheckable)</li>
+<li id="s35">OpenBSD may have had more modern software support, but SPARC support is likely to be dropped soon. (user-be12, 2021-05-26, exchange 180762, check: uncheckable)</li>
+<li id="s36">Hardware acceleration is not supported in OpenBSD versions greater than 6.7. (user-be12, 2022-06-26, exchange 182531, check: supported)</li>
+<li id="s37">OpenBSD provides binary packages but lacks modern browsers. (user-af19, 2022-05-29, exchange 234042, check: uncheckable)</li>
+<li id="s38">OpenBSD is simple, while DragonflyBSD uses a Hybrid kernel and has the HAMMER filesystem. (user-17cb, 2023-08-04, exchange 74469, check: uncheckable)</li>
+<li id="s39">OpenBSD is open (source), free, and current software (kernel and userland) for SGI machines. (user-6e7b, 2023-10-14, exchange 41517, check: uncheckable)</li>
+<li id="s40">OpenBSD supports the IP22 kernel, maintained by user-6e7b since 2021. (user-6e7b, 2023-10-26, exchange 109295, check: supported)</li>
+<li id="s41">OpenBSD is not well-supported on IP22. (user-42cf, 2023-11-30, exchange 42830, check: uncheckable)</li>
+<li id="s42">OpenBSD stopped supporting the sgi platform in 2021; their 6.9 ISO may or may not have been a live ISO. (user-6e7b, 2023-11-20, exchange 109471, check: supported)</li>
+<li id="s43">OpenBSD can be installed manually using commands like dksc(0,2,8)sashARCS. (user-22f9, 2023-12-22, exchange 43384, check: supported)</li>
+<li id="s44">openbsd can be booted from an .iso file using dksc(x,y,z)sashARCS or install button in the prom (user-22f9, 2023-12-22, exchange 43332, check: uncheckable)</li>
+<li id="s45">The CD ISO is a minimal installer that sets up networking and grabs file sets for OpenBSD remotely; the Install ISO contains those file sets. (user-22f9, 2023-12-22, exchange 43331, check: uncheckable)</li>
+<li id="s46">An SGI Octane can run OpenBSD. (user-e4d0, 2024-01-13, exchange 227237, check: supported)</li>
+<li id="s47">OpenBSD is used for firewalls and mail servers. (user-616d, 2024-11-05, exchange 185556, check: uncheckable)</li>
+<li id="s48">You can build your root FS with NFSRB2 or unpack the sets yourself; the FTP server at ftp.eu.openbsd.org has older versions of OpenBSD sets while the main server only has the latest ones. (user-6e7b, 2026-04-26, exchange 90497, check: uncheckable)</li>
+<li id="s49">The OpenBSD boot process for SGI machines involves determining IP via BOOTP/DHCP, loading a kernel via TFTP, kernel starting, determining IP, asking Bootparamd for root and swap paths, and mounting root via NFS. (user-6e7b, 2026-04-26, exchange 90495, check: uncheckable)</li>
+<li id="s50">Switching to OpenBSD can make many SGI systems work out of the box. (user-6e7b, 2026-05-09, exchange 90678, check: uncheckable)</li>
+<li id="s51">OpenBSD boots to a glass console if configured in PROM. (user-3e2d, 2026-06-21, exchange 220478, check: uncheckable)</li>
+<li id="s52">IRIS can run OpenBSD from an IP22 kernel with a custom loader. (user-3e2d, 2026-04-21, exchange 226367, check: uncheckable)</li>
+<li id="s53">Ramdisk kernels up to 7.4 can be used to boot and install OpenBSD on IRIX IRIS. (user-6e7b, 2026-04-21, exchange 226367, check: supported)</li>
+<li id="s54">OpenBSD talks to WD SCSI controller via PIO port instead of DMA, using a base address from the documentation that differs from what PROM and IRIX use. (user-3e2d, 2026-06-16, exchange 220464, check: uncheckable)</li>
+<li id="s55">The OpenBSD driver for the wd controller has issues with emulated controllers. (user-6e7b, 2026-06-16, exchange 220463, check: uncheckable)</li>
+<li id="s56">OpenBSD requires a special read of ASR with CIP=0 after SELECT, which is incompatible with IRIX's behavior of not reading ASR and expecting an interrupt. (user-3e2d, 2026-06-21, exchange 220476, check: supported)</li>
+<li id="s57">OpenBSD hasn't managed to have everything under one license yet. (user-07ed, 2026-07-22, exchange 216263, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="openbsd-6-9.html">OpenBSD 6.9</a> (5)
+</li>
+<li><a href="openbsd-7-4.html">OpenBSD 7.4</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="octane.html">Octane</a>, <a href="ip22.html">IP22</a>, <a href="iris.html">IRIS</a>, <a href="netra-t1-105.html">Netra t1/105</a>, <a href="sgi-hardware.html">SGI hardware</a>, <a href="ultra-10.html">Ultra 10</a>, <a href="ultra-60.html">Ultra 60</a>, <a href="blade-1000.html">Blade 1000</a>, <a href="blade-150.html">Blade 150</a>, <a href="g4-mini.html">G4 Mini</a>, <a href="netra-t105.html">Netra t105</a>, <a href="sparcclassic.html">SPARCclassic</a>, <a href="sparcstation-20.html">SPARCstation 20</a>, <a href="ss20.html">SS20</a>, <a href="thinkpad.html">ThinkPad</a>, <a href="vax.html">VAX</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Processors: <a href="sparc.html">SPARC</a>, <a href="mips.html">MIPS</a>, <a href="indigo-r3k.html">Indigo R3K</a>, <a href="mips-sgi.html">MIPS SGI</a>, <a href="ppc64.html">PPC64</a>, <a href="sparc-hardware.html">SPARC hardware</a>, <a href="sparc64.html">SPARC64</a>, <a href="ultrasparc-ii.html">UltraSPARC II</a>
+</li>
+<li>Graphics: <a href="expert3d.html">Expert3D</a>, <a href="xvr-100.html">XVR-100</a>, <a href="xvr-1200.html">XVR-1200</a>
+</li>
+<li>Operating systems: <a href="netbsd.html">NetBSD</a>, <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="solaris.html">Solaris</a>, <a href="freebsd.html">FreeBSD</a>, <a href="gentoo.html">Gentoo</a>, <a href="debian.html">Debian</a>, <a href="mint.html">Mint</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="solaris-7.html">Solaris 7</a>, <a href="solaris-9.html">Solaris 9</a>, <a href="vms.html">VMS</a>
+</li>
+<li>Software: <a href="cde.html">CDE</a>, <a href="binutils.html">binutils</a>, <a href="scsi-driver.html">SCSI driver</a>, <a href="tyrquake.html">TyrQuake</a>, <a href="wine.html">Wine</a>, <a href="clang.html">clang</a>, <a href="driver.html">driver</a>, <a href="efs2tar.html">efs2tar</a>, <a href="mplayer.html">mplayer</a>, <a href="package-management.html">package management</a>, <a href="pkgsrc.html">pkgsrc</a>
+</li>
+<li>Parts and peripherals: <a href="2gb-ram.html">2GB RAM</a>, <a href="cdrom.html">CDROM</a>, <a href="prom.html">PROM</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="boot-floppy.html">boot floppy</a>, <a href="port.html">port</a>, <a href="serial-console.html">serial console</a>, <a href="systemd.html">systemd</a>
+</li>
+<li>Standards and interfaces: <a href="tftp.html">TFTP</a>, <a href="dhcp.html">DHCP</a>, <a href="dma.html">DMA</a>, <a href="ethernet-address.html">Ethernet address</a>, <a href="x.html">X</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>, <a href="dec.html">DEC</a>, <a href="dell.html">Dell</a>, <a href="hp.html">HP</a>, <a href="iso.html">ISO</a>, <a href="lenovo.html">Lenovo</a>, <a href="next.html">NeXT</a>, <a href="sun-t5120.html">Sun T5120</a>, <a href="sun4c.html">sun4c</a>
+</li>
+<li>Other: <a href="aviion.html">AViiON</a>, <a href="bootp-dhcp.html">BOOTP/DHCP</a>, <a href="cavium.html">Cavium</a>, <a href="dg-ux.html">DG/UX</a>, <a href="expert3d-lite.html">Expert3D-Lite</a>, <a href="pio.html">PIO</a>, <a href="sparcstation-ipx.html">SparcStation IPX</a>, <a href="u80.html">U80</a>, <a href="vaxen.html">VAXen</a>, <a href="void.html">Void</a>, <a href="fluxbox.html">fluxbox</a>, <a href="htop.html">htop</a>, <a href="ksh.html">ksh</a>, <a href="ls.html">ls</a>, <a href="nfsrb2.html">nfsrb2</a>, <a href="platform.html">platform</a>, <a href="sgi-mips.html">sgi_mips</a>
+</li></ul>
+</body>
+</html>

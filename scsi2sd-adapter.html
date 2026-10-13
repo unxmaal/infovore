@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI2SD adapter</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI2SD adapter</h1>
+<p>Claims: 8 Part of <a href="scsi2sd.html">SCSI2SD</a></p>
+<p>The SCSI2SD adapter is a software-controlled device compatible with V6 systems. <sup><a href="#s1">1</a></sup> It can be connected to an A2000, used on an O2 (though slower for sequential IO), and used to replace a failing SCSI drive on an Indy. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It requires a 3.5-inch mounting bracket, which can be provided by a 5.25-inch to 3.5-inch adapter. <sup><a href="#s5">5</a></sup> It can improve disc throughput on the original hardware, but it is currently crashing on the PI due to misconfiguration. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The SCSi2SD adapter is software-controlled and compatible with V6 systems. (user-f229, 2021-07-13, exchange 99465, check: uncheckable)</li>
+<li id="s2">The A2000 can be connected to a SCSI2SD adapter. (user-f229, 2020-05-14, exchange 233033, check: uncheckable)</li>
+<li id="s3">The SCSI2SD adapter works on an O2 but is slower for sequential IO. (user-6afa, 2020-09-11, exchange 97521, check: supported)</li>
+<li id="s4">A SCSI2SD adapter can be used to replace a failing SCSI drive on an Indy, but it may be simpler to install a new drive and recover data from the old one using a system that supports SGI partitions and EFS/XFS filesystems (user-d903, 2023-09-06, exchange 84057, check: supported)</li>
+<li id="s5">The SCSI2SD adapter requires a 3.5-inch mounting bracket and can be used with a 5.25-inch to 3.5-inch adapter. (user-8de9, 2022-02-27, exchange 241013, check: supported)</li>
+<li id="s6">To improve disc throughput on the original hardware, try a SCSI2SD adapter. (user-a346, 2022-12-27, exchange 93012, check: uncheckable)</li>
+<li id="s7">The SCSI2SD adapter is crashing on the PI due to misconfiguration. (user-59b9, 2021-10-14, exchange 205719, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="a2000.html">A2000</a>, <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="pi.html">PI</a>
+</li>
+<li>Graphics: <a href="v6.html">V6</a>
+</li>
+<li>Parts and peripherals: <a href="scsi-drive.html">SCSI drive</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>_XSGISetSpecialDestroyHandler</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>_XSGISetSpecialDestroyHandler</h1>
+<p>Claims: 6</p>
+<p>libGL loads with dlopen and calls _XSGISetSpecialDestroyHandler, which requires linking with a specific X-related library. <sup><a href="#s1">1</a></sup> The issue is due to a missing symbol _XSGISetSpecialDestroyHandler in libXext from SGUG RSE, which is present in the version from Irix. <sup><a href="#s2">2</a></sup> The function _XSGISetSpecialDestroyHandler is private API and not publicly available, and its expected signature can be found in a header file. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The callback set by _XSGISetSpecialDestroyHandler may not be called until the application quits. <sup><a href="#s5">5</a></sup> It is possible to generate a C file with this function doing nothing or returning 0, but expect issues with OpenGL context management. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">libGL loads with dlopen and calls XSGISetSpecialDestroyHandler, which requires linking with a specific X-related library. (user-21b8, 2024-12-08, exchange 215603, check: uncheckable)</li>
+<li id="s2">The issue is due to a missing symbol _XSGISetSpecialDestroyHandler in libXext from SGUG RSE, which is present in the version from Irix. (user-8780, 2024-12-08, exchange 215603, check: uncheckable)</li>
+<li id="s3">The expected signature of _XSGISetSpecialDestroyHandler can be found in a header file. (user-aac7, 2024-12-17, exchange 71773, check: uncheckable)</li>
+<li id="s4">The function _XSGISetSpecialDestroyHandler is private API and not publicly available. (user-8780, 2024-12-17, exchange 71780, check: uncheckable)</li>
+<li id="s5">The callback set by _XSGISetSpecialDestroyHandler may not be called until the application quits. (user-aac7, 2024-12-17, exchange 71773, check: uncheckable)</li>
+<li id="s6">It is possible to generate a C file with this function doing nothing or returning 0, but expect issues with OpenGL context management. (user-aac7, 2024-12-17, exchange 71780, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Other: <a href="dlopen.html">dlopen</a>, <a href="libgl.html">libGL</a>, <a href="libxext.html">libXext</a>
+</li></ul>
+</body>
+</html>

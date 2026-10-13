@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>patch</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>patch</h1>
+<p>Claims: 47</p>
+<p>The `patch` command applies a diff file containing differences produced by `diff` to original files, producing patched versions, and can be used with options like `-p0` and `-b` for specifying the patch level and creating backups respectively. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> To create a patch, diff the edited source file with the original, not the entire directory. <sup><a href="#s3">3</a></sup> You can use `patch -p3` to strip the first 3 paths from the patch file. <sup><a href="#s4">4</a></sup> Applying the patch involves 4 steps and editing 3 text files. <sup><a href="#s5">5</a></sup> Patching tcl.m4 with a specific diff rejects the patch due to whitespace differences, but adding `--ignore-whitespace` resolves it. <sup><a href="#s6">6</a></sup> The Python 2.7.16 patch is close but has known test suite failures. <sup><a href="#s7">7</a></sup> Applying the patch allows compilation to proceed past the initial error, though the linker then complains about missing libraries. <sup><a href="#s8">8</a></sup> A missing setenv in the patch causes issues, and the string should not be free'd. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The `patch` command can be used to apply patches, with options like -p0 and -b for specifying the patch level and creating backups respectively. (user-37ee, 2019-05-27, exchange 67228, check: supported)</li>
+<li id="s2">patch takes a diff file containing differences produced by diff and applies them to original files, producing patched versions. (user-b1da, 2020-12-20, exchange 13027, check: uncheckable)</li>
+<li id="s3">To create a patch, diff the edited source file with the original, not the entire directory. (user-17cb, 2020-12-27, exchange 69164, check: uncheckable)</li>
+<li id="s4">You can `patch -p3` to strip the first 3 paths from the patch file (user-6afa, 2022-06-05, exchange 70411, check: supported)</li>
+<li id="s5">Applying the patch involves 4 steps and editing 3 text files. (user-2a3c, 2026-06-13, exchange 219801, check: supported)</li>
+<li id="s6">patching tcl.m4 with a specific diff rejects the patch due to whitespace differences; adding --ignore-whitespace resolves it. (user-2189, 2019-07-04, exchange 67330, check: uncheckable)</li>
+<li id="s7">The Python 2.7.16 patch is close but has known test suite failures. (user-2d09, 2019-09-21, exchange 214843, check: supported)</li>
+<li id="s8">Applying the patch allows compilation to proceed past the initial error, though the linker then complains about missing libraries. (user-7973, 2025-07-31, exchange 72611, check: uncheckable)</li>
+<li id="s9">A missing setenv in the patch causes issues, and the string should not be free'd. (user-42cf, 2020-02-03, exchange 68322, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="patch-set.html">patch set</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-5-3-xfs.html">IRIX 5.3 XFS</a>, <a href="irix-6-3.html">IRIX 6.3</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-install.html">IRIX install</a>, <a href="os-install.html">OS install</a>, <a href="solaris-7.html">Solaris 7</a>
+</li>
+<li>Software: <a href="spec-file.html">spec file</a>, <a href="hpe.html">HPE</a>, <a href="ido.html">IDO</a>, <a href="rpm.html">RPM</a>, <a href="inst.html">inst</a>, <a href="setenv.html">setenv</a>, <a href="sshd.html">sshd</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="gcc4.html">gcc4</a>
+</li>
+<li>Other: <a href="patch-file.html">.patch file</a>, <a href="hp-ux-9-05.html">HP-UX 9.05</a>, <a href="simcity.html">SimCity</a>, <a href="bug.html">bug</a>, <a href="bundle.html">bundle</a>, <a href="checksum.html">checksum</a>, <a href="compatibility.html">compatibility</a>, <a href="directory.html">directory</a>, <a href="math-h.html">math.h</a>, <a href="source.html">source</a>, <a href="source-file.html">source file</a>
+</li></ul>
+</body>
+</html>

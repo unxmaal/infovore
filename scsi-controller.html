@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI controller</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI controller</h1>
+<p>Claims: 53 Part of <a href="scsi.html">SCSI</a> Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>The QLogic FAS201 is a SCSI controller, while the QLogic QLA12160 is a SCSI controller paired with a Broadcom BCM5704 Ethernet controller. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Reply Sound Blaster 16 + SCSI card combines an OPL3 chip, a SCSI controller, and a Vibra 16 chip into one unit. <sup><a href="#s3">3</a></sup> The SCSI controller on the IO3 is a WD33c93, and dksc is the SCSI controller. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The SCSI controller on the Indy is integrated into the main board and is set to ID 0, which is reserved for the SCSI controller on SGI systems. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> On SGI systems the SCSI controller is set to ID 0 and the disk should be set to ID 1, whereas on PCs the controller is usually ID 7 and the disk is ID 0. <sup><a href="#s8">8</a></sup> The SCSI controller uses ID 0, and disks should use IDs 1 and up. <sup><a href="#s9">9</a></sup> The Indigo2 has a SCSI controller and an on-board Ethernet interface, and the O2's boot disk can be a SCSI controller for hard disks. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The Onyx2 has a SCSI controller on the IO6g, not the midplane, and the white connectors on the midplane connect SCSI drives to the IO6g. <sup><a href="#s12">12</a></sup> The Octane can boot from NVMe using a hack that involves a SCSI controller understood by PROM and modifying kernel functions to map the root using the NVMe driver as a secondary controller. <sup><a href="#s13">13</a></sup> The challenge S has a single SCSI controller for all SCSI devices, including those connected to the 50-pin external port. <sup><a href="#s14">14</a></sup> The SCSI controller must be registered as /hw/ql/2 or later on Octane, with a kernel hack to recognize it there, while on O2 it skips on-board controllers and looks at /hw/scsi/X in hwgraph. <sup><a href="#s15">15</a></sup> The system has an integral SCSI controller 2 and 0, and an IOC3/IOC4 serial port. <sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Qlogic FAS201 is a SCSI controller. (user-237d, 2020-03-13, exchange 96539, check: uncheckable)</li>
+<li id="s2">The SCSI controller is a QLogic QLA12160 and the Ethernet controller is a Broadcom BCM5704. (user-59b9, 2020-12-31, exchange 216382, check: uncheckable)</li>
+<li id="s3">The Reply Sound Blaster 16 + SCSI card is an OPL3 chip, a SCSI controller, and a Vibra 16 chip rolled into one. (user-24f9, 2022-05-22, exchange 234031, check: supported)</li>
+<li id="s4">dksc is the SCSI controller. (user-03ad, 2024-02-25, exchange 44826, check: uncheckable)</li>
+<li id="s5">The SCSI controller on the IO3 is a WD33c93. (user-86e1, 2024-12-03, exchange 241253, check: uncheckable)</li>
+<li id="s6">The SCSI controller on an Indy is integrated into the main board. (user-04a3, 2021-04-01, exchange 16130, check: supported)</li>
+<li id="s7">ID 0 is reserved for the SCSI controller on SGI systems. (user-b1da, 2021-10-16, exchange 21172, check: supported)</li>
+<li id="s8">On SGI systems, the SCSI controller is set to ID #0 and the disk should be set to ID #1. On PCs, the controller is usually ID #7 and the disk is ID #0. (user-86e1, 2025-01-22, exchange 53221, check: supported)</li>
+<li id="s9">The SCSI controller uses ID #0, disks should use IDs #1 and up. (user-86e1, 2024-11-15, exchange 112788, check: supported)</li>
+<li id="s10">The O2's boot disk can be a SCSI controller for hard disks. (user-e872, 2024-02-26, exchange 223734, check: supported)</li>
+<li id="s11">The Indigo2 has a SCSI controller and an on-board Ethernet interface. (user-bba0, 2024-09-05, exchange 210930, check: supported)</li>
+<li id="s12">The Onyx2 has a SCSI controller on the IO6g, not the midplane. The white connectors on the midplane are for connecting SCSI drives to the IO6g. Cleaning the connectors with deoxit resolved the issue. The base IO slot has (user-24f0, 2025-09-21, exchange 213098, check: supported)</li>
+<li id="s13">The Octane can boot from NVMe with a hack that involves using a SCSI controller understood by PROM and modifying kernel functions to map root using NVMe driver as a secondary controller. (user-3e2d, 2025-12-08, exchange 225745, check: supported)</li>
+<li id="s14">The challenge S has a single SCSI controller for all SCSI devices, including those connected to the 50-pin external port. (user-2a3c, 2026-01-08, exchange 89297, check: supported)</li>
+<li id="s15">The scsi controller must be registered as /hw/ql/2 or later on Octane, with a kernel hack to recognize it there; on O2, it skips on-board controllers and looks at /hw/scsi/X in hwgraph. (user-3e2d, 2026-03-30, exchange 73342, check: supported)</li>
+<li id="s16">The system has an integral SCSI controller 2 and 0, and an IOC3/IOC4 serial port. (user-86e1, 2026-08-18, exchange 124947, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="indigo2.html">Indigo2</a>, <a href="onyx2.html">Onyx2</a>, <a href="alpha-server.html">Alpha server</a>, <a href="amiga-2000.html">Amiga 2000</a>, <a href="challenge-s.html">Challenge S</a>, <a href="pc.html">PC</a>, <a href="professional-iris.html">Professional IRIS</a>, <a href="tezro.html">Tezro</a>, <a href="workstation.html">workstation</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-kernel.html">IRIX kernel</a>, <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>, <a href="qemu.html">QEMU</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="72-pin-simms.html">72-pin SIMMs</a>, <a href="ethernet-controller.html">Ethernet controller</a>, <a href="ide-controller.html">IDE controller</a>, <a href="io6g.html">IO6G</a>, <a href="sca-drive.html">SCA drive</a>, <a href="ssd.html">SSD</a>, <a href="boot-disk.html">boot disk</a>, <a href="boot-drive.html">boot drive</a>, <a href="network-card.html">network card</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet.html">Ethernet</a>, <a href="nvme.html">NVMe</a>, <a href="scsi-device.html">SCSI device</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="vmware.html">VMware</a>
+</li>
+<li>Other: <a href="4-19-kernel.html">4.19 kernel</a>, <a href="bcm5704.html">BCM5704</a>, <a href="esdi.html">ESDI</a>, <a href="io3.html">IO3</a>, <a href="ultra-5-10.html">Ultra 5/10</a>, <a href="dksc.html">dksc</a>, <a href="midplane.html">midplane</a>, <a href="sector-size.html">sector size</a>
+</li></ul>
+</body>
+</html>

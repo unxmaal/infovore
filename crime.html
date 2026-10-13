@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRIME</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CRIME</h1>
+<p>Claims: 5</p>
+<p>CRIME is a GPU with SIMD instructions in the O2, which includes a watchdog called McGriff. <sup><a href="#s1">1</a></sup> CRIME has 3 tiled TLBs holding 64 entries each, and for 32-bit pixels each tile is 128x128, with framebuffer dimensions not needing to be aligned to tile boundaries but requiring an integral number of tiles. <sup><a href="#s2">2</a></sup> CRIME has a 144-bit bus running at 133 MHz internally, which is converted to a 288-bit 66 MHz bus for memory. <sup><a href="#s3">3</a></sup> CRIME can do a 162 MHz pixel clock, which was spotted on the spec as a frequency of least error for the PLL. <sup><a href="#s4">4</a></sup> Inter IC bus signals can be labeled using signal timing diagrams, even if there is no pinout, by numbering them 'CRIME, EVIL, MACE' 1, 2, 3, etc. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O2 has a GPU with SIMD instructions, named Crime, which includes a watchdog called McGriff. (user-8b3c, 2019-12-01, exchange 214897, check: supported)</li>
+<li id="s2">CRIME has 3 tiled TLBs holding 64 entries each, and for 32-bit pixels, each tile is 128x128, with framebuffer dimensions not needing to be aligned to tile boundaries but requiring an integral number of tiles. A 1920x1024 (user-8780, 2025-05-24, exchange 117061, check: supported)</li>
+<li id="s3">CRIME has a 144-bit bus running at 133 MHz internally, which is converted to a 288-bit 66 MHz bus for memory. (user-757f, 2026-01-24, exchange 121132, check: supported)</li>
+<li id="s4">CRIME can do 162 MHz pixel clock just fine - spotted it on the spec as a frequency of least error for the PLL and had to try. (user-42cf, 2025-05-18, exchange 225070, check: supported)</li>
+<li id="s5">You could label inter IC bus signals using signal timing diagrams, even if there's no pinout, by numbering them 'CRIME, EVIL, MACE' 1,2,3, etc. (user-4f7c, 2026-02-18, exchange 121579, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="crime-1-5-spec.html">CRIME 1.5 spec</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Parts and peripherals: <a href="mace.html">MACE</a>
+</li>
+<li>Other: <a href="tiles.html">tiles</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sashARCS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sashARCS</h1>
+<p>Claims: 5</p>
+<p>sashARCS is used by the Indigo2 R4000 and the O2, but not by the R8000 or R10000. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The `sa` file is in the mkboottape format and can be used for installation, though booting from tape is no longer supported. <sup><a href="#s3">3</a></sup> It contains files such as `sash64`, `sashARCS`, and `mr` with sizes 266000, 342532, and 19200000. <sup><a href="#s3">3</a></sup> Running a built driver as an executable ELF binary from sashARCS may work, but exiting back to the Command Monitor with hinv giving different results is more challenging. <sup><a href="#s4">4</a></sup> The O2 has a compatibility issue with sashARCS, indicated by a drive detection error. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Indigo2 R4000 uses sashARCS, but R8000 and R10000 do not. (user-b7c4, 2023-12-24, exchange 209773, check: supported)</li>
+<li id="s2">The O2 uses sashARCS. (user-b7c4, 2023-12-24, exchange 209773, check: supported)</li>
+<li id="s3">The `sa` file is in the mkboottape format and can be used for installation, though booting from tape is no longer supported. It contains files like `sash64`, `sashARCS`, and `mr` with sizes 266000, 342532, and 19200000, (user-07ed, 2024-08-01, exchange 210750, check: supported)</li>
+<li id="s4">Running a built driver as an executable ELF binary from SashARCS may work, but exiting back to the Command Monitor with hinv giving different results is more challenging. (user-c799, 2024-12-11, exchange 113143, check: uncheckable)</li>
+<li id="s5">The O2 has a compatibility issue with SASHARCS, indicated by a drive detection error. (user-45c8, 2025-05-28, exchange 56854, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="indigo2-r4000.html">Indigo2 R4000</a>, <a href="r10000.html">R10000</a>, <a href="r8000.html">R8000</a>
+</li>
+<li>Parts and peripherals: <a href="command-monitor.html">command monitor</a>
+</li></ul>
+</body>
+</html>

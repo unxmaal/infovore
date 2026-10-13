@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I2C</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>I2C</h1>
+<p>Claims: 3</p>
+<p>Some cards required a PC BIOS for proper initialization, while others had issues with i2c and EDID, leading to resolution problems. <sup><a href="#s1">1</a></sup> A bad PSU can cause I2C issues severe enough to affect L1 cache functionality, which can be debugged by checking PSU and env chips, and fixes may involve replacement. <sup><a href="#s2">2</a></sup> ODYSSEY shows up in env, temp, and fans, likely via I2C. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Some cards required a PC BIOS for proper initialization, while others had issues with i2c and EDID, leading to resolution problems. (user-c831, 2021-04-14, exchange 16563, check: uncheckable)</li>
+<li id="s2">A bad PSU can cause I2C issues severe enough to affect L1 cache functionality; this can be debugged by checking PSU and env chips; fixes may involve replacement. (user-22f9, 2021-10-30, exchange 100661, check: uncheckable)</li>
+<li id="s3">ODYSSEY shows up in env, temp, and fans, likely via I2C. (user-7fd9, 2025-07-02, exchange 225220, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="pc-bios.html">PC BIOS</a>
+</li>
+<li>Graphics: <a href="odyssey.html">Odyssey</a>
+</li>
+<li>Parts and peripherals: <a href="l1-cache.html">L1 cache</a>, <a href="psu.html">PSU</a>, <a href="card.html">card</a>
+</li>
+<li>Other: <a href="edid.html">EDID</a>
+</li></ul>
+</body>
+</html>

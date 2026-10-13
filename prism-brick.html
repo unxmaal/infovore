@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism brick</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Prism brick</h1>
+<p>Claims: 12 Part of <a href="prism.html">Prism</a></p>
+<p>The Prism brick requires a separate Altix compute module to operate, using 'g' notation for graphics slots. <sup><a href="#s1">1</a></sup> The Prism brick has an Altix IO topology with specific PCI segment, PCIBUS, brick, rack, slot, bus, and connection details. <sup><a href="#s2">2</a></sup> The FireGL X1s with HP firmware do not work in the Prism brick; the system locks up when trying to load the EFI. <sup><a href="#s3">3</a></sup> The Prism brick requires specific AGP card configurations; it crashes with a GeForce 2 Ti and doesn't detect a Radeon 9500. <sup><a href="#s4">4</a></sup> Prism setup with Altix 350 base node and Prism brick provides DVI output via ATI FireGL X3 cards. <sup><a href="#s5">5</a></sup> The Prism brick drops to CAC mode when connected to a 4K monitor via DVI to HDMI adapter but works fine with a VGA monitor. <sup><a href="#s6">6</a></sup> The Prism brick can get stuck at 'L1 Booting' and outputs 'setup_tdrdata_shub()' when not in the rack, and moving it fixes it. <sup><a href="#s7">7</a></sup> Ordi-spare in France has an out-of-stock Prism brick. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Prism brick requires a separate Altix compute module to operate, using 'g' notation for graphics slots. (user-59b9, 2020-09-13, exchange 216356, check: uncheckable)</li>
+<li id="s2">The Prism brick has an Altix IO topology with specific PCI segment, PCIBUS, brick, rack, slot, bus, and connection details. (user-59b9, 2020-12-30, exchange 216380, check: uncheckable)</li>
+<li id="s3">The FireGL X1s with HP firmware do not work in the Prism brick; the system locks up when trying to load the EFI. (user-59b9, 2020-09-18, exchange 75377, check: uncheckable)</li>
+<li id="s4">The Prism brick requires specific AGP card configurations; it crashes with a GeForce 2 Ti and doesn't detect a Radeon 9500. (user-59b9, 2020-09-21, exchange 75382, check: supported)</li>
+<li id="s5">Prism setup with Altix 350 base node and Prism brick provides DVI output via ATI FireGL X3 cards. (user-f229, 2020-12-29, exchange 13205, check: supported)</li>
+<li id="s6">The Prism brick drops to CAC mode when connected to a 4K monitor via DVI to HDMI adapter but works fine with a VGA monitor. (user-59b9, 2020-12-30, exchange 216380, check: supported)</li>
+<li id="s7">The Prism brick can get stuck at 'L1 Booting' and outputs 'setup_tdrdata_shub()' when not in the rack, and moving it fixes it. (user-24f0, 2025-05-18, exchange 76332, check: uncheckable)</li>
+<li id="s8">Ordi-spare in France has an out-of-stock Prism brick. (user-5906, 2026-08-18, exchange 216644, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix-350.html">Altix 350</a>
+</li>
+<li>Graphics: <a href="firegl-x1.html">FireGL X1</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="4k-monitor.html">4K monitor</a>, <a href="agp-card.html">AGP card</a>, <a href="firegl-cards.html">FireGL cards</a>
+</li>
+<li>Standards and interfaces: <a href="efi.html">EFI</a>
+</li>
+<li>Other: <a href="ordi-spare.html">Ordi-Spare</a>
+</li></ul>
+</body>
+</html>

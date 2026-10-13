@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI2</h1>
+<p>Claims: 10 Part of <a href="scsi.html">SCSI</a></p>
+<p>The V6 board supports SCSI2, offering better performance than V5.x boards, and the Indy can't do more than SCSI2 at 10 Mbit/s, so v6 is perfect for it. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SS10 is SCSI-2, fast/narrow. <sup><a href="#s3">3</a></sup> The IC is an active terminator specifically for SCSI-2, which makes sense given the HD50 connector. <sup><a href="#s4">4</a></sup> Scsi2 speeds are bottlenecked with scsi io on the o2. <sup><a href="#s5">5</a></sup> The ZuluSCSI USBLINK allows connecting SCSI devices via USB, supporting SCSI 1 and 2, and enables direct copying to a micro SD card for imaging drives. <sup><a href="#s6">6</a></sup> Disabling SCSI 2 support allows BlueSCSI to pass diagnostics on an Indy. <sup><a href="#s7">7</a></sup> The Indigo2 has a known issue causing timeout problems; disabling scsi2 or enabling phase delay can fix it. <sup><a href="#s8">8</a></sup> The Indigo1 is not SCSI2 compatible; disabling SCSI2 in the configuration prevents issues. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The V6 board supports SCSI2, offering better performance than V5.x boards. (user-f229, 2019-03-27, exchange 1184, check: uncheckable)</li>
+<li id="s2">Indy can't do more than SCSI2 at 10 Mbit/s, so v6 is perfect for it. (user-c831, 2021-05-14, exchange 99208, check: supported)</li>
+<li id="s3">SS10 is SCSI-2 I think. Fast/narrow. (user-95db, 2022-07-03, exchange 239752, check: supported)</li>
+<li id="s4">The IC is an active terminator specifically for SCSI-2, which makes sense given the HD50 connector. (user-c831, 2023-12-14, exchange 223552, check: supported)</li>
+<li id="s5">Scsi2 speeds are bottlenecked with scsi io on the o2. (user-24f0, 2024-06-18, exchange 210525, check: supported)</li>
+<li id="s6">The ZuluSCSI USBLINK allows connecting SCSI devices via USB, supporting SCSI 1 and 2, and enables direct copying to a micro SD card for imaging drives. (user-22f9, 2025-06-04, exchange 225134, check: supported)</li>
+<li id="s7">Disabling SCSI 2 support allows BlueSCSI to pass diagnostics on an Indy. (user-7243, 2025-12-01, exchange 225726, check: supported)</li>
+<li id="s8">The Indigo2 has a known issue causing timeout problems; disabling scsi2 or enabling phase delay can fix it. (user-17cb, 2026-05-09, exchange 226446, check: supported)</li>
+<li id="s9">The Indigo1 is not SCSI2 compatible; disabling SCSI2 in the configuration prevents issues. (user-17cb, 2026-05-13, exchange 226456, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="indigo1.html">Indigo1</a>, <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="ss10.html">SS10</a>
+</li>
+<li>Parts and peripherals: <a href="bluescsi.html">BlueSCSI</a>, <a href="micro-sd-card.html">micro SD card</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-1.html">SCSI 1</a>
+</li></ul>
+</body>
+</html>

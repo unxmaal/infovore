@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4D/50</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>4D/50</h1>
+<p>Claims: 12</p>
+<p>The 4D/70 GT and 4D/50 boards use the same PROM, and the 4D/70 GT can be run as a 4D/50 with an IP4 at 8 MHz. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> 4D1-1 was exclusively for the 4D/60, while 4D/70 and 4D/50 did not get supported until 4D1-2. <sup><a href="#s3">3</a></sup> 4D/50 and 4D/70 should be working in the next release, but with no graphics at all. <sup><a href="#s4">4</a></sup> The 4D/50 has no ZB2 and is likely broken without RAM, lacks a tape drive capstan, has a CDROM unrecognized by its PROM, and does not have a VME network card. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The 4D/50 'G' has issues with its tape drive, graphics, and SCSI devices, and may have problems with the backplane's IACK/BG jumpers. <sup><a href="#s7">7</a></sup> A 4D/50 with a broken IP4 CPU board and hard disk can be repaired by replacing the CPU board and using another hard disk, and a Toshiba MK156FB hard disk was found later, tested on a PC, then installed in the 4D/50. <sup><a href="#s8">8</a></sup> The ENP10 is rebadged as a Motorola MVME330, and manuals for the MVME330 help emulate the ENP10, allowing 4D/50 and 4D/70 to connect to the internet. <sup><a href="#s9">9</a></sup> The MAME rom for 4D/50 and 70 has pre-set monitor variables in the nvram, and the most recent rom bundle for the ENP10 ethernet card is available. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The 4D/70 GT and 4D/50 boards use the same PROM. (user-86e1, 2023-08-16, exchange 223260, check: supported)</li>
+<li id="s2">The 4D/70 GT can be run as a 4D/50 with an IP4 at 8 MHz. (user-86e1, 2024-04-02, exchange 189019, check: supported)</li>
+<li id="s3">4D1-1 was exclusively for the 4D/60, while 4D/70 and 4D/50 did not get supported until 4D1-2. (user-56d4, 2024-05-31, exchange 241207, check: supported)</li>
+<li id="s4">4D/50 and 4D/70 should be working in the next release, but no graphics at all. (user-a719, 2023-08-29, exchange 220304, check: supported)</li>
+<li id="s5">The 4D/50 has no ZB2 and is likely broken without RAM. (user-a079, 2024-07-23, exchange 189233, check: supported)</li>
+<li id="s6">The 4D/50 lacks a tape drive capstan, a CDROM is unrecognized by its PROM, and it does not have a VME network card. (user-86e1, 2025-07-14, exchange 189802, check: supported)</li>
+<li id="s7">The 4D/50 'G' has issues with its tape drive, graphics, and SCSI devices, and may have problems with the backplane's IACK/BG jumpers. (user-86e1, 2025-07-18, exchange 189808, check: supported)</li>
+<li id="s8">A 4D/50 with a broken IP4 CPU board and hard disk can be repaired by replacing the CPU board and using another hard disk. A Toshiba MK156FB hard disk was found later and tested on a PC, then installed in the 4D/50 and 4D (user-86e1, 2025-09-17, exchange 189928, check: supported)</li>
+<li id="s9">The ENP10 is rebadged as a Motorola MVME330, and manuals for the MVME330 help emulate the ENP10, allowing 4D/50 and 4D/70 to connect to the internet. (user-86e1, 2025-01-09, exchange 224377, check: supported)</li>
+<li id="s10">The MAME rom for 4D/50 and 70 has pre-set monitor variables in the nvram. The most recent rom bundle for the ENP10 ethernet card is available. To use the nvram image, remove any existing nvram file before starting. (user-a719, 2025-05-02, exchange 93572, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="4d-70.html">4D/70</a>, <a href="4d-60.html">4D/60</a>, <a href="4d-70-gt.html">4D/70 GT</a>
+</li>
+<li>Graphics: <a href="graphics.html">graphics</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="prom.html">PROM</a>, <a href="hard-disk.html">hard disk</a>, <a href="tape-drive.html">tape drive</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-device.html">SCSI device</a>
+</li>
+<li>Other: <a href="70.html">70</a>, <a href="clover1.html">Clover1</a>, <a href="enp10.html">ENP10</a>
+</li></ul>
+</body>
+</html>

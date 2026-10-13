@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>didbs</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>didbs</h1>
+<p>Claims: 63 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenSSH">OpenSSH</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<p>didbs is a tool that automates the build of IRIX development tooling from base IRIX and development tools, using MIPSPro except for gcc-related tooling, and is not a general porting system or elegant. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It can build a `.tardist` for base platform tools without packaging them, and prebuilt versions are available on forums as torrent files that can be downloaded and untarred. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> didbs supports MIPS3 and can install single packages, though shuffling packages to the front of the compilation order breaks the package testing abilities inside didbs. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The gcc9 in didbs is built using a chain of earlier gcc versions, and gcc compilation time varies with the version of gcc and the release version of didbs. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> didbs is being updated to use the correct 'lib32' style library directories and specific 'mips4' and 'mips3' releases, and irixports is being worked on by lbdm and will include gcc compilers as part of didbs releases. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> didbs 0.1.8 requires systune ncargs 131072 and an existing compatible release linked at /usr/didbs/current to run bootstrap, and extracting didbs under the home directory breaks -rpath entries, which placing it in /usr/didbs/0_1_8_etc fixes. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> Didbs is a software package for bootstrapping a system into a usable development setup, providing the most current set of basic tools together with a GCC9 binary and other tools for IRIX development. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> It includes OpenSSL, OpenSSH, and GNU screen (the latter not in the default set), and is available as a large .tar file via torrent, with the latest version being the 0.1.9 Xmas release. <sup><a href="#s15">15</a></sup><sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The name can be interpreted as 'dans irix development bootstrapper', and the program saves time setting up a fresh IRIX installation. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> didbs may have newer libraries than the system binaries expect to see, though this is not the case on a 6.5.30 install with didbs 1.5. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> It is part of a hierarchy of didbs &gt; irixports &gt; Nekoware, and can be pulled in or used via a 'didbs' branch added to the irixports repo, though this might overwrite or double download existing files. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> didbs has been around for a while and may be deprecated in favor of sgug-rse. <sup><a href="#s27">27</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">didbs is a tool to automate the build of IRIX from base IRIX and development tools, with variations limited to compiler and patch level. (user-2d09, 2019-08-08, exchange 67723, check: uncheckable)</li>
+<li id="s2">Didbs is a script that builds a bunch of development tooling all in one go, using MIPSPro except for gcc-related tooling, and is not a general porting system or elegant. (user-2d09, 2019-09-30, exchange 214859, check: uncheckable)</li>
+<li id="s3">didbs can build `.tardist` for base platform tools without packaging them. (user-2d09, 2019-07-16, exchange 67499, check: supported)</li>
+<li id="s4">Prebuilt versions of didbs are available on forums. (user-2189, 2019-11-03, exchange 4088, check: uncheckable)</li>
+<li id="s5">Didbs is a binary release available as a torrent file that can be downloaded and untarred. (user-f229, 2019-11-13, exchange 214886, check: uncheckable)</li>
+<li id="s6">Didbs supports MIPS3. (user-0251, 2019-09-27, exchange 214855, check: uncheckable)</li>
+<li id="s7">didbs allows installing single packages. (user-f229, 2019-10-26, exchange 3998, check: uncheckable)</li>
+<li id="s8">Shuffling packages to the front of the compilation order breaks the package testing abilities inside didbs. (user-2d09, 2019-09-30, exchange 214859, check: uncheckable)</li>
+<li id="s9">The gcc9 in Didbs is built using a chain of earlier gcc versions. (user-2d09, 2019-11-14, exchange 214889, check: uncheckable)</li>
+<li id="s10">gcc compilation time varies with the version of gcc and the release version of didbs, affecting the time to produce compiled code. (user-2d09, 2019-09-10, exchange 67854, check: uncheckable)</li>
+<li id="s11">Didbs is being updated to use the correct 'lib32' style library directories and specific 'mips4' and 'mips3' releases. (user-2d09, 2019-08-27, exchange 67820, check: uncheckable)</li>
+<li id="s12">irixports is being worked on by lbdm and will include gcc compilers as part of didbs releases. (user-2d09, 2019-08-08, exchange 67722, check: uncheckable)</li>
+<li id="s13">didbs 0.1.8 requires systune ncargs 131072 and an existing compatible release linked at /usr/didbs/current to run bootstrap. (user-2d09, 2019-11-16, exchange 214890, check: supported)</li>
+<li id="s14">Extracting didbs under the home directory breaks -rpath entries, placing it in /usr/didbs/0_1_8_etc fixes it. (user-2d09, 2019-11-19, exchange 214892, check: uncheckable)</li>
+<li id="s15">Didbs includes a GCC9 binary and other tools, available as a large .tar file via torrent, for IRIX development. (user-d903, 2019-11-28, exchange 4420, check: uncheckable)</li>
+<li id="s16">Didbs is a software package for bootstrapping a system into a usable development setup. (user-d903, 2019-11-28, exchange 204052, check: uncheckable)</li>
+<li id="s17">didbs is the most current set of basic tools together with gcc9 (user-d903, 2019-12-25, exchange 5065, check: uncheckable)</li>
+<li id="s18">The latest didbs 0.1.9 Xmas release from last Sunday is available for download. (user-bf68, 2019-12-19, exchange 68225, check: supported)</li>
+<li id="s19">Didbs includes both OpenSSL and OpenSSH. (user-2189, 2019-12-22, exchange 68229, check: uncheckable)</li>
+<li id="s20">GNU screen is not included in the default Didbs set but is useful for running long compile jobs. (user-b4f4, 2020-01-05, exchange 68250, check: uncheckable)</li>
+<li id="s21">Didbs can be interpreted as 'dans irix development bootstrapper' or a way to heat up vintage computer nerds houses. (user-2d09, 2019-11-28, exchange 204052, check: uncheckable)</li>
+<li id="s22">The program 'didbs' saves time setting up a fresh IRIX installation. (user-637b, 2020-01-06, exchange 5335, check: uncheckable)</li>
+<li id="s23">didbs may have newer libraries than the system binaries expect to see. (user-42cf, 2020-01-21, exchange 216879, check: uncheckable)</li>
+<li id="s24">This isn't the case on my 6.5.30 install with didbs 1.5 (user-d903, 2020-01-21, exchange 216879, check: supported)</li>
+<li id="s25">user-ba81 added a 'didbs' branch to the irixports repo which may help in pulling in/using didbs, though it might overwrite or double download existing files; user-2d09 has not used it. (user-2d09, 2019-12-12, exchange 68211, check: uncheckable)</li>
+<li id="s26">didbs &gt; irixports &gt; Nekoware (user-2189, 2019-12-25, exchange 5065, check: uncheckable)</li>
+<li id="s27">didbs has been around for a while and may be deprecated in favor of sgug-rse. (user-2189, 2020-02-11, exchange 6315, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="mips3.html">MIPS3</a>
+</li>
+<li>Operating systems: <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-development.html">IRIX development</a>
+</li>
+<li>Software: <a href="irixports.html">irixports</a>, <a href="mipspro.html">MIPSpro</a>, <a href="nekoware.html">nekoware</a>, <a href="rse.html">RSE</a>, <a href="bash.html">bash</a>, <a href="python2.html">python2</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="booterizer.html">Booterizer</a>, <a href="makefile.html">Makefile</a>, <a href="openssh.html">OpenSSH</a>, <a href="openssl.html">OpenSSL</a>, <a href="perl.html">Perl</a>, <a href="rpm.html">RPM</a>, <a href="sdl.html">SDL</a>, <a href="demos.html">demos</a>, <a href="git.html">git</a>, <a href="ncurses.html">ncurses</a>, <a href="python3.html">python3</a>, <a href="setenv.html">setenv</a>, <a href="sgugshell.html">sgugshell</a>, <a href="tardist.html">tardist</a>, <a href="xmms.html">xmms</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="gcc9.html">GCC9</a>, <a href="sgug.html">SGUG</a>, <a href="gcc8.html">gcc8</a>
+</li>
+<li>Other: <a href="libexslt.html">libexslt</a>, <a href="unzip.html">unzip</a>
+</li></ul>
+</body>
+</html>

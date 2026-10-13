@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IP28</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IP28</h1>
+<p>Claims: 25</p>
+<p>The IP28 is an SGI workstation that can run Linux, for which the Linux kernel was patched to support the IP28 architecture and GCC patches were also required. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The IP28 is unsupported, and none of the IP22 stages are bootable. <sup><a href="#s5">5</a></sup> The L2 controller on the IP28 runs kernel 2.4.7, and an IP28 can run a 2.6 kernel. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> IP28 boots with an r10k ISO from T/2 SDE Linux but experiences segfaults, and a Gentoo nfsroot image is also available. <sup><a href="#s8">8</a></sup> The IP28 has issues with OpenBSD/sgi, with OpenBSD 7.2 being the version that first showed problems on IP28. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> OpenBSD/sgi 7.0 - 7.4 works on IP22, IP27, IP28, IP30, and IP32 with specific CPU types. <sup><a href="#s11">11</a></sup> Tape can be used to restore IRIX installations but not to boot versions earlier than 6.2 on IP28. <sup><a href="#s12">12</a></sup> A weak solder joint on the PS/2 socket can cause keyboard issues on an IP28. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Linux can boot on an IP28. (user-03ad, 2023-09-13, exchange 209229, check: uncheckable)</li>
+<li id="s2">The Linux kernel was patched to support the IP28 architecture. (user-03ad, 2023-09-13, exchange 40704, check: uncheckable)</li>
+<li id="s3">GCC patches were also required for the Linux port to the IP28. (user-03ad, 2023-09-13, exchange 40704, check: uncheckable)</li>
+<li id="s4">IP26 and IP28 are SGI workstations. (user-03ad, 2025-02-05, exchange 114476, check: uncheckable)</li>
+<li id="s5">The IP28 is unsupported, and none of the IP22 stages are bootable. (user-22f9, 2023-09-23, exchange 40960, check: uncheckable)</li>
+<li id="s6">The L2 controller on the IP28 runs kernel 2.4.7. (user-03ad, 2023-09-13, exchange 40704, check: supported)</li>
+<li id="s7">An IP28 can run a 2.6 kernel. (user-bba0, 2024-09-15, exchange 210975, check: supported)</li>
+<li id="s8">IP28 boots with an r10k ISO from T/2 SDE Linux but experiences segfaults; a Gentoo nfsroot image is also available. (user-22f9, 2023-09-15, exchange 215410, check: supported)</li>
+<li id="s9">The IP28 has issues with OpenBSD/sgi. (user-6e7b, 2023-11-01, exchange 209483, check: uncheckable)</li>
+<li id="s10">OpenBSD 7.2 is the version that first showed problems on IP28; the corresponding IP32 kernel can be found at a specific GitHub release with a given hash. (user-6e7b, 2026-04-25, exchange 90474, check: supported)</li>
+<li id="s11">OpenBSD/sgi 7.0 - 7.4 works on IP22, IP27, IP28, IP30, and IP32 with specific CPU types. (user-6e7b, 2023-11-30, exchange 209657, check: supported)</li>
+<li id="s12">Tape can be used to restore IRIX installations but not to boot versions earlier than 6.2 on IP28. It's limited to IRIX &lt; 6.2 for booting from CDROM. (user-bba0, 2024-08-01, exchange 210750, check: supported)</li>
+<li id="s13">A weak solder joint on the PS/2 socket can cause keyboard issues on an IP28. (user-e872, 2024-09-07, exchange 210940, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ip22.html">IP22</a>, <a href="impact.html">Impact</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>, <a href="r4400.html">R4400</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="openbsd-sgi.html">OpenBSD/sgi</a>, <a href="linux-kernel.html">Linux kernel</a>
+</li>
+<li>Software: <a href="qemu.html">QEMU</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="ip26-prom.html">IP26 PROM</a>, <a href="ip32.html">IP32</a>, <a href="l2-controller.html">L2 controller</a>
+</li>
+<li>Other: <a href="ip26.html">IP26</a>, <a href="2-6-kernel.html">2.6 kernel</a>, <a href="ip27.html">IP27</a>, <a href="ip20.html">ip20</a>
+</li></ul>
+</body>
+</html>

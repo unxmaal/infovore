@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>machine type</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>machine type</h1>
+<p>Claims: 3 Part of <a href="machine.html">machine</a></p>
+<p>The hostid and machine type are written using 'c!' commands at specific addresses, with the ethernet address written to subsequent addresses. <sup><a href="#s1">1</a></sup> The first two numbers indicate the machine type, and the hostid and MAC address are often noted on the NVRAM chip for newer machines. <sup><a href="#s2">2</a></sup> The hostid and Ethernet address can be reprogrammed, and the machine type may need to be set to avoid various problems, which may require programming a MAC address and hostid. <sup><a href="#s3">3</a></sup><sup><a href="#s2">2</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To write the hostid and machine type, use 'c!' commands at specific addresses, and for the ethernet address, use subsequent addresses. (user-9528, 2022-02-01, exchange 181354, check: uncheckable)</li>
+<li id="s2">The hostid and Ethernet address can be reprogrammed, and the first two numbers indicate the machine type; hostid/mac address is often noted on the NVRAM chip for newer machines. (user-03ad, 2024-01-25, exchange 240225, check: supported)</li>
+<li id="s3">The issue might be due to the machine type not being set, which can cause various problems, and programming a MAC address and hostid might be necessary. (user-9528, 2022-06-18, exchange 182417, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Parts and peripherals: <a href="nvram-chip.html">NVRAM chip</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet-address.html">Ethernet address</a>
+</li>
+<li>Other: <a href="hostid.html">hostid</a>
+</li></ul>
+</body>
+</html>

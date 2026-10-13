@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenVPN</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>OpenVPN</h1>
+<p>Claims: 10</p>
+<p>OpenVPN is a VPN software package that installs a TAP adapter (via the TAP/TUN driver) for use in networking setups. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The TAP/TUN driver can be installed separately from OpenVPN and can coexist with other VPN software. <sup><a href="#s4">4</a></sup> Networking in MAME can be set up by installing OpenVPN and the TAP adapter, then bridging the TAP adapter with the LAN/WiFi connection. <sup><a href="#s5">5</a></sup><sup><a href="#s3">3</a></sup> Networking in Irix emulation requires bridging a TAP adapter to the local network connection and configuring IP addresses, with FTP usable via a Windows FTP server. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> On Windows, the OpenVPN TAP adapter can be set to an address such as 10.0.0.2, with the guest (Indy) given a corresponding address such as 10.0.0.3. <sup><a href="#s8">8</a></sup> OpenVPN 2.5 does not bridge the TAP adapter with the Ethernet connection on Windows 11, whereas 2.4.12 with Internet Connection Sharing works, and updates of Windows 10 or 11 may require fixes. <sup><a href="#s1">1</a></sup><sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">OpenVPN 2.5 does not bridge TAP adapter with Ethernet connection on Windows 11, but 2.4.12 with Internet Connection Sharing works. (user-ce6b, 2022-12-30, exchange 220252, check: supported)</li>
+<li id="s2">The TAP/TUN driver with OpenVPN allows network adapter selection in Mame on an Indy. (user-a719, 2020-03-16, exchange 220142, check: supported)</li>
+<li id="s3">Install Open VPN in Windows to get a TAP adapter for networking in Mame. (user-ce6b, 2024-03-14, exchange 220321, check: uncheckable)</li>
+<li id="s4">The taptun driver can be installed separately from OpenVPN, and it can coexist with other VPN software. The host side of the tap adapter is typically configured as 192.168.137.1, and the guest as 192.168.137.2. IPRouting (user-a719, 2024-03-20, exchange 93357, check: supported)</li>
+<li id="s5">To set up networking in MAME, install OpenVPN and the TAP adapter, then bridge the TAP adapter with your LAN/Wifi (for Win 10). (user-ce6b, 2020-09-15, exchange 92637, check: supported)</li>
+<li id="s6">Network setup in Irix emulation using OpenVPN requires bridging a TAP adapter to the local network connection, but updates of Windows 10 or 11 may require fixes. (user-ce6b, 2022-12-29, exchange 220249, check: supported)</li>
+<li id="s7">Irix 5.3 networking can be set up by bridging a TAP adapter with a network adapter on Windows, using OpenVPN, and configuring IP addresses. FTP can be used with a Windows FTP server. (user-ce6b, 2023-06-15, exchange 93195, check: supported)</li>
+<li id="s8">On Windows, set OpenVPN Tap adapter to 10.0.0.2 and inside Irix setup give the Indy 10.0.0.3 for network communication; enable the network adapter inside Mame via scr lock and network menus; OpenVPN 2.6 works well for I2 (user-ce6b, 2025-04-12, exchange 220366, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Operating systems: <a href="irix-emulation.html">IRIX emulation</a>, <a href="windows.html">Windows</a>, <a href="windows-10.html">Windows 10</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="tap-tun-driver.html">TAP/TUN driver</a>
+</li>
+<li>Parts and peripherals: <a href="tap-adapter.html">TAP adapter</a>, <a href="network-adapter.html">network adapter</a>
+</li></ul>
+</body>
+</html>

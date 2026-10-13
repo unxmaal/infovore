@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>swap partition</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>swap partition</h1>
+<p>Claims: 7 Part of <a href="swap.html">swap</a></p>
+<p>With a fresh drive, going to (r)epartition and choosing (ro)ot creates a basic root partition and swap partition without additional configuration, after which backing out and exiting writes the changes. <sup><a href="#s1">1</a></sup> The miniroot boots from the swap partition if IRIX has not yet used it for swap, and an issue may arise from PROM settings pointing to the wrong partition as root, which is partition 0 by SGI's standard. <sup><a href="#s2">2</a></sup> An error message indicating the swap partition is not valid likely means the disk has not been partitioned, and the issue appears to be with the swap partition since manually booting with specific kernel options resolves the error. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> To recover data, the 'exercise' feature can be used with specific parameters on the drive, though it may overwrite the swap partition. <sup><a href="#s5">5</a></sup> You can mount /usr on an xlv and use a different disk for the swap partition. <sup><a href="#s6">6</a></sup> Diskless booting involves copying a miniroot to a swap partition and mounting it as root, requiring a kernel capable of mounting the root filesystem, with the PROM environment able to specify the root path. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">With a fresh drive, go to (r)epartition, and choose (ro)ot; that gives a basic root partition and swap partition, no frills; then just .. back out and (exi)t and it should write the changes. (user-d903, 2019-10-01, exchange 203968, check: uncheckable)</li>
+<li id="s2">The miniroot boots from the swap partition if IRIX hasn't used it for swap yet, and an issue could be prom settings pointing to the wrong partition as root, which is partition 0 by SGI's standard. (user-d903, 2021-05-04, exchange 217114, check: supported)</li>
+<li id="s3">The error message indicates the swap partition is not valid, likely due to the disk not being partitioned. (user-8b3c, 2023-01-15, exchange 208214, check: uncheckable)</li>
+<li id="s4">The issue seems to be with the swap partition, as manually booting with specific kernel options resolves the error. (user-ce6b, 2023-06-14, exchange 220284, check: uncheckable)</li>
+<li id="s5">To recover data, one can use the 'exercise' feature with specific parameters on the drive, though it may overwrite the swap partition. (user-1629, 2024-11-18, exchange 112821, check: uncheckable)</li>
+<li id="s6">You can mount /usr on an xlv and use a different disk for the swap partition. (user-b1da, 2024-12-10, exchange 218637, check: uncheckable)</li>
+<li id="s7">Diskless booting involves copying a miniroot to a swap partition and mounting it as root; the kernel must be capable of mounting the root filesystem, and the PROM environment can specify the root path. (user-4eea, 2025-09-05, exchange 87878, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="partition.html">partition</a>, <a href="root-filesystem.html">root filesystem</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="prom-settings.html">PROM settings</a>, <a href="drive.html">drive</a>
+</li>
+<li>Other: <a href="diskless-booting.html">diskless booting</a>
+</li></ul>
+</body>
+</html>

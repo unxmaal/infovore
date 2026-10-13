@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>libGLcore</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>libGLcore</h1>
+<p>Claims: 3</p>
+<p>Linking both libGL and libGLcore is a GCC issue. <sup><a href="#s1">1</a></sup> The SGUG-RSE OpenGL situation involves linking issues with libGLcore, undefined symbols from libXext, and architecture-dependent symbols, requiring specific linker flags to resolve. <sup><a href="#s2">2</a></sup> The lack of libGLcore in ldd's output could be suspicious, but since the build system uses pkg-config, editing SDL2's .pc file and setting flags according to the test program's proper flags could help. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Linking both `libGL` and `libGLcore` is a GCC issue. (user-8780, 2025-02-14, exchange 215644, check: supported)</li>
+<li id="s2">The SGUG-RSE OpenGL situation involves linking issues with `libGLcore`, undefined symbols from `libXext`, and architecture-dependent symbols, requiring specific linker flags to resolve. (user-8780, 2025-05-22, exchange 215731, check: supported)</li>
+<li id="s3">The lack of libGLcore in ldd's output could be suspicious but the build system uses pkg-config, so editing SDL2's `.pc` file and setting flags according to the test program's proper flags could help. `dlopen` stuff might (user-8780, 2025-10-07, exchange 215828, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="sdl2.html">SDL2</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="libgl.html">libGL</a>, <a href="libxext.html">libXext</a>, <a href="pkg-config.html">pkg-config</a>
+</li></ul>
+</body>
+</html>

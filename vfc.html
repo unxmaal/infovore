@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vfc</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>vfc</h1>
+<p>Claims: 13</p>
+<p>The `vfc` command is part of the vfc package, which is included in the IRIX distribution but not installed by default. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It is available on the foundation CDs and the applications disc for IRIX 6.4, but not on the IRIX 6.5.30 Overlays. <sup><a href="#s2">2</a></sup><sup><a href="#s4">4</a></sup> The `vfc` program sets flags passed to `cpp` and can be used to create custom .sdb files for IMPACT graphics by setting specific pre-compiler options. <sup><a href="#s1">1</a></sup><sup><a href="#s6">6</a></sup> It can build VFOs, but cannot do so if the pixel clock exceeds a predefined limit. <sup><a href="#s7">7</a></sup><sup><a href="#s5">5</a></sup> The VFC can achieve a 1280x1024 resolution at 85Hz, provided the pixel clock does not exceed 144MHz, and can likely support 4k resolution. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The VFC documentation describes user-defined variables and explains that blanking, though not visible, is necessary for compatibility with CRT displays, consuming up to 25% of a video frame. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The `vfc` command can be used to set flags that are passed to `cpp`. (user-42cf, 2019-03-01, exchange 833, check: supported)</li>
+<li id="s2">VFC is on the IRIX install media but not installed by default; it requires both the 6.5.x overlay and the foundation CDs. (user-6afa, 2022-04-30, exchange 217577, check: supported)</li>
+<li id="s3">vfc is not installed by default on SGI machines; it can be found on foundation discs but is not included by default. (user-e4d0, 2024-05-30, exchange 111420, check: uncheckable)</li>
+<li id="s4">The `vfc` program is part of the vfc package and is not installed by default on IRIX 6.5.30 Overlays; it is available on the applications disc for IRIX 6.4. (user-6c80, 2024-06-06, exchange 218437, check: supported)</li>
+<li id="s5">The tool 'vfc' for creating VFO files is included in the IRIX distribution. (user-ae4b, 2025-05-23, exchange 225107, check: uncheckable)</li>
+<li id="s6">To create a custom .sdb file for IMPACT graphics using VFC, one must set specific pre-compiler options. (user-bba0, 2024-06-13, exchange 46848, check: uncheckable)</li>
+<li id="s7">The vfc cannot build VFOs if the pixel clock exceeds a predefined limit. (user-42cf, 2021-12-27, exchange 215274, check: uncheckable)</li>
+<li id="s8">The VFC can achieve a 1280x1024 resolution at 85Hz, but the pixel clock must not exceed 144MHz; otherwise, porch issues may occur. (user-5fa2, 2020-09-09, exchange 10937, check: supported)</li>
+<li id="s9">The VFC can likely support 4k resolution; a user connected two singlelink DVIs from an IBM T221 to achieve 2160p on a DCD. (user-22f9, 2025-02-17, exchange 54387, check: supported)</li>
+<li id="s10">The VFC documentation describes user-defined variables and explains that blanking, though not visible, is necessary for compatibility with CRT displays, consuming up to 25% of a video frame. (user-42cf, 2025-04-15, exchange 116088, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Graphics: <a href="impact-graphics.html">IMPACT graphics</a>
+</li>
+<li>Operating systems: <a href="irix-6-4.html">IRIX 6.4</a>, <a href="irix-6-5-x.html">IRIX 6.5.x</a>
+</li>
+<li>Software: <a href="dcd.html">DCD</a>, <a href="documentation.html">documentation</a>
+</li>
+<li>Parts and peripherals: <a href="display.html">display</a>
+</li>
+<li>Standards and interfaces: <a href="sse.html">SSE</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="cbob.html">CBOB</a>, <a href="cpp.html">cpp</a>, <a href="foundation-discs.html">foundation discs</a>
+</li></ul>
+</body>
+</html>

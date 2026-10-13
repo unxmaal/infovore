@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>linker</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>linker</h1>
+<p>Claims: 9 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Compiler">Compiler</a>.</p>
+<p>The linker combines binary segments such as CODE, TEXT, DATA, BSS, and RODATA, and decides their locations. <sup><a href="#s1">1</a></sup> When compiling, if functions are called but not included, the compiler generates object files assuming the functions are defined elsewhere, but the linker will fail if those definitions are not provided. <sup><a href="#s2">2</a></sup> The linker requires specific constructors to be defined to avoid undefined references. <sup><a href="#s3">3</a></sup> The linker needs to look in a specific directory for libraries, and the path must be specified. <sup><a href="#s4">4</a></sup> The error message indicates that the linker is unable to find a library called -limbuf. <sup><a href="#s5">5</a></sup> To resolve a debugging artifact path, tell the linker to ignore unresolved symbols in object files or all unresolved symbols. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Compilers generate binary segments like CODE, TEXT, DATA, BSS, RODATA, and the linker decides their locations. (user-6afa, 2021-04-01, exchange 16115, check: uncheckable)</li>
+<li id="s2">when compiling, if functions are called but not included, the compiler will generate object files assuming the functions are defined elsewhere, but the linker will fail if those definitions are not provided. (user-42cf, 2019-02-10, exchange 67032, check: uncheckable)</li>
+<li id="s3">The linker requires specific constructors to be defined to avoid undefined references. (user-60b6, 2019-02-01, exchange 203670, check: uncheckable)</li>
+<li id="s4">The linker needs to look in a specific directory for libraries, and the path must be specified. (user-ab99, 2022-03-28, exchange 206741, check: uncheckable)</li>
+<li id="s5">The error message indicates that the linker is unable to find a library called -limbuf. (user-f8d5, 2022-12-14, exchange 82610, check: uncheckable)</li>
+<li id="s6">To resolve a debugging artifact path, tell the linker to ignore unresolved symbols in object files or all unresolved symbols. (user-42cf, 2019-07-24, exchange 67628, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="compiler.html">compiler</a>, <a href="library.html">library</a>
+</li>
+<li>Other: <a href="libimbuf.html">libimbuf</a>
+</li></ul>
+</body>
+</html>

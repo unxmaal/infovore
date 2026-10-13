@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O300</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>O300</h1>
+<p>Claims: 53</p>
+<h2 id="with-origin-350">With Origin 350</h2>
+<p>The O300 can use O350 PCI-X and MPX units for more RAM and PCI-X slots, and it has only PCI slots. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The O300 can use VPro cards internally, but the O350 cannot. <sup><a href="#s3">3</a></sup> The O300 is much noisier than the O350, which is better engineered than the O300's problematic internal design. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The O300 and O350 have M serial numbers, while larger machines have L serial numbers, and reserializing bricks is possible but cannot force a nonstandard prefix. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The O300 and O350 use the same 2GB RAM kits as the O350, Fuel, and Tezro. <sup><a href="#s8">8</a></sup> The O300/O350 lines are more common than the Tezro/Fuel. <sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>The O300 main unit has four 500 MHz MIPS R14000 processors with 2 MB secondary cache running at 250 MHz, and it has 4 RAM slots that can take up to 4GB of RAM. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The O300 can be booted from either of its two bricks, but a general exception error occurs on one brick (001c25) and can be resolved by issuing a 'reset' command, after which the machine boots fine. <sup><a href="#s12">12</a></sup> The O300 can boot from TFTP and uses the SCSI emulator for booting. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The O300 supports USB and can Numalink to another brick to make it Onyx. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O300 can use O350 PCI-X and MPX units for more RAM and PCI-X slots. (user-ba81, 2019-12-16, exchange 204075, check: supported)</li>
+<li id="s2">the O300 has only pci-slots, you should go for an O350 or a pci-x brick (user-bf68, 2021-07-30, exchange 99590, check: supported)</li>
+<li id="s3">The O350 can use VPro cards internally, but the O300 cannot. (user-9849, 2021-07-21, exchange 18620, check: supported)</li>
+<li id="s4">The O300 is much noisier than the O350. (user-b7c4, 2022-01-22, exchange 24981, check: supported)</li>
+<li id="s5">The O300 has problematic internal design, while the O350 is better engineered. (user-24f0, 2026-07-16, exchange 124115, check: supported)</li>
+<li id="s6">O300, O350 and Onyx4 gfx-bricks have all M-serials (user-bf68, 2021-12-05, exchange 101103, check: supported)</li>
+<li id="s7">O300 and O350 bricks have M serial numbers, while larger machines have L serial numbers; reserializing bricks is possible but won't let you force a nonstandard prefix. (user-e4d0, 2025-09-04, exchange 118400, check: supported)</li>
+<li id="s8">The O350, O300, O350, Fuel, and Tezro use the same 2GB RAM kits. (user-86e1, 2024-08-23, exchange 210851, check: supported)</li>
+<li id="s9">The O300/O350 lines are more common than Tezro/Fuel. (user-24f0, 2024-10-01, exchange 112239, check: supported)</li>
+<li id="s10">the O300 can take up to 4GB RAM in the 4 slots (user-bf68, 2019-03-02, exchange 859, check: supported)</li>
+<li id="s11">The O300 main unit has four 500 MHz MIPS R14000 processors with 2 MB secondary cache running at 250 MHz. (user-c831, 2019-11-29, exchange 220820, check: supported)</li>
+<li id="s12">The O300 can be booted from either of its two bricks, but the error only occurs on one of them (001c25). The other brick (001c31) boots fine. (user-a2cf, 2020-07-12, exchange 97213, check: supported)</li>
+<li id="s13">The O300 can boot from TFTP. (user-86e1, 2025-10-24, exchange 236479, check: supported)</li>
+<li id="s14">The Tezro and O300 use the SCSI emulator for booting. (user-7973, 2026-01-28, exchange 73066, check: supported)</li>
+<li id="s15">The O300 supports USB. (user-4f7c, 2025-08-27, exchange 58656, check: supported)</li>
+<li id="s16">You can Numalink an O300 to another brick to make it Onyx; or you can lose your shit and plug it into an IR3 or IR4. (user-b7c4, 2021-03-24, exchange 204875, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin-350.html">Origin 350</a>, <a href="fuel.html">Fuel</a>, <a href="origin-3000.html">Origin 3000</a>, <a href="tezro.html">Tezro</a>, <a href="numalink.html">Numalink</a>, <a href="350.html">350</a>, <a href="altix.html">Altix</a>, <a href="altix-350.html">Altix 350</a>, <a href="onyx4.html">Onyx4</a>, <a href="origin-200.html">Origin 200</a>
+</li>
+<li>Graphics: <a href="ir3.html">IR3</a>, <a href="ir4.html">IR4</a>
+</li>
+<li>Operating systems: <a href="booting.html">booting</a>
+</li>
+<li>Software: <a href="boot.html">boot</a>
+</li>
+<li>Parts and peripherals: <a href="pci-x-brick.html">PCI-X brick</a>, <a href="c-brick.html">C-brick</a>, <a href="r-brick.html">R-brick</a>, <a href="ram.html">RAM</a>, <a href="battery.html">battery</a>, <a href="chip.html">chip</a>, <a href="router-brick.html">router brick</a>
+</li>
+<li>Standards and interfaces: <a href="tftp.html">TFTP</a>, <a href="serial.html">serial</a>
+</li>
+<li>Other: <a href="m-serials.html">M-serials</a>, <a href="bzip2.html">bzip2</a>, <a href="threads.html">threads</a>
+</li></ul>
+</body>
+</html>

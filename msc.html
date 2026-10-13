@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSC</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MSC</h1>
+<p>Claims: 7</p>
+<p>The MSC is a component that can coexist with 400 MHz node boards, IR2 boards, router boards, and Octane motherboards in a system. <sup><a href="#s1">1</a></sup> The MSC monitors the fans, and a fan tray is recommended for reliability. <sup><a href="#s2">2</a></sup> On an Onyx2, the module ID can be queried with 'mod' and set with 'mod &lt;2-digit hex number&gt;', which affects address space allocation. <sup><a href="#s3">3</a></sup> The MSC continued to receive standby power after a PSU failure, indicating not all parts were completely blown. <sup><a href="#s4">4</a></sup> The MSC has jumpers for different levels of diagnostics, overriding nvram values. <sup><a href="#s5">5</a></sup> The MSC is on a different bus from the SCSI one. <sup><a href="#s6">6</a></sup> MMSC is a touchscreen UI that sends the same command to multiple MSCs. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">I have several 400 MHz node boards, a set of IR2 boards, an MSC, a couple of router boards, and a couple of Octane motherboards. (user-59b9, 2020-12-09, exchange 204548, check: supported)</li>
+<li id="s2">The MSC monitors the fans and a fan tray is recommended for reliability. (user-86e1, 2024-03-06, exchange 223754, check: uncheckable)</li>
+<li id="s3">To change the module ID on an Onyx2, you can query the MSC with 'mod' and set it with 'mod &lt;2-digit hex number&gt;', affecting address space allocation. (user-d203, 2024-04-26, exchange 111030, check: supported)</li>
+<li id="s4">The MSC continued to receive standby power after the PSU failure, indicating not all parts were completely blown. (user-2d40, 2024-12-26, exchange 113317, check: uncheckable)</li>
+<li id="s5">The msc has jumpers for different levels of diagnostics, overriding nvram values. (user-2a3c, 2025-08-29, exchange 225369, check: uncheckable)</li>
+<li id="s6">The MSC is on a different bus from the SCSI one. (user-24f0, 2025-09-29, exchange 213158, check: uncheckable)</li>
+<li id="s7">MMSC is a touchscreen UI to send the same command to multiple MSC’s. (user-24f0, 2026-07-18, exchange 220536, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx2.html">Onyx2</a>
+</li>
+<li>Parts and peripherals: <a href="psu.html">PSU</a>, <a href="jumper.html">jumper</a>, <a href="router-boards.html">router boards</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>
+</li>
+<li>Other: <a href="mmsc.html">MMSC</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wget</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>wget</h1>
+<p>Claims: 26 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Wget">Wget</a>, <a href="https://en.wikipedia.org/wiki/Pkgsrc">Pkgsrc</a>.</p>
+<p>wget is available on IRIX for downloading files, and packages including wget are hosted by user-42cf, which also provides standalone applications and static binaries for IRIX such as openssh. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> wget can be installed through pkgsrc, which will use the wget in your PATH whether installed with pkgsrc or built externally, and pkgsrc may offer configuration overrides or be set to use an external dependency for wget. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> wget requires Perl to build its manpage and test suite, and GNU tar and wget are necessary for the didbs installation process. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> wget and git do not compile on macOS Leopard, and compiling wget on the SPARCClassic takes a long time. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> wget can use the --no-check-certificate or -k option to bypass SSL checks, and updating wget to the latest version fixes a bug where it sends a truncated Host header, which gets denied. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> dillo uses its own HTTP library implementation and wget is not a dependency, with curl being more commonly used for HTTP libraries. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">user-42cf hosts packages including standalone applications and static binaries for IRIX, such as openssh and wget. (user-b4f4, 2018-12-26, exchange 66797, check: uncheckable)</li>
+<li id="s2">wget is available on IRIX for downloading files. (user-2189, 2020-07-09, exchange 78513, check: uncheckable)</li>
+<li id="s3">pkgsrc will use the wget in your PATH, whether you install it with pkgsrc or build it externally. (user-37ee, 2020-08-02, exchange 10275, check: uncheckable)</li>
+<li id="s4">pkgsrc might have a configuration override for wget settings. (user-37ee, 2020-08-03, exchange 10309, check: uncheckable)</li>
+<li id="s5">pkgsrc can be configured to use an external dependency for wget. (user-b1da, 2020-08-04, exchange 10348, check: uncheckable)</li>
+<li id="s6">wget can be installed through pkgsrc. (user-1446, 2020-08-04, exchange 10349, check: uncheckable)</li>
+<li id="s7">GNU tar and wget are necessary for the didbs installation process. (user-f229, 2020-01-01, exchange 77049, check: uncheckable)</li>
+<li id="s8">wget requires Perl to build its manpage and test suite. (user-b1da, 2020-08-02, exchange 10289, check: uncheckable)</li>
+<li id="s9">wget and git do not compile on macOS Leopard. (user-17cb, 2021-02-19, exchange 231408, check: uncheckable)</li>
+<li id="s10">Compiling wget on the SPARCClassic takes a long time (user-1361, 2021-05-21, exchange 205078, check: uncheckable)</li>
+<li id="s11">Updating wget to the latest version fixes a bug where it sends a truncated `Host:` header, which gets denied. (user-2d09, 2019-11-04, exchange 68092, check: supported)</li>
+<li id="s12">wget and curl can use the --no-check-certificate or -k option to bypass SSL checks. (user-5a3a, 2023-11-17, exchange 218233, check: uncheckable)</li>
+<li id="s13">dillo uses its own HTTP library implementation and wget is not a dependency; curl is more commonly used for HTTP libraries. (user-42cf, 2019-08-09, exchange 2964, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="sparcclassic.html">SPARCclassic</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>
+</li>
+<li>Software: <a href="curl.html">curl</a>, <a href="pkgsrc.html">pkgsrc</a>, <a href="openssh.html">OpenSSH</a>, <a href="python.html">Python</a>, <a href="booterizer.html">Booterizer</a>, <a href="dillo.html">Dillo</a>, <a href="gnu-tar.html">GNU tar</a>, <a href="nekoware-packages.html">Nekoware packages</a>, <a href="perl.html">Perl</a>, <a href="git.html">git</a>, <a href="irix-ansible.html">irix_ansible</a>
+</li>
+<li>Standards and interfaces: <a href="ftp.html">FTP</a>, <a href="ssh.html">SSH</a>
+</li>
+<li>Other: <a href="http.html">HTTP</a>, <a href="fetch.html">fetch</a>, <a href="nekodeps-pl.html">nekodeps.pl</a>, <a href="netcat.html">netcat</a>
+</li></ul>
+</body>
+</html>

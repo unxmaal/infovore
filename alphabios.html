@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlphaBIOS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>AlphaBIOS</h1>
+<p>Claims: 14</p>
+<p>AlphaBIOS is a firmware environment used on some DEC Alpha machines, including the DS10, which supports it for running configuration tools and Windows on the 466MHz version but not on the 617MHz version. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Some Alphas were delivered with Adaptecs, requiring AlphaBIOS and NT. <sup><a href="#s1">1</a></sup> The PALcode and firmware are specific to the machine; EV4 machines like the Alphastation 200 use ARC, while EV5 machines use AlphaBIOS, and EV5 machines do not support ARC firmware. <sup><a href="#s3">3</a></sup> Formatting drives requires initial setup in AlphaBIOS, with system partition creation necessary, and Windows setup handles the rest; this procedure has been consistent since the Alpha's inception. <sup><a href="#s4">4</a></sup> AlphaBIOS works best with ANSI terminal mode, and SRM supports any VT greater than 100, so AlphaBIOS is not ideal for serial consoles. <sup><a href="#s5">5</a></sup> AlphaBIOS requires a functioning RTC battery to run the ECU, an ARCS/AlphaBIOS program, while SRM is less sensitive to a dead RTC battery. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> An original Dallas DS1287 produces beeps and fails to initialize the AlphaBIOS, and the AlphaBIOS hangs on display of 'Arc Firmware Loaded' with a new Dallas battery. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> If RAM is bad, the system may not chime and will sit with an amber light, and some machines default to AlphaBIOS when their battery runs out. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Some Alphas were delivered with Adaptecs, requiring AlphaBIOS and NT. (user-03ad, 2022-06-07, exchange 239688, check: uncheckable)</li>
+<li id="s2">The DS10 supports AlphaBIOS for running configuration tools and Windows on the 466MHz version but not on the 617MHz version. (user-03ad, 2023-06-22, exchange 235357, check: supported)</li>
+<li id="s3">The PALcode and firmware are specific to the machine; EV5 machines like yours do not support ARC firmware. EV4 machines like the Alphastation 200 use ARC, while EV5 machines use AlphaBIOS. Linux is the only OS with a定制的P (user-03ad, 2024-12-03, exchange 235547, check: supported)</li>
+<li id="s4">Formatting drives requires initial setup in AlphaBIOS, with system partition creation necessary; Windows setup handles the rest. This procedure has been consistent since the Alpha's inception and applies to NT on MIPS as (user-03ad, 2023-07-06, exchange 235362, check: uncheckable)</li>
+<li id="s5">Alphabios works best with ANSI terminal mode, and SRM supports any VT greater than 100; Alphabios is not ideal for serial consoles. (user-03ad, 2024-10-11, exchange 235478, check: supported)</li>
+<li id="s6">You must switch to SRM by replacing the battery in the AlphaBIOS to install openVMS; check if your graphics card is supported first. (user-03ad, 2024-11-15, exchange 235508, check: uncheckable)</li>
+<li id="s7">AlphaBIOS requires a functioning RTC battery to run the ECU, while SRM is less sensitive to a dead RTC battery. (user-e532, 2025-10-05, exchange 235796, check: uncheckable)</li>
+<li id="s8">the ECU is an ARCS / AlphaBIOS program (user-03ad, 2025-11-30, exchange 235840, check: uncheckable)</li>
+<li id="s9">An original Dallas DS1287 produces beeps and fails to initialize the AlphaBIOS. (user-83aa, 2025-12-04, exchange 235842, check: uncheckable)</li>
+<li id="s10">The AlphaBIOS hangs on display of 'Arc Firmware Loaded' with a new Dallas battery. (user-83aa, 2025-12-04, exchange 235842, check: uncheckable)</li>
+<li id="s11">If RAM is bad, the system may not chime and will sit with an amber light. (user-9528, 2021-12-23, exchange 101341, check: uncheckable)</li>
+<li id="s12">Some machines default to Alphabios when their battery runs out. (user-03ad, 2026-01-01, exchange 235864, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ds10.html">DS10</a>
+</li>
+<li>Graphics: <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="srm.html">SRM</a>, <a href="nt.html">NT</a>, <a href="openvms.html">OpenVMS</a>
+</li>
+<li>Software: <a href="firmware.html">firmware</a>
+</li>
+<li>Parts and peripherals: <a href="rtc-battery.html">RTC battery</a>
+</li>
+<li>Standards and interfaces: <a href="arc.html">ARC</a>, <a href="arcs.html">ARCS</a>
+</li>
+<li>Other: <a href="adaptec.html">Adaptec</a>, <a href="ev5.html">EV5</a>, <a href="palcode.html">PALcode</a>
+</li></ul>
+</body>
+</html>

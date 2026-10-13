@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sh</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sh</h1>
+<p>Claims: 5</p>
+<p>Changing the default login shell to sh resolves the visual login issue, and using 'sh' at the installer menu should bring up a shell. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The script should be run in sh, not tcsh. <sup><a href="#s3">3</a></sup> sh expands an unset environment variable to a null string, causing the `First RE may not be null` message during boot. <sup><a href="#s4">4</a></sup> QuickTransit-1.2.1-004 fixes `sh` issues on QuickTransit-1.2-001.ia64, but sgug tdnf still fails with Error(1469), while xterm and xclock work. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Changing the default login shell to sh resolves the visual login issue. (user-8999, 2020-05-06, exchange 216916, check: uncheckable)</li>
+<li id="s2">At the installer menu, using 'sh' should bring up a shell. (user-e4d0, 2024-04-27, exchange 111065, check: uncheckable)</li>
+<li id="s3">The script should be run in sh, not tcsh. (user-e4d0, 2024-09-27, exchange 218559, check: uncheckable)</li>
+<li id="s4">sh expands an unset environment variable to a null string, causing the `First RE may not be null` message during boot. (user-b1da, 2024-10-22, exchange 112511, check: supported)</li>
+<li id="s5">QuickTransit-1.2.1-004 fixes `sh` issues on QuickTransit-1.2-001.ia64 but sgug tdnf still fails with Error(1469). xterm and xclock work. (user-0f65, 2026-06-16, exchange 76624, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sh4-cpu.html">SH4 CPU</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="quicktransit.html">QuickTransit</a>, <a href="tcsh.html">tcsh</a>
+</li></ul>
+</body>
+</html>

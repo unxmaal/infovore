@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/var/log</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/var/log</h1>
+<p>Claims: 4</p>
+<p>The /etc/syslog.conf file typically configures log files, placing them in /var/adm on SysV-style systems and in /var/log on BSD-style systems, with IRIX following SysV conventions. <sup><a href="#s1">1</a></sup> Keeping /var and /var/log on separate partitions is recommended to avoid filling up the root partition with logs and audit trails. <sup><a href="#s2">2</a></sup> On the O2, DHCP's automatic startup can be checked with 'chkconfig | grep autoconfig', and Ethernet link issues can be investigated by examining /var/adm/SYSLOG for 'no carrier' messages after unplugging the cable. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">/etc/syslog.conf typically configures log files, often in /var/adm for SysV-ish systems and /var/log for BSD, with IRIX following SysV conventions. (user-237d, 2020-04-17, exchange 216907, check: uncheckable)</li>
+<li id="s2">Separate `/var` and `/var/log` are recommended to avoid filling up the root partition with logs and audit trails. (user-7b1c, 2022-06-09, exchange 241051, check: supported)</li>
+<li id="s3">To check if DHCP is configured to start automatically on the O2, use 'chkconfig | grep autoconfig'; for Ethernet link issues, check /var/adm/SYSLOG for 'no carrier' messages after unplugging the cable. (user-c026, 2026-08-20, exchange 226911, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="bsd.html">BSD</a>, <a href="irix.html">IRIX</a>
+</li>
+<li>Other: <a href="var.html">/var</a>, <a href="var-adm-syslog.html">/var/adm/SYSLOG</a>, <a href="chkconfig.html">chkconfig</a>
+</li></ul>
+</body>
+</html>

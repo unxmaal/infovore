@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xfsdump</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>xfsdump</h1>
+<p>Claims: 41 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<p>It backs up only used space, which can save disk space, and is used for incremental backups. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> xfsdump requires specifying the source filesystem and a session label, and can output to a file or device with -f, or to standard output with - when -f is omitted. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It can be used to copy data over a network by piping output to ssh, rsh, or netcat, or by writing to an NFS mount or share. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> xfsdump can be used to back up data to a local file or NFS share for later transfer, and to dump an SGI drive to a file for network transfer. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> It is used to move filesystems such as /usr to an external disk, and to clone XFS drives, though it is not suitable for imaging an entire disk. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> xfsdump does not ignore NFS mounts by default and can be used from a chroot shell. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">xfsdump only backs up used space and can be used to save disk space. (user-0de0, 2023-07-05, exchange 83778, check: uncheckable)</li>
+<li id="s2">xfsdump is used for incremental backups, and syncthing is used for rolling backups. (user-6c80, 2024-11-27, exchange 211338, check: uncheckable)</li>
+<li id="s3">xfsdump requires specifying the source file system and a session label. (user-6dfb, 2025-01-11, exchange 52062, check: uncheckable)</li>
+<li id="s4">xfsdump uses - for standard output if -f is omitted, and -f specifies the destination file or device. (user-6dfb, 2025-01-11, exchange 211559, check: uncheckable)</li>
+<li id="s5">Xfsdump can be used to copy data over a network. (user-7b1c, 2022-05-13, exchange 231734, check: uncheckable)</li>
+<li id="s6">xfsdump output can be piped to ssh or rsh for remote backup execution. (user-07ed, 2025-01-10, exchange 211557, check: uncheckable)</li>
+<li id="s7">XFSdump to netcat is a preferred method for backups. (user-f190, 2025-11-21, exchange 219264, check: uncheckable)</li>
+<li id="s8">xfsdump to an nfs mount and a restore can recover files. (user-24f0, 2026-09-05, exchange 214586, check: uncheckable)</li>
+<li id="s9">You can use xfsdump, dd, or tar to backup data to a local file or an NFS share, then transfer the file via FTP. (user-07ed, 2025-01-10, exchange 52048, check: uncheckable)</li>
+<li id="s10">xfsdump can be used to dump an SGI drive to a file for network transfer. (user-e4d0, 2026-09-17, exchange 220057, check: uncheckable)</li>
+<li id="s11">To move /usr to an external disk in IRIX, one can use rsync or XFS-dump. (user-e872, 2024-11-12, exchange 211237, check: uncheckable)</li>
+<li id="s12">To image the drive, use dd to create an entire disk image, as xfs_dump is not suitable for an entire disk label. (user-24f0, 2025-02-17, exchange 54391, check: uncheckable)</li>
+<li id="s13">To clone an XFS drive on an Octane2, use fx to repartition and format, then xfsdump and xfsrestore to copy the data, and manually transfer header files. (user-ba5b, 2025-12-26, exchange 225830, check: supported)</li>
+<li id="s14">xfsdump does not ignore NFS mounts by default. (user-e4e2, 2026-04-28, exchange 219695, check: uncheckable)</li>
+<li id="s15">xfsdump can be used from a chroot shell but requires the prom environment variable console to be set to d for successful installation over the serial console on some platforms. (user-1629, 2026-05-24, exchange 219760, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="xfs-file-system.html">XFS file system</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="modern-linux.html">modern Linux</a>, <a href="netboot.html">netboot</a>
+</li>
+<li>Software: <a href="xfsrestore.html">xfsrestore</a>, <a href="xfs.html">XFS</a>, <a href="dd.html">dd</a>, <a href="rsh.html">rsh</a>, <a href="tar.html">tar</a>, <a href="virtualbox.html">VirtualBox</a>, <a href="xz.html">XZ</a>, <a href="zulu.html">Zulu</a>, <a href="fx.html">fx</a>, <a href="rsync.html">rsync</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="bluescsi.html">BlueSCSI</a>, <a href="serial-console.html">serial console</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="ethernet.html">Ethernet</a>, <a href="sca.html">SCA</a>, <a href="ssh.html">SSH</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="netcat.html">netcat</a>, <a href="backup.html">backup</a>, <a href="image.html">image</a>, <a href="permissions.html">permissions</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ansible</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ansible</h1>
+<p>Claims: 37 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Ansible_%28software%29">Ansible (software)</a>.</p>
+<p>Ansible is an automation tool that can run commands locally or remotely via SSH, and can manage standard Unix sysadmin tasks such as setting the timezone and configuring SGI systems once SSH is available on the target host. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can run puppet, and can be used together with puppet. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Ansible is good for running on many machines but is not great for showing output in real time. <sup><a href="#s6">6</a></sup> To run a task only if a variable is true, use the 'when' keyword in the task definition. <sup><a href="#s7">7</a></sup> Ansible can trigger other tools, and terraform can trigger ansible. <sup><a href="#s8">8</a></sup> Booterizer uses Vagrant and Ansible to create a virtual machine and provision an SGI system, using Ansible for post-install configuration. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Booterizer will not work on IRIX, and all booter versions require specific versions of ruby, ansible, and vagrant, with BigSur being incompatible. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Booterizer does not require ansible to be installed on the host OS. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Ansible can run commands locally or remotely via SSH, but for local tasks, it requires specific handling to work correctly. (user-f229, 2019-10-28, exchange 76939, check: uncheckable)</li>
+<li id="s2">Ansible can manage standard Unix sysadmin tasks, including setting the timezone. (user-2189, 2020-09-16, exchange 215057, check: uncheckable)</li>
+<li id="s3">Ansible scripts can configure SGI systems once SSH is available on the target host. (user-f229, 2019-01-06, exchange 76726, check: uncheckable)</li>
+<li id="s4">ansible can run puppet (user-2189, 2019-02-08, exchange 507, check: uncheckable)</li>
+<li id="s5">using ansible and puppet together (user-2189, 2019-02-08, exchange 507, check: uncheckable)</li>
+<li id="s6">ansible is good for running on many machines but not great for showing output in real time. (user-2189, 2018-12-30, exchange 66834, check: uncheckable)</li>
+<li id="s7">To run a task only if a variable is true, use the 'when' keyword in the task definition. (user-f229, 2019-01-01, exchange 66909, check: uncheckable)</li>
+<li id="s8">terraform can trigger other tools like ansible (user-b1da, 2021-01-22, exchange 14029, check: uncheckable)</li>
+<li id="s9">Booterizer creates a virtual machine using Vagrant and Ansible to set up and provision an SGI system. (user-7b1c, 2020-03-13, exchange 77094, check: uncheckable)</li>
+<li id="s10">Ansible was used for post-install configuration in Booterizer, but a bug in the telnet module was fixed. (user-07ed, 2024-11-22, exchange 211309, check: uncheckable)</li>
+<li id="s11">Booterizer uses vagrant and ansible, which won't work on IRIX. (user-9860, 2021-11-19, exchange 216755, check: uncheckable)</li>
+<li id="s12">All booter versions require specific versions of ruby, ansible, and vagrant; BigSur is incompatible. (user-f229, 2021-09-08, exchange 79802, check: uncheckable)</li>
+<li id="s13">Booterizer doesn't require ansible to be installed on the host OS. (user-d903, 2019-07-23, exchange 2728, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ansible-playbook.html">Ansible playbook</a> (9)
+</li>
+<li><a href="ansible-plays.html">ansible plays</a> (3)
+</li>
+<li><a href="ansible-task.html">Ansible task</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="os-x.html">OS X</a>, <a href="wsl.html">WSL</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="vagrant.html">Vagrant</a>, <a href="booterizer.html">Booterizer</a>, <a href="rse.html">RSE</a>, <a href="ruby.html">Ruby</a>, <a href="virtualbox.html">VirtualBox</a>, <a href="irix-ansible.html">irix_ansible</a>, <a href="sshd.html">sshd</a>
+</li>
+<li>Standards and interfaces: <a href="ssh.html">SSH</a>, <a href="telnet.html">telnet</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="puppet.html">puppet</a>, <a href="big-sur.html">Big Sur</a>, <a href="neko.html">Neko</a>, <a href="terraform.html">Terraform</a>, <a href="bzip2.html">bzip2</a>, <a href="pip.html">pip</a>, <a href="settings-yml.html">settings.yml</a>
+</li></ul>
+</body>
+</html>

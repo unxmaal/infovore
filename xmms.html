@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xmms</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>xmms</h1>
+<p>Claims: 26 Background: 3 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/XMMS">XMMS</a>, <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>.</p>
+<p>It can be built using didbs with specific compiler flags and patches, requiring adjustment of plug-ins and dependencies from nekoware, which offers a Dmedia plugin and a native sound plugin version that failed on r4k due to compilation issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> XMMS uses the ESD sound API for portable sound, and requires the ESD daemon to be launched for sound output, as failing to do so causes segfaults. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> It works with MP3s while using less CPU power than the default media player, and can play web radio and downloaded MP3s. <sup><a href="#s4">4</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> On SGI systems, the output plugin must be set to 'sgi audio' to resolve segfaults, and a specific library for SGI output may need its paths and configuration checked. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> It is available from SGUG-RSE, where installation requires manually configuring the official repository and using 'tdnf install xmms', though it is specified but not yet built for tdnf on some systems. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> The xmms dmedia output plugin produces noise and is difficult to diagnose, and a package may overwrite configure when unpacked atop a certain version of xmms. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">xmms can be built using didbs with specific compiler flags and patches, requiring massaging of plug-ins and dependencies from nekoware. (user-bc5d, 2019-11-12, exchange 68117, check: uncheckable)</li>
+<li id="s2">There is a Dmedia plugin available in nekoware for XMMS. (user-22f9, 2025-04-11, exchange 212336, check: uncheckable)</li>
+<li id="s3">Nekoware's XMMS version had a native sound plugin but failed on r4k due to compilation issues. (user-17cb, 2025-05-05, exchange 116648, check: supported)</li>
+<li id="s4">xmms has problems with ESD for streaming audio but works with MP3s. (user-e872, 2021-05-02, exchange 69583, check: uncheckable)</li>
+<li id="s5">XMMS is available on SGI systems, specifically from RSE, and requires launching ESD for sound. (user-25f7, 2021-12-18, exchange 70153, check: uncheckable)</li>
+<li id="s6">Starting esd as the user is necessary to avoid seg faults and ensure proper audio playback with XMMS. (user-25f7, 2021-12-26, exchange 215272, check: uncheckable)</li>
+<li id="s7">xmms requires the ESD daemon to be launched for sound output; launching `/usr/sgug/bin/esd &amp;` and then running xmms works. (user-17cb, 2022-01-23, exchange 70250, check: supported)</li>
+<li id="s8">ESD is a sound API for portable sound, used by some applications like xmms. (user-17cb, 2025-05-04, exchange 87244, check: uncheckable)</li>
+<li id="s9">xmms uses less CPU power playing mp3s than the default media player. (user-6afa, 2021-12-20, exchange 70177, check: uncheckable)</li>
+<li id="s10">xmms on my 300mhz O2 rocks the web radio (user-e872, 2022-02-06, exchange 25443, check: supported)</li>
+<li id="s11">Got a Napster client to compile and tested it against a server, playing downloaded mp3s in XMMS. (user-e0a4, 2022-03-17, exchange 215300, check: uncheckable)</li>
+<li id="s12">xmms requires the correct audio plugin to work on an SGI; setting the output plugin to 'sgi audio' resolves segfaults. (user-bc18, 2019-07-28, exchange 203864, check: uncheckable)</li>
+<li id="s13">xmms requires a specific library for SGI output which may not be recognized by default; check library paths and xmms configuration. (user-ab99, 2022-01-22, exchange 25000, check: uncheckable)</li>
+<li id="s14">XMMS is specified but not yet built for tdnf on RSE. (user-e872, 2021-07-10, exchange 69749, check: uncheckable)</li>
+<li id="s15">To install xmms, use 'tdnf install xmms' if the repository is correctly set up. (user-17cb, 2021-12-21, exchange 215265, check: uncheckable)</li>
+<li id="s16">XMMS is available in SGUG-RSE and a reasonably-specced Indy can handle MP3s. (user-59b9, 2023-09-13, exchange 223338, check: supported)</li>
+<li id="s17">To install xmms on SGUG RSE, you need to configure the official repo manually. (user-17cb, 2025-05-04, exchange 87234, check: uncheckable)</li>
+<li id="s18">The xmms dmedia output plugin produces noise, though it's an improvement, and is difficult to diagnose. (user-42cf, 2025-05-06, exchange 215718, check: uncheckable)</li>
+<li id="s19">the package overwrites `configure` when unpacked atop a certain version of xmms, which can be solved by getting the specific version of xmms, unpacking, and applying a diff to the latest version of xmms; this avoids gnu- (user-42cf, 2025-05-06, exchange 72301, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="r4000.html">R4000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="nekoware.html">nekoware</a>, <a href="tdnf.html">tdnf</a>, <a href="rse.html">RSE</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="didbs.html">didbs</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="esd.html">ESD</a>, <a href="mp3.html">MP3</a>, <a href="dmedia.html">dmedia</a>, <a href="cli.html">CLI</a>, <a href="plugin.html">plugin</a>
+</li></ul>
+</body>
+</html>

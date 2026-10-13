@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Symmon</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Symmon</h1>
+<p>Claims: 4</p>
+<p>Symmon is a symbolic debugger for the kernel that is supposed to load before the kernel, but it can be challenging to get it to work. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It requires kernel debugging tools to be installed, and insufficient memory can prevent loading symmon and the kernel. <sup><a href="#s1">1</a></sup> Symmon can reside in the volume header. <sup><a href="#s3">3</a></sup> Symmon fails to load due to text size not fitting in a FreeMemory area on IRIX 6.5 IP35, even with 2 GB of RAM. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">symmon is a symbolic debugger for the kernel; it requires kernel debugging tools to be installed; insufficient memory can prevent loading symmon and the kernel. (user-3e2d, 2026-05-05, exchange 213933, check: uncheckable)</li>
+<li id="s2">Symmon is supposed to load before the kernel, but it can be challenging to get it to work. (user-3e2d, 2026-06-14, exchange 216026, check: uncheckable)</li>
+<li id="s3">Symmon can reside in the volume header. (user-3e2d, 2025-11-02, exchange 88515, check: uncheckable)</li>
+<li id="s4">Symmon fails to load due to text size not fitting in a FreeMemory area on IRIX 6.5 IP35, even with 2 GB of RAM. (user-8780, 2026-06-14, exchange 73740, check: supported)</li>
+</ol>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI drive</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI drive</h1>
+<p>Claims: 72 Part of <a href="scsi.html">SCSI</a> Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/FireWire">FireWire</a>, <a href="https://en.wikipedia.org/wiki/Ultra_1">Ultra 1</a>.</p>
+<p>SCSI drives are generally compatible across systems, with any SCSI drive expected to work in an external enclosure the same as internally, provided termination is handled correctly. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> SGI machines typically work with any SCSI drive that supports mode select, regardless of jumper settings. <sup><a href="#s3">3</a></sup> A SCSI drive is likely faulty if it fails to work with a known-good drive and jumpers, and a dead drive will not show up in hinv or cannot be written to with software. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Various systems can use SCSI drives, including the PowerBook G4, PowerMac G3, FireWire systems, and the O2, though some may require specific handling such as formatting with Lido or using a 4x IBM SCSI drive for CD-ROMs. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Some systems have limitations, such as the A500 possibly not recognizing a SCSI drive properly, the Cube booting from a disk image via the 'Previous' feature, and the G3 enforcing an IDE limit of 128 GiB even when a SCSI drive is installed. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Data recovery may be needed for failing Indy SCSI drives, and a SCSI2SD adapter can replace a failing drive, though installing a new drive and recovering data using a system supporting SGI partitions and EFS/XFS filesystems may be simpler. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Any SCSI drive should work in an external enclosure the same as internally; pay attention to termination. (user-d903, 2019-09-15, exchange 3521, check: uncheckable)</li>
+<li id="s2">For a SCSI drive, set the drive to ID 1 and terminate it. (user-9849, 2021-04-01, exchange 16130, check: supported)</li>
+<li id="s3">SGIs typically work with any SCSI drive that supports mode select, regardless of jumper settings. (user-237d, 2021-08-10, exchange 221449, check: uncheckable)</li>
+<li id="s4">If a SCSI drive is dead, it won't show up in hinv or you can't write to it with software. (user-9528, 2021-10-08, exchange 20864, check: uncheckable)</li>
+<li id="s5">A SCSI drive is likely faulty if it doesn't work with the same drive and jumpers. (user-9528, 2022-01-29, exchange 221886, check: uncheckable)</li>
+<li id="s6">The PowerBook G4 can have a SCSI drive that isn't detected due to formatting issues, requiring Lido for formatting. (user-1361, 2021-01-30, exchange 14376, check: uncheckable)</li>
+<li id="s7">A 4x IBM SCSI drive can be used for CD-ROMs on an O2. (user-c831, 2021-05-09, exchange 180740, check: supported)</li>
+<li id="s8">The PowerMac G3 can be used to install a SCSI drive. (user-5510, 2023-08-10, exchange 209035, check: uncheckable)</li>
+<li id="s9">A FireWire system can use a SCSI drive. (user-616d, 2025-03-02, exchange 212114, check: uncheckable)</li>
+<li id="s10">A500 may not recognize a SCSI drive properly. (user-d903, 2020-02-14, exchange 233020, check: uncheckable)</li>
+<li id="s11">The Cube can boot from a disk image on a SCSI drive using the 'Previous' feature. (user-24f9, 2020-10-30, exchange 11866, check: uncheckable)</li>
+<li id="s12">The IDE limit on a G3 is 128 GiB, while a SCSI drive installed can be 146.8 GB, showing the IDE limit is being enforced even when a SCSI drive is used. (user-1361, 2022-04-24, exchange 206893, check: supported)</li>
+<li id="s13">A SCSI2SD adapter can be used to replace a failing SCSI drive on an Indy, but it may be simpler to install a new drive and recover data from the old one using a system that supports SGI partitions and EFS/XFS filesystems (user-d903, 2023-09-06, exchange 84057, check: supported)</li>
+<li id="s14">An Indy SCSI drive is failing and needs data recovery. (user-22f9, 2025-01-21, exchange 224430, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="a2000.html">A2000</a>, <a href="a500.html">A500</a>, <a href="amiga.html">Amiga</a>, <a href="c8000.html">C8000</a>, <a href="cube.html">Cube</a>, <a href="g3.html">G3</a>, <a href="powerbook-g4.html">PowerBook G4</a>, <a href="ultra-1.html">Ultra 1</a>, <a href="vax.html">VAX</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Processors: <a href="ppro.html">PPro</a>, <a href="r12k-o2.html">R12K O2</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="linux.html">Linux</a>, <a href="netbsd.html">NetBSD</a>, <a href="openbsd.html">OpenBSD</a>, <a href="ultrix.html">Ultrix</a>, <a href="booting.html">booting</a>
+</li>
+<li>Software: <a href="ide.html">IDE</a>, <a href="netware.html">Netware</a>, <a href="scsi-emulator.html">SCSI emulator</a>, <a href="boot.html">boot</a>, <a href="boot-process.html">boot process</a>, <a href="fx.html">fx</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="led.html">LED</a>, <a href="pci-riser.html">PCI riser</a>, <a href="psu-fan.html">PSU fan</a>, <a href="power-mac-g3.html">Power Mac G3</a>, <a href="raid-card.html">RAID card</a>, <a href="rascsi.html">RaSCSI</a>, <a href="sata-drives.html">SATA drives</a>, <a href="scsi-backplane.html">SCSI backplane</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="scsi2sd-adapter.html">SCSI2SD adapter</a>, <a href="ssd.html">SSD</a>, <a href="jumper-setting.html">jumper setting</a>, <a href="tape.html">tape</a>
+</li>
+<li>Standards and interfaces: <a href="firewire.html">Firewire</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="apple-cd300e.html">Apple CD300e</a>, <a href="ebay.html">eBay</a>
+</li>
+<li>Other: <a href="6-x.html">6.x</a>, <a href="atx.html">ATX</a>, <a href="hp-ux-9-05.html">HP-UX 9.05</a>, <a href="ian-mapleson.html">Ian Mapleson</a>, <a href="old-macs.html">Old Macs</a>, <a href="vigrasound.html">VigraSound</a>, <a href="model.html">model</a>, <a href="scsicontrol.html">scsicontrol</a>, <a href="temperature.html">temperature</a>, <a href="termination.html">termination</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIPS3</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MIPS3</h1>
+<p>Claims: 34 Part of <a href="mips.html">MIPS</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/FFmpeg">FFmpeg</a>.</p>
+<p>MIPS3 is a 64-bit processor architecture, and MIPS3 software runs on MIPS4 CPUs such as the R5K. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The R4k CPU is MIPS-3, and MIPS3 is supported by the mipspro image. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> MIPS3 software can be obtained from specific sources or compiled, and there is a MIPS3 version available for various programs. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Software built for MIPS3 includes FFmpeg, OpenSSH, mplayer, and ScummVM, though some have limitations such as slow performance on an O2 or support for fewer formats. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Compatibility issues exist, such as postinstall scripts failing due to missing files, and Blender 2.41 gives a segmentation fault on an Indigo2 R4000. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Emulation of MIPS3 in MAME is less complete than the r4000 code, and NetBSD on MIPS3 has issues with the EntryHi register and the ADDU instruction. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">MIPS3 and up processors are all 64-bit processors. (user-6afa, 2022-04-18, exchange 92895, check: supported)</li>
+<li id="s2">MIPS4 is backwards compatible; MIPS3 software runs on an R5K. (user-b7c4, 2019-08-03, exchange 220745, check: supported)</li>
+<li id="s3">MIPS3 works on MIPS4 CPUs. (user-b4f4, 2021-04-09, exchange 215108, check: uncheckable)</li>
+<li id="s4">R4k is MIPS-3 (user-b1da, 2024-11-28, exchange 51042, check: supported)</li>
+<li id="s5">MIPS3 is supported by the mipspro image, but MIPS4 requires an R5K CPU. (user-cd7d, 2026-07-30, exchange 220569, check: supported)</li>
+<li id="s6">There is a MIPS3 version available. (user-7973, 2024-02-16, exchange 215436, check: uncheckable)</li>
+<li id="s7">MIPS-3 specific software can be obtained from specific sources or compiled if available. (user-554a, 2024-11-28, exchange 51043, check: supported)</li>
+<li id="s8">FFmpeg can be compiled for mips3 and used to convert .mp4 videos to .rgb format for use in SGI discreet programs, though it runs slowly on an O2. (user-42cf, 2019-07-11, exchange 214780, check: supported)</li>
+<li id="s9">The OpenSSH version available for IRIX is statically compiled for mips3 and works on older machines; it is a recent test release but still functional. (user-b4f4, 2019-12-09, exchange 214900, check: uncheckable)</li>
+<li id="s10">There is an mplayer build for MIPS3 that doesn't require external libraries but supports fewer formats. (user-6afa, 2021-12-15, exchange 70122, check: uncheckable)</li>
+<li id="s11">Scummvm for mips 3 on Irix 6.5.0 may require neko scummvm with nekoSDL. (user-74cb, 2022-02-09, exchange 80955, check: supported)</li>
+<li id="s12">mips3 and mips4 compatibility: irixports bootstrap gcc4.7.4 and gcc8.2.0 both run on mips3, but postinstall scripts on 8.2.0 fail due to /opt/local/bin/bash not existing. (user-d903, 2019-08-09, exchange 214821, check: supported)</li>
+<li id="s13">Has anyone managed to get the MIPS-3 version of Blender up and running? Version 2.41 gives a segmentation fault and core dumps on an Indigo2 R4000. (user-59df, 2021-11-07, exchange 217284, check: supported)</li>
+<li id="s14">The TLB in the mips3 and drc code is slightly less complete/accurate than that in r4000.cpp; the r4000.cpp code can run Windows NT whereas the mips3 code cannot. (user-a719, 2026-01-19, exchange 93687, check: supported)</li>
+<li id="s15">NetBSD on a MIPS3 machine has issues with the EntryHi register not limiting values, leading to potential TLB programming skips and incorrect instruction emulation, especially for 32-bit signed branches. (user-231e, 2026-01-21, exchange 93717, check: supported)</li>
+<li id="s16">The MIPS3 ADDU instruction requires sign-extension in 32-bit mode, and some arithmetic operations are incorrect without it. (user-231e, 2026-01-21, exchange 93718, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="challenge-s.html">Challenge S</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Processors: <a href="mips4.html">MIPS4</a>, <a href="mips32.html">MIPS32</a>, <a href="mips64.html">MIPS64</a>, <a href="r10000.html">R10000</a>, <a href="r3000.html">R3000</a>, <a href="r4000.html">R4000</a>, <a href="r5000.html">R5000</a>, <a href="r5k-cpu.html">R5K CPU</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-0.html">IRIX 6.5.0</a>, <a href="netbsd.html">NetBSD</a>, <a href="windows-nt.html">Windows NT</a>
+</li>
+<li>Software: <a href="blender.html">Blender</a>, <a href="elf.html">ELF</a>, <a href="llvm.html">LLVM</a>, <a href="mame.html">MAME</a>, <a href="mipspro.html">MIPSpro</a>, <a href="nekoware-packages.html">Nekoware packages</a>, <a href="openssh.html">OpenSSH</a>, <a href="rse.html">RSE</a>, <a href="bash.html">bash</a>, <a href="didbs.html">didbs</a>, <a href="ffmpeg.html">ffmpeg</a>, <a href="irixports.html">irixports</a>, <a href="nekoware.html">nekoware</a>, <a href="tar.html">tar</a>
+</li>
+<li>Companies: <a href="sgi-rgb-format.html">SGI RGB format</a>, <a href="sgug.html">SGUG</a>, <a href="gcc-4-7-4.html">gcc 4.7.4</a>
+</li>
+<li>Other: <a href="r4000-cpp.html">r4000.cpp</a>, <a href="drc.html">DRC</a>, <a href="mp4.html">MP4</a>, <a href="scummvm.html">ScummVM</a>, <a href="sgi-sh.html">sgi.sh</a>
+</li></ul>
+</body>
+</html>

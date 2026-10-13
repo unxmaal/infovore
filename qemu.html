@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QEMU</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>QEMU</h1>
+<p>Claims: 79 Background: 20 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/QEMU">QEMU</a>.</p>
+<p>QEMU is a free and open source emulator that can boot HP-UX, AIX, and Linux for their respective CPUs, and supports AIX, VMS, and HP-UX for tinkering. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> QEMU can emulate MIPS, but not all SGI systems boot IRIX, and some targets like alpha do not work well. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> QEMU can run IRIX user space binaries, allowing binary execution but not direct hardware access, and can run MIPS IRIX apps on x86 from source. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> QEMU can run x86 Windows on a SPARC chip, but running Windows 10 in vanilla QEMU is not recommended. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> QEMU is slow, and x86 emulation on POWER is at least 10x slower than native. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> QEMU is not designed for graphical stuff, and its SPARC emulation for NeXTSTEP is broken. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> QEMU can be compiled under IRIX emulation and builds natively on arm64. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> QEMU without KVM is only good for different architectures or really old OSes. <sup><a href="#s20">20</a></sup> QEMU is a complex emulator that requires thorough testing, and its closest approach to automatic emulation involves minimal setup. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> QEMU emulates only what is required for a target and translates everything else, using a JIT that can offer better performance and scalability. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> QEMU can emulate systems with a PROM, including hardware components such as SCSI controllers and Ethernet, and can emulate 603 and 604 PowerPC processors, though PowerPC emulation may be slow. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> QEMU can run MIPS NT, but the mouse pointer eventually goes out of control and requires a keyboard reboot, and it cannot run the mips1 uname binary from the HD2 image. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> NeWS 1.1 can be run inside QEMU, but there is no emulator for the Personal IRIS or IRIS 4D yet, and the 'white-on-white' bug is specific to IRIS and has a fix in QEMU. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> System mode in QEMU does not have the ability to do GL acceleration. <sup><a href="#s31">31</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">qemu can boot PA-RISC HP-UX. (user-b1da, 2021-10-26, exchange 235010, check: uncheckable)</li>
+<li id="s2">QEMU can boot HP-UX, AIX, and Linux for their respective CPUs. (user-f9d4, 2019-09-07, exchange 3381, check: uncheckable)</li>
+<li id="s3">qemu and mame serve specific purposes and are free and open source; closed source emulators that are incomplete and paid should not be used. (user-f9d4, 2019-11-11, exchange 92418, check: uncheckable)</li>
+<li id="s4">QEMU supports AIX, VMS, and HP-UX for tinkering. (user-95db, 2022-01-25, exchange 74235, check: uncheckable)</li>
+<li id="s5">QEMU can emulate MIPS but not SGI hardware. (user-7b1c, 2020-04-23, exchange 220149, check: uncheckable)</li>
+<li id="s6">some of its more unstable targets like alpha don't really work too well (user-1446, 2020-01-23, exchange 231157, check: uncheckable)</li>
+<li id="s7">QEMU can emulate several SGI systems, but not all of them boot IRIX. (user-22f9, 2020-09-11, exchange 92592, check: uncheckable)</li>
+<li id="s8">userland emulation with QEMU can be used to run IRIX 5.3 compilers on Linux, potentially speeding up compilation on older SGI hardware (user-edea, 2019-07-26, exchange 220109, check: supported)</li>
+<li id="s9">QEMU can run IRIX user space binaries compiled with statically recompiled IRIX compilers for Linux, useful for compiling on Linux but not for full IRIX environment simulation. (user-edea, 2020-12-01, exchange 220180, check: uncheckable)</li>
+<li id="s10">QEMU can emulate IRIX userspace, allowing binary execution but not direct hardware access; XGL might work but real hardware interaction fails. (user-9860, 2021-11-09, exchange 220199, check: uncheckable)</li>
+<li id="s11">Running MIPS IRIX apps on x86 with QEMU can be done from source and may run faster than on actual MIPS hardware, depending on the application's requirements. (user-9860, 2021-11-01, exchange 205840, check: uncheckable)</li>
+<li id="s12">QEMU can run x86 Windows on a SPARC chip with sufficient CPU cores and threads, though performance may vary. (user-1361, 2020-02-02, exchange 5883, check: uncheckable)</li>
+<li id="s13">Running Windows 10 in vanilla QEMU is not recommended. (user-1446, 2020-11-25, exchange 12412, check: supported)</li>
+<li id="s14">qemu is slow and buggy (user-d166, 2020-01-23, exchange 231157, check: uncheckable)</li>
+<li id="s15">QEMU x86 emulation on POWER is at least 10x slower than native, with exceptions. (user-c831, 2020-06-27, exchange 9237, check: supported)</li>
+<li id="s16">qemu isn't designed for graphical stuff (user-de13, 2020-01-16, exchange 92460, check: uncheckable)</li>
+<li id="s17">Qemu's SPARC emulation for NeXTSTEP is broken. (user-7b1c, 2022-04-18, exchange 156920, check: uncheckable)</li>
+<li id="s18">It can be compiled under IRIX emulation through QEmu. (user-bc18, 2019-08-26, exchange 125997, check: uncheckable)</li>
+<li id="s19">qemu builds natively on arm64. (user-ba81, 2021-04-06, exchange 144935, check: uncheckable)</li>
+<li id="s20">QEMU without KVM is only good for different architectures or really old OSes. (user-1446, 2020-11-25, exchange 12412, check: uncheckable)</li>
+<li id="s21">QEMU is complex and requires thorough testing. (user-22f9, 2024-11-20, exchange 50603, check: uncheckable)</li>
+<li id="s22">The closest to 'automatic' emulation is the QEMU approach, requiring minimal setup. (user-edea, 2025-03-20, exchange 218840, check: uncheckable)</li>
+<li id="s23">mame is hw in sw full emulation, qemu emulates only what's required and translates everything else (user-ce51, 2026-08-02, exchange 94645, check: uncheckable)</li>
+<li id="s24">JIT under QEMU can offer better performance and scalability for emulation targets. (user-4f7c, 2026-08-25, exchange 220654, check: uncheckable)</li>
+<li id="s25">QEMU can emulate a system with a PROM, emulating necessary hardware components like SCSI controllers and Ethernet. (user-ce51, 2026-08-02, exchange 94644, check: uncheckable)</li>
+<li id="s26">QEMU's PowerPC emulation may be slow, but it can emulate 603 and 604 processors. QEMU can emulate Mac startup chimes. (user-d492, 2024-11-14, exchange 149250, check: supported)</li>
+<li id="s27">QEMU can run MIPS NT, but the mouse pointer eventually goes nuts and requires a keyboard reboot. (user-e532, 2025-03-20, exchange 55330, check: uncheckable)</li>
+<li id="s28">qemu can't run the mips1 uname binary from the HD2 image, which has files created two months before 4D1-3.0's earliest mention. (user-56d4, 2024-04-02, exchange 189007, check: supported)</li>
+<li id="s29">NeWS 1.1 can be run inside QEMU but there's no emulator for the Personal IRIS or IRIS 4D yet. (user-5fa2, 2023-06-05, exchange 241070, check: supported)</li>
+<li id="s30">The 'white-on-white' bug is specific to IRIS and has a fix in QEMU. (user-ce51, 2026-08-14, exchange 220629, check: uncheckable)</li>
+<li id="s31">System mode in QEMU does not have the ability to do GL acceleration. (user-4f7c, 2026-08-02, exchange 94644, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iris.html">IRIS</a>, <a href="arm.html">ARM</a>, <a href="arm-macs.html">ARM Macs</a>, <a href="arm64.html">ARM64</a>, <a href="indy.html">Indy</a>, <a href="mac.html">Mac</a>, <a href="o2.html">O2</a>, <a href="raspberry-pi.html">Raspberry Pi</a>, <a href="sgi-hardware.html">SGI hardware</a>
+</li>
+<li>Processors: <a href="sparc.html">SPARC</a>, <a href="x86.html">x86</a>, <a href="mips.html">MIPS</a>, <a href="mips-iii.html">MIPS III</a>, <a href="mips-magnum.html">MIPS Magnum</a>, <a href="mips-nt.html">MIPS NT</a>, <a href="mips-instructions.html">MIPS instructions</a>, <a href="pa-risc.html">PA-RISC</a>, <a href="powerpc.html">PowerPC</a>, <a href="t4.html">T4</a>
+</li>
+<li>Graphics: <a href="xgl.html">XGL</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="aix.html">AIX</a>, <a href="linux.html">Linux</a>, <a href="a-ux.html">A/UX</a>, <a href="irix-emulation.html">IRIX emulation</a>, <a href="nextstep.html">NeXTSTEP</a>, <a href="os-x.html">OS X</a>, <a href="openvms.html">OpenVMS</a>, <a href="solaris.html">Solaris</a>, <a href="vms.html">VMS</a>, <a href="windows.html">Windows</a>, <a href="windows-10.html">Windows 10</a>, <a href="windows-xp.html">Windows XP</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="dosbox.html">DOSBox</a>, <a href="docker.html">Docker</a>, <a href="firefox.html">Firefox</a>, <a href="ido.html">IDO</a>, <a href="news.html">NeWS</a>, <a href="xfree86.html">XFree86</a>, <a href="clang.html">clang</a>, <a href="desktop.html">desktop</a>, <a href="emulation.html">emulation</a>, <a href="fsck.html">fsck</a>, <a href="gxemul.html">gxemul</a>, <a href="mplayer.html">mplayer</a>
+</li>
+<li>Parts and peripherals: <a href="ip28.html">IP28</a>, <a href="kvm.html">KVM</a>, <a href="power.html">POWER</a>, <a href="prom.html">PROM</a>, <a href="scsi-controller.html">SCSI controller</a>, <a href="cache.html">cache</a>
+</li>
+<li>Standards and interfaces: <a href="ethernet.html">Ethernet</a>, <a href="x.html">X</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="hp.html">HP</a>, <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="utm.html">UTM</a>, <a href="603.html">603</a>, <a href="604.html">604</a>, <a href="bochs.html">Bochs</a>, <a href="gio.html">GIO</a>, <a href="talos-ii.html">Talos II</a>, <a href="initramfs.html">initramfs</a>, <a href="source-code.html">source code</a>
+</li></ul>
+</body>
+</html>

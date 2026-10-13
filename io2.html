@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IO2</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IO2</h1>
+<p>Claims: 6</p>
+<p>The IO2, IO3, and IO3B bridge VME to PowerPath, while the GM board bridges PowerPath to graphics, and both boards have massive connectors. <sup><a href="#s1">1</a></sup> The IO3 SCSI interface is faster than the IO2, supporting 10MB/s versus 1MB/s, though the difference might not be noticeable. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> An IO3 or IO3B can connect both drive bays to separate SCSI channels, while an IO2 with a single channel requires a jumper to connect all bays to one chain. <sup><a href="#s4">4</a></sup> The IP7 board uses a different backplane than the IO2, and the graphics boards use MPLink on the backplane. <sup><a href="#s5">5</a></sup> The IO3B switch is necessary, and the PROM revision is not the issue. <sup><a href="#s5">5</a></sup> A working set of GTX cards was found for an IO2 and IP7 33mhz, with plans to run IRIX 3.3.2 to keep power consumption low. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IO2/IO3/IO3B bridge VME to PowerPath, and the GM board bridges PowerPath to graphics. Both have massive connectors. (user-86e1, 2023-10-25, exchange 188710, check: uncheckable)</li>
+<li id="s2">The IO3 SCSI interface is faster than IO2 but the difference might not be noticeable. (user-86e1, 2023-04-30, exchange 37714, check: uncheckable)</li>
+<li id="s3">The IO3 board supports 10MB/s SCSI speeds, faster than the IO2 which supports 1MB/s. (user-86e1, 2025-05-28, exchange 241332, check: supported)</li>
+<li id="s4">An IO3 or IO3B can connect both drive bays to separate SCSI channels, while an IO2 with a single channel requires a jumper to connect all bays to one chain. (user-86e1, 2024-11-28, exchange 189334, check: uncheckable)</li>
+<li id="s5">The IP7 board uses a different backplane than the IO2, and the IO3B switch is necessary. The PROM revision is not the issue. The graphics boards use MPLink on the backplane. (user-c9fb, 2020-11-05, exchange 221113, check: uncheckable)</li>
+<li id="s6">I kept swapping GTX cards until I found a working set for my IO2 and IP7 33mhz, planning to run IRIX 3.3.2 on it to keep power consumption low. (user-c9fb, 2021-07-27, exchange 99548, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-3-3-2.html">IRIX 3.3.2</a>
+</li>
+<li>Parts and peripherals: <a href="io3b.html">IO3B</a>, <a href="ip7.html">IP7</a>
+</li>
+<li>Other: <a href="io3.html">IO3</a>
+</li></ul>
+</body>
+</html>

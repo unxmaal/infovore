@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mips-sgi-irix6.5</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>mips-sgi-irix6.5</h1>
+<p>Claims: 5</p>
+<p>The config.log shows that the configure script is unable to find the correct nm tool for the mips-sgi-irix6.5 target, resulting in an error during compilation. <sup><a href="#s1">1</a></sup> The target binutils should be in /opt/gcc/mips-sgi-irix6.5/bin under the GCC prefix. <sup><a href="#s2">2</a></sup> The omp.h file in /opt/gcc/lib/gcc/mips-sgi-irix6.5/4.7.4/include is the latest version used by the system, and its presence prevents rebuilding gcc unless it's missing. <sup><a href="#s3">3</a></sup> The gcc installation includes the header fix script, whose path is ./libexec/gcc/mips-sgi-irix6.5/4.7.4/install-tools/mkheaders. <sup><a href="#s4">4</a></sup> You may need to create a symlink such as `ln -sf /opt/local/binutils/bin /opt/local/gcc-8.2.0/mips-sgi-irix6.5`. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The config.log shows that the configure script is unable to find the correct nm tool for the mips-sgi-irix6.5 target, resulting in an error during compilation. (user-f229, 2018-12-30, exchange 66840, check: uncheckable)</li>
+<li id="s2">The target binutils should be in /opt/gcc/mips-sgi-irix6.5/bin under the GCC prefix. (user-42cf, 2019-01-01, exchange 66899, check: uncheckable)</li>
+<li id="s3">The omp.h file in /opt/gcc/lib/gcc/mips-sgi-irix6.5/4.7.4/include is the latest version used by the system, and its presence prevents rebuilding gcc unless it's missing. (user-2189, 2019-01-01, exchange 66917, check: supported)</li>
+<li id="s4">gcc installation includes the header fix script; the script path is ./libexec/gcc/mips-sgi-irix6.5/4.7.4/install-tools/mkheaders (user-42cf, 2019-01-02, exchange 66925, check: supported)</li>
+<li id="s5">you need to do something like `ln -sf /opt/local/binutils/bin /opt/local/gcc-8.2.0/mips-sgi-irix6.5` iirc (user-ba81, 2019-02-03, exchange 66990, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="binutils.html">binutils</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>
+</li>
+<li>Other: <a href="4-7-4.html">4.7.4</a>, <a href="config-log.html">config.log</a>
+</li></ul>
+</body>
+</html>

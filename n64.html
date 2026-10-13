@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N64</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>N64</h1>
+<p>Claims: 134 Background: 12 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Nintendo_64">Nintendo 64</a>, <a href="https://en.wikipedia.org/wiki/Silicon_Graphics">Silicon Graphics</a>, <a href="https://en.wikipedia.org/wiki/IRIS_GL">IRIS GL</a>, <a href="https://en.wikipedia.org/wiki/RDRAM">RDRAM</a>, <a href="https://en.wikipedia.org/wiki/Video_games_and_Linux">Video games and Linux</a>.</p>
+<h2 id="with-o2">With O2</h2>
+<p>The N64 and O2 share architectural similarities: both use an embedded R4000-class MIPS CPU and unified memory, and the O2's architecture is very similar to the N64, making it potentially usable for N64 development. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The O2 uses a hardware design similar to the N64, putting another MIPS CPU into the memory map with some 6K of firmware, and the N64 chip is a subset of the O2 one. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The O2 uses the CRIME engine for memory, video, and compression, handling vector calculations with a separate CPU, while the N64 uses the RSP for vector calculations. <sup><a href="#s5">5</a></sup> The O2's unified memory map is one that N64 emulators had trouble emulating. <sup><a href="#s6">6</a></sup> The O2 performs shading in a second pass and may not support texture blending effects from the N64 due to OGL compliance issues. <sup><a href="#s7">7</a></sup> The N64 video output may not work on SGI O2 due to sync signal differences from the PAL specification, similar to Atari 800 and IBM PC (CGA). <sup><a href="#s8">8</a></sup> Someone got an N64 working on an Indy and an O2. <sup><a href="#s9">9</a></sup></p>
+<h2 id="general">General</h2>
+<p>The N64 uses a MIPS CPU developed by MIPS and SGI, and cannot run x86/x64 software directly. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> It has a maximum RAM of 8 MB and a maximum ROM size of 240 MB, with 4 KB of texture memory often split into 2 KB for texture and 2 KB for palette. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The N64 uses an RSP similar in concept to the CRM graphics of the O2, which processes RSP-encoded data for display lists flushed to the RSP every frame as a GFX task. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> Most games of the era were written in C, with assembly still common and C++ rarely used due to overhead and limited memory, and MIPS assembly is used in N64 development. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> Several developers have created their own SDK/OS for the N64 using C, and coding an OS might be easier than porting one. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Non-game software on the N64 is specialized; it has good specs for Win 3.1 but not Win95, and running Linux is impractical due to limited RAM and lack of necessary peripherals. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> IRIX would be very difficult to run on the N64 without source code and a significant amount of memory, and trying to get IRIX working is not practical without source code. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> There is a custom command-based OS written in Assembly that might work on the N64, requiring less than a megabyte of RAM to boot. <sup><a href="#s25">25</a></sup> The N64 development SDK was designed for SGI workstations, including the Indy, Onyx, and O2, due to their similar architectures, and Nintendo PARTNER-N64 was a development kit for SGI workstations that connected to a special N64 via SCSI for game development. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup> IRIX does not run on the N64, though IRISGL is an OpenGL implementation for SGI machines that can run N64 software with modifications. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup> The N64's RCP runs a MIPS R4k series core and uses SGI UMA, and the console was a scaled-down InfiniteReality. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> A stock N64 has 4 MB of texture RAM, which is its total RAM capacity, and it had a 4k texture cache that likely did not support multitexturing. <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> The N64's CPU has no DMA because the RCP has to do it, and the RDP has complex calls that require learning. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> The N64 doesn't have sprites in the conventional sense; even HUD elements are just a pair of polygons with a texture on them. <sup><a href="#s36">36</a></sup> The N64 outputs only S-Video and composite, so a passive adapter is needed for component input, and its video output is not ideal but can be managed with the right hardware. <sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup> N64s are prone to freezing if the cartridge connection loses contact for even a second, but they can survive being mishandled and remain functional. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup> The N64 is a low-end MIPS system with Onyx graphics features, slower than many SGI systems, and had hardware textures that some SGI systems lacked. <sup><a href="#s41">41</a></sup> It had some unique graphics features but was much slower than many SGI systems. <sup><a href="#s42">42</a></sup> SGI used RDRAM and licensed N64 technology, and the N64's graphics architecture, or one of its architects, influenced SGI's design philosophy. <sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> The N64 shipped significantly more units than SGI's computer systems over their history. <sup><a href="#s45">45</a></sup> The N64 binaries are statically linked only, and MIPSpro does not support N64 and produces invalid code for older CPU steppings. <sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> The N64 can experience a 'power on, no video or audio' issue that persists despite cleaning and replacing AV cables, with the board looking clean and without obvious solder point or capacitor corrosion. <sup><a href="#s48">48</a></sup> Its RDRAM can be finicky, especially with texture RAM, and troubleshooting may involve contact cleaning or repairing corroded traces near the CPU or RCP. <sup><a href="#s49">49</a></sup><sup><a href="#s50">50</a></sup> Some N64 models converted from quads to triangles for performance can misalign textures, leading to visual issues like stretched or broken textures, especially on full quad textures such as pillars in Pokémon Stadium. <sup><a href="#s51">51</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The N64 has an embedded R4000-class MIPS CPU but uses unified memory like the O2. (user-bc18, 2020-05-18, exchange 8476, check: supported)</li>
+<li id="s2">The O2's architecture is very similar to the N64, making it potentially usable for N64 development. (user-8b3c, 2020-10-04, exchange 227168, check: supported)</li>
+<li id="s3">The O2 used a hardware design similar to the N64 which puts another MIPS CPU into the memory map with some 6K of firmware. This CPU had additional Vector Instructions, although I believe only 1 firmware version was ever载 (user-8b3c, 2022-08-17, exchange 70454, check: supported)</li>
+<li id="s4">The N64 chip is a subset of the O2 one. (user-24f0, 2024-10-10, exchange 49720, check: supported)</li>
+<li id="s5">The O2 uses the CRIME engine for memory, video, and compression, handling vector calculations with a separate CPU; the N64 uses the RSP for vector calculations. (user-24f0, 2024-06-23, exchange 47167, check: supported)</li>
+<li id="s6">the O2 has a unified memory map that N64 emulators had trouble emulating (user-bc18, 2020-12-22, exchange 13113, check: supported)</li>
+<li id="s7">The O2 performs shading in a second pass. It may not support texture blending effects from the N64 due to OGL compliance issues. (user-4f7c, 2026-08-24, exchange 73804, check: supported)</li>
+<li id="s8">The N64 video output may not work on SGI O2 due to sync signal differences from PAL specification, similar to Atari 800 and IBM PC (CGA). (user-ce5a, 2019-05-31, exchange 1850, check: supported)</li>
+<li id="s9">Someone got an N64 working on an Indy and an O2. (user-637b, 2019-06-16, exchange 2080, check: supported)</li>
+<li id="s10">The N64 uses a MIPS CPU and cannot run x86/x64 software directly. (user-8b3c, 2019-07-18, exchange 125942, check: uncheckable)</li>
+<li id="s11">Owning an N64 is like owning SGI hardware because MIPS and SGI developed the processor and graphics chips for the system. (user-59fe, 2019-08-09, exchange 227114, check: uncheckable)</li>
+<li id="s12">The N64 and PS2 use MIPS chips, but they are proprietary and not standard. (user-b1da, 2020-07-23, exchange 9933, check: uncheckable)</li>
+<li id="s13">The N64 has a maximum RAM of 8 MB and a maximum ROM size of 240 MB. (user-8b3c, 2019-07-17, exchange 2591, check: supported)</li>
+<li id="s14">The N64 has 4 KB of texture memory, often split into 2 KB for texture and 2 KB for palette. (user-8b3c, 2019-09-22, exchange 227119, check: supported)</li>
+<li id="s15">The N64 uses RSP encoded data for display lists (DL) which are flushed to the RSP every frame as a GFX task; a PC port could emulate RSP code but a true native port would replace models with OpenGL equivalents. (user-cdae, 2019-06-29, exchange 67304, check: uncheckable)</li>
+<li id="s16">The N64 has an RSP similar in concept to the CRM graphics of the O2. (user-8b3c, 2019-07-17, exchange 2591, check: supported)</li>
+<li id="s17">MIPS assembly is beautiful and used in N64 development. (user-8b3c, 2020-02-04, exchange 6016, check: uncheckable)</li>
+<li id="s18">Most games in the era of the N64 were written in C, with assembly still very common and C++ rarely used due to overhead and limited memory. (user-6afa, 2020-08-24, exchange 97437, check: uncheckable)</li>
+<li id="s19">Several developers have created their own SDK/OS for the N64 using C. (user-8b3c, 2019-07-18, exchange 125942, check: uncheckable)</li>
+<li id="s20">Coding an OS for the N64 might be easier than porting one. (user-59fe, 2019-07-18, exchange 125942, check: uncheckable)</li>
+<li id="s21">Non-game software on the N64 is specialized; it has good specs for Win 3.1 but not Win95. (user-8b3c, 2019-07-18, exchange 125942, check: supported)</li>
+<li id="s22">Running Linux on N64 is impractical due to limited RAM and lack of necessary peripherals; even a busybox shell would be slow, and a full distro is out of the question. (user-db13, 2019-07-19, exchange 125947, check: uncheckable)</li>
+<li id="s23">IRIX would be very difficult to run on the N64 without source code and a significant amount of memory. (user-ea8d, 2019-07-17, exchange 2595, check: uncheckable)</li>
+<li id="s24">Trying to get IRIX working on the N64 is not practical without source code and would require a substantial amount of time. (user-59fe, 2019-07-17, exchange 2595, check: uncheckable)</li>
+<li id="s25">There's a custom command-based OS written in Assembly that might work on the N64, requiring less than a megabyte of RAM to boot. (user-59fe, 2019-07-17, exchange 2598, check: uncheckable)</li>
+<li id="s26">The N64 development SDK was designed for SGI workstations, including the Indy, Onyx, and O2, due to their similar architectures. (user-8b3c, 2020-10-04, exchange 227168, check: supported)</li>
+<li id="s27">Nintendo PARTNER-N64 was a development kit for SGI Workstations that connected to a special N64 via SCSI for game development. (user-d41d, 2023-04-04, exchange 208521, check: uncheckable)</li>
+<li id="s28">IRIX does not run on your N64 (user-b7c4, 2020-09-11, exchange 92605, check: uncheckable)</li>
+<li id="s29">IRISGL is an OpenGL implementation for SGI machines; it can run N64 software with modifications. (user-cade, 2020-11-23, exchange 12364, check: uncheckable)</li>
+<li id="s30">The RCP in the N64 runs a MIPS R4k series core and uses SGI UMA. (user-5510, 2023-03-16, exchange 36704, check: supported)</li>
+<li id="s31">N64 was a scaled-down InfiniteReality. (user-baf6, 2023-06-09, exchange 208829, check: uncheckable)</li>
+<li id="s32">The n64 had a 4k texture cache and likely did not support multitexturing. (user-6afa, 2020-10-06, exchange 69086, check: supported)</li>
+<li id="s33">A stock N64 has 4 MB of texture RAM, which is its total RAM capacity. (user-baf6, 2023-05-18, exchange 38080, check: supported)</li>
+<li id="s34">The N64's CPU has no DMA, because the RCP has to do it. (user-baf6, 2022-10-13, exchange 207803, check: uncheckable)</li>
+<li id="s35">The RDP in the N64 has complex calls that require learning. (user-5510, 2023-03-16, exchange 36704, check: uncheckable)</li>
+<li id="s36">The N64 doesn't have sprites in the conventional sense; even HUD elements are just a pair of polygons with a texture on 'em. (user-baf6, 2022-10-13, exchange 207803, check: uncheckable)</li>
+<li id="s37">The N64 outputs only S-Video and composite, so a passive adapter is needed for component input. (user-1361, 2021-03-30, exchange 16026, check: uncheckable)</li>
+<li id="s38">The N64's video output is not ideal but can be managed with the right hardware. (user-1446, 2021-03-30, exchange 16025, check: uncheckable)</li>
+<li id="s39">N64s are prone to freezing if the cartridge connection loses contact for even a second. (user-22f9, 2020-12-01, exchange 12569, check: uncheckable)</li>
+<li id="s40">The N64 can survive being mishandled and remains functional. (user-1361, 2021-07-26, exchange 205300, check: uncheckable)</li>
+<li id="s41">N64 is a low-end MIPS system with Onyx graphics features, slower than many SGI systems, and had hardware textures that some SGI systems lacked. (user-1a5a, 2024-11-16, exchange 85910, check: supported)</li>
+<li id="s42">N64 had some unique graphics features but was much slower than many SGI systems. (user-24f0, 2024-11-16, exchange 85910, check: uncheckable)</li>
+<li id="s43">SGI used RDRAM and licensed N64 technology. (user-17cb, 2025-05-05, exchange 225020, check: uncheckable)</li>
+<li id="s44">The N64's graphics architecture, or one of its architects, influenced SGI's design philosophy. (user-4f7c, 2026-08-02, exchange 94625, check: uncheckable)</li>
+<li id="s45">The N64 shipped significantly more units than SGI's computer systems over their history. (user-2a3c, 2025-06-17, exchange 117361, check: uncheckable)</li>
+<li id="s46">N64 binaries are statically linked only, the LGPLv2 exception is dynamic linking only (user-6c80, 2024-08-29, exchange 210898, check: uncheckable)</li>
+<li id="s47">MIPSpro does not support N64 and produces invalid code for older CPU steppings. (user-22f9, 2025-03-18, exchange 224751, check: uncheckable)</li>
+<li id="s48">The N64 can experience a 'power on, no video or audio' issue that persists despite cleaning and更换AV线缆并未解决问题，主板看起来非常干净，没有明显的焊点或电容器腐蚀。 (user-baf6, 2024-01-16, exchange 191710, check: uncheckable)</li>
+<li id="s49">The N64's RDRAM can be finicky, especially with texture RAM. (user-baf6, 2024-01-16, exchange 241773, check: uncheckable)</li>
+<li id="s50">Troubleshooting the N64 may involve contact cleaning or repairing corroded traces near the CPU or RCP. (user-baf6, 2024-01-16, exchange 241773, check: uncheckable)</li>
+<li id="s51">Some N64 models converted from quads to triangles for performance can misalign textures, leading to visual issues like stretched or broken textures, especially on full quad textures such as pillars in Pokémon Stadium. (user-45c8, 2025-06-24, exchange 72457, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="n64-board.html">N64 board</a> (5)
+</li>
+<li><a href="n64-controller.html">N64 controller</a> (4)
+</li>
+<li><a href="n64-demo.html">n64 demo</a> (5)
+</li>
+<li><a href="n64-dev-board.html">N64 Dev board</a> (4)
+</li>
+<li><a href="n64-development.html">N64 development</a> (6)
+</li>
+<li><a href="n64-devkit.html">N64 devkit</a> (6)
+</li>
+<li><a href="n64-game.html">N64 game</a> (13)
+</li>
+<li><a href="n64-sdk.html">N64 SDK</a> (9)
+</li>
+<li><a href="n64-simulator.html">N64 simulator</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="indy.html">Indy</a>, <a href="tezro.html">Tezro</a>, <a href="fuel.html">Fuel</a>, <a href="onyx.html">Onyx</a>, <a href="ps1.html">PS1</a>, <a href="psp.html">PSP</a>, <a href="snes.html">SNES</a>, <a href="32x.html">32X</a>, <a href="atari-800.html">Atari 800</a>, <a href="fpu.html">FPU</a>, <a href="iris.html">IRIS</a>, <a href="octane.html">Octane</a>, <a href="r12000-cpu.html">R12000 CPU</a>, <a href="ultra64.html">Ultra64</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>, <a href="mips-assembly.html">MIPS assembly</a>, <a href="indy-r5k.html">Indy R5K</a>, <a href="mips-cpu.html">MIPS CPU</a>, <a href="mips-chip.html">MIPS chip</a>, <a href="r12000.html">R12000</a>, <a href="r4400.html">R4400</a>, <a href="r4k-cpu.html">R4K CPU</a>, <a href="r8000.html">R8000</a>
+</li>
+<li>Graphics: <a href="infinitereality.html">InfiniteReality</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="n32.html">n32</a>, <a href="gentoo.html">Gentoo</a>, <a href="netbsd.html">NetBSD</a>, <a href="os.html">OS</a>, <a href="windows.html">Windows</a>, <a href="windows-10.html">Windows 10</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="mipspro.html">MIPSpro</a>, <a href="saturn.html">Saturn</a>, <a href="c-2.html">C</a>, <a href="c.html">C++</a>, <a href="iris-gl.html">IRIS GL</a>, <a href="jit.html">JIT</a>, <a href="mame.html">MAME</a>, <a href="opengl.html">OpenGL</a>, <a href="poweranimator.html">PowerAnimator</a>, <a href="rse-gcc.html">RSE GCC</a>, <a href="amdgpu.html">amdgpu</a>, <a href="compiler.html">compiler</a>, <a href="emulation.html">emulation</a>, <a href="emulator.html">emulator</a>, <a href="ioquake3.html">ioquake3</a>, <a href="x86-emulator.html">x86 emulator</a>
+</li>
+<li>Parts and peripherals: <a href="rdram.html">RDRAM</a>, <a href="u64-board.html">U64 board</a>, <a href="chipset.html">chipset</a>, <a href="dev-board.html">dev board</a>, <a href="keyboard.html">keyboard</a>, <a href="texture-ram.html">texture RAM</a>
+</li>
+<li>Standards and interfaces: <a href="rsp.html">RSP</a>, <a href="rcp.html">RCP</a>, <a href="rdp.html">RDP</a>, <a href="s-video.html">S-Video</a>, <a href="scsi.html">SCSI</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sony-news.html">Sony NEWS</a>
+</li>
+<li>Other: <a href="documents.html">documents</a>, <a href="8-mb.html">8 MB</a>, <a href="gamecube.html">GameCube</a>, <a href="genesis.html">Genesis</a>, <a href="nes.html">NES</a>, <a href="nintendo.html">Nintendo</a>, <a href="r300.html">R300</a>, <a href="readme.html">README</a>, <a href="traces.html">Traces</a>, <a href="uma.html">UMA</a>, <a href="assembly.html">assembly</a>, <a href="composite.html">composite</a>, <a href="ique.html">iQue</a>, <a href="textures.html">textures</a>
+</li></ul>
+</body>
+</html>

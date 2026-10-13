@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>installer</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>installer</h1>
+<p>Claims: 33</p>
+<p>The SGI IRIX installer (INST) handles base and overlay packages with dependencies, uses a different miniroot kernel for each supported platform, and is a flat file with concatenated segments consisting of the files and binaries. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The installer has an option to drop into the shell, where commands such as mkfs or mkfs_xfs can be run on a disk. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The installer should take care of the volume header automatically, as long as it is present on the partition map. <sup><a href="#s5">5</a></sup> The installer can be run in X mode, but a second dtterm can be used to label disks before the installer fails, and the install can also be done in text mode using a serial console when XVR-1200 is unavailable. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The installer has a hardcoded NIC list that is not patched, and different installer versions support specific hardware configurations. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The IRIX 6.5.22 installer includes exit commands and is chosen for its text rendering system compatibility with older software like Photoshop, while the IRIX 6.5.30 installer can be patched to skip the platform check, though missing platform-specific miniroots cause issues. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> You can download IRIX distribution files for the LOVE installer from the provided link, but the installer crashes with a love error when requesting a label or file using a tftp client from a Linux workstation. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IRIX installer (INST) handles base and overlay packages with dependencies. (user-f229, 2020-11-16, exchange 77290, check: uncheckable)</li>
+<li id="s2">The installer has an option to drop into shell, uses a different miniroot kernel for each supported platform, is a flat file with concatenated segments consisting of the files and binaries. (user-b4f4, 2021-05-22, exchange 79362, check: uncheckable)</li>
+<li id="s3">Once you load into the installer, you can drop out to the shell and run mkfs. (user-d903, 2020-12-03, exchange 78838, check: uncheckable)</li>
+<li id="s4">when you get into the installer, get a shell and do `mkfs_xfs /dev/dsk/dks0d1s0` (user-9528, 2025-12-14, exchange 60882, check: supported)</li>
+<li id="s5">The installer should take care of the volume header (as long as it's there on the partition map) automatically. (user-95db, 2021-10-01, exchange 100284, check: uncheckable)</li>
+<li id="s6">The installer can be run in X mode, but a second dtterm can be used to label disks before the installer chokes. (user-7b1c, 2022-05-20, exchange 182048, check: uncheckable)</li>
+<li id="s7">The install can be done in text mode using a serial console when XVR-1200 is unavailable. (user-baf6, 2022-05-20, exchange 182048, check: supported)</li>
+<li id="s8">The installer has a hardcoded NIC list that isn't patched. (user-e872, 2024-05-24, exchange 111382, check: uncheckable)</li>
+<li id="s9">Different installer versions support specific hardware configurations. (user-1a5a, 2026-07-20, exchange 219864, check: uncheckable)</li>
+<li id="s10">The SGI IRIX 6.5.22 installer includes exit commands and is chosen for its text rendering system compatibility with older software like Photoshop. (user-848e, 2020-02-18, exchange 6431, check: supported)</li>
+<li id="s11">The IRIX 6.5.30 installer can be patched to skip platform check, but missing platform-specific miniroots cause issues. (user-b4f4, 2021-05-22, exchange 79364, check: supported)</li>
+<li id="s12">You can download IRIX distribution files for the LOVE installer from the provided link. (user-281e, 2023-11-24, exchange 209622, check: uncheckable)</li>
+<li id="s13">The installer crashes with a love error when requesting a label/file using a tftp client from a Linux workstation. (user-7973, 2025-10-25, exchange 77800, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="solaris.html">Solaris</a>, <a href="irix.html">IRIX</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="nt4.html">NT4</a>, <a href="vm.html">VM</a>, <a href="miniroot-kernel.html">miniroot kernel</a>
+</li>
+<li>Software: <a href="shell.html">shell</a>, <a href="bios.html">BIOS</a>, <a href="esxi.html">ESXi</a>, <a href="love.html">LOVE</a>, <a href="nekoware-packages.html">Nekoware packages</a>, <a href="photoshop.html">Photoshop</a>, <a href="softimage-3-7.html">Softimage 3.7</a>, <a href="console.html">console</a>, <a href="fx.html">fx</a>, <a href="inst.html">inst</a>, <a href="mkfs.html">mkfs</a>, <a href="root.html">root</a>, <a href="sash.html">sash</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="ram.html">RAM</a>, <a href="drive.html">drive</a>, <a href="serial-console.html">serial console</a>
+</li>
+<li>Other: <a href="fat-partition.html">FAT partition</a>, <a href="mbp.html">MBP</a>, <a href="pram.html">PRAM</a>, <a href="purify.html">Purify</a>, <a href="warp-3.html">Warp 3</a>, <a href="xsi.html">XSI</a>, <a href="admin-menu.html">admin menu</a>, <a href="dtterm.html">dtterm</a>, <a href="platform.html">platform</a>, <a href="text-mode.html">text mode</a>, <a href="text-rendering.html">text rendering</a>
+</li></ul>
+</body>
+</html>

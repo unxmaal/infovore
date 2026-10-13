@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clock</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>clock</h1>
+<p>Claims: 6</p>
+<p>The clock is line powered and requires a ROM SIMM for the chime and startup process involving PRAM and clock. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The machine resets the clock to year 2000 when powered off after ~24 hours of running. <sup><a href="#s3">3</a></sup> The RAMDAC address was strobed by the clock, making debugging difficult. <sup><a href="#s4">4</a></sup> Emulating the clock is necessary but the system won't refuse to boot if the clock isn't emulated. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The clock is line powered. (user-07ed, 2024-10-21, exchange 193230, check: uncheckable)</li>
+<li id="s2">A ROM SIMM is required for chime and startup process involving PRAM and clock. (user-8de9, 2025-02-21, exchange 232514, check: uncheckable)</li>
+<li id="s3">The machine resets the clock to year 2000 when powered off after ~24 hours of running. (user-42a9, 2025-03-06, exchange 115138, check: supported)</li>
+<li id="s4">The RAMDAC address was strobed by the clock, making debugging difficult. (user-07ed, 2025-04-04, exchange 238825, check: uncheckable)</li>
+<li id="s5">Emulating the clock is necessary but the system won't refuse to boot if the clock isn't emulated. (user-d251, 2026-07-29, exchange 94526, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="clock-chip.html">clock chip</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Parts and peripherals: <a href="rom-simm.html">ROM SIMM</a>
+</li>
+<li>Other: <a href="b1000.html">B1000</a>, <a href="pram.html">PRAM</a>, <a href="ramdac.html">RAMDAC</a>
+</li></ul>
+</body>
+</html>

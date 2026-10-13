@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>caps</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>caps</h1>
+<p>Claims: 12</p>
+<p>G5 systems can suffer from tin migration and lead-free thermal issues, especially with caps. <sup><a href="#s1">1</a></sup> The 4 10000uF caps on the 5V rail of the bus bar leak, and the personal IRIS PSU has a common failure where the caps on the 5V rail leak, though some still work. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Caps like this sometimes fail due to repeated thermal stress, causing material failure; they are optional, especially on chips that stabilize voltage. <sup><a href="#s4">4</a></sup> Corrosion from bad caps can be difficult to remove, especially in high-density boards, but most boards can be restored. <sup><a href="#s5">5</a></sup> Replacement caps need low ESR, especially in high current output filter circuits, and replacing bad caps with low ESR variants of Wurth, Rubycon, or Kemet can help stabilize the PSU. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">G5 systems can suffer from tin migration and lead-free thermal issues, especially with caps. (user-2d40, 2020-02-05, exchange 6054, check: uncheckable)</li>
+<li id="s2">The 4 10000uF caps on the 5V rail of the bus bar leak. (user-56d4, 2023-10-14, exchange 223433, check: supported)</li>
+<li id="s3">The personal IRIS PSU has a common failure where the caps on the 5V rail leak, though some still work. (user-56d4, 2024-06-15, exchange 46975, check: supported)</li>
+<li id="s4">Caps like this sometimes fail due to repeated thermal stress, causing material failure; they are optional, especially on chips that stabilize voltage. (user-3e2d, 2025-12-28, exchange 190057, check: uncheckable)</li>
+<li id="s5">Corrosion from bad caps can be difficult to remove, especially in high-density boards, but most boards can be restored. (user-a079, 2022-10-05, exchange 222565, check: uncheckable)</li>
+<li id="s6">Replacing bad caps with low ESR variants of Wurth, Rubycon, or Kemet can help stabilize the PSU. (user-616d, 2025-07-16, exchange 225254, check: uncheckable)</li>
+<li id="s7">Replacement caps need low ESR, especially in high current output filter circuits; slightly larger capacity is fine but much larger might cause inrush current issues. (user-86e1, 2026-06-17, exchange 226582, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="caps-lock.html">caps lock</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="g5.html">G5</a>, <a href="iigs.html">IIgs</a>
+</li>
+<li>Parts and peripherals: <a href="5v-rail.html">5V rail</a>, <a href="pram-battery.html">PRAM battery</a>, <a href="psu.html">PSU</a>, <a href="battery.html">battery</a>
+</li>
+<li>Other: <a href="esr.html">ESR</a>, <a href="mosfet.html">MOSFET</a>, <a href="corrosion.html">corrosion</a>, <a href="inrush-current.html">inrush current</a>
+</li></ul>
+</body>
+</html>

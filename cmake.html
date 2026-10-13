@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CMake</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CMake</h1>
+<p>Claims: 28 Background: 11 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/CMake">CMake</a>.</p>
+<p>CMake is a build system used to configure and build projects, with typical commands being `mkdir build &amp;&amp; cd build`, `cmake ../`, and `make`. <sup><a href="#s1">1</a></sup> It is useful for cross-platform builds, working on all platforms, though its design is considered inelegant and awkward. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> CMake can be used to specify not to use system libraries like libpng, and to add linker options via TARGET_LINK_LIBRARIES. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It can be used with MIPSPro, and certain flags like `-fpermissive` may need to be passed through the `CMAKE_C_FLAGS` variable. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> CMake is available on IRIX and included in RSE, but it thinks it's Linux, which can cause issues. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> It has IRIX support for its Linux version but not for macOS, and it is not available on SGUG or another repo. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Building projects with CMake may require a high version, such as above 3.14 for ioquake3, which is not supported by IRIX. <sup><a href="#s14">14</a></sup> Some builds require dependencies like libuv, which may not be available on vintage systems, and cmake itself may need to be installed first. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">cmake is used to configure and build projects; typical commands are `mkdir build &amp;&amp; cd build`, `cmake ../`, and `make`. (user-e872, 2022-01-15, exchange 145671, check: supported)</li>
+<li id="s2">CMake can be complex but is useful for cross-platform builds. (user-42cf, 2019-07-11, exchange 67428, check: uncheckable)</li>
+<li id="s3">CMake is an inelegant, awkward build system that works on all platforms but is not the worst choice for writing build files that need to work everywhere. (user-21b8, 2020-06-14, exchange 9040, check: uncheckable)</li>
+<li id="s4">The design of CMake is considered inelegant due to its need to know details about the build, while Make provides a simpler mechanism for building based on dependencies and commands. (user-21b8, 2025-01-22, exchange 71870, check: uncheckable)</li>
+<li id="s5">TARGET_LINK_LIBRARIES(libname) is used to add linker options in CMake. (user-8547, 2019-01-22, exchange 176, check: uncheckable)</li>
+<li id="s6">CMake can be used to specify not to use system libraries like libpng. (user-42cf, 2019-07-11, exchange 67428, check: uncheckable)</li>
+<li id="s7">CMake may not allow certain flags like `-fpermissive`, requiring them to be passed through the `CMAKE_C_FLAGS` variable. (user-5510, 2022-12-15, exchange 183357, check: supported)</li>
+<li id="s8">CMake can be used with MIPSPro. (user-22f9, 2025-02-25, exchange 72011, check: uncheckable)</li>
+<li id="s9">CMake could be made to work with MIPSpro, which might change opinions on it. (user-22f9, 2025-04-08, exchange 72178, check: uncheckable)</li>
+<li id="s10">cmake is available on IRIX and included in RSE. (user-2189, 2020-09-16, exchange 215057, check: uncheckable)</li>
+<li id="s11">CMake on IRIX thinks it's Linux, causing potential issues, but can be worked around. (user-9860, 2022-02-04, exchange 80876, check: uncheckable)</li>
+<li id="s12">CMake has IRIX support for its Linux version, but not for macOS. (user-ff99, 2022-02-04, exchange 80877, check: uncheckable)</li>
+<li id="s13">CMake is not available on SGUG or another repo. (user-281e, 2025-09-11, exchange 72721, check: uncheckable)</li>
+<li id="s14">Building ioquake3 requires a high CMake version, likely above 3.14, which is not supported by IRIX. (user-8547, 2019-08-08, exchange 214820, check: supported)</li>
+<li id="s15">meson and ninja are build systems used by glib2, requiring scikit-build which depends on cmake, which in turn needs a working libuv, which requires actual IRIX code. (user-42cf, 2019-02-13, exchange 67057, check: uncheckable)</li>
+<li id="s16">Postgres requires a specific version of CMake, which in turn requires an asynchronous I/O library called libuv, but no port exists for it on this vintage system. (user-42cf, 2019-07-08, exchange 67364, check: uncheckable)</li>
+<li id="s17">cmake needs to be installed first. (user-2189, 2020-06-28, exchange 68835, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="brl-cad.html">BRL-CAD</a>, <a href="mipspro.html">MIPSpro</a>, <a href="rse.html">RSE</a>, <a href="x-library.html">X library</a>, <a href="freeglut.html">freeglut</a>, <a href="ioquake3.html">ioquake3</a>, <a href="make.html">make</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="ninja.html">Ninja</a>, <a href="xrender.html">Xrender</a>, <a href="libexslt.html">libexslt</a>, <a href="user-f229.html">user-f229</a>
+</li></ul>
+</body>
+</html>

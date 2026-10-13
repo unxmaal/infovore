@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PATH</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PATH</h1>
+<p>Claims: 24 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash (Unix shell)</a>.</p>
+<p>Environment variables like PATH are part of the shell. <sup><a href="#s1">1</a></sup> PATH can be set in csh using 'setenv PATH /whatever/path' and in bash using 'export PATH=/whatever/path'. <sup><a href="#s2">2</a></sup> PATH can be set in .profile, .bashrc, or .cshrc, and the current shell session should be modified to test the change. <sup><a href="#s3">3</a></sup> Some shells have a rehash command that affects PATH and may take measurable time to execute. <sup><a href="#s4">4</a></sup> Adding PATH=${PATH}:/opt/bin in the user's .login file can result in /opt/bin being added twice if the PATH variable is already set, leading to duplication in the final PATH. <sup><a href="#s5">5</a></sup> Adding paths universally can cause issues with internal startup scripts, and root's shell should not have funky replacements for standard system utils in its PATH to avoid flummoxing init scripts. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">environment variables like PATH are part of the shell. (user-8547, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s2">setting PATH in csh uses 'setenv PATH /whatever/path' and in bash uses 'export PATH=/whatever/path'. (user-8547, 2019-07-14, exchange 2493, check: uncheckable)</li>
+<li id="s3">Check .profile, .bashrc, or .cshrc to set PATH, and modify the current shell session to test the change. (user-21b8, 2024-08-15, exchange 215548, check: uncheckable)</li>
+<li id="s4">Some shells have a `rehash` command that affects PATH and may take measurable time to execute. (user-7b1c, 2023-02-27, exchange 208389, check: supported)</li>
+<li id="s5">Adding PATH=${PATH}:/opt/bin in the user's .login file can result in /opt/bin being added twice if the PATH variable is already set, leading to duplication in the final PATH. (user-2a3c, 2025-10-21, exchange 219197, check: uncheckable)</li>
+<li id="s6">Adding paths universally can cause issues with internal startup scripts. (user-e872, 2021-05-17, exchange 217131, check: uncheckable)</li>
+<li id="s7">Root's shell should not have funky replacements for standard system utils in its PATH to avoid flummoxing init scripts. (user-7b1c, 2022-11-08, exchange 217771, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-2.html">IRIX 6.2</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>, <a href="shell.html">shell</a>, <a href="bashrc.html">.bashrc</a>, <a href="java.html">Java</a>, <a href="maya.html">Maya</a>, <a href="prman-3-9.html">Prman 3.9</a>, <a href="cc.html">cc</a>, <a href="csh.html">csh</a>, <a href="environment-variables.html">environment variables</a>, <a href="ifconfig.html">ifconfig</a>, <a href="library.html">library</a>, <a href="root-s-shell.html">root's shell</a>, <a href="sgug-rse.html">sgug-rse</a>
+</li>
+<li>Parts and peripherals: <a href="vfo.html">VFO</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="profile.html">.profile</a>, <a href="macports.html">MacPorts</a>, <a href="cshrc.html">.cshrc</a>, <a href="label.html">label</a>, <a href="tmux.html">tmux</a>, <a href="zsh.html">zsh</a>
+</li></ul>
+</body>
+</html>

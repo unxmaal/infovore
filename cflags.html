@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CFLAGS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CFLAGS</h1>
+<p>Claims: 4</p>
+<p>CFLAGS is the variable used to hold compiler flags, while CC is used for the compiler and LDFLAGS for linker flags. <sup><a href="#s1">1</a></sup> Cflags relate to how software packages are compiled, and one should set specific Cflags for the extensions relevant to one's CPU. <sup><a href="#s2">2</a></sup> To address an endian issue, one can add `-D__BIG_ENDIAN__=1` to CFLAGS in the Makefile, rebuild, and observe the result; if the problem persists, actual fixes are needed. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">use CC for the compiler and CFLAGS for compiler flags, LDFLAGS for linker flags. (user-21b8, 2024-08-16, exchange 71517, check: uncheckable)</li>
+<li id="s2">Cflags relate to how software packages are compiled, and one should set specific Cflags for the extensions relevant to one's CPU. (user-22f9, 2024-11-20, exchange 50611, check: uncheckable)</li>
+<li id="s3">To address an endian issue, add `-D__BIG_ENDIAN__=1` to `CFLAGS` in the Makefile, rebuild, and observe the result; if the problem persists, actual fixes are needed. (user-42cf, 2021-06-28, exchange 69699, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="glut.html">GLUT</a>, <a href="makefile.html">Makefile</a>, <a href="cc.html">cc</a>
+</li>
+<li>Other: <a href="ldflags.html">LDFLAGS</a>
+</li></ul>
+</body>
+</html>

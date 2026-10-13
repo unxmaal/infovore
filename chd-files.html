@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHD files</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CHD files</h1>
+<p>Claims: 6 Part of <a href="chd.html">CHD</a></p>
+<p>CHD files are like HDF files of a working IRIX install. <sup><a href="#s1">1</a></sup> An OS that can read the SGI partition map and mount the efs partitions is needed to access .chd files. <sup><a href="#s2">2</a></sup> CHD files contain a filesystem that can be extracted using chdman; the extracted files can be burned or used with tools like efs2tar. <sup><a href="#s3">3</a></sup> `chdman info -i &lt;filename.chd&gt;` gives the SHA hash for a CHD file, which is in the softlist. <sup><a href="#s4">4</a></sup> Using `mame64 &lt;system&gt; &lt;softwarelist entry&gt;` works for MAME; CHD files need to be obtained from somewhere first. <sup><a href="#s5">5</a></sup> There are places to get CHD files for different IRIX versions and bios files, and I have them on my FTP server. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">CHD files are like HDF files of a working IRIX install. (user-22f9, 2020-07-14, exchange 9581, check: uncheckable)</li>
+<li id="s2">An OS that can read the SGI partition map and mount the efs partitions is needed to access .chd files. (user-d903, 2020-07-14, exchange 9589, check: uncheckable)</li>
+<li id="s3">chd files contain a filesystem that can be extracted using chdman; the extracted files can be burned or used with tools like efs2tar (user-3663, 2020-09-03, exchange 220162, check: uncheckable)</li>
+<li id="s4">`chdman info -i &lt;filename.chd&gt;` gives the SHA hash for a CHD file, which is in the softlist. (user-3663, 2020-06-30, exchange 220153, check: supported)</li>
+<li id="s5">Using `mame64 &lt;system&gt; &lt;softwarelist entry&gt;` works for MAME; CHD files need to be obtained from somewhere first. (user-3663, 2020-06-30, exchange 220153, check: supported)</li>
+<li id="s6">There are places to get CHD files for different IRIX versions and bios files, and I have them on my FTP server. (user-d903, 2020-07-12, exchange 9560, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="os.html">OS</a>
+</li>
+<li>Software: <a href="efs-partition.html">EFS partition</a>, <a href="mame.html">MAME</a>, <a href="efs2tar.html">efs2tar</a>
+</li>
+<li>Other: <a href="chdman.html">chdman</a>
+</li></ul>
+</body>
+</html>

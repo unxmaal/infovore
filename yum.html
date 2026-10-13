@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>yum</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>yum</h1>
+<p>Claims: 6</p>
+<p>yum and rpm are considered notorious bloatware, even on early Linux, and rpm was not a very good solution, though it is better than having a source port system. <sup><a href="#s1">1</a></sup> rpm does not have out-of-box auto dependency management and relies on external tools like yum for dependency resolution. <sup><a href="#s2">2</a></sup> DNF, or Dandified yum, is the next generation version of yum, roughly maintaining CLI compatibility with yum and defining a strict API for extensions and plugins. <sup><a href="#s3">3</a></sup> DNF has larger dependencies than yum, including bash and python3-dnf, and requires additional python packages that have not been ported yet. <sup><a href="#s4">4</a></sup> RSE has additional packages installable from the yum cloud, requiring about 4 commands to set up. <sup><a href="#s5">5</a></sup> SGUG does not have yum or the new package manager. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The big issue I see is that yum and rpm, even in their modern form, are notorious bloatware, even on early Linux, and people hated rpm; it was not a very good solution, but it's better than having a source port system, (user-c831, 2020-01-09, exchange 5378, check: uncheckable)</li>
+<li id="s2">rpm does not have out-of-box auto dependency management; it relies on external tools like yum for dependency resolution. (user-2d09, 2020-03-12, exchange 214948, check: uncheckable)</li>
+<li id="s3">DNF or Dandified yum is the next generation version of yum. It roughly maintains CLI compatibility with yum and defines a strict API for extensions and plugins. (user-f229, 2020-10-26, exchange 11782, check: uncheckable)</li>
+<li id="s4">dnf has larger dependencies than yum, including bash and python3-dnf, and requires additional python packages that haven't been ported yet. (user-2189, 2020-07-26, exchange 10063, check: uncheckable)</li>
+<li id="s5">RSE has additional packages installable from the yum cloud, requiring about 4 commands to set up. (user-f229, 2021-11-14, exchange 80093, check: supported)</li>
+<li id="s6">We don't have yum or the new package manager on SGUG yet. (user-e872, 2020-10-26, exchange 11781, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="rpm.html">RPM</a>, <a href="dnf.html">dnf</a>, <a href="rse.html">RSE</a>, <a href="bash.html">bash</a>
+</li>
+<li>Companies: <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="extension.html">extension</a>, <a href="plugin.html">plugin</a>
+</li></ul>
+</body>
+</html>

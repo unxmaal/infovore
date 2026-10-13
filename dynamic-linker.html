@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dynamic linker</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>dynamic linker</h1>
+<p>Claims: 3</p>
+<p>The dynamic linker, such as rld on IRIX and ld.so on Unix systems, determines where programs run and manages shared libraries during runtime. <sup><a href="#s1">1</a></sup> It re-links executables on the fly based on hints left by the original linker. <sup><a href="#s2">2</a></sup> Issues with the dynamic linker or missing debugging symbols can cause miniperl to hang at high CPU usage with stable memory. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The dynamic linker, `rld` on IRIX, and `ld.so` on Unix systems, determines where programs run and manage shared libraries during runtime. (user-42cf, 2021-05-22, exchange 17501, check: supported)</li>
+<li id="s2">The dynamic linker re-links executables on the fly based on hints left by the original linker. (user-42cf, 2021-06-09, exchange 17822, check: uncheckable)</li>
+<li id="s3">miniperl hangs at high CPU usage with stable memory, likely due to issues with dynamic linker or missing debugging symbols. (user-3e3c, 2021-02-28, exchange 15064, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="rld.html">rld</a>
+</li></ul>
+</body>
+</html>

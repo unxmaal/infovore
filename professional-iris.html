@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Professional IRIS</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Professional IRIS</h1>
+<p>Claims: 40</p>
+<p>The Professional IRIS is a tower-based computer that came in both single-tower and twin-tower configurations, using VME as its system bus. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It was the only SGI machine placed in a single-tower case, and a single-tower Professional IRIS must be a factory configuration if it uses VME. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The Professional IRIS has a yellow chromate chassis, while the PowerOne PSU of the single-tower PowerSeries is chrome-plated steel. <sup><a href="#s5">5</a></sup> It has a 1000W PSU that draws 450W from the wall, indicating a substantial power budget for a 12-slot backplane. <sup><a href="#s6">6</a></sup> The Professional IRIS has a built-in SCSI controller and offers ESDI as an additional VME board, and it supports SMD and IPI disks. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> It uses VME as its system bus, and jumpers on the backplane configure the VME bus, with incorrect settings rendering the system non-functional. <sup><a href="#s2">2</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The VME ethernet card on the Professional IRIS is referred to as 'fxp' in the driver. <sup><a href="#s11">11</a></sup> The kernel configuration for the Professional IRIS from IRIX 4.0.5 lists supported hardware drivers. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The professional Iris could be considered a tower. (user-22f9, 2020-05-08, exchange 8195, check: uncheckable)</li>
+<li id="s2">PowerSeries uses a proprietary bus (PowerPath) and has some VME slots for expansion cards; Professional IRIS is completely VME based. (user-86e1, 2023-04-20, exchange 222994, check: uncheckable)</li>
+<li id="s3">A single tower Professional IRIS must be a factory configuration if it uses VME. (user-03ad, 2024-05-27, exchange 189127, check: uncheckable)</li>
+<li id="s4">The Professional IRIS was the only one they put in a single tower case. (user-56d4, 2025-01-15, exchange 189426, check: uncheckable)</li>
+<li id="s5">The Professional IRIS has a yellow chromate chassis, while the PowerOne PSU of the single tower PowerSeries is chrome plated steel. (user-86e1, 2026-03-20, exchange 241437, check: uncheckable)</li>
+<li id="s6">The Professional IRIS has a 1000W PSU that draws 450W from the wall, indicating a substantial power budget for a 12-slot backplane. (user-86e1, 2025-11-10, exchange 243423, check: supported)</li>
+<li id="s7">Professional IRIS has a built-in SCSI controller and offers ESDI as an additional VME board; ESDI was more developed and cheaper in early days. (user-cdcd, 2022-07-14, exchange 222361, check: uncheckable)</li>
+<li id="s8">Professional IRIS supports SMD and IPI disks. (user-cdcd, 2022-07-14, exchange 222361, check: uncheckable)</li>
+<li id="s9">Professional IRIS uses VME as system bus; PowerSeries / Crimson use PowerPath but have VME compatibility through a bridge. (user-86e1, 2024-05-27, exchange 189127, check: supported)</li>
+<li id="s10">Jumpers on the backplane configure the VME bus, which is the system bus on Professional IRIS systems; incorrect settings render the system non-functional. (user-86e1, 2025-08-11, exchange 241385, check: uncheckable)</li>
+<li id="s11">The VME ethernet card on the professional IRIS is referred to as 'fxp' in the driver. (user-86e1, 2023-10-06, exchange 109037, check: uncheckable)</li>
+<li id="s12">The kernel configuration for Professional IRIS from IRIX 4.0.5 lists supported hardware drivers. (user-cdcd, 2022-07-14, exchange 222361, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="powerseries.html">PowerSeries</a>, <a href="indigo.html">Indigo</a>, <a href="4d-70-gt.html">4D/70 GT</a>, <a href="crimson.html">Crimson</a>, <a href="4d.html">4D</a>, <a href="iris.html">IRIS</a>, <a href="pi-25.html">PI 25</a>
+</li>
+<li>Processors: <a href="68k-iris.html">68k IRIS</a>, <a href="r2000.html">R2000</a>
+</li>
+<li>Operating systems: <a href="irix-4-0-5.html">IRIX 4.0.5</a>, <a href="irix-2-x.html">IRIX 2.x</a>, <a href="irix-3-2.html">IRIX 3.2</a>, <a href="irix-4-x.html">IRIX 4.x</a>
+</li>
+<li>Software: <a href="hardware-drivers.html">hardware drivers</a>
+</li>
+<li>Parts and peripherals: <a href="powerseries-chassis.html">PowerSeries chassis</a>, <a href="psu.html">PSU</a>, <a href="powerone-psu.html">PowerOne PSU</a>, <a href="scsi-controller.html">SCSI controller</a>
+</li>
+<li>Standards and interfaces: <a href="vme-bus.html">VME bus</a>, <a href="scsi.html">SCSI</a>, <a href="scsi-error.html">SCSI error</a>, <a href="vme.html">VME</a>, <a href="vme-slot.html">VME slot</a>, <a href="networking.html">networking</a>
+</li>
+<li>Other: <a href="4d1-2-0.html">4d1-2.0</a>, <a href="clover1.html">Clover1</a>, <a href="clover2.html">Clover2</a>, <a href="dram.html">DRAM</a>, <a href="esdi.html">ESDI</a>, <a href="jan-jaap.html">Jan-Jaap</a>, <a href="smd.html">SMD</a>, <a href="tt.html">TT</a>
+</li></ul>
+</body>
+</html>

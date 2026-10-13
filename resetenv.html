@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>resetenv</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>resetenv</h1>
+<p>Claims: 7</p>
+<p>resetenv resets PROM variables to their defaults, not the root password. <sup><a href="#s1">1</a></sup> It can be run in the PROM to reset environment variables, and running it might help with missing password jumper issues. <sup><a href="#s2">2</a></sup> To preserve PROM settings, one should print them with 'printenv' and reset them with 'resetenv'. <sup><a href="#s3">3</a></sup> However, resetenv does not provide a usable set of NVRAM contents, and setting certain variables like 'root' does not prevent the system from hanging during initialization. <sup><a href="#s4">4</a></sup> Checksum errors to the NVRAM were not resolved by enableall/resetenv, and when changing the RTC chip on an O2, a resetenv and bypass jumper may not resolve boot issues, requiring a NVRAM dump from a functioning O2 to diagnose the problem. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">resetenv resets PROM variables to their defaults, not the root password (user-8547, 2022-02-23, exchange 26284, check: uncheckable)</li>
+<li id="s2">resetenv can be run in the prom to reset environment variables; running it might help with missing password jumper issues. (user-511a, 2024-11-16, exchange 112792, check: uncheckable)</li>
+<li id="s3">To preserve PROM settings, one should print them with 'printenv' and reset them with 'resetenv'. (user-8547, 2022-02-23, exchange 26283, check: uncheckable)</li>
+<li id="s4">Resetenv does not provide a usable set of NVRAM contents, and setting certain variables like 'root' does not prevent the system from hanging during initialization. (user-c831, 2020-01-22, exchange 5653, check: uncheckable)</li>
+<li id="s5">Checksum errors to the nvram were not resolved by `enableall`/`resetenv`. (user-e52d, 2026-07-22, exchange 124230, check: supported)</li>
+<li id="s6">When changing the RTC chip on an O2, a resetenv and bypass jumper may not resolve boot issues, and existing guides may not work; a NVRAM dump from a functioning O2 might be needed to diagnose the problem. (user-c831, 2020-01-22, exchange 5652, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="rtc-chip.html">RTC chip</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="nvram.html">NVRAM</a>, <a href="prom-settings.html">PROM settings</a>
+</li>
+<li>Other: <a href="printenv.html">printenv</a>
+</li></ul>
+</body>
+</html>

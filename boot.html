@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>boot</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>boot</h1>
+<p>Claims: 23</p>
+<p>Some machines can boot after a reboot, with occasional read errors that can be retried, and one user reports that their machine boots. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Bootability varies by hardware: an O300 can boot for real with a 95% chance of success, an Octane with a front plane failure cannot boot and shows only fan operation, and an O2 fails to boot when SCSI drives are plugged in but boots once the drive is unplugged. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> TT unix SRV4 can only boot via SCSI or Thunder IDE, and the disk needs to have a boot sector and be set active to boot. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The system tries to boot even if no keyboard is detected, but without a keyboard you won't get graphics during boot, though you should still see boot messages and a console, and it may not display video output. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Boot problems include failing to boot past the x-mouse cursor, a kernel panic on a fresh install caused by a failed hard drive, and the error 'get_chimera_type: elsc_cbrick_type_get(0) failed status = -112' during boot, which can be resolved by powering down and then back up. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> You can use Rufus to write an image to a USB to boot and backup the hard disk. <sup><a href="#s13">13</a></sup> Formatting and mounting the partition as /boot is the correct procedure, and the system unmounts /boot before running the 'is there a new kernel' part of the shutdown script, so one may need to manually copy /unix.install to /boot/unix. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The machine is able to boot after a reboot, with occasional read errors that can be retried. (user-ba81, 2019-04-28, exchange 203775, check: uncheckable)</li>
+<li id="s2">It boots!!! (user-83aa, 2025-12-05, exchange 164723, check: uncheckable)</li>
+<li id="s3">You can boot it for real with your O300 if you'd wanted to; if it gets that far, 95% chance it will work. (user-b7c4, 2019-11-23, exchange 95798, check: supported)</li>
+<li id="s4">My O2 doesn’t boot when SCSI drives are plugged into it; unplugging the drive allows it to boot. (user-9c31, 2020-08-29, exchange 10797, check: supported)</li>
+<li id="s5">An Octane's front plane failure prevents boot and serial output, leaving only fan operation upon power-on, even with a good PSU. (user-c831, 2025-02-07, exchange 224579, check: supported)</li>
+<li id="s6">TT unix SRV4 can only boot via SCSI or Thunder IDE. (user-17cb, 2019-12-03, exchange 73963, check: uncheckable)</li>
+<li id="s7">The disk needs to have a boot sector and be set active to boot. (user-1361, 2021-02-13, exchange 14735, check: uncheckable)</li>
+<li id="s8">The system tries to boot even if no keyboard is detected, but may not display video output. (user-9849, 2021-04-27, exchange 16973, check: uncheckable)</li>
+<li id="s9">Without a keyboard, you won't get graphics during boot, but you should still see boot messages and a console. (user-e872, 2025-05-03, exchange 87222, check: uncheckable)</li>
+<li id="s10">The system fails to boot past the x-mouse cursor. (user-9305, 2022-02-19, exchange 102502, check: uncheckable)</li>
+<li id="s11">The error 'get_chimera_type: elsc_cbrick_type_get(0) failed status = -112' occurs during boot and can be resolved by powering down and then back up. (user-8a09, 2023-02-23, exchange 208381, check: supported)</li>
+<li id="s12">The hard drive failed and caused a kernel panic on a fresh install, preventing boot. (user-ec52, 2025-07-28, exchange 212800, check: uncheckable)</li>
+<li id="s13">You can use Rufus to write an image to a USB to boot and backup the hard disk. (user-22f9, 2024-07-02, exchange 47332, check: uncheckable)</li>
+<li id="s14">Formatting and mounting the partition as /boot is the correct procedure. (user-f190, 2026-01-09, exchange 215862, check: uncheckable)</li>
+<li id="s15">The system unmounts /boot before running the 'is there a new kernel' part of the shutdown script, so one may need to manually copy /unix.install to /boot/unix. (user-f190, 2026-03-21, exchange 62696, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="boot-chime.html">boot chime</a> (9)
+</li>
+<li><a href="boot-command.html">boot command</a> (3)
+</li>
+<li><a href="boot-disk.html">boot disk</a> (4)
+</li>
+<li><a href="boot-drive.html">boot drive</a> (3)
+</li>
+<li><a href="boot-floppy.html">boot floppy</a> (4)
+</li>
+<li><a href="boot-issues.html">boot issues</a> (6)
+</li>
+<li><a href="boot-manager.html">boot manager</a> (3)
+</li>
+<li><a href="boot-process.html">boot process</a> (9)
+</li>
+<li><a href="boot-prom.html">boot prom</a> (11)
+</li>
+<li><a href="boot-time.html">boot time</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="o300.html">O300</a>, <a href="octane.html">Octane</a>
+</li>
+<li>Graphics: <a href="graphics.html">graphics</a>
+</li>
+<li>Operating systems: <a href="bsd.html">BSD</a>, <a href="irix.html">IRIX</a>, <a href="kernel.html">kernel</a>, <a href="kernel-panic.html">kernel panic</a>
+</li>
+<li>Software: <a href="fsck.html">fsck</a>, <a href="partition.html">partition</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="clock-battery.html">clock battery</a>, <a href="disk-image.html">disk image</a>, <a href="frontplane.html">frontplane</a>, <a href="hard-drive.html">hard drive</a>, <a href="video-output.html">video output</a>
+</li>
+<li>Standards and interfaces: <a href="arcs.html">ARCS</a>, <a href="usb.html">USB</a>, <a href="serial.html">serial</a>, <a href="serial-output.html">serial output</a>
+</li>
+<li>Other: <a href="login.html">.login</a>, <a href="backup.html">backup</a>, <a href="dksc.html">dksc</a>, <a href="image.html">image</a>, <a href="noac.html">noac</a>
+</li></ul>
+</body>
+</html>

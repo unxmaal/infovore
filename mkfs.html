@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mkfs</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>mkfs</h1>
+<p>Claims: 16</p>
+<p>The `mkfs` command creates a new filesystem, whereas the `fx` command only creates a disklabel or partition table and does not handle filesystems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> On IRIX, `mkfs` can be run from the `inst` admin menu to partition and format the drive, which formats the realroot and usr partitions. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> `mkfs` is also used to clean a single partition on IRIX, and reinstalling an operating system cleanly requires running it in single user mode to avoid installing over existing data. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The `mkfs` command can be executed after booting into the installer or a minimal live version of the OS, and it can be run by dropping out to the shell once loaded into the installer. <sup><a href="#s10">10</a></sup><sup><a href="#s3">3</a></sup> `mkfs` is used to format drives in various contexts, including formatting a Spinny instead of using the low-level format in `fx` for convenience. <sup><a href="#s11">11</a></sup><sup><a href="#s6">6</a></sup> Unix V7 can load standalone programs like `mkfs` from fixed locations on tape, and the commands `pvcreate`, `vgcreate`, `lvcreate`, and `mkfs` are used together to create a volume group, logical volume, and format it. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> A Netra computer given away had issues with RAM during `mkfs` from install tool CDs, and after running `mkfs` during an install it is better to reboot, though it may still work without it. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The fx command only re-partitions and does not handle filesystems; mkfs is needed to create a new filesystem. (user-b1da, 2021-10-25, exchange 21561, check: uncheckable)</li>
+<li id="s2">Use `mkfs` to create a new filesystem instead of `fx` which creates a disklabel, not filesystems. (user-b1da, 2022-05-27, exchange 217589, check: supported)</li>
+<li id="s3">The `fx` command creates the disklabel/partition table, while `mkfs` creates the filesystem, which can only be executed after booting into the installer or a minimal live version of the OS. (user-b1da, 2022-11-12, exchange 82384, check: supported)</li>
+<li id="s4">From 'inst', use the admin menu to run `mkfs` to partition and format the drive. (user-2189, 2019-09-07, exchange 76830, check: supported)</li>
+<li id="s5">mkfs from inst admin will format realroot and usr partitions. (user-c9fb, 2020-12-04, exchange 78839, check: uncheckable)</li>
+<li id="s6">inst and mkfs are needed to format a drive in some cases. (user-b1da, 2021-10-25, exchange 21560, check: uncheckable)</li>
+<li id="s7">To reinstall IRIX cleanly, go to the Admin option and run `mkfs`. (user-2189, 2019-08-28, exchange 3220, check: supported)</li>
+<li id="s8">Reinstalling an operating system requires going to Admin and mkfs in single user mode to avoid installing over existing data. (user-2189, 2019-10-27, exchange 204013, check: uncheckable)</li>
+<li id="s9">To clean a single partition on IRIX, use mkfs; for DOD wipe, use a dedicated utility. (user-d903, 2021-08-31, exchange 217223, check: uncheckable)</li>
+<li id="s10">Once you load into the installer, you can drop out to the shell and run mkfs. (user-d903, 2020-12-03, exchange 78838, check: uncheckable)</li>
+<li id="s11">A Spinny should be formatted with mkfs rather than the low-level format in fx for convenience. (user-d903, 2021-08-08, exchange 216742, check: uncheckable)</li>
+<li id="s12">Unix V7 can load standalone programs like mkfs from fixed locations on tape. (user-e04c, 2020-07-11, exchange 216092, check: uncheckable)</li>
+<li id="s13">The commands pvcreate, vgcreate, lvcreate, and mkfs are used to create a volume group and logical volume and format it. (user-237d, 2021-01-08, exchange 75584, check: uncheckable)</li>
+<li id="s14">The Netra computer thrown to the freebie table had issues with RAM during mkfs from install tool CDs. (user-848e, 2019-09-16, exchange 3535, check: uncheckable)</li>
+<li id="s15">After running `mkfs` during an install, it's better to reboot, though it may still work without it. (user-f190, 2026-03-21, exchange 219589, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="netra.html">Netra</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="unix-v7.html">UNIX v7</a>, <a href="operating-system.html">operating system</a>, <a href="single-user-mode.html">single user mode</a>
+</li>
+<li>Software: <a href="fx.html">fx</a>, <a href="fx-command.html">fx command</a>, <a href="inst.html">inst</a>, <a href="installer.html">installer</a>, <a href="shell.html">shell</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>
+</li>
+<li>Other: <a href="admin-menu.html">admin menu</a>
+</li></ul>
+</body>
+</html>

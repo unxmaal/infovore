@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>optimization</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>optimization</h1>
+<p>Claims: 9</p>
+<p>Optimization can cause compiler bugs that break programs, such as readline 8.0 requiring -O1 with mipspro and possibly -O0 if optimization fails, and Bash failing on MIPS Pro by losing the first character of the command line. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Optimizing MIPS code can be difficult, as interleaving int and fp ops required effort that led to compiler trust, and C compilers usually do not produce direct translations. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Optimization is sometimes required, as compiling kernel modules needs it, and it can reduce build size, as shown by the Irix image dropping from 28M to 2.2M. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Optimization has downsides, including diminishing returns where effort for small gains increases, and it can obscure disassembly, making analysis difficult. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">readline 8.0 requires -O1 with mipspro and may need -O0 if optimization fails, due to compiler bugs. (user-2d09, 2020-02-19, exchange 68433, check: supported)</li>
+<li id="s2">Bash evaluation can fail with optimization on MIPS Pro, losing the first character of the command line. (user-6afa, 2021-06-22, exchange 18045, check: uncheckable)</li>
+<li id="s3">Interleaving int and fp ops in MIPS required pain to optimize, leading to compiler trust. (user-6afa, 2021-06-22, exchange 18045, check: uncheckable)</li>
+<li id="s4">you never get direct translations out of C compilers (usually). (user-37ee, 2021-08-01, exchange 69859, check: uncheckable)</li>
+<li id="s5">Compiling kernel modules requires optimization. (user-5510, 2022-05-14, exchange 29127, check: uncheckable)</li>
+<li id="s6">The build size of the Irix image before and after optimization is 28M and 2.2M respectively. (user-08fb, 2026-04-05, exchange 73450, check: supported)</li>
+<li id="s7">Optimization can obscure disassembly, making analysis difficult. (user-42cf, 2023-05-24, exchange 83616, check: uncheckable)</li>
+<li id="s8">There are diminishing returns in optimization, where the effort required for small gains increases. (user-5510, 2023-07-13, exchange 39204, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-image.html">IRIX image</a>
+</li>
+<li>Software: <a href="mipspro.html">MIPSpro</a>, <a href="c-compiler.html">C compiler</a>
+</li>
+<li>Other: <a href="disassembly.html">disassembly</a>
+</li></ul>
+</body>
+</html>

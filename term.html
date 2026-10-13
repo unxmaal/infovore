@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TERM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>TERM</h1>
+<p>Claims: 5</p>
+<p>The `TERM` environment variable specifies the terminal type, and common safe values include `xterm`, `ANSI`, and `vt220` [,]. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It can be set using commands such as `export TERM=ANSI` or `setenv TERM=xterm` [,]. <sup><a href="#s1">1</a></sup><sup><a href="#s3">3</a></sup> Setting `TERM` in files like `.login`, `.profile`, or `.cshrc` also allows configuration of other environment variables such as `MANPATH` and `EDITOR` []. <sup><a href="#s4">4</a></sup> Terminal emulators may display line drawing characters correctly on some terminal types but fail when run within `screen`, even if `$TERM` is set to `vt100` or `vt102` []. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">I am guessing you've got bash when you log into the pi. So ssh over, type `export TERM=ANSI` and see what happens if you then run irssi (user-d903, 2019-12-11, exchange 4780, check: supported)</li>
+<li id="s2">TERM=xterm is a safe value; or even vt220 if anything fails. (user-37ee, 2020-08-09, exchange 10493, check: uncheckable)</li>
+<li id="s3">The command `setenv TERM=xterm` sets the terminal type to xterm; `pwd` prints the current working directory. (user-e872, 2022-06-06, exchange 29721, check: supported)</li>
+<li id="s4">Adding a 'stty rows 25 cols 80' line to .login, .profile, or .cshrc sets terminal size, and setting TERM, MANPATH, EDITOR, BROWSER in these files configures the environment. (user-c831, 2021-04-02, exchange 98671, check: supported)</li>
+<li id="s5">Terminal emulators like alsamixer may display line drawing characters correctly on VT101 but may fail to do so when run within screen even if $TERM is set to vt100 or vt102, showing instead a single character where aLine (user-04a3, 2023-01-21, exchange 35605, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="bash.html">bash</a>, <a href="setenv.html">setenv</a>
+</li>
+<li>Parts and peripherals: <a href="screen.html">screen</a>
+</li>
+<li>Standards and interfaces: <a href="xterm.html">xterm</a>
+</li>
+<li>Other: <a href="cshrc.html">.cshrc</a>, <a href="login.html">.login</a>, <a href="profile.html">.profile</a>, <a href="vt101.html">VT101</a>, <a href="irssi.html">irssi</a>
+</li></ul>
+</body>
+</html>

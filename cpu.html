@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPU</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CPU</h1>
+<p>Claims: 191 Background: 23 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Central_processing_unit">Central processing unit</a>, <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics processing unit</a>, <a href="https://en.wikipedia.org/wiki/SGI_Octane">SGI Octane</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>.</p>
+<h2 id="with-o2">With O2</h2>
+<p>The O2 is a single-CPU machine that also uses RAM, and its CPU is a 1-wire device on the O2 riser. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The O2 and O2+ have similar cases and CPUs, with the O2+ having a higher revision motherboard and possibly a serial controller improvement. <sup><a href="#s4">4</a></sup> The O2 can use an R12000 CPU running at 400 MHz, and it can achieve 50+ MB/s reads with 4K request sizes; CPUs up to 800 MHz existed at the SGI labs, and you can swap in a 600 MHz model or faster. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Overclocking an O2 CPU to 600 MHz was common, often requiring specific parts and adjustments to the system bus. <sup><a href="#s8">8</a></sup> Removing the PCI riser and replacing the CPU can be done on an O2 without issues, though the hostid may need to be changed with sysid, and an O2 can boot and run with a new CPU, SCSI2SD, and SD card. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> O2 systems received CPU and graphics upgrades during their operational lifespan, but upgrading the CPU can drastically affect graphics output. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> O2 video output issues can be caused by a faulty CPU, resulting in solid colors and system hangs, and faulty CPUs can cause issues even if they work intermittently. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The O2 can have an issue with the CPU not being seated properly, causing amber light symptoms, and it can red light due to issues with the power supply, CPU, or other components like the PIMM or MRE. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
+<h2 id="with-ram">With RAM</h2>
+<p>The differences between Sun Lunchboxes are primarily in CPU and RAM type, with some models having Ethernet jacks instead of AUI. <sup><a href="#s17">17</a></sup> The U2 improved significantly over the U1 with better CPU options, more RAM, faster disks, and 24-bit accelerated graphics without sacrificing a RAM slot. <sup><a href="#s18">18</a></sup> The first-gen RS/6000s shipped with a default RAM size of 16MB and ran at approximately 25MHz. <sup><a href="#s19">19</a></sup> The system is currently without RAM and CPU, effectively having 0 MHz CPU and 0 GB RAM, and the 0 CPU configuration has no RAM and no HEART. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> The CPU and RAM were loose, and the CPU was unscrewed. <sup><a href="#s22">22</a></sup> Reseating RAM and CPU can resolve lockups and other issues, but reseating the CPU and RAM may not resolve all issues, so inspecting the board for dead custom chips is a next step. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> Replacing the CPU, RAM, NVRAM, etc. was necessary to get an SGI working, and replacing the DC-DC board, RAM, CPU, and components like the CGA and battery backplane did not resolve the idle hang issue. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> A TLB Refill Exception on a Fuel is likely related to RAM issues, but since swapping RAM did not help, it may be a CPU or motherboard fault, and reseating the CPU and using contact cleaner might resolve it. <sup><a href="#s27">27</a></sup></p>
+<h2 id="general">General</h2>
+<p>A CPU must have a certain number of transistors and be able to process data to be considered a CPU. <sup><a href="#s28">28</a></sup> Understanding a CPU at the transistor level is crucial for accurate emulation, especially for hardware with undocumented quirks. <sup><a href="#s29">29</a></sup> The CPU is emulated through an interpreter, and OS flexibility allows for non-100% correct CPU emulation, with some self-tests potentially breaking but fixable. <sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> The first step in designing a CPU is to design the ALU and then write it to an FPGA. <sup><a href="#s32">32</a></sup> The CPU is attached to other hardware containing game data, and various boards connect it to fast peripherals, such as the Moto 56k DSP board and the system bus board. <sup><a href="#s33">33</a></sup><sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> The CPU can be manually set to different clock speeds, such as 250 MHz for an R10k or 333 MHz for the PSP's MIPS R4k, and the initialization code in PROM sets up multipliers and other parameters affecting its effective clock speed. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup> The CPU may also be limited by the mainboard, though any 2x600 CPU works, and a CPU with 65W TDP draws up to 80W. <sup><a href="#s39">39</a></sup><sup><a href="#s40">40</a></sup> The CPU may experience issues such as not responding, being faulty, or having voltage problems, which can sometimes be resolved by replacing the CPU, cleaning and repasting it, or power cycling. <sup><a href="#s41">41</a></sup><sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> Reseating the CPU can resolve issues related to dust accumulation or poor contact between the CPU, mainboard, and GPU, and can sometimes resolve other system issues. <sup><a href="#s45">45</a></sup><sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup> If a CPU installed in an SGI system is not compatible, the system may have issues and may need the PROM flashed. <sup><a href="#s48">48</a></sup> The VME bridge hangs off the CPU directly, similar to being parallel to the Sbus. <sup><a href="#s49">49</a></sup> The Octane supports a variety of CPU, IO, and graphics options, with dual-CPU and MXI/MXE recommended for optimal performance, and V10 or V12 CPUs are suggested for the Octane2. <sup><a href="#s50">50</a></sup><sup><a href="#s51">51</a></sup> The Crusoe offered usable performance with less power, possibly due to architectural design and IBM's new 5+ layer copper process fab. <sup><a href="#s52">52</a></sup> A CPU can draw significantly more power when installed than when not installed, and a short circuit on the CPU can cause a power supply to overload. <sup><a href="#s53">53</a></sup> The CPU draws 120 watts, so it is likely dead, and may show no activity beyond a clock signal, in which case a replacement CPU should be tried. <sup><a href="#s54">54</a></sup><sup><a href="#s55">55</a></sup> A CPU with a single pulse on power up and one more on soft shutdown might be fried, and a CPU may have a 36 ohm VCC/GND short. <sup><a href="#s56">56</a></sup><sup><a href="#s57">57</a></sup> The CPU pins may be corroded, but the tantalums tested good out of circuit. <sup><a href="#s58">58</a></sup> Reseating and swapping CPUs did not resolve the issue, suggesting a possible dead motherboard. <sup><a href="#s59">59</a></sup> A G5 Quad's CPU can fail due to thermal shock and may require reballing, and the CPU is not socketed with an integrated GPU, requiring a motherboard upgrade to replace it. <sup><a href="#s60">60</a></sup><sup><a href="#s61">61</a></sup> The CPU under the heatsink can reach over 80 degrees Celsius, and heat from the CPU may cause minor warping of the board, affecting contact. <sup><a href="#s62">62</a></sup><sup><a href="#s63">63</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">On the O2 riser, the CPU is a 1-wire device. (user-22f9, 2019-02-21, exchange 691, check: supported)</li>
+<li id="s2">The machine has a single CPU. (user-b1da, 2023-01-05, exchange 238426, check: uncheckable)</li>
+<li id="s3">The O2 uses a CPU and has RAM. (user-95db, 2023-03-05, exchange 36501, check: supported)</li>
+<li id="s4">The O2 and O2+ have similar cases and CPUs, with the O2+ having a higher revision motherboard and possibly a serial controller improvement. (user-8547, 2022-02-08, exchange 102197, check: supported)</li>
+<li id="s5">O2s had CPUs up to 800 MHz at the SGI labs. (user-8547, 2022-02-11, exchange 102327, check: supported)</li>
+<li id="s6">You can swap the CPU to a 600 MHz model or faster (user-22f9, 2025-02-09, exchange 211946, check: supported)</li>
+<li id="s7">The O2 can use an R12000 CPU; it runs at 400 MHz and can achieve 50+ MB/s reads with 4K request sizes. (user-8547, 2025-12-14, exchange 89013, check: supported)</li>
+<li id="s8">Overclocking an O2 CPU to 600 MHz was common, often requiring specific parts and adjustments to the system bus. (user-8547, 2023-04-28, exchange 107258, check: supported)</li>
+<li id="s9">Removing the PCI riser and replacing the CPU can be done on an O2 without issues, though the hostid may need to be changed with sysid. (user-8547, 2019-06-05, exchange 1941, check: supported)</li>
+<li id="s10">An O2 can boot and run with a new CPU, SCSI2SD, and SD card. (user-6afa, 2020-06-26, exchange 9233, check: supported)</li>
+<li id="s11">Upgrading the CPU in the O2 can drastically affect graphics output. (user-24f0, 2024-02-27, exchange 223735, check: supported)</li>
+<li id="s12">O2 systems received CPU and graphics upgrades during their operational lifespan. (user-86e1, 2026-04-17, exchange 63107, check: supported)</li>
+<li id="s13">O2 video output issues can be caused by a faulty CPU, resulting in solid colors and system hangs. (user-8547, 2021-08-17, exchange 205404, check: supported)</li>
+<li id="s14">O2s may require cleaning the SCA port and reseating the CPU; faulty CPUs can cause issues even if they work intermittently; graphics problems are more common than SCSI issues. (user-8547, 2023-01-14, exchange 106311, check: uncheckable)</li>
+<li id="s15">The O2 can red light due to issues with the power supply, CPU, or other components like the PIMM or MRE. (user-4f7c, 2025-01-21, exchange 113780, check: supported)</li>
+<li id="s16">The O2 has an issue with the CPU not being seated properly, causing amber light symptoms. (user-5d99, 2026-07-08, exchange 214168, check: supported)</li>
+<li id="s17">The differences between Sun Lunchboxes are primarily in CPU and RAM type, with some models having Ethernet jacks instead of AUI. (user-b7c4, 2019-08-04, exchange 2883, check: uncheckable)</li>
+<li id="s18">The U2 improved significantly over the U1 with better CPU options, more RAM, faster disks, and 24-bit accelerated graphics without sacrificing a RAM slot. (user-7b1c, 2022-05-15, exchange 239625, check: supported)</li>
+<li id="s19">The first-gen RS/6000s shipped with a default RAM size of 16MB and ran at approximately 25MHz. (user-07ed, 2024-01-16, exchange 209855, check: supported)</li>
+<li id="s20">The system is currently without RAM and CPU, effectively having 0 MHz CPU and 0 GB RAM. (user-5510, 2022-05-10, exchange 29027, check: supported)</li>
+<li id="s21">The 0 CPU configuration has no RAM and no HEART. (user-4f7c, 2025-06-21, exchange 57197, check: supported)</li>
+<li id="s22">The CPU and RAM were loose, and the CPU was unscrewed. (user-e4e2, 2026-06-19, exchange 226599, check: uncheckable)</li>
+<li id="s23">Reseating RAM and CPU can resolve lockups and other issues. (user-94cb, 2022-05-10, exchange 222240, check: uncheckable)</li>
+<li id="s24">Reseating the CPU and RAM may not resolve all issues; inspecting the board for dead custom chips is a next step. (user-7b9e, 2024-04-14, exchange 210235, check: uncheckable)</li>
+<li id="s25">Replacing the CPU, RAM, NVRAM, etc. was necessary to get my SGI working. (user-1361, 2022-04-12, exchange 27999, check: uncheckable)</li>
+<li id="s26">Replacing the DC-DC board, RAM, CPU, and components like the CGA and battery backplane did not resolve the idle hang issue. (user-3e2d, 2025-05-10, exchange 159394, check: uncheckable)</li>
+<li id="s27">TLB Refill Exception on a Fuel is likely related to RAM issues, but since swapping RAM did not help, it may be a CPU or motherboard fault; reseating the CPU and using contact cleaner might resolve it. (user-2189, 2020-08-30, exchange 221050, check: supported)</li>
+<li id="s28">A CPU must have a certain number of transistors and be able to process data to be considered a CPU. (user-8b3c, 2020-08-10, exchange 97351, check: uncheckable)</li>
+<li id="s29">Understanding a CPU at the transistor level is crucial for accurate emulation, especially for hardware with undocumented quirks. (user-ea8d, 2019-07-01, exchange 2283, check: uncheckable)</li>
+<li id="s30">The CPU is emulated through an interpreter. (user-b7c4, 2019-05-19, exchange 220102, check: uncheckable)</li>
+<li id="s31">OS flexibility allows for non-100% correct CPU emulation, with some self-tests potentially breaking but fixable. (user-3663, 2020-04-01, exchange 220147, check: supported)</li>
+<li id="s32">The first step in designing a CPU is to design the ALU and then write it to an FPGA. (user-3dfe, 2020-02-16, exchange 6401, check: uncheckable)</li>
+<li id="s33">The CPU is attached to other hardware containing game data. (user-59fe, 2019-12-30, exchange 126117, check: uncheckable)</li>
+<li id="s34">Moto 56k DSP board connects the CPU to fast peripherals. (user-237d, 2021-11-19, exchange 235022, check: supported)</li>
+<li id="s35">The system bus board is a local bus that connects the CPU to fast peripherals. (user-237d, 2021-11-19, exchange 235022, check: uncheckable)</li>
+<li id="s36">An R10k CPU can be manually set to 250 MHz. (user-8547, 2019-07-05, exchange 2348, check: supported)</li>
+<li id="s37">The PlayStation Portable (PSP) uses a 333 MHz MIPS R4k CPU. (user-c831, 2022-01-07, exchange 227215, check: supported)</li>
+<li id="s38">The initialization code in PROM sets up multipliers and other parameters for the CPU, affecting its effective clock speed. (user-b4f4, 2019-06-22, exchange 95295, check: uncheckable)</li>
+<li id="s39">The CPU may also be limited by the mainboard, though any 2x600 CPU works. (user-d903, 2020-06-16, exchange 97081, check: uncheckable)</li>
+<li id="s40">A CPU with 65W TDP draws up to 80W. (user-b1da, 2020-06-21, exchange 9145, check: supported)</li>
+<li id="s41">A CPU in Slot 3/Slice 1 is not responding and is invisible. A power cycle may resolve the issue. (user-f229, 2019-10-09, exchange 203982, check: supported)</li>
+<li id="s42">Faulty CPUs can cause many issues in O2 machines, including booting but then hanging or displaying strange colors. (user-8547, 2021-12-15, exchange 101217, check: supported)</li>
+<li id="s43">The Fuel's CPU can experience voltage issues which may be related to the PSU; replacing the CPU and using an ATX adapter resolved the issue. (user-59b9, 2020-11-04, exchange 221112, check: supported)</li>
+<li id="s44">Cleaning and repasting a CPU can fix it. (user-e872, 2020-12-31, exchange 13346, check: uncheckable)</li>
+<li id="s45">The Indigo2 High Impact may have a power supply issue or poor contact between the CPU, mainboard, and GPU. (user-22f9, 2022-01-24, exchange 101671, check: supported)</li>
+<li id="s46">Reseating the CPU can resolve issues related to dust accumulation. (user-8de9, 2022-05-10, exchange 222240, check: uncheckable)</li>
+<li id="s47">Reseating the CPU multiple times can sometimes resolve system issues. (user-8547, 2024-04-14, exchange 210235, check: uncheckable)</li>
+<li id="s48">If a CPU installed in an SGI system is not compatible, the system will have issues and may need the PROM flashed. (user-e4d0, 2022-05-04, exchange 103610, check: uncheckable)</li>
+<li id="s49">The VME bridge hangs off the CPU directly, similar to being parallel to the Sbus. (user-237d, 2022-04-04, exchange 239589, check: uncheckable)</li>
+<li id="s50">The Octane supports a variety of CPU, IO, and graphics options; dual-CPU and MXI/MXE are recommended for optimal performance. (user-07ed, 2024-12-07, exchange 113063, check: supported)</li>
+<li id="s51">For an Octane2, V10 or V12 CPUs are suggested for best performance. (user-1a5a, 2024-12-07, exchange 113063, check: supported)</li>
+<li id="s52">Crusoe had usable performance with less power, possibly due to architectural design and IBM's new 5+ layer copper process fab. (user-07ed, 2024-12-16, exchange 158864, check: supported)</li>
+<li id="s53">A CPU can draw significantly more power when installed compared to when not installed, and a short circuit on the CPU can cause a power supply to overload. (user-15e1, 2025-03-17, exchange 115364, check: uncheckable)</li>
+<li id="s54">The CPU was drawing 120 watts, so it's likely dead. (user-15e1, 2025-03-17, exchange 115372, check: supported)</li>
+<li id="s55">The CPU shows no activity beyond a clock signal; a replacement CPU should be tried if no other voltages or code execution is observed. (user-59df, 2026-08-10, exchange 160545, check: uncheckable)</li>
+<li id="s56">A CPU with a single pulse on power up and one more on soft shutdown might be fried. (user-0de0, 2025-03-02, exchange 242144, check: uncheckable)</li>
+<li id="s57">The CPU has a 36 ohm VCC/GND short. The EEPROM needs to be identified to check its contents. (user-231e, 2026-08-12, exchange 124795, check: supported)</li>
+<li id="s58">The CPU pins may be corroded, but the tantalums tested good out of circuit. (user-15e1, 2025-03-17, exchange 115372, check: uncheckable)</li>
+<li id="s59">Reseating and swapping CPUs did not resolve the issue, suggesting a possible dead motherboard. (user-cd83, 2026-08-02, exchange 65112, check: uncheckable)</li>
+<li id="s60">A G5 Quad's CPU can fail due to thermal shock and may require reballing. (user-3ec5, 2025-03-18, exchange 232553, check: uncheckable)</li>
+<li id="s61">The CPU is not socketed and the GPU is integrated, requiring a motherboard upgrade to replace it. (user-b4f4, 2025-08-04, exchange 234590, check: uncheckable)</li>
+<li id="s62">The CPU under the heatsink can reach over 80 degrees Celsius. (user-9219, 2025-12-17, exchange 225786, check: supported)</li>
+<li id="s63">Heat from the CPU may cause minor warping of the board, affecting contact. (user-f190, 2026-01-05, exchange 61242, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="cpu-architecture.html">CPU architecture</a> (3)
+</li>
+<li><a href="cpu-board.html">CPU board</a> (24)
+</li>
+<li><a href="cpu-cache.html">CPU cache</a> (4)
+</li>
+<li><a href="cpu-card.html">CPU card</a> (4)
+</li>
+<li><a href="cpu-connector.html">CPU connector</a> (3)
+</li>
+<li><a href="cpu-fan.html">CPU fan</a> (6)
+</li>
+<li><a href="cpu-issue.html">CPU issue</a> (3)
+</li>
+<li><a href="cpu-module.html">CPU module</a> (28)
+</li>
+<li><a href="cpu-prom.html">CPU PROM</a> (4)
+</li>
+<li><a href="cpu-speed.html">CPU speed</a> (5)
+</li>
+<li><a href="cpu-swap.html">CPU swap</a> (3)
+</li>
+<li><a href="cpu-upgrade.html">CPU upgrade</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="fpu.html">FPU</a>, <a href="indigo2.html">Indigo2</a>, <a href="fuel.html">Fuel</a>, <a href="indy.html">Indy</a>, <a href="origin-200.html">Origin 200</a>, <a href="arm.html">ARM</a>, <a href="blade-2000.html">Blade 2000</a>, <a href="g3-beige.html">G3 Beige</a>, <a href="g5-quad.html">G5 Quad</a>, <a href="iris.html">IRIS</a>, <a href="indigo1.html">Indigo1</a>, <a href="macintosh.html">Macintosh</a>, <a href="octane-iii.html">Octane III</a>, <a href="onyx4.html">Onyx4</a>, <a href="origin-2k.html">Origin 2K</a>, <a href="pc.html">PC</a>, <a href="rs-6000.html">RS/6000</a>, <a href="skywriter.html">SkyWriter</a>, <a href="tezro-rack.html">Tezro rack</a>, <a href="u1.html">U1</a>, <a href="u2.html">U2</a>, <a href="ultra-2.html">Ultra 2</a>, <a href="ultra64.html">Ultra64</a>, <a href="system-bus.html">system bus</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>, <a href="r12000.html">R12000</a>, <a href="r5900.html">R5900</a>, <a href="risc.html">RISC</a>
+</li>
+<li>Graphics: <a href="gpu.html">GPU</a>, <a href="graphics.html">graphics</a>, <a href="v12.html">V12</a>, <a href="xvr-4000.html">XVR-4000</a>, <a href="graphics-board.html">graphics board</a>, <a href="graphics-issue.html">graphics issue</a>, <a href="graphics-subsystem.html">graphics subsystem</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="bootloader.html">bootloader</a>, <a href="operating-system.html">operating system</a>
+</li>
+<li>Software: <a href="emulation.html">emulation</a>, <a href="programs.html">programs</a>, <a href="fpga.html">FPGA</a>, <a href="proe.html">ProE</a>, <a href="sd-card.html">SD card</a>, <a href="xfs.html">XFS</a>, <a href="boot-issues.html">boot issues</a>, <a href="code.html">code</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="motherboard.html">motherboard</a>, <a href="power-supply.html">power supply</a>, <a href="prom.html">PROM</a>, <a href="psu.html">PSU</a>, <a href="memory.html">memory</a>, <a href="ati-card.html">ATI card</a>, <a href="cd-drive.html">CD drive</a>, <a href="eeprom.html">EEPROM</a>, <a href="fuel-prom.html">Fuel PROM</a>, <a href="impact-compression-card.html">IMPACT Compression card</a>, <a href="io-board.html">IO board</a>, <a href="ip59.html">IP59</a>, <a href="nvram.html">NVRAM</a>, <a href="pcie-card.html">PCIe card</a>, <a href="power.html">POWER</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="ssd.html">SSD</a>, <a href="vrm.html">VRM</a>, <a href="xio-connector.html">XIO connector</a>, <a href="board.html">board</a>, <a href="cable.html">cable</a>, <a href="cache.html">cache</a>, <a href="cache-chips.html">cache chips</a>, <a href="compression-connector.html">compression connector</a>, <a href="disk.html">disk</a>, <a href="heatsink.html">heatsink</a>, <a href="mainboard.html">mainboard</a>, <a href="nodeboard.html">nodeboard</a>, <a href="rack.html">rack</a>, <a href="resistor.html">resistor</a>, <a href="riser.html">riser</a>, <a href="socket.html">socket</a>, <a href="thermal-pad.html">thermal pad</a>
+</li>
+<li>Standards and interfaces: <a href="sbus.html">SBus</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="apple.html">Apple</a>, <a href="sun-lunchbox.html">Sun Lunchbox</a>, <a href="sun-t5120.html">Sun T5120</a>
+</li>
+<li>Other: <a href="reballing.html">reballing</a>, <a href="z.html">-z</a>, <a href="1040stf.html">1040STF</a>, <a href="4d-320.html">4D/320</a>, <a href="4d-480.html">4D/480</a>, <a href="b2000.html">B2000</a>, <a href="celeron.html">Celeron</a>, <a href="gigabyte.html">Gigabyte</a>, <a href="gridcase.html">Gridcase</a>, <a href="io.html">IO</a>, <a href="northbridge.html">Northbridge</a>, <a href="pimm.html">PIMM</a>, <a href="predator.html">Predator</a>, <a href="tdp.html">TDP</a>, <a href="tlb.html">TLB</a>, <a href="u80.html">U80</a>, <a href="compiling.html">compiling</a>, <a href="contact.html">contact</a>, <a href="cooling.html">cooling</a>, <a href="geometry.html">geometry</a>, <a href="gold.html">gold</a>, <a href="hardware-acceleration.html">hardware acceleration</a>, <a href="hardware-texturing.html">hardware texturing</a>, <a href="hostid.html">hostid</a>, <a href="overclocking.html">overclocking</a>, <a href="process.html">process</a>, <a href="registers.html">registers</a>, <a href="regulator.html">regulator</a>, <a href="tantalum.html">tantalum</a>, <a href="thermal-paste.html">thermal paste</a>, <a href="underclocking.html">underclocking</a>, <a href="wafer.html">wafer</a>
+</li></ul>
+</body>
+</html>

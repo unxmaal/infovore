@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Challenge</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Challenge</h1>
+<p>Claims: 38 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/NetSurf">NetSurf</a>.</p>
+<p>The Challenge is a server that runs on a regular house outlet and 24/7 without issues, and SGI called their servers 'Challenge' before 'Origin'. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The Challenge has various hardware issues, including a boot problem caused by a missing pin on a Dallas chip, memory running out when compiling Net::SSLeay in Perl (prompting an order for additional 512M RAM), and a problem with the last 4 tests that requires turning off the 'direct I/O' flag to pass all tests. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The Challenge's hardware includes a HVD labeled 'RED' that requires careful handling, a VME fast ethernet card that is half-duplex but significantly faster than 10 Mb half-duplex, and a deskside model with 12x R4400@250 that is the fastest IRIX 5.3 system and a deskside model with 12x R10K that is the fastest IRIX 6.2 system. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The Challenge can run nethack, netsurf (compiled for IRIX 6.5), and full RSE builds, and it can have dual Ethernet interfaces. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The dual 75MHz IP21 boards for the Challenge provide better floating-point performance than a single 150MHz R4K but similar integer performance, making them suitable for compute servers, but they do not work with IR graphics or IMPACT in the Indigo2. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> The Challenge has a screw in the backplane that restricts CPU slots, which can be removed with pliers, and a system controller board that restricts more slots and requires a new board for multiple CPUs. <sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> The IO4 board is an I/O board for SGI Challenge and Onyx systems, providing keyboard, mouse, serial, and SCSI for disks, and is 9U VME sized, while the C19 plug is compatible with Onyx and Challenge but not with Crimson or PowerSeries. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> The custom DC-DC converters on the backplane boards are prone to failure due to bad capacitors. <sup><a href="#s23">23</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Challenge lacks graphics hardware and is primarily a server. (user-6d1a, 2020-05-26, exchange 96933, check: supported)</li>
+<li id="s2">The Challenge runs on a regular house outlet. (user-f229, 2021-04-12, exchange 69385, check: supported)</li>
+<li id="s3">The Challenge runs 24/7 without issues. (user-6afa, 2021-10-06, exchange 205677, check: supported)</li>
+<li id="s4">SGI called their servers 'Challenge' before 'Origin'. (user-9528, 2023-12-14, exchange 43159, check: supported)</li>
+<li id="s5">The Challenge runs out of memory when compiling Net::SSLeay in Perl. (user-f229, 2019-10-06, exchange 68013, check: supported)</li>
+<li id="s6">Additional 512M RAM was ordered for the Challenge. (user-f229, 2019-10-06, exchange 68013, check: supported)</li>
+<li id="s7">The Challenge has an issue with the last 4 tests and requires turning off the 'direct I/O' flag to pass all tests. (user-f229, 2019-10-22, exchange 95610, check: supported)</li>
+<li id="s8">The Challenge's boot issue was due to a missing pin on a Dallas chip, and the Indy's chip was broken by a similar issue. (user-637b, 2019-03-02, exchange 847, check: supported)</li>
+<li id="s9">The VME fast ethernet card in the Challenge is half-duplex but significantly faster than 10 Mb half-duplex. (user-6d41, 2020-08-10, exchange 97344, check: supported)</li>
+<li id="s10">The Challenge has a HVD labeled 'RED' which requires careful handling. (user-f229, 2021-04-23, exchange 98843, check: supported)</li>
+<li id="s11">A deskside Challenge with 12x R4400@250 is the fastest IRIX 5.3 system (user-86e1, 2023-06-17, exchange 107914, check: supported)</li>
+<li id="s12">A deskside Challenge with 12x R10K is the fastest IRIX 6.2 system (user-86e1, 2023-06-17, exchange 107914, check: supported)</li>
+<li id="s13">The Challenge can run nethack. (user-6afa, 2021-01-22, exchange 217035, check: supported)</li>
+<li id="s14">netsurf is compiled for IRIX 6.5 and runs on older machines like the Challenge. (user-6afa, 2021-08-09, exchange 19099, check: supported)</li>
+<li id="s15">The Challenge can run full RSE builds and did so for months without errors. (user-f229, 2021-08-07, exchange 205356, check: supported)</li>
+<li id="s16">Challenge, O2, Origin, Fuel and Tez can have dual Ethernet interfaces; technically, Indy and Indigo2 can with the right card. (user-0251, 2021-11-16, exchange 77477, check: supported)</li>
+<li id="s17">The dual 75MHz IP21 boards for the Challenge provide better floating-point performance than a single 150MHz R4K but similar integer performance, making them suitable for compute servers but not for Onyx or with IR/IMPACT (user-86e1, 2023-06-17, exchange 107914, check: supported)</li>
+<li id="s18">The dual 75MHz IP21 boards do not work with IR graphics or IMPACT in the Indigo2 (user-86e1, 2023-06-17, exchange 107914, check: supported)</li>
+<li id="s19">The RealityStation has a single CPU; the Challenge has a screw in the backplane that restricts CPU slots, which can be removed with pliers; a system controller board check determines the number of CPUs; a faulty system's (user-86e1, 2023-08-28, exchange 223292, check: supported)</li>
+<li id="s20">The Challenge system controller board restricts more slots; a new board is needed for multiple CPUs; the Challenge DM was likely a marketing strategy to keep the warranty. (user-03ad, 2023-08-28, exchange 223292, check: supported)</li>
+<li id="s21">The IO4 board is an I/O board for SGI Challenge and Onyx systems, providing keyboard, mouse, serial, and SCSI for disks, and is 9U VME sized. (user-86e1, 2024-11-08, exchange 85853, check: supported)</li>
+<li id="s22">The C19 plug is compatible with Onyx and Challenge but not with Crimson or PowerSeries. (user-86e1, 2025-02-24, exchange 224648, check: supported)</li>
+<li id="s23">The custom DC-DC converters on the backplane boards are prone to failure due to bad capacitors. (user-22f9, 2025-04-26, exchange 116469, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="challenge-dm.html">Challenge DM</a> (3)
+</li>
+<li><a href="challenge-l.html">Challenge L</a> (30)
+</li>
+<li><a href="challenge-m.html">Challenge M</a> (15)
+</li>
+<li><a href="challenge-xl.html">Challenge XL</a> (10)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="onyx.html">Onyx</a>, <a href="crimson.html">Crimson</a>, <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="origin.html">Origin</a>, <a href="fuel.html">Fuel</a>, <a href="iris.html">IRIS</a>, <a href="impact.html">Impact</a>, <a href="indigo2.html">Indigo2</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="origin-350.html">Origin 350</a>
+</li>
+<li>Processors: <a href="r10000.html">R10000</a>, <a href="r4000.html">R4000</a>, <a href="r4400.html">R4400</a>
+</li>
+<li>Graphics: <a href="ir-graphics.html">IR graphics</a>, <a href="rendering.html">rendering</a>
+</li>
+<li>Operating systems: <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="netsurf.html">Netsurf</a>
+</li>
+<li>Parts and peripherals: <a href="system-controller-board.html">system controller board</a>, <a href="ip21-boards.html">IP21 boards</a>, <a href="backplane.html">backplane</a>
+</li>
+<li>Standards and interfaces: <a href="hvd.html">HVD</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="hp9000.html">HP9000</a>
+</li>
+<li>Other: <a href="reality-station.html">Reality Station</a>, <a href="nethack.html">nethack</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>_rld_new_interface</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>_rld_new_interface</h1>
+<p>Claims: 5</p>
+<p>`_rld_new_interface` is an internal interface used by the IRIX runtime linker (`rld`) for functionality such as `dladdr`, and it is loaded at runtime by `rld`, so the symbol exists even if it is not present at link time. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The interface allows the runtime linker to handle missing symbols at application launch time. <sup><a href="#s3">3</a></sup> Building git on IRIX_ports requires resolving undefined references to `_rld_new_interface` when using /opt/local/openssl. <sup><a href="#s4">4</a></sup> A `_rld_new_interface` warning indicates issues with linking abicalls files with non-abicalls files. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">`_rld_new_interface` is loaded at runtime by `rld`, so the symbol exists even if it's not present at link time (user-42cf, 2019-07-24, exchange 67627, check: supported)</li>
+<li id="s2">The IRIX runtime linker (rld) uses internal interfaces like `_rld_new_interface` for functionality such as `dladdr`. (user-b1da, 2024-02-27, exchange 218304, check: supported)</li>
+<li id="s3">The `rld_newinterface` allows the runtime linker to handle missing symbols at application launch time. (user-2d09, 2019-10-03, exchange 67994, check: supported)</li>
+<li id="s4">Building git on IRIX_ports requires resolving undefined references to `_rld_new_interface' when using /opt/local/openssl. (user-f229, 2019-09-26, exchange 67937, check: uncheckable)</li>
+<li id="s5">The `_rld_new_interface` warning indicates issues with linking abicalls files with non-abicalls files, which is new to the speaker. (user-2d09, 2019-10-13, exchange 68033, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="rld.html">rld</a>, <a href="git.html">git</a>, <a href="irixports.html">irixports</a>
+</li>
+<li>Other: <a href="dladdr.html">dladdr</a>
+</li></ul>
+</body>
+</html>

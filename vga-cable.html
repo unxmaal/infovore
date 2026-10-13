@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VGA cable</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VGA cable</h1>
+<p>Claims: 8 Part of <a href="vga.html">VGA</a></p>
+<p>Some VGA cables can be modified by removing pins to resolve display issues, such as snipping the HSync and VSync pins from a Dell LCD cable to improve scaling modes, or pulling out ID pins (including pins 12 and 15) to disable EDID. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Removing the hsync and vsync pins from a VGA cable resolves green image issues and enables sync on green (SOG). <sup><a href="#s5">5</a></sup> A cheap VGA cable can fix the RGBS to RGsB issue by enabling SOG. <sup><a href="#s6">6</a></sup> The O2 outputs all signals over VGA and starts with VGA, so it can be connected to a VGA monitor using a standard VGA cable, though this can confuse some machines like the HP SoG CRT. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Some monitors allow setting scaling modes, like the Dell LCD which improved when HSync/VSync pins were snipped from the VGA cable. (user-6afa, 2021-08-03, exchange 18954, check: uncheckable)</li>
+<li id="s2">Try removing this pin from your VGA cable, it worked for me. (user-59df, 2025-04-23, exchange 224944, check: uncheckable)</li>
+<li id="s3">Pulling out ID pins on VGA cable solved the issue. (user-37bb, 2026-01-10, exchange 61386, check: uncheckable)</li>
+<li id="s4">Disabling EDID by removing pins 12 and 15 on the VGA cable allowed the system to boot to X11 login. (user-3e2d, 2026-01-10, exchange 61386, check: supported)</li>
+<li id="s5">The O2 can use monitors with sync on green or separate syncs; removing hsync and vsync pins from the VGA cable resolves green image issues. (user-757f, 2026-02-21, exchange 243701, check: supported)</li>
+<li id="s6">A cheap VGA cable can fix the RGBS to RGsB issue by enabling SOG. (user-e872, 2022-08-17, exchange 239806, check: uncheckable)</li>
+<li id="s7">The O2 outputs all signals over VGA, which can confuse some machines like the HP SoG CRT. The O2 starts with VGA and can be connected to a VGA monitor using a standard VGA cable. The O2's green LCD display issue may be a (user-37bb, 2022-07-08, exchange 31000, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Companies: <a href="dell-lcd.html">Dell LCD</a>
+</li>
+<li>Other: <a href="pin.html">pin</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>checksum</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>checksum</h1>
+<p>Claims: 6</p>
+<p>A checksum is used to validate the integrity of downloaded packages when patches are applied via a `.patch` file. <sup><a href="#s1">1</a></sup> Checksums can reveal data corruption, as mismatched values between a downloaded image and a flash drive suggest the drive or the computer's USB ports may be corrupting data. <sup><a href="#s2">2</a></sup> Checksums are also used in other schemes, such as the DES encryption combined with Base58 encoding and a checksum used for license keys in pre-v7 Alias software. <sup><a href="#s3">3</a></sup> For 3C503 users, enabling 'Generate checksum byte' in an 8KB build is required to avoid compatibility errors. <sup><a href="#s4">4</a></sup> A checksum issue can cause problems in bootstrapping if the values are not set. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">patches can be applied to downloaded packages using a `.patch` file, and integrity can be validated with a checksum. (user-b1da, 2020-10-01, exchange 11293, check: supported)</li>
+<li id="s2">Checksums match for the downloaded image but not for the flash drive on a specific computer, suggesting the flash drive or the computer's USB ports may be corrupting data. (user-c383, 2023-01-09, exchange 234157, check: uncheckable)</li>
+<li id="s3">The pre-v7 Alias software uses DES encryption combined with Base58 encoding and a checksum scheme for license keys. (user-ce6b, 2023-09-11, exchange 218162, check: uncheckable)</li>
+<li id="s4">For 3C503 users, you must use an 8KB build and ensure 'Generate checksum byte' is enabled to avoid compatibility errors. (user-d5ee, 2026-07-01, exchange 234769, check: supported)</li>
+<li id="s5">A CHECKSUM issue can cause problems in bootstrapping if the values are not set. (user-2189, 2020-08-05, exchange 160918, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-6-5-21.html">IRIX 6.5.21</a>
+</li>
+<li>Software: <a href="alias.html">Alias</a>, <a href="openssl.html">OpenSSL</a>, <a href="patch.html">patch</a>
+</li>
+<li>Parts and peripherals: <a href="usb-port.html">USB port</a>, <a href="flash-drive.html">flash drive</a>
+</li>
+<li>Other: <a href="patch-file.html">.patch file</a>, <a href="des.html">DES</a>
+</li></ul>
+</body>
+</html>

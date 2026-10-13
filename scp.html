@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scp</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>scp</h1>
+<p>Claims: 10</p>
+<p>scp can be used to transfer files to SGI systems, along with NFS, FTP, and the network in general, for both installs and moving files to an SGI Octane without an external CD drive. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> scp is used for copying files between machines in both directions, and it might close and reopen the connection after each file transfer. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> scp stopped working due to changed key algorithms, possibly requiring expansion of accepted keys on the server side. <sup><a href="#s5">5</a></sup> When your id_rsa.pub is added to ~/.ssh/authorized_keys on the SGI box, typing 'scp somefile my_sgi:/some/directory' provides tab autocompletion, but it looks up the path on the remote machine each time. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NFS, FTP, or SCP can be used for SGI installs. (user-7b1c, 2022-09-22, exchange 105042, check: uncheckable)</li>
+<li id="s2">ftp, scp, nfs, network in general can be used to transfer files to an SGI Octane without an external CD drive. (user-4341, 2023-08-30, exchange 223301, check: supported)</li>
+<li id="s3">scp might close/reopen the connection after each file transfer. (user-5510, 2023-07-04, exchange 39076, check: uncheckable)</li>
+<li id="s4">scp is used for copying files between machines in both directions. (user-7973, 2025-02-25, exchange 72007, check: uncheckable)</li>
+<li id="s5">scp stopped working due to changed key algorithms, possibly requiring expansion of accepted keys on the server side. (user-21b8, 2025-02-25, exchange 215657, check: uncheckable)</li>
+<li id="s6">When you add your id_rsa.pub to ~/.ssh/authorized_keys on the sgi box, you will have 'tab autocompletion' while typing 'scp somefile my_sgi:/some/directory' but it will look up the path on the remote machine each time. (user-7973, 2026-03-06, exchange 62480, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="efs.html">EFS</a>, <a href="git.html">git</a>, <a href="mount.html">mount</a>
+</li>
+<li>Standards and interfaces: <a href="ftp.html">FTP</a>, <a href="nfs.html">NFS</a>, <a href="rcp.html">RCP</a>, <a href="ssh.html">SSH</a>
+</li>
+<li>Companies: <a href="sgi-box.html">SGI box</a>
+</li></ul>
+</body>
+</html>

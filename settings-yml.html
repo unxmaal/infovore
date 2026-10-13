@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>settings.yml</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>settings.yml</h1>
+<p>Claims: 4</p>
+<p>Ansible relies on Vagrant to map its variables, which Vagrant reads from settings.yml and a distro yml before provisioning the VM. <sup><a href="#s1">1</a></sup> The settings for Vagrant are in settings.yml, which should be edited according to the README. <sup><a href="#s2">2</a></sup> The clientether in settings.yml does not match the MAC address shown by the booterizer. <sup><a href="#s3">3</a></sup> The installmirror setting in settings.yml for IRIX 6.5.22 bootstrapping should be 'http://' instead of 'https://sgi-irix.s3.amazonaws.com' to avoid access denied errors. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Ansible relies on Vagrant to map its variables, which Vagrant reads from settings.yml and a distro yml, before provisioning the VM. (user-2189, 2019-02-04, exchange 216650, check: uncheckable)</li>
+<li id="s2">The settings for Vagrant are in settings.yml, which should be edited according to the README. (user-2189, 2019-09-06, exchange 76825, check: uncheckable)</li>
+<li id="s3">The clientether in settings.yml does not match the MAC address shown by the booterizer. (user-a4ce, 2020-03-15, exchange 77114, check: uncheckable)</li>
+<li id="s4">The installmirror setting in settings.yml for IRIX 6.5.22 bootstrapping should be 'http://' instead of 'https://sgi-irix.s3.amazonaws.com' to avoid access denied errors. (user-c831, 2020-06-21, exchange 77209, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-6-5-22.html">IRIX 6.5.22</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="vagrant.html">Vagrant</a>, <a href="ansible.html">ansible</a>
+</li></ul>
+</body>
+</html>

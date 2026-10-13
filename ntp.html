@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NTP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NTP</h1>
+<p>Claims: 9</p>
+<p>NTP runs on boot time before anything that checks dates, so it can handle time issues. <sup><a href="#s1">1</a></sup> Compiling NTP requires running configure twice, and NTP 4.2.8p13 fails with an undeclared PATH_MAX error, which can be fixed by defining PATH_MAX to 4096; subdir configure scripts in NTP do not share results, leading to redundant configuration steps. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> There have been NTP ports before; this one is neko_openntpd-3.9p1. <sup><a href="#s4">4</a></sup> ESXi and Windows VM should synchronize their clocks using NTP; ESXi uses UTC by default. <sup><a href="#s5">5</a></sup> An Indy's clock being off is likely due to an old DALLAS chip and can be corrected with NTP; an NTP server might not be available immediately after a cold boot, leading to clock issues. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">NTP runs on boot time before anything that checks dates, so it can handle time issues. (user-b7c4, 2019-07-17, exchange 95361, check: uncheckable)</li>
+<li id="s2">Compiling NTP requires running configure twice, and NTP 4.2.8p13 fails with an undeclared PATH_MAX error, which can be fixed by defining PATH_MAX to 4096. (user-2189, 2019-07-17, exchange 67510, check: supported)</li>
+<li id="s3">Subdir configure scripts in NTP do not share results, leading to redundant configuration steps. (user-42cf, 2019-07-17, exchange 67515, check: uncheckable)</li>
+<li id="s4">There have been NTP ports before; this one is neko_openntpd-3.9p1. (user-ba81, 2019-09-20, exchange 67889, check: uncheckable)</li>
+<li id="s5">ESXi and Windows VM should synchronize their clocks using NTP; ESXi uses UTC by default. (user-cb4c, 2020-07-12, exchange 9544, check: uncheckable)</li>
+<li id="s6">An Indy's clock being off is likely due to an old DALLAS chip and can be corrected with NTP. (user-7b1c, 2021-09-24, exchange 205598, check: supported)</li>
+<li id="s7">An NTP server might not be available immediately after a cold boot, leading to clock issues. (user-07ed, 2024-07-12, exchange 240333, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Software: <a href="esxi.html">ESXi</a>
+</li>
+<li>Parts and peripherals: <a href="dallas-chip.html">Dallas chip</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="wifi.html">WiFi</a>
+</li>
+<li>Other: <a href="cold-boot.html">cold boot</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R3K</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>R3K</h1>
+<p>Claims: 30</p>
+<h2 id="with-r4000">With R4000</h2>
+<p>The Indigo2 was launched during the IRIX 4.x era, and 4.x runs on R3k and R4k Indigo1 and early R4k Indigo2 boards. <sup><a href="#s1">1</a></sup> The power supply was changed between R3k and R4k boards, but the backplane is the same; the R4K PSU has a larger zener diode than the R3K, and an R3K may have an R4K supply. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The EEPROM location differs between R3k and R4k boards, and switching from an R4k to an R3k clears the EEPROM to FF:FF:FF:FF:FF:FF. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The 8-pin DIP containing the MAC address and environment settings is the same for R3k and R4k, but upgrading from R3K to R4K repositions the MAC address in the EEPROM while putting an R3K board back results in invalid values. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The R3K Indigo uses a socketed CR2032 battery with an elastic strap and a drop-in replacement, while the R4K uses a soldered connection. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="general">General</h2>
+<p>The R3K is a MIPS CPU type distinct from the R2K, and the R3000A is a 40 MHz R3K or an R3K core packaged as an R2K, in which case hinv shows R3K / R2K. <sup><a href="#s12">12</a></sup> The PlayStation 1's CPU is an R3K, and an Indigo with an R3K can run ancient IRIXes. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> The R3K uses DIMMs that are hard to find, boots with 32MB RAM, and requires a SCSI terminator to boot correctly, since using an external Apple drive causes issues with mounting ISOs or other data via the /dev/scsi path. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> GCC 7.2.0 has better optimizations for the R3K target than 6.3.0. <sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Indigo2 was launched during the IRIX 4.x era and 4.x runs on R3k and R4k Indigo1 and early R4k Indigo2. (user-8de9, 2022-02-01, exchange 217440, check: supported)</li>
+<li id="s2">The power supply was changed between R3k and R4k boards, but the backplane is the same. (user-d903, 2023-06-14, exchange 107880, check: supported)</li>
+<li id="s3">The PSU of the R4K has a larger zener diode than the R3K. (user-ae91, 2024-06-29, exchange 223994, check: supported)</li>
+<li id="s4">your r3k may have an r4k supply. Thats how mine is. (user-cd83, 2026-08-31, exchange 125274, check: supported)</li>
+<li id="s5">Switching from an R4k to an R3k clears the EEPROM to FF:FF:FF:FF:FF:FF. (user-9219, 2025-03-21, exchange 55413, check: supported)</li>
+<li id="s6">The EEPROM location differs between R3k and R4k boards. (user-03ad, 2025-03-21, exchange 212237, check: supported)</li>
+<li id="s7">Upgrading from R3K to R4K repositions the MAC address in the EEPROM, but putting a R3K board back results in invalid values. (user-9219, 2025-04-21, exchange 56128, check: supported)</li>
+<li id="s8">The 8 pin dip containing the mac address and environment settings is the same for r3k and r4k. (user-9219, 2025-10-10, exchange 225550, check: supported)</li>
+<li id="s9">The TOD battery is easy to solder on R4K but not on R3K. (user-6afa, 2021-08-19, exchange 205416, check: supported)</li>
+<li id="s10">The R3K Indigo uses a socketed CR2032 battery with an elastic strap, while the R4K uses a soldered connection. (user-86e1, 2025-03-17, exchange 115366, check: supported)</li>
+<li id="s11">The R3K IRIX system uses a drop-in TOD battery replacement, unlike the R4K which is soldered in place. (user-164b, 2026-04-29, exchange 226409, check: supported)</li>
+<li id="s12">The R2KA is an R2K core packaged as an R3K; hinv shows R3K / R2K. The R3000A is a 40 MHz R3K or an R3K core packaged as an R2K. IP6 is really slow. R3K and R2K are different CPU types. 68k IRISes were made but scrapped. (user-24f0, 2025-09-25, exchange 118776, check: supported)</li>
+<li id="s13">The PS1's CPU is an R3K. (user-60b6, 2019-03-15, exchange 67127, check: supported)</li>
+<li id="s14">An Indigo with an R3k can run ancient IRIXes. (user-6c80, 2024-02-20, exchange 44723, check: supported)</li>
+<li id="s15">R3K uses DIMMs that are hard to find. (user-e872, 2026-07-27, exchange 226774, check: supported)</li>
+<li id="s16">The R3k boots with 32MB RAM. (user-c6be, 2025-09-25, exchange 118800, check: supported)</li>
+<li id="s17">The R3k requires a SCSI terminator to boot correctly; using an external Apple drive causes issues with mounting ISOs or other data, specifically with the /dev/scsi path. (user-986f, 2025-09-25, exchange 225484, check: supported)</li>
+<li id="s18">GCC 7.2.0 has better optimizations for MIPS than 6.3.0 for R3K target. (user-60b6, 2019-03-15, exchange 67127, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="r3k-board.html">R3k board</a> (3)
+</li>
+<li><a href="r3k-cpu.html">R3K CPU</a> (3)
+</li>
+<li><a href="r3k-indigo.html">R3K Indigo</a> (22)
+</li>
+<li><a href="r3k-psu.html">R3K PSU</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="indigo.html">Indigo</a>, <a href="o2.html">O2</a>, <a href="ps1.html">PS1</a>
+</li>
+<li>Processors: <a href="r4000.html">R4000</a>, <a href="r2k.html">R2K</a>, <a href="r4400.html">R4400</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-4-0-5h.html">IRIX 4.0.5H</a>, <a href="irix-4-x.html">IRIX 4.x</a>, <a href="irix-5-3.html">IRIX 5.3</a>
+</li>
+<li>Software: <a href="mipspro.html">MIPSpro</a>
+</li>
+<li>Parts and peripherals: <a href="eeprom.html">EEPROM</a>, <a href="cr2032-battery.html">CR2032 battery</a>, <a href="ip6.html">IP6</a>, <a href="psu.html">PSU</a>, <a href="scsi-terminator.html">SCSI terminator</a>, <a href="backplane.html">backplane</a>
+</li>
+<li>Other: <a href="gio32.html">GIO32</a>, <a href="tav3.html">TAV3</a>, <a href="zener-diode.html">zener diode</a>
+</li></ul>
+</body>
+</html>

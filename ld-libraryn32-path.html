@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LD_LIBRARYN32_PATH</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>LD_LIBRARYN32_PATH</h1>
+<p>Claims: 18</p>
+<p>LD_LIBRARY_PATH and/or LD_LIBRARYN32_PATH can be used to specify library directories. <sup><a href="#s1">1</a></sup> For dynamic linking, LD_LIBRARYN32_PATH should include 32-bit library directories in a specific order so the compiler and ld can find and select the correct libraries. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Setting LD_LIBRARYN32_PATH to include paths such as /usr/lib32 and specific library paths ensures correct library resolution for 32-bit binaries. <sup><a href="#s5">5</a></sup> If shared libraries are expected in a specific directory, LD_LIBRARYN32_PATH must be set accordingly for the software to use the correct versions. <sup><a href="#s6">6</a></sup> The build process, buildpkg, and scripts may override LD_LIBRARYN32_PATH, potentially causing issues, and specifying library paths with -L and using -rpath can fix incorrect library selection. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s9">9</a></sup> Wrapping the binary with a launcher script to set LD_LIBRARYN32_PATH is a viable solution if modifying the library search path directly is not possible. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">LD_LIBRARY_PATH and/or LD_LIBRARYN32_PATH can be used to specify library directories. (user-42cf, 2019-01-30, exchange 361, check: uncheckable)</li>
+<li id="s2">For dynamic linking, set `LD_LIBRARYN32_PATH` to include paths to 32-bit libraries. (user-f229, 2019-07-16, exchange 67486, check: supported)</li>
+<li id="s3">The LD_LIBRARYN32_PATH should include 32-bit library directories in a specific order for the compiler to find the correct libraries. (user-2d09, 2019-09-29, exchange 67964, check: supported)</li>
+<li id="s4">When linking, ld uses LD_LIBRARYN32_PATH for library search order, which may lead to incorrect library selection; specifying library paths with -L and using -rpath can fix this. (user-22f9, 2025-02-19, exchange 114854, check: uncheckable)</li>
+<li id="s5">Setting `LD_LIBRARY_PATH` and `LD_LIBRARYN32_PATH` to `/usr/lib32` and specific library paths ensures correct library resolution for 32-bit binaries. (user-f229, 2019-08-18, exchange 67782, check: supported)</li>
+<li id="s6">If shared libraries are expected in a specific directory, the LD_LIBRARYN32_PATH must be set accordingly for the software to use the correct versions. (user-6afa, 2021-12-21, exchange 215267, check: uncheckable)</li>
+<li id="s7">buildpkg may handle rpath differently from standalone builds, potentially causing issues with LD_LIBRARYN32_PATH. (user-2d09, 2019-10-09, exchange 214867, check: uncheckable)</li>
+<li id="s8">The scripts are overriding the LD_LIBRARYN32_PATH. (user-d903, 2019-12-12, exchange 68215, check: uncheckable)</li>
+<li id="s9">The build process may override the LD_LIBRARYN32_PATH variable, and compiling SDL_image might require the SDL2 branch. (user-f190, 2026-03-05, exchange 215915, check: uncheckable)</li>
+<li id="s10">Wrapping the binary with a launcher script to set LD_LIBRARYN32_PATH is a viable solution if modifying the library search path directly is not possible. (user-b1da, 2022-12-29, exchange 70636, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="ld-library-path.html">LD_LIBRARY_PATH</a>, <a href="ffmpeg.html">ffmpeg</a>, <a href="ld.html">ld</a>, <a href="make.html">make</a>, <a href="rpath.html">rpath</a>
+</li>
+<li>Companies: <a href="sgug-path.html">sgug path</a>
+</li>
+<li>Other: <a href="sgugshell-sh.html">sgugshell.sh</a>
+</li></ul>
+</body>
+</html>

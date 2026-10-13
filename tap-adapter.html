@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAP adapter</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>TAP adapter</h1>
+<p>Claims: 9</p>
+<p>The TAP adapter is a virtual network adapter used to set up networking in MAME, typically obtained by installing OpenVPN in Windows. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The taptun driver can be installed separately from OpenVPN and can coexist with other VPN software. <sup><a href="#s3">3</a></sup> Networking setup involves bridging the TAP adapter with the local LAN/WiFi network connection, though updates of Windows 10 or 11 may require fixes. <sup><a href="#s1">1</a></sup><sup><a href="#s4">4</a></sup> The TAP adapter is sometimes connected after MAME starts running. <sup><a href="#s5">5</a></sup> The host side of the TAP adapter is typically configured with a fixed IP address, such as 192.168.137.1 or 10.0.0.2, while the guest (e.g., an Indy running Irix) is given a corresponding address such as 192.168.137.2 or 10.0.0.3. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s8">8</a></sup> To route network traffic between a MAME guest and a host PC, configure the TAP adapter with fixed addresses and enable routing on the host. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To set up networking in MAME, install OpenVPN and the TAP adapter, then bridge the TAP adapter with your LAN/Wifi (for Win 10). (user-ce6b, 2020-09-15, exchange 92637, check: supported)</li>
+<li id="s2">Install Open VPN in Windows to get a TAP adapter for networking in Mame. (user-ce6b, 2024-03-14, exchange 220321, check: uncheckable)</li>
+<li id="s3">The taptun driver can be installed separately from OpenVPN, and it can coexist with other VPN software. The host side of the tap adapter is typically configured as 192.168.137.1, and the guest as 192.168.137.2. IPRouting (user-a719, 2024-03-20, exchange 93357, check: supported)</li>
+<li id="s4">Network setup in Irix emulation using OpenVPN requires bridging a TAP adapter to the local network connection, but updates of Windows 10 or 11 may require fixes. (user-ce6b, 2022-12-29, exchange 220249, check: supported)</li>
+<li id="s5">The TAP adapter is sometimes connected after MAME starts running. (user-ce6b, 2023-01-14, exchange 220264, check: uncheckable)</li>
+<li id="s6">Set the TAP adapter's IP address to 192.168.137.250, netmask 255.255.255.0, and gateway 192.168.137.1. (user-ce6b, 2023-01-05, exchange 93085, check: supported)</li>
+<li id="s7">To route network traffic between a MAME guest and a host PC, configure the tap adapter with fixed addresses and enable routing on the host. (user-a719, 2023-07-27, exchange 220296, check: uncheckable)</li>
+<li id="s8">On Windows, set OpenVPN Tap adapter to 10.0.0.2 and inside Irix setup give the Indy 10.0.0.3 for network communication; enable the network adapter inside Mame via scr lock and network menus; OpenVPN 2.6 works well for I2 (user-ce6b, 2025-04-12, exchange 220366, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Operating systems: <a href="irix-emulation.html">IRIX emulation</a>, <a href="windows.html">Windows</a>, <a href="windows-10.html">Windows 10</a>
+</li>
+<li>Software: <a href="openvpn.html">OpenVPN</a>, <a href="mame.html">MAME</a>
+</li>
+<li>Parts and peripherals: <a href="network-adapter.html">network adapter</a>
+</li></ul>
+</body>
+</html>

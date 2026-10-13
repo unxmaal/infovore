@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>setenv</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>setenv</h1>
+<p>Claims: 19</p>
+<p>setenv is a command used to change environment variables, while printenv displays the current environment settings. <sup><a href="#s1">1</a></sup> setenv uses the syntax `setenv label value` rather than the syntax used by export. <sup><a href="#s2">2</a></sup> For example, `setenv TERM=xterm` sets the terminal type to xterm, and `setenv DEBUG 1` provides boot-time debug information. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The command `setenv -f eaddr` sets the MAC address and is specific to the SGI Indy, where it may not work on other systems. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> setenv can be used from PROM to manage environment variables, and the boot tune can be changed using setenv under printenv. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Some settings do not persist across reboots, and the `-p` argument for setenv never worked on some machines, where `setenv x y`, `printenv`, and `init` are used instead to keep settings alive. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The 'printenv' command shows current environment settings; 'setenv' changes them. (user-9528, 2020-10-13, exchange 11455, check: uncheckable)</li>
+<li id="s2">setenv does not use the same syntax as export; it requires `setenv label value`. (user-e872, 2022-06-06, exchange 29722, check: supported)</li>
+<li id="s3">The command `setenv TERM=xterm` sets the terminal type to xterm; `pwd` prints the current working directory. (user-e872, 2022-06-06, exchange 29721, check: supported)</li>
+<li id="s4">The PROM command `setenv DEBUG 1` provides boot-time debug information. (user-9860, 2023-01-14, exchange 35472, check: supported)</li>
+<li id="s5">If you have the new rom I would do the setenv -f eaddr (the mac address on the back of the machine) (user-1446, 2019-12-16, exchange 78077, check: uncheckable)</li>
+<li id="s6">The 'setenv -f eaddr' command is specific to the SGI Indy and may not work on other systems. (user-ce6b, 2023-06-08, exchange 220278, check: supported)</li>
+<li id="s7">You can use 'setenv' from PROM to manage environment variables; pulling the hard disk and attaching keyboard and screen can access PROM. (user-86e1, 2023-10-05, exchange 209343, check: uncheckable)</li>
+<li id="s8">You can change the boot tune using setenv under printenv. (user-ac3f, 2025-11-05, exchange 213287, check: uncheckable)</li>
+<li id="s9">Setting `autoboot 0` via `setenv` does not persist across reboots; `printenv` shows the change before reboot but not after. (user-22f9, 2020-04-26, exchange 7843, check: supported)</li>
+<li id="s10">-p argument for setenv never worked on their machines; instead, use 'setenv x y', 'printenv', and 'init' to soft reboot the PROM and keep settings alive. (user-e4e2, 2026-08-19, exchange 125007, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="bash.html">bash</a>, <a href="didbs.html">didbs</a>, <a href="git.html">git</a>, <a href="patch.html">patch</a>, <a href="programs.html">programs</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="xio-board.html">XIO board</a>
+</li>
+<li>Standards and interfaces: <a href="xterm.html">xterm</a>
+</li>
+<li>Other: <a href="printenv.html">printenv</a>, <a href="unsetenv.html">unsetenv</a>, <a href="term.html">TERM</a>, <a href="eaddr.html">eaddr</a>, <a href="ksh.html">ksh</a>, <a href="zsh.html">zsh</a>
+</li></ul>
+</body>
+</html>

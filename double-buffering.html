@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>double buffering</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>double buffering</h1>
+<p>Claims: 7 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Framebuffer">Framebuffer</a>, <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>.</p>
+<p>Double buffering renders to a back buffer and swaps it with the front buffer, which prevents flicker. <sup><a href="#s1">1</a></sup> It is used to ensure the screen is updated correctly, though it can be avoided using glFinish() and glFlush(), which is not ideal for performance. <sup><a href="#s2">2</a></sup> On modern systems it can work without vsync, but on older systems like IRIX it can cause flicker. <sup><a href="#s3">3</a></sup> Without double buffering there is no buffer to vsync, so disabling it can eliminate vsync-related flicker. <sup><a href="#s4">4</a></sup> With an 8 bytes/pixel framebuffer, 24-bit color cannot be combined with a zbuffer and double buffering, while 16 bytes/pixel allows quad-buffer and z-buffer with 10-bit color. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">GLUT_DOUBLE enables double buffering which prevents flicker by rendering to a back buffer and swapping it with the front buffer. (user-22f9, 2023-10-30, exchange 41905, check: uncheckable)</li>
+<li id="s2">Double buffering is used to ensure that the screen is updated correctly, but it can be avoided by using glFinish() and glFlush(), though this is not ideal for performance. (user-6afa, 2021-10-18, exchange 21263, check: uncheckable)</li>
+<li id="s3">On modern systems, double buffering can still work without vsync, but on older systems like IRIX, it can cause flicker. (user-22f9, 2023-10-30, exchange 41905, check: uncheckable)</li>
+<li id="s4">Without double buffering, there is no buffer to vsync, so disabling double buffering can eliminate vsync-related flicker. (user-b1da, 2023-10-30, exchange 41905, check: uncheckable)</li>
+<li id="s5">With 8 bytes/pixel framebuffer, you can't have 24-bit color with zbuffer and double buffering; 16 bytes/pixel allows quad-buffer and z-buffer with 10-bit color. (user-21b8, 2025-03-18, exchange 215672, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Graphics: <a href="z-buffer.html">Z buffer</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>
+</li>
+<li>Parts and peripherals: <a href="framebuffer.html">framebuffer</a>
+</li>
+<li>Other: <a href="vsync.html">vsync</a>, <a href="color.html">color</a>, <a href="flickering.html">flickering</a>
+</li></ul>
+</body>
+</html>

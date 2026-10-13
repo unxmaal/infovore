@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sash</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sash</h1>
+<p>Claims: 48</p>
+<p>Sash is a single-file MIPS binary that serves as a command interpreter and shell on the system, linked at 0x80C00000 for 32-bit systems and 0xA800000000C00000 for 64-bit systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Sash is a PROM with filesystem support that can be loaded from the command monitor to provide additional functionality, and it can read more things and provide a more consistent run environment than the PROMs. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Sash is on disk rather than loaded from memory on the board, and the PROM can read sash from a limited number of devices while sash itself can handle more. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> To load Sash, you call scsi(0)diskrdisk(0)partition/sash from the command monitor, and partition 8 contains sash and presumably the bootloader while partition 0 has the collection of files. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The command to boot SASH is boot -f (controller,SCSI ID,partition)sash, and you can boot IRIX by typing boot from the PROM and using ls to list disk contents from SASH. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The SGI VTOC has a pointer to a Sash as a last resort if the root partition is gone, and to boot into sash you can set OSLoader sash and optionally OSLoadFilename /unix to avoid manual loading each time. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Sash can boot without a miniroot or disk attachment, but without a drive it cannot load the miniroot. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Correct sash and kernel versions are crucial, and the base install tools tar from 6.5 does not include sash. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> sash is a boot environment on IRIX systems, and the command to boot from CD partition 8 is 'boot -f scsi(0)cdrompartitionsashARCS'. <sup><a href="#s18">18</a></sup> Loading sash works, but loading IDE or kernel fails. <sup><a href="#s19">19</a></sup> sash can boot to ARCS and sash but fails to boot IRIX, and the system failed diagnostics, specifically the Mother Board test, rebooting instead of leaving at a smdk&gt; prompt. <sup><a href="#s20">20</a></sup> The panic happens if you didn't boot into sash first. <sup><a href="#s21">21</a></sup> Resetting account passwords can be done by booting into sash or accessing the drive in another Octane. <sup><a href="#s22">22</a></sup> Recovery from bricking a drive, a risk when modifying the kernel, involves testing with a known good system like Zulu, then using sash to boot a backup kernel. <sup><a href="#s23">23</a></sup> The dd command in SASH fails with a media error when attempting to write to a disk that is format corrupted. <sup><a href="#s24">24</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Sash is a single-file MIPS binary linked at 0x80C00000 for 32-bit systems and 0xA800000000C00000 for 64-bit systems. (user-e04c, 2020-05-23, exchange 216934, check: supported)</li>
+<li id="s2">Sash is the command interpreter on the system. (user-e4d0, 2022-09-03, exchange 81988, check: uncheckable)</li>
+<li id="s3">sash is a PROM with filesystem support. (user-9860, 2021-11-01, exchange 100686, check: uncheckable)</li>
+<li id="s4">The command monitor in PROM can load `sash`, which provides additional functionality. (user-9860, 2024-12-12, exchange 224301, check: supported)</li>
+<li id="s5">sash can read more things and provides a more consistent run environment than the PROMs provided (user-231e, 2026-01-09, exchange 61352, check: uncheckable)</li>
+<li id="s6">Sash is on disk, not loaded from memory on the board. (user-6c80, 2024-05-17, exchange 111301, check: uncheckable)</li>
+<li id="s7">The PROM can read sash from a limited number of devices, and sash itself can handle more. (user-9860, 2024-12-11, exchange 113143, check: uncheckable)</li>
+<li id="s8">To load Sash, you call `scsi(0)disk(1)rdisk(0)partition(8)/sash` from the command monitor, then run `scsi(0)disk(1)rdisk(0)partition(0)/unix` from Sash to load the OS. (user-d903, 2019-12-28, exchange 96073, check: supported)</li>
+<li id="s9">Partition 8 contains sash and presumably the bootloader, 0 has the collection of files (user-fa69, 2022-07-23, exchange 104324, check: supported)</li>
+<li id="s10">The command to boot SASH is `boot -f (controller,SCSI ID,partition)sash`. (user-45c8, 2022-08-02, exchange 31581, check: supported)</li>
+<li id="s11">To boot IRIX, type 'boot' from the PROM. From SASH, use 'ls' to list disk contents. (user-42cf, 2025-04-14, exchange 212352, check: uncheckable)</li>
+<li id="s12">IRIX VTOC has a pointer to a SASH as a last resort if the root partition is gone. (user-f229, 2020-01-10, exchange 5405, check: uncheckable)</li>
+<li id="s13">To boot into sash, set `OSLoader sash` and optionally `OSLoadFilename /unix` to avoid manual loading each time. (user-e4d0, 2022-09-03, exchange 217681, check: supported)</li>
+<li id="s14">sash can boot without a miniroot or disk attachment. (user-42cf, 2025-09-16, exchange 219118, check: uncheckable)</li>
+<li id="s15">Without a drive, Sash cannot load the miniroot. (user-583a, 2025-09-16, exchange 219117, check: uncheckable)</li>
+<li id="s16">Correct sash and kernel versions are crucial; some install media may lack kernel for a platform. (user-03ad, 2024-06-09, exchange 215509, check: uncheckable)</li>
+<li id="s17">the base install tools tar from 6.5 does not include sash. (user-f190, 2025-11-17, exchange 219254, check: supported)</li>
+<li id="s18">The command to boot from CD partition 8 for sash on IRIX is 'boot -f scsi(0)cdrom(4)partition(8)sashARCS'. (user-616d, 2026-05-05, exchange 219712, check: supported)</li>
+<li id="s19">Loading sash works, but loading IDE or kernel fails. (user-3e2d, 2026-05-29, exchange 93973, check: uncheckable)</li>
+<li id="s20">The system failed diagnostics, specifically the Mother Board test, and rebooted instead of leaving at a smdk&gt; prompt. It can boot to ARCS and sash but fails to boot IRIX. (user-e52d, 2026-07-22, exchange 124215, check: uncheckable)</li>
+<li id="s21">The panic happens if you didn't boot into sash first. (user-e4e2, 2026-08-19, exchange 226908, check: uncheckable)</li>
+<li id="s22">Resetting account passwords can be done by booting into `sash` or accessing the drive in another Octane. (user-baf6, 2026-09-21, exchange 214696, check: supported)</li>
+<li id="s23">Bricking a drive is a risk when modifying the kernel; recovery involves testing with a known good system like Zulu, then using sash to boot a backup kernel (user-3e2d, 2026-06-18, exchange 123665, check: uncheckable)</li>
+<li id="s24">The dd command in SASH fails with a media error when attempting to write to a disk that is format corrupted. (user-4f7c, 2026-07-15, exchange 219851, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iris.html">IRIS</a>, <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="32-bit.html">32-bit</a>, <a href="mips-binary.html">MIPS binary</a>, <a href="r10k-o2.html">R10K O2</a>, <a href="r5000.html">R5000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="kernel.html">kernel</a>, <a href="miniroot.html">miniroot</a>, <a href="unix.html">Unix</a>
+</li>
+<li>Software: <a href="fx.html">fx</a>, <a href="booterizer.html">Booterizer</a>, <a href="ide.html">IDE</a>, <a href="zulu.html">Zulu</a>, <a href="dd-command.html">dd command</a>, <a href="inst.html">inst</a>, <a href="installer.html">installer</a>, <a href="partition.html">partition</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="cdrom.html">CDROM</a>, <a href="ip7-powerseries.html">IP7 PowerSeries</a>, <a href="boot-prom.html">boot prom</a>, <a href="command-monitor.html">command monitor</a>, <a href="drive.html">drive</a>, <a href="hard-drive.html">hard drive</a>, <a href="motherboard.html">motherboard</a>
+</li>
+<li>Standards and interfaces: <a href="arcs.html">ARCS</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>
+</li>
+<li>Other: <a href="64-bit.html">64-bit</a>, <a href="dvhtool.html">dvhtool</a>, <a href="panic.html">panic</a>, <a href="platform.html">platform</a>, <a href="showconfig.html">showconfig</a>, <a href="volume-header.html">volume header</a>
+</li></ul>
+</body>
+</html>

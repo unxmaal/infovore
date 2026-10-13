@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chkconfig</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>chkconfig</h1>
+<p>Claims: 5</p>
+<p>chkconfig is a command-line tool used to list the current state of daemons and to start them. <sup><a href="#s1">1</a></sup> It can be used to manage NFS services, and there are instructions for enabling the NFS client on Windows 10. <sup><a href="#s2">2</a></sup> On IRIX, chkconfig flags work similarly to Linux; they can be checked with /sbin/chkconfig and set with chkconfig -f, and IS_ON is a variable used in scripts to check flags. <sup><a href="#s3">3</a></sup> To check if DHCP is configured to start automatically on the O2, use 'chkconfig | grep autoconfig'; for Ethernet link issues, check /var/adm/SYSLOG for 'no carrier' messages after unplugging the cable. <sup><a href="#s4">4</a></sup> To enable or disable specific services using chkconfig, one needs to create a service script in /etc/init.d and a symlink in /etc/rc2.d with the S99 prefix, and a config file in /var/config with 'on' or 'off'. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">To list the current state of daemons and start them, use `chkconfig` in a terminal. (user-b7c4, 2019-09-07, exchange 3386, check: supported)</li>
+<li id="s2">chkconfig can be used to manage NFS services, and there are instructions for enabling NFS client on Windows 10. (user-6dfb, 2025-01-10, exchange 52052, check: supported)</li>
+<li id="s3">chkconfig flags on IRIX work similarly to Linux; they can be checked with /sbin/chkconfig and set with chkconfig -f; IS_ON is a variable used in scripts to check flags (user-9860, 2021-12-18, exchange 70154, check: uncheckable)</li>
+<li id="s4">To check if DHCP is configured to start automatically on the O2, use 'chkconfig | grep autoconfig'; for Ethernet link issues, check /var/adm/SYSLOG for 'no carrier' messages after unplugging the cable. (user-c026, 2026-08-20, exchange 226911, check: supported)</li>
+<li id="s5">To enable/disable specific services using `chkconfig`, one needs to create a service script in `/etc/init.d` and a symlink in `/etc/rc2.d` with `S99` prefix, and a config file in `/var/config` with 'on' or 'off'. (user-f587, 2021-04-12, exchange 69417, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="linux.html">Linux</a>, <a href="windows-10.html">Windows 10</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-service.html">NFS service</a>
+</li>
+<li>Other: <a href="etc-init-d.html">/etc/init.d</a>, <a href="var-adm-syslog.html">/var/adm/SYSLOG</a>, <a href="var-log.html">/var/log</a>
+</li></ul>
+</body>
+</html>

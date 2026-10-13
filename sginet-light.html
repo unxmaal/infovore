@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sginet-light</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sginet-light</h1>
+<p>Claims: 7</p>
+<p>sginet-light can be added to the system list on sginet. <sup><a href="#s1">1</a></sup> It works offline and even on IRIX 4, and does not require any dependencies, while sginet requires -lcurl -ljson-c -lncurses -lform -lpanel. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> You can register an SGI machine without an internet connection by downloading the 'sginet light' version, printing the JSON payload, copying it to an internet-connected machine, and pasting it into the registration form. <sup><a href="#s4">4</a></sup> sginet-light generates the hinv payload for registering on the sginet website but does not report uptime and online status. <sup><a href="#s5">5</a></sup> sginet-light for IRIX 5.3 uses a simple socket operation to connect to a local nginx proxy and report uptime via HTTP. <sup><a href="#s6">6</a></sup> It can be used to check hardware information by finding the necessary calls. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">sginet-light can be added to the system list on sginet. (user-7973, 2024-08-17, exchange 215551, check: uncheckable)</li>
+<li id="s2">sginet-light works offline and even on IRIX 4. (user-7973, 2025-04-29, exchange 212425, check: supported)</li>
+<li id="s3">sginet-light does not require any dependencies and is offline, while sginet requires -lcurl -ljson-c -lncurses -lform -lpanel. (user-7973, 2025-05-28, exchange 72371, check: uncheckable)</li>
+<li id="s4">You can register an SGI machine without an internet connection by downloading the 'sginet light' version, printing the JSON payload, copying it to an internet-connected machine, and pasting it into the registration form. (user-7973, 2024-11-16, exchange 85912, check: uncheckable)</li>
+<li id="s5">sginet-light generates the hinv payload for registering on the sginet website but does not report uptime and online status. (user-7973, 2026-02-06, exchange 61971, check: uncheckable)</li>
+<li id="s6">sginet-light for IRIX 5.3 uses a simple socket operation to connect to a local nginx proxy and report uptime via HTTP. (user-7973, 2026-02-08, exchange 89653, check: supported)</li>
+<li id="s7">sginet-light can be used to check hardware information by finding the necessary calls. (user-7973, 2025-06-04, exchange 215747, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="machine.html">machine</a>
+</li>
+<li>Operating systems: <a href="irix-4.html">IRIX 4</a>, <a href="irix-5-3.html">IRIX 5.3</a>
+</li>
+<li>Software: <a href="sginet.html">sginet</a>
+</li></ul>
+</body>
+</html>

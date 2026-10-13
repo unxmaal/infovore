@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreeBSD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>FreeBSD</h1>
+<p>Claims: 81 Background: 29 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/FreeBSD">FreeBSD</a>, <a href="https://en.wikipedia.org/wiki/Blender_%28software%29">Blender (software)</a>, <a href="https://en.wikipedia.org/wiki/Common_Desktop_Environment">Common Desktop Environment</a>, <a href="https://en.wikipedia.org/wiki/Debian">Debian</a>, <a href="https://en.wikipedia.org/wiki/Rust_%28programming_language%29">Rust (programming language)</a>, <a href="https://en.wikipedia.org/wiki/Tcsh">Tcsh</a>, <a href="https://en.wikipedia.org/wiki/ZFS">ZFS</a>.</p>
+<p>FreeBSD is a usable, friendly, modern Unix environment used for servers, network-attached storage, and Juniper switches. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It supports PowerPC systems, including being the most supported BSD option for IBM PowerPC, and runs on systems with as little as 512MB of RAM. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> FreeBSD provides ZFS, which some users prefer over Linux for storage due to better file system integrity, and its ZFS arrays can run reliably for years. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> However, FreeBSD can break in production, be beyond repair, and is sometimes called FreeBSOD. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Its kernel compilation can fail due to missing files or malformed conditionals, and it uses lld for x64/POWER/ARM64 instead of binutils. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> FreeBSD does not support autofs, instead using a daemon for automounting rather than integrating it like Linux and Solaris. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> FreeBSD and OpenBSD share an ancestor with IRIX. <sup><a href="#s18">18</a></sup> FreeBSD is dropping support for 32-bit x86 architectures. <sup><a href="#s19">19</a></sup> ZFS is interoperable between Solaris and FreeBSD with careful pool version management, though migrating off ZFS or to Linux-ZFS causes pain due to the rebase from OpenSolaris to ZOL. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> FreeBSD has good integration between its ports system, bhyve, and containers. <sup><a href="#s22">22</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">FreeBSD is preferred over custom Linux setups due to less daily work fixing crashes. (user-22f9, 2019-02-08, exchange 506, check: uncheckable)</li>
+<li id="s2">FreeBSD is a usable and friendly operating system. (user-1446, 2019-12-18, exchange 4931, check: uncheckable)</li>
+<li id="s3">FreeBSD is a modern Unix environment. (user-37ee, 2020-06-24, exchange 9204, check: uncheckable)</li>
+<li id="s4">FreeBSD is used for servers. (user-37ee, 2020-08-04, exchange 10346, check: uncheckable)</li>
+<li id="s5">The Juniper switch is running FreeBSD. (user-2189, 2020-12-17, exchange 98048, check: uncheckable)</li>
+<li id="s6">FreeBSD supports PowerPC. (user-c831, 2019-12-18, exchange 4931, check: uncheckable)</li>
+<li id="s7">FreeBSD is the most supported option for IBM PowerPC systems in BSD. (user-0251, 2019-12-28, exchange 5154, check: uncheckable)</li>
+<li id="s8">FreeBSD runs on systems with 512MB RAM installed, and can run on an EMXI system with version 6.5.30. It may not handle VPro well. Benchmarks like Dhrystone, Whetstone, and Linpack can be used. SoftWindows95 runs on IRIX, (user-1361, 2020-08-04, exchange 10334, check: supported)</li>
+<li id="s9">FreeBSD's ZFS array can run fine for 6 years. (user-37ee, 2020-06-24, exchange 9204, check: supported)</li>
+<li id="s10">FreeBSD and ZFS are used for storage instead of Linux, with ZFS offering better file system integrity and quality of life improvements. (user-37ee, 2020-11-13, exchange 217019, check: uncheckable)</li>
+<li id="s11">FreeBSD has ZFS, which is nice if you have more than 8GB of RAM. (user-8de9, 2022-03-12, exchange 156805, check: supported)</li>
+<li id="s12">FreeBSD can break in production and be beyond repair. (user-37ee, 2020-06-24, exchange 9204, check: uncheckable)</li>
+<li id="s13">FreeBSD is called FreeBSOD. (user-8de9, 2022-03-12, exchange 156805, check: uncheckable)</li>
+<li id="s14">The FreeBSD kernel compilation can fail due to missing files or malformed conditionals. (user-db13, 2019-08-01, exchange 2844, check: uncheckable)</li>
+<li id="s15">FreeBSD uses lld for x64/POWER/ARM64 instead of binutils (user-22f9, 2019-06-19, exchange 67247, check: uncheckable)</li>
+<li id="s16">early Unix machines often had filesystems automounted off NIS, unlike FreeBSD which does not support autofs. (user-ab99, 2022-03-26, exchange 206727, check: uncheckable)</li>
+<li id="s17">FreeBSD uses a daemon for automounting instead of integrating it like Linux and Solaris. (user-7b1c, 2022-03-26, exchange 206727, check: uncheckable)</li>
+<li id="s18">FreeBSD and OpenBSD share an ancestor with IRIX. (user-22f9, 2023-12-22, exchange 209765, check: uncheckable)</li>
+<li id="s19">FreeBSD is dropping support for 32-bit x86 architectures. (user-22f9, 2024-02-22, exchange 218296, check: supported)</li>
+<li id="s20">ZFS is interoperable between Solaris and FreeBSD with careful pool version management. (user-7b1c, 2022-04-22, exchange 181894, check: uncheckable)</li>
+<li id="s21">Migrating off ZFS or to Linux-ZFS causes pain due to the rebase from OpenSolaris to ZOL leaving FreeBSD in a bad situation. (user-22f9, 2025-01-13, exchange 52344, check: uncheckable)</li>
+<li id="s22">FreeBSD has good integration between its ports system, bhyve, and containers. (user-fa69, 2022-11-01, exchange 239874, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="powermac-g5.html">PowerMac G5</a>
+</li>
+<li>Processors: <a href="powerpc.html">PowerPC</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>, <a href="irix.html">IRIX</a>, <a href="openbsd.html">OpenBSD</a>, <a href="gentoo.html">Gentoo</a>, <a href="debian.html">Debian</a>, <a href="netbsd.html">NetBSD</a>, <a href="dos.html">DOS</a>, <a href="haiku.html">Haiku</a>, <a href="haiku-os.html">Haiku OS</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="linux-distro.html">Linux distro</a>, <a href="minix.html">MINIX</a>, <a href="solaris.html">Solaris</a>, <a href="unix.html">Unix</a>, <a href="windows-95.html">Windows 95</a>
+</li>
+<li>Software: <a href="zfs.html">ZFS</a>, <a href="cde.html">CDE</a>, <a href="blender.html">Blender</a>, <a href="rust.html">Rust</a>, <a href="clang.html">clang</a>, <a href="libtool.html">libtool</a>, <a href="pkgsrc.html">pkgsrc</a>, <a href="tcsh.html">tcsh</a>
+</li>
+<li>Parts and peripherals: <a href="port.html">port</a>, <a href="adaptec-card.html">Adaptec card</a>, <a href="power.html">POWER</a>, <a href="xorg.html">Xorg</a>, <a href="performance.html">performance</a>, <a href="serial-console.html">serial console</a>
+</li>
+<li>Standards and interfaces: <a href="nfs-export.html">NFS export</a>, <a href="nfsv2.html">NFSv2</a>, <a href="x-support.html">X support</a>, <a href="x64.html">x64</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="aleph0-demo.html">Aleph0 demo</a>, <a href="emxi.html">EMXI</a>, <a href="freenas.html">FreeNAS</a>, <a href="go.html">Go</a>, <a href="nis.html">NIS</a>, <a href="opensolaris.html">OpenSolaris</a>, <a href="ps-valuepoint.html">PS/Valuepoint</a>, <a href="void.html">Void</a>, <a href="x-terminal.html">X-Terminal</a>, <a href="autofs.html">autofs</a>, <a href="bhyve.html">bhyve</a>, <a href="container.html">container</a>, <a href="lld.html">lld</a>, <a href="nginx.html">nginx</a>
+</li></ul>
+</body>
+</html>

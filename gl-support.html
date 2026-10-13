@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GL support</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GL support</h1>
+<p>Claims: 8 Part of <a href="gl.html">GL</a></p>
+<p>The SGI RX2620 has a VGA output, but Runelite may fall back to software rendering due to lack of GL support. <sup><a href="#s1">1</a></sup> Dual graphics can provide better GL support but is quirky and not recommended. <sup><a href="#s2">2</a></sup> GZDoom requires modern GL support, which IRIX lacks. <sup><a href="#s3">3</a></sup> The SDL2 libs from SGUG-RSE lack GL support, so an SDL2 package specifically built with GL support enabled is needed for running SDL2-GL tests and Homeworld-SDL. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Building SDL2 with GL support is necessary for certain SDL2-GL tests and Homeworld-SDL, and the package includes GL support and may have additional debug printouts. <sup><a href="#s6">6</a></sup> SDL2 2.0.14 with GL support was compiled based off the work of user-22f9, with fixes and porting, and will be improved in nekoware. <sup><a href="#s7">7</a></sup> The game wipEout can be downloaded and run on IRIX using SDL2 with GL support, which is not supported by the SDL2 from the SGUG-RSE repo. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The RX2620 has a VGA output but Runelite may fall back to software rendering due to lack of GL support. (user-ba81, 2021-08-15, exchange 75669, check: uncheckable)</li>
+<li id="s2">Dual graphics can provide better GL support but is quirky and not recommended. (user-59b9, 2022-08-18, exchange 222443, check: uncheckable)</li>
+<li id="s3">GZDoom requires modern GL support, which IRIX lacks. (user-b1da, 2023-01-13, exchange 208198, check: uncheckable)</li>
+<li id="s4">The SDL2 libs from SGUG-RSE lack GL support. (user-7973, 2024-08-07, exchange 71464, check: uncheckable)</li>
+<li id="s5">An SDL2 package with GL support is needed for running SDL2-GL tests and Homeworld-SDL. The package must be specifically built with GL support enabled. (user-7973, 2024-08-09, exchange 215538, check: uncheckable)</li>
+<li id="s6">Building SDL2 with GL support is necessary for certain SDL2-GL tests and Homeworld-SDL. The package includes GL support and may have additional debug printouts. (user-6afa, 2024-08-09, exchange 215538, check: uncheckable)</li>
+<li id="s7">2.0.14 with GL support was compiled and is based off the work of user-22f9, with fixes and porting, and will be improved in nekoware. (user-22f9, 2025-03-12, exchange 72040, check: supported)</li>
+<li id="s8">The game wipEout can be downloaded and run on IRIX using SDL2 with GL support, which is not supported by the SDL2 from the SGUG-RSE repo. (user-7973, 2026-03-11, exchange 219554, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="rx2620.html">rx2620</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="sdl2.html">SDL2</a>, <a href="nekoware.html">nekoware</a>
+</li>
+<li>Standards and interfaces: <a href="vga-output.html">VGA output</a>
+</li>
+<li>Other: <a href="homeworld-sdl.html">Homeworld-SDL</a>, <a href="wipeout.html">Wipeout</a>
+</li></ul>
+</body>
+</html>

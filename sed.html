@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sed</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sed</h1>
+<p>Claims: 10 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Perl">Perl</a>.</p>
+<p>sed is a line editing tool that may require non-POSIX extensions for full functionality, and Perl can provide similar functionality with universal regex and replacement capabilities. <sup><a href="#s1">1</a></sup> The /opt/local/bin/sed binary can be obtained from GNU sources. <sup><a href="#s2">2</a></sup> sed can be used to switch the shebang of a script to use a different interpreter, and global replace with sed can be used for simple domain changes in files. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> sed throws an error when the first regex is empty, and NetBSD shows a similar error for an empty regex. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The regex problem can be mitigated by using nbcompat's reg*() functions, though the bootstrap process does not respect this flag for bmake and sed. <sup><a href="#s7">7</a></sup> sed has a 'Not enough space' error when using the default HPUX tools, and IRIX's startup scripts contain a misbehaving sed command. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> inst files can have GFXBOARD or MGRAS restrictions that can be overridden with -m GFXBOARD= or -m MGRAS= options or by modifying the files with sed. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">sed can be used for line editing but may require non-POSIX extensions for full functionality; Perl can provide similar functionality with universal regex and replacement capabilities. (user-ba81, 2019-03-04, exchange 880, check: uncheckable)</li>
+<li id="s2">/opt/local/bin/sed can be obtained from GNU sources. (user-2189, 2019-05-24, exchange 67221, check: uncheckable)</li>
+<li id="s3">`sed -i -e '/^#!\/usr\\/bin\\/python$/ s/python$/python2/' $RPM_BUILD_ROOT%{_bindir}/gtk-builder-convert` switches the shebang of the gtk-builder-convert script to use /usr/sgug/bin/python instead of /usr/bin/python. (user-cd7d, 2020-06-16, exchange 68707, check: uncheckable)</li>
+<li id="s4">Global replace with `sed` can be used for simple domain changes in files. (user-d903, 2024-03-07, exchange 45016, check: supported)</li>
+<li id="s5">sed throws an error when the first regex is empty. (user-b1da, 2024-10-22, exchange 224173, check: uncheckable)</li>
+<li id="s6">NetBSD also shows a similar error for an empty regex. (user-b1da, 2024-10-22, exchange 224173, check: uncheckable)</li>
+<li id="s7">The regex problem can be mitigated by using nbcompat's reg*() functions, though the bootstrap process does not respect this flag for bmake and sed. (user-37ee, 2021-02-27, exchange 204797, check: uncheckable)</li>
+<li id="s8">sed has a 'Not enough space' error when using the default HPUX tools. (user-3e3c, 2021-02-27, exchange 204797, check: uncheckable)</li>
+<li id="s9">IRIX's startup scripts contain a misbehaving sed command. (user-b1da, 2024-10-22, exchange 224173, check: uncheckable)</li>
+<li id="s10">inst files can have GFXBOARD or MGRAS restrictions that can be overridden with -m GFXBOARD= or -m MGRAS= options or by modifying the files with sed. A ruby inst clone is available for Linux at https://github.com/irixxxx/ (user-9860, 2021-10-24, exchange 217274, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mgras.html">MGRAS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="perl.html">Perl</a>
+</li>
+<li>Companies: <a href="hp.html">HP</a>
+</li>
+<li>Other: <a href="gfxboard.html">GFXBOARD</a>, <a href="bmake.html">bmake</a>
+</li></ul>
+</body>
+</html>

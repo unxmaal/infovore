@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RaSCSI</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RaSCSI</h1>
+<p>Claims: 65</p>
+<h2 id="with-bluescsi">With BlueSCSI</h2>
+<p>BlueSCSI is based on RaSCSI and is a SCSI emulator for the IIgs that can use the same images as RaSCSI, assuming you have a SCSI card in the IIgs. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The BlueSCSI uses a Bluepill STM32 microcontroller and is cheaper than the RASCSI, which is the most versatile, while BlueSCSI is the cheapest and ZuluSCSI/SD2SCSI is the fastest. <sup><a href="#s3">3</a></sup> BlueSCSI and RaSCSI share core SCSI signaling but differ in their environments, and the RASCSI can use a BlueSCSI for SCSI emulation. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The BlueSCSI and RASCSI firmware fixes disk utility and apple-branded disks issues, improving compatibility. <sup><a href="#s6">6</a></sup> There are preinstalled and blank images available for Rascsi/BlueSCSI at https://github.com/erichelgeson/BlueSCSI/wiki/Usage#premade-images. <sup><a href="#s7">7</a></sup></p>
+<h2 id="general">General</h2>
+<p>RaSCSI is an open source project that runs on a Raspberry Pi and emulates SCSI devices, including drives, CDs, and SCSI Ethernet. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> It was designed for x68000 machines but can potentially turn a Raspberry Pi into a SCSI drive in SGI machines. <sup><a href="#s11">11</a></sup> RaSCSI supports multiple drive emulation, CD emulation, SCSI Ethernet, hot-swappable SCSI drives via Raspberry Pi USB ports, and can mount an ISO file from the web as a CD via HTTP. <sup><a href="#s9">9</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s10">10</a></sup> RaSCSI speeds are capped at 1MB/sec due to GPIO limitations, though it can achieve speeds up to 4MB/s on an Atari Falcon. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> RaSCSI's main bottleneck is likely CPU speed, and it could be used for SCSI-to-iSCSI conversion due to its more powerful architecture. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> RaSCSI allows swapping between different IRIX versions on the same machine by hot swapping the boot disk, and it is the only known solution for IRIX multiboot besides manually switching out hard drives or SD cards. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> RaSCSI can be managed with an Android app and can be purchased from a tindie option on the Github page. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> RaSCSI is a SCSI drive emulator built on a Raspberry Pi that is cheaper than a SCSI2SD and can also emulate a SCSI Ethernet adapter for classic Macs and a SCSI display adapter for video output. <sup><a href="#s22">22</a></sup> It can emulate multiple device types, offers a fully configurable web interface accessible from the host machine, and provides a one-click installation of netatalk. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> It can be ported to various platforms, including Pine64, with some work, and acts as a pass-through for iSCSI. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> It provides Ethernet functionality for systems without native Ethernet support, and with a SCSI disk emulator like RaSCSI you can swap disk images easily. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> It is the easiest for CD image handling with a web interface, providing a minimal web page for local system connections when changing images. <sup><a href="#s29">29</a></sup> It gets about 1.5MB/sec, compared to SD2SCSI v6 at close to 10MB/sec and ZuluSCSI at 4-5MB/sec. <sup><a href="#s30">30</a></sup> CD drive emulation in RaSCSI causes random read errors with Mac drivers, and it can cause hardware failures on SS10's SCSI bus due to a metal part pressing on a 5V trace, leading to SCSI bus parity errors and inability to boot from the internal hard drive. <sup><a href="#s31">31</a></sup><sup><a href="#s32">32</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">BlueSCSI is a SCSI emulator for the IIgs and can use the same images as RaSCSI, assuming you have a SCSI card in the IIgs. (user-f229, 2021-08-09, exchange 19085, check: uncheckable)</li>
+<li id="s2">BlueSCSI is based on RaSCSI and can be unstable if resistor networks are not checked before soldering. (user-1361, 2021-08-09, exchange 205360, check: uncheckable)</li>
+<li id="s3">BlueSCSI is the cheapest, rascsi is the most versatile, and zuluscsi/sd2scsi is the fastest. (user-95db, 2022-09-22, exchange 215334, check: uncheckable)</li>
+<li id="s4">The I2I can use a RASCSI or BlueSCSI for SCSI emulation; the BlueSCSI uses a Bluepill STM32 microcontroller and is cheaper than the RASCSI but has less multifunction potential if all you need is SCSI emulation. The boot/ (user-f229, 2021-07-19, exchange 77397, check: uncheckable)</li>
+<li id="s5">Rascsi and bluescsi share core SCSI signaling but differ in their environments. (user-95db, 2021-11-14, exchange 221697, check: uncheckable)</li>
+<li id="s6">The BlueSCSI and RASCSI firmware fixes disk utility and apple-branded disks issues, improving compatibility. (user-95db, 2022-09-17, exchange 231877, check: uncheckable)</li>
+<li id="s7">There are preinstalled and blank images available for rascsi/bluescsi here: https://github.com/erichelgeson/BlueSCSI/wiki/Usage#premade-images (user-d903, 2022-11-21, exchange 231947, check: uncheckable)</li>
+<li id="s8">RaSCSI is open source and supports SCSI Ethernet emulation. (user-9305, 2021-02-24, exchange 98462, check: uncheckable)</li>
+<li id="s9">rascsi emulates a framebuffer over SCSI and can do Ethernet over SCSI, hot-swappable SCSI drives via Raspberry Pi USB ports, and is running on a Raspberry Pi. (user-17cb, 2021-04-14, exchange 144963, check: uncheckable)</li>
+<li id="s10">RaSCSI supports multiple drive emulation, CD emulation, and SCSI Ethernet; it offers more features than basic drive functionality. (user-1361, 2022-01-29, exchange 25226, check: uncheckable)</li>
+<li id="s11">RaSCSI can potentially turn a Raspberry Pi into a SCSI drive in SGIs, though it was designed for x68000 machines. (user-6afa, 2020-06-28, exchange 9268, check: uncheckable)</li>
+<li id="s12">RASCSI allows mounting an ISO file from the web as a CD via HTTP on a Pi. (user-f229, 2021-07-11, exchange 221397, check: uncheckable)</li>
+<li id="s13">RaSCSI speeds capped at 1MB/s, far below scsi2sd speeds. (user-6afa, 2020-06-28, exchange 9269, check: supported)</li>
+<li id="s14">RaSCSI has a 1MB/sec cap due to GPIO limitations, suggesting a need for a higher-end solution. (user-6afa, 2020-07-01, exchange 220995, check: supported)</li>
+<li id="s15">RaSCSI can achieve speeds up to 4mb/s on an Atari Falcon, which is close to the Falcon's theoretical maximum. (user-17cb, 2021-11-20, exchange 69993, check: supported)</li>
+<li id="s16">Rascsi could be used for SCSI-to-iSCSI conversion due to its more powerful architecture. (user-95db, 2021-09-22, exchange 216748, check: uncheckable)</li>
+<li id="s17">So with the unveiling of the Pi Zero 2, RaSCSI's main bottleneck is likely CPU speed rather than something else. (user-6afa, 2021-10-28, exchange 205816, check: supported)</li>
+<li id="s18">The RASCSI allows swapping between different IRIX versions on the same machine by hot swapping the boot disk. (user-f229, 2021-11-01, exchange 100683, check: uncheckable)</li>
+<li id="s19">RaSCSI is the only known solution for IRIX multiboot besides manually switching out hard drives or SD cards. (user-8de9, 2022-02-21, exchange 81170, check: uncheckable)</li>
+<li id="s20">rascsi can be managed with an Android app. (user-95db, 2021-11-01, exchange 100684, check: uncheckable)</li>
+<li id="s21">rascsi can be purchased from a tindie option on the Github page, which is likely the best option for North Americans. (user-9860, 2021-11-01, exchange 100684, check: uncheckable)</li>
+<li id="s22">RaSCSI is a SCSI drive emulator that uses a Raspberry Pi, which is cheaper than a SCSI2SD and can also emulate a SCSI Ethernet adapter for classic Macs and a SCSI display adapter for video output. (user-6afa, 2022-02-26, exchange 206542, check: uncheckable)</li>
+<li id="s23">Rascsi can emulate multiple device types and has a fully configurable web interface accessible from the host machine. (user-17cb, 2022-05-09, exchange 217583, check: uncheckable)</li>
+<li id="s24">RASCSI provides a one-click installation of netatalk. (user-f229, 2022-08-19, exchange 146716, check: uncheckable)</li>
+<li id="s25">RASCSI is a SCSI-to-ethernet driver that can be ported to various platforms, including Pine64, with some work. (user-95db, 2022-09-06, exchange 82009, check: uncheckable)</li>
+<li id="s26">RaSCSI is a pass-through for iSCSI. (user-07ed, 2022-09-14, exchange 207663, check: uncheckable)</li>
+<li id="s27">Rascsi provides Ethernet functionality for systems without native Ethernet support. (user-95db, 2022-09-22, exchange 215336, check: uncheckable)</li>
+<li id="s28">With a SCSI disk emulator like RaSCSI, you can swap disk images easily. (user-ce6b, 2023-09-23, exchange 218192, check: uncheckable)</li>
+<li id="s29">rascsi is the easiest for CD image handling with a web interface, and it provides a minimal web page for local system connections when changing images. (user-d903, 2022-09-18, exchange 70509, check: uncheckable)</li>
+<li id="s30">RaSCSI gets about 1.5MB/sec, SD2SCSI v6 gets close to 10MB/sec, and ZuluSCSI gets 4-5MB/sec. (user-95db, 2022-09-21, exchange 215333, check: supported)</li>
+<li id="s31">CD drive emulation in RaSCSI causes random read errors with Mac drivers. (user-6afa, 2022-02-26, exchange 145852, check: uncheckable)</li>
+<li id="s32">RaSCSI can cause hardware failures on SS10's SCSI bus due to a metal part pressing on a 5V trace, leading to SCSI bus parity errors and inability to boot from the internal hard drive. (user-b98d, 2022-09-24, exchange 239850, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="pi4.html">Pi4</a>, <a href="raspberry-pi.html">Raspberry Pi</a>, <a href="atari-falcon.html">Atari Falcon</a>, <a href="i2i.html">I2I</a>, <a href="iigs.html">IIgs</a>, <a href="mac-plus.html">Mac Plus</a>, <a href="o2.html">O2</a>, <a href="se-30.html">SE/30</a>, <a href="ss10.html">SS10</a>, <a href="print-server.html">print server</a>
+</li>
+<li>Processors: <a href="cpu-speed.html">CPU speed</a>, <a href="r12k-o2.html">R12K O2</a>
+</li>
+<li>Parts and peripherals: <a href="bluescsi.html">BlueSCSI</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="ip6.html">IP6</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="scsi2sd-v6.html">SCSI2SD v6</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="disk-utility.html">disk utility</a>, <a href="hard-drive.html">hard drive</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-bus.html">SCSI bus</a>, <a href="scsi-card.html">SCSI card</a>, <a href="x68000.html">x68000</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="netatalk.html">Netatalk</a>, <a href="sd2scsi-v6.html">SD2SCSI v6</a>
+</li></ul>
+</body>
+</html>

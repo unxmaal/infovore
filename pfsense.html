@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pfSense</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>pfSense</h1>
+<p>Claims: 11</p>
+<p>pfSense is used for firewall and network configuration, with some manual sync required between firewall and Unifi. <sup><a href="#s1">1</a></sup> A Celeron machine running pfSense can handle router duties well, and pfSense with a Celeron G5905 can provide better ping times but slower speeds, with turning on CODEL making things faster. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Known issues include the DNS resolver stopping every few hours due to the unbound service stopping without reason, and high CPU usage with IPsec. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> pfSense can be migrated to OPNsense for router functions, and VyOS is more powerful than pfSense but requires CLI proficiency. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> pfSense runs virtualized on ESXi, but VMware is considered a dead end for future migration. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">pfSense is used for firewall and network configuration, with some manual sync required between firewall and Unifi. (user-86e1, 2026-04-17, exchange 242360, check: uncheckable)</li>
+<li id="s2">A Celeron machine running pfsense can handle router duties well. (user-9528, 2021-12-18, exchange 23580, check: uncheckable)</li>
+<li id="s3">pfSense with a Celeron G5905 can provide better ping times but slower speeds, and turning on CODEL can make things faster. (user-5510, 2022-05-29, exchange 207107, check: uncheckable)</li>
+<li id="s4">pfSense DNS resolver stops every few hours due to unbound service stopping without reason. (user-cd7d, 2021-12-18, exchange 23576, check: uncheckable)</li>
+<li id="s5">high CPU usage with IPsec is a known issue in pfSense. (user-cd7d, 2021-12-18, exchange 23576, check: uncheckable)</li>
+<li id="s6">pfSense can be migrated to OPNsense for router functions. (user-86e1, 2025-03-12, exchange 242253, check: uncheckable)</li>
+<li id="s7">VyOS is more powerful than pfSense but requires CLI proficiency. (user-3dfe, 2020-07-02, exchange 9340, check: uncheckable)</li>
+<li id="s8">pfSense runs virtualized on ESXi, but VMware is considered a dead end for future migration. (user-86e1, 2026-04-17, exchange 242360, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="esxi.html">ESXi</a>
+</li>
+<li>Standards and interfaces: <a href="tcp-ip-stack.html">TCP/IP stack</a>
+</li>
+<li>Companies: <a href="vmware.html">VMware</a>
+</li>
+<li>Other: <a href="opnsense.html">OPNsense</a>, <a href="celeron.html">Celeron</a>, <a href="celeron-g5905.html">Celeron G5905</a>, <a href="freenas.html">FreeNAS</a>, <a href="unifi.html">UniFi</a>
+</li></ul>
+</body>
+</html>

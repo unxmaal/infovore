@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uname</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>uname</h1>
+<p>Claims: 7</p>
+<p>coreutils installs its own 'uname' which can conflict with the IRIX version. <sup><a href="#s1">1</a></sup> The software checks if the OS is POSIX to copy libraries and tools, and this can be done by modifying the configuration process or the `uname` output. <sup><a href="#s2">2</a></sup> The uname reported by the system may indicate IRIX vs IRIX64 as different architectures, but the binaries are compatible and should run fine. <sup><a href="#s3">3</a></sup> The issue with uname is due to rpm confusion, not software incompatibility. <sup><a href="#s4">4</a></sup> The uname in the second photo is 3.3 ip6. <sup><a href="#s5">5</a></sup> The QP2TERM `uname` binary on os/400 outputs the machine's serial number with extra zeros. <sup><a href="#s6">6</a></sup> uname can report the specific IRIX version being used. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">coreutils installs its own 'uname' which can conflict with the IRIX version. (user-22f9, 2019-04-12, exchange 214749, check: uncheckable)</li>
+<li id="s2">The software checks if the OS is POSIX to copy libraries and tools, and this can be done by modifying the configuration process or the `uname` output. (user-b1da, 2020-03-31, exchange 68517, check: supported)</li>
+<li id="s3">The uname reported by the system may indicate IRIX vs IRIX64 as different architectures, but the binaries are compatible and should run fine. (user-42cf, 2020-04-25, exchange 214962, check: uncheckable)</li>
+<li id="s4">The issue with uname is due to rpm confusion, not software incompatibility. (user-42cf, 2020-04-25, exchange 214962, check: uncheckable)</li>
+<li id="s5">The uname in the second photo is 3.3 ip6. (user-0251, 2020-09-08, exchange 216997, check: supported)</li>
+<li id="s6">The QP2TERM `uname` binary on os/400 outputs the machine's serial number with extra zeros. (user-b1da, 2022-05-16, exchange 238274, check: supported)</li>
+<li id="s7">uname can report the specific IRIX version being used. (user-6c80, 2024-11-29, exchange 189337, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="uname-r.html">uname -R</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-version.html">IRIX version</a>, <a href="irix.html">IRIX</a>, <a href="irix64.html">IRIX64</a>, <a href="os-400.html">OS/400</a>
+</li>
+<li>Standards and interfaces: <a href="posix.html">POSIX</a>
+</li></ul>
+</body>
+</html>

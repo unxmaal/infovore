@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>booting</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>booting</h1>
+<p>Claims: 18</p>
+<p>Boot problems associated with booting include machines freezing and failing to boot when network drivers are installed while connected over the network, getting stuck at the root password screen when booting from CD, and having issues booting from multiple SCSI drives. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Boot slowness can occur for various reasons, including slow booting in general, disk tests taking about 10 minutes, and reconfiguring devices making booting slower, especially if the battery is dead. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Boot failures can stem from hardware or configuration issues, such as the O2ctane not booting with the enclosure connected, the Fuel requiring an ATX adapter and replacement of environment monitoring chips to boot properly, the Fuel not booting without graphics, the Fuel possibly resulting in only an L1 prompt due to a CPU board failure, and powerstack openfirmware on an MVME160 <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Boot behavior varies by system: the bottom device in a cluster of O300s wins the master election to boot the correct disk, passing root= to the kernel can be useful for booting, the system still boots into the OS and starts X11 and CDE fine, and the machine boots over the network but requires a hard drive. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> Boot processes can involve specific steps, such as the process of booting a target involving acquiring an IP address, figuring out what to do next, acquiring a bootloader via TFTP, and booting a kernel via NFS, and the LED display showing '2' when booting, indicating some progress. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> Boot capabilities include systems that do not support booting from SATA but can boot from network. <sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Installing network drivers while connected over the network can cause the machine to freeze and prevent it from booting. (user-6afa, 2020-08-20, exchange 10705, check: uncheckable)</li>
+<li id="s2">The system works but gets stuck at the root password screen when booting from CD. (user-616d, 2024-12-06, exchange 238741, check: uncheckable)</li>
+<li id="s3">This system may have issues booting from multiple SCSI drives. (user-6d0a, 2025-02-05, exchange 53815, check: uncheckable)</li>
+<li id="s4">it's booting slowly (user-f9d4, 2021-01-05, exchange 216385, check: uncheckable)</li>
+<li id="s5">Disk tests can take about 10 minutes. Booting can be very slow. (user-39c0, 2023-01-01, exchange 220254, check: supported)</li>
+<li id="s6">Reconfiguring devices can make booting slower, especially if the battery is dead. (user-07ed, 2026-08-28, exchange 239208, check: uncheckable)</li>
+<li id="s7">The O2ctane won't boot with the enclosure connected. (user-6afa, 2022-02-01, exchange 221891, check: uncheckable)</li>
+<li id="s8">The Fuel may require an ATX adapter and replacement of environment monitoring chips to boot properly; it can be finicky about booting without a keyboard. (user-ba5b, 2026-03-31, exchange 200625, check: supported)</li>
+<li id="s9">The Fuel will not boot without graphics, but other SGI machines can boot without graphics. (user-cd83, 2026-07-22, exchange 124226, check: supported)</li>
+<li id="s10">The Fuel may have issues that result in only an L1 prompt, possibly due to a CPU board failure. (user-ba5b, 2026-03-31, exchange 200625, check: supported)</li>
+<li id="s11">I had powerstack openfirmware running on MVME1603 but I couldnt get anything to boot (user-9528, 2026-04-16, exchange 226354, check: uncheckable)</li>
+<li id="s12">The bottom device in a cluster of O300s wins the master election to boot the correct disk. (user-d203, 2021-01-23, exchange 98237, check: uncheckable)</li>
+<li id="s13">Passing `root=` to the kernel can be useful for booting; user-9860 successfully booted. (user-9860, 2021-10-03, exchange 100307, check: supported)</li>
+<li id="s14">it still will boot into the os and start x11 and cde fine (user-b1da, 2020-11-27, exchange 12473, check: uncheckable)</li>
+<li id="s15">This machine boots over the network but requires a hard drive. (user-cd83, 2026-07-23, exchange 226748, check: uncheckable)</li>
+<li id="s16">the process of booting a target involves acquiring an IP address, figuring out what to do next, acquiring a bootloader via TFTP, and booting a kernel via NFS (permissions issues may be related to root squash). (user-42cf, 2023-06-07, exchange 240055, check: uncheckable)</li>
+<li id="s17">The LED display shows '2' when booting, indicating some progress. (user-03ad, 2023-01-25, exchange 235310, check: supported)</li>
+<li id="s18">It doesn't support booting from SATA, but can boot from network. (user-9860, 2021-10-03, exchange 100335, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>, <a href="o300.html">O300</a>, <a href="machine.html">machine</a>
+</li>
+<li>Operating systems: <a href="os.html">OS</a>, <a href="x11.html">X11</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="cde.html">CDE</a>
+</li>
+<li>Parts and peripherals: <a href="l1-prompt.html">L1 prompt</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="hard-drive.html">hard drive</a>, <a href="network.html">network</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="openfirmware.html">OpenFirmware</a>, <a href="tftp.html">TFTP</a>
+</li></ul>
+</body>
+</html>

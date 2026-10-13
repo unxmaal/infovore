@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X protocol</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>X protocol</h1>
+<p>Claims: 4 Part of <a href="x.html">X</a></p>
+<p>VNc allows any client that supports VNc to access the entire desktop, but X protocol offers more functionality, though neither X protocol nor VNc provides good graphics acceleration or 3D frame rates. <sup><a href="#s1">1</a></sup> GL over X protocol with rendering on the local machine is simple and meshes well with the X window system. <sup><a href="#s2">2</a></sup> Changing a window to override-redirect after mapping won't notify the WM to release it; it has to be done before mapping. <sup><a href="#s3">3</a></sup> SDL2 should not pass invalid attributes to XCreateWindow, which can cause a BadMatch error; debugging involves checking the X protocol for valid arguments and testing each suspect value in SDL2's code. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">VNc allows any client that supports VNc to access the entire desktop, but X protocol offers more functionality. X and VNc do not provide good graphics acceleration or 3D frame rates. (user-c831, 2019-11-10, exchange 95679, check: supported)</li>
+<li id="s2">GL over X protocol with rendering on the local machine is simple and meshes well with the X window system. (user-21b8, 2024-02-08, exchange 209999, check: uncheckable)</li>
+<li id="s3">changing a window to override-redirect after mapping won't notify the WM to release it; it has to be done before mapping (user-21b8, 2023-10-03, exchange 215413, check: uncheckable)</li>
+<li id="s4">SDL2 should not pass invalid attributes to XCreateWindow, which can cause a BadMatch error; debugging involves checking the X protocol for valid arguments and testing each suspect value in SDL2's code. (user-21b8, 2025-11-12, exchange 72850, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="sdl2.html">SDL2</a>
+</li>
+<li>Other: <a href="vnc.html">VNC</a>, <a href="xcreatewindow.html">XCreateWindow</a>, <a href="window.html">window</a>
+</li></ul>
+</body>
+</html>

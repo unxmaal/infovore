@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cross-compilation</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>cross-compilation</h1>
+<p>Claims: 5</p>
+<p>Cross-compilation can be challenging due to packages expecting to run tools they've just compiled and those that use build tooling not supporting cross-compilation. <sup><a href="#s1">1</a></sup> This difficulty is especially evident with SBCL, which is written in Common Lisp, and with CLisp, where the inconsistency in binary naming between binutils and GCC can cause issues. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Cross-compilation from x86 to MIPS was challenging early on, with GCC providing subpar results compared to native compilation. <sup><a href="#s4">4</a></sup> user-2189's compilertron is a Docker container that can be used for cross-compilation with distcc on an IRIX box. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Cross-compilation can be challenging due to packages expecting to run tools they've just compiled and those that use build tooling not supporting cross-compilation. (user-2d09, 2019-11-03, exchange 68091, check: uncheckable)</li>
+<li id="s2">The inconsistency in binary naming between binutils and GCC can cause issues in cross-compilation, as seen with CLisp. (user-9b9c, 2019-07-18, exchange 67534, check: uncheckable)</li>
+<li id="s3">Cross-compilation can be challenging, especially with SBCL which is written in Common Lisp. (user-888b, 2020-04-30, exchange 7936, check: uncheckable)</li>
+<li id="s4">Cross-compilation from x86 to MIPS was challenging early on, with GCC providing subpar results compared to native compilation. (user-baf6, 2023-04-04, exchange 208520, check: uncheckable)</li>
+<li id="s5">user-2189's compilertron is a Docker container that can be used for cross-compilation with distcc on an IRIX box. (user-2189, 2021-11-30, exchange 70031, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="compilertron.html">Compilertron</a>, <a href="docker-container.html">Docker container</a>, <a href="sbcl.html">SBCL</a>, <a href="binutils.html">binutils</a>, <a href="distcc.html">distcc</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ethernet address</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Ethernet address</h1>
+<p>Claims: 9 Part of <a href="ethernet.html">Ethernet</a></p>
+<p>The Ethernet address is stored in non-volatile RAM (NVRAM) and is read during controller initialization, but a corrupted address may require a Dallas chip upgrade or manual setting of the MAC address. <sup><a href="#s1">1</a></sup> A bad serial and Ethernet address can prevent OpenBSD from booting, and manually setting them to correct values resolves the issue. <sup><a href="#s2">2</a></sup> The Ethernet address can be obtained by configuring Prom to bootp and reading the bootp logfile, or by using Booterizer to force a bootp request as seen in tftpd log entries. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The hostid and Ethernet address can be reprogrammed, the first two numbers indicate the machine type, and the hostid/MAC address is often noted on the NVRAM chip for newer machines. <sup><a href="#s5">5</a></sup> The location of the PROM holding the Ethernet address can cause problems when swapping mainboards, and the R3000 can be upgraded to an R4000 CPU board with the PROM routine copying the Ethernet address to the new location, though downgrading to R3000 is not easily possible. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> A dead NVRAM chip causing a wrong Ethernet address can prevent booting diagnostics over the network, and fixing NVRAM and resetting the Ethernet address might help on an Indy. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Ethernet address obtained from non-volatile RAM during controller initialization was corrupted, requiring a Dallas chip upgrade or setting a MAC address manually. The netmask is not available in miniroot, and serial- (user-5823, 2019-08-10, exchange 2976, check: uncheckable)</li>
+<li id="s2">Having a bad serial and Ethernet address can prevent OpenBSD from booting; manually setting them to correct values resolves the issue. (user-7151, 2022-07-11, exchange 239775, check: uncheckable)</li>
+<li id="s3">Prom can be configured to bootp, and the ethernet address can be obtained from the bootp logfile. (user-f229, 2019-09-23, exchange 3614, check: uncheckable)</li>
+<li id="s4">Booterizer can show the Ethernet address by forcing a bootp request, as seen in the tftpd log entries. (user-f229, 2019-12-31, exchange 77028, check: uncheckable)</li>
+<li id="s5">The hostid and Ethernet address can be reprogrammed, and the first two numbers indicate the machine type; hostid/mac address is often noted on the NVRAM chip for newer machines. (user-03ad, 2024-01-25, exchange 240225, check: supported)</li>
+<li id="s6">The location of the prom that holds the Ethernet address can cause problems when swapping mainboards back and forth. (user-03ad, 2023-06-14, exchange 107882, check: uncheckable)</li>
+<li id="s7">The R3000 can be upgraded to an R4000 CPU board, but the PROM routine copies the Ethernet address to the new location and downgrading to R3000 is not easily possible. (user-03ad, 2024-09-15, exchange 112131, check: supported)</li>
+<li id="s8">Fixing NVRAM and resetting the Ethernet address might help on an Indy. (user-03ad, 2025-04-12, exchange 212344, check: supported)</li>
+<li id="s9">Booting diagnostics over the network is also not possible due to a dead NVRAM chip causing a wrong Ethernet address. (user-e7f6, 2026-07-06, exchange 124007, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="mac-address.html">MAC address</a>, <a href="machine-type.html">machine type</a>
+</li>
+<li>Processors: <a href="r3000.html">R3000</a>, <a href="r4000.html">R4000</a>
+</li>
+<li>Operating systems: <a href="openbsd.html">OpenBSD</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>
+</li>
+<li>Parts and peripherals: <a href="nvram-chip.html">NVRAM chip</a>, <a href="dallas-chip.html">Dallas chip</a>, <a href="nvram.html">NVRAM</a>, <a href="prom.html">PROM</a>
+</li>
+<li>Standards and interfaces: <a href="bootp.html">bootp</a>
+</li>
+<li>Other: <a href="hostid.html">hostid</a>
+</li></ul>
+</body>
+</html>

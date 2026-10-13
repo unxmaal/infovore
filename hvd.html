@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HVD</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>HVD</h1>
+<p>Claims: 22</p>
+<p>HVD (High Voltage Differential) SCSI uses differential signaling, which reduces interference and signal degradation, making it more reliable and resistant to noise over longer distances and allowing longer cable lengths than SE or LVD. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> HVD was primarily an interconnect for disk arrays and external storage, used for long-distance connections to disk arrays and disk shelves that might be distant, and was used in tape libraries and tape drives with long cables. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> HVD and LVD are incompatible due to different voltage differences, and HVD can cause damage ("magic smoke") if mixed with SE or LVD. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> HVD can use standard HD50, HD68, and VHDCI connectors in addition to its specific connector, and can work on LVD but not guaranteed. <sup><a href="#s8">8</a></sup> HVD was used by Sun and DEC for external storage arrays, by Alphas for SCSI clustering and shared SCSI buses under VMS, by some HP9000 systems, and on Onyx1. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> HVD drives were difficult to handle and rebuild, could throw medium errors, and required careful handling. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Differential signaling in HVD makes it more reliable over longer distances by reducing interference and signal degradation. (user-07ed, 2022-07-01, exchange 30592, check: uncheckable)</li>
+<li id="s2">HVD runs can be longer due to being more resistant to noise (user-22f9, 2025-02-26, exchange 212084, check: uncheckable)</li>
+<li id="s3">Long SCSI cables for tape drives or disk shelves might require HVD for reliable operation. (user-07ed, 2022-07-01, exchange 30592, check: uncheckable)</li>
+<li id="s4">Tape libraries and disk arrays often used HVD for long-distance connections. (user-07ed, 2024-10-08, exchange 112353, check: uncheckable)</li>
+<li id="s5">HVD was primarily an interconnect for disk arrays, with only a few drives being natively HVD. (user-616d, 2024-10-08, exchange 112352, check: uncheckable)</li>
+<li id="s6">HVD and LVD are incompatible due to different voltage differences. (user-07ed, 2022-07-01, exchange 30592, check: uncheckable)</li>
+<li id="s7">HVD can cause magic smoke if mixed with SE or LVD. (user-86e1, 2025-05-21, exchange 225093, check: uncheckable)</li>
+<li id="s8">HVD can use standard HD50, HD68, and VHDCI connectors in addition to its specific connector. (user-7b1c, 2022-11-21, exchange 207959, check: uncheckable)</li>
+<li id="s9">Sun and DEC used HVD for external storage arrays. Alphas supported SCSI clustering and shared SCSI buses with HVD under VMS. Some HP9000 used HVD, not just the 735. A bunch of three-digit C-, J-, D-, and K-classes used H (user-03ad, 2024-10-08, exchange 224133, check: supported)</li>
+<li id="s10">Onyx1 uses HVD. (user-22f9, 2025-02-17, exchange 54389, check: uncheckable)</li>
+<li id="s11">Hot-swappable drive arrays (HVD) can be difficult to rebuild and can damage equipment if not handled carefully. (user-d960, 2025-08-25, exchange 212921, check: uncheckable)</li>
+<li id="s12">HVD can cause issues, as it may throw medium errors. (user-616d, 2025-11-01, exchange 119517, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="challenge.html">Challenge</a>, <a href="onyx1.html">Onyx1</a>, <a href="se.html">SE</a>
+</li>
+<li>Operating systems: <a href="vms.html">VMS</a>
+</li>
+<li>Parts and peripherals: <a href="disk-arrays.html">disk arrays</a>, <a href="tape-library.html">tape library</a>
+</li>
+<li>Standards and interfaces: <a href="lvd.html">LVD</a>
+</li>
+<li>Companies: <a href="dec.html">DEC</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="hd50.html">HD50</a>, <a href="hd68.html">HD68</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gold</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>gold</h1>
+<p>Claims: 6</p>
+<p>Gold is a linker that is lighter weight and has fewer lines of code than alternatives, which is why it was suggested as an option. <sup><a href="#s1">1</a></sup> Modern linkers like gold or lld only look in specified libraries and differ in how they handle undefined symbols of dependent libraries. <sup><a href="#s2">2</a></sup> Gold has a patch for MIPS64 and could improve IRIX's ld/bfd. <sup><a href="#s3">3</a></sup> Someone managed to get GOLD to compile, but it was segfaulting with gcc4, and the C++ issues with gcc8 may be related to stack unwinding, which uses DWARF sections. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Gold is a lot lighter weight and has less lines of code, hence why I suggested we give it a shot. (user-22f9, 2019-06-18, exchange 67241, check: uncheckable)</li>
+<li id="s2">Modern linkers like `gold` or `lld` only look in specified libraries and differ in handling undefined symbols of dependent libraries. (user-9860, 2021-10-18, exchange 79971, check: supported)</li>
+<li id="s3">gold has a patch for MIPS64 and could improve IRIX's ld/bfd. (user-22f9, 2019-02-08, exchange 499, check: uncheckable)</li>
+<li id="s4">I managed to get GOLD to compile but it was segfaulting all over the place with gcc4, and I wonder if the C++ issues with gcc8 are related to stack unwinding, which uses DWARF sections. (user-2d09, 2019-06-18, exchange 67241, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips64.html">MIPS64</a>
+</li>
+<li>Parts and peripherals: <a href="cpu.html">CPU</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="gcc4.html">gcc4</a>, <a href="gcc8.html">gcc8</a>
+</li>
+<li>Other: <a href="electronics.html">electronics</a>, <a href="lld.html">lld</a>
+</li></ul>
+</body>
+</html>

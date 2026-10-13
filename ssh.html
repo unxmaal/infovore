@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSH</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SSH</h1>
+<p>Claims: 55 Background: 13 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Secure_Shell">Secure Shell</a>, <a href="https://en.wikipedia.org/wiki/Remote_Shell">Remote Shell</a>, <a href="https://en.wikipedia.org/wiki/X_Window_System">X Window System</a>.</p>
+<p>SSH is an old-school remote access protocol that provides a terminal session on the remote machine. <sup><a href="#s1">1</a></sup> It can be used for login, copying files, and remote access with X11 forwarding. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s1">1</a></sup> The command 'ssh -Y' enables trusted X11 forwarding for remote graphical sessions. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> X11 forwarding over SSH can be slow due to crypto overhead, so X11 compression should be enabled. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> SSH has been ported to various systems, including IRIX, A/UX, and 68k Macs, and can serve as an alternative to IRC clients or telnet/RSH. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> SSH can encounter issues such as client or configuration errors, timeouts during cloning, and failures caused by VirtualBox kernel module problems. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> SSH can create tunnels to forward connections to specified ports, and can be used with the -R option to create a remote port that redirects to a port on the firewall. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> ssh and rsh use stdin/stdout to pipe commands, allowing remote execution of dd, tar, or xfsdump, and xfsdump output can be piped to ssh or rsh for remote backup execution. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> NFS, SSH, and RSH are different network protocols. <sup><a href="#s20">20</a></sup> ssh can be a symlink to rsh under alternatives on Debian, and rsh can be installed with rsh-client. <sup><a href="#s21">21</a></sup> Irix 6.5.2x supports ssh, scp, and git. <sup><a href="#s22">22</a></sup> TLS and SSH key management is resource-intensive on NetBSD. <sup><a href="#s23">23</a></sup> The R4600PC-100 has telnet but not SSH, and its SSH daemon is slow and may time out during key negotiation. <sup><a href="#s24">24</a></sup> Connecting to the MCP server can be done via SSH for IRIX 6.5/6.2 or using a TCP/inetd/TCP wrappers method for IRIX 5.3, and netcat on Windows, macOS, or Linux. <sup><a href="#s25">25</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SSH is an old-school remote access protocol that provides a terminal session on the remote machine. (user-b7c4, 2021-04-06, exchange 16299, check: uncheckable)</li>
+<li id="s2">Use SSH and WinSCP to copy files from a PC to IRIX. (user-f9d4, 2019-06-22, exchange 2161, check: uncheckable)</li>
+<li id="s3">The system uses SSH for login and has an IP35 processor running at 800 MHz. (user-b7c4, 2019-06-22, exchange 67271, check: supported)</li>
+<li id="s4">Remote access to IRIX can be achieved via SSH and X forwarding; period-accurate remote desktop software exists but is not used by the speaker; Windows users can use Xmanager 6 for remote access (user-59fe, 2019-07-19, exchange 2635, check: supported)</li>
+<li id="s5">The command 'ssh -Y' works nicely for remote graphical sessions. (user-f229, 2020-06-10, exchange 8927, check: uncheckable)</li>
+<li id="s6">ssh with -Y enables trusted X11 forwarding. (user-17cb, 2020-12-28, exchange 98104, check: uncheckable)</li>
+<li id="s7">X11 forwarding over SSH can be slow, especially with crypto overhead. (user-42cf, 2020-01-16, exchange 96194, check: uncheckable)</li>
+<li id="s8">X11 compression should be enabled for SSH X forwarding, and some clients may need it specified. (user-cb4c, 2020-01-16, exchange 96194, check: uncheckable)</li>
+<li id="s9">SSH is an alternative to IRC clients on 68k Macs. (user-d903, 2019-12-18, exchange 220835, check: supported)</li>
+<li id="s10">SSH has been ported to A/UX, but it is not recent and uses an old cipher set. (user-27eb, 2020-05-24, exchange 231224, check: uncheckable)</li>
+<li id="s11">RSH or telnet can be used as alternatives to SSH. (user-c831, 2023-04-27, exchange 37660, check: uncheckable)</li>
+<li id="s12">rsh and ssh are different protocols; rshd checks .rhosts for authentication. (user-d2ef, 2023-05-25, exchange 38211, check: uncheckable)</li>
+<li id="s13">The Ansible provisioning task fails due to a FileNotFoundError for 'ssh', suggesting an issue with the SSH client or configuration. (user-503b, 2019-09-27, exchange 76859, check: uncheckable)</li>
+<li id="s14">SSH timeouts can occur during cloning processes. (user-8547, 2022-11-04, exchange 33755, check: uncheckable)</li>
+<li id="s15">VirtualBox kernel module issues can cause SSH failures. (user-5510, 2023-08-10, exchange 209035, check: uncheckable)</li>
+<li id="s16">You can use SSH with the -R option to create a remote port on the SGI that redirects to a port on the firewall. (user-21b8, 2024-07-16, exchange 215529, check: uncheckable)</li>
+<li id="s17">ssh can create tunnels to forward connections to specified ports (user-21b8, 2024-07-16, exchange 71431, check: uncheckable)</li>
+<li id="s18">ssh and rsh use stdin/stdout to pipe commands, allowing remote execution of dd, tar, or xfsdump. (user-07ed, 2025-01-10, exchange 211557, check: uncheckable)</li>
+<li id="s19">xfsdump output can be piped to ssh or rsh for remote backup execution. (user-07ed, 2025-01-10, exchange 211557, check: uncheckable)</li>
+<li id="s20">NFS, SSH, and RSH are different network protocols; DD creates disk images, while xfsdump backs up files incrementally into a .tar or .tar.gz file. (user-6dfb, 2025-01-10, exchange 52045, check: uncheckable)</li>
+<li id="s21">rsh is a command that can be a symlink to ssh under alternatives on Debian, and can be installed with rsh-client. (user-6dfb, 2025-01-10, exchange 211558, check: uncheckable)</li>
+<li id="s22">Irx 6.5.2x supports ssh, scp, and git. (user-21b8, 2025-03-31, exchange 86911, check: supported)</li>
+<li id="s23">TLS and SSH key management is resource-intensive on NetBSD. (user-231e, 2026-01-15, exchange 219406, check: uncheckable)</li>
+<li id="s24">The R4600PC-100 has telnet but not SSH; SSH daemon is slow and may time out during key negotiation. (user-231e, 2026-01-26, exchange 61693, check: supported)</li>
+<li id="s25">Connecting to the MCP server can be done via SSH for IRIX 6.5/6.2 or using a TCP/inetd/TCP wrappers method for IRIX 5.3, and netcat on Windows, macOS, or Linux. (user-2a3c, 2026-06-06, exchange 219782, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="ssh-client.html">ssh client</a> (3)
+</li>
+<li><a href="ssh-server.html">SSH server</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iris.html">IRIS</a>, <a href="mcp-server.html">MCP server</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="x11.html">X11</a>, <a href="x11-forwarding.html">X11 forwarding</a>, <a href="a-ux.html">A/UX</a>, <a href="debian.html">Debian</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="netbsd.html">NetBSD</a>, <a href="kernel-module.html">kernel module</a>
+</li>
+<li>Software: <a href="rsh.html">rsh</a>, <a href="python.html">Python</a>, <a href="git.html">git</a>, <a href="barrier.html">Barrier</a>, <a href="booterizer.html">Booterizer</a>, <a href="irc.html">IRC</a>, <a href="mame.html">MAME</a>, <a href="virtualbox.html">VirtualBox</a>, <a href="ansible.html">ansible</a>, <a href="dd.html">dd</a>, <a href="emacs.html">emacs</a>, <a href="firewall.html">firewall</a>, <a href="irix-ansible.html">irix_ansible</a>, <a href="scp.html">scp</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="tar.html">tar</a>, <a href="wget.html">wget</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="serial-console.html">serial console</a>
+</li>
+<li>Standards and interfaces: <a href="x-forwarding.html">X forwarding</a>, <a href="telnet.html">telnet</a>, <a href="dhcp.html">DHCP</a>, <a href="nfs.html">NFS</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="rhosts.html">.rhosts</a>, <a href="http.html">HTTP</a>, <a href="suse.html">SUSE</a>, <a href="alternatives.html">alternatives</a>, <a href="compression.html">compression</a>, <a href="mutt.html">mutt</a>, <a href="netcat.html">netcat</a>
+</li></ul>
+</body>
+</html>

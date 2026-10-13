@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sw_config</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>sw_config</h1>
+<p>Claims: 5</p>
+<p>The sw_config tool and related tools are missing from the /usr/discreet/sw folder, and running sw_config results in a segmentation error. <sup><a href="#s1">1</a></sup> The NVMe drive is seen on 2008SP6 but causes segmentation faults with sw_config. <sup><a href="#s2">2</a></sup> sw_config requires a previous setup drive's preferences, which are not found in cfg files and are stored elsewhere. <sup><a href="#s3">3</a></sup> sw_config reports an 'operation starts past end of partition' error when attempting to use an XFS filesystem. <sup><a href="#s4">4</a></sup> To set up the drive, use sw_config, apply the date patch, and place the license file in /etc, choosing the filesystem type in init.cfg; Version 7.6 and 7.7 supported a generic file for storage. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The sw_config and related tools are missing from the /usr/discreet/sw folder, and running sw_config results in a segmentation error. (user-f352, 2022-08-17, exchange 143158, check: uncheckable)</li>
+<li id="s2">The NVMe drive is seen on 2008SP6 but causes segmentation faults with sw_config. (user-4847, 2026-08-17, exchange 143424, check: uncheckable)</li>
+<li id="s3">sw_config requires a previous setup drive's preferences, not found in cfg files, stored elsewhere. (user-164b, 2023-05-02, exchange 143235, check: uncheckable)</li>
+<li id="s4">sw_config reports an 'operation starts past end of partition' error when attempting to use an XFS filesystem. (user-1171, 2023-06-05, exchange 83690, check: uncheckable)</li>
+<li id="s5">To set up the drive, use `sw_config`, apply the date patch, and place the license file in /etc; choose the filesystem type in `init.cfg`. Version 7.6 and 7.7 supported a generic file for storage. (user-ce6b, 2025-06-13, exchange 231104, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="xfs.html">XFS</a>, <a href="license-file.html">license file</a>
+</li>
+<li>Parts and peripherals: <a href="nvme-drive.html">NVMe drive</a>
+</li></ul>
+</body>
+</html>

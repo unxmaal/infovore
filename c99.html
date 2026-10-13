@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C99</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>C99</h1>
+<p>Claims: 16 Part of <a href="c-2.html">C</a> Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/Open64">Open64</a>.</p>
+<p>MIPSpro is an older SGI compiler that supports C89 and is fast but may lack full C99 support, having been K&amp;R before becoming ANSI C and then stopping at C99. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> MIPSpro supports many C99 features but some constructs can cause it to crash, and it supports at least C99 and possibly C95. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> Variable attributes in C99 are implemented via macros that control compiler behavior. <sup><a href="#s5">5</a></sup> The declaration int xyz[]; is officially supported in C99 and MIPSpro, whereas int xyz<sup><a href="#s0">0</a></sup>; was a GCC-ism before C99. <sup><a href="#s6">6</a></sup> Microsoft used an array declaration at the end of bitmap header structs in early Windows SDKs, before C99. <sup><a href="#s7">7</a></sup> The isnan function is defined in math.h in C99. <sup><a href="#s8">8</a></sup> The stdint.h header is required for C99 compilers but may be optional for C89 compilers on IRIX, and upgrading the compiler to C99 is recommended for future compatibility. <sup><a href="#s9">9</a></sup> Compiling GCC on HP-UX with a C99 compiler may fail due to bootstrap comparison errors, so a C89 compiler should be used instead. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">MIPSpro is an older SGI compiler that supports C89 and is fast but may lack full C99 support. (user-42cf, 2019-07-12, exchange 2460, check: uncheckable)</li>
+<li id="s2">MIPSpro compiler was K&amp;R before becoming ANSI C, then stopped at C99. (user-8547, 2022-11-15, exchange 82411, check: uncheckable)</li>
+<li id="s3">mipspro supports many C99 features but some constructs can cause it to crash. (user-42cf, 2019-02-02, exchange 203672, check: uncheckable)</li>
+<li id="s4">MIPSpro supports at least C99 and possibly C95. (user-8547, 2024-05-13, exchange 218394, check: uncheckable)</li>
+<li id="s5">variable attributes in C99 are implemented via macros that control compiler behavior. (user-42cf, 2019-02-02, exchange 203672, check: uncheckable)</li>
+<li id="s6">int xyz<sup><a href="#s0">0</a></sup>; is a GCC-ism before C99; int xyz[]; is officially supported in C99 and MIPSpro; using -c99 flag for cc might work. (user-8547, 2019-03-22, exchange 67143, check: supported)</li>
+<li id="s7">Microsoft used an array declaration at the end of bitmap header structs in early Windows SDKs, before C99. (user-9b9c, 2019-03-23, exchange 67144, check: uncheckable)</li>
+<li id="s8">The isnan function is defined in math.h in C99. (user-b1da, 2022-12-26, exchange 215353, check: uncheckable)</li>
+<li id="s9">The stdint.h header is required for C99 compilers but may be optional for C89 compilers on IRIX; upgrading the compiler to C99 is recommended for future compatibility. (user-21b8, 2024-05-11, exchange 215492, check: uncheckable)</li>
+<li id="s10">Compiling GCC on HP-UX with a C99 compiler may fail due to bootstrap comparison errors; try using a C89 compiler instead. (user-b1da, 2020-06-06, exchange 8868, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="mipspro.html">MIPSpro</a>, <a href="c89.html">C89</a>, <a href="cc.html">cc</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="hp.html">HP</a>, <a href="sgi.html">SGI</a>
+</li></ul>
+</body>
+</html>

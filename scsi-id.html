@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI ID</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI ID</h1>
+<p>Claims: 32 Part of <a href="scsi.html">SCSI</a></p>
+<p>The SCSI ID of a drive can be set using jumpers on the PCB, white pins, or by shorting specific pins, and these methods are used to avoid ID conflicts, especially for the boot drive which should be ID 1. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> SGI drives often default to SCSI ID 0, which can cause conflicts, and most SGI systems boot from SCSI ID 1 by default. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> On SGIs, the SCSI controller is #0 rather than #7, and the SCSI ID is often set based on the physical slot the drive occupies, with the first slot getting ID 1 as the regular boot disk. <sup><a href="#s4">4</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Pre-SCA SGI systems often made setting the SCSI ID easy or automatic, and the SCA bus can set the SCSI ID, though this is not implemented by default and slot swapping changes the drive ID instead of the image filename. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The interposer board defines the SCSI ID, power, and other functions rather than the direct SCA ribbon, and the CD-ROM drive's SCSI ID is typically hardcoded per slot but can sometimes be changed using jumpers on the drive or the SCA adapter. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> On the O2, changing the SCSI ID is done through a PROM variable, and the CD-ROM's SCSI ID might need to be changed if ID 3 is incorrect. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup> For the BlueSCSI, the SCSI ID is set by filename, and it can be jumpered for ID 1 and placed in any bay to work. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> The Zulu Control Board can handle multiple images for the same SCSI ID. <sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">AFAIR that sets the scsi ID of the drive (user-42cf, 2021-07-13, exchange 99464, check: uncheckable)</li>
+<li id="s2">The buttons on the front panel control the SCSI ID by changing jumpers on the PCB. (user-b1da, 2021-09-29, exchange 205631, check: uncheckable)</li>
+<li id="s3">The white pins are for setting the SCSI ID and the black sockets are for termination. (user-b7c4, 2022-05-01, exchange 103538, check: uncheckable)</li>
+<li id="s4">On SGIs, the SCSI controller is #0, not #7, and you must set the drive's SCSI ID using a jumper to avoid conflicts, especially for the boot drive which should be ID 1. (user-86e1, 2024-06-17, exchange 210520, check: supported)</li>
+<li id="s5">The system sets the drives SCSI ID based on the slot it’s in but has to short specific pins to do so; no cable, no jumper, no short causes a conflicting ID. (user-2a3c, 2025-02-09, exchange 114644, check: uncheckable)</li>
+<li id="s6">SGI drives often default to SCSI ID 0, which can cause issues. (user-7b1c, 2022-05-01, exchange 103539, check: supported)</li>
+<li id="s7">Most SGI systems would boot from SCSI ID 1 by default. (user-1629, 2024-11-28, exchange 211342, check: supported)</li>
+<li id="s8">For SGIs, use the proper SCSI ID for the physical slot, and set the 'force single ended' jumper if needed. (user-03ad, 2024-06-17, exchange 210520, check: uncheckable)</li>
+<li id="s9">Having the SCA bus set the SCSI ID is a nice-to-have feature but not essential; the first slot gets ID 1 and is the regular boot disk, while extra slots are for options disks. (user-5906, 2025-11-08, exchange 119631, check: supported)</li>
+<li id="s10">Pre-SCA SGI systems often made it easy or automatic to set the SCSI ID. (user-b1da, 2022-05-01, exchange 103539, check: uncheckable)</li>
+<li id="s11">The SCA bus can set the SCSI ID, but it is not implemented by default; slot swapping changes the drive ID instead of the image filename. (user-5906, 2025-11-08, exchange 119631, check: uncheckable)</li>
+<li id="s12">The CD-ROM drive's SCSI ID is typically hardcoded per slot but can sometimes be changed using jumpers on the drive or the SCA adapter. (user-3e2d, 2025-02-08, exchange 114634, check: uncheckable)</li>
+<li id="s13">The interposer board defines SCSI ID, power, and other functions, not the direct SCA ribbon. (user-e4e2, 2026-08-09, exchange 219943, check: uncheckable)</li>
+<li id="s14">Changing the SCSI ID on an O2 is just a PROM variable. (user-1a5a, 2026-01-03, exchange 225859, check: supported)</li>
+<li id="s15">SCSI ID 3 might be incorrect for the CDROM; try another ID. (user-c986, 2026-07-23, exchange 226751, check: supported)</li>
+<li id="s16">For the BlueSCSI, set the SCSI ID by filename (e.g., HD1_IRIX_63.img for ID1). (user-86e1, 2024-06-18, exchange 210527, check: uncheckable)</li>
+<li id="s17">Jumper the BlueSCSI for ID1 and place it in any bay; it will work. (user-86e1, 2024-06-18, exchange 210527, check: uncheckable)</li>
+<li id="s18">The Zulu Control Board can handle multiple images for the same SCSI ID. (user-616d, 2025-09-18, exchange 225455, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="cd-rom-drive.html">CD-ROM drive</a>, <a href="crimson.html">Crimson</a>, <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="bluescsi.html">BlueSCSI</a>, <a href="power.html">POWER</a>, <a href="qic-drive.html">QIC drive</a>, <a href="drive.html">drive</a>, <a href="hard-drive.html">hard drive</a>, <a href="jumper.html">jumper</a>
+</li>
+<li>Standards and interfaces: <a href="sca-bus.html">SCA bus</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="daystar-genesis-mp.html">Daystar Genesis MP</a>, <a href="hpib.html">HPIB</a>, <a href="mfm.html">MFM</a>, <a href="ntt-indy.html">NTT Indy</a>, <a href="configuration-file.html">configuration file</a>, <a href="filename.html">filename</a>, <a href="function.html">function</a>, <a href="pin.html">pin</a>, <a href="slot.html">slot</a>, <a href="termination.html">termination</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CD-ROM drive</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CD-ROM drive</h1>
+<p>Claims: 39 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/CD-ROM">CD-ROM</a>, <a href="https://en.wikipedia.org/wiki/Optical_disc_drive">Optical disc drive</a>.</p>
+<p>CD-ROM drives can suffer from a variety of mechanical and electrical problems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Tray mechanisms may get stuck, which can be fixed by moving a white gear on a shaft, while the O2 drive can have trouble returning to its original position. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The manual eject rod can break off and needs to be epoxied back, and the black-plastic insert inside the front bezel can break, causing the button to be held down about half the time. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Some issues are resolved by adjusting SCSI settings, such as setting termination back to 'on' on the DIP switches, checking for a terminator jumper, enabling termpwr, or disconnecting the drive to avoid SCSI bus problems. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The SCSI ID is typically hardcoded per slot but can sometimes be changed using jumpers on the drive or the SCA adapter, and jumpers should be checked, particularly on the bottom side. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The drive may have issues with certain media, as high reflectivity CD-RW and CD-R discs work better, while 700 MB discs are not typically a problem for O2 drives. <sup><a href="#s14">14</a></sup> A CD-ROM drive that can read the entire disc, including the margins, is needed for an SGI disc. <sup><a href="#s15">15</a></sup> The CD-ROM drive works fine on the Octane, but the Octane itself lacks a built-in drive and instead relies on network connectivity, NFS mounts, and external SCSI enclosures. <sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The CD-ROM drive has gears that can cause the tray to get stuck; moving a white gear on a shaft fixed the issue. (user-8547, 2019-08-19, exchange 3100, check: uncheckable)</li>
+<li id="s2">The O2 CD-ROM drive can have issues returning to its original position. (user-2189, 2019-10-06, exchange 3756, check: supported)</li>
+<li id="s3">A CD-Rom drive replacement is needed due to damage. (user-818d, 2023-11-12, exchange 240176, check: uncheckable)</li>
+<li id="s4">A 40oz dead blow hammer was used to fix a CD-ROM drive issue. (user-2a3c, 2025-08-02, exchange 212826, check: supported)</li>
+<li id="s5">The CD-ROM drive's manual eject rod can break off and needs to be epoxied back. (user-231e, 2025-12-20, exchange 225802, check: uncheckable)</li>
+<li id="s6">The black-plastic insert inside the CD-ROM drive's front bezel can break, causing the button to be held down 50% of the time. (user-231e, 2025-12-20, exchange 225802, check: supported)</li>
+<li id="s7">There's also something wrong with the CDROM drive, if it's even there. Molex pulled, front button looks odd (user-86e1, 2026-01-28, exchange 243627, check: uncheckable)</li>
+<li id="s8">The issue was a 'Too much data requested... resetting SCSI bus' error when trying to install software from a CD, which was resolved by setting the termination back to 'on' on the DIP switches of the CD-ROM drive. (user-59fe, 2021-09-02, exchange 205486, check: uncheckable)</li>
+<li id="s9">Check for a terminator jumper on the CDROM drive. (user-3e2d, 2025-05-28, exchange 212545, check: uncheckable)</li>
+<li id="s10">Disconnect the CDROM drive to avoid issues on the SCSI bus. (user-3e2d, 2025-05-28, exchange 56858, check: uncheckable)</li>
+<li id="s11">Enabling termpwr from the CDROM drive resolved SCSI issues in one case. (user-24f0, 2025-09-30, exchange 118934, check: uncheckable)</li>
+<li id="s12">The CD-ROM drive's SCSI ID is typically hardcoded per slot but can sometimes be changed using jumpers on the drive or the SCA adapter. (user-3e2d, 2025-02-08, exchange 114634, check: uncheckable)</li>
+<li id="s13">The CDROM drive should be checked for jumpers, particularly on the bottom side. (user-c831, 2025-05-28, exchange 212545, check: uncheckable)</li>
+<li id="s14">The O2's CDROM drive may have issues with CD-RW discs and some CD-Rs; high reflectivity media works better; 700 MB discs are not typically a problem for O2 drives; networking options include NFS, SMB, and FTP; /etc/fstab (user-24f0, 2024-06-08, exchange 46499, check: supported)</li>
+<li id="s15">A CD-ROM drive that can read the entire disc, including the 'margins', is needed for an SGI disc. (user-24f0, 2025-09-25, exchange 59603, check: uncheckable)</li>
+<li id="s16">The CDROM drive works fine on the Octane. (user-8de9, 2022-08-13, exchange 217655, check: supported)</li>
+<li id="s17">The Octane lacks a CD-ROM drive but compensates with network connectivity and NFS mounts, and external SCSI enclosures were common. (user-24f0, 2025-10-09, exchange 119057, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="indigo.html">Indigo</a>, <a href="netbooting.html">netbooting</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="mame.html">MAME</a>
+</li>
+<li>Parts and peripherals: <a href="256mb-of-ram.html">256MB of RAM</a>, <a href="dip-switches.html">DIP switches</a>, <a href="dvd-drive.html">DVD drive</a>, <a href="scsi-dvd-drive.html">SCSI DVD drive</a>, <a href="zuluscsi.html">ZuluSCSI</a>, <a href="jumper.html">jumper</a>, <a href="network-installation.html">network installation</a>, <a href="power-led.html">power LED</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="nfs-mount.html">NFS mount</a>, <a href="scsi-id.html">SCSI ID</a>, <a href="scsi-bus.html">SCSI bus</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>, <a href="sgi-disc.html">SGI disc</a>
+</li>
+<li>Other: <a href="smb.html">SMB</a>, <a href="gear.html">gear</a>, <a href="termpwr.html">termpwr</a>
+</li></ul>
+</body>
+</html>

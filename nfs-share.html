@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFS share</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>NFS share</h1>
+<p>Claims: 21 Part of <a href="nfs.html">NFS</a></p>
+<p>NFS shares can store disk images created with dd. <sup><a href="#s1">1</a></sup> NFS shares can hold IRIX installers and development packages, and properly chosen paths can serve as installation prefixes for cross-compilers, allowing direct installation on an SGI. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> BSD or Solaris are better choices for an NFS server than macOS. <sup><a href="#s4">4</a></sup> The boot process can reboot and run INST with a new selections file pointing to an NFS share for MIPSpro stuff. <sup><a href="#s5">5</a></sup> NFS shares can be used to transfer files to IRIX, and an IPX can copy files to an NFS share. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> A conditional mount in fstab allows the NFS share to connect on demand, avoiding issues with systems not always on. <sup><a href="#s8">8</a></sup> To mount an NFS share from IRIX to Linux, add the share to /etc/fstab with appropriate options and click the unmounted drive icon in the file manager to mount it on demand. <sup><a href="#s9">9</a></sup> Moving /usr/src to an NFS share on a gem ethernet could improve performance. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">You can use dd to make a disk image and store it on an NFS share. (user-cd83, 2020-01-18, exchange 5528, check: uncheckable)</li>
+<li id="s2">Properly chosen NFS share paths can be used as installation prefixes for cross-compilers, allowing direct installation on an SGI. (user-42cf, 2019-01-01, exchange 66906, check: uncheckable)</li>
+<li id="s3">The NFS share contains IRIX installers and development packages. (user-f229, 2020-01-01, exchange 77053, check: uncheckable)</li>
+<li id="s4">BSD or Solaris are better choices for an NFS server than macOS. (user-22f9, 2019-04-26, exchange 203770, check: uncheckable)</li>
+<li id="s5">The boot process can reboot and run INST with a new selections file pointing to an NFS share for MIPSpro stuff. (user-f229, 2020-01-01, exchange 5252, check: uncheckable)</li>
+<li id="s6">An IPX can copy files to an NFS share. (user-ab99, 2022-03-13, exchange 27189, check: uncheckable)</li>
+<li id="s7">NFS share or FTP can be used to transfer files to IRIX; NFS is used by the speaker for household file transfers. (user-24f0, 2024-11-30, exchange 51151, check: uncheckable)</li>
+<li id="s8">Using a conditional mount in fstab allows the NFS share to connect on demand, avoiding issues with systems not always on. (user-17cb, 2024-12-12, exchange 218642, check: uncheckable)</li>
+<li id="s9">To mount an NFS share from IRIX to Linux, add the share to /etc/fstab with appropriate options and click the unmounted drive icon in the file manager to mount it on demand. (user-17cb, 2025-03-27, exchange 212267, check: uncheckable)</li>
+<li id="s10">Moving /usr/src to an NFS share on a gem ethernet could improve performance. (user-07ed, 2026-07-15, exchange 240906, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="ipx.html">IPX</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>, <a href="bsd.html">BSD</a>, <a href="irix.html">IRIX</a>, <a href="irix-install.html">IRIX install</a>, <a href="irix-installer.html">IRIX installer</a>
+</li>
+<li>Software: <a href="dd.html">dd</a>, <a href="efs-disc.html">EFS disc</a>, <a href="mipspro.html">MIPSpro</a>, <a href="boot-process.html">boot process</a>, <a href="cross-compiler.html">cross-compiler</a>, <a href="inst.html">inst</a>, <a href="rsync.html">rsync</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>, <a href="disk-image.html">disk image</a>, <a href="drive.html">drive</a>
+</li>
+<li>Standards and interfaces: <a href="ftp.html">FTP</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="etc-fstab.html">/etc/fstab</a>, <a href="safecopy.html">safecopy</a>
+</li></ul>
+</body>
+</html>

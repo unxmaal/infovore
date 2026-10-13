@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>secondary cache</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>secondary cache</h1>
+<p>Claims: 9</p>
+<p>The 133MHz R4600SC processor module has 512KB of secondary cache, and most R4k Indys still have secondary cache. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Secondary cache is not in the CPU but consists of 4 SIMMs per CPU, with 1MB or 4MB available depending on the type, and 250MHz CPUs typically have 4MB. <sup><a href="#s3">3</a></sup> The ROctane has secondary cache, and the RM5271 can have 512kB, 1MB, 2MB, or 4MB secondary cache, depending on the PROM configuration. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> IRIX 5 requires more RAM and secondary cache than 16MB to run properly, but SGI shipped systems with insufficient components to cut costs. <sup><a href="#s6">6</a></sup> Modifying an R5000PC to have secondary cache involves obtaining NOS cache chips and having them installed by a specialist. <sup><a href="#s7">7</a></sup> The RM7000A Issue No. 5 from August 2002 mentions that the mode bit sets the write mode to the internal I/D and secondary cache and JTLB, but not the tertiary cache. <sup><a href="#s8">8</a></sup> A full schematic is needed to figure out how the secondary cache is implemented, as it seems they are not using the R5k's external cache controller. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The 133MHz R4600SC processor module has 512KB secondary cache (user-f229, 2022-02-28, exchange 222050, check: supported)</li>
+<li id="s2">Most R4k Indys still have secondary cache. (user-8de9, 2022-08-30, exchange 104745, check: supported)</li>
+<li id="s3">Secondary cache is not in the CPU, it’s those 4 SIMMs per CPU, with 1MB or 4MB available depending on the type, and 250MHz CPUs typically have 4MB. (user-86e1, 2023-09-09, exchange 223332, check: supported)</li>
+<li id="s4">The ROctane has secondary cache. (user-281e, 2024-07-28, exchange 210726, check: uncheckable)</li>
+<li id="s5">The RM5271 can have 512kB, 1MB, 2MB, or 4MB secondary cache, depending on the PROM configuration. (user-757f, 2026-03-05, exchange 226163, check: supported)</li>
+<li id="s6">IRIX 5 requires more RAM and secondary cache than 16 MB to run properly; SGI shipped systems with insufficient components to cut costs. (user-8de9, 2025-02-02, exchange 53736, check: supported)</li>
+<li id="s7">Modifying an R5000PC to have secondary cache involves obtaining NOS cache chips and having them installed by a specialist. (user-22f9, 2025-02-17, exchange 114775, check: uncheckable)</li>
+<li id="s8">The RM7000A Issue No. 5 from August 2002 mentions that the mode bit sets the write mode to the internal I/D and secondary cache and JTLB, but not the tertiary cache. (user-c799, 2026-01-25, exchange 121140, check: supported)</li>
+<li id="s9">I need a full schematic to figure out how the secondary cache is implemented, as it seems they're not using the R5k's external cache controller. (user-757f, 2026-05-05, exchange 201271, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="secondary-cache-size.html">secondary cache size</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Processors: <a href="r4000.html">R4000</a>, <a href="rm5271.html">RM5271</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Parts and peripherals: <a href="ram.html">RAM</a>, <a href="simm.html">SIMM</a>
+</li></ul>
+</body>
+</html>

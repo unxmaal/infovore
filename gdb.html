@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gdb</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>gdb</h1>
+<p>Claims: 52 Background: 18 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/GNU_Debugger">GNU Debugger</a>, <a href="https://en.wikipedia.org/wiki/Dbx_%28debugger%29">Dbx (debugger)</a>, <a href="https://en.wikipedia.org/wiki/Ghidra">Ghidra</a>.</p>
+<p>gdb is a debugger that can print backtraces and show the call stack to help diagnose issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> gdb can debug binaries compiled with gcc and mipspro, and can be used for GCC-compiled code, though it is not reliable with binaries created using the latest gcc8 build. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> gdb works well with binaries built using gcc4, but Merijn's gcc-4.6.1 generates binaries that could not be debugged with the included GDB. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> gdb has limited support for threads on IRIX, and may not be effective for debugging pthreads issues. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> gdb can be run on a binary from within the build tree of an autotools project using 'libtool --mode=execute gdb'. <sup><a href="#s11">11</a></sup> gdb can have issues with IRIX 6.5.22, including infinite loops when stepping into libc calls. <sup><a href="#s12">12</a></sup> gdb on IRIX does not properly support ptrace for stepping and other debugging tasks. <sup><a href="#s13">13</a></sup> gdb can be compiled with the -g flag. <sup><a href="#s14">14</a></sup> GDB is a symbolic debugger for C/C++ that works well but has issues with 16-bit x86 code through qemu stubs. <sup><a href="#s15">15</a></sup> It offered support for Unix systems, with better performance when using GCC. <sup><a href="#s16">16</a></sup> GDB has issues with pthreads and other things built with GCC, and dbx has problems with GCC-built programs. <sup><a href="#s17">17</a></sup> GDB can be used to debug MIPS applications by running specific commands like `bt`, `info registers`, and `disassemble` when the program bus errors, and it can be used to debug a program that segmentation faults. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> GDB on IRIX only works by accident and isn't good at debugging C++ code, and it isn't very good at driving processes with ptrace on IRIX. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup> Using gdb or ddd on the IRIX port results in the program hanging without responding to CTRL-C until it crashes. <sup><a href="#s22">22</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">dbx is the SGI equivalent of gdb and can print a backtrace for debugging. (user-42cf, 2019-02-03, exchange 66987, check: uncheckable)</li>
+<li id="s2">The bt command in gdb can show the call stack to help diagnose issues. (user-42cf, 2019-02-19, exchange 67084, check: uncheckable)</li>
+<li id="s3">Use gdb for debugging GCC compiled code and dbx/workshop for MIPSPro compiled code. (user-8547, 2019-05-11, exchange 214752, check: uncheckable)</li>
+<li id="s4">gdb can debug binaries with gcc and mipspro debugging symbols if configured correctly. (user-42cf, 2019-05-11, exchange 214753, check: uncheckable)</li>
+<li id="s5">gdb isn't reliable with binaries created using the latest gcc8 build. (user-2d09, 2019-07-21, exchange 67581, check: uncheckable)</li>
+<li id="s6">gdb works well with binaries built using gcc4. (user-2d09, 2019-07-21, exchange 67581, check: uncheckable)</li>
+<li id="s7">Merijn's gcc-4.6.1 generates Perl that endlessly loops and binaries it generates could not be debugged with the included GDB. (user-3e3c, 2021-03-03, exchange 15112, check: supported)</li>
+<li id="s8">GDB may not be effective for debugging pthreads issues. (user-2d09, 2019-10-03, exchange 67994, check: uncheckable)</li>
+<li id="s9">gdb does not support IRIX threads well. (user-42cf, 2020-02-17, exchange 68411, check: uncheckable)</li>
+<li id="s10">gdb has never supported thread debugging on IRIX. (user-42cf, 2020-06-29, exchange 215017, check: uncheckable)</li>
+<li id="s11">GDB can be run on a binary from within the build tree of an autotools project using 'libtool --mode=execute gdb'. (user-2d09, 2019-09-13, exchange 214835, check: uncheckable)</li>
+<li id="s12">GDB can have issues with IRIX 6.5.22, including infinite loops when stepping into libc calls. (user-b1da, 2023-01-17, exchange 215365, check: supported)</li>
+<li id="s13">gdb on IRIX does not properly support ptrace for stepping and other debugging tasks; users can manually step by typing 's'. (user-9860, 2023-10-08, exchange 41348, check: uncheckable)</li>
+<li id="s14">gdb can be compiled with the -g flag. (user-42cf, 2021-05-02, exchange 215149, check: uncheckable)</li>
+<li id="s15">gdb is a powerful symbolic debugger for C/C++ that works well but has issues with 16-bit x86 code through qemu stubs. (user-21b8, 2026-04-22, exchange 215978, check: supported)</li>
+<li id="s16">GDB offered support for Unix systems, with better performance when using GCC. (user-c831, 2023-10-08, exchange 209358, check: uncheckable)</li>
+<li id="s17">GDB has issues with pthreads and other things built with GCC; dbx has problems with GCC-built programs. (user-6afa, 2024-08-14, exchange 215547, check: uncheckable)</li>
+<li id="s18">gdb can be used to debug MIPS applications by running specific commands like `bt`, `info registers`, and `disassemble` when the program bus errors. (user-6c80, 2024-09-06, exchange 71564, check: supported)</li>
+<li id="s19">gdb can be used to debug a program that segmentation faults (user-4eea, 2025-09-08, exchange 72705, check: uncheckable)</li>
+<li id="s20">GDB sometimes freezes when loading assets or even before, and it isn't very good at driving processes with ptrace on IRIX. (user-757f, 2026-05-19, exchange 216013, check: uncheckable)</li>
+<li id="s21">GDB on IRIX only works by accident and isn't good at debugging C++ code. (user-b1da, 2026-05-19, exchange 216013, check: uncheckable)</li>
+<li id="s22">Using gdb or ddd on the IRIX port results in the program hanging without responding to CTRL-C until it crashes. (user-7973, 2024-08-13, exchange 215546, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="dbx.html">dbx</a>, <a href="c.html">C++</a>, <a href="dosbox.html">DOSBox</a>, <a href="ghidra.html">Ghidra</a>, <a href="n64-development.html">N64 development</a>, <a href="perl.html">Perl</a>, <a href="binutils.html">binutils</a>, <a href="ld.html">ld</a>, <a href="libtool.html">libtool</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>
+</li>
+<li>Other: <a href="usr-lib32.html">/usr/lib32</a>, <a href="ida.html">IDA</a>, <a href="core-dump.html">core dump</a>, <a href="par.html">par</a>, <a href="segfault.html">segfault</a>
+</li></ul>
+</body>
+</html>

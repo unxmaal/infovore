@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U320</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>U320</h1>
+<p>Claims: 11</p>
+<p>U320 drives should work with a U2 interface, and Async narrow SCSI-I is not as fast as U320. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Replacing 40MB SCSI controllers with U160 or U320 controllers would significantly increase disk speed. <sup><a href="#s3">3</a></sup> SCSI emulators on the O2 require adapters due to using SCA internally, making external setups easier and faster with U320 drives. <sup><a href="#s4">4</a></sup> Most U160 and U320 cards support LVD or SE, but typically use SE for Fast/Wide modes and below. <sup><a href="#s5">5</a></sup> The Tezro's controller is Ultra160, and the RedRock drive is likely U320. <sup><a href="#s6">6</a></sup> The Octane can saturate the UW SCSI bus with U160 drives, but U320 drives won't. <sup><a href="#s7">7</a></sup> A U320 bus can theoretically handle the speed of an M2 SATA SSD, but practical SCSI overhead limits this. <sup><a href="#s8">8</a></sup> An U160 SCSI bus exceeds PATA's 133MB/s, making an U320 Acard limited to 133MB/s on a U160 bus unnecessary. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">U320 drives should work with a U2 interface. (user-7b1c, 2020-04-27, exchange 7867, check: uncheckable)</li>
+<li id="s2">Async narrow SCSI-I is not as fast as U320. (user-237d, 2022-02-07, exchange 80911, check: uncheckable)</li>
+<li id="s3">Replacing 40MB SCSI controllers with U160 or U320 controllers would significantly increase disk speed. (user-8547, 2022-03-04, exchange 26876, check: supported)</li>
+<li id="s4">SCSI emulators on the O2 require adapters due to using SCA internally, making external setups easier and faster with U320 drives. (user-7b1c, 2022-05-19, exchange 103848, check: supported)</li>
+<li id="s5">Most U160 and U320 cards support LVD or SE, but typically use SE for Fast/Wide modes and below. (user-7b1c, 2022-07-01, exchange 30591, check: uncheckable)</li>
+<li id="s6">The Tezro's controller is Ultra160, and the RedRock drive is likely U320. (user-7b1c, 2022-11-10, exchange 105526, check: supported)</li>
+<li id="s7">The Octane can saturate the UW SCSI bus with U160 drives, but U320 drives won't. (user-22f9, 2024-12-01, exchange 112985, check: supported)</li>
+<li id="s8">A U320 bus can theoretically handle the speed of an M2 SATA SSD, but practical SCSI overhead limits this. (user-22f9, 2024-12-09, exchange 113100, check: uncheckable)</li>
+<li id="s9">An U160 SCSI bus exceeds PATA's 133MB/s, making an U320 Acard limited to 133MB/s on a U160 bus unnecessary. (user-86e1, 2024-12-09, exchange 113100, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="u320-drive.html">U320 drive</a> (3)
+</li>
+<li><a href="u320-scsi.html">U320 SCSI</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="se.html">SE</a>, <a href="tezro.html">Tezro</a>, <a href="u2.html">U2</a>
+</li>
+<li>Parts and peripherals: <a href="red-rock.html">Red Rock</a>
+</li>
+<li>Standards and interfaces: <a href="lvd.html">LVD</a>, <a href="sca.html">SCA</a>, <a href="scsi.html">SCSI</a>
+</li>
+<li>Other: <a href="u160.html">U160</a>, <a href="pata.html">PATA</a>, <a href="ultra160.html">Ultra160</a>
+</li></ul>
+</body>
+</html>

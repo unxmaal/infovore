@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireshark</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Wireshark</h1>
+<p>Claims: 7</p>
+<p>Wireshark is a tool for viewing and analyzing network traffic between devices. <sup><a href="#s1">1</a></sup> Promiscuous mode tells Wireshark to listen to all traffic rather than only traffic that targets your machine's MAC address. <sup><a href="#s2">2</a></sup> Wireshark can be used to capture ARP requests sent when loading a file over bootp. <sup><a href="#s3">3</a></sup> It can capture the response when pinging a device from another machine on the same network to find its MAC address. <sup><a href="#s4">4</a></sup> Wireshark can confirm network booting by checking whether a machine downloads the loader and the kernel. <sup><a href="#s5">5</a></sup> A tcpdump capture can be extracted from a running container and analyzed with Wireshark. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Installing tcpdump or Wireshark on the pi can help view network traffic between devices, which has resolved similar issues. (user-fa69, 2025-07-25, exchange 77769, check: uncheckable)</li>
+<li id="s2">Promiscuous mode in Wireshark tells it to listen to all traffic, rather than traffic that targets your machine's MAC address. (user-6d41, 2020-02-01, exchange 75045, check: uncheckable)</li>
+<li id="s3">It sends out ARP requests when you try and load a file over bootp, which can be captured with Wireshark. (user-b1da, 2024-08-11, exchange 48269, check: uncheckable)</li>
+<li id="s4">To find the MAC address, use Wireshark to capture the response when pinging the SGI from another machine on the same network. (user-cd83, 2020-03-14, exchange 77105, check: uncheckable)</li>
+<li id="s5">To confirm network booting, use `tcpdump` or `wireshark` to check if the machine downloads the loader and the kernel. (user-6e7b, 2023-11-30, exchange 42867, check: supported)</li>
+<li id="s6">You can log into a running container, extract a tcpdump capture, and analyze it with Wireshark. (user-07ed, 2026-03-30, exchange 62848, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="ping.html">ping</a>
+</li>
+<li>Parts and peripherals: <a href="prom.html">PROM</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="tcpdump.html">tcpdump</a>, <a href="container.html">container</a>, <a href="eaddr.html">eaddr</a>
+</li></ul>
+</body>
+</html>

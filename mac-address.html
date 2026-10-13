@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAC address</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MAC address</h1>
+<p>Claims: 39 Part of <a href="mac.html">Mac</a> Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/MAC_address">MAC address</a>.</p>
+<p>The MAC address is stored in various hardware components depending on the system, including non-volatile RAM, a Dallas chip, an EEPROM, the frontplane, the PCI riser, the ethernet riser, or the IO board, and it is linked to the case rather than the CPU board. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The MAC address can be programmable, and reprogramming it was an undocumented feature, though editing the PROM with a hex editor is required to update it on an Indigo2. <sup><a href="#s10">10</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s11">11</a></sup> The MAC address is used as a unique identifier for the system, appearing in the PROM's ARP response and serving as the lmhostid in IRIX, where it is also used to bypass node lock licenses. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s8">8</a></sup> The MAC address may need to be reset or set manually in situations such as installing IRIX, when the PROM battery dies, when the address is corrupted or lost, or when spoofing is necessary for installation. <sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> An invalid or incorrect MAC address can cause problems, including system crashes, error popups, the system failing to recognize itself, the router ignoring the address, or the system booting into diag-switch? true mode. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Ethernet address obtained from non-volatile RAM during controller initialization was corrupted, requiring a Dallas chip upgrade or setting a MAC address manually. The netmask is not available in miniroot, and serial- (user-5823, 2019-08-10, exchange 2976, check: uncheckable)</li>
+<li id="s2">FLEXlm license checking issues can be related to hardware, specifically the Dallas chip, and may involve reading the MAC address, but the NVRAM is not directly involved for Tezro systems. (user-7973, 2022-03-20, exchange 81316, check: supported)</li>
+<li id="s3">The MAC address is stored in NVRAM and needs to be repaired and reprogrammed if lost. (user-03ad, 2022-06-06, exchange 239681, check: uncheckable)</li>
+<li id="s4">The front panel of the system connects to a little blue IDC connector next to the power, which contains an EEPROM with the system ID and MAC address. (user-86e1, 2024-09-23, exchange 224097, check: uncheckable)</li>
+<li id="s5">To remove the MAC address from a Cadduo, you can either remove the front plane or the system tray, but be careful as the latter might damage the drive bay. The MAC address is stored in a battery-like component that holds (user-e4d0, 2025-03-08, exchange 115184, check: uncheckable)</li>
+<li id="s6">The DS1982 is a one-wire device that holds the MAC address, and IRIX uses it for the Ethernet MAC and lmhostid. (user-e4d0, 2025-05-16, exchange 212493, check: uncheckable)</li>
+<li id="s7">The Octane stores its MAC address in the button on the frontplane, while the O2 stores it on the PCI riser. (user-e4d0, 2025-05-16, exchange 212491, check: supported)</li>
+<li id="s8">The MAC address on SGI machines can be used as a unique identifier for the system, often stored in specific hardware components like the frontplane, PCI riser, or ethernet riser. It can also be programmable for O2 andOct (user-e4d0, 2025-06-17, exchange 117392, check: supported)</li>
+<li id="s9">The MAC address is hard-coded on the IO board, not stored in the Dallas chip. (user-86e1, 2026-07-06, exchange 124007, check: uncheckable)</li>
+<li id="s10">Editing the PROM with a hex editor is required to update the MAC address on an Indigo2. (user-8b3c, 2019-07-25, exchange 92333, check: supported)</li>
+<li id="s11">The ability to reprogram the MAC address was an undocumented feature. (user-1a5a, 2026-07-06, exchange 124007, check: uncheckable)</li>
+<li id="s12">The PROM's ARP response reveals the MAC address, useful for identifying SGI machines like the Indigo and 4D. (user-f229, 2021-10-31, exchange 100682, check: supported)</li>
+<li id="s13">Changing the Mac address was used to bypass node lock licenses in IRIX. (user-03ad, 2022-12-05, exchange 208024, check: uncheckable)</li>
+<li id="s14">To install IRIX, you may need to reset the MAC address. (user-1446, 2019-12-28, exchange 96066, check: uncheckable)</li>
+<li id="s15">The Indy requires setting the MAC address if the PROM battery dies; Irinikus made a video on how to do it for IRIX 5.3. (user-24f0, 2024-06-07, exchange 220329, check: supported)</li>
+<li id="s16">Spoofing the MAC address might be necessary for installation. (user-2a3c, 2024-08-20, exchange 218511, check: uncheckable)</li>
+<li id="s17">The system retains settings and MAC address when powered off for a week. (user-511a, 2024-12-02, exchange 113022, check: uncheckable)</li>
+<li id="s18">Programming the MAC address in the NVRAM allows the network to function, but the system boots into diag-switch? true mode. (user-1b6a, 2020-08-28, exchange 239242, check: uncheckable)</li>
+<li id="s19">Irix crashes if the console settings or MAC address are incorrect; setting `eaddr` may fix it. (user-3663, 2024-08-04, exchange 111894, check: supported)</li>
+<li id="s20">The MAC address '5d' is interpreted as a multicast/broadcast, causing the router to ignore it. (user-616d, 2024-12-14, exchange 240450, check: supported)</li>
+<li id="s21">The error is likely due to an invalid MAC address, which can cause the system to not recognize itself, or it could be a network issue. (user-22f9, 2025-04-04, exchange 218858, check: uncheckable)</li>
+<li id="s22">IRIX will crash if the MAC address doesn't start with 08:00:69. (user-3e2d, 2026-05-20, exchange 219756, check: supported)</li>
+<li id="s23">IRIX will give error popups and use CPU power for networking if the MAC address doesn't start with the SGI prefix. (user-1a5a, 2026-05-20, exchange 219756, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="o2.html">O2</a>, <a href="indy.html">Indy</a>, <a href="octane.html">Octane</a>, <a href="onyx2-midplane.html">Onyx2 midplane</a>, <a href="system-id.html">system ID</a>
+</li>
+<li>Graphics: <a href="cadduo.html">CADduo</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="solaris-8.html">Solaris 8</a>
+</li>
+<li>Software: <a href="alias.html">Alias</a>, <a href="flexlm.html">FlexLM</a>, <a href="hinv.html">hinv</a>
+</li>
+<li>Parts and peripherals: <a href="dallas-chip.html">Dallas chip</a>, <a href="nvram.html">NVRAM</a>, <a href="prom.html">PROM</a>, <a href="eeprom.html">EEPROM</a>, <a href="idc-connector.html">IDC connector</a>, <a href="io-board.html">IO board</a>, <a href="pci-riser.html">PCI riser</a>, <a href="drive-bay.html">drive bay</a>, <a href="frontplane.html">frontplane</a>
+</li>
+<li>Standards and interfaces: <a href="dhcp.html">DHCP</a>, <a href="ethernet-address.html">Ethernet address</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="dallas-part.html">Dallas part</a>, <a href="sgi-settings.html">SGI settings</a>, <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="irinikus.html">Irinikus</a>, <a href="button.html">button</a>, <a href="eaddr.html">eaddr</a>, <a href="filename.html">filename</a>, <a href="hostid.html">hostid</a>
+</li></ul>
+</body>
+</html>

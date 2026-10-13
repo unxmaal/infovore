@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSE</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RSE</h1>
+<p>Claims: 79 Background: 2 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/CMake">CMake</a>, <a href="https://en.wikipedia.org/wiki/Heartbleed">Heartbleed</a>.</p>
+<p>RSE is an rpm-based project providing basic IRIX packages and enabling porting of new software. <sup><a href="#s1">1</a></sup> It runs well on newer versions of IRIX and is biased towards 6.5.30. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can be installed by reading the README.md on github. <sup><a href="#s4">4</a></sup> The IRIX Catalogue can launch RSE packages. <sup><a href="#s5">5</a></sup> It includes cmake, which is available on IRIX. <sup><a href="#s6">6</a></sup> RSE 0.0.7beta 'Miss Moneypenny' adds 154 new packages and 1124 binary RPMs. <sup><a href="#s7">7</a></sup> RSE (RPM Software Environment) is based on FC31 and uses RPM for package management, packaged as an RPM. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> SGI used existing tools like RPM to create tardist packages rather than reinventing the wheel, though tardist itself was not used for RSE due to untarring time and lack of lifespan. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> The RSE approach using RPM gains the entire source tree of fc.31 and allows for building relevant software packages for IRIX. <sup><a href="#s8">8</a></sup> Contributors to RSE explain their decisions openly and encourage interaction with the code. <sup><a href="#s14">14</a></sup> There are issues building GL programs against RSE right now, including a specific invocation required to get OpenGL packages built with the GNU tools in RSE to link with OpenGL properly. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The newer libXext in RSE conflicts with IRIX's version due to SGI-specific callbacks, requiring linker flag adjustments, and adding a x11.pc pkg-config definition and including xrender headers can fix most X extension issues in RSE. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup> An Octane can take multiple days to compile software for RSE. <sup><a href="#s19">19</a></sup> RSE does not exist for 5.3. <sup><a href="#s20">20</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">RSE is an rpm-based project providing basic IRIX packages and enabling porting of new software. (user-d903, 2021-03-09, exchange 98546, check: uncheckable)</li>
+<li id="s2">The RSE works well on newer versions of IRIX. (user-9dfb, 2020-12-14, exchange 69143, check: uncheckable)</li>
+<li id="s3">RSE is biased towards 6.5.30 and using multiple disks is recommended for Tezro or Octane users for Flame. (user-e872, 2021-04-14, exchange 215123, check: supported)</li>
+<li id="s4">install RSE by reading the README.md on github. (user-f229, 2020-02-10, exchange 214922, check: uncheckable)</li>
+<li id="s5">The IRIX Catalogue can launch RSE packages. (user-17cb, 2020-12-25, exchange 215074, check: uncheckable)</li>
+<li id="s6">cmake is available on IRIX and included in RSE. (user-2189, 2020-09-16, exchange 215057, check: uncheckable)</li>
+<li id="s7">RSE 0.0.7beta 'Miss Moneypenny' adds 154 new packages and 1124 binary RPMs. (user-f229, 2020-12-25, exchange 215074, check: supported)</li>
+<li id="s8">The RSE approach using RPM gains the entire source tree of fc.31 and allows for building relevant software packages for IRIX. (user-f229, 2021-11-16, exchange 217304, check: uncheckable)</li>
+<li id="s9">RSE is based on FC31 and uses RPM for package management after extensive consideration and proof of concept with pkgsrc. (user-f229, 2022-06-23, exchange 30435, check: uncheckable)</li>
+<li id="s10">RSE is the RPM Software Environment and is packaged as an RPM. (user-f229, 2023-04-10, exchange 83317, check: uncheckable)</li>
+<li id="s11">RSE is RPM based. (user-f229, 2023-06-23, exchange 38910, check: uncheckable)</li>
+<li id="s12">SGI did not reinvent the wheel for RSE by using existing tools like rpm to create tardist packages. (user-d903, 2021-11-16, exchange 217304, check: uncheckable)</li>
+<li id="s13">Tardist was not used for RSE due to untarring time and lack of lifespan to wait for it. (user-f229, 2022-06-23, exchange 30435, check: uncheckable)</li>
+<li id="s14">Contributors to RSE explain their decisions openly and encourage interaction with the code. (user-2189, 2022-02-09, exchange 80946, check: uncheckable)</li>
+<li id="s15">there are issues building GL programs against RSE right now - it's something we need to solve still (user-6afa, 2021-12-12, exchange 215244, check: uncheckable)</li>
+<li id="s16">There is a specific invocation required to get OpenGL packages built with the GNU tools in RSE to link with OpenGL properly. (user-b1da, 2023-03-21, exchange 83192, check: uncheckable)</li>
+<li id="s17">The newer `libXext` in RSE conflicts with IRIX's version due to SGI-specific callbacks, requiring linker flag adjustments. (user-8780, 2025-02-14, exchange 71943, check: supported)</li>
+<li id="s18">Adding a x11.pc pkg-config definition and including xrender headers can fix most X extension issues in RSE, though issues with X extensions requiring interfaces not in irix libX11.so might persist. (user-22f9, 2025-02-20, exchange 215650, check: uncheckable)</li>
+<li id="s19">An Octane can take multiple days to compile software for RSE. (user-e872, 2026-07-27, exchange 214272, check: supported)</li>
+<li id="s20">RSE does not exist for 5.3. (user-24f0, 2024-12-24, exchange 215616, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="rse-gcc.html">RSE GCC</a> (3)
+</li>
+<li><a href="rse-repo.html">RSE repo</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="tezro.html">Tezro</a>, <a href="fuel.html">Fuel</a>, <a href="origin-350.html">Origin 350</a>
+</li>
+<li>Processors: <a href="mips3.html">MIPS3</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-3.html">IRIX 6.3</a>, <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="nekoware.html">nekoware</a>, <a href="rpm.html">RPM</a>, <a href="gl.html">GL</a>, <a href="netsurf.html">Netsurf</a>, <a href="didbs.html">didbs</a>, <a href="git.html">git</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="sshd.html">sshd</a>, <a href="xmms.html">xmms</a>, <a href="bashrc.html">.bashrc</a>, <a href="c.html">C++</a>, <a href="cmake.html">CMake</a>, <a href="compositor.html">Compositor</a>, <a href="gl-programs.html">GL programs</a>, <a href="gnu-grep.html">GNU grep</a>, <a href="gnu-tools.html">GNU tools</a>, <a href="gtk3.html">GTK3</a>, <a href="github.html">GitHub</a>, <a href="llvm.html">LLVM</a>, <a href="openssl.html">OpenSSL</a>, <a href="rpm-package.html">RPM package</a>, <a href="sdl.html">SDL</a>, <a href="sdl2.html">SDL2</a>, <a href="ansible.html">ansible</a>, <a href="distcc.html">distcc</a>, <a href="freeware.html">freeware</a>, <a href="gmake.html">gmake</a>, <a href="gtk2.html">gtk2</a>, <a href="inst.html">inst</a>, <a href="installation.html">installation</a>, <a href="irix-ansible.html">irix_ansible</a>, <a href="mplayer.html">mplayer</a>, <a href="mrxvt.html">mrxvt</a>, <a href="pkgsrc.html">pkgsrc</a>, <a href="sgugshell.html">sgugshell</a>, <a href="swmgr.html">swmgr</a>, <a href="tardist.html">tardist</a>, <a href="tardist-package.html">tardist package</a>, <a href="tdnf.html">tdnf</a>
+</li>
+<li>Parts and peripherals: <a href="36gb-drive.html">36GB drive</a>, <a href="atx-psu.html">ATX PSU</a>, <a href="battery.html">battery</a>
+</li>
+<li>Standards and interfaces: <a href="motif.html">Motif</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>, <a href="glitchworks.html">Glitchworks</a>, <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="fc31.html">fc31</a>, <a href="abiword.html">Abiword</a>, <a href="esd.html">ESD</a>, <a href="qt4.html">Qt4</a>, <a href="readme-md.html">README.md</a>, <a href="worker.html">Worker</a>, <a href="dot-file.html">dot file</a>, <a href="libxext.html">libXext</a>, <a href="libexslt.html">libexslt</a>, <a href="libstdc.html">libstdc++</a>, <a href="pip.html">pip</a>, <a href="sgi-sh.html">sgi.sh</a>, <a href="sm64ex.html">sm64ex</a>, <a href="sugshell.html">sugshell</a>, <a href="yum.html">yum</a>
+</li></ul>
+</body>
+</html>

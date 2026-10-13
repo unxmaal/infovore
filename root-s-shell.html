@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>root&#x27;s shell</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>root's shell</h1>
+<p>Claims: 4</p>
+<p>On Solaris pre-10, root's shell must be set to /sbin/sh to avoid issues with the shell not being executable; this is fixed in 10. <sup><a href="#s1">1</a></sup> Changing root's shell to /usr/sgug/bin/bash can break stuff if it relies on libraries or binaries not on /. <sup><a href="#s2">2</a></sup> Root's shell should not have funky replacements for standard system utils in its PATH to avoid flummoxing init scripts. <sup><a href="#s3">3</a></sup> On Solaris versions before 10, changing root's shell can lead to a shell that can't run with /usr unmounted, causing issues in single user mode. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">On Solaris pre-10, root's shell must be set to /sbin/sh to avoid issues with the shell not being executable; this is fixed in 10. (user-7b1c, 2020-04-15, exchange 74066, check: supported)</li>
+<li id="s2">Changing root's shell to /usr/sgug/bin/bash can break stuff if it relies on libraries or binaries not on /. (user-15a0, 2022-11-08, exchange 217771, check: uncheckable)</li>
+<li id="s3">Root's shell should not have funky replacements for standard system utils in its PATH to avoid flummoxing init scripts. (user-7b1c, 2022-11-08, exchange 217771, check: uncheckable)</li>
+<li id="s4">On Solaris versions before 10, changing root's shell can lead to a shell that can't run with /usr unmounted, causing issues in single user mode. (user-7b1c, 2022-11-08, exchange 217771, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="solaris.html">Solaris</a>
+</li>
+<li>Software: <a href="path.html">PATH</a>
+</li></ul>
+</body>
+</html>

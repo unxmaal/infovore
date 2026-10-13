@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDL</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SDL</h1>
+<p>Claims: 27 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>, <a href="https://en.wikipedia.org/wiki/Simple_DirectMedia_Layer">Simple DirectMedia Layer</a>.</p>
+<p>SDL is available for IRIX, with both SDL1 and SDL2 versions, and has been used for IRIX porting. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Several programs have been ported to IRIX using SDL, including milkytracker, prboom-plus, MESS (an OpenGL version by Axatax), SM64, and SM64ex. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Compiling SM64ex on IRIX requires the latest RSE and SDL from nekoware or RSE, along with X11 libraries that have GL support, which may need recompilation from the wip-testing branch to fix SDL errors. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> SDL configuration on IRIX 6.5 can show an accelerated VPRO/B/128 renderer with texture support running at OpenGL and SDL version 1.2. <sup><a href="#s9">9</a></sup> SDL sound combined with X11 video should work, though SDL-using clients may have issues with Xorg but work with Xsgi, and the SDL in sgug was broken but is now fixed. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> SDL's --enable-sdl-dlopen option allows it to handle X11 symbols with dlopen, which can affect linking. <sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SDL1/2 is available for IRIX. (user-f2a5, 2020-11-17, exchange 215066, check: supported)</li>
+<li id="s2">SDL has been used for IRIX porting. (user-0de0, 2025-04-02, exchange 218854, check: uncheckable)</li>
+<li id="s3">milkytracker runs on IRIX using SDL. (user-22f9, 2019-01-17, exchange 126, check: uncheckable)</li>
+<li id="s4">prboom-plus can be compiled on an O2 using nekoware's SDL and libdumb without SDL2. (user-8547, 2019-03-09, exchange 954, check: supported)</li>
+<li id="s5">we have a SDL version of MESS that Axatax made a while ago, I think it was OpenGL 1.2 or 1.3, great for Vpro and above (user-8547, 2019-08-21, exchange 3154, check: supported)</li>
+<li id="s6">The O2 can run SM64 with some porting, and the SDL port for IRIX is fine. (user-1446, 2020-09-16, exchange 204431, check: supported)</li>
+<li id="s7">Compiling sm64ex requires the latest RSE and SDL, which can be found in nekoware or RSE. (user-1446, 2021-11-18, exchange 227203, check: uncheckable)</li>
+<li id="s8">Compiling sm64ex on IRIX requires X11 libraries with GL support, which may need recompilation from the wip-testing branch to fix SDL errors. (user-1446, 2021-12-12, exchange 70094, check: uncheckable)</li>
+<li id="s9">The SDL configuration shows an accelerated VPRO/B/128 renderer with texture support running at Irix 6.5, using OpenGL and SDL version 1.2. (user-7973, 2025-05-16, exchange 218954, check: supported)</li>
+<li id="s10">clients using SDL might have issues with Xorg, but work with Xsgi. (user-42cf, 2019-07-20, exchange 67573, check: uncheckable)</li>
+<li id="s11">SDL sound and X11 video combination should work. (user-9f32, 2021-07-01, exchange 69710, check: uncheckable)</li>
+<li id="s12">We had to use SDL because the X11 backend wasn't working with XSGI. (user-17cb, 2026-01-12, exchange 215867, check: uncheckable)</li>
+<li id="s13">The SDL in sgug was broken, but it's fixed now. (user-17cb, 2026-01-12, exchange 215867, check: uncheckable)</li>
+<li id="s14">SDL's `--enable-sdl-dlopen` option allows it to handle X11 symbols with `dlopen`, which can affect linking. (user-8780, 2025-10-05, exchange 215824, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="sdl1.html">SDL1</a> (10)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="big-endian.html">big endian</a>
+</li>
+<li>Graphics: <a href="vpro.html">VPro</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="x11.html">X11</a>, <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="opengl.html">OpenGL</a>, <a href="xsgi.html">Xsgi</a>, <a href="gl.html">GL</a>, <a href="glquake.html">GLQuake</a>, <a href="glut.html">GLUT</a>, <a href="rse.html">RSE</a>, <a href="devilutionx.html">devilutionX</a>, <a href="didbs.html">didbs</a>, <a href="game-engine.html">game engine</a>, <a href="nekoware.html">nekoware</a>
+</li>
+<li>Parts and peripherals: <a href="xorg.html">Xorg</a>
+</li>
+<li>Companies: <a href="sgug.html">SGUG</a>
+</li>
+<li>Other: <a href="milkytracker.html">MilkyTracker</a>, <a href="sm64.html">SM64</a>, <a href="dlopen.html">dlopen</a>, <a href="prboom-plus.html">prboom-plus</a>, <a href="sm64ex.html">sm64ex</a>
+</li></ul>
+</body>
+</html>

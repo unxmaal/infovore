@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EFS filesystem</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>EFS filesystem</h1>
+<p>Claims: 13 Part of <a href="efs.html">EFS</a> Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>.</p>
+<p>EFS is an older Unix filesystem, similar to XFS, that can be used as storage for disk images and mounts on Linux. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It supports filesystem sizes up to 8 GB, and for larger drives multiple 8 GB EFS filesystems can be created. <sup><a href="#s3">3</a></sup> IRIX 5.3 uses the EFS filesystem, which on the Indigo2 maxes out at approximately 7GB despite larger disk sizes. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The img and iso files are the same, differing only in name due to the use of the EFS file system. <sup><a href="#s6">6</a></sup> To create an EFS filesystem image from an IRIX CD, use dd with appropriate options, and to mount an SGI-format ISO file in IRIX you may need to use a Linux box to mount the ISO as a block device using the efs file system and then share it via NFS. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> Ultra64 demos require the EFS filesystem on an Onyx, and Softimage 3.7 works on an emulated Indy with IRIX 5.3 and an EFS filesystem using FlexLM installation. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Softimage licensing works but may have issues on an Indigo2 R4400 250 MHz with Extreme and IRIX 5.3 EFS filesystem. <sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">EFS is an older Unix filesystem, similar to XFS, and can be used as storage for disk images. (user-7b1c, 2022-11-12, exchange 82386, check: uncheckable)</li>
+<li id="s2">The EFS file system mounts on Linux. (user-5e15, 2024-05-17, exchange 111300, check: uncheckable)</li>
+<li id="s3">EFS supports filesystem sizes up to 8 GB; for larger drives, multiple 8 GB EFS filesystems can be created. (user-6c80, 2025-01-17, exchange 52825, check: supported)</li>
+<li id="s4">IRIX 5.3 uses EFS filesystem, maxes out at ~7GB per filesystem. (user-86e1, 2023-07-19, exchange 93220, check: supported)</li>
+<li id="s5">The EFS filesystem on the Indigo2 can support a maximum of approximately 7GB, despite the disk size being larger. (user-86e1, 2023-09-11, exchange 40643, check: supported)</li>
+<li id="s6">The img and iso files are the same, differing only in name due to the use of EFS file system. (user-3663, 2020-01-10, exchange 92448, check: uncheckable)</li>
+<li id="s7">To mount an SGI-format ISO file in IRIX, you may need to use a Linux box to mount the ISO as a block device using the `efs` file system and then share it via NFS. (user-e872, 2021-08-02, exchange 18920, check: supported)</li>
+<li id="s8">To create an EFS filesystem image from an IRIX CD, use dd with appropriate options. (user-37ee, 2021-08-03, exchange 217186, check: uncheckable)</li>
+<li id="s9">Ultra64 demos require EFS filesystem on an Onyx. (user-f229, 2021-09-06, exchange 205507, check: supported)</li>
+<li id="s10">Softimage 3.7 works on an emulated Indy with IRIX 5.3 and an EFS filesystem using FlexLM installation. (user-ce6b, 2022-01-04, exchange 217391, check: supported)</li>
+<li id="s11">Softimage licensing works, but may have issues on an Indigo2 R4400 250 MHz with Extreme and IRIX 5.3 EFS filesystem. (user-8547, 2022-01-04, exchange 217391, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="indy.html">Indy</a>, <a href="onyx.html">Onyx</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="softimage.html">Softimage</a>, <a href="softimage-3-7.html">Softimage 3.7</a>, <a href="dd.html">dd</a>
+</li>
+<li>Companies: <a href="iso-file.html">ISO file</a>
+</li>
+<li>Other: <a href="img-file.html">.img file</a>, <a href="usr.html">/usr</a>
+</li></ul>
+</body>
+</html>

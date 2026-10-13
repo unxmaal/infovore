@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RM7965</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>RM7965</h1>
+<p>Claims: 5</p>
+<p>The RM7965 is 256 TPGA like the RM7065 and requires an interposer to work, but is not pin compatible with the RM7900 and lacks L3 cache. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The RM7965 has limited L3 cache support, whereas the RM7900 CPU has external cache. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> The RM7965 datasheet includes external cache mode bits even though the RM7965 does not support external cache, leading to the discovery of similar bits for the RM7900, for which no useful datasheet exists. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The RM7965 is not pin compatible with the RM7900 and lacks L3 cache. (user-f763, 2026-01-25, exchange 226012, check: uncheckable)</li>
+<li id="s2">The RM7965 is 256 TBGA like the RM7065 and requires an interposer to work; the RM7065 could be used with an interposer but loses L3 cache. (user-f763, 2026-01-25, exchange 121170, check: supported)</li>
+<li id="s3">The RM7965 requires a custom interposer and has limited L3 cache support. (user-c799, 2026-01-25, exchange 226012, check: uncheckable)</li>
+<li id="s4">The RM7900 CPU has external cache, unlike the RM7965. (user-757f, 2026-02-17, exchange 121542, check: uncheckable)</li>
+<li id="s5">The RM7965 datasheet includes external cache mode bits even though the RM7965 does not support external cache, leading to the discovery of similar bits for the RM7900, for which no useful datasheet exists. (user-c799, 2026-02-17, exchange 121543, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="rm7900.html">RM7900</a>
+</li>
+<li>Other: <a href="interposer.html">interposer</a>
+</li></ul>
+</body>
+</html>

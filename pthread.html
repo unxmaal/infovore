@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pthread</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>pthread</h1>
+<p>Claims: 9</p>
+<p>The pthread library is sometimes required for linking, as adding `-lpthread` resolved a missing-libcrypto.a linking issue. <sup><a href="#s1">1</a></sup> pthread usage can be affected by linking order, as a segfault during Ruby's `make install` was possibly related to pthreads or libstdc++ linking order. <sup><a href="#s2">2</a></sup> Linking pthreads may cause the C++ `strtoll` function on MIPS to fail to clear `errno`, affecting subsequent calls. <sup><a href="#s3">3</a></sup> The dicl library must be installed as 64-bit in /usr/sgug for proper pthread usage, otherwise a test fails. <sup><a href="#s4">4</a></sup> Building GCC 4.7.1 on the hpux.connect.org toolchain may require a kernel patch for `p_thread` functionality. <sup><a href="#s5">5</a></sup> std::mutex does not require pthread linkage. <sup><a href="#s6">6</a></sup> pthread can improve performance, as pthread on a 4 CPU Origin achieved 30.794165 tok/s instead of 4.9 tok/s by launching 3 threads. <sup><a href="#s7">7</a></sup> llama2_bigendian_pthread.c is intended for IRIX and uses pthread to distribute matmul load, with the optimal number of threads depending on the model and CPU count. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The linking of libcrypto.a requires the pthread library, which was missing, and adding `-lpthread` resolved the issue. (user-b4f4, 2020-01-05, exchange 68252, check: supported)</li>
+<li id="s2">Running Make install on Ruby causes a segfault due to a hard-coded file path issue, possibly related to pthreads or libstdc++ linking order. (user-a0f2, 2020-02-03, exchange 68322, check: uncheckable)</li>
+<li id="s3">The `strtoll` function in C++ on MIPS may fail to clear `errno` if pthreads are linked, causing issues with subsequent calls. (user-2d09, 2020-02-17, exchange 68412, check: supported)</li>
+<li id="s4">The dicl library must be installed as 64-bit in /usr/sgug for proper pthread usage; otherwise, a test fails. (user-cd7d, 2020-06-09, exchange 214980, check: supported)</li>
+<li id="s5">The hpux.connect.org toolchain is likely broken, and building GCC 4.7.1 may require a kernel patch for `p_thread` functionality. (user-b1da, 2020-07-24, exchange 9996, check: supported)</li>
+<li id="s6">std::mutex does not require pthread linkage. (user-711b, 2021-01-12, exchange 75614, check: uncheckable)</li>
+<li id="s7">pthread on a 4 CPU Origin can achieve 30.794165 tok/s instead of 4.9 tok/s by launching 3 threads. (user-7973, 2024-03-08, exchange 71069, check: supported)</li>
+<li id="s8">llama2_bigendian_pthread.c is intended for IRIX and uses pthread to distribute matmul load; the optimal number of threads depends on the model and CPU count. (user-07ed, 2024-08-16, exchange 48445, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="origin.html">Origin</a>
+</li>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="ruby.html">Ruby</a>
+</li>
+<li>Companies: <a href="gcc-4-7-1.html">GCC 4.7.1</a>
+</li>
+<li>Other: <a href="dicl.html">dicl</a>, <a href="libstdc.html">libstdc++</a>
+</li></ul>
+</body>
+</html>

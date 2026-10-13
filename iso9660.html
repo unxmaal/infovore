@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ISO9660</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ISO9660</h1>
+<p>Claims: 13 Part of <a href="iso.html">ISO</a></p>
+<p>IRIX can read ISO9660 DVDs, though UDF support is uncertain, and ISO9660 is supported with optional Joliet and Rock Ridge extensions, though it may fail with Joliet. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> ISO9660 support was added to SGI systems through a hack to NFS. <sup><a href="#s4">4</a></sup> The sector size on SGI CDs is 512 bytes, and on ISO9660 it is 4096 bytes. <sup><a href="#s5">5</a></sup> The `mount` command requires the `-t iso9660` option and `-o loop` option to be correctly placed, and to mount a CD-ROM, use 'mount -t iso9660 /dev/scsi/sc0d5l0 /mntpnt', with the device possibly on SCSI 3-6. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> You can mount ISO9660 files but not `img` files as a loop device in IRIX, so loopback mounting the ISO on a Linux machine and then copying it works. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> efsextract works with ISO9660 discs but not all MIPS Magnum discs, with bugs including stack corruption when buffer size is not 512 bytes. <sup><a href="#s10">10</a></sup> The term 'iso' can be ambiguous, referring to either ISO9660 or EFS-formatted CD image dumps, and Irix install CDs use EFS format. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The Solaris 2.6 ISO is an ISO 9660 filesystem. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX can read ISO9660 DVDs; UDF support is uncertain. (user-7b1c, 2020-03-21, exchange 96581, check: uncheckable)</li>
+<li id="s2">mplayer can access raw devices but may not support UDF on IRIX; ISO9660 is supported as well (user-9860, 2022-03-13, exchange 27209, check: uncheckable)</li>
+<li id="s3">IRIX supports ISO9660 with optional Joliet and Rock Ridge extensions, but may fail with Joliet. (user-e872, 2024-11-29, exchange 211355, check: uncheckable)</li>
+<li id="s4">ISO9660 support was added to SGI systems through a hack to NFS. (user-d960, 2025-09-22, exchange 225469, check: uncheckable)</li>
+<li id="s5">The sector size on SGI CDs is 512 bytes, and on ISO9660 it is 4096 bytes. (user-bc5d, 2020-07-05, exchange 216716, check: supported)</li>
+<li id="s6">The `mount` command requires the `-t iso9660` option and `-o loop` option to be correctly placed. (user-7b1c, 2022-11-07, exchange 216783, check: supported)</li>
+<li id="s7">To mount a CD-ROM, use 'mount -t iso9660 /dev/scsi/sc0d5l0 /mntpnt'; the device may be on SCSI 3-6. (user-986f, 2025-09-25, exchange 225483, check: supported)</li>
+<li id="s8">You can mount ISO9660 files but not `img` files as a loop device in IRIX. (user-1446, 2020-04-25, exchange 7823, check: supported)</li>
+<li id="s9">Loopback mounting the ISO on a Linux machine and then copying it works. (user-237d, 2020-06-07, exchange 160824, check: uncheckable)</li>
+<li id="s10">efsextract works with ISO9660 discs but not all MIPS Magnum discs; there are bugs including stack corruption when buffer size is not 512 bytes. (user-6c80, 2023-11-26, exchange 218235, check: supported)</li>
+<li id="s11">The term 'iso' can be ambiguous, referring to either ISO9660 or EFS-formatted CD image dumps. (user-3663, 2021-03-05, exchange 217052, check: uncheckable)</li>
+<li id="s12">ImgBurn doesn't support .IMAGE files, which are essentially raw image files, unlike ISO9660. Irix install CDs use EFS format. (user-8de9, 2022-01-14, exchange 217410, check: uncheckable)</li>
+<li id="s13">The Solaris 2.6 ISO is an ISO 9660 filesystem. (user-b1da, 2022-11-05, exchange 239881, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips-magnum.html">MIPS Magnum</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="solaris-2-6.html">Solaris 2.6</a>
+</li>
+<li>Software: <a href="cd.html">CD</a>, <a href="efs.html">EFS</a>, <a href="imgburn.html">ImgBurn</a>, <a href="efsextract.html">efsextract</a>, <a href="mount.html">mount</a>, <a href="mplayer.html">mplayer</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="scsi.html">SCSI</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="udf.html">UDF</a>, <a href="img.html">.img</a>, <a href="image-file.html">image file</a>, <a href="loopback-mounting.html">loopback mounting</a>, <a href="sector-size.html">sector size</a>
+</li></ul>
+</body>
+</html>

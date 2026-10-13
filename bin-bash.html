@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/bin/bash</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>/bin/bash</h1>
+<p>Claims: 4</p>
+<p>aterm resolves which shell to use by checking the SHELL environment variable, falling back to getpwuid, then /bin/sh, and finally /bin/bash as the last resort. <sup><a href="#s1">1</a></sup> aterm expects /bin/bash or $SHELL to be present, falling back to /usr/sgug/bin/bash if not found. <sup><a href="#s2">2</a></sup> aterm requires the xorg-x11-fonts-misc package to resolve font errors, and may also need /bin/bash if it closes immediately after starting. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">aterm checks the SHELL environment variable, falls back to getpwuid, and uses /bin/sh if the shell is not set, with /bin/bash as the last resort. (user-21b8, 2024-05-23, exchange 215500, check: uncheckable)</li>
+<li id="s2">aterm expects /bin/bash or $SHELL to be present, falling back to /usr/sgug/bin/bash if not found. (user-7973, 2024-05-23, exchange 215498, check: uncheckable)</li>
+<li id="s3">aterm requires the xorg-x11-fonts-misc package to resolve font errors, and may also need /bin/bash if it closes immediately after starting. (user-7973, 2025-11-06, exchange 88585, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="solaris-10.html">Solaris 10</a>
+</li>
+<li>Software: <a href="aterm.html">aterm</a>, <a href="shell.html">shell</a>
+</li>
+<li>Other: <a href="bin-sh.html">/bin/sh</a>
+</li></ul>
+</body>
+</html>

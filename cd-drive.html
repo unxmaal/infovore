@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CD drive</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CD drive</h1>
+<p>Claims: 53 Part of <a href="cd.html">CD</a></p>
+<p>Real Indy units are picky about CD drive compatibility, and modding an Indy to fit a CD drive is rare. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Pre-8 Mac OS versions require an Apple CD drive or specific extensions, while later versions can use non-Apple SCSI CD drives. <sup><a href="#s3">3</a></sup> The CD drive is an ancient 2x drive. <sup><a href="#s4">4</a></sup> From L1, running `* pwr up` accesses the EFI shell where you can use a CD drive for OS installs. <sup><a href="#s5">5</a></sup> Version 6.5.30 does not come with many demos beyond basic video test files, so an earlier version's apps CD can be used; they are installed using a CD drive and software manager, and the process does not require overlays. <sup><a href="#s6">6</a></sup> A CD drive works fine but is picky about CDRs, except one brand. <sup><a href="#s7">7</a></sup> The CD drive on the machine may be IDE-compatible but could have issues with ATAPI drives; SCSI or USB CD drives might work as alternatives. <sup><a href="#s8">8</a></sup> The front internal speaker and CD drive playback audio are fine, but the line level type port out back is problematic. <sup><a href="#s9">9</a></sup> Installing the base 5.3 version from CD results in constant SCSI bus errors, which are resolved by removing the CD drive. <sup><a href="#s10">10</a></sup> The machine crashes when loading the kernel with the CD drive and PCI cards plugged in. <sup><a href="#s11">11</a></sup> On IRIX 4.0.5, the install creates folders for /CDROM, /CDROM2, etc., but does not mount EFS CDs. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Real Indy units are picky about CD drive compatibility. (user-b7c4, 2019-07-25, exchange 220106, check: supported)</li>
+<li id="s2">Modding an Indy to fit a CD drive is rare. (user-0251, 2020-02-07, exchange 96308, check: supported)</li>
+<li id="s3">Pre-8 Mac OS versions require an Apple CD drive or specific extensions, while later versions can use non-Apple SCSI CD drives. (user-24f9, 2019-12-20, exchange 220837, check: supported)</li>
+<li id="s4">The CD drive is an ancient 2x drive. (user-17cb, 2019-12-23, exchange 143472, check: supported)</li>
+<li id="s5">control+d and control+t drop you in and out of L1; from L1, run `* pwr up` to access the EFI shell where you can use a CD drive for OS installs. (user-b7c4, 2020-02-02, exchange 75053, check: supported)</li>
+<li id="s6">6.5.30 does not come with many demos beyond basic video test files; use an earlier version's apps CD for demos; install them using a CD drive and software manager; the process does not require overlays. (user-b7c4, 2020-02-14, exchange 78179, check: supported)</li>
+<li id="s7">A CD drive works fine but is picky about CDRs, except one brand. (user-e872, 2020-11-13, exchange 12200, check: uncheckable)</li>
+<li id="s8">The CD drive on the machine may be IDE-compatible but could have issues with ATAPI drives; SCSI or USB CD drives might work as alternatives. (user-237d, 2020-11-25, exchange 234923, check: uncheckable)</li>
+<li id="s9">Front internal speaker and CD drive playback audio is fine, but the line level type port out back is problematic. (user-e872, 2020-12-06, exchange 12627, check: uncheckable)</li>
+<li id="s10">Installing the base 5.3 version from CD results in constant SCSI bus errors which are resolved by removing the CD drive. (user-7ded, 2026-04-29, exchange 90548, check: supported)</li>
+<li id="s11">The machine crashes when loading the kernel with CD drive and PCI cards plugged in. (user-e52d, 2026-07-22, exchange 226740, check: uncheckable)</li>
+<li id="s12">Does anybody know if you need a mount command on IRIX 4.0.5 to mount a CD drive? My install is creating the folders for /CDROM, /CDROM2, etc but it doesn't seem to be mounting EFS CDs. I confirmed it is EFS as Reanimator (user-e4e2, 2026-07-28, exchange 124447, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="indy.html">Indy</a>, <a href="crimson.html">Crimson</a>, <a href="os-x-server.html">OS X Server</a>, <a href="octane.html">Octane</a>, <a href="origin-200.html">Origin 200</a>, <a href="ss20.html">SS20</a>, <a href="ultra-2.html">Ultra 2</a>, <a href="ultra-5.html">Ultra 5</a>, <a href="ultra-60.html">Ultra 60</a>, <a href="ibook-g3.html">iBook G3</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="a-ux.html">A/UX</a>, <a href="irix-4-0-5.html">IRIX 4.0.5</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="nextstep-3-3.html">NextStep 3.3</a>, <a href="os-9.html">OS 9</a>, <a href="sles9.html">SLES9</a>, <a href="bootloader.html">bootloader</a>, <a href="kernel.html">kernel</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="efi-shell.html">EFI shell</a>, <a href="mame.html">MAME</a>, <a href="mount-command.html">mount command</a>, <a href="software-manager.html">software manager</a>
+</li>
+<li>Parts and peripherals: <a href="cd-r.html">CD-R</a>, <a href="cpu.html">CPU</a>, <a href="dat-drive.html">DAT drive</a>, <a href="dvd-ram-drive.html">DVD-RAM drive</a>, <a href="l1.html">L1</a>, <a href="psu.html">PSU</a>, <a href="sd-card-adapter.html">SD card adapter</a>, <a href="toshiba-drives.html">Toshiba drives</a>, <a href="fan.html">fan</a>
+</li>
+<li>Standards and interfaces: <a href="pci-card.html">PCI card</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="sun-lunchbox.html">Sun Lunchbox</a>
+</li>
+<li>Other: <a href="2x.html">2x</a>, <a href="adf.html">ADF</a>
+</li></ul>
+</body>
+</html>

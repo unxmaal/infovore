@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX 6.5</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX 6.5</h1>
+<p>Claims: 255 Part of <a href="irix.html">IRIX</a> Background: 15 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/IRIX">IRIX</a>, <a href="https://en.wikipedia.org/wiki/SGI_Indy">SGI Indy</a>, <a href="https://en.wikipedia.org/wiki/Dillo">Dillo</a>, <a href="https://en.wikipedia.org/wiki/NetSurf">NetSurf</a>, <a href="https://en.wikipedia.org/wiki/SGI_O2">SGI O2</a>, <a href="https://en.wikipedia.org/wiki/XFS">XFS</a>.</p>
+<h2 id="with-irix-5-3">With IRIX 5.3</h2>
+<p>IRIX 5.3 is faster than IRIX 6.5, especially on low-end Indys, where the 175MHz Indy running IRIX 5.3 is significantly faster than 6.5 for desktop use and comparable to an Octane. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The Indigo2 R4k runs both IRIX 5.3 and 6.5 with significant speed differences, and only the Octane needs to run IRIX 6.5, while everything else can boot down to 5.3 or even 4. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The Indy runs IRIX versions, with 5.3 being period-appropriate and 6.5 being near the end of its life. <sup><a href="#s6">6</a></sup> Different IRIX versions have varying software compatibility, with 5.3 potentially offering better compatibility for older software like AVID Media Suite Pro. <sup><a href="#s7">7</a></sup> In IRIX 5.3, function names like `AFopenfile()` are used, whereas in IRIX 6.5, they are lowercase, e.g., `afOpenFile()`. <sup><a href="#s8">8</a></sup> The FPU test fails on IRIX 5.3 but passes on IRIX 6.5, suggesting IRIX 5.3 configures the FPU differently. <sup><a href="#s9">9</a></sup> FTP works for file transfer in IRIX 6.5 due to passive mode, but not in 5.3. <sup><a href="#s10">10</a></sup></p>
+<h2 id="with-irix-6-2">With IRIX 6.2</h2>
+<p>IRIX 6.2 and 6.5 can be slow, but Profile Guided Optimization can significantly improve performance when used with Link Time Optimization, especially on IRIX 6.2 and 6.5. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> IRIX 6.5 had issues with demo executables and strange errors, while 6.2 had missing executables for most demos. <sup><a href="#s13">13</a></sup> IRIX 6.5 has OpenGL 1.1, while 6.2 has only OpenGL 1.0 for textures. <sup><a href="#s14">14</a></sup> The SGI SDK for N64 development is compatible with IRIX 6.5 but works best on 6.2 or 6.3; by 2000, Nintendo stopped updating the SGI release of the SDK due to most studios moving to PCs for cheaper development tools. <sup><a href="#s15">15</a></sup> The Onyx can run an SGI IRIX 6.2 drive and keep an SGI IRIX 6.5 install for swapping between, without Vigra. <sup><a href="#s16">16</a></sup> Weatherstar software runs on 6.2 or 6.3, not 6.5. <sup><a href="#s17">17</a></sup> The ZuluSCSI Blaster does not honor drive geometry from the .ini file, causing issues with the fx program in both SGI IRIX 6.2 and 6.5 versions. <sup><a href="#s18">18</a></sup> Booting IRIX 6.2 and 6.5 can spike the CPU and cause issues in SGI emulation. <sup><a href="#s19">19</a></sup></p>
+<h2 id="with-indy">With Indy</h2>
+<p>The SGI Indy can run IRIX 6.5, though it may have come originally with IRIX 5.1. <sup><a href="#s20">20</a></sup> An Indy with an R4400 CPU and 1GB of RAM can take up to three minutes to load IRIX after logging in, and CHD-equipped models require patience during boot. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> The Indy can be configured with an R4400 CPU and includes documentation and IRIX 6.5 media, or with an R5k 150MHz CPU, Indycam, monitor, keyboard, mouse, and IRIX 6.5 CDs. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> Indys with env chips have problems and cost more, but run IRIX 6.5 well with 256MB of RAM. <sup><a href="#s25">25</a></sup> Running Alias/1 on an Indy with IRIX 6.5 is not possible, and IRIX 6.5 on a real Indy may have issues, such as showing 7 units on controller 0. <sup><a href="#s26">26</a></sup><sup><a href="#s27">27</a></sup></p>
+<h2 id="general">General</h2>
+<p>IRIX 6.5 was released in June 1998, following IRIX 6.3, which came out in 1996; SGI invested little in the MIPS platform, and 6.5 was released late. <sup><a href="#s28">28</a></sup><sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup> Foundation was the base release of IRIX 6.5 and never changed throughout its run. <sup><a href="#s31">31</a></sup> Booterizer provides a fresh base install of IRIX 6.5, and irixports quickly sets up a working GCC environment. <sup><a href="#s32">32</a></sup> gcc 8.2.0 can compile C and C++ on IRIX 6.5. <sup><a href="#s33">33</a></sup> Frame Maker 5.5 works on IRIX 6.5 without issues. <sup><a href="#s34">34</a></sup> IRIX 6.5 requires at least 512 MB of RAM for Maya. <sup><a href="#s35">35</a></sup> IRIX 6.5 was released in 1998, and support for the platform was largely abandoned soon after its release. <sup><a href="#s36">36</a></sup> IRIX 6.5 is commonly referred to simply as 6.5, and it was preferred over versions 6.0.1 and 6.1. <sup><a href="#s37">37</a></sup><sup><a href="#s38">38</a></sup> IRIX 6.5 is POSIX compliant, though the specification is old. <sup><a href="#s39">39</a></sup> Maintenance stream releases for IRIX 6.5 contained only bug fixes, while feature stream releases included both bug fixes and new features, though near the end of the 6.5 cycle the feature stream releases contained only bug fixes. <sup><a href="#s40">40</a></sup> Later 6.5 versions are required for a lot of hardware support. <sup><a href="#s41">41</a></sup> IRIX 6.5 was the last version of IRIX released. <sup><a href="#s42">42</a></sup> It is compliant with UNIX System V Release 4, UNIX 95, and POSIX, including 1e/2c draft 15 ACLs and Capabilities. <sup><a href="#s43">43</a></sup> It is the most Linux-like Unix out there, and most things found on modern Linux came from IRIX. <sup><a href="#s44">44</a></sup> The Indigo magic desktop was renamed to the IRIX interactive desktop in version 6.5. <sup><a href="#s45">45</a></sup> It is less hardware-specific than later versions. <sup><a href="#s46">46</a></sup> It can support up to about 8 exbibytes with XFS. <sup><a href="#s47">47</a></sup> The 'sa' command is only in IRIX 6.5. <sup><a href="#s48">48</a></sup> It runs well on an O2 without texture issues, and a preinstalled O2 booted correctly out of the box. <sup><a href="#s49">49</a></sup><sup><a href="#s50">50</a></sup> IRIX 6.5 was an all-platforms release. <sup><a href="#s51">51</a></sup> The IRIX 6.5 source code is available on GitHub and includes versions 6.5.17 and 6.5.5, with 6.5.17 being a mislabeled version from 2002 that includes PROM source for various machines. <sup><a href="#s52">52</a></sup> The collection contains many IRIX releases but lacks some IRIX 4 and 5.x versions and some ancillary discs for IRIX 6.5. <sup><a href="#s53">53</a></sup> For a fresh IRIX 6.5 install, one includes the foundation and development/library isos for 6.5, and the overlay isos for the target version, like 6.5.22. <sup><a href="#s54">54</a></sup> With IRIX 6.5, it's easier to install everything first and then remove what's not needed, avoiding later pain with overlays and patches. <sup><a href="#s55">55</a></sup> Checking CD contents in IRIX 6.5 involves looking in the dist/ folder, but finding specific package versions requires checking IDB files. <sup><a href="#s56">56</a></sup> IRIX 6.5 is not recommended for machines older than R5000. <sup><a href="#s57">57</a></sup> 6.2 is compatible with late Indys and IMPACT I2s but not older systems that struggle with 6.5. <sup><a href="#s58">58</a></sup> IRIX 6.5 has multiple versions, including 6.5.5 and 6.5.7. <sup><a href="#s59">59</a></sup> Running IRIX 6.5 with the wrong cache line size can cause issues. <sup><a href="#s60">60</a></sup> The R10K CPU has a pre-execution bug in the SCSI driver related to speculative execution that can lock a machine solid; the bug was fixed with workarounds in the 6.5 kernel source. <sup><a href="#s61">61</a></sup> IRIX 6.5 doesn't feel very snappy on R4400. <sup><a href="#s62">62</a></sup> The O2 with a 300 MHz R5000 CPU and 256 MB RAM can run IRIX 6.5 and starts in the rescue menu. <sup><a href="#s63">63</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX 5.3 is faster than 6.5, especially on low-end Indys. (user-b7c4, 2021-03-31, exchange 217085, check: supported)</li>
+<li id="s2">The 175Mhz Indy runs IRIX 5.3, which is significantly faster than 6.5 for desktop use, comparable to an Octane. (user-5397, 2021-08-26, exchange 79752, check: supported)</li>
+<li id="s3">6.5 is slower than 6.2 and 5.3 on the Indy. (user-6c80, 2023-11-27, exchange 42731, check: supported)</li>
+<li id="s4">The Indigo2 R4k runs IRIX 5.3 and 6.5 with significant speed differences. (user-f229, 2022-02-16, exchange 188191, check: supported)</li>
+<li id="s5">Only the Octane needs to run IRIX 6.5, while everything else can boot down to 5.3 or even 4. (user-8de9, 2025-02-05, exchange 224564, check: supported)</li>
+<li id="s6">The Indy runs IRIX versions, with 5.3 being period-appropriate and 6.5 being near the end of its life. (user-2a3c, 2026-05-11, exchange 219728, check: supported)</li>
+<li id="s7">Different IRIX versions have varying software compatibility, with 5.3 potentially offering better compatibility for older software like AVID Media Suite Pro. (user-2a3c, 2026-05-11, exchange 219728, check: supported)</li>
+<li id="s8">In IRIX 5.3, function names like `AFopenfile()` are used, whereas in IRIX 6.5, they are lowercase, e.g., `afOpenFile()`. Implicit declarations should be replaced with lowercase names. (user-5906, 2025-07-30, exchange 215784, check: supported)</li>
+<li id="s9">The FPU test fails on IRIX 5.3 but passes on IRIX 6.5, suggesting IRIX 5.3 configures the FPU differently. (user-3e2d, 2026-03-29, exchange 62818, check: supported)</li>
+<li id="s10">FTP works for file transfer in IRIX 6.5 due to passive mode, but not in 5.3. (user-3e2d, 2026-04-03, exchange 93758, check: supported)</li>
+<li id="s11">IRIX 6.2 and 6.5 can be slow. (user-8de9, 2022-07-01, exchange 30597, check: supported)</li>
+<li id="s12">Profile Guided Optimization can significantly improve performance when used with Link Time Optimization, especially on IRIX 6.2 and 6.5. (user-1085, 2025-10-05, exchange 93611, check: supported)</li>
+<li id="s13">IRIX 6.5 had issues with demo executables and strange errors, while 6.2 had missing executables for most demos. (user-45c8, 2020-01-05, exchange 227147, check: supported)</li>
+<li id="s14">IRIX 6.5 has OpenGL 1.1, 6.2/5.3 have only OpenGL 1.0 for textures. (user-ce5a, 2021-01-31, exchange 14443, check: supported)</li>
+<li id="s15">The SGI SDK for N64 development is compatible with IRIX 6.5 but works best on 6.2 or 6.3; by 2000, Nintendo stopped updating the SGI release of the SDK due to most studios moving to PCs for cheaper development tools; de编 (user-bc18, 2021-03-24, exchange 227178, check: supported)</li>
+<li id="s16">The Onyx can run an SGI IRIX 6.2 drive and keep an SGI IRIX 6.5 install for swapping between, without Vigra. (user-22f9, 2021-12-12, exchange 221756, check: supported)</li>
+<li id="s17">Weatherstar software runs on 6.2 or 6.3, not 6.5. (user-9305, 2022-02-19, exchange 102532, check: supported)</li>
+<li id="s18">The ZuluSCSI Blaster does not honor drive geometry from the .ini file, causing issues with the fx program in both SGI IRIX 6.2 and 6.5 versions. (user-22f9, 2025-04-13, exchange 224885, check: supported)</li>
+<li id="s19">Booting IRIX 6.2 and 6.5 can spike the CPU and cause issues in SGI emulation. (user-1085, 2026-01-12, exchange 220386, check: supported)</li>
+<li id="s20">The Indy can run IRIX 6.5, but the drive was originally 5.1. (user-1a5a, 2026-05-08, exchange 219724, check: supported)</li>
+<li id="s21">An Indy with an R4400 CPU and 1GB of RAM can take up to three minutes to load IRIX after logging in. (user-22f9, 2020-01-06, exchange 5347, check: supported)</li>
+<li id="s22">Irix 6.5 runs on Indy with CHDs but requires patience during boot. (user-a719, 2022-02-16, exchange 220212, check: supported)</li>
+<li id="s23">an SGI Indy with an R5k 150MHz CPU, Indycam, monitor, keyboard, mouse, and IRIX 6.5 CDs is included if picked up. (user-17cb, 2022-05-03, exchange 103581, check: supported)</li>
+<li id="s24">The Indy can come with R4400 CPU and includes documentation and IRIX 6.5 media. (user-e532, 2025-09-21, exchange 118713, check: supported)</li>
+<li id="s25">indys have problems with env chips and cost more; they run 6.5 well with 256mb ram. (user-616d, 2026-02-20, exchange 226110, check: supported)</li>
+<li id="s26">IRIX 6.5 on an Indy may have issues; it shows 7 units on controller 0. (user-554a, 2024-09-18, exchange 210988, check: supported)</li>
+<li id="s27">Running Alias/1 on an Indy with IRIX 6.5 is not possible. (user-86e1, 2026-05-12, exchange 219732, check: supported)</li>
+<li id="s28">Irix 6.3 was released in 1996, followed by 6.5 in 1998, and SGI did not invest much in 6.3 after that. (user-bf68, 2019-06-27, exchange 77861, check: supported)</li>
+<li id="s29">IRIX versions, even minor point releases, seem to be a year apart sometimes. (user-8b3c, 2019-07-23, exchange 220103, check: uncheckable)</li>
+<li id="s30">IRIX 6.5 was released late as SGI focused less on the MIPS platform. (user-bc18, 2020-01-04, exchange 204096, check: supported)</li>
+<li id="s31">Foundation was the base release of IRIX 6.5 and never changed throughout the run. (user-b7c4, 2020-04-19, exchange 7615, check: supported)</li>
+<li id="s32">Booterizer provides a fresh base install of IRIX 6.5, and irixports quickly sets up a working GCC environment. (user-f229, 2019-07-14, exchange 2487, check: supported)</li>
+<li id="s33">gcc 8.2.0 can compile C and C++ on IRIX 6.5. (user-42cf, 2019-01-06, exchange 61, check: supported)</li>
+<li id="s34">Frame Maker 5.5 works on IRIX 6.5 without issues. (user-e98f, 2019-09-28, exchange 216844, check: supported)</li>
+<li id="s35">IRIX 6.5 requires at least 512 MB of RAM for Maya. (user-22f9, 2020-09-15, exchange 204429, check: supported)</li>
+<li id="s36">they stopped putting much effort into IRIX as soon as 6.5 came out in 1998, even before Itanium was coming to town (user-8de9, 2022-03-29, exchange 217541, check: supported)</li>
+<li id="s37">IRIX 6.5 is commonly seen as 6.5. (user-8de9, 2022-02-09, exchange 80955, check: supported)</li>
+<li id="s38">IRIX 6.5 was preferred over 6.1 and 6.0.1. (user-03ad, 2022-06-10, exchange 239701, check: supported)</li>
+<li id="s39">IRIX 6.5 is POSIX compliant, but the spec is old. (user-7b1c, 2022-05-06, exchange 28904, check: supported)</li>
+<li id="s40">Maintenance stream releases for IRIX 6.5 were purely bug fixes, while feature stream included both bug fixes and new features, but near the end of the 6.5 cycle, feature stream releases only contained bug fixes. (user-d903, 2022-06-02, exchange 222296, check: supported)</li>
+<li id="s41">Later 6.5 versions are _required_ for a lot of hardware support. (user-e872, 2022-01-24, exchange 206299, check: supported)</li>
+<li id="s42">6.5 was the last version of IRIX released. (user-1a5a, 2024-03-23, exchange 210180, check: supported)</li>
+<li id="s43">IRIX 6.5 is compliant with UNIX System V Release 4, UNIX 95, and POSIX (including 1e/2c draft 15 ACLs and Capabilities). (user-e872, 2024-10-07, exchange 232371, check: supported)</li>
+<li id="s44">IRIX 6.5 is the most linux like Unix out there. Most things you find on modern linux came from IRIX. (user-c831, 2023-09-04, exchange 209161, check: supported)</li>
+<li id="s45">The Indigo magic desktop was renamed to the IRIX interactive desktop in version 6.5. (user-bba0, 2024-08-01, exchange 210749, check: supported)</li>
+<li id="s46">IRIX 6.5 is less hardware-specific than later versions. (user-e4e2, 2025-01-04, exchange 113414, check: supported)</li>
+<li id="s47">IRIX 6.5 supports up to about 8 exbibytes with XFS. (user-2a3c, 2025-02-09, exchange 114643, check: supported)</li>
+<li id="s48">sa is only in IRIX 6.5. (user-45c8, 2025-02-03, exchange 218756, check: supported)</li>
+<li id="s49">With quality of life improvements, IRIX runs well on an O2 without texture issues. (user-37bb, 2022-09-17, exchange 207683, check: supported)</li>
+<li id="s50">IRIX 6.5 preinstalled on an O2 booted correctly out of the box. (user-1a5a, 2023-09-28, exchange 41071, check: supported)</li>
+<li id="s51">IRIX 6.5 was an all-platforms release. (user-c9c3, 2026-02-19, exchange 219505, check: supported)</li>
+<li id="s52">The IRIX 6.5 source code is available on GitHub and includes versions 6.5.17 and 6.5.5, with 6.5.17 being a mislabeled version from 2002 that includes PROM source for various machines. (user-f190, 2025-12-10, exchange 215849, check: supported)</li>
+<li id="s53">The collection contains many IRIX releases but lacks some IRIX 4 and 5.x versions and some ancillary discs for IRIX 6.5. (user-6c80, 2025-09-12, exchange 88096, check: supported)</li>
+<li id="s54">For a fresh IRIX 6.5 install, one includes the foundation and development/library isos for 6.5, and the overlay isos for the target version, like 6.5.22. (user-231e, 2025-12-24, exchange 219346, check: supported)</li>
+<li id="s55">With IRIX 6.5, it's easier to install everything first and then remove what's not needed, avoiding later pain with overlays and patches. (user-03ad, 2026-01-03, exchange 219382, check: supported)</li>
+<li id="s56">Checking CD contents in IRIX 6.5 involves looking in the dist/ folder, but finding specific package versions requires checking IDB files. (user-f190, 2026-01-30, exchange 89583, check: supported)</li>
+<li id="s57">IRIX 6.5 is not recommended for machines older than R5000. (user-1a5a, 2026-02-06, exchange 213642, check: supported)</li>
+<li id="s58">6.2 is compatible with late Indys and IMPACT I2s but not older systems that struggle with 6.5. (user-1a5a, 2026-03-13, exchange 213763, check: supported)</li>
+<li id="s59">IRIX 6.5 has multiple versions including 6.5.5 and 6.5.7, and GL2 W3.7 is available for 68k machines. (user-d251, 2026-09-09, exchange 125463, check: supported)</li>
+<li id="s60">Running IRIX 6.5 with the wrong cache line size can cause issues. (user-3e2d, 2026-03-28, exchange 62816, check: supported)</li>
+<li id="s61">The R10K CPU has a pre-execution bug in the SCSI driver that can lock a machine solid; the bug is related to speculative execution and was fixed with workarounds in the 6.5 kernel source. (user-bba0, 2026-09-16, exchange 66539, check: supported)</li>
+<li id="s62">IRIX 6.5 doesn't feel very snappy on R4400. (user-1a5a, 2026-06-10, exchange 214065, check: supported)</li>
+<li id="s63">The O2 with a 300 MHz R5000 CPU and 256 MB RAM can run IRIX 6.5 and starts in the rescue menu. (user-c986, 2026-06-17, exchange 244085, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="irix-6-5-0.html">IRIX 6.5.0</a> (6)
+</li>
+<li><a href="irix-6-5-12.html">IRIX 6.5.12</a> (3)
+</li>
+<li><a href="irix-6-5-13.html">IRIX 6.5.13</a> (7)
+</li>
+<li><a href="irix-6-5-17.html">IRIX 6.5.17</a> (7)
+</li>
+<li><a href="irix-6-5-20.html">IRIX 6.5.20</a> (4)
+</li>
+<li><a href="irix-6-5-21.html">IRIX 6.5.21</a> (4)
+</li>
+<li><a href="irix-6-5-22.html">IRIX 6.5.22</a> (215)
+</li>
+<li><a href="irix-6-5-23.html">IRIX 6.5.23</a> (4)
+</li>
+<li><a href="irix-6-5-26.html">IRIX 6.5.26</a> (6)
+</li>
+<li><a href="irix-6-5-27m.html">IRIX 6.5.27m</a> (3)
+</li>
+<li><a href="irix-6-5-28.html">IRIX 6.5.28</a> (8)
+</li>
+<li><a href="irix-6-5-29.html">IRIX 6.5.29</a> (3)
+</li>
+<li><a href="irix-6-5-30.html">IRIX 6.5.30</a> (219)
+</li>
+<li><a href="irix-6-5-31.html">IRIX 6.5.31</a> (4)
+</li>
+<li><a href="irix-6-5-5.html">IRIX 6.5.5</a> (7)
+</li>
+<li><a href="irix-6-5-7.html">IRIX 6.5.7</a> (10)
+</li>
+<li><a href="irix-6-5-8.html">IRIX 6.5.8</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="indigo2.html">Indigo2</a>, <a href="indycam.html">Indycam</a>, <a href="r5k-indy.html">R5K Indy</a>, <a href="challenge.html">Challenge</a>, <a href="ftp-server.html">FTP server</a>, <a href="impact-i2.html">IMPACT I2</a>, <a href="indigo.html">Indigo</a>, <a href="indigo-magic-desktop.html">Indigo Magic Desktop</a>, <a href="indigo1.html">Indigo1</a>, <a href="octane.html">Octane</a>, <a href="onyx.html">Onyx</a>, <a href="onyx1.html">Onyx1</a>, <a href="onyx2.html">Onyx2</a>, <a href="r10k-cpu.html">R10K CPU</a>, <a href="r4400-cpu.html">R4400 CPU</a>, <a href="rm7000.html">RM7000</a>, <a href="ultra64.html">Ultra64</a>
+</li>
+<li>Processors: <a href="r4400.html">R4400</a>, <a href="r5000.html">R5000</a>, <a href="indigo2-r4k.html">Indigo2 R4k</a>, <a href="mips.html">MIPS</a>, <a href="r10000.html">R10000</a>, <a href="r10k-i2.html">R10K I2</a>, <a href="r4400-indy.html">R4400 Indy</a>
+</li>
+<li>Graphics: <a href="gfx.html">GFX</a>, <a href="ir.html">IR</a>, <a href="mental-ray.html">Mental Ray</a>, <a href="odyssey.html">Odyssey</a>, <a href="vpro-graphics.html">VPro graphics</a>
+</li>
+<li>Operating systems: <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-2.html">IRIX 6.2</a>, <a href="irix-6-3.html">IRIX 6.3</a>, <a href="irix-4.html">IRIX 4</a>, <a href="irix-5-1.html">IRIX 5.1</a>, <a href="irix-5-x.html">IRIX 5.x</a>, <a href="irix-6-0-1.html">IRIX 6.0.1</a>, <a href="irix-6-1.html">IRIX 6.1</a>, <a href="irix-6-4.html">IRIX 6.4</a>, <a href="n32-binary.html">N32 binary</a>, <a href="wsl2.html">WSL2</a>
+</li>
+<li>Software: <a href="mame.html">MAME</a>, <a href="maya.html">Maya</a>, <a href="openssh.html">OpenSSH</a>, <a href="sgug-rse.html">sgug-rse</a>, <a href="alias.html">Alias</a>, <a href="booterizer.html">Booterizer</a>, <a href="coff.html">COFF</a>, <a href="java.html">Java</a>, <a href="mipspro-7-4.html">MIPSpro 7.4</a>, <a href="mozilla.html">Mozilla</a>, <a href="n64-sdk.html">N64 SDK</a>, <a href="xfs.html">XFS</a>, <a href="irixports.html">irixports</a>, <a href="n64-demo.html">n64 demo</a>, <a href="sash.html">sash</a>, <a href="fx-program.html">*fx* program</a>, <a href="autocad-r13.html">AutoCAD R13</a>, <a href="dillo.html">Dillo</a>, <a href="discord.html">Discord</a>, <a href="efs.html">EFS</a>, <a href="efs-filesystem.html">EFS filesystem</a>, <a href="elf.html">ELF</a>, <a href="flame-4.html">Flame 4</a>, <a href="gl2-w3-7.html">GL2-W3.7</a>, <a href="gtk3.html">GTK3</a>, <a href="github.html">GitHub</a>, <a href="irc.html">IRC</a>, <a href="mipspro.html">MIPSpro</a>, <a href="maya-6-5.html">Maya 6.5</a>, <a href="maya-7.html">Maya 7</a>, <a href="netsurf.html">Netsurf</a>, <a href="opengl-1-0.html">OpenGL 1.0</a>, <a href="opengl-1-1.html">OpenGL 1.1</a>, <a href="rse.html">RSE</a>, <a href="scsi-driver.html">SCSI driver</a>, <a href="sdl.html">SDL</a>, <a href="sgug-toolchain.html">SGUG toolchain</a>, <a href="samba.html">Samba</a>, <a href="softimage-3-7.html">Softimage 3.7</a>, <a href="binutils.html">binutils</a>, <a href="curl.html">curl</a>, <a href="didbs.html">didbs</a>, <a href="emulation.html">emulation</a>, <a href="freeware.html">freeware</a>, <a href="inst.html">inst</a>, <a href="installation.html">installation</a>, <a href="keygen.html">keygen</a>, <a href="mount.html">mount</a>, <a href="nekoware.html">nekoware</a>, <a href="software.html">software</a>, <a href="tgcware.html">tgcware</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="jaz-drive.html">Jaz drive</a>, <a href="256mb-ram.html">256MB RAM</a>, <a href="300gb-sca-drive.html">300GB SCA drive</a>, <a href="56k-modem.html">56k modem</a>, <a href="bluescsi.html">BlueSCSI</a>, <a href="ip35.html">IP35</a>, <a href="zip-disk.html">Zip disk</a>, <a href="zuluscsi-blaster.html">ZuluSCSI Blaster</a>, <a href="network-card.html">network card</a>, <a href="tape.html">tape</a>
+</li>
+<li>Standards and interfaces: <a href="ftp.html">FTP</a>, <a href="dhcp.html">DHCP</a>, <a href="posix.html">POSIX</a>, <a href="dns.html">DNS</a>, <a href="ipv6.html">IPv6</a>, <a href="nfsv3.html">NFSv3</a>, <a href="posix-threads.html">POSIX threads</a>, <a href="scsi.html">SCSI</a>, <a href="usb.html">USB</a>, <a href="serial-port.html">serial port</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="gcc.html">GCC</a>, <a href="iso-image.html">ISO image</a>, <a href="gcc-8-2-0.html">gcc 8.2.0</a>
+</li>
+<li>Other: <a href="usr-gfx-setmon.html">/usr/gfx/setmon</a>, <a href="128mb.html">128MB</a>, <a href="3-x.html">3.x</a>, <a href="4-x.html">4.x</a>, <a href="9-x.html">9.x</a>, <a href="alias-1.html">Alias/1</a>, <a href="bonus-tools.html">Bonus Tools</a>, <a href="chd.html">CHD</a>, <a href="cmucl.html">CMUCL</a>, <a href="chatzilla.html">ChatZilla</a>, <a href="common-lisp.html">Common Lisp</a>, <a href="drc.html">DRC</a>, <a href="dogfight.html">Dogfight</a>, <a href="flash.html">Flash</a>, <a href="foundation.html">Foundation</a>, <a href="idb-file.html">IDB file</a>, <a href="inperson.html">InPerson</a>, <a href="library-path.html">LIBRARY_PATH</a>, <a href="mekton.html">Mekton</a>, <a href="png.html">PNG</a>, <a href="ql2342.html">QL2342</a>, <a href="rapidapp.html">RapidApp</a>, <a href="runescape.html">Runescape</a>, <a href="s3.html">S3</a>, <a href="scummvm.html">ScummVM</a>, <a href="simcity.html">SimCity</a>, <a href="account.html">account</a>, <a href="fmsx.html">fMSX</a>, <a href="gnulib.html">gnulib</a>, <a href="gpubench.html">gpubench</a>, <a href="gpubench-ogl1.html">gpubench_ogl1</a>, <a href="o32.html">o32</a>, <a href="old-software.html">old software</a>, <a href="overlay.html">overlay</a>, <a href="overlay-discs.html">overlay discs</a>
+</li></ul>
+</body>
+</html>

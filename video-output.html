@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>video output</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>video output</h1>
+<p>Claims: 17 Part of <a href="video.html">video</a></p>
+<p>Video output problems on some machines may cause the display to go to sleep quickly when logging in as root, requiring a system restart to recover. <sup><a href="#s1">1</a></sup> The Octane may have issues with RAM slots and video output, reseating RAM does not always fix problems, and the PSU might be a common failure. <sup><a href="#s2">2</a></sup> A machine may no longer show an error but still have no video output, and the system may try to boot even if no keyboard is detected. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> SGI video output (vo:sgi:pixeltex) uses pixel_texture (rgb) and glDrawPixels for drawing, and using -vo sgi:pixeltex:async can improve performance but may not fix visual issues. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Double buffered video output uses two buffers, one for screen display and one for drawing, with a swap once drawing is complete to ensure smooth graphics but requires more VRAM. <sup><a href="#s7">7</a></sup> Indy can give video output even if the keyboard can't be detected, and in serial tests video output can take a long time, especially if the NVRAM battery has failed, leading to diag-mode and verbose POST. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> Laserdisc video output uses the internal RF signal, and the video output works until Frost takes over. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> The O2 motherboard can have a slightly cooked video output which manifests as excessive green, possibly due to issues with a bridge pack between the ports and the motherboard. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">When logging in as root, the video output on some machines may go to sleep quickly and require a system restart to recover. (user-b1da, 2020-01-18, exchange 5541, check: uncheckable)</li>
+<li id="s2">The Octane may have issues with RAM slots and video output; reseating RAM does not always fix problems; the PSU might be a common failure. (user-1361, 2021-01-24, exchange 14105, check: supported)</li>
+<li id="s3">The machine is no longer showing an error but has no video output. (user-1361, 2021-01-24, exchange 14087, check: uncheckable)</li>
+<li id="s4">The system tries to boot even if no keyboard is detected, but may not display video output. (user-9849, 2021-04-27, exchange 16973, check: uncheckable)</li>
+<li id="s5">The SGI video output (vo:sgi:pixeltex) uses pixel_texture (rgb) and glDrawPixels for drawing. (user-6afa, 2021-12-17, exchange 70143, check: uncheckable)</li>
+<li id="s6">Using -vo sgi:pixeltex:async can improve performance but may not fix visual issues. (user-6afa, 2021-12-17, exchange 70143, check: uncheckable)</li>
+<li id="s7">Double buffered means you have two buffers for your video output, one for screen display and one for drawing, with a swap once drawing is complete to ensure smooth graphics but requires more VRAM. (user-b1da, 2021-12-24, exchange 101368, check: supported)</li>
+<li id="s8">Indy can give video output even if the keyboard can't be detected. (user-8de9, 2022-04-18, exchange 103262, check: supported)</li>
+<li id="s9">In serial tests, video output can take a long time, especially if the NVRAM battery has failed, leading to diag-mode and verbose POST. (user-07ed, 2022-09-22, exchange 183011, check: uncheckable)</li>
+<li id="s10">Laserdisc video output uses the internal RF signal. (user-e872, 2025-01-14, exchange 211610, check: uncheckable)</li>
+<li id="s11">The video output works until Frost takes over. (user-1a5a, 2025-05-24, exchange 143294, check: uncheckable)</li>
+<li id="s12">The O2 motherboard can have a slightly cooked video output which manifests as excessive green, possibly due to issues with a bridge pack between the ports and the motherboard. (user-e872, 2026-01-26, exchange 121206, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="xio-slot.html">XIO slot</a>
+</li>
+<li>Processors: <a href="cpu-fan.html">CPU fan</a>
+</li>
+<li>Operating systems: <a href="os.html">OS</a>
+</li>
+<li>Software: <a href="boot.html">boot</a>, <a href="mplayer.html">mplayer</a>, <a href="root.html">root</a>
+</li>
+<li>Parts and peripherals: <a href="nvram-battery.html">NVRAM battery</a>, <a href="psu.html">PSU</a>, <a href="ram-slots.html">RAM slots</a>, <a href="tesla-cards.html">Tesla cards</a>, <a href="vram.html">VRAM</a>, <a href="motherboard.html">motherboard</a>
+</li>
+<li>Standards and interfaces: <a href="serial-output.html">serial output</a>
+</li>
+<li>Other: <a href="frost.html">Frost</a>, <a href="laserdisc.html">Laserdisc</a>, <a href="post.html">POST</a>, <a href="gldrawpixels.html">glDrawPixels</a>, <a href="shoehorn.html">shoehorn</a>
+</li></ul>
+</body>
+</html>

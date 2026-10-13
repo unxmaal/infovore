@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>radeonhd</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>radeonhd</h1>
+<p>Claims: 3</p>
+<p>radeonhd supports some newer FireGL cards but not the FireGL X1, and it crashes in SLES11. <sup><a href="#s1">1</a></sup> Xorg -configure might be necessary and radeon might not be the correct driver, as SLES11 used radeonhd instead. <sup><a href="#s2">2</a></sup> SLES10 crashes on startup of X, SLES9 is too old for the 3450 PCI, and SLES11 has a system lockup bug with radeonhd. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">`radeonhd` supports some newer FireGL cards but not the FireGL X1; it crashes in SLES11. `radeon` is still present but crashes. (user-59b9, 2020-08-25, exchange 216347, check: supported)</li>
+<li id="s2">Xorg -configure might be necessary and `radeon` might not be the correct driver; SLES11 used `radeonhd` instead. (user-1446, 2020-08-25, exchange 216346, check: supported)</li>
+<li id="s3">SLES10 crashes on startup of X, SLES9 is too old for the 3450 PCI, and SLES11 has a system lockup bug with radeonhd. (user-1446, 2020-10-20, exchange 11672, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="radeon.html">Radeon</a>
+</li>
+<li>Operating systems: <a href="sles-10.html">SLES 10</a>, <a href="sles11.html">SLES11</a>, <a href="sles9.html">SLES9</a>
+</li></ul>
+</body>
+</html>

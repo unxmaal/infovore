@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xnest</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Xnest</h1>
+<p>Claims: 7</p>
+<p>Xnest is a client for remote X on Linux, while Xmanager 6 is recommended for Windows. <sup><a href="#s1">1</a></sup> Xephyr is a full X server alternative to Xnest that offers fewer bugs and more features, including OpenGL support. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Xnest can be used to run two X servers, but they cannot coordinate inputs, and it can also create a headless desktop session over TCP. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Running two X servers with separate screens requires a fullscreen Xephyr/Xnest on :0.1 for a proper XDMCP connection. <sup><a href="#s6">6</a></sup> Using Xnest with :1 -query ip.of.the.box no longer works for connecting to IRIX via XDMCP. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Xmanager 6 and xnest are recommended clients for remote X on Windows and Linux respectively. (user-ba81, 2019-01-21, exchange 171, check: supported)</li>
+<li id="s2">Xephyr is a full X server alternative to xnest, offering fewer bugs and missing features. (user-237d, 2020-06-17, exchange 216951, check: uncheckable)</li>
+<li id="s3">Xephyr has more features than Xnest, including OpenGL support. (user-86e1, 2024-07-04, exchange 47488, check: uncheckable)</li>
+<li id="s4">Xnest can be used for running two X servers, but they can't coordinate inputs. (user-7b1c, 2022-09-24, exchange 239850, check: supported)</li>
+<li id="s5">Xnest can be used to create a headless desktop session over TCP. (user-7973, 2024-07-04, exchange 47487, check: uncheckable)</li>
+<li id="s6">Running two X servers with separate screens requires a fullscreen Xephyr/Xnest on :0.1 for proper XDMCP connection. (user-7b1c, 2022-09-24, exchange 239849, check: supported)</li>
+<li id="s7">Using Xnest :1 -query ip.of.the.box does not work anymore for connecting to IRIX via XDMCP. (user-22f9, 2019-01-19, exchange 148, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="windows.html">Windows</a>
+</li>
+<li>Standards and interfaces: <a href="xdmcp.html">XDMCP</a>
+</li>
+<li>Other: <a href="xephyr.html">Xephyr</a>, <a href="remote-x.html">remote X</a>
+</li></ul>
+</body>
+</html>

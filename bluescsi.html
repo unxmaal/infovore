@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlueSCSI</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>BlueSCSI</h1>
+<p>Claims: 149</p>
+<h2 id="with-zuluscsi">With ZuluSCSI</h2>
+<p>ZuluSCSI is a SCSI emulator that is faster than BlueSCSI, easier to use than SCSI2SD, and uses filename-based setup, while BlueSCSI is an open source community where anyone can contribute and is cheaper than ZuluSCSI, which is closed source though its hardware is open. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The biggest difference is that BlueSCSI and RASCSI are hobbyist projects, while ZuluSCSI and SD2SCSI are more business-oriented projects. <sup><a href="#s4">4</a></sup> ZuluSCSI and BlueSCSI are basically the same, and both can achieve up to 20MB/s, saturating any 10MB SCSI bus. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> They are great for old Macs, Amigas, SGI, and Suns, and changing out a hard drive for a BlueSCSI or ZuluSCSI can help with thermals. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> SanDisk SD cards have been reported as causing issues with BlueSCSI and ZuluSCSI. <sup><a href="#s10">10</a></sup></p>
+<h2 id="with-rascsi">With RaSCSI</h2>
+<p>BlueSCSI is based on RaSCSI and can use the same images as RaSCSI, assuming you have a SCSI card in the IIgs. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> BlueSCSI uses a Bluepill STM32 microcontroller and is cheaper than RaSCSI but has less multifunction potential if all you need is SCSI emulation. <sup><a href="#s13">13</a></sup> RaSCSI and BlueSCSI share core SCSI signaling but differ in their environments. <sup><a href="#s14">14</a></sup> RaSCSI can emulate the BlueSCSI. <sup><a href="#s15">15</a></sup> The BlueSCSI and RASCSI firmware fixes disk utility and apple-branded disks issues, improving compatibility. <sup><a href="#s16">16</a></sup> There are preinstalled and blank images available for rascsi/bluescsi here: https://github.com/erichelgeson/BlueSCSI/wiki/Usage#premade-images. <sup><a href="#s17">17</a></sup></p>
+<h2 id="general">General</h2>
+<p>BlueSCSI is a cheap SCSI emulation device that performs similarly to the v5 and feels faster than traditional solutions because it removes latency. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup> It works well for Mac Plus, is compact enough for external use on a Mac and a w30 sampler keyboard, and can act as a USB/SCSI connector. <sup><a href="#s20">20</a></sup><sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup> BlueSCSI supports CD/DVD and other optical devices, making it a nice CDROM replacement with good ISO support and emulation capabilities for various operating systems. <sup><a href="#s23">23</a></sup><sup><a href="#s24">24</a></sup> The BlueSCSI fork called GreenSCSI uses a Teensy and may support tape emulation, while the F4 version uses a blackpill with more space that could also support tape emulation. <sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> BlueSCSI does not work with SGIs, and AzulSCSI is an alternative with slightly better hardware. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> BlueSCSI is a SCSI emulation device that works with older Macintosh models using a DB24 connector, as well as with SGI systems and RS/6000 machines. <sup><a href="#s29">29</a></sup><sup><a href="#s30">30</a></sup><sup><a href="#s31">31</a></sup> It can emulate multiple SCSI units, with the SCSI ID determined by the image filename (for example, HD1_IRIX_63.img corresponds to ID1). <sup><a href="#s32">32</a></sup><sup><a href="#s33">33</a></sup> Basilisk and SheepShaver both recognize BlueSCSI drives, and the associated extension ignores BlueSCSI so that hard drives are always read as raw files. <sup><a href="#s34">34</a></sup><sup><a href="#s35">35</a></sup> The firmware version can be retrieved using the BlueSCSI API, and the BlueSCSI IRIX CLI tool is available on GitHub for testing. <sup><a href="#s36">36</a></sup><sup><a href="#s37">37</a></sup> The WiFi version of the BlueSCSI works as a wireless connection, and the Mac OS identifies it as a Dayna SCSI-Ethernet adapter, making software transfer more convenient. <sup><a href="#s38">38</a></sup><sup><a href="#s39">39</a></sup> The BlueSCSI is generally suitable for older SGI models but not for the O2/Octane2, and it is somewhat slow and designed primarily for classic Macs rather than SGI systems. <sup><a href="#s40">40</a></sup><sup><a href="#s41">41</a></sup><sup><a href="#s42">42</a></sup> It cannot be used as a CD emulator to install from because it lacks a way to change the CD image during installation, and swapping CDs can only be done through the OS's eject function. <sup><a href="#s42">42</a></sup><sup><a href="#s43">43</a></sup><sup><a href="#s44">44</a></sup> The BlueSCSI is inadequate for large transfers such as video files, but works well as a CD-ROM replacement on an O2. <sup><a href="#s45">45</a></sup> BlueSCSI is a SCSI replacement device that can be used instead of an internal hard drive in SGI systems such as the Indy, Indigo, O2, and Octane, and can be installed on the 50-pin CD-ROM connector. <sup><a href="#s46">46</a></sup><sup><a href="#s47">47</a></sup><sup><a href="#s48">48</a></sup><sup><a href="#s49">49</a></sup> BlueSCSI drives are simply images, making it easier to use than SCSI2SD, which uses sectors on the flash. <sup><a href="#s50">50</a></sup> BlueSCSI firmware remains GPL, same as always. <sup><a href="#s51">51</a></sup> BlueSCSI is slightly less compatible with SGI systems. <sup><a href="#s52">52</a></sup> BlueSCSI requires specific jumper settings, including setting the termination jumper to off if the Indigo has a terminator at the end of the SCSI cable. <sup><a href="#s53">53</a></sup><sup><a href="#s54">54</a></sup> BlueSCSI firmware updates have caused issues, including Indigo 2s not booting after updating to v2025. <sup><a href="#s55">55</a></sup> Network install is the best method for BlueSCSI installs, especially since CD drives are becoming harder to find or fix. <sup><a href="#s56">56</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">zuluscsi is a SCSI emulator faster than bluescsi, easier to use than scsi2sd, and has filename-based setup. (user-6afa, 2022-05-17, exchange 103808, check: uncheckable)</li>
+<li id="s2">zuluscsi is closed source but the hardware is open. (user-95db, 2022-05-24, exchange 103886, check: uncheckable)</li>
+<li id="s3">bluescsi is an open source community where anyone can contribute, and it is cheaper than Zuluscsi. (user-17cb, 2025-03-21, exchange 212234, check: uncheckable)</li>
+<li id="s4">The biggest difference is that BlueSCSI/RASCSI are very much hobbiest projects, while zuluscsi and sd2scsi are more business projects, better by that nature. (user-95db, 2022-05-24, exchange 103887, check: uncheckable)</li>
+<li id="s5">BlueSCSI and ZuluSCSI emulators can achieve up to 20MB/s, but SCA disks can reach 100MB/s or more. (user-9860, 2024-07-01, exchange 210585, check: supported)</li>
+<li id="s6">The modern $40 ZuluSCSI/bluescsi devices are incredibly easy to use and will saturate any 10MB SCSI bus. (user-616d, 2025-12-21, exchange 60967, check: supported)</li>
+<li id="s7">Zuluscsi and BlueSCSI are basically the same. (user-616d, 2026-08-18, exchange 214454, check: uncheckable)</li>
+<li id="s8">Zuluscsi/Bluescsi/Scsiknife are great for old Macs, Amigas, SGI, Suns, everything. (user-3e2d, 2025-05-28, exchange 212552, check: uncheckable)</li>
+<li id="s9">Changing out the hard drive for a BlueSCSI / ZuluSCSI can help with thermals. (user-616d, 2025-09-27, exchange 213143, check: uncheckable)</li>
+<li id="s10">SanDisk SD cards have been reported as issues with BlueSCSI and ZuluSCSI. (user-95db, 2023-02-07, exchange 222837, check: uncheckable)</li>
+<li id="s11">BlueSCSI is a SCSI emulator for the IIgs and can use the same images as RaSCSI, assuming you have a SCSI card in the IIgs. (user-f229, 2021-08-09, exchange 19085, check: uncheckable)</li>
+<li id="s12">BlueSCSI is based on RaSCSI and can be unstable if resistor networks are not checked before soldering. (user-1361, 2021-08-09, exchange 205360, check: uncheckable)</li>
+<li id="s13">The I2I can use a RASCSI or BlueSCSI for SCSI emulation; the BlueSCSI uses a Bluepill STM32 microcontroller and is cheaper than the RASCSI but has less multifunction potential if all you need is SCSI emulation. The boot/ (user-f229, 2021-07-19, exchange 77397, check: uncheckable)</li>
+<li id="s14">Rascsi and bluescsi share core SCSI signaling but differ in their environments. (user-95db, 2021-11-14, exchange 221697, check: uncheckable)</li>
+<li id="s15">RaSCSI can emulate the bluescsi. (user-5510, 2022-05-08, exchange 103674, check: uncheckable)</li>
+<li id="s16">The BlueSCSI and RASCSI firmware fixes disk utility and apple-branded disks issues, improving compatibility. (user-95db, 2022-09-17, exchange 231877, check: uncheckable)</li>
+<li id="s17">There are preinstalled and blank images available for rascsi/bluescsi here: https://github.com/erichelgeson/BlueSCSI/wiki/Usage#premade-images (user-d903, 2022-11-21, exchange 231947, check: uncheckable)</li>
+<li id="s18">Bluescsi has similar performance to v5 and is cheap. (user-d903, 2021-05-14, exchange 99208, check: uncheckable)</li>
+<li id="s19">AzulSCSI and BlueSCSI remove latency, making them feel faster than traditional solutions. (user-95db, 2022-04-21, exchange 206878, check: uncheckable)</li>
+<li id="s20">BlueSCSI works well for MacPlus and enhanced firmware should be tested. (user-95db, 2021-11-01, exchange 221650, check: uncheckable)</li>
+<li id="s21">Bluescsi is compact and suitable for external use on a Mac and a w30 sampler keyboard. (user-c831, 2022-08-21, exchange 222448, check: uncheckable)</li>
+<li id="s22">The BlueSCSI can act as a USB/SCSI connector. (user-95db, 2022-09-14, exchange 207663, check: uncheckable)</li>
+<li id="s23">BlueSCSI is a cheap alternative for SCSI support, with good ISO support and emulation capabilities for various operating systems including Solaris 8, NT-AXP (Alpha), Debian 3.1 AXP, and MacOS; it can be used as a CDROM, (user-95db, 2022-06-29, exchange 239744, check: supported)</li>
+<li id="s24">BlueSCSI supports optical devices, making it a nice CDROM replacement. (user-95db, 2022-09-22, exchange 215334, check: uncheckable)</li>
+<li id="s25">The BlueSCSI fork called GreenSCSI uses a Teensy and may support tape emulation. (user-95db, 2021-12-13, exchange 80349, check: uncheckable)</li>
+<li id="s26">The F4 version of BlueSCSI uses a blackpill and has more space, potentially supporting tape emulation. (user-95db, 2021-12-13, exchange 80349, check: uncheckable)</li>
+<li id="s27">BlueSCSI doesn't work with SGIs. (user-8de9, 2022-04-06, exchange 206787, check: uncheckable)</li>
+<li id="s28">AzulSCSI is an alternative to BlueSCSI with slightly better hardware and performance around 2.5-3 MBytes/sec, costing around $820 USD. (user-95db, 2022-04-21, exchange 206878, check: supported)</li>
+<li id="s29">BlueSCSI is a potential solution for SCSI on older Macintosh models with a DB24 connector. (user-554a, 2024-06-09, exchange 46565, check: uncheckable)</li>
+<li id="s30">Disk emulators are used instead of real disks, as they can be more convenient. An example is a BlueSCSI on an RS/6000. (user-d5ee, 2025-03-18, exchange 178414, check: supported)</li>
+<li id="s31">The RS/6000 370 7012 can use BlueSCSI and 24-bit 3D graphics cards. (user-d5ee, 2025-04-02, exchange 238819, check: supported)</li>
+<li id="s32">The BlueSCSI can emulate multiple units with SCSI ID set by filename. (user-bba0, 2024-06-18, exchange 210527, check: uncheckable)</li>
+<li id="s33">For the BlueSCSI, set the SCSI ID by filename (e.g., HD1_IRIX_63.img for ID1). (user-86e1, 2024-06-18, exchange 210527, check: uncheckable)</li>
+<li id="s34">Basilisk and SheepShaver both recognize BlueSCSI drives. (user-1a5a, 2024-06-01, exchange 232284, check: uncheckable)</li>
+<li id="s35">The extension with Bluescsi is ignored and hard drives are always read as raw files. (user-95db, 2024-06-01, exchange 232285, check: uncheckable)</li>
+<li id="s36">The BlueSCSI firmware version can be retrieved using the BlueSCSI API. (user-bba0, 2024-06-19, exchange 210532, check: uncheckable)</li>
+<li id="s37">The BlueSCSI IRIX CLI tool is available on GitHub for testing. (user-bba0, 2024-06-23, exchange 210554, check: uncheckable)</li>
+<li id="s38">The WiFi version of the BlueSCSI is a good choice for ease of use. (user-d5ee, 2024-07-11, exchange 232319, check: uncheckable)</li>
+<li id="s39">The Pico-W on the BlueSCSI card works as a wireless connection and the Mac OS identifies it as a Dayna SCSI-Ethernet adapter, making software transfer more convenient. (user-1a5a, 2024-10-13, exchange 49772, check: uncheckable)</li>
+<li id="s40">Bluescsi works with SGIs and is sufficient for slower SCSI busses. (user-6afa, 2024-04-12, exchange 210231, check: uncheckable)</li>
+<li id="s41">BlueSCSI is good for the older SGIs but not O2/Octane2. (user-ae91, 2024-06-12, exchange 210482, check: supported)</li>
+<li id="s42">Bluescsi is 'ok' but it's a bit slow and its designed to be used with classic Macs rather than SGI. Also you can't use it as a CD emulator to install from as it lacks a way to change the CD image during install. (user-bba0, 2024-06-18, exchange 210525, check: uncheckable)</li>
+<li id="s43">The BlueSCSI lacks a button to switch CD images, making it inconvenient for installing SGI systems. (user-bba0, 2024-07-23, exchange 210705, check: uncheckable)</li>
+<li id="s44">The BlueSCSI's design for Macs means swapping CDs can only be done through the OS's eject function. (user-bc18, 2024-07-23, exchange 210705, check: uncheckable)</li>
+<li id="s45">The BlueSCSI is inadequate for large transfers like video files, but works well as a CD-ROM replacement on an O2. (user-17cb, 2025-02-07, exchange 53981, check: supported)</li>
+<li id="s46">An external BlueSCSI can be used instead of an internal hard drive. (user-24f0, 2025-04-27, exchange 232614, check: uncheckable)</li>
+<li id="s47">The Indy uses BlueSCSI; the original 1994 drive is noisy. (user-1a5a, 2025-07-15, exchange 117682, check: supported)</li>
+<li id="s48">Indigo and O2 work with BlueSCSI; it can be installed on the 50-pin CD-ROM connector. (user-9219, 2025-09-07, exchange 118438, check: supported)</li>
+<li id="s49">One can create BlueSCSI-compatible clean install disk images for Octane with MGRAS/IMPACT, Octane with ODYSSEY/VPro, and possibly O2. (user-baf6, 2026-09-21, exchange 66688, check: supported)</li>
+<li id="s50">BlueSCSI is easier to use as drives are just images, while SCSI2SD uses sectors on the flash. (user-ba5b, 2026-05-08, exchange 226443, check: uncheckable)</li>
+<li id="s51">BlueSCSI firmware remains GPL, same as always. (user-f190, 2026-01-08, exchange 213502, check: uncheckable)</li>
+<li id="s52">Blue SCSI is slightly less compatible with SGI systems. (user-616d, 2026-08-19, exchange 226908, check: uncheckable)</li>
+<li id="s53">The BlueSCSI requires the termination jumper to be set to off if the Indigo has a terminator at the end of the SCSI cable. (user-164b, 2026-05-08, exchange 226445, check: supported)</li>
+<li id="s54">The BlueSCSI requires specific jumper settings, and the Zulu can use USB for a serial console. (user-ba5b, 2026-09-07, exchange 66297, check: uncheckable)</li>
+<li id="s55">Updating BlueSCSI firmware to v2025 can cause Indigo 2s to not boot. (user-bba0, 2025-07-23, exchange 212777, check: supported)</li>
+<li id="s56">Network install is the best method for BlueSCSI installs, especially since CD drives are becoming harder to find/fix. (user-2a3c, 2026-09-21, exchange 66688, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="bluescsi-firmware.html">BlueSCSI firmware</a> (5)
+</li>
+<li><a href="bluescsi-v2.html">BlueSCSI V2</a> (28)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>, <a href="o2.html">O2</a>, <a href="indigo.html">Indigo</a>, <a href="indigo2.html">Indigo2</a>, <a href="mac.html">Mac</a>, <a href="mac-plus.html">Mac Plus</a>, <a href="g-brick.html">G-brick</a>, <a href="i2i.html">I2I</a>, <a href="iifx.html">IIfx</a>, <a href="iigs.html">IIgs</a>, <a href="macintosh.html">Macintosh</a>, <a href="octane.html">Octane</a>, <a href="pi4.html">Pi4</a>, <a href="quadra.html">Quadra</a>, <a href="rs-6000.html">RS/6000</a>, <a href="ss10.html">SS10</a>, <a href="vaxstation-3100.html">VAXstation 3100</a>
+</li>
+<li>Processors: <a href="r5k-cpu.html">R5K CPU</a>
+</li>
+<li>Graphics: <a href="3d-graphics-card.html">3D graphics card</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="a-ux.html">A/UX</a>, <a href="amigaos.html">AmigaOS</a>, <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-8.html">IRIX 6.5.8</a>, <a href="solaris-8.html">Solaris 8</a>, <a href="ultrix.html">Ultrix</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="zulu.html">Zulu</a>, <a href="sd-card.html">SD card</a>, <a href="cd-images.html">CD images</a>, <a href="github.html">GitHub</a>, <a href="xfs-partition.html">XFS partition</a>, <a href="emulation.html">emulation</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="zuluscsi.html">ZuluSCSI</a>, <a href="rascsi.html">RaSCSI</a>, <a href="scsi2sd.html">SCSI2SD</a>, <a href="hard-drive.html">hard drive</a>, <a href="dds-drive.html">DDS drive</a>, <a href="hdd.html">HDD</a>, <a href="sca-connector.html">SCA connector</a>, <a href="sca-disks.html">SCA disks</a>, <a href="scsi-cable.html">SCSI cable</a>, <a href="zuluscsi-blaster.html">ZuluSCSI Blaster</a>, <a href="disk-utility.html">disk utility</a>, <a href="root-disk.html">root disk</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="scsi-id.html">SCSI ID</a>, <a href="sca.html">SCA</a>, <a href="scsi-card.html">SCSI card</a>, <a href="scsi2.html">SCSI2</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="dec.html">DEC</a>
+</li>
+<li>Other: <a href="azulscsi.html">AzulSCSI</a>, <a href="img-file.html">.img file</a>, <a href="basilisk.html">Basilisk</a>, <a href="daynaport.html">DaynaPort</a>, <a href="f4.html">F4</a>, <a href="mcu.html">MCU</a>, <a href="monkey-island.html">Monkey Island</a>, <a href="piscsi.html">PiSCSI</a>, <a href="sd2scsi.html">SD2SCSI</a>, <a href="scsiknife.html">Scsiknife</a>, <a href="sheepshaver.html">SheepShaver</a>, <a href="command-line.html">command line</a>, <a href="filename.html">filename</a>, <a href="ini-file.html">ini file</a>
+</li></ul>
+</body>
+</html>

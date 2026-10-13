@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XVR-100</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>XVR-100</h1>
+<p>Claims: 19</p>
+<p>The XVR-100 is an ATI Radeon 7000 card (Mac Edition) with Sun firmware, running at 66MHz despite being 32-bit. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> It can be reflashed from an ATI Radeon 7000 Mac Edition and used in an Ultra 5 for 3D purposes. <sup><a href="#s1">1</a></sup><sup><a href="#s6">6</a></sup> The XVR-100 has native dual-head capability, unlike other cards. <sup><a href="#s7">7</a></sup> It supports OpenGL and can run at resolutions higher than 1280x1024. <sup><a href="#s8">8</a></sup> The chip has 3D acceleration, but Solaris drivers (including Xsun) only expose 2D acceleration, using a software renderer instead. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Under Linux, the XVR-100 can do 3D acceleration like a Radeon 7500, though there are no good Linux drivers for it. <sup><a href="#s12">12</a></sup><sup><a href="#s14">14</a></sup> It works with Xsun, Xorg, and CDE on Solaris 10, and is supported by OpenBSD (with better results for the XVR-100 than the XVR-1200). <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> On the SGI 2500, the card required a kernel recompile with a lower securelevel to initialize properly. <sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Ultra 5 has onboard graphics limited to 8-bit color, but can use PCI graphics cards including ATI Radeon 7000 Mac Edition reflashed as an XVR-100. (user-7b1c, 2020-02-26, exchange 216081, check: supported)</li>
+<li id="s2">The XVR-100 is a Radeon 7000 Mac Edition with Sun firmware. (user-7b1c, 2022-03-12, exchange 239561, check: supported)</li>
+<li id="s3">The XVR-100 is a 66MHz card despite being 32-bit. (user-7b1c, 2022-04-22, exchange 181893, check: supported)</li>
+<li id="s4">The XVR-100 is a Radeon 7000, suitable for Windows or Mac OS. (user-baf6, 2022-09-29, exchange 239853, check: supported)</li>
+<li id="s5">The xvr100 is an ATI graphics card. (user-e872, 2024-11-05, exchange 185556, check: uncheckable)</li>
+<li id="s6">The XVR-100 can be used in an Ultra 5 for 3D, though it's essentially a Radeon 7000. (user-5510, 2022-05-24, exchange 239646, check: supported)</li>
+<li id="s7">Dualhead unless they're: XVR-1000, XVR-100 or XVR-1200, all of which have native dual-head capability. (user-7b1c, 2022-02-10, exchange 181415, check: supported)</li>
+<li id="s8">The XVR-100 has OpenGL support and can run at resolutions higher than 1280x1024, while the Elite3D maxes out at 1280x1024 and the Creator3D can do 1600x1200 but only single-buffered. (user-7b1c, 2022-05-24, exchange 239646, check: supported)</li>
+<li id="s9">XSun does not expose 3D components on PGX32 and XVR-100 as 3D acceleration, treating them as 2D accelerated framebuffers. (user-7b1c, 2020-03-29, exchange 7068, check: supported)</li>
+<li id="s10">Solaris drivers do not expose 3D acceleration on the XVR-100, despite the chip having it. (user-7b1c, 2022-03-12, exchange 239561, check: supported)</li>
+<li id="s11">Sun's drivers don't expose 3D acceleration features on the PGX64, XVR-100, XVR-300, or PGX32. (user-7b1c, 2022-04-22, exchange 181889, check: supported)</li>
+<li id="s12">The XVR-100 card can do 3D acceleration under Linux like a Radeon 7500, but the Solaris driver only exposes 2D acceleration. (user-7b1c, 2022-05-18, exchange 182015, check: supported)</li>
+<li id="s13">The XVR-100 does not support OpenGL hardware acceleration, using a software renderer instead. (user-2a24, 2022-07-13, exchange 239784, check: supported)</li>
+<li id="s14">There are no good Linux drivers for the XVR-100. (user-5510, 2022-05-24, exchange 239646, check: supported)</li>
+<li id="s15">XVR-100 works with Xsun, Xorg, and CDE on Solaris 10. (user-7b1c, 2022-09-29, exchange 239853, check: supported)</li>
+<li id="s16">XVR-100 is for running Linux (user-5510, 2022-12-10, exchange 34636, check: supported)</li>
+<li id="s17">openbsd supports the xvr-100 and xvr-1200, with better results for the xvr-100; xvr-1200 can access x11 (user-be12, 2022-12-28, exchange 183400, check: supported)</li>
+<li id="s18">On the SGI 2500 with XVR-100, the graphics card required a kernel recompile with a lower securelevel to initialize properly. (user-9528, 2021-09-02, exchange 239395, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="radeon-7000.html">Radeon 7000</a>, <a href="creator3d.html">Creator3D</a>, <a href="elite3d.html">Elite3D</a>, <a href="ultra-5.html">Ultra 5</a>
+</li>
+<li>Graphics: <a href="xvr-1200.html">XVR-1200</a>, <a href="xvr-1000.html">XVR-1000</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>, <a href="linux.html">Linux</a>, <a href="openbsd.html">OpenBSD</a>
+</li>
+<li>Software: <a href="xsun.html">Xsun</a>, <a href="cde.html">CDE</a>, <a href="opengl.html">OpenGL</a>, <a href="driver.html">driver</a>
+</li>
+<li>Parts and peripherals: <a href="xorg.html">Xorg</a>
+</li>
+<li>Companies: <a href="sun.html">Sun</a>
+</li>
+<li>Other: <a href="2500.html">2500</a>, <a href="3d-acceleration.html">3D acceleration</a>, <a href="pgx32.html">PGX32</a>, <a href="pgx64.html">PGX64</a>
+</li></ul>
+</body>
+</html>

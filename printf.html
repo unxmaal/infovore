@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>printf</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>printf</h1>
+<p>Claims: 9</p>
+<p>printf is a varargs function with prototype `int printf(const char *s, ...)`, even without including &lt;stdio.h&gt;. It is often used as a debugging method. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> fprintf prints to a FILE * and its formatting is exactly the same as with regular printf. <sup><a href="#s3">3</a></sup> The IRIX printf function can be buggy with certain formatting arguments, causing unexpected output or crashes. <sup><a href="#s4">4</a></sup> Invalid format characters in printf should not cause a coredump. <sup><a href="#s5">5</a></sup> To print a float with printf in MIPSPro assembly, provide a format string like "value: %f\n" as the first argument and the float value as the second argument. <sup><a href="#s6">6</a></sup> The utf8 library works decently with its own printf. <sup><a href="#s7">7</a></sup> Ultrix lacks a printf binary, requiring alternative methods for output. <sup><a href="#s8">8</a></sup> The `log_write_debug` function, a vararg function similar to `printf`, contains a `jmp rdx` instruction that sometimes points to invalid code, causing a segfault. <sup><a href="#s9">9</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">printf on IRIX is a varargs function with prototype `int printf(const char *s, ...)`, even without including &lt;stdio.h&gt; (user-9860, 2021-10-23, exchange 215215, check: supported)</li>
+<li id="s2">printf is often used as a debugging method. (user-95db, 2024-08-14, exchange 215547, check: uncheckable)</li>
+<li id="s3">fprintf prints to a FILE * and its formatting is exactly the same as with regular printf. (user-42cf, 2021-04-07, exchange 16321, check: uncheckable)</li>
+<li id="s4">The IRIX printf function can be buggy with certain formatting arguments, causing unexpected output or crashes. (user-b1da, 2022-02-18, exchange 206455, check: uncheckable)</li>
+<li id="s5">Invalid format characters in printf should not cause a coredump. (user-42cf, 2020-01-05, exchange 68251, check: uncheckable)</li>
+<li id="s6">To print a float with printf in MIPSPro assembly, provide a format string like "value: %f\n" as the first argument and the float value as the second argument. (user-ae4b, 2025-07-30, exchange 219034, check: supported)</li>
+<li id="s7">utf8 library works decently with its own printf. (user-42cf, 2020-07-12, exchange 215031, check: uncheckable)</li>
+<li id="s8">Ultrix lacks a printf binary, requiring alternative methods for output. (user-f229, 2019-04-08, exchange 1310, check: uncheckable)</li>
+<li id="s9">The `log_write_debug` function, a vararg function similar to `printf`, contains a `jmp rdx` instruction that sometimes points to invalid code, causing a segfault. (user-b1da, 2024-08-12, exchange 166144, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="ultrix.html">Ultrix</a>
+</li></ul>
+</body>
+</html>

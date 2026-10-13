@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLVM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>LLVM</h1>
+<p>Claims: 28 Background: 10 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/LLVM">LLVM</a>, <a href="https://en.wikipedia.org/wiki/Dbx_%28debugger%29">Dbx (debugger)</a>.</p>
+<p>LLVM has been ported to IRIX, with work carried out by user-cd7d up to version 37, and version 14.0.6 optimized for the mips64-sgi-irix6.5-gnuabin32 target; it is seen as a future compiler for IRIX, and a full rebuild using new LLVM and clang is required to avoid ABI or GOT memory mapping issues. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> LLVM has a MIPS backend but not a PA-RISC or HPPA backend, and it does not support MIPS3 or MIPS4 processors directly, only the MIPS32 and MIPS64 variants. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> LLVM can be used to cross-compile, producing ARM code, and can provide performance improvements when used with ICC on Itanium. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> LLVM supports Rust and Go among other languages, and Apple uses clang, a frontend for LLVM, for their compiler. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> LLVM has poor support for certain platforms, especially embedded and S/390, and porting it to a niche 32-bit RISC took significantly more time. <sup><a href="#s12">12</a></sup> LLVM's stricter defaults make it harder to build older software. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">LLVM for IRIX has been worked on by user-cd7d up to version 37. (user-8547, 2019-07-27, exchange 214808, check: supported)</li>
+<li id="s2">IRIX LLVM version 14.0.6 is optimized and targets mips64-sgi-irix6.5-gnuabin32. (user-f229, 2023-01-16, exchange 70670, check: supported)</li>
+<li id="s3">LLVM is seen as a future compiler for IRIX. (user-f229, 2023-06-02, exchange 215392, check: uncheckable)</li>
+<li id="s4">The weechat bundle from the site requires a full rebuild without old sgug stuff and new LLVM and clang to avoid ABI or GOT memory mapping issues. (user-f190, 2026-03-29, exchange 73337, check: uncheckable)</li>
+<li id="s5">LLVM has a MIPS backend but not a PA-RISC backend. (user-b1da, 2020-07-25, exchange 10030, check: uncheckable)</li>
+<li id="s6">LLVM does not have an HPPA backend for HP-UX. (user-b1da, 2020-09-11, exchange 10966, check: uncheckable)</li>
+<li id="s7">LLVM does not support MIPS3 or MIPS4 processors directly, only MIPS32 and MIPS64 variants. (user-b1da, 2021-04-01, exchange 217086, check: uncheckable)</li>
+<li id="s8">LLVM can be used to cross-compile, producing ARM code. (user-1361, 2021-04-02, exchange 16153, check: uncheckable)</li>
+<li id="s9">LLVM can provide performance improvements when used with ICC on Itanium. (user-1867, 2023-06-03, exchange 70830, check: uncheckable)</li>
+<li id="s10">Apple uses clang, a frontend for LLVM, for their compiler. (user-cb4c, 2020-03-10, exchange 216086, check: uncheckable)</li>
+<li id="s11">llvm supports Rust and Go among other languages. (user-e872, 2021-10-14, exchange 217267, check: uncheckable)</li>
+<li id="s12">LLVM has poor support for certain platforms, especially embedded and S/390, and is less committed to free software due to corporatization and patents. Porting LLVM to a niche 32-bit RISC took significantly more time and (user-22f9, 2025-03-06, exchange 212141, check: supported)</li>
+<li id="s13">LLVM's stricter defaults make it harder to build older software. (user-231e, 2026-04-16, exchange 219671, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="itanium.html">Itanium</a>, <a href="mips.html">MIPS</a>, <a href="mips3.html">MIPS3</a>, <a href="mips32.html">MIPS32</a>, <a href="mips4.html">MIPS4</a>, <a href="pa-risc.html">PA-RISC</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="n32-abi.html">n32 ABI</a>
+</li>
+<li>Software: <a href="clang.html">clang</a>, <a href="dbx.html">dbx</a>, <a href="c.html">C++</a>, <a href="rse.html">RSE</a>, <a href="cross-compiler.html">cross-compiler</a>
+</li>
+<li>Companies: <a href="gcc.html">GCC</a>, <a href="apple.html">Apple</a>
+</li>
+<li>Other: <a href="mach.html">Mach</a>, <a href="iphone.html">iPhone</a>
+</li></ul>
+</body>
+</html>

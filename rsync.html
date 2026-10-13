@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rsync</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>rsync</h1>
+<p>Claims: 15</p>
+<p>rsync is a file transfer tool that is considered better than rcp or ftp for data exchange, especially when SSH is too slow on old hardware. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It can be interrupted and resumed, which is useful for copying entire drives. <sup><a href="#s3">3</a></sup> rsync is used for backups, often together with cron. <sup><a href="#s4">4</a></sup> On IRIX, rsync is part of the RCS package in the default IRIX 6.5.30, though it was not available on the PowerServer 530. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It is used on IRIX to copy files, move /usr to an external disk, and move files to servers via scripts. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> It can also deploy a Gentoo-based system across multiple machines and copy directory trees to NFS shares. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Rsync is a good alternative for data exchange, especially when SSH is too slow on old hardware. (user-237d, 2020-05-12, exchange 78356, check: uncheckable)</li>
+<li id="s2">rsync is much better than rcp or ftp (user-237d, 2022-02-02, exchange 188081, check: uncheckable)</li>
+<li id="s3">rsync can be interrupted and resumed, useful for copying entire drives; for a full backup, use `rsync -av indy:/ backup_dir`; for an image, use `rsh indy dd if=/dev/dsk/XXX of=- &gt; indy.dd` (user-237d, 2024-09-22, exchange 85733, check: supported)</li>
+<li id="s4">rsync and cron are used for backups. (user-cd7d, 2026-07-18, exchange 214221, check: uncheckable)</li>
+<li id="s5">The default IRIX 6.5.30 'rsync' is part of the RCS package. (user-c831, 2019-12-19, exchange 216867, check: supported)</li>
+<li id="s6">The rsync software was not available on the PowerServer 530. (user-5e15, 2024-05-17, exchange 111305, check: supported)</li>
+<li id="s7">To install software on IRIX, mount ISO images as virtual CD-ROMs and use rsync to copy files, then share the destination directory over NFS for installation. (user-c831, 2021-05-19, exchange 79346, check: uncheckable)</li>
+<li id="s8">To move /usr to an external disk in IRIX, one can use rsync or XFS-dump. (user-e872, 2024-11-12, exchange 211237, check: uncheckable)</li>
+<li id="s9">Scripts can automate tasks and move files to servers using rsync on IRIX. (user-164b, 2026-01-30, exchange 89570, check: uncheckable)</li>
+<li id="s10">A Gentoo-based system on G4 Xserves can be set up with specific kernel .config settings and then deployed across multiple machines using rsync. (user-c831, 2019-12-18, exchange 4929, check: uncheckable)</li>
+<li id="s11">i setup a nfs share on my linux server, and mounted irix iso's on linux. then i used rsync to copy the entire directory tree of the cdroms to my nfs share into their own individual dirs. then i can access any of my irix (user-c831, 2020-04-30, exchange 77169, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="g4-xserve.html">G4 Xserve</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="sd-card.html">SD card</a>, <a href="xfs-partition.html">XFS partition</a>, <a href="irixports.html">irixports</a>, <a href="tar.html">tar</a>, <a href="xfsdump.html">xfsdump</a>
+</li>
+<li>Parts and peripherals: <a href="thumb-drive.html">thumb drive</a>
+</li>
+<li>Standards and interfaces: <a href="nfs.html">NFS</a>, <a href="ftp.html">FTP</a>, <a href="nfs-share.html">NFS share</a>, <a href="rcp.html">RCP</a>
+</li>
+<li>Companies: <a href="iso-image.html">ISO image</a>
+</li>
+<li>Other: <a href="rhosts.html">.rhosts</a>, <a href="cron.html">cron</a>
+</li></ul>
+</body>
+</html>

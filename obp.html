@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OBP</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>OBP</h1>
+<p>Claims: 19</p>
+<p>On older machines the OBP is not flashable and requires burning an EPROM, while upgrading on a Blade 2500 requires desoldering the EPROM chip and manually flashing a newer version. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> The Ultra 5 requires setting the write protect jumper to write allow for an OBP upgrade, and a poor soldering job can leave the OBP non-functional. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> An onboard SCSI controller issue can cause boot failures that are resolved by updating the OBP, and a dictionary overflow from a failing SCSI controller can prevent the machine from booting. <sup><a href="#s5">5</a></sup><sup><a href="#s2">2</a></sup> OBP defaults to console on serial if no keyboard is present, but does not recognize USB keyboards in pre-Blade-100 systems, and a keyboard and mouse are needed for the X server to start. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> OBP can be accessed without a display or keyboard, and it has stock default environment variables, so the machine should start without the NVRAM, though it will likely complain. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> To update the OBP you need to specify the boot device and, if necessary, the devalias or filepath, and set the cdrom ID to 6 for OBP to find it. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> Setting diag-switch? true in the OBP and resetting passes diagnostics except for NVRAM issues, and Jumpstart can be used even with a broken Ethernet address if the network address is set in OBP before booting. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">OBP on older machines is not flashable, it requires burning an EPROM. (user-07ed, 2021-10-20, exchange 239422, check: uncheckable)</li>
+<li id="s2">Upgrading the OBP on a Blade 2500 requires desoldering the EPROM chip and manually flashing a newer version, which can cause a dictionary overflow if the onboard SCSI controller fails, preventing the machine from booting (user-04a3, 2022-03-10, exchange 239559, check: supported)</li>
+<li id="s3">I resoldered the OBP and it didn't work; I did a poor job soldering it back on. (user-04a3, 2021-02-19, exchange 180493, check: uncheckable)</li>
+<li id="s4">The Ultra 5 requires setting the write protect jumper to write allow for OBP upgrade. (user-7151, 2022-06-17, exchange 182387, check: supported)</li>
+<li id="s5">A PCI SCSI controller works on the sb2500, but an onboard SCSI controller issue caused boot failures which were resolved by updating the OBP. (user-04a3, 2021-03-04, exchange 180534, check: uncheckable)</li>
+<li id="s6">OBP will default to console on serial if no keyboard is present; the OS can override this, but a keyboard and mouse are needed for X server to start. (user-7b1c, 2022-04-18, exchange 181859, check: uncheckable)</li>
+<li id="s7">OBP does not recognize USB keyboards in pre-Blade-100 systems. (user-7b1c, 2022-04-19, exchange 239603, check: supported)</li>
+<li id="s8">OBP can be accessed without a display or keyboard, but no video output is seen with the original RAM configuration. (user-6e7b, 2023-11-28, exchange 240189, check: uncheckable)</li>
+<li id="s9">The OBP has defaults for the environment, so the machine should also start without the NVRAM, though the machine will likely complain. (user-22f9, 2023-11-28, exchange 184637, check: uncheckable)</li>
+<li id="s10">Their OBP has stock default variables. (user-08fb, 2026-04-11, exchange 187498, check: uncheckable)</li>
+<li id="s11">To update OBP, you need to specify the boot device and, if necessary, the devalias or filepath. (user-7151, 2022-06-17, exchange 182387, check: uncheckable)</li>
+<li id="s12">Set the cdrom ID to 6 for OBP to find it. (user-9528, 2022-10-02, exchange 183055, check: supported)</li>
+<li id="s13">Setting `diag-switch? true` in the OBP and resetting passes diagnostics except for NVRAM issues. (user-8de9, 2022-06-25, exchange 182513, check: supported)</li>
+<li id="s14">Jumpstart can be used even with a broken Ethernet address if the network address is set in OBP before booting. (user-9528, 2023-11-12, exchange 240177, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="blade-2500.html">Blade 2500</a>, <a href="o2.html">O2</a>, <a href="ultra-5.html">Ultra 5</a>
+</li>
+<li>Processors: <a href="hypersparc.html">HyperSPARC</a>
+</li>
+<li>Graphics: <a href="pci-video-card.html">PCI video card</a>
+</li>
+<li>Operating systems: <a href="sunos.html">SunOS</a>
+</li>
+<li>Software: <a href="x-server.html">X server</a>, <a href="minicom.html">minicom</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="eprom.html">EPROM</a>, <a href="eprom-chip.html">EPROM chip</a>, <a href="nvram.html">NVRAM</a>, <a href="pci-scsi-controller.html">PCI SCSI controller</a>, <a href="usb-keyboard.html">USB keyboard</a>
+</li>
+<li>Other: <a href="jumpstart.html">Jumpstart</a>, <a href="sm71.html">SM71</a>
+</li></ul>
+</body>
+</html>

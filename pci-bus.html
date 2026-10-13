@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCI bus</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PCI bus</h1>
+<p>Claims: 10 Part of <a href="pci.html">PCI</a></p>
+<p>The FW800 port on a PowerBook may not work due to issues with the PCI bus or soldering. <sup><a href="#s1">1</a></sup> An S3 Vision chip can be on the PCI bus even if the riser has only ISA or VLB slots. <sup><a href="#s2">2</a></sup> The shared bus nature of PCI on stock PCs was a reason Unix systems on Sparc/SGI were faster. <sup><a href="#s3">3</a></sup> SBS bus adapters connect VMEbus and PCI bus, enabling seamless operation and superior performance. <sup><a href="#s4">4</a></sup> The PCI bus on O2, Octane, and Origin 2K is 5V. <sup><a href="#s5">5</a></sup> The PCI bus in the O2 may be a limiting factor for data transfer speeds, as it is not very efficient, limiting gigabit network IO, and adapters are 32-bit only, halving the theoretical bandwidth. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Network packets may be CPU-limited before hitting PCI bus limits. <sup><a href="#s7">7</a></sup> Drivers output showing no children on the PCI Bus suggests a riser issue; the IST tool `errdmp` on an x86 machine with l1usb driver can provide hardware hints. <sup><a href="#s8">8</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The FW800 port on a PowerBook may not work due to issues with the PCI bus or soldering. (user-e872, 2022-05-10, exchange 231727, check: uncheckable)</li>
+<li id="s2">An S3 Vision chip can be on the PCI bus even if the riser has only ISA or VLB slots. (user-7b1c, 2022-07-15, exchange 238309, check: uncheckable)</li>
+<li id="s3">The shared bus nature of PCI on stock PCs was a reason Unix systems on Sparc/SGI were faster. (user-e872, 2022-09-23, exchange 235240, check: uncheckable)</li>
+<li id="s4">SBS bus adapters connect VMEbus and PCI bus, enabling seamless operation and superior performance. (user-e4d0, 2023-05-04, exchange 107411, check: uncheckable)</li>
+<li id="s5">The PCI bus on O2, Octane, and Origin 2K is 5V. (user-86e1, 2024-10-14, exchange 211114, check: supported)</li>
+<li id="s6">The PCI bus in the O2 may be a limiting factor for data transfer speeds. (user-2a3c, 2025-12-06, exchange 225743, check: supported)</li>
+<li id="s7">The O2 has a PCI bus that is not very efficient, limiting gigabit network IO, and adapters are 32-bit only, halving the theoretical bandwidth. Network packets may be CPU-limited before hitting PCI bus limits. (user-3e2d, 2025-12-06, exchange 225740, check: supported)</li>
+<li id="s8">Drivers output shows no children on the PCI Bus, suggesting a riser issue; IST tool `errdmp` on an x86 machine with l1usb driver can provide hardware hints. (user-0f65, 2026-04-15, exchange 216612, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="origin-2k.html">Origin 2K</a>, <a href="powerbook.html">PowerBook</a>
+</li>
+<li>Standards and interfaces: <a href="isa.html">ISA</a>, <a href="vme-bus.html">VME bus</a>
+</li></ul>
+</body>
+</html>

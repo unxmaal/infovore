@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lld</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>lld</h1>
+<p>Claims: 6</p>
+<p>lld is not fully compatible with GNU ld but can be adapted using regex. <sup><a href="#s1">1</a></sup> FreeBSD uses lld for x64/POWER/ARM64 instead of binutils. <sup><a href="#s2">2</a></sup> Modern linkers like gold or lld only look in specified libraries and differ in handling undefined symbols of dependent libraries. <sup><a href="#s3">3</a></sup> The mips and lld owners need to be consulted for acceptable ways to implement certain features. <sup><a href="#s4">4</a></sup> rld requires code conforming to the IRIX ABI, and lld can be configured to emit such code. <sup><a href="#s5">5</a></sup> The linker lld uses less memory than GNU ld for linking. <sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">lld is not fully compatible with GNU ld but can be adapted using regex. (user-22f9, 2019-02-08, exchange 501, check: uncheckable)</li>
+<li id="s2">FreeBSD uses lld for x64/POWER/ARM64 instead of binutils (user-22f9, 2019-06-19, exchange 67247, check: uncheckable)</li>
+<li id="s3">Modern linkers like `gold` or `lld` only look in specified libraries and differ in handling undefined symbols of dependent libraries. (user-9860, 2021-10-18, exchange 79971, check: supported)</li>
+<li id="s4">The mips and lld owners need to be consulted for acceptable ways to implement certain features. (user-9860, 2021-10-28, exchange 80019, check: uncheckable)</li>
+<li id="s5">rld requires code conforming to the IRIX ABI, and lld can be configured to emit such code. (user-9860, 2021-10-28, exchange 80022, check: uncheckable)</li>
+<li id="s6">The linker `lld` uses less memory than GNU ld for linking. (user-9860, 2022-01-28, exchange 70274, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="mips.html">MIPS</a>
+</li>
+<li>Operating systems: <a href="freebsd.html">FreeBSD</a>
+</li>
+<li>Software: <a href="gnu-ld.html">GNU ld</a>, <a href="rld.html">rld</a>
+</li>
+<li>Standards and interfaces: <a href="x64.html">x64</a>
+</li>
+<li>Other: <a href="gold.html">gold</a>
+</li></ul>
+</body>
+</html>

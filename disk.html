@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>disk</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>disk</h1>
+<p>Claims: 125 Background: 6 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Hard_disk_drive">Hard disk drive</a>.</p>
+<p>A disk may fail for various reasons, including a physical unrecovered read error in the middle of the disk's storage, a failing disk indicated by a distinct clacking noise from the disk compartment, or a dead disk that shows no LEDs or spinup. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> When a disk is not detected, the cause could be a loose data or power connection to the disk backplane, a faulty disk, or a problem with the cable or FC controller. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Swapping the disk with a known good disk can fix the issue, though swapping the disk did not resolve the issue in some cases. <sup><a href="#s3">3</a></sup><sup><a href="#s6">6</a></sup> To fully erase a disk, run /exercise in fx, write only, select the entire disk range, and zero out the entire disk, creating a new label before exiting fx; however, for 300GB disks, using /exercise in fx to zero out the disk is not recommended. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The low level format option is for creating the sectors or remapping bad parts of the disk, and was a last ditch thing if a drive wouldn't partition or format in the OS. <sup><a href="#s9">9</a></sup> Partitioning the disk can resolve installation issues, and to overwrite a disk, use the rootdrive option from the partition menu. <sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Fresh installs can fail if a disk is missing or improperly copied, and the error message 'Copying installation program to disk. .... 10% ......' suggests a slow or failing disk during installation. <sup><a href="#s12">12</a></sup><sup><a href="#s13">13</a></sup> Wiping the disk with fx may not resolve installation issues. <sup><a href="#s14">14</a></sup> A disk can suffer various failures, including a resistor failure that caused it to burst into flames, a degaussing event that wiped the servo track and left the disk unspinnable, and a toasted disk that may have caused missing files. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup><sup><a href="#s17">17</a></sup> A bad disk can cause the format utility to fail and stop recognizing the disk, report a larger number of blocks if it has bad blocks, and produce a 'write failed' error during installation. <sup><a href="#s18">18</a></sup><sup><a href="#s19">19</a></sup><sup><a href="#s20">20</a></sup> Formatting a disk can fix problems, such as when a format corrected a disk so blocksize reported 33 GB instead of 2 TB, though formatting costs nothing but can be expensive for the disk itself and may involve redundant steps like erasing and formatting twice. <sup><a href="#s21">21</a></sup><sup><a href="#s22">22</a></sup><sup><a href="#s23">23</a></sup> Zeroing a disk, either with dd or by zeroing the first few MB to make it appear fresh, is possible, and a corrupt filesystem may cause the miniroot to crash when attempting to mount it, so formatting before installation is advisable. <sup><a href="#s24">24</a></sup><sup><a href="#s25">25</a></sup><sup><a href="#s26">26</a></sup> Diagnostics can help identify disk problems, though the system and disk may pass all diagnostics while issues still exist, and running the disk or power-cycling may help preserve data as a short-term fix. <sup><a href="#s27">27</a></sup><sup><a href="#s28">28</a></sup> A disk can achieve close to 100-150MB/sec for read/write, exceeding what a 1GBit connection can handle, and two to three disks can fully saturate a 2GBit connection. <sup><a href="#s29">29</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">This alert indicates a physical issue with the disk, specifically an unrecovered read error in the middle of the disk's storage. (user-9860, 2021-09-08, exchange 99994, check: uncheckable)</li>
+<li id="s2">The machine has a distinct clacking noise from the disk compartment, indicating a failing disk. (user-03ad, 2023-05-05, exchange 238514, check: uncheckable)</li>
+<li id="s3">A disk not detected by the SCSI card shows no LEDs or spinup; swapping with a known good disk fixes the issue. (user-b1da, 2022-10-28, exchange 207854, check: uncheckable)</li>
+<li id="s4">Most likely, your disk is dead. Less likely but possible - either the data or power connection to the disk backplane is loose. Even less likely: the FC controller is farkled. (user-7b1c, 2022-05-19, exchange 182032, check: uncheckable)</li>
+<li id="s5">The issue could be with the cable, backplane, or a faulty disk. (user-e4d0, 2022-08-31, exchange 104761, check: uncheckable)</li>
+<li id="s6">Swapping the disk did not resolve the issue. (user-5fa2, 2023-01-09, exchange 222783, check: uncheckable)</li>
+<li id="s7">To fully erase a disk, run /exercise in fx, write only, select entire disk range, and zero out the entire disk. This can take a while but ensures the disk is cleared. Creating a new label before exiting fx is recommended (user-86e1, 2024-03-27, exchange 223811, check: uncheckable)</li>
+<li id="s8">For 300GB disks, using /exercise in fx to zero out the disk is not recommended (user-8547, 2024-03-27, exchange 223811, check: supported)</li>
+<li id="s9">the low level format option is for creating the sectors or remapping bad parts of the disk, and was a last ditch thing if a drive wouldn't partition or format in the OS. (user-d903, 2022-04-17, exchange 222166, check: uncheckable)</li>
+<li id="s10">Partitioning the disk can resolve installation issues. (user-b1da, 2023-11-12, exchange 158157, check: uncheckable)</li>
+<li id="s11">To overwrite a disk, use the rootdrive option from the partition menu. (user-7b1c, 2020-04-19, exchange 7600, check: uncheckable)</li>
+<li id="s12">Fresh installs can fail if a disk is missing or improperly copied. (user-0251, 2022-02-19, exchange 102552, check: uncheckable)</li>
+<li id="s13">The error message 'Copying installation program to disk. .... 10% ......' suggests a slow or failing disk during installation. (user-c831, 2019-12-20, exchange 78089, check: supported)</li>
+<li id="s14">Wiping the disk with `fx` may not resolve installation issues. (user-9c31, 2020-08-30, exchange 78663, check: supported)</li>
+<li id="s15">A disk experienced a resistor failure that caused it to burst into flames. (user-24f0, 2024-04-02, exchange 241182, check: uncheckable)</li>
+<li id="s16">Degaussing may have wiped the servo track, leaving the disk unspinnable. (user-86e1, 2025-06-19, exchange 241360, check: uncheckable)</li>
+<li id="s17">If the files aren't available because of a toasted disk, that could explain the delays. (user-3b50, 2025-12-09, exchange 60835, check: uncheckable)</li>
+<li id="s18">A bad disk can cause the format utility to fail and stop recognizing the disk. (user-d5ee, 2024-04-19, exchange 240299, check: uncheckable)</li>
+<li id="s19">A disk with bad blocks will report a larger number of blocks. (user-1962, 2024-05-11, exchange 85043, check: uncheckable)</li>
+<li id="s20">The installer gets a 'write failed' error when trying to install from sash, indicating an issue with the disk or partitioning. (user-8de9, 2025-01-23, exchange 53286, check: uncheckable)</li>
+<li id="s21">Formatting a disk doesn't cost anything but can be expensive for the disk itself. (user-42cf, 2025-06-22, exchange 225192, check: uncheckable)</li>
+<li id="s22">A format fixed the disk, as blocksize now reports 33 GB instead of 2 TB. (user-4f7c, 2025-06-22, exchange 117428, check: supported)</li>
+<li id="s23">The video has redundant steps, such as erasing and formatting the disk twice. (user-2a3c, 2025-06-24, exchange 212628, check: uncheckable)</li>
+<li id="s24">If you have a corrupt filesystem on your disk, the miniroot may attempt to mount it and crash; it's a good idea to format the disk before installation, especially with old disks. (user-86e1, 2025-12-09, exchange 213405, check: uncheckable)</li>
+<li id="s25">dd can zero out a disk. (user-616d, 2026-07-15, exchange 91213, check: uncheckable)</li>
+<li id="s26">Zeroing the first few MB of a disk can make it appear fresh. (user-3e2d, 2026-07-15, exchange 91213, check: uncheckable)</li>
+<li id="s27">The system and disk pass all the diagnostics. (user-2a3c, 2025-09-06, exchange 59039, check: uncheckable)</li>
+<li id="s28">Running the disk for a good 5 minutes then doing a quick power-cycle reboot can help preserve data in some machines, though this is only a short-term fix. (user-e4e2, 2026-07-16, exchange 124110, check: supported)</li>
+<li id="s29">A single disk can push close to 100-150MB/sec for read/write, which is more than a 1GBit connection can handle, and two to three disks can fully saturate a 2GBit connection. (user-8547, 2024-05-14, exchange 223908, check: supported)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="disk-arrays.html">disk arrays</a> (3)
+</li>
+<li><a href="disk-controller.html">disk controller</a> (4)
+</li>
+<li><a href="disk-copy.html">Disk Copy</a> (3)
+</li>
+<li><a href="disk-drive.html">disk drive</a> (10)
+</li>
+<li><a href="disk-i-o.html">disk I/O</a> (5)
+</li>
+<li><a href="disk-image.html">disk image</a> (17)
+</li>
+<li><a href="disk-interface.html">disk interface</a> (3)
+</li>
+<li><a href="disk-sled.html">disk sled</a> (7)
+</li>
+<li><a href="disk-space.html">disk space</a> (7)
+</li>
+<li><a href="disk-utility.html">disk utility</a> (5)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="4d-440.html">4D/440</a>, <a href="e3000.html">E3000</a>, <a href="impact.html">Impact</a>, <a href="indigo.html">Indigo</a>, <a href="mac.html">Mac</a>, <a href="o2.html">O2</a>, <a href="se-mode.html">SE mode</a>, <a href="tezro.html">Tezro</a>, <a href="u2.html">U2</a>, <a href="filesystem.html">filesystem</a>
+</li>
+<li>Processors: <a href="r4400.html">R4400</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="miniroot.html">miniroot</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-6-5-30.html">IRIX 6.5.30</a>, <a href="linux.html">Linux</a>, <a href="nt.html">NT</a>, <a href="os.html">OS</a>
+</li>
+<li>Software: <a href="format-utility.html">format utility</a>, <a href="fx.html">fx</a>, <a href="c360.html">C360</a>, <a href="ide.html">IDE</a>, <a href="imgburn.html">ImgBurn</a>, <a href="zfs.html">ZFS</a>, <a href="zulu.html">Zulu</a>, <a href="dd.html">dd</a>, <a href="root-directory.html">root directory</a>, <a href="script.html">script</a>, <a href="tar.html">tar</a>, <a href="tar-file.html">tar file</a>, <a href="xlv.html">xlv</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="300-gb-disk.html">300 GB disk</a>, <a href="cpu.html">CPU</a>, <a href="ram.html">RAM</a>, <a href="sas-controller.html">SAS controller</a>, <a href="backplane.html">backplane</a>, <a href="cable.html">cable</a>, <a href="jumper.html">jumper</a>, <a href="memory.html">memory</a>, <a href="mice.html">mice</a>, <a href="ribbon-cable.html">ribbon cable</a>, <a href="terminator.html">terminator</a>
+</li>
+<li>Standards and interfaces: <a href="scsi.html">SCSI</a>, <a href="lvd.html">LVD</a>, <a href="scsi-bus.html">SCSI bus</a>, <a href="scsi-card.html">SCSI card</a>, <a href="serial-number.html">serial number</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>, <a href="ibm.html">IBM</a>, <a href="iso.html">ISO</a>
+</li>
+<li>Other: <a href="zero-out.html">zero out</a>, <a href="1gb.html">1GB</a>, <a href="aic7880.html">AIC7880</a>, <a href="quantum.html">Quantum</a>, <a href="san.html">SAN</a>, <a href="backup.html">backup</a>, <a href="bad-sectors.html">bad sectors</a>, <a href="badblock.html">badblock</a>, <a href="clone.html">clone</a>, <a href="cloning.html">cloning</a>, <a href="configuration-file.html">configuration file</a>, <a href="connection.html">connection</a>, <a href="diagnostics.html">diagnostics</a>, <a href="formatting.html">formatting</a>, <a href="logical-volume.html">logical volume</a>, <a href="partitioning.html">partitioning</a>, <a href="slot.html">slot</a>, <a href="space.html">space</a>
+</li></ul>
+</body>
+</html>

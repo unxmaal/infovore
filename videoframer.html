@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VideoFramer</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>VideoFramer</h1>
+<p>Claims: 12</p>
+<p>The VideoFramer is a VME card (a 9U VME assembly with a SCSI port) that can be used inside the IRIS and as a breakout box for the VME 6U card 030-0185-00x, available without daughter boards. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It is also available for the O2, and may work with the Galileo due to similar connector and design, though the Galileo has no electronics. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> The VideoFramer is actually called SlideShowFramer because it processes video frame by frame rather than in real-time. <sup><a href="#s7">7</a></sup> It requires a single-frame capable video deck such as Betacam or U-Matic, a BlackMagic Hyperdeck, a VLAN-capable deck that understands VideoLan commands, a serial-controlled VTR, or a software emulator to interface with an SGI system. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The VideoFramer in the 4D/35 and the VideoLab in the 4D/380 have D1 digital video I/O, but the VideoFramer can only do single-frame I/O while the VideoLab can do real-time I/O and project live video as a texture on geometry. <sup><a href="#s10">10</a></sup> Both the VideoFramer and VideoLab have digital I/O on the card but need a breakout box for analogue component video, and composite video is not supported by the VideoLab. <sup><a href="#s11">11</a></sup> SoftImage 2.66 on QIC tape can import video from VideoLab and VideoFramer but requires licenses. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The VideoFramer is the breakout box for the VME 6U card 030-0185-00x, available without daughter boards. (user-cdcd, 2022-04-05, exchange 241036, check: supported)</li>
+<li id="s2">The VideoFramer is a 9U VME assembly with a SCSI port. (user-2d40, 2022-04-13, exchange 188369, check: supported)</li>
+<li id="s3">The VideoFramer is a VME card inside the IRIS. (user-86e1, 2023-04-28, exchange 188498, check: uncheckable)</li>
+<li id="s4">The Galileo has no electronics, I would imagine the Videoframer would be similar? (user-9528, 2023-04-30, exchange 188499, check: uncheckable)</li>
+<li id="s5">VideoFramer for O2. (user-56d4, 2023-05-19, exchange 223124, check: supported)</li>
+<li id="s6">Galileo might work with VideoFramer due to similar connector and design. (user-8de9, 2025-01-29, exchange 113991, check: uncheckable)</li>
+<li id="s7">VideoFramer is actually called SlideShowFramer as it processes video frame by frame, not in real-time. (user-86e1, 2025-08-14, exchange 117972, check: uncheckable)</li>
+<li id="s8">The VideoFramer requires a VLAN-capable deck that understands VideoLan commands, a serial-controlled VTR, or a software emulator to interface with an SGI system. (user-86e1, 2024-03-11, exchange 223770, check: uncheckable)</li>
+<li id="s9">SlideShowFramer requires a single-frame capable video deck like Betacam or U-Matic, or a BlackMagic Hyperdeck for video processing. (user-86e1, 2025-08-14, exchange 117972, check: uncheckable)</li>
+<li id="s10">The VideoFramer in the 4D/35 and the VideoLab in the 4D/380 have D1 digital video I/O. The VideoFramer can only do single frame I/O, while the VideoLab can do real-time I/O and project live video as a texture on geometry (user-86e1, 2026-01-21, exchange 219423, check: supported)</li>
+<li id="s11">Both VideoFramer and VideoLab have digital I/O on the card, but need a breakout box for the analogue component video. Composite video is not supported by the VideoLab (user-86e1, 2026-01-21, exchange 219423, check: uncheckable)</li>
+<li id="s12">SoftImage 2.66 on QIC tape can import video from VideoLab and VideoFramer but requires licenses. (user-86e1, 2023-02-14, exchange 222850, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="iris.html">IRIS</a>, <a href="o2.html">O2</a>
+</li>
+<li>Software: <a href="softimage-2-66.html">Softimage 2.66</a>
+</li>
+<li>Parts and peripherals: <a href="qic-tape.html">QIC tape</a>
+</li>
+<li>Other: <a href="videolab.html">VideoLab</a>, <a href="galileo.html">Galileo</a>, <a href="betacam.html">Betacam</a>, <a href="u-matic.html">U-Matic</a>, <a href="composite-video.html">composite video</a>
+</li></ul>
+</body>
+</html>

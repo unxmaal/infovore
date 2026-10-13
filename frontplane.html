@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>frontplane</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>frontplane</h1>
+<p>Claims: 26</p>
+<p>The frontplane is a passive component containing many gold and white connectors with small pins, SMD capacitors, and big diodes that could fail. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> On some SGI machines, the frontplane has a DB15 connector that may have been used for serial debugging or testing boards at the factory, and old revisions of Octane frontplanes have a cutout for a DB15 port. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> In SGI Octane systems, the SCSI backplane connects to the frontplane. <sup><a href="#s7">7</a></sup> The frontplane may store the MAC address, which can be used as a unique identifier for the system. <sup><a href="#s8">8</a></sup> The frontplane is necessary for system operation on the O2, and reseating or mishandling it can cause failure. <sup><a href="#s9">9</a></sup> An Octane's frontplane failure prevents boot and serial output, leaving only fan operation upon power-on, even with a good PSU. <sup><a href="#s10">10</a></sup> The frontplane may be physically cracked, and accessing it requires removing the front plastic by squeezing top tabs and unscrewing six screws after removing other components. <sup><a href="#s11">11</a></sup> When upgrading the frontplane, it is meant to be swappable so that licenses can be kept. <sup><a href="#s12">12</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The frontplane has many gold and white connectors with small pins. (user-e872, 2022-09-15, exchange 32695, check: uncheckable)</li>
+<li id="s2">frontplane is passive, pci is already on an extender (user-e872, 2024-11-14, exchange 85895, check: uncheckable)</li>
+<li id="s3">The front plane has many SMD capacitors. (user-2a3c, 2026-06-25, exchange 123793, check: uncheckable)</li>
+<li id="s4">The big diodes on the front plane could fail. (user-e4e2, 2026-06-25, exchange 123793, check: uncheckable)</li>
+<li id="s5">The frontplane on some SGI machines has a DB15 connector that may have been used for serial debugging or testing the boards at the factory. (user-59b9, 2020-05-04, exchange 8047, check: uncheckable)</li>
+<li id="s6">Old revisions of Octane frontplanes have a cutout for a DB15 port. (user-59b9, 2020-05-04, exchange 8048, check: supported)</li>
+<li id="s7">the SCSI backplane connects to the frontplane in SGI Octane systems (user-37bb, 2021-09-23, exchange 205594, check: supported)</li>
+<li id="s8">The MAC address on SGI machines can be used as a unique identifier for the system, often stored in specific hardware components like the frontplane, PCI riser, or ethernet riser. It can also be programmable for O2 andOct (user-e4d0, 2025-06-17, exchange 117392, check: supported)</li>
+<li id="s9">The frontplane on the O2 is necessary for system operation; reseating or mishandling can cause failure. (user-f190, 2026-01-05, exchange 61240, check: supported)</li>
+<li id="s10">An Octane's front plane failure prevents boot and serial output, leaving only fan operation upon power-on, even with a good PSU. (user-c831, 2025-02-07, exchange 224579, check: supported)</li>
+<li id="s11">The frontplane contains a sea of capacitors and may be physically cracked; accessing it requires removing the front plastic by squeezing top tabs and unscrewing six screws after removing other components. (user-6d0a, 2025-02-02, exchange 114275, check: supported)</li>
+<li id="s12">When you upgrade your frontplane, it’s meant to be swappable so you can keep your licenses. (user-e4d0, 2025-03-08, exchange 115190, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="frontplane-connector.html">frontplane connector</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="octane.html">Octane</a>, <a href="mac-address.html">MAC address</a>, <a href="system-module.html">system module</a>
+</li>
+<li>Graphics: <a href="graphics-board.html">graphics board</a>
+</li>
+<li>Software: <a href="boot.html">boot</a>, <a href="license.html">license</a>
+</li>
+<li>Parts and peripherals: <a href="psu.html">PSU</a>, <a href="db15-connector.html">DB15 connector</a>, <a href="pci-riser.html">PCI riser</a>, <a href="prom-version.html">PROM version</a>, <a href="psu-connector.html">PSU connector</a>, <a href="scsi-backplane.html">SCSI backplane</a>, <a href="smd-capacitor.html">SMD capacitor</a>, <a href="mainboard.html">mainboard</a>, <a href="power-supply.html">power supply</a>, <a href="system-board.html">system board</a>
+</li>
+<li>Standards and interfaces: <a href="pci.html">PCI</a>, <a href="serial-output.html">serial output</a>
+</li>
+<li>Companies: <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="diode.html">diode</a>
+</li></ul>
+</body>
+</html>

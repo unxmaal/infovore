@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>backplane</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>backplane</h1>
+<p>Claims: 37 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Router_%28computing%29">Router (computing)</a>.</p>
+<p>Some systems, such as Altixes, do not have a backplane, while others require jumpering for certain configurations. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Backplanes vary in interface and function: some are SCSI, some are not SCA, and some use a SAS switch to solve the Octopus configuration. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Backplanes connect components such as nodeboards, routers, and external SCSI devices, and may include control logic, a power distribution unit, or a system controller board. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup> Backplane size correlates with a machine's era and speed, and smaller backplanes can fit into larger ones. <sup><a href="#s12">12</a></sup> Backplanes are prone to damage and failure from issues such as bent pins, connectors requiring significant force, toner-like dust, or a failed aux voltage regulator. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup><sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> Backplane problems can be isolated using external SCSI enclosures or by testing components in a working system. <sup><a href="#s17">17</a></sup><sup><a href="#s18">18</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Jumpering the backplane is necessary for certain configurations. (user-b7c4, 2020-05-01, exchange 7959, check: uncheckable)</li>
+<li id="s2">Altixes do not have a backplane. (user-1446, 2020-05-05, exchange 8097, check: uncheckable)</li>
+<li id="s3">the backplane is not SCA (user-cd83, 2020-09-20, exchange 97563, check: uncheckable)</li>
+<li id="s4">The backplane is SCSI. (user-b1da, 2021-07-10, exchange 99416, check: uncheckable)</li>
+<li id="s5">back plane with a sas switch solves the octopus. (user-22f9, 2024-11-24, exchange 50868, check: uncheckable)</li>
+<li id="s6">Routers are connected via the backplane and sort things out during initialization. (user-f229, 2021-04-23, exchange 221295, check: uncheckable)</li>
+<li id="s7">The system controller board, located next to the power regulator boards on the rear side of the backplane, contains components that sense voltages and fan operation. (user-095d, 2021-09-16, exchange 221527, check: uncheckable)</li>
+<li id="s8">The ports on the back of the backplane are likely for connecting external SCSI devices. (user-b1da, 2021-10-23, exchange 221622, check: uncheckable)</li>
+<li id="s9">The Power Distribution Unit sits between the Backplane and the dual PSU's. (user-670a, 2023-02-14, exchange 36109, check: uncheckable)</li>
+<li id="s10">The backplane connects nodeboards on an O2k, but for more than two cards, a router card is needed; a null router can act as a wire connecting two nodes. (user-24f0, 2025-04-19, exchange 224925, check: supported)</li>
+<li id="s11">Modular PSUs in PowerSeries systems have a backplane with control logic and an aux voltage regulator that powers the fan; if the aux voltage regulator fails, the PSU fan stops, leading to PSU failure. (user-86e1, 2025-10-10, exchange 241407, check: uncheckable)</li>
+<li id="s12">The backplane's size correlates with the machine's era and speed; smaller backplanes can fit into larger ones, and large backplanes have integral PSUs or multiple snap-in PSUs. (user-616d, 2026-02-11, exchange 165088, check: uncheckable)</li>
+<li id="s13">The backplane of the Octane/Onyx2 will be coated with a layer of toner-like fine dust after many years of service, which can cause issues with new XIO options. (user-56d4, 2023-03-24, exchange 36885, check: supported)</li>
+<li id="s14">The blue connectors on the backplane require significant force to engage and have caused issues; cleaning with DeoxIt Gold resolved similar problems in Crimson. (user-86e1, 2023-11-08, exchange 188757, check: supported)</li>
+<li id="s15">The backplane is sensitive to damage, even from a nuked connector. (user-22f9, 2024-01-22, exchange 44002, check: uncheckable)</li>
+<li id="s16">The backplane of the machine had bent pins causing issues, which were fixed by desoldering the connectors. (user-e4e2, 2026-09-13, exchange 227027, check: uncheckable)</li>
+<li id="s17">An external SCSI enclosure can be used to determine if the issue is with the backplane or the system board. (user-59b9, 2022-08-12, exchange 104581, check: uncheckable)</li>
+<li id="s18">The backplane is a suspect in system failures, and a working system is needed to test components. (user-86e1, 2025-07-18, exchange 241374, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="altix.html">Altix</a>, <a href="4d.html">4D</a>, <a href="4d-380.html">4D/380</a>, <a href="4d-440.html">4D/440</a>, <a href="challenge.html">Challenge</a>, <a href="indigo2.html">Indigo2</a>, <a href="octane.html">Octane</a>, <a href="onyx.html">Onyx</a>, <a href="origin-2000.html">Origin 2000</a>, <a href="powerseries.html">PowerSeries</a>, <a href="skywriter.html">SkyWriter</a>, <a href="system-module.html">system module</a>
+</li>
+<li>Processors: <a href="r3k.html">R3K</a>, <a href="r4000.html">R4000</a>
+</li>
+<li>Graphics: <a href="xl.html">XL</a>
+</li>
+<li>Software: <a href="bios.html">BIOS</a>
+</li>
+<li>Parts and peripherals: <a href="psu.html">PSU</a>, <a href="sca-connector.html">SCA connector</a>, <a href="cable.html">cable</a>, <a href="compute-bricks.html">compute bricks</a>, <a href="connector.html">connector</a>, <a href="disk.html">disk</a>, <a href="nodeboard.html">nodeboard</a>, <a href="router.html">router</a>, <a href="sled.html">sled</a>, <a href="system-board.html">system board</a>, <a href="system-controller-board.html">system controller board</a>
+</li>
+<li>Standards and interfaces: <a href="fibre-channel.html">Fibre Channel</a>, <a href="numa.html">NUMA</a>, <a href="scsi.html">SCSI</a>, <a href="bus.html">bus</a>
+</li>
+<li>Other: <a href="e4500.html">E4500</a>, <a href="hba.html">HBA</a>, <a href="powerone.html">PowerOne</a>, <a href="storage.html">storage</a>, <a href="voltage.html">voltage</a>
+</li></ul>
+</body>
+</html>

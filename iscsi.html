@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iSCSI</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>iSCSI</h1>
+<p>Claims: 15 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/SCSI">SCSI</a>.</p>
+<p>iSCSI is a SCSI transport option that can run over Ethernet, dial-up, ham radio, FDDI, and Daynaport, though some of these combinations are rare or require tuning. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> SCSI can be carried over FC, SAS, iSCSI, or FireWire. <sup><a href="#s6">6</a></sup> Fibre Channel has lower latency and is more reliable than iSCSI for storage applications, while iSCSI over Ethernet can be faster and uses standard networking hardware. <sup><a href="#s1">1</a></sup> iSCSI and FCoE can use regular Ethernet, whereas InfiniBand is more expensive and requires TCP/IP or iSER/SRB configuration, and cannot boot x86 servers. <sup><a href="#s7">7</a></sup> NVMeOF is a newer storage protocol that can run over FC or RDMA networks, offering lower latency than iSCSI. <sup><a href="#s8">8</a></sup> iSCSI is used for storage in various contexts, including FreeNAS, ZFS for VMs over InfiniBand, Proxmox shared storage and VM migrations, and booting and rooting systems such as the U45 over 10Gbit Ethernet. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> iSCSI is not compatible enough with most Unix systems to be useful for vintage computing. <sup><a href="#s13">13</a></sup> Someone has not built an Ethernet iSCSI to IDE/SATA/SAS/SCSI bridge or a PCIe to iSCSI adapter with a networked hard drive that speaks iSCSI. <sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Fibre Channel has lower latency and is more reliable than iSCSI for storage applications, even though iSCSI over Ethernet can be faster and uses standard networking hardware. (user-6d41, 2020-01-16, exchange 5496, check: uncheckable)</li>
+<li id="s2">FDDI can be used for iSCSI, but it's a rare combination of systems that support both. (user-07ed, 2024-12-04, exchange 193831, check: uncheckable)</li>
+<li id="s3">Daynaport over iSCSI is possible (user-e872, 2026-05-18, exchange 213977, check: uncheckable)</li>
+<li id="s4">iSCSI over dial-up may require some tuning (user-07ed, 2026-05-18, exchange 213976, check: uncheckable)</li>
+<li id="s5">iSCSI over ham radio (user-b815, 2026-05-18, exchange 213976, check: uncheckable)</li>
+<li id="s6">SCSI can be over FC, SAS, iSCSI, or FireWire (user-cd83, 2026-07-23, exchange 226744, check: uncheckable)</li>
+<li id="s7">iSCSI and FCoE can use regular Ethernet, while InfiniBand is more expensive and requires TCP/IP or iSER/SRB configuration. InfiniBand cannot boot x86 servers, whereas Fibre Channel is plug-and-play with zoning needing a (user-3663, 2020-05-18, exchange 216928, check: uncheckable)</li>
+<li id="s8">NVMeOF is a newer storage protocol that can run over FC or RDMA networks, offering lower latency than iSCSI. (user-b1da, 2020-11-07, exchange 12008, check: uncheckable)</li>
+<li id="s9">iSCSI on FreeNAS is useful for storage. (user-cd7d, 2020-06-19, exchange 9113, check: uncheckable)</li>
+<li id="s10">I could use ZFS on an iSCSI with infiniband for VMs. (user-b1da, 2020-09-12, exchange 10991, check: uncheckable)</li>
+<li id="s11">The U45 can netboot and root on iSCSI, and can boot from 10Gbit Ethernet. (user-7b1c, 2023-03-07, exchange 239982, check: supported)</li>
+<li id="s12">Proxmox can export ZFS over iSCSI for shared storage and VM migrations. (user-b1da, 2026-02-16, exchange 213687, check: uncheckable)</li>
+<li id="s13">iSCSI is not compatible enough with most Unix systems to be useful for vintage computing. (user-1446, 2020-07-02, exchange 97189, check: uncheckable)</li>
+<li id="s14">someone hasn't built an Ethernet iSCSI to IDE/SATA/SAS/SCSI bridge or a PCIe -&gt; iSCSI adapter with a networked harddrive that speaks iSCSI (user-237d, 2020-07-02, exchange 97187, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="u45.html">U45</a>
+</li>
+<li>Operating systems: <a href="vms.html">VMS</a>, <a href="windows.html">Windows</a>
+</li>
+<li>Software: <a href="zfs.html">ZFS</a>, <a href="proxmox.html">Proxmox</a>, <a href="sas.html">SAS</a>
+</li>
+<li>Parts and peripherals: <a href="nas.html">NAS</a>
+</li>
+<li>Standards and interfaces: <a href="fibre-channel.html">Fibre Channel</a>, <a href="infiniband.html">Infiniband</a>, <a href="fddi.html">FDDI</a>, <a href="scsi.html">SCSI</a>
+</li>
+<li>Other: <a href="daynaport.html">DaynaPort</a>, <a href="freenas.html">FreeNAS</a>
+</li></ul>
+</body>
+</html>

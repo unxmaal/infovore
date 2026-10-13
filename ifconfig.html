@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ifconfig</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>ifconfig</h1>
+<p>Claims: 12</p>
+<p>ifconfig uses procfs. <sup><a href="#s1">1</a></sup> ifconfig is still used for network configuration, especially on OpenBSD. <sup><a href="#s2">2</a></sup> The ip command replaces ifconfig in some Linux distributions, including recent Ubuntus, and Linux distributions stopped using ifconfig in RHEL 7 in favor of ip. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> To find the MAC, use ifconfig or printenv, and to configure the network, set an IP address using ifconfig. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Using ifconfig to set the IP address can establish network connectivity even for a fresh install. <sup><a href="#s7">7</a></sup> egconfig is executed at system startup time to download firmware for gigabit adapters, but may require ifconfig for additional configuration. <sup><a href="#s8">8</a></sup> The 'link' option in ifconfig can force the port speed without auto-negotiation. <sup><a href="#s9">9</a></sup> ifconfig and netstat commands are not on the $PATH for regular users on IRIX; they are in /usr/etc. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">ifconfig uses procfs (user-22f9, 2019-05-29, exchange 1832, check: uncheckable)</li>
+<li id="s2">ifconfig is still used for network configuration, especially on OpenBSD. (user-0251, 2020-01-30, exchange 96268, check: uncheckable)</li>
+<li id="s3">The ip command replaces ifconfig in some Linux distributions, including recent Ubuntus. (user-d903, 2019-10-22, exchange 216671, check: uncheckable)</li>
+<li id="s4">Linux distributions stopped using ifconfig in RHEL 7 in favor of ip. (user-1446, 2020-01-30, exchange 96269, check: supported)</li>
+<li id="s5">To find the MAC, use ifconfig or printenv. (user-37ee, 2021-02-28, exchange 15067, check: uncheckable)</li>
+<li id="s6">To configure the network, set an IP address using `ifconfig`. (user-e4d0, 2024-11-30, exchange 51154, check: supported)</li>
+<li id="s7">Using ifconfig to set the IP address can establish network connectivity even for a fresh install. (user-e4d0, 2025-07-25, exchange 219020, check: uncheckable)</li>
+<li id="s8">egconfig is executed at system startup time to download firmware for gigabit adapters, but may require ifconfig for additional configuration. (user-6dfb, 2026-05-28, exchange 123295, check: uncheckable)</li>
+<li id="s9">The 'link' option in ifconfig can force the port speed without auto-negotiation. (user-c026, 2026-08-20, exchange 125034, check: uncheckable)</li>
+<li id="s10">ifconfig and netstat commands are not on the $PATH for regular users on IRIX; they are in /usr/etc. (user-22f9, 2025-01-21, exchange 218714, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mac.html">Mac</a>
+</li>
+<li>Operating systems: <a href="linux-distributions.html">Linux distributions</a>, <a href="irix.html">IRIX</a>, <a href="ubuntu.html">Ubuntu</a>
+</li>
+<li>Software: <a href="path.html">PATH</a>, <a href="inst.html">inst</a>, <a href="shell.html">shell</a>
+</li>
+<li>Other: <a href="ip.html">IP</a>, <a href="printenv.html">printenv</a>, <a href="procfs.html">procfs</a>
+</li></ul>
+</body>
+</html>

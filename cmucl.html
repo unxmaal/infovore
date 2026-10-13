@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CMUCL</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CMUCL</h1>
+<p>Claims: 7</p>
+<p>CMUCL is a Common Lisp implementation that has IRIX support, including through sigcontext, and requires specific binaries for IRIX 6.5 that may not work on all systems due to differences in installed libraries. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> CMUCL is actively developed but has a complex build process involving bootstrapping, whereas SBCL, a Lisp implementation derived from CMUCL, has a simpler bootstrap build system. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> For POSIX/Irix signals, defining the OS context as the signal context rather than the user context is suggested, as seen in CMUCL. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">SBCL was a port of CMUCL, which had Irix support. (user-9b9c, 2019-03-03, exchange 863, check: uncheckable)</li>
+<li id="s2">SBCL is a Lisp implementation derived from CMUCL, which has IRIX support through sigcontext. (user-9b9c, 2019-04-10, exchange 67151, check: uncheckable)</li>
+<li id="s3">CMUCL uses sigcontext for CPU state storage on all platforms. (user-9b9c, 2019-04-10, exchange 67151, check: uncheckable)</li>
+<li id="s4">cmucl, a Common Lisp implementation, requires specific binaries for IRIX 6.5 and may not work on all systems due to differences in installed libraries. (user-2189, 2020-06-02, exchange 216707, check: supported)</li>
+<li id="s5">CLisp might be easier to build on IRIX than CMUCL, which is actively developed but has a complex build process involving bootstrapping. (user-9b9c, 2019-03-12, exchange 214744, check: uncheckable)</li>
+<li id="s6">SBCL's bootstrap build system is simpler than CMUCL's. (user-9b9c, 2019-04-10, exchange 67151, check: uncheckable)</li>
+<li id="s7">Defining the OS context as the signal context, rather than the user context, is suggested for POSIX/Irix signals, as seen in CMUCL. (user-9b9c, 2019-04-08, exchange 67147, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-6-5.html">IRIX 6.5</a>
+</li>
+<li>Software: <a href="sbcl.html">SBCL</a>
+</li>
+<li>Other: <a href="clisp.html">CLISP</a>, <a href="common-lisp.html">Common Lisp</a>
+</li></ul>
+</body>
+</html>

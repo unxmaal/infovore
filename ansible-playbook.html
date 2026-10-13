@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ansible playbook</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Ansible playbook</h1>
+<p>Claims: 9 Part of <a href="ansible.html">ansible</a></p>
+<p>The Ansible playbook serves as live documentation for the process of building IRIX root. <sup><a href="#s1">1</a></sup> The playbook will not re-extract IRIX root if the yaccpar file exists. <sup><a href="#s2">2</a></sup> Ansible playbook `master_setup.yml` configures an IRIX Octane, but users should review and customize it as needed. <sup><a href="#s3">3</a></sup> The Ansible playbook fetches and installs Nekoware bundles on an IRIX box, using `mkdir -p /usr/nekoware &amp;&amp; chmod 755 /usr/nekoware` to create the Nekoware directory. <sup><a href="#s4">4</a></sup> The bootstrap.yml Ansible playbook configures SSHD, ensuring SSHD is running, and can be customized to run specific tasks. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> To apply changes, run the Ansible playbook and reboot the system. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The Ansible playbook serves as live documentation for the process of building IRIX root. (user-2189, 2018-12-30, exchange 66829, check: uncheckable)</li>
+<li id="s2">The playbook will not re-extract IRIX root if the yaccpar file exists. (user-2189, 2018-12-30, exchange 66829, check: uncheckable)</li>
+<li id="s3">Ansible playbook `master_setup.yml` configures an IRIX Octane, but users should review and customize it as needed. (user-2189, 2019-09-08, exchange 76837, check: supported)</li>
+<li id="s4">The Ansible playbook fetches and installs Nekoware bundles on an IRIX box, using `mkdir -p /usr/nekoware &amp;&amp; chmod 755 /usr/nekoware` to create the Nekoware directory. (user-2189, 2019-09-08, exchange 76835, check: supported)</li>
+<li id="s5">The bootstrap ansible playbook can be customized to run specific tasks. (user-bc5d, 2019-09-20, exchange 3574, check: uncheckable)</li>
+<li id="s6">The bootstrap.yml Ansible playbook configures SSHD, and it should ensure SSHD is running. (user-d903, 2019-10-07, exchange 3782, check: uncheckable)</li>
+<li id="s7">To apply changes, run the Ansible playbook and reboot the system. (user-2189, 2021-09-20, exchange 77434, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="raspberry-pi.html">Raspberry Pi</a>
+</li>
+<li>Operating systems: <a href="irix-octane.html">IRIX Octane</a>
+</li>
+<li>Software: <a href="nekoware.html">nekoware</a>, <a href="sshd.html">sshd</a>
+</li>
+<li>Other: <a href="bootstrap.html">bootstrap</a>, <a href="reboot.html">reboot</a>
+</li></ul>
+</body>
+</html>

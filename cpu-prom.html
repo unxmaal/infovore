@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPU PROM</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>CPU PROM</h1>
+<p>Claims: 4 Part of <a href="cpu.html">CPU</a></p>
+<p>The CPU PROM boots the CPU board, checks hardware, and determines next steps, while the IO PROM accesses I/O devices. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> For SMP SGIs, the IO4 PROM and CPU PROM are separate, with each CPU having its own CPU PROM and the IO PROM handling booting from a device. <sup><a href="#s1">1</a></sup> The CPU PROM sets configuration flags such as clock multiplier and cache enabling. <sup><a href="#s3">3</a></sup> The IO3 and IP7 PROMs are EPROMs that must match the CPU PROM revisions. <sup><a href="#s4">4</a></sup> Onyx systems have a system controller for CPU board coordination. <sup><a href="#s2">2</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The IO4 PROM and CPU PROM are separate for SMP SGIs, with each CPU having its own CPU PROM and the IO PROM handling booting from a device; older IO4 boards lack the flash for R8K and R10K IO PROMs. (user-86e1, 2024-04-21, exchange 223852, check: supported)</li>
+<li id="s2">The CPU PROM boots the CPU board, checks hardware, and determines next steps. The IO PROM accesses I/O devices. Onyx systems have a system controller for CPU board coordination. Onyx 2 may check and allocate memory among (user-cdcd, 2024-04-21, exchange 223853, check: supported)</li>
+<li id="s3">The O2 supports the R7000 CPU, and the CPU PROM sets configuration flags like clock multiplier and cache enabling. (user-f763, 2024-11-27, exchange 211336, check: supported)</li>
+<li id="s4">The 4D/380 VGX can drop into a 'PON&gt;' prompt due to issues with the IP7 board, particularly the boot master CPU. The IO3 and IP7 PROMs are EPROMs and must match the CPU PROM revisions. Firmware versions can affect boot- (user-86e1, 2024-04-22, exchange 111008, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="4d-380-vgx.html">4D/380 VGX</a>, <a href="o2.html">O2</a>, <a href="onyx2.html">Onyx2</a>
+</li>
+<li>Processors: <a href="r7000-cpu.html">R7000 CPU</a>
+</li>
+<li>Parts and peripherals: <a href="ip7-board.html">IP7 board</a>, <a href="system-controller.html">system controller</a>
+</li></ul>
+</body>
+</html>

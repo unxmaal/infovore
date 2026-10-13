@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dlopen</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>dlopen</h1>
+<p>Claims: 5</p>
+<p>libGL loads with dlopen and calls XSGISetSpecialDestroyHandler, which requires linking with a specific X-related library. <sup><a href="#s1">1</a></sup> SDL's --enable-sdl-dlopen option allows it to handle X11 symbols with dlopen, which can affect linking. <sup><a href="#s2">2</a></sup> Rebuilding an rpm without dlopen took 2 minutes 30 seconds on 16x 600 MHz R14000 and 27 minutes on a Fuel with identical CPU but one. <sup><a href="#s3">3</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">libGL loads with dlopen and calls XSGISetSpecialDestroyHandler, which requires linking with a specific X-related library. (user-21b8, 2024-12-08, exchange 215603, check: uncheckable)</li>
+<li id="s2">SDL's `--enable-sdl-dlopen` option allows it to handle X11 symbols with `dlopen`, which can affect linking. (user-8780, 2025-10-05, exchange 215824, check: supported)</li>
+<li id="s3">Rebuilding an rpm without dlopen took 2 minutes 30 seconds on 16x 600 MHz R14000 and 27 minutes on a Fuel with identical CPU but one. (user-7973, 2025-10-08, exchange 72795, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="fuel.html">Fuel</a>
+</li>
+<li>Processors: <a href="r14000.html">R14000</a>
+</li>
+<li>Software: <a href="rpm.html">RPM</a>, <a href="sdl.html">SDL</a>
+</li>
+<li>Other: <a href="big-sur.html">Big Sur</a>, <a href="xsgisetspecialdestroyhandler.html">_XSGISetSpecialDestroyHandler</a>, <a href="libgl.html">libGL</a>
+</li></ul>
+</body>
+</html>

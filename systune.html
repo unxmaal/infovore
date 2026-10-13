@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Systune</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Systune</h1>
+<p>Claims: 6 Background: 1 claim already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Kernel_%28operating_system%29">Kernel (operating system)</a>.</p>
+<p>Systune is a console command used to set variables, and it may involve re-linking with new settings and drivers, as seen in Tru64. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> It is used for tasks such as enabling the scroll wheel for IRIX (`systune pcmouse_mode #`) and increasing `ncargs` to 131072 to avoid 'Arg list too long' errors when building openssl with `irix64-mips4-gcc`. <sup><a href="#s1">1</a></sup><sup><a href="#s3">3</a></sup> Systune often requires rebuilding the kernel. <sup><a href="#s4">4</a></sup> Folks also discussed systune recompiling for SunOS 4.x, which is BSD-derived, though the command to enable IPv6 is not systune. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">There's a command you've gotta enable in the console for the scroll wheel to work with IRIX: `systune pcmouse_mode #` (user-b7c4, 2019-08-05, exchange 95434, check: supported)</li>
+<li id="s2">Systune involves setting variables and may involve re-linking with new settings and drivers, as seen in Tru64. (user-07ed, 2024-03-15, exchange 218328, check: uncheckable)</li>
+<li id="s3">building openssl with `irix64-mips4-gcc` requires increasing `ncargs` using `systune ncargs 131072` to avoid 'Arg list too long' errors. (user-f229, 2019-11-05, exchange 214880, check: supported)</li>
+<li id="s4">Systune often requires rebuilding the kernel. (user-e4d0, 2024-03-15, exchange 218328, check: uncheckable)</li>
+<li id="s5">The command to enable IPv6 is not systune. (user-637b, 2020-02-06, exchange 6130, check: uncheckable)</li>
+<li id="s6">Folks talked about systune recompiling for SunOS 4.x, which is BSD-derived. (user-7b1c, 2022-11-10, exchange 33903, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="bsd.html">BSD</a>, <a href="irix.html">IRIX</a>, <a href="sunos-4-x.html">SunOS 4.x</a>, <a href="tru64.html">Tru64</a>, <a href="kernel.html">kernel</a>
+</li>
+<li>Software: <a href="openssl.html">OpenSSL</a>
+</li>
+<li>Standards and interfaces: <a href="ipv6.html">IPv6</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qemu-irix</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>qemu-irix</h1>
+<p>Claims: 22</p>
+<p>QEMU-IRIX is a binary-level virtualization layer that emulates the MIPS r4k CPU by binary translation and translates IRIX system calls to Linux system calls, allowing individual IRIX binaries to run but not a full system. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> It does not fully emulate SGI hardware, emulating running things in IRIX rather than an SGI machine. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> It is headless and cannot access hardware directly, though it can talk to a remote X server and run some X11 programs, but not all hardware-accelerated graphics. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> It supports building 32-bit MIPS binaries using the n32 ABI and does not automatically enable 64-bit mode with -march. <sup><a href="#s10">10</a></sup> Its compatibility is not great and requires an IRIX rootfs, and it works on WSL, allowing IRIX binary execution on a gaming PC. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> It is designed for running user space applications that don't touch the hardware, specifically for IDO, the IRIX 5.3 compiler, and is better for running command-line binaries quickly. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">QEMU IRIX emulates the CPU and system calls, allowing individual binaries to run but not a full system. (user-6afa, 2020-08-21, exchange 92572, check: uncheckable)</li>
+<li id="s2">Qemu-irix is a binary-level virtualization layer for running IRIX binaries, not an emulator. (user-de13, 2019-11-11, exchange 92417, check: uncheckable)</li>
+<li id="s3">qemu-irix supports IRIX userland emulation but not full system emulation. (user-0251, 2020-08-01, exchange 10209, check: uncheckable)</li>
+<li id="s4">qemu-irix works extremely well, emulating MIPS r4k by binary translation and IRIX syscalls by translating to Linux syscalls, making it very fast for testing IRIX tools and binaries. (user-9860, 2021-10-12, exchange 220198, check: supported)</li>
+<li id="s5">QEMU-IRIX is a binary-level virtualization layer that does not fully emulate SGI hardware. (user-22f9, 2019-11-11, exchange 92416, check: uncheckable)</li>
+<li id="s6">QEMU IRIX doesn't emulate an SGI, it emulates running things in IRIX, similar to how WSL1 emulates running things in Linux. (user-6afa, 2020-08-21, exchange 92572, check: uncheckable)</li>
+<li id="s7">qemu-irix is headless; X forwarding and Motif desktop can be set up but are difficult and may cause performance issues. (user-bc18, 2020-09-12, exchange 92616, check: uncheckable)</li>
+<li id="s8">qemu-irix can talk to a remote X server but cannot access hardware directly. (user-237d, 2021-10-12, exchange 220198, check: uncheckable)</li>
+<li id="s9">qemu-irix userland emulation can run some X11 programs, but not all hardware-accelerated graphics. (user-d903, 2024-03-27, exchange 220323, check: uncheckable)</li>
+<li id="s10">QEMU-IRIX supports building 32-bit MIPS binaries using the n32 ABI, and does not automatically enable 64-bit mode with -march. (user-5510, 2023-08-11, exchange 77686, check: supported)</li>
+<li id="s11">The compatibility of qemu-irix isn't great and requires an IRIX rootfs. (user-de13, 2019-11-25, exchange 216860, check: uncheckable)</li>
+<li id="s12">QEMU-IRIX works on WSL, allowing IRIX binary execution on a gaming PC. (user-42cf, 2021-12-08, exchange 23093, check: uncheckable)</li>
+<li id="s13">Qemu-irix is better for running command-line binaries quickly. (user-42cf, 2022-01-17, exchange 92785, check: uncheckable)</li>
+<li id="s14">qemu-irix was designed for running user space applications that don't touch the hardware, specifically for IDO, the IRIX 5.3 compiler, and no other work has been done on it. (user-22f9, 2025-01-22, exchange 215624, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indy.html">Indy</a>
+</li>
+<li>Processors: <a href="mips-binary.html">MIPS binary</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-5-3.html">IRIX 5.3</a>, <a href="irix-os.html">IRIX OS</a>, <a href="irix-binaries.html">IRIX binaries</a>, <a href="wsl.html">WSL</a>, <a href="n32-abi.html">n32 ABI</a>
+</li>
+<li>Software: <a href="ido.html">IDO</a>
+</li></ul>
+</body>
+</html>

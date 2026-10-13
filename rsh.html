@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rsh</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>rsh</h1>
+<p>Claims: 21 Background: 4 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Remote_Shell">Remote Shell</a>, <a href="https://en.wikipedia.org/wiki/Secure_Shell">Secure Shell</a>.</p>
+<p>rsh is an IP-dependent protocol with strict security checks based on hostname and IP, using .rhosts files for authentication via rshd. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> It can be used as an alternative to SSH for remote command execution, piping commands through stdin/stdout. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> rsh is available on Debian, where it can be a symlink to ssh under alternatives and installed with rsh-client. <sup><a href="#s7">7</a></sup> Network installs of IRIX use rsh and tftp, relying on bootp and DNS for hostname resolution, with mismatched hostnames and IPs causing issues. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Setting up these services can be done on a virtual machine from a Windows laptop, and Love simplifies bootp, tftp, and rsh into a single NAT-friendly binary. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The services may need guest access configured on the server, and older systems may have rsh, chargen, and finger turned on by default. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> xfsdump output can be piped to rsh for remote backup execution. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The IRIX MCP server can use rsh or SSH as its transport and has no dependencies. <sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">rsh is IP-dependent and has strict security checks; enabling NFS is a better alternative. (user-2189, 2019-09-09, exchange 76840, check: uncheckable)</li>
+<li id="s2">rsh and ssh are different protocols; rshd checks .rhosts for authentication. (user-d2ef, 2023-05-25, exchange 38211, check: uncheckable)</li>
+<li id="s3">the pi booterizer uses an archaic tftp / rsh process for loading the miniroot, which is secure only through hostname and IP checks (user-2189, 2020-03-14, exchange 77110, check: uncheckable)</li>
+<li id="s4">RSH or telnet can be used as alternatives to SSH. (user-c831, 2023-04-27, exchange 37660, check: uncheckable)</li>
+<li id="s5">Alternative services like telnet or rsh can be used instead of the specific service that requires more resources. (user-6e7b, 2024-03-25, exchange 185015, check: uncheckable)</li>
+<li id="s6">ssh and rsh use stdin/stdout to pipe commands, allowing remote execution of dd, tar, or xfsdump. (user-07ed, 2025-01-10, exchange 211557, check: uncheckable)</li>
+<li id="s7">rsh is a command that can be a symlink to ssh under alternatives on Debian, and can be installed with rsh-client. (user-6dfb, 2025-01-10, exchange 211558, check: uncheckable)</li>
+<li id="s8">Irix net install uses tftp and rsh for installation, relying on DNS for hostname resolution; host-level DNS is also involved; mismatched hostnames and IPs can cause issues. (user-2189, 2020-02-26, exchange 77082, check: uncheckable)</li>
+<li id="s9">The miniroot installer uses special rsh and tftp magic for network installs. (user-848e, 2020-02-13, exchange 6367, check: uncheckable)</li>
+<li id="s10">It needs bootp and rsh services to run. (user-f229, 2021-11-16, exchange 77494, check: uncheckable)</li>
+<li id="s11">The installation can be done off a Windows laptop by setting up required bits and pieces like bootp, tftp, and rsh on a virtual machine. (user-42cf, 2019-07-31, exchange 2832, check: uncheckable)</li>
+<li id="s12">Love simplifies bootp, tftp, and rsh into a single binary, making it more NAT-friendly. (user-986f, 2025-09-25, exchange 216807, check: uncheckable)</li>
+<li id="s13">rsh and tftp services on the Ubuntu server should be configured with guest access for these operations to work. (user-d903, 2023-08-12, exchange 39683, check: uncheckable)</li>
+<li id="s14">There's stuff like `rsh` and `chargen` and `finger` turned on by default. (user-42cf, 2022-02-07, exchange 102095, check: supported)</li>
+<li id="s15">xfsdump output can be piped to ssh or rsh for remote backup execution. (user-07ed, 2025-01-10, exchange 211557, check: uncheckable)</li>
+<li id="s16">The command used was xfsdump -f /dev/root | rsh 192.168.1.4 "cat &gt; /root/SGI_backups/backup.xfs". (user-6dfb, 2025-01-11, exchange 52062, check: supported)</li>
+<li id="s17">The IRIX MCP server can be installed using SSH or RSH as the transport, and it has no dependencies. (user-2a3c, 2026-07-30, exchange 220571, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="mcp-server.html">MCP server</a>, <a href="origin-350.html">Origin 350</a>, <a href="pi-booterizer.html">pi booterizer</a>
+</li>
+<li>Operating systems: <a href="debian.html">Debian</a>
+</li>
+<li>Software: <a href="xfsdump.html">xfsdump</a>, <a href="love.html">LOVE</a>, <a href="dd.html">dd</a>
+</li>
+<li>Standards and interfaces: <a href="ssh.html">SSH</a>, <a href="tftp.html">TFTP</a>, <a href="bootp.html">bootp</a>, <a href="nfs.html">NFS</a>, <a href="telnet.html">telnet</a>, <a href="dns.html">DNS</a>
+</li>
+<li>Other: <a href="rhosts.html">.rhosts</a>, <a href="ezsetup.html">EZsetup</a>, <a href="alternatives.html">alternatives</a>
+</li></ul>
+</body>
+</html>

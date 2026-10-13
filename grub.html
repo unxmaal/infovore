@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRUB</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>GRUB</h1>
+<p>Claims: 12</p>
+<p>GRUB can run on an Itanium processor, and stock GRUB might not work on x86 Cobalts without extra support. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> You can use GRUB to boot macOS alongside Windows, and to run an old version of Red Hat, set the video mode to VESA in GRUB. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> GRUB can be removed from the MBR in Windows by using Bootrec commands. <sup><a href="#s5">5</a></sup> Insufficient memory can cause a black screen when trying to boot GRUB, and the server may boot to GRUB, then show a black screen with a blinking underscore. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Configuring GRUB to chainload NTLDR from a secondary drive requires mapping the drives; the commands `map (hd0) (hd1)` and `map (hd1) (hd0)` should be used before attempting to chainload. <sup><a href="#s8">8</a></sup> The 24.12 ISO has glibc issues and may fail to boot due to GRUB errors. <sup><a href="#s9">9</a></sup> GRUB displays only the word 'GRUB'. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">grub can run on an Itanium processor. (user-f9d4, 2019-08-14, exchange 3006, check: uncheckable)</li>
+<li id="s2">Stock GRUB might not work on x86 Cobalts without extra support. (user-6e7b, 2026-06-03, exchange 244518, check: uncheckable)</li>
+<li id="s3">You can use GRUB to boot macOS alongside Windows. (user-22f9, 2020-08-01, exchange 10202, check: uncheckable)</li>
+<li id="s4">To run an old version of Red Hat, set the video mode to VESA in GRUB. (user-f229, 2020-12-29, exchange 13214, check: uncheckable)</li>
+<li id="s5">GRUB can be removed from the MBR in Windows by using Bootrec commands. (user-37bb, 2022-01-26, exchange 25098, check: uncheckable)</li>
+<li id="s6">insufficient memory can cause a black screen when trying to boot GRUB. (user-5510, 2022-07-08, exchange 31025, check: uncheckable)</li>
+<li id="s7">The server boots to GRUB, then shows a black screen with a blinking underscore. (user-d41d, 2023-01-03, exchange 208164, check: uncheckable)</li>
+<li id="s8">Configuring GRUB to chainload NTLDR from a secondary drive requires mapping the drives; the commands `map (hd0) (hd1)` and `map (hd1) (hd0)` should be used before attempting to chainload, but the specific configuration ` (user-7151, 2023-01-05, exchange 157767, check: supported)</li>
+<li id="s9">The 24.12 ISO has glibc issues and may fail to boot due to GRUB errors; elilo compilation also failed. (user-0f65, 2025-03-27, exchange 76310, check: supported)</li>
+<li id="s10">GRUB displays only the word 'GRUB'. (user-c9c3, 2026-02-23, exchange 89836, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="grub2.html">Grub2</a> (4)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="itanium-processor.html">Itanium processor</a>, <a href="x86-cobalt.html">x86 Cobalt</a>
+</li>
+<li>Operating systems: <a href="linux.html">Linux</a>, <a href="windows.html">Windows</a>, <a href="macos.html">macOS</a>
+</li>
+<li>Software: <a href="gnome.html">GNOME</a>
+</li>
+<li>Parts and peripherals: <a href="framebuffer.html">framebuffer</a>, <a href="video-mode.html">video mode</a>
+</li>
+<li>Standards and interfaces: <a href="glibc.html">glibc</a>
+</li>
+<li>Companies: <a href="red-hat.html">Red Hat</a>
+</li></ul>
+</body>
+</html>

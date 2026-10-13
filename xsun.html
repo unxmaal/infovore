@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xsun</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>Xsun</h1>
+<p>Claims: 17</p>
+<p>Xsun was the default X server for Solaris, used for SPARC systems, while Xorg and XFree86 supported x86 systems. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Xsun is poorly designed and may not perform well, being slow even on hardware that is not particularly fast. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Xsun has limited graphics card support on Solaris x86, especially before Solaris 9 or 10, and limited drivers for certain cards on SPARC compared to x86. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> Most ATI Rage XL PCI cards work with Xsun for Solaris, though some may require reflash, while Rage 128 cards may not work with Xsun on SPARC even with a SPARC OpenFirmware ROM. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> Xsun does not expose 3D components on PGX32 and XVR-100 as 3D acceleration, treating them as 2D accelerated framebuffers. <sup><a href="#s8">8</a></sup> XVR-100 works with Xsun, Xorg, and CDE on Solaris 10, and Solaris 10 on SPARC uses Xsun instead of Xorg, using `fbconfig` for configuration. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> Xsun might not support USB keyboards/mice well, and can start without a mouse if the 'AllowMouseOpenFail' option is set, though Xsun does not have this by default. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> CATIA requires Xsun or old OpenWindows, not Xorg or modern CDE. <sup><a href="#s13">13</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Xsun was the display server for SPARC systems, but Xorg and XFree86 supported x86 systems. (user-7b1c, 2022-09-26, exchange 32948, check: uncheckable)</li>
+<li id="s2">Xsun, the default X server for Solaris, is poorly designed and may not perform well on SPARC hardware. (user-7b1c, 2022-10-23, exchange 183105, check: uncheckable)</li>
+<li id="s3">Xsun can be slow, even on hardware that isn't particularly fast. (user-7b1c, 2022-10-24, exchange 239867, check: uncheckable)</li>
+<li id="s4">Xsun has limited drivers for certain graphics cards on SPARC, especially compared to x86. (user-7b1c, 2022-04-18, exchange 181859, check: uncheckable)</li>
+<li id="s5">Xsun has limited graphics card support on Solaris x86, especially before Solaris 9 or 10. (user-7b1c, 2022-04-18, exchange 181859, check: supported)</li>
+<li id="s6">Most ATI Rage XL PCI cards work with Xsun for Solaris, though some may require reflash. (user-7b1c, 2020-02-26, exchange 216081, check: uncheckable)</li>
+<li id="s7">Rage 128 graphics cards may not work with Xsun on SPARC, even if they have a SPARC OpenFirmware ROM. (user-7b1c, 2022-04-18, exchange 181859, check: supported)</li>
+<li id="s8">XSun does not expose 3D components on PGX32 and XVR-100 as 3D acceleration, treating them as 2D accelerated framebuffers. (user-7b1c, 2020-03-29, exchange 7068, check: supported)</li>
+<li id="s9">Solaris 10 on SPARC uses Xsun instead of Xorg; use `fbconfig` for configuration. (user-7b1c, 2022-07-02, exchange 182564, check: supported)</li>
+<li id="s10">XVR-100 works with Xsun, Xorg, and CDE on Solaris 10. (user-7b1c, 2022-09-29, exchange 239853, check: supported)</li>
+<li id="s11">Xorg can start without a mouse if the 'AllowMouseOpenFail' option is set, but Xsun does not have this by default. (user-7b1c, 2022-03-07, exchange 181651, check: uncheckable)</li>
+<li id="s12">Xsun might not support USB keyboards/mice well. (user-7b1c, 2022-04-18, exchange 181859, check: uncheckable)</li>
+<li id="s13">CATIA requires Xsun or old OpenWindows, not Xorg or modern CDE. (user-585b, 2019-11-01, exchange 4068, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Processors: <a href="sparc.html">SPARC</a>
+</li>
+<li>Graphics: <a href="xvr-100.html">XVR-100</a>, <a href="graphics-card.html">graphics card</a>
+</li>
+<li>Operating systems: <a href="solaris.html">Solaris</a>, <a href="solaris-10.html">Solaris 10</a>, <a href="solaris-x86.html">Solaris x86</a>
+</li>
+<li>Software: <a href="xfree86.html">XFree86</a>, <a href="catia.html">CATIA</a>, <a href="cde.html">CDE</a>, <a href="xsgi.html">Xsgi</a>
+</li>
+<li>Parts and peripherals: <a href="xorg.html">Xorg</a>, <a href="3d-card.html">3D card</a>
+</li>
+<li>Other: <a href="3d-acceleration.html">3D acceleration</a>, <a href="pgx32.html">PGX32</a>, <a href="rage-128.html">Rage 128</a>
+</li></ul>
+</body>
+</html>

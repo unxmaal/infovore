@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCI riser</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>PCI riser</h1>
+<p>Claims: 21 Part of <a href="pci.html">PCI</a></p>
+<p>The PCI riser is attached to a cage with a metal tab that holds it onto the module cage, and the plastic cover needs to be removed to access it. <sup><a href="#s1">1</a></sup> The PCI riser holds the Ethernet MAC address via a Dallas DS2505 IC, which stores the original Ethernet address and system serial number for licensing. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The MAC address on SGI machines can be used as a unique identifier for the system, often stored in specific hardware components like the frontplane, PCI riser, or ethernet riser, and it can also be programmable for O2. <sup><a href="#s4">4</a></sup> The O2 has a system ID in the PCI riser which otherwise looks like bare PCB, and it complains about no MAC address if run without one. <sup><a href="#s5">5</a></sup> Power for SCSI drives can be provided by a white connector on the PCI riser, which usually connects to a SCSI backplane. <sup><a href="#s6">6</a></sup> A PCI riser with two slots requires a PCI to PCI bridge. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The PCI riser is attached to a cage with a metal tab that holds it onto the module cage, and the plastic cover needs to be removed to access it. (user-9e0a, 2020-06-20, exchange 97112, check: uncheckable)</li>
+<li id="s2">The PCI riser holds the Ethernet MAC address via a Dallas DS2505 IC. (user-e4d0, 2025-03-28, exchange 115684, check: uncheckable)</li>
+<li id="s3">The PCI riser in the O2 contains a Number-in-a-Can (NIC) which holds the original Ethernet address and system serial number for licensing. (user-6c80, 2025-05-16, exchange 212491, check: supported)</li>
+<li id="s4">The MAC address on SGI machines can be used as a unique identifier for the system, often stored in specific hardware components like the frontplane, PCI riser, or ethernet riser. It can also be programmable for O2 andOct (user-e4d0, 2025-06-17, exchange 117392, check: supported)</li>
+<li id="s5">The O2 has a system ID in the PCI riser which otherwise looks like bare PCB, and it complains about no MAC address if run without one. (user-3e2d, 2025-10-31, exchange 119490, check: supported)</li>
+<li id="s6">Power for SCSI drives can be provided by a white connector on the PCI riser, which usually connects to a SCSI backplane. (user-bc5d, 2021-04-29, exchange 17045, check: uncheckable)</li>
+<li id="s7">A PCI riser with two slots requires a PCI to PCI bridge. (user-757f, 2026-01-17, exchange 225973, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>, <a href="altix.html">Altix</a>, <a href="altix-350.html">Altix 350</a>, <a href="blade-2000.html">Blade 2000</a>, <a href="mac-address.html">MAC address</a>, <a href="onyx4.html">Onyx4</a>, <a href="r5k-o2.html">R5k O2</a>, <a href="radeon.html">Radeon</a>
+</li>
+<li>Graphics: <a href="xvr-1200.html">XVR-1200</a>
+</li>
+<li>Software: <a href="chimera.html">Chimera</a>, <a href="amdgpu.html">amdgpu</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="io10.html">IO10</a>, <a href="io9.html">IO9</a>, <a href="ram.html">RAM</a>, <a href="scsi-backplane.html">SCSI backplane</a>, <a href="scsi-drive.html">SCSI drive</a>, <a href="frontplane.html">frontplane</a>
+</li>
+<li>Standards and interfaces: <a href="agp.html">AGP</a>, <a href="efi.html">EFI</a>, <a href="ethernet-mac-address.html">Ethernet MAC address</a>
+</li>
+<li>Other: <a href="bcm5704.html">BCM5704</a>, <a href="cage.html">cage</a>
+</li></ul>
+</body>
+</html>

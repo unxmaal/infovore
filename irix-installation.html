@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRIX installation</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>IRIX installation</h1>
+<p>Claims: 29 Part of <a href="irix.html">IRIX</a></p>
+<p>IRIX installation is the process of installing the IRIX operating system, and it is rare for some users. <sup><a href="#s1">1</a></sup> The process involves opening CDs and from-ing others, which is a bit unusual, and it uses miniroot during installation rather than for booting the system. <sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> Installation requires `su` to create and chown /usr/didbs, then untar didbs.tar there, and root has no password during installation. <sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup> The installation can be automated using selection files with the `inst` command, and Google Gemini can create roboinst scripts for automated installation, though a reboot after rqsall is needed. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> The official installation guide recommends setting aside 1 or 2 hours, with faster processors speeding up the process. <sup><a href="#s8">8</a></sup> Various tools can be used for installation, including the M-Systems U320 SCSI Flash Disk for storing the /unix kernel, Booterizer to simplify installation, and zuluscsi to clone an installation from a HDD to an SD card. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup><sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">IRIX installation is rare for some users. (user-042f, 2022-09-03, exchange 217682, check: uncheckable)</li>
+<li id="s2">The IRIX installation process involves opening CDs and from-ing others, which is a bit unusual. (user-2189, 2020-04-24, exchange 77159, check: uncheckable)</li>
+<li id="s3">Miniroot is used during IRIX installation, not for booting the system. (user-3e2d, 2025-11-25, exchange 219278, check: uncheckable)</li>
+<li id="s4">IRIX installation requires `su` to create and chown /usr/didbs, then untar didbs.tar there. (user-f229, 2020-01-01, exchange 77049, check: supported)</li>
+<li id="s5">Root has no password in the IRIX installation. (user-1629, 2024-11-21, exchange 50709, check: uncheckable)</li>
+<li id="s6">The 'inst' command can use selection files to automate an IRIX installation. (user-e4d0, 2026-09-21, exchange 214700, check: uncheckable)</li>
+<li id="s7">Google Gemini can create roboinst scripts for automated IRIX installation, but a reboot after rqsall is needed. (user-4c05, 2026-02-19, exchange 62229, check: uncheckable)</li>
+<li id="s8">The official IRIX installation guide recommends setting aside 1 or 2 hours, with faster processors speeding up the process. (user-cd83, 2023-11-17, exchange 218234, check: supported)</li>
+<li id="s9">The M-Systems U320 SCSI Flash Disk can be used for IRIX installation and storing the /unix kernel, but it is expensive for small amounts of data. Disk performance statistics are unusual. (user-7973, 2022-12-11, exchange 105908, check: uncheckable)</li>
+<li id="s10">Booterizer simplifies IRIX installation but can be used as a crutch. (user-2189, 2023-01-01, exchange 216787, check: uncheckable)</li>
+<li id="s11">To clone an IRIX installation from a HDD to an SD card using zuluscsi, both the HDD and zuluscsi are connected to the SCSI bus of the SGI machine in initiator mode, and zuluscsi images the found drive to an SD card. (user-7973, 2025-03-29, exchange 224811, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="irix-installation-process.html">IRIX installation process</a> (3)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="octane.html">Octane</a>, <a href="o2.html">O2</a>, <a href="indy.html">Indy</a>, <a href="machine.html">machine</a>
+</li>
+<li>Operating systems: <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="sd-card.html">SD card</a>, <a href="fx.html">fx</a>, <a href="inst-command.html">inst command</a>
+</li>
+<li>Parts and peripherals: <a href="cdrom.html">CDROM</a>, <a href="zuluscsi.html">ZuluSCSI</a>
+</li>
+<li>Other: <a href="command.html">command</a>, <a href="rqsall.html">rqsall</a>, <a href="su.html">su</a>
+</li></ul>
+</body>
+</html>

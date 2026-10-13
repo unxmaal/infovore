@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCSI cable</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>SCSI cable</h1>
+<p>Claims: 19 Part of <a href="scsi.html">SCSI</a></p>
+<p>A SCSI cable is a cable used to connect devices, and it can connect a drive bay or drive cage backplane, which may also receive power. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup><sup><a href="#s3">3</a></sup> The Indy has an external SCSI port that can be adapted to 50-pin IDC or O350 external SCSI using an external SCSI cable, and the O350 has a 68-pin SCSI connector on the enclosure. <sup><a href="#s4">4</a></sup> A SCSI cable with self termination can be used instead of a separate terminator, and the BlueSCSI requires the termination jumper to be set to off if the Indigo has a terminator at the end of the SCSI cable. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> A SCSI cable can be routed from an internal port on an R10k chassis by drilling or modifying a drive sled, and a complex SCSI cable setup can still work. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> If a SCSI cable is damaged, it may need to be cut out and replaced, and a system not booting can indicate a hardware issue such as an improperly connected SCSI cable. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The CD-ROM and HDD are not detected with a SCSI cable, and autodetection of IDs works on startup but throws register errors, suggesting poor contact or a faulty cable. <sup><a href="#s11">11</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The cable is a SCSI cable. (user-86e1, 2024-01-17, exchange 223617, check: uncheckable)</li>
+<li id="s2">There's a SCSI cable connecting the drive cage backplane, which also receives power. (user-7b1c, 2022-03-06, exchange 239548, check: uncheckable)</li>
+<li id="s3">A Dolch FlexPac has compatibility issues compared to earlier models, but a SCSI cable can be used to connect to the drive bay. (user-616d, 2025-04-05, exchange 159310, check: uncheckable)</li>
+<li id="s4">The Indy has an external SCSI port that can be adapted to 50-pin IDC or O350 external SCSI to IDC using an external SCSI cable. The O350 has a 68-pin SCSI connector on the enclosure. The availability of SCSI cables and适配 (user-9860, 2021-11-09, exchange 205871, check: supported)</li>
+<li id="s5">A SCSI cable with self termination can be used instead of a separate terminator. The bus configuration with self termination installed is &lt;unformatted bluscsi partition <sup><a href="#s1">1</a></sup> ------- Tape drive <sup><a href="#s2">2</a></sup> ------ external SCSI CD- (user-ae91, 2024-05-04, exchange 218383, check: supported)</li>
+<li id="s6">The BlueSCSI requires the termination jumper to be set to off if the Indigo has a terminator at the end of the SCSI cable. (user-164b, 2026-05-08, exchange 226445, check: supported)</li>
+<li id="s7">A drive sled can be drilled or modified to route a SCSI cable from the internal port on an R10k chassis. (user-8547, 2024-03-27, exchange 110833, check: supported)</li>
+<li id="s8">A complex SCSI cable setup can still work. (user-616d, 2024-12-13, exchange 224304, check: uncheckable)</li>
+<li id="s9">If the SCSI cable is damaged, it may need to be cut out and replaced. (user-86e1, 2024-12-13, exchange 211440, check: uncheckable)</li>
+<li id="s10">The system not booting can indicate a hardware issue, such as an improperly connected SCSI cable. (user-8547, 2024-02-22, exchange 110435, check: uncheckable)</li>
+<li id="s11">The CD-ROM and HDD are not detected with a SCSI cable, and autodetection of IDs works on startup but throws register errors, suggesting poor contact or a faulty cable. (user-1361, 2021-12-13, exchange 235031, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo.html">Indigo</a>, <a href="indy.html">Indy</a>, <a href="origin-350.html">Origin 350</a>, <a href="powerbook.html">PowerBook</a>, <a href="xio.html">XIO</a>
+</li>
+<li>Parts and peripherals: <a href="bluescsi.html">BlueSCSI</a>, <a href="cdrom.html">CDROM</a>, <a href="hdd.html">HDD</a>, <a href="power.html">POWER</a>
+</li>
+<li>Standards and interfaces: <a href="pci.html">PCI</a>
+</li></ul>
+</body>
+</html>

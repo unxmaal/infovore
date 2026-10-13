@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fdisk</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>fdisk</h1>
+<p>Claims: 7</p>
+<p>fdisk is a disk management tool similar to tools like gparted. <sup><a href="#s1">1</a></sup> fdisk can create partitions by writing bytes at the start of the disk. <sup><a href="#s2">2</a></sup> fdisk can create a GPT/MBR partition tagged as xfs for SGI disklabels and still supports writing sgi disklabels in current Ubuntu. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> fdisk could hang if it encountered an unrecognized partition table, and it can drop you back into the command prompt if it encounters issues. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> You may need overlay software, such as OnTrack Disk Manager, or use fdisk /mbr. <sup><a href="#s7">7</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Fx is similar to disk management tools like fdisk or gparted. (user-c831, 2024-11-21, exchange 50697, check: uncheckable)</li>
+<li id="s2">fdisk just goes to the start of the disk and dumps some bytes there to create partitions. (user-b1da, 2021-11-01, exchange 221651, check: uncheckable)</li>
+<li id="s3">fdisk can create a GPT/MBR partition that is tagged as xfs for SGI disklabels. (user-9860, 2021-11-01, exchange 221651, check: uncheckable)</li>
+<li id="s4">fdisk still supports writing sgi disklabels in current Ubuntu. (user-d903, 2021-11-01, exchange 221651, check: uncheckable)</li>
+<li id="s5">The FDISK utility could hang if it encountered an unrecognized partition table. (user-42cf, 2021-09-08, exchange 79812, check: uncheckable)</li>
+<li id="s6">fdisk can drop you back into the command prompt if it encounters issues, as happened with the SCSI disk partition. (user-b1da, 2023-11-12, exchange 234242, check: uncheckable)</li>
+<li id="s7">You’ll need an overlay software I think; try https://www.philscomputerlab.com/ontrack-disk-manager.html or use fdisk /mbr. (user-e4d0, 2024-03-20, exchange 238651, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="ubuntu.html">Ubuntu</a>
+</li>
+<li>Software: <a href="xfs.html">XFS</a>, <a href="disklabel.html">disklabel</a>, <a href="partition-table.html">partition table</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>window</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>window</h1>
+<p>Claims: 4</p>
+<p>Setting r_fullscreen 0 allows ioquake3 to run in a window instead of fullscreen. <sup><a href="#s1">1</a></sup> Changing a window to override-redirect after mapping won't notify the WM to release it; it has to be done before mapping. <sup><a href="#s2">2</a></sup> There's no simple way to map process IDs to windows, and the mechanism described might use LD_PRELOAD or ICCCM client messages to identify windows. <sup><a href="#s3">3</a></sup> The mechanism can do anything to identify windows, and it allows any GL program to be a screensaver. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Setting r_fullscreen 0 allows ioquake3 to run in a window instead of fullscreen. (user-17cb, 2019-07-28, exchange 67673, check: supported)</li>
+<li id="s2">changing a window to override-redirect after mapping won't notify the WM to release it; it has to be done before mapping (user-21b8, 2023-10-03, exchange 215413, check: uncheckable)</li>
+<li id="s3">There's no simple way to map process IDs to windows, and the mechanism described might use LD_PRELOAD or ICCCM client messages to identify windows. (user-21b8, 2023-10-03, exchange 215414, check: uncheckable)</li>
+<li id="s4">The mechanism can do anything to identify windows, and it allows any GL program to be a screensaver. (user-b1da, 2023-10-03, exchange 215414, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="ioquake3.html">ioquake3</a>, <a href="screensaver.html">screensaver</a>
+</li>
+<li>Standards and interfaces: <a href="x-protocol.html">X protocol</a>
+</li>
+<li>Other: <a href="ld-preload.html">LD_PRELOAD</a>
+</li></ul>
+</body>
+</html>

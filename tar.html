@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tar</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>tar</h1>
+<p>Claims: 45 Background: 7 claims already covered by Wikipedia, see <a href="https://en.wikipedia.org/wiki/Tar_%28computing%29">Tar (computing)</a>.</p>
+<p>tar is a command used for backing up data to tape and for transferring files on and off tapes and onto hard drives. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> tar can create archives, list their contents without extracting them, and identify whether a file is a tar archive. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup> tar can extract archives in various formats, including .tgz, .tar.xz, and XZ files, and can decompress gzip files without damaging the original. <sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The tar command with the f option requires a single '-' to indicate stdin, with no space before it. <sup><a href="#s9">9</a></sup> Older tar implementations, such as IRIX tar, do not automatically detect compression, unlike GNU tar, and installing GNU tar can solve this issue. <sup><a href="#s7">7</a></sup><sup><a href="#s10">10</a></sup> tar can overwrite files if not used with the correct options, and old versions might create archives with absolute paths that can overwrite the root directory when extracted. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> tar may encounter input/output errors when reading from a tape, and certain programs may fail if the directory contains a file with a .gz extension. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> tar is easier to use than dd for copying files, but dd is necessary for boot sectors and for creating exact images of tapes. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup> The command tar -xvf /path/to/source.tar -C /destination_dir extracts a tar file to a specified directory. <sup><a href="#s17">17</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">tar is the tool to get shit on and off tapes (and onto hard drives). (user-f229, 2021-08-16, exchange 217208, check: uncheckable)</li>
+<li id="s2">The command `tar` is used for backing up data to tape. (user-e872, 2025-02-06, exchange 53929, check: supported)</li>
+<li id="s3">tar can identify if a file is a tar archive. (user-b1da, 2020-08-03, exchange 10315, check: uncheckable)</li>
+<li id="s4">tar -tf &lt;filename&gt; lists contents without extracting. (user-ab99, 2021-08-26, exchange 205468, check: uncheckable)</li>
+<li id="s5">To install software in .tgz format on IRIX, first use gunzip to decompress it to .tar, then tar -xvf to extract it. (user-b7c4, 2019-03-02, exchange 837, check: uncheckable)</li>
+<li id="s6">To extract a tar.xz file, use 'tar -xvf filename.tar.xz'. (user-2d40, 2019-12-18, exchange 4897, check: uncheckable)</li>
+<li id="s7">The command gunzip -c &lt;archive&gt; | tar -xvf - extracts a gzip file and then extracts its contents, and this method does not damage the original file. IRIX's tar did not support built-in gzip decompression, adhering to the (user-c831, 2021-05-22, exchange 79358, check: uncheckable)</li>
+<li id="s8">tar xf can decompress multiple formats including XZ files. (user-e872, 2021-05-22, exchange 217135, check: uncheckable)</li>
+<li id="s9">The tar command with the f option requires a single '-' to indicate stdin, with no space before it. (user-7b1c, 2020-03-11, exchange 78218, check: uncheckable)</li>
+<li id="s10">IRIX tar does not automatically detect compression like GNU tar; installing GNU tar can solve this issue. Directory and checksum errors may persist even after installing GNU tar., (user-03ad, 2023-07-08, exchange 83826, check: uncheckable)</li>
+<li id="s11">tar can overwrite files if not used with the correct options, as demonstrated by accidentally overwriting 1.png. (user-bc18, 2019-12-02, exchange 4511, check: supported)</li>
+<li id="s12">Old versions of tar might create tar files with absolute paths that can overwrite the root directory when extracted. (user-d903, 2022-03-13, exchange 217512, check: uncheckable)</li>
+<li id="s13">The tar command on IRIX may fail if the directory contains a file with a .gz extension, as it might be interpreted as a compression flag. (user-b1da, 2022-06-14, exchange 29995, check: uncheckable)</li>
+<li id="s14">The `tar` command may encounter input/output errors when reading from a tape, possibly due to tape issues. (user-bba0, 2025-04-13, exchange 55945, check: supported)</li>
+<li id="s15">tar is easier to use than dd for copying files, but dd is necessary for boot sectors. (user-e872, 2021-12-28, exchange 80578, check: uncheckable)</li>
+<li id="s16">To create a fully exact image of a DYNIX/ptx tape, `dd` can be used after rewinding the tape with `mt`, preserving all filesystem data and TOC contents; `tar` preserves filesystem content but not raw filesystem data. (user-ff99, 2022-08-13, exchange 216136, check: supported)</li>
+<li id="s17">tar -xvf /path/to/source.tar -C /destination_dir will extract a tar file to a specified directory. (user-07ed, 2026-05-06, exchange 213939, check: uncheckable)</li>
+</ol>
+<h2 id="subtopics">Subtopics</h2>
+<ul>
+<li><a href="tar-file.html">tar file</a> (13)
+</li></ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="indigo2.html">Indigo2</a>
+</li>
+<li>Processors: <a href="mips3.html">MIPS3</a>, <a href="mips4.html">MIPS4</a>, <a href="r10000.html">R10000</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>, <a href="irix-tar.html">IRIX tar</a>, <a href="irix-5-1.html">IRIX 5.1</a>, <a href="linux.html">Linux</a>
+</li>
+<li>Software: <a href="dd.html">dd</a>, <a href="gnu-tar.html">GNU tar</a>, <a href="efs.html">EFS</a>, <a href="xfsdump.html">xfsdump</a>, <a href="sd-card.html">SD card</a>, <a href="efsextract.html">efsextract</a>, <a href="gzip.html">gzip</a>, <a href="root-directory.html">root directory</a>, <a href="rsync.html">rsync</a>
+</li>
+<li>Parts and peripherals: <a href="tape.html">tape</a>, <a href="cdrom.html">CDROM</a>, <a href="dat-drive.html">DAT drive</a>, <a href="disk.html">disk</a>, <a href="thumb-drive.html">thumb drive</a>
+</li>
+<li>Standards and interfaces: <a href="scsi-hdd.html">SCSI HDD</a>, <a href="ssh.html">SSH</a>
+</li>
+<li>Companies: <a href="iso.html">ISO</a>, <a href="sgi.html">SGI</a>
+</li>
+<li>Other: <a href="gunzip.html">gunzip</a>, <a href="command.html">command</a>, <a href="gtar.html">gtar</a>, <a href="unzip.html">unzip</a>
+</li></ul>
+</body>
+</html>

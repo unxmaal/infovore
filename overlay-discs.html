@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>overlay discs</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>overlay discs</h1>
+<p>Claims: 5 Part of <a href="overlay.html">overlay</a></p>
+<p>Overlay discs contain cumulative updates that patch the files on the foundation discs, which come from the original IRIX 6.5 release. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> All versions of IRIX 6.5 after the original release have overlay discs that install on top of the base install, and minor version patches are located on separate overlay discs. <sup><a href="#s3">3</a></sup><sup><a href="#s2">2</a></sup> Overlay discs also contain the miniroot needed to boot into the miniroot. <sup><a href="#s4">4</a></sup> IRIX 6.5.22 requires all 3 overlay discs, the IRIX 6.5 Foundation (2 discs), and both the Applications and Complementary Applications discs. <sup><a href="#s5">5</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">Overlay discs contain cumulative updates over the base 6.5.0 install (user-e473, 2020-07-11, exchange 9540, check: supported)</li>
+<li id="s2">Foundation discs are from the original 6.5 release; all versions of 6.5 after that have overlay discs that patch the files on the foundation discs; you'd boot from the 6.5.30 overlay disc 1 (user-d903, 2022-11-13, exchange 105594, check: supported)</li>
+<li id="s3">eoe.sw.base is the base components of the OS; for IRIX 6.5, minor version patches are on separate overlay discs that install on top of the base install; adding foundation and overlay discs might resolve conflicts. (user-d903, 2022-09-13, exchange 217693, check: supported)</li>
+<li id="s4">Overlay discs contain the miniroot needed to boot into the miniroot. If you have overlay IRIX discs from Raion, you can try booting into the miniroot without setting up Booterizer. The pi version might be easier. Floptec (user-1446, 2020-09-08, exchange 10928, check: uncheckable)</li>
+<li id="s5">IRIX 6.5.22 requires all 3 overlay discs, IRIX 6.5 Foundation (2 discs), and both the Applications and Complementary Applications discs. (user-6c80, 2024-06-05, exchange 210414, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Operating systems: <a href="irix-6-5.html">IRIX 6.5</a>, <a href="irix-6-5-22.html">IRIX 6.5.22</a>, <a href="miniroot.html">miniroot</a>
+</li>
+<li>Software: <a href="booterizer.html">Booterizer</a>, <a href="application.html">application</a>
+</li>
+<li>Other: <a href="raion.html">Raion</a>, <a href="foundation-discs.html">foundation discs</a>
+</li></ul>
+</body>
+</html>

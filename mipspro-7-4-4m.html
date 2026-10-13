@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIPSpro 7.4.4m</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MIPSpro 7.4.4m</h1>
+<p>Claims: 4 Part of <a href="mipspro-7-4.html">MIPSpro 7.4</a></p>
+<p>Specific patches are required for MIPSpro 7.4.4m to ensure correct compilation, and installing them might resolve the issue. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> For xz compilation, MIPSpro 7.4.4m requires -O1 instead of -O2, and --disable-shared or -64 CFLAGS can work around shared liblzma issues. <sup><a href="#s3">3</a></sup> To install MIPSpro 7.4.4m, install the product first, then the required patches, using swmgr which selects the needed updates. <sup><a href="#s4">4</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">specific patches are required for MIPSpro 7.4.4m to ensure correct compilation. (user-2189, 2019-01-13, exchange 203648, check: supported)</li>
+<li id="s2">Installing patches for MIPSpro 7.4.4m might resolve the issue. (user-42cf, 2019-01-19, exchange 142, check: supported)</li>
+<li id="s3">MIPSpro 7.4.4m requires -O1 instead of -O2 for xz compilation, and --disable-shared or -64 CFLAGS can work around shared liblzma issues. (user-8547, 2019-02-10, exchange 67038, check: supported)</li>
+<li id="s4">To install MIPSPRO 7.4.4m, install the product first, then required patches, using swmgr which selects needed updates. (user-8547, 2022-11-19, exchange 105671, check: supported)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Software: <a href="swmgr.html">swmgr</a>
+</li></ul>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MACE</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+</head>
+<body>
+<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<h1>MACE</h1>
+<p>Claims: 17</p>
+<p>The O2's MACE chipset is in early stages of reverse engineering, and the MACE docs include the System Verilog for the block. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Duplicate memory addresses in the O2's BGE, MACE, and PCI components can make hardware debugging difficult. <sup><a href="#s3">3</a></sup> MACE can support multiple controllers, though PCI parallel limitations may restrict additional connections. <sup><a href="#s4">4</a></sup> MACE enters a fault state if it receives too many PCI RETRY signals. <sup><a href="#s5">5</a></sup> MACE has compatibility issues with Voodoo1, which are due to specific bugs rather than incompatibility with Voodoo2 or other cards. <sup><a href="#s6">6</a></sup><sup><a href="#s7">7</a></sup> These issues include conflicting texture upload speeds between MACE and Voodoo1, a DMA byteswap that always uses 32 bits, and problematic 16-bit LFB writes that require a shadow buffer for 32-bit writes. <sup><a href="#s8">8</a></sup><sup><a href="#s9">9</a></sup> The Voodoo+MACE combination limits the framerate, with a single TMU card performing slightly better on PC. <sup><a href="#s10">10</a></sup></p>
+<h2 id="sources">Sources</h2>
+<ol>
+<li id="s1">The O2's MACE chipset is in early stages of reverse engineering. (user-3663, 2020-04-01, exchange 220147, check: supported)</li>
+<li id="s2">The O2 controller requires software to set bits for PS/2 protocol; the MACE docs include the System Verilog for the block. (user-231e, 2026-04-22, exchange 226371, check: supported)</li>
+<li id="s3">Duplicate memory addresses in the O2's BGE, MACE, and PCI components can make hardware debugging difficult. (user-2a3c, 2025-09-29, exchange 59698, check: supported)</li>
+<li id="s4">Mace can support multiple controllers, though PCI parallel limitations may restrict additional connections. (user-4f7c, 2026-04-10, exchange 122517, check: uncheckable)</li>
+<li id="s5">MACE enters a fault state if it receives too many PCI RETRY signals. (user-757f, 2026-03-28, exchange 215939, check: uncheckable)</li>
+<li id="s6">Voodoo1 and MACE have compatibility issues, with MACE being particularly problematic. (user-757f, 2026-03-26, exchange 215932, check: uncheckable)</li>
+<li id="s7">MACE's performance issues are due to specific bugs that make it incompatible with Voodoo1, but not necessarily with Voodoo2 or other cards. (user-757f, 2026-04-01, exchange 215949, check: uncheckable)</li>
+<li id="s8">DMA byteswap in Mace always uses 32 bits, and LFB writes have issues, especially 16-bit writes which are borked, requiring a shadow buffer for 32-bit writes. (user-757f, 2026-04-02, exchange 93749, check: supported)</li>
+<li id="s9">The MACE and Voodoo1 have conflicting texture upload speeds. (user-757f, 2026-04-02, exchange 215953, check: uncheckable)</li>
+<li id="s10">The Voodoo+MACE limits the framerate; a single TMU card performs slightly better on PC. (user-757f, 2026-04-30, exchange 73549, check: uncheckable)</li>
+</ol>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>Machines: <a href="o2.html">O2</a>
+</li>
+<li>Processors: <a href="r5000.html">R5000</a>
+</li>
+<li>Graphics: <a href="voodoo2.html">Voodoo2</a>
+</li>
+<li>Operating systems: <a href="irix.html">IRIX</a>
+</li>
+<li>Software: <a href="ps2.html">PS2</a>, <a href="mame.html">MAME</a>
+</li>
+<li>Parts and peripherals: <a href="av1-card.html">AV1 card</a>
+</li>
+<li>Standards and interfaces: <a href="ps-2-protocol.html">PS/2 protocol</a>
+</li>
+<li>Other: <a href="voodoo1.html">Voodoo1</a>, <a href="crime.html">CRIME</a>
+</li></ul>
+</body>
+</html>
