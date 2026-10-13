@@ -77,6 +77,8 @@ def test_encode_round_trips_pixels_palette_and_frames() -> None:
     assert b"NETSCAPE2.0" not in encode(3, 2, palette, [frame_a])
     long = encode(300, 1, palette, [[1] * 300])
     assert decode(long)[3] == [[1] * 300]
+    for n in range(1, 12):
+        assert decode(encode(n, 1, palette, [[2] * n]))[3] == [[2] * n]
     assert encode(3, 2, palette, [frame_a]) == encode(3, 2, palette, [frame_a])
 
 
