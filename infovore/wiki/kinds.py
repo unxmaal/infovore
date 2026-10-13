@@ -56,6 +56,34 @@ _RULES: Final = (
     ),
 )
 _COMPILED: Final = tuple((kind, re.compile(rx, re.IGNORECASE)) for kind, rx in _RULES)
+_NAME_RULES: Final = (
+    ("cpu", r"cpus?|processors?|r\d{4,5}[a-z]?|r\d+k|rm\d{4}[a-z]?|680[0-9]0|0[346]0"),
+    ("os", r"win(?:dows|9[58]|nt|xp|2k)|unix|linux|bsd|dos|operating systems?"),
+    ("graphics", r"graphics|gfx|framebuffer|gpus?|video cards?"),
+    (
+        "part",
+        r"psus?|power suppl(?:y|ies)|drives?|disks?|cards?|cables?|ram|dimms?|simms?|sdram"
+        r"|capacitors?|fans?|connectors?|ports?|sockets?|jumpers?|e?proms?|roms?|nvram|leds?"
+        r"|modems?|monitors?|crt|keyboards?|mouse|mice|sleds?|batter(?:y|ies)|tapes?|memory|boards?"
+        r"|backplanes?|chassis|rails?|screws?|pads?|adapters?|controllers?|risers?|terminators?"
+        r"|heatsinks?|bricks?|floppy|cd-?rom|dvd|chipsets?|microcontrollers?|asics?|vrms?",
+    ),
+    (
+        "software",
+        r"drivers?|patch(?:es)?|librar(?:y|ies)|compilers?|cross-compiler|emulators?|shells?"
+        r"|editors?|browsers?|toolchains?|daemons?|packages?|screensavers?|gnu \S+|games?|firmware"
+        r"|microcode|applications?|utilit(?:y|ies)|programs?|window managers?|filesystems?",
+    ),
+    (
+        "machine",
+        r"workstations?|servers?|mainframes?|terminals?|laptops?|notebooks?|powerbooks?|i?books?"
+        r"|macbook(?: \S+)?|desksides?|rackmounts?|computers?|consoles?|machines?|systems?",
+    ),
+    ("standard", r"protocols?|standards?|bus|interfaces?|encodings?|endian(?:ness)?"),
+)
+_NAME_COMPILED: Final = tuple(
+    (kind, re.compile(rf"(?:^|\s)(?:{rx})(?:$|\s)", re.IGNORECASE)) for kind, rx in _NAME_RULES
+)
 _MODEL = re.compile(r"^([A-Za-z]+)\d")
 _VERSION = re.compile(r"\.\d+[a-z]*$")
 _TRAILER = re.compile(
@@ -68,6 +96,13 @@ def kind_from_description(description: str) -> str | None:
     head = _TRAILER.split(description, 1)[0]
     for kind, pattern in _COMPILED:
         if pattern.search(head):
+            return kind
+    return None
+
+
+def kind_from_name(name: str) -> str | None:
+    for kind, pattern in _NAME_COMPILED:
+        if pattern.search(name):
             return kind
     return None
 
@@ -100,6 +135,7 @@ def assign_kinds(
     def resolve(name: str) -> str:
         if name not in out:
             kind = authority.get(name) or kind_from_description(descriptions.get(name, ""))
+            kind = kind or kind_from_name(name)
             if kind is None:
                 kind = resolve(parent[name]) if name in parent else OTHER
             out[name] = kind

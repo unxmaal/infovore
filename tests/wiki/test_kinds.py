@@ -6,6 +6,7 @@ from infovore.wiki.kinds import (
     assign_kinds,
     kind_counts,
     kind_from_description,
+    kind_from_name,
     parents,
     summarise_kinds,
 )
@@ -40,6 +41,42 @@ def test_kind_from_description(description: str, kind: str | None) -> None:
     assert kind_from_description(description) == kind
 
 
+@pytest.mark.parametrize(
+    ("name", "kind"),
+    [
+        ("Octane PSU", "part"),
+        ("Zip drive", "part"),
+        ("network card", "part"),
+        ("tantalum capacitor", "part"),
+        ("PS/2 port", "part"),
+        ("Alpha CPU", "cpu"),
+        ("R7k", "cpu"),
+        ("RM7000C", "cpu"),
+        ("68030", "cpu"),
+        ("060", "cpu"),
+        ("processor", "cpu"),
+        ("Win95", "os"),
+        ("SCO Unix", "os"),
+        ("operating system", "os"),
+        ("3D graphics", "graphics"),
+        ("GNU make", "software"),
+        ("cross-compiler", "software"),
+        ("shared library", "software"),
+        ("PowerBook", "machine"),
+        ("MacBook Pro", "machine"),
+        ("mainframe", "machine"),
+        ("system board", "part"),
+        ("little endian", "standard"),
+        ("Half-Life", None),
+        ("Octane", None),
+        ("IRIX 6.5", None),
+        ("", None),
+    ],
+)
+def test_kind_from_name(name: str, kind: str | None) -> None:
+    assert kind_from_name(name) == kind
+
+
 def test_parents_nest_by_name_prefix_and_model_number_onto_a_bigger_page() -> None:
     sizes = {
         "IRIX": 100,
@@ -63,8 +100,16 @@ def test_parents_nest_by_name_prefix_and_model_number_onto_a_bigger_page() -> No
     assert parents({"irix": 3, "IRIX 6.5": 10}) == {}
 
 
-def test_assign_kinds_prefers_authority_then_description_then_parent() -> None:
-    sizes = {"IRIX": 100, "IRIX 6.5": 40, "IRIX 6.5.22": 5, "Octane": 80, "VPro": 10, "Nekoware": 7}
+def test_assign_kinds_prefers_authority_then_description_then_name_then_parent() -> None:
+    sizes = {
+        "IRIX": 100,
+        "IRIX 6.5": 40,
+        "IRIX 6.5.22": 5,
+        "Octane": 80,
+        "Octane PSU": 3,
+        "VPro": 10,
+        "Nekoware": 7,
+    }
     descriptions = {
         "IRIX": "Computer operating system",
         "Octane": "Hydrocarbon",
@@ -76,11 +121,12 @@ def test_assign_kinds_prefers_authority_then_description_then_parent() -> None:
         "IRIX 6.5": "os",
         "IRIX 6.5.22": "os",
         "Octane": "machine",
+        "Octane PSU": "part",
         "VPro": "other",
         "Nekoware": "other",
     }
     counts = kind_counts(kinds, sizes)
-    assert counts == {"machine": (1, 80), "os": (3, 145), "other": (2, 17)}
-    assert list(counts) == ["machine", "os", "other"]
-    assert summarise_kinds(counts) == "machine 1 (80), os 3 (145), other 2 (17)"
+    assert counts == {"machine": (1, 80), "os": (3, 145), "part": (1, 3), "other": (2, 17)}
+    assert list(counts) == ["machine", "os", "part", "other"]
+    assert summarise_kinds(counts) == "machine 1 (80), os 3 (145), part 1 (3), other 2 (17)"
     assert set(LABELS) == set(KINDS) and KINDS[-1] == "other"

@@ -34,6 +34,7 @@ GENERAL: Final = "General"
 UNSORTED: Final = "Unsorted"
 INDEX: Final = "index"
 ALL: Final = "all"
+KIND_PREFIX: Final = "kind-"
 INDEX_MIN: Final = 10
 PART_SEPARATOR: Final = "#"
 DEFAULT_MIN_SECTION: Final = 10
@@ -286,7 +287,7 @@ def sections_of(
 
 
 def page_files(names: Iterable[str], weights: Mapping[str, int] | None = None) -> dict[str, str]:
-    taken = {INDEX, ALL}
+    taken = {INDEX, ALL, *(f"{KIND_PREFIX}{k}" for k in KINDS)}
     out: dict[str, str] = {}
     for name in sorted(names, key=lambda n: (-(weights or {}).get(n, 0), n)):
         base = slug(name) or f"topic-{hashlib.sha1(name.encode()).hexdigest()[:8]}"
@@ -354,17 +355,13 @@ def render_page(
             )
     if children:
         lines += ["", "## Subtopics", ""]
-        lines += [_link(t, files, children) for t in _ranked(children)]
+        lines += [_link(t, files, children) for t in _by_name(children)]
     skip = set(children or {}) | {parent}
     related = sorted((t for t in cooc if t in files and t not in skip), key=lambda t: (-cooc[t], t))
     if related:
         lines += ["", "## See also", ""]
         lines += _see_also(related, files, nav.kinds if nav else {})
     return "\n".join(lines) + "\n"
-
-
-def _ranked(sizes: Mapping[str, int]) -> list[str]:
-    return sorted(sizes, key=lambda n: (-sizes[n], n))
 
 
 def _link(name: str, files: Mapping[str, str], sizes: Mapping[str, int]) -> str:
@@ -396,16 +393,44 @@ def render_disambiguation(
     return "\n".join(lines) + "\n"
 
 
-def render_all(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
-    lines = ["# All topics", "", f"{len(pages)} pages. [Index]({INDEX}.md)"]
+def kind_file(kind: str) -> str:
+    return f"{KIND_PREFIX}{kind}.md"
+
+
+def _pages(n: int) -> str:
+    return f"{n} page" + ("" if n == 1 else "s")
+
+
+def _by_name(pages: Mapping[str, int]) -> list[str]:
+    return sorted(pages, key=lambda n: (n.casefold(), n))
+
+
+def _az(title: str, intro: str, pages: Mapping[str, int], files: Mapping[str, str]) -> str:
+    lines = [f"# {title}", "", intro]
     letter = None
-    for name in sorted(pages, key=lambda n: (n.casefold(), n)):
+    for name in _by_name(pages):
         first = name[0].upper() if name[0].isalpha() else "#"
         if first != letter:
             letter = first
             lines += ["", f"## {letter}", ""]
         lines.append(_link(name, files, pages))
     return "\n".join(lines) + "\n"
+
+
+def render_all(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
+    return _az("All topics", f"{_pages(len(pages))}. [Index]({INDEX}.md)", pages, files)
+
+
+def render_kind(kind: str, pages: Mapping[str, int], files: Mapping[str, str]) -> str:
+    intro = f"{_pages(len(pages))}, {_count(pages)} claims. [Index]({INDEX}.md)"
+    return _az(LABELS[kind], intro, pages, files)
+
+
+def _by_kind(pages: Mapping[str, int], kinds: Mapping[str, str]) -> dict[str, dict[str, int]]:
+    out: dict[str, dict[str, int]] = {}
+    for name in pages:
+        out.setdefault(kinds.get(name, KINDS[-1]), {})[name] = pages[name]
+    return {kind: out[kind] for kind in KINDS if kind in out}
 
 
 def render_index(
@@ -421,17 +446,25 @@ def render_index(
     children: dict[str, list[str]] = {}
     for child, p in parent.items():
         children.setdefault(p, []).append(child)
+    groups = _by_kind(topics, nav.kinds)
     lines.append(f"{len(topics)} topics, {_count(topics)} claims. [All topics A-Z]({ALL}.md)")
-    shown = [n for n in _ranked(topics) if n not in parent and pages[n] >= nav.index_min]
-    for kind in KINDS:
-        names = [n for n in shown if nav.kinds.get(n, KINDS[-1]) == kind]
-        if names:
-            lines += ["", f"## {LABELS[kind]}", ""]
-            for name in names:
-                lines += _tree(name, children, pages, files, nav.index_min, 0)
+    lines += ["", _jump_bar(groups)]
+    shown = {n for n in topics if n not in parent and pages[n] >= nav.index_min}
+    for kind, members in groups.items():
+        label = LABELS[kind]
+        lines += ["", f"## {label}", ""]
+        lines.append(f"{_pages(len(members))}. [All {label.lower()} A-Z]({kind_file(kind)})")
+        if names := [n for n in _by_name(members) if n in shown]:
+            lines.append("")
+        for name in names:
+            lines += _tree(name, children, pages, files, nav.index_min, 0)
     if unsorted:
         lines += ["", "## Unsorted", "", _link(UNSORTED, files, unsorted)]
     return "\n".join(lines) + "\n"
+
+
+def _jump_bar(groups: Mapping[str, Mapping[str, int]]) -> str:
+    return " · ".join(f"[{LABELS[k]}](#{slug(LABELS[k])}) ({len(m)})" for k, m in groups.items())
 
 
 def _count(pages: Mapping[str, int]) -> int:
@@ -448,7 +481,7 @@ def _tree(
 ) -> list[str]:
     lines = ["  " * depth + _link(name, files, pages)]
     kids = {c: pages[c] for c in children.get(name, []) if pages[c] >= index_min}
-    for child in _ranked(kids):
+    for child in _by_name(kids):
         lines += _tree(child, children, pages, files, index_min, depth + 1)
     return lines
 
@@ -506,6 +539,8 @@ def build_site(
     files = {f"{INDEX}.md": render_index(sizes, names, nav)}
     if nav is not None:
         files[f"{ALL}.md"] = render_all(pages, names)
+        for kind, members in _by_kind(pages, nav.kinds).items():
+            files[kind_file(kind)] = render_kind(kind, members, names)
     for name, group in by_topic.items():
         files[names[name]] = render_page(
             name,
