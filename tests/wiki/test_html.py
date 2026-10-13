@@ -57,13 +57,18 @@ def test_body_renders_headings_paragraphs_nested_bullets_and_numbered_sources() 
 
 def test_page_wraps_body_with_title_nav_and_optional_search() -> None:
     text = page("# O2 & co\n\nx\n")
-    assert text.startswith("<!doctype html>") and "<title>O2 &amp; co</title>" in text
+    assert (
+        text.startswith("<!doctype html>")
+        and "<title>O2 &amp; co - SGUG Discord Wiki</title>" in text
+    )
+    assert '<p class="site"><a href="index.html">SGUG Discord Wiki</a></p>' in text
     assert '<a href="index.html">Index</a>' in text and "<script>" not in text
     index = page("# Index\n", [{"t": "A</script>", "f": "a.html", "n": 1}])
     assert '<input id="q"' in index and '<script>var ITEMS = [{"t": "A<\\/script>"' in index
     assert 'src="spinner.gif"' in index and 'src="spinner.gif"' not in text
     assert "})(ITEMS);" in index
-    assert "<title>Wiki</title>" in page("no heading\n")
+    assert "<title>Wiki - SGUG Discord Wiki</title>" in page("no heading\n")
+    assert "<title>SGUG Discord Wiki</title>" in index
 
 
 def test_build_site_writes_html_and_search_index(tmp_path: Path) -> None:

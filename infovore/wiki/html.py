@@ -13,6 +13,7 @@ _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 _CITE = re.compile(r"\[(\d+)\]")
 _BULLET = re.compile(r"^( *)- (.*)$")
 _NUMBERED = re.compile(r"^(\d+)\. (.*)$")
+SITE: Final = "SGUG Discord Wiki"
 GUESTBOOK: Final = "https://github.com/unxmaal/infovore/issues"
 STYLE: Final = (
     'body{background:#000 url(bg.gif);color:#0f0;font:16px/1.4 "Times New Roman",Times,serif;'
@@ -37,10 +38,13 @@ STYLE: Final = (
     ".center{text-align:center}.badges img{margin:3px;border:1px solid #fff}"
     '.counter{font:bold 1em "Courier New",Courier,monospace;color:#ff0}'
     ".counter img{vertical-align:middle;border:2px inset #808080}"
+    '.site{font:bold 2.6em "Comic Sans MS","Comic Sans",cursive;color:#ff0;text-align:center;'
+    "text-shadow:4px 4px #f00;margin:0 0 0.3em}.site a:link,.site a:visited{color:#ff0;"
+    "text-decoration:none}"
     "@media(prefers-color-scheme:dark){body{background-color:#000}}"
 )
 MARQUEE: Final = (
-    "*** WELCOME TO THE INFOVORE SGI LORE WIKI *** BEST VIEWED IN NETSCAPE NAVIGATOR 3.0"
+    "*** WELCOME TO THE SGUG DISCORD WIKI *** BEST VIEWED IN NETSCAPE NAVIGATOR 3.0"
     " AT 800X600 *** THIS SITE IS UNDER CONSTRUCTION *** SIGN THE GUESTBOOK ***"
 )
 
@@ -141,6 +145,7 @@ def body(markdown: str) -> str:
 
 def page(markdown: str, search: Sequence[Mapping[str, str | int]] | None = None) -> str:
     title = next((ln[2:] for ln in markdown.splitlines() if ln.startswith("# ")), "Wiki")
+    head = SITE if title == "Index" else f"{html.escape(title)} - {SITE}"
     search_box = (
         '<form class="search" onsubmit="return false"><img src="spinner.gif" width="24"'
         ' height="24" alt=""><input id="q" type="search" placeholder="Search topics"></form>\n'
@@ -154,9 +159,10 @@ def page(markdown: str, search: Sequence[Mapping[str, str | int]] | None = None)
     return (
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        f"<title>{html.escape(title)}</title>\n<style>{STYLE}</style>\n</head>\n<body>\n"
+        f"<title>{head}</title>\n<style>{STYLE}</style>\n</head>\n<body>\n"
         f"<marquee>{MARQUEE}</marquee>\n"
         '<table class="frame"><tr><td class="main">\n'
+        f'<p class="site"><a href="index.html">{SITE}</a></p>\n'
         '<nav>[ <a href="index.html">Index</a> | <a href="all.html">All topics</a> |'
         f' <a href="{GUESTBOOK}">Guestbook</a> ]'
         ' <img src="new.gif" width="32" height="16" alt="New"></nav>\n'
