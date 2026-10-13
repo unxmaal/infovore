@@ -23,6 +23,7 @@ from infovore.wiki.canon import (
 from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
 from infovore.wiki.html import write_html
 from infovore.wiki.kinds import KINDS, LABELS, parents
+from infovore.wiki.scrub import scrub
 from infovore.wiki.topics import Topics, disambiguations, load_topics, slug, topic_redirects
 
 if TYPE_CHECKING:
@@ -138,7 +139,7 @@ def load_claims(
             reason = f"check:{row['chk'] or UNCHECKED}"
         else:
             reason = None
-        statement = _line(row["statement"])
+        statement = scrub(_line(row["statement"]))
         if reason is None and lexicon and not claim_has_tech(lexicon, topics, statement):
             reason = "no_tech"
         if reason is not None:
@@ -250,7 +251,7 @@ def _prose(
         if cited:
             for i in cited:
                 numbers.setdefault(i, len(numbers) + 1)
-            parts.append(f"{text} " + "".join(f"[{numbers[i]}]" for i in cited))
+            parts.append(f"{scrub(text)} " + "".join(f"[{numbers[i]}]" for i in cited))
     return " ".join(parts)
 
 

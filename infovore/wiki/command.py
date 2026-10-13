@@ -23,6 +23,7 @@ from infovore.wiki.build import (
 from infovore.wiki.eligibility import DEFAULT_VERDICTS, VERDICTS_HELP, parse_verdicts
 from infovore.wiki.groups import GROUPING_HELP, GROUPINGS, make_grouper_for, summarise
 from infovore.wiki.kinds import assign_kinds, kind_counts, summarise_kinds
+from infovore.wiki.scrub import scan
 from infovore.wiki.tag_command import run_tag
 from infovore.wiki.topics import disambiguations, topic_kinds
 from infovore.wiki.write_command import run_write
@@ -106,6 +107,8 @@ class WikiCommand:
         tag.add_argument("--write", action="store_true", help="without it: print one request")
         tag.add_argument("--resume", action="store_true")
         tag.add_argument("--progress-every", type=int, default=500, dest="progress_every")
+        scan = sub.add_parser("scan", help="find Discord links, ids and emails in a built site")
+        scan.add_argument("dir", type=Path, help="site directory")
         write = sub.add_parser("write", help="write cited article sections for each topic")
         write.add_argument("--tag-run", type=int, required=True, dest="tag_run")
         write.add_argument("--runs", default=None, help="comma-separated claim run ids")
@@ -129,6 +132,12 @@ class WikiCommand:
     async def run(self, context: "AppContext", args: argparse.Namespace) -> int:
         if args.wiki_action == "tag":
             return run_tag(context, args)
+        if args.wiki_action == "scan":
+            hits = scan(args.dir)
+            for h in hits:
+                context.stdout.write(f"{h.file}:{h.line}: {h.kind}: {h.text}\n")
+            context.stdout.write(f"hits: {len(hits)}\n")
+            return 0 if not hits else 1
         if args.wiki_action == "write":
             return run_write(context, args, _runs(context.conn, args.runs))
         articles = _articles(context.conn, args) if args.wiki_action == "build" else None
