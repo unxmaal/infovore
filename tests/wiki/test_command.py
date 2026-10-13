@@ -146,3 +146,22 @@ def test_background_flag_counts_established_claims_in_stats(tmp_path: Path) -> N
     argv = ["wiki", "build", "--out", str(site), "--min-claims", "1", "--background", "0.8"]
     assert run(argv, env)[0] == ExitCode.OK
     assert "Background: 1 claim already covered" in (site / "o2.md").read_text()
+
+
+def test_scan_lists_hits_and_fails_on_any(tmp_path: Path) -> None:
+    env = seeded(tmp_path)
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "a.html").write_text("ok\n", encoding="utf-8")
+    code, out = run(["wiki", "scan", str(site)], env)
+    assert code == ExitCode.OK and out == "hits: 0\n"
+    (site / "b.html").write_text(
+        "x https://discord.gg/q and 524976640468713497\n", encoding="utf-8"
+    )
+    code, out = run(["wiki", "scan", str(site)], env)
+    assert code == 1
+    assert out == (
+        "b.html:1: discord-link: https://discord.gg/q\n"
+        "b.html:1: snowflake: 524976640468713497\n"
+        "hits: 2\n"
+    )
