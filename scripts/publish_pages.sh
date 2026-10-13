@@ -17,7 +17,7 @@ if git ls-remote --exit-code --heads "$remote" "$branch" >/dev/null 2>&1; then
   git fetch -q "$remote" "$branch"
   git worktree add -q "$wt" "$remote/$branch" --detach
 else
-  git worktree add -q --orphan "$wt" "$branch"
+  git worktree add -q --orphan -b "$branch" "$wt"
 fi
 find "$wt" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 cp "$site"/*.html "$site"/search.json "$wt"/
