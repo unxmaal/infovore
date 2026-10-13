@@ -3,11 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>tardist</title>
-<style>body{font:16px/1.5 system-ui,sans-serif;max-width:60em;margin:1em auto;padding:0 1em;color:#222}nav a{margin-right:1em}h1{margin-top:0.5em}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}input{font:inherit;width:100%;padding:0.4em;box-sizing:border-box}#hits{list-style:none;padding:0}</style>
+<title>tardist - SGUG Discord Wiki</title>
+<style>body{background:#000 url(bg.gif);color:#0f0;font:16px/1.4 "Times New Roman",Times,serif;margin:0;padding:8px}a:link{color:#ff0}a:visited{color:#f0f}a:hover{color:#0ff;background:#008}h1{font:bold 2.2em "Comic Sans MS","Comic Sans",cursive;color:#f0f;text-shadow:3px 3px #00f;margin:0.2em 0}h2{font:bold 1.3em Impact,"Arial Black",sans-serif;color:#0ff;letter-spacing:1px;border-bottom:3px ridge #f0f;margin:1em 0 0.4em}table.frame{width:100%;max-width:62em;margin:0 auto;border:4px outset #c0c0c0;background:#000080;border-collapse:separate;border-spacing:0}td.main{padding:10px}marquee{display:block;background:#f00;color:#ff0;font:bold 1.1em Arial,Helvetica,sans-serif;padding:4px;border:3px double #ff0;max-width:62em;margin:0 auto 8px}nav{font:bold 1em Arial,Helvetica,sans-serif;color:#fff}nav a{margin:0 0.3em}img.divider{display:block;width:100%;height:6px;margin:8px 0}ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}ol li{color:#c0c0c0}p{color:#fff}input{font:1em "Courier New",Courier,monospace;width:100%;padding:0.3em;box-sizing:border-box;background:#c0c0c0;border:2px inset #808080;color:#000}#hits{list-style:none;padding:0}form.search{display:flex;gap:8px;align-items:center}.blink{animation:blink 1s steps(1) infinite}@keyframes blink{50%{opacity:0}}.center{text-align:center}.badges img{margin:3px;border:1px solid #fff}.counter{font:bold 1em "Courier New",Courier,monospace;color:#ff0}.counter img{vertical-align:middle;border:2px inset #808080}.site{font:bold 2.6em "Comic Sans MS","Comic Sans",cursive;color:#ff0;text-align:center;text-shadow:4px 4px #f00;margin:0 0 0.3em}.site a:link,.site a:visited{color:#ff0;text-decoration:none}@media(prefers-color-scheme:dark){body{background-color:#000}}</style>
 </head>
 <body>
-<nav><a href="index.html">Index</a><a href="all.html">All topics</a></nav>
+<marquee>*** WELCOME TO THE SGUG DISCORD WIKI *** BEST VIEWED IN NETSCAPE NAVIGATOR 3.0 AT 800X600 *** THIS SITE IS UNDER CONSTRUCTION *** SIGN THE GUESTBOOK ***</marquee>
+<table class="frame"><tr><td class="main">
+<p class="site"><a href="index.html">SGUG Discord Wiki</a></p>
+<nav>[ <a href="index.html">Index</a> | <a href="all.html">All topics</a> | <a href="https://github.com/unxmaal/infovore/issues">Guestbook</a> ] <img src="new.gif" width="32" height="16" alt="New"></nav>
+<img class="divider" src="divider.gif" alt="">
 <h1>tardist</h1>
 <p>Claims: 54</p>
 <p>A tardist is a tar archive packaged inside the IRIX `inst` format, and its file structure typically includes license, install, readme, remove, and sw files. <sup><a href="#s1">1</a></sup><sup><a href="#s2">2</a></sup> Tardist files can be created using tools such as EPM, irixports with EPM (with spec.py handling package specifications), nekoware, and tgcware scripts, and can contain selectable install sections for the main install, manpages, dev libraries, and source. <sup><a href="#s3">3</a></sup><sup><a href="#s4">4</a></sup><sup><a href="#s5">5</a></sup><sup><a href="#s6">6</a></sup> Tardist packages built with DIDBS GCC work on other IRIX machines, and tardist files can be installed on IRIX by following specific installation steps. <sup><a href="#s7">7</a></sup><sup><a href="#s8">8</a></sup> The `inst` command requires a tardist file to be untarred into a folder before opening it, and it can fail after creating 26 temporary directories when installing multiple tardist packages, a problem resolved by extracting files manually. <sup><a href="#s9">9</a></sup><sup><a href="#s10">10</a></sup> The software manager on IRIX has trouble reading tardist files, and the swmgr tool cannot open certain tardist files, reporting them as 'bad'. <sup><a href="#s11">11</a></sup><sup><a href="#s12">12</a></sup> The swmgr tool can download .tardist files over the web to /tmp, and gunzip is needed to decompress .tardist files on IRIX 5.3. <sup><a href="#s13">13</a></sup><sup><a href="#s14">14</a></sup> Tardist files can contain source code and patch files, though their inclusion was arbitrary among developers, and better nekoware packages included source and patches as optional installs. <sup><a href="#s15">15</a></sup><sup><a href="#s16">16</a></sup></p>
@@ -46,5 +50,11 @@
 </li>
 <li>Other: <a href="readme.html">README</a>, <a href="fw-hexedit.html">fw_hexedit</a>, <a href="gunzip.html">gunzip</a>, <a href="man-page.html">man page</a>, <a href="source-code.html">source code</a>, <a href="tarball.html">tarball</a>
 </li></ul>
+<img class="divider" src="divider.gif" alt="">
+<p class="center"><img src="construction.gif" width="160" height="40" alt="Under construction"></p>
+<p class="center badges"><img src="badge-netscape.gif" width="88" height="31" alt="NETSCAPE NOW!"><img src="badge-yahoo.gif" width="88" height="31" alt="YAHOO! LISTED"><img src="badge-vi.gif" width="88" height="31" alt="MADE WITH VI"><img src="badge-irix.gif" width="88" height="31" alt="GET IRIX 6.5"><img src="badge-html.gif" width="88" height="31" alt="VALID HTML 3.2"><img src="badge-800x600.gif" width="88" height="31" alt="800X600 OR BUST"></p>
+<p class="center counter">Claims served: <img src="counter.gif" alt="counter"></p>
+<p class="center"><span class="blink">Best viewed at 800x600.</span> Sign my <a href="https://github.com/unxmaal/infovore/issues">guestbook</a>. No frames, no Java, no cookies.</p>
+</td></tr></table>
 </body>
 </html>
