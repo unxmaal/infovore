@@ -20,8 +20,9 @@ from infovore.wiki.canon import (
     spelling_counts,
     summarise_merge,
 )
+from infovore.wiki.corrections import Correction, load_corrections
 from infovore.wiki.eligibility import REJECTED_REVIEWS, UNCHECKED, is_publishable
-from infovore.wiki.html import write_html
+from infovore.wiki.html import REPO, write_html
 from infovore.wiki.kinds import KINDS, LABELS, parents
 from infovore.wiki.scrub import scrub
 from infovore.wiki.topics import Topics, disambiguations, load_topics, slug, topic_redirects
@@ -35,6 +36,7 @@ GENERAL: Final = "General"
 UNSORTED: Final = "Unsorted"
 INDEX: Final = "index"
 ALL: Final = "all"
+FIX: Final = "fix"
 KIND_PREFIX: Final = "kind-"
 INDEX_MIN: Final = 10
 PART_SEPARATOR: Final = "#"
@@ -96,6 +98,7 @@ def subjects(topics: Topics, statement: str) -> frozenset[str]:
 @dataclass(frozen=True)
 class Excluded:
     by_reason: dict[str, int]
+    unmatched: tuple[Correction, ...] = ()
 
     @property
     def total(self) -> int:
@@ -114,8 +117,11 @@ def load_claims(
     tag_runs: Sequence[int] | None = None,
     verdicts: frozenset[str] | None = None,
     background: float | None = None,
+    corrections: Mapping[tuple[int, str], Correction] | None = None,
 ) -> tuple[list[WikiClaim], Excluded]:
     topics = load_topics()
+    fixes = load_corrections() if corrections is None else corrections
+    matched: set[tuple[int, str]] = set()
     lexicon = load_lexicon(conn) if tech_only else None
     dropped = dropped_pairs(conn, salt)
     rows = conn.execute(
@@ -140,6 +146,12 @@ def load_claims(
         else:
             reason = None
         statement = scrub(_line(row["statement"]))
+        if fix := fixes.get((row["exchange_id"], statement)):
+            matched.add(fix.key)
+            if fix.replace is None:
+                reason = reason or "corrected"
+            else:
+                statement = fix.replace
         if reason is None and lexicon and not claim_has_tech(lexicon, topics, statement):
             reason = "no_tech"
         if reason is not None:
@@ -163,7 +175,8 @@ def load_claims(
         loaded = _tagged(conn, loaded, tag_runs, topics)
     if background is not None:
         loaded = _with_novelty(conn, loaded)
-    return loaded, Excluded(excluded)
+    unmatched = tuple(f for k, f in sorted(fixes.items()) if k not in matched)
+    return loaded, Excluded(excluded, unmatched)
 
 
 def _with_novelty(conn: sqlite3.Connection, claims: list[WikiClaim]) -> list[WikiClaim]:
@@ -288,7 +301,7 @@ def sections_of(
 
 
 def page_files(names: Iterable[str], weights: Mapping[str, int] | None = None) -> dict[str, str]:
-    taken = {INDEX, ALL, *(f"{KIND_PREFIX}{k}" for k in KINDS)}
+    taken = {INDEX, ALL, FIX, *(f"{KIND_PREFIX}{k}" for k in KINDS)}
     out: dict[str, str] = {}
     for name in sorted(names, key=lambda n: (-(weights or {}).get(n, 0), n)):
         base = slug(name) or f"topic-{hashlib.sha1(name.encode()).hexdigest()[:8]}"
@@ -422,6 +435,64 @@ def render_all(pages: Mapping[str, int], files: Mapping[str, str]) -> str:
     return _az("All topics", f"{_pages(len(pages))}. [Index]({INDEX}.md)", pages, files)
 
 
+FIX_PAGE: Final = f"""# Fix a mistake
+
+Every page here is generated from the SGUG Discord archive. Nobody edits the pages by hand, and a
+hand edit would vanish at the next build. Fixes go into the generator, [infovore on GitHub]({REPO}),
+as a pull request, and reach the site with the next build.
+
+If you would rather not open a pull request, [open an issue]({REPO}/issues) naming the page and
+quoting the text. Someone else will do the rest.
+
+## A claim is wrong
+
+Find the claim under Sources at the bottom of its page. Note the exchange number and the statement,
+exactly as printed. Add an entry to
+[corrections.toml]({REPO}/blob/main/infovore/wiki/corrections.toml):
+
+    [[claim]]
+    exchange = 1956
+    statement = "The Octane is more expandable than the O2."
+    drop = true
+
+To reword the claim instead of removing it, put a replace line in place of the drop line:
+
+    replace = "The Octane has more expansion slots than the O2."
+
+A dropped claim and every sentence that relied on it leave the page at the next build. A replaced
+claim shows its new wording under Sources at once, and the prose above it catches up on the next
+article run.
+
+## A topic has the wrong kind, the wrong name, or two spellings
+
+Topics live in [topics.toml]({REPO}/blob/main/infovore/wiki/topics.toml). An entry names the topic
+and its kind: machine, cpu, graphics, os, software, part, standard, company or other. The redirects
+list holds spellings that should land on this page. The aliases list holds words that mean this
+topic when they appear in a claim.
+
+    [[topic]]
+    name = "Indigo2"
+    kind = "machine"
+    aliases = ["indigo2", "indigo 2"]
+    redirects = ["I2"]
+
+A name that means several things gets a disambiguation entry listing its candidates:
+
+    [[disambiguation]]
+    name = "Ultra"
+    candidates = ["Ultra 5", "Ultra64", "SCSI"]
+
+## Anything else
+
+A page that should not exist, a section that reads wrong, a broken link: [open an
+issue]({REPO}/issues). Who said what is pseudonymous by design and cannot be changed.
+"""
+
+
+def render_fix() -> str:
+    return FIX_PAGE
+
+
 def render_kind(kind: str, pages: Mapping[str, int], files: Mapping[str, str]) -> str:
     intro = f"{_pages(len(pages))}, {_count(pages)} claims. [Index]({INDEX}.md)"
     return _az(LABELS[kind], intro, pages, files)
@@ -537,7 +608,7 @@ def build_site(
     kids: dict[str, dict[str, int]] = {}
     for child, p in parent.items():
         kids.setdefault(p, {})[child] = sizes[child]
-    files = {f"{INDEX}.md": render_index(sizes, names, nav)}
+    files = {f"{INDEX}.md": render_index(sizes, names, nav), f"{FIX}.md": render_fix()}
     if nav is not None:
         files[f"{ALL}.md"] = render_all(pages, names)
         for kind, members in _by_kind(pages, nav.kinds).items():

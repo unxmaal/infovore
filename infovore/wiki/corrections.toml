@@ -1,0 +1,8 @@
+# Claim corrections, applied at build time. See the site's "Fix a mistake" page.
+# An entry matches a claim by its exchange number and its statement exactly as printed
+# under Sources, and either drops it (drop = true) or rewords it (replace = "...").
+#
+# [[claim]]
+# exchange = 1956
+# statement = "The Octane is more expandable than the O2."
+# drop = true

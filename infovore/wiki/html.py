@@ -13,8 +13,11 @@ _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 _CITE = re.compile(r"\[(\d+)\]")
 _BULLET = re.compile(r"^( *)- (.*)$")
 _NUMBERED = re.compile(r"^(\d+)\. (.*)$")
+_CODE = re.compile(r"^    (.*)$")
 SITE: Final = "SGUG Discord Wiki"
-GUESTBOOK: Final = "https://github.com/unxmaal/infovore/issues"
+REPO: Final = "https://github.com/unxmaal/infovore"
+GUESTBOOK: Final = f"{REPO}/issues"
+FIX_PAGE: Final = "fix.html"
 STYLE: Final = (
     'body{background:#000 url(bg.gif);color:#0f0;font:16px/1.4 "Times New Roman",Times,serif;'
     "margin:0;padding:8px}"
@@ -31,6 +34,8 @@ STYLE: Final = (
     "img.divider{display:block;width:100%;height:6px;margin:8px 0}"
     "ul{padding-left:1.5em}li{margin:0.2em 0}sup a{text-decoration:none}"
     "ol li{color:#c0c0c0}p{color:#fff}"
+    'pre{background:#000;color:#ff0;border:1px dashed #0f0;padding:6px;font:0.9em "Courier New",'
+    "Courier,monospace;overflow-x:auto}"
     'input{font:1em "Courier New",Courier,monospace;width:100%;padding:0.3em;'
     "box-sizing:border-box;background:#c0c0c0;border:2px inset #808080;color:#000}"
     "#hits{list-style:none;padding:0}form.search{display:flex;gap:8px;align-items:center}"
@@ -98,15 +103,23 @@ def body(markdown: str) -> str:
     out: list[str] = []
     stack: list[str] = []
     paragraph: list[str] = []
+    code: list[str] = []
     numbered = False
 
     def flush() -> None:
         if paragraph:
             out.append("<p>" + inline(" ".join(paragraph)) + "</p>")
             paragraph.clear()
+        if code:
+            out.append("<pre>" + html.escape("\n".join(code), quote=False) + "</pre>")
+            code.clear()
 
     for line in markdown.splitlines():
-        if m := _BULLET.match(line):
+        if (m := _CODE.match(line)) and not stack:
+            if paragraph:
+                flush()
+            code.append(m.group(1))
+        elif m := _BULLET.match(line):
             flush()
             depth = len(m.group(1)) // 2 + 1
             if depth > len(stack):
@@ -164,7 +177,7 @@ def page(markdown: str, search: Sequence[Mapping[str, str | int]] | None = None)
         '<table class="frame"><tr><td class="main">\n'
         f'<p class="site"><a href="index.html">{SITE}</a></p>\n'
         '<nav>[ <a href="index.html">Index</a> | <a href="all.html">All topics</a> |'
-        f' <a href="{GUESTBOOK}">Guestbook</a> ]'
+        f' <a href="{FIX_PAGE}">Fix a mistake</a> | <a href="{GUESTBOOK}">Guestbook</a> ]'
         ' <img src="new.gif" width="32" height="16" alt="New"></nav>\n'
         '<img class="divider" src="divider.gif" alt="">\n'
         + (search_box if search is not None else "")
@@ -175,6 +188,7 @@ def page(markdown: str, search: Sequence[Mapping[str, str | int]] | None = None)
         + f'<p class="center badges">{badges}</p>\n'
         + '<p class="center counter">Claims served: <img src="counter.gif" alt="counter"></p>\n'
         + '<p class="center"><span class="blink">Best viewed at 800x600.</span>'
+        f' Spotted a mistake? <a href="{FIX_PAGE}">Fix it</a>.'
         f' Sign my <a href="{GUESTBOOK}">guestbook</a>. No frames, no Java, no cookies.</p>\n'
         "</td></tr></table>\n"
         + (f"<script>var ITEMS = {items};{SCRIPT}</script>\n" if search is not None else "")

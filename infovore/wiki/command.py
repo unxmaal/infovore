@@ -168,6 +168,8 @@ class WikiCommand:
         ]
         redirects = redirect_names(context.conn, [args.tag_run]) if args.tag_run else {}
         lines.append(f"redirects: {len(redirects)}")
+        lines.append(f"corrections unmatched: {len(excluded.unmatched)}")
+        lines += [f"  exchange {f.exchange}: {f.statement}" for f in excluded.unmatched]
         if args.wiki_action == "build":
             nav = Navigation(kinds, redirects, disambiguations(), args.index_min)
             build_site(

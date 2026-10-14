@@ -53,6 +53,10 @@ def test_body_renders_headings_paragraphs_nested_bullets_and_numbered_sources() 
         "</ol>\n"
     )
     assert body("") == "\n" and body("plain") == "<p>plain</p>\n"
+    assert body('Add this:\n    [[claim]]\n    x = "<b>"\n\nText\n    more\n## H\n') == (
+        '<p>Add this:</p>\n<pre>[[claim]]\nx = "&lt;b&gt;"</pre>\n<p>Text</p>\n'
+        '<pre>more</pre>\n<h2 id="h">H</h2>\n'
+    )
 
 
 def test_page_wraps_body_with_title_nav_and_optional_search() -> None:
@@ -63,6 +67,8 @@ def test_page_wraps_body_with_title_nav_and_optional_search() -> None:
     )
     assert '<p class="site"><a href="index.html">SGUG Discord Wiki</a></p>' in text
     assert '<a href="index.html">Index</a>' in text and "<script>" not in text
+    assert '| <a href="fix.html">Fix a mistake</a> |' in text
+    assert 'Spotted a mistake? <a href="fix.html">Fix it</a>.' in text
     index = page("# Index\n", [{"t": "A</script>", "f": "a.html", "n": 1}])
     assert '<input id="q"' in index and '<script>var ITEMS = [{"t": "A<\\/script>"' in index
     assert 'src="spinner.gif"' in index and 'src="spinner.gif"' not in text
@@ -76,7 +82,7 @@ def test_build_site_writes_html_and_search_index(tmp_path: Path) -> None:
     nav = Navigation(kinds={"O2": "machine"}, redirects={"O2s": "O2"}, index_min=1)
     written = build_site(claims, 1, tmp_path, nav=nav, html=True)
     assert "index.html" in written and "o2s.html" in written and SEARCH in written
-    assert len(written) == 2 * 11 + 1 + 12
+    assert len(written) == 2 * 12 + 1 + 12
     assert "kind-machine.html" in written and "counter.gif" in written
     assert (tmp_path / "bg.gif").read_bytes().startswith(b"GIF89a")
     assert (tmp_path / "o2s.html").read_text().count('<a href="o2.html">O2</a>') == 1
