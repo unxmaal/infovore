@@ -152,6 +152,10 @@ Measurement history and results are kept in the mcm-engine knowledge base, not i
 
 Members opt out by holding the role named by `INFOVORE_OPT_OUT_ROLE` (default `no-archive`). The bot needs the Message Content and Server Members intents. `infovore sync-optouts` syncs the role and redacts the history of newly opted-out users. Redaction happens before storage in ingest, so a re-run never un-redacts anything. `INFOVORE_EXCLUDE_CHANNELS` keeps whole channels out of the archive and out of every sampler. Share archives only through `export-archive`.
 
+## Fixing a mistake on the site
+
+Every built site carries a `fix.md`/`fix.html` page, linked from the nav and footer of every page, that tells readers how to fix what they see. Two files take the fixes, both by pull request: `infovore/wiki/corrections.toml` for claims (an entry matches an exchange number plus the statement exactly as printed under Sources, and either `drop = true` or `replace = "..."`; `load_claims` applies it after scrubbing, dropped claims count as `corrected` under excluded, and `build`/`stats` print `corrections unmatched: N` with each entry that matched nothing), and `infovore/wiki/topics.toml` for kinds, aliases, redirects and disambiguations. A drop removes the dependent prose at the next build because pages keep only sentences whose cited claims are present; a replace shows under Sources at once and the prose catches up on the next article run.
+
 ## Deployment
 
 Nothing host-specific lives in code. `infovore` is one console-script package (`uv tool install .`) and one container image from the `Dockerfile`; `/data` holds `INFOVORE_DB_PATH` and `INFOVORE_SCRATCH_DIR`. Never place the database on EFS, FSx or any network filesystem.

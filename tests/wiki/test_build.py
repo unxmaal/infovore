@@ -24,6 +24,7 @@ from infovore.wiki.build import (
     render_redirect,
     sections_of,
 )
+from infovore.wiki.corrections import load_corrections
 from infovore.wiki.eligibility import SUPPORTED
 from tests.claims.seed import NOW
 from tests.wiki.seed import add_claim, add_exchange, wiki_db
@@ -115,6 +116,29 @@ def test_load_claims_verdict_policy_excludes_unsupported_and_unchecked(tmp_path:
     )
 
 
+def test_load_claims_applies_corrections_and_reports_unmatched(tmp_path: Path) -> None:
+    conn = wiki_db(tmp_path)
+    e1 = add_exchange(conn, 1, "2026-02-01")
+    add_claim(conn, e1, "user-aaaa", "The O2 is   quiet.")
+    add_claim(conn, e1, "user-bbbb", "The O2 is loud.")
+    add_claim(conn, e1, "user-cccc", "The O2 has 1GB.", review="wrong")
+    fixes = load_corrections(
+        '[[claim]]\nexchange = 1\nstatement = "The O2 is loud."\ndrop = true\n'
+        '[[claim]]\nexchange = 1\nstatement = "The O2 has 1GB."\ndrop = true\n'
+        '[[claim]]\nexchange = 1\nstatement = "The O2 is quiet."\nreplace = "The O2 is silent."\n'
+        '[[claim]]\nexchange = 2\nstatement = "Nothing."\ndrop = true\n'
+        '[[claim]]\nexchange = 1\nstatement = "The O2 is cheap."\nreplace = "x"\n'
+    )
+    claims, excluded = load_claims(conn, corrections=fixes)
+    assert [(c.speaker, c.statement) for c in claims] == [("user-aaaa", "The O2 is silent.")]
+    assert excluded.by_reason == {"corrected": 1, "review": 1}
+    assert [(f.exchange, f.statement) for f in excluded.unmatched] == [
+        (1, "The O2 is cheap."),
+        (2, "Nothing."),
+    ]
+    assert load_claims(conn)[1].unmatched == ()
+
+
 def test_load_claims_collapses_duplicates_across_runs(tmp_path: Path) -> None:
     conn = wiki_db(tmp_path)
     e1 = add_exchange(conn, 1, "2026-02-01")
@@ -170,8 +194,9 @@ def test_stats_distribution_covers_every_bucket() -> None:
 def test_build_site_writes_pages_and_index_deterministically(tmp_path: Path) -> None:
     out = tmp_path / "wiki"
     written = build_site(CLAIMS, 2, out)
-    assert written == ["index.md", "o2.md", "r12000.md"]
+    assert written == ["fix.md", "index.md", "o2.md", "r12000.md"]
     assert sorted(p.name for p in out.iterdir()) == written
+    assert (out / "fix.md").read_text().startswith("# Fix a mistake\n")
     first = {p.name: p.read_text() for p in out.iterdir()}
     build_site(list(reversed(CLAIMS)), 2, out)
     assert {p.name: p.read_text() for p in out.iterdir()} == first
@@ -249,14 +274,15 @@ def test_render_page_concatenates_section_parts() -> None:
 
 def test_page_files_are_unique_and_never_empty_or_index() -> None:
     files = page_files(
-        ["O2", "O2机器", "C", "C++", "电源供应", "Index", "o2-2"],
+        ["O2", "O2机器", "C", "C++", "电源供应", "Index", "o2-2", "Fix"],
         {"O2": 100, "O2机器": 4, "C": 5, "C++": 9, "电源供应": 3, "Index": 1, "o2-2": 50},
     )
+    assert files["Fix"] == "fix-2.md"
     assert files["O2"] == "o2.md" and files["o2-2"] == "o2-2.md" and files["O2机器"] == "o2-3.md"
     assert files["C++"] == "c.md" and files["C"] == "c-2.md"
     assert files["Index"] == "index-2.md"
     assert re.fullmatch(r"topic-[0-9a-f]{8}\.md", files["电源供应"])
-    assert len(set(files.values())) == 7
+    assert len(set(files.values())) == 8
     assert page_files(["b", "a"]) == {"a": "a.md", "b": "b.md"}
 
 
@@ -408,6 +434,7 @@ def test_build_site_writes_redirects_disambiguation_and_all_pages(tmp_path: Path
         "all.md",
         "fiber-channel.md",
         "fibre-channel.md",
+        "fix.md",
         "index.md",
         "irix-6-5.md",
         "irix.md",
