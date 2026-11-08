@@ -53,7 +53,7 @@ gate and human reviews, not on the claim check.
   migrations (next is 0031). Never migrate the live DB from tests.
 - LLM calls go through the gateway (:4000) with `infovore.llm.gateway_key.headers()`,
   `json_schema` strict response format (only eval-* aliases enforce it),
-  temperature 0, under `lockf -k ~/localharness/queue/generation.lock`.
+  temperature 0, under SoHoT's `with-gpu-lock`, which the GPU steps take themselves (#375).
 - Reuse `infovore.claims.extract` patterns: `Transport`, `http_post`,
   `fetch_model_id`, `extract_concurrently`-style pool, stop on signals.
 - Reuse `infovore.claims.value.tokens` for token sets.

@@ -10,3 +10,4 @@ def _no_real_gateway_key(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
     monkeypatch.delenv("SOHOT_GATEWAY_KEY", raising=False)
     monkeypatch.setenv("SOHOT_GATEWAY_STORE", "file")
     monkeypatch.setenv("LOCALHARNESS_HOME", str(tmp_path / "no-localharness"))
+    monkeypatch.setenv("LH_GPU_LOCK_HELD", "1")

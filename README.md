@@ -81,6 +81,7 @@ Settings come from the environment, or a `.env` file in the working directory. M
 | `INFOVORE_PSEUDONYM_SALT` | unset | secret salt for the per-user pseudonyms `claims extract` shows the model; keep it stable and never commit it |
 | `INFOVORE_WORKERS` | CPU count | worker processes |
 | `INFOVORE_GATEWAY_API_KEY`, `SOHOT_GATEWAY_KEY` | SoHoT store | key for the LiteLLM gateway that `claims extract` and `relevance llm-score` call; unset, infovore reads SoHoT's store (macOS Keychain service `localharness-gateway`, else `$LOCALHARNESS_HOME/gateway.key`). On the serving machine `soh gateway key` prints it |
+| `LOCALHARNESS_HOME` | `~/localharness` | SoHoT's home. GPU steps (`claims extract` and `novelty`, `relevance cascade`, `compare`, `embed-score` and `llm-score`, `wiki tag --write`, `wiki write --write`, any `--grouping embed`) take the Studio's GPU through `$LOCALHARNESS_HOME/deploy/scripts/with-gpu-lock`, waiting while SoHoT holds it, and refuse to start when it is missing. Do not wrap them in `lockf` |
 | `INFOVORE_<STAGE>_BACKEND`, `_MODEL`, `_CONCURRENCY`, `_TIMEOUT` | `claude_cli`, per stage, `2`, `60` | LLM backend per stage (`EXTRACT`, `PROBE`, `JUDGE`); other `INFOVORE_<STAGE>_*` keys, such as `BASE_URL` and `API_KEY` for `openai_compat`, pass through as backend options |
 
 `INFOVORE_TRIAGE_MIN_P_LORE` was removed and is rejected at startup.
@@ -95,7 +96,7 @@ Run as `uv run infovore <command>` from a checkout, or `infovore <command>` once
 - `infovore chunk [--rechunk] [--recipe N] [--dry-run] [--measure] [--gap M] [--adaptive] [--fold F] [--channels LIST]`: group messages into closed exchanges; `--measure` reports without writing.
 - `infovore run [--interval S] [--once]`: live ingest plus a periodic chunk, triage and cascade loop, with no LLM, until SIGTERM or SIGINT.
 - `infovore sync-optouts`: sync the opt-out role and redact newly opted-out users' history.
-- `infovore doctor [--deep] [--gateway URL]`: read-only PASS/WARN/FAIL health check of `~/.infovore.env`, the database (never created or migrated), the uv environment, GPU lock, model gateway and host facts; exits 1 on any FAIL.
+- `infovore doctor [--deep] [--gateway URL]`: read-only PASS/WARN/FAIL health check of `~/.infovore.env`, the database (never created or migrated), the uv environment, SoHoT's `with-gpu-lock`, model gateway and host facts; exits 1 on any FAIL.
 - `infovore snapshot DEST [--force]`: consistent copy of the database through the SQLite backup API.
 - `infovore export-archive DEST [--force]`: shareable SQLite file of archived exchanges.
 - `infovore slice freeze | show`: freeze the evaluation slices once; show exchanges and messages per size bucket.
