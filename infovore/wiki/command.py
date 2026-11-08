@@ -69,6 +69,11 @@ class WikiCommand:
     name = "wiki"
     help = "static Markdown wiki from publishable claims: build pages, print stats"
 
+    def gpu(self, args: argparse.Namespace) -> bool:
+        if args.wiki_action in ("tag", "write") and args.write:
+            return True
+        return bool(getattr(args, "grouping", None) == "embed")
+
     def configure(self, parser: argparse.ArgumentParser) -> None:
         sub = parser.add_subparsers(
             dest="wiki_action", required=True, parser_class=argparse.ArgumentParser

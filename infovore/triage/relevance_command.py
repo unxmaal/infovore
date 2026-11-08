@@ -78,6 +78,13 @@ class RelevanceCommand:
     name = "relevance"
     help = "relevance cascade: lexicon, then embedding scorer, then residue (#209)"
 
+    def gpu(self, args: argparse.Namespace) -> bool:
+        if args.relevance_action == "cascade":
+            return args.explain is None
+        if args.relevance_action == "llm-score":
+            return not args.dry_run
+        return args.relevance_action in ("compare", "embed-score")
+
     def configure(self, parser: argparse.ArgumentParser) -> None:
         sub = parser.add_subparsers(
             dest="relevance_action", required=True, parser_class=argparse.ArgumentParser

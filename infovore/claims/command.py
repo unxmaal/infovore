@@ -422,6 +422,11 @@ class ClaimsCommand:
     name = "claims"
     help = "claim extraction trial: extract with a local model, review, report"
 
+    def gpu(self, args: argparse.Namespace) -> bool:
+        if args.claims_action == "extract":
+            return not args.dry_run
+        return bool(args.claims_action == "novelty")
+
     def configure(self, parser: argparse.ArgumentParser) -> None:
         sub = parser.add_subparsers(
             dest="claims_action", required=True, parser_class=argparse.ArgumentParser

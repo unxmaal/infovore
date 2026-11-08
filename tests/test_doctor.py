@@ -63,17 +63,18 @@ def seeded_db(path: Path, empty: Sequence[str] = ()) -> None:
 def host(tmp_path: Path, env: dict[str, str] | None = None, **kwargs: object) -> Host:
     home = tmp_path / "home"
     home.mkdir(exist_ok=True)
+    wrapper = home / "localharness" / "deploy" / "scripts" / "with-gpu-lock"
+    wrapper.parent.mkdir(parents=True, exist_ok=True)
+    wrapper.write_text("")
+    wrapper.chmod(0o755)
     merged = dict(GOOD_ENV)
     merged["INFOVORE_DB_PATH"] = str(tmp_path / "x.db")
     merged.update(env or {})
-    lockf = tmp_path / "lockf"
-    lockf.write_text("")
     defaults: dict[str, object] = {
         "run": fake_run(),
         "hostname": lambda: "Terminus.local",
         "free_bytes": lambda path: 900 * 1024**3,
         "has_module": lambda name: True,
-        "lockf": lockf,
         "project_root": tmp_path,
     }
     defaults.update(kwargs)
@@ -221,20 +222,6 @@ def test_python_sync_check_unavailable(tmp_path: Path) -> None:
 
     results = by_name(doctor.check_python(host(tmp_path, run=run)))
     assert results["py.lock"].status is Status.FAIL
-
-
-def test_gpu_lock_present_and_absent(tmp_path: Path) -> None:
-    h = host(tmp_path)
-    lock = h.home / "localharness" / "queue" / "generation.lock"
-    assert by_name(doctor.check_gpu_lock(h))["gpu.lock"].status is Status.WARN
-    lock.parent.mkdir(parents=True)
-    lock.write_text("")
-    assert {r.status for r in doctor.check_gpu_lock(h)} == {Status.PASS}
-
-
-def test_gpu_lockf_missing(tmp_path: Path) -> None:
-    h = host(tmp_path, lockf=tmp_path / "nope")
-    assert by_name(doctor.check_gpu_lock(h))["gpu.lockf"].status is Status.FAIL
 
 
 def test_gateway_variants(tmp_path: Path) -> None:

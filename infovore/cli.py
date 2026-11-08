@@ -12,6 +12,7 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Any, NoReturn, Protocol, TextIO
 
+from infovore import gpu_lock
 from infovore.config import (
     ConfigError,
     Settings,
@@ -262,6 +263,11 @@ class SnapshotCommand:
         return ExitCode.OK
 
 
+def uses_gpu(command: Command, args: argparse.Namespace) -> bool:
+    gpu = getattr(command, "gpu", None)
+    return bool(gpu(args)) if gpu is not None else False
+
+
 def builtin_commands() -> list[Command]:
     from infovore.chunk.command import ChunkCommand
     from infovore.claims.command import ClaimsCommand
@@ -374,7 +380,8 @@ def main(
             stdout,
             source_factory if source_factory is not None else default_source_factory,
         )
-        return asyncio.run(command.run(context, args))
+        with gpu_lock.take() if uses_gpu(command, args) else contextlib.nullcontext():
+            return asyncio.run(command.run(context, args))
     except ConfigError as error:
         stderr.write(f"configuration error: {error}\n")
         return ExitCode.CONFIG

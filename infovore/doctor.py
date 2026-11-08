@@ -1,6 +1,7 @@
 import argparse
 import importlib.util
 import json
+import os
 import shutil
 import socket
 import sqlite3
@@ -14,14 +15,13 @@ from typing import TextIO
 
 from infovore.config import read_dotenv
 from infovore.db.connection import load_migrations
+from infovore.gpu_lock import wrapper_path
 
 ENV_FILE = ".infovore.env"
 REQUIRED_VARS = ("INFOVORE_DB_PATH", "INFOVORE_PSEUDONYM_SALT")
 RETIRED_VARS = ("INFOVORE_TRIAGE_MIN_P_LORE",)
 COUNTED_TABLES = ("current_exchanges", "annotations", "claims_v2")
 GATEWAY_MODEL = "eval-7b"
-LOCKF = Path("/usr/bin/lockf")
-LOCK_PATH = Path("localharness/queue/generation.lock")
 MIN_FREE_GIB = 50
 GIB = 1024**3
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -72,7 +72,6 @@ class Host:
     hostname: Callable[[], str] = socket.gethostname
     free_bytes: Callable[[Path], int] = free_bytes
     has_module: Callable[[str], bool] = has_module
-    lockf: Path = LOCKF
     project_root: Path = PROJECT_ROOT
 
 
@@ -212,20 +211,11 @@ def check_python(host: Host) -> list[Check]:
 
 
 def check_gpu_lock(host: Host) -> list[Check]:
-    if host.lockf.exists():
-        results = [Check(Status.PASS, "gpu.lockf", f"{host.lockf} exists")]
-    else:
-        results = [
-            Check(Status.FAIL, "gpu.lockf", f"{host.lockf} missing", "lockf ships with macOS")
-        ]
-    lock = host.home / LOCK_PATH
-    if lock.exists():
-        results.append(Check(Status.PASS, "gpu.lock", f"{lock} exists"))
-    else:
-        results.append(
-            Check(Status.WARN, "gpu.lock", f"{lock} missing", "localharness not yet installed")
-        )
-    return results
+    wrapper = wrapper_path(host.environ, host.home)
+    if os.access(wrapper, os.X_OK):
+        return [Check(Status.PASS, "gpu.lock", f"{wrapper} is executable")]
+    hint = f"check out SoHoT's deploy at {wrapper.parents[1]} or set LOCALHARNESS_HOME"
+    return [Check(Status.FAIL, "gpu.lock", f"{wrapper} missing", hint)]
 
 
 def check_gateway(host: Host, url: str) -> Check:
